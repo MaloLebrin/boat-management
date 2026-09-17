@@ -186,6 +186,68 @@ C'est arrivé en écrivant `ports_validation.spec.ts` : `createEnterprisePlanUse
 membership, donc pas la capability `ports.create` — il fallait `createEnterpriseAdminUser()`. Les
 deux assertions ci-dessus le détectent ; un `assertStatus(302)` seul, non.
 
+## Épingler une page Inertia (#689)
+
+### Lire les props ne prouve pas quelle page a répondu
+
+`@japa/api-client` délègue à superagent, qui suit **cinq redirections par défaut**. Un GET protégé
+qui redirige vers `/login` est donc suivi, les en-têtes `x-inertia` sont rejoués sur la destination,
+et le test reçoit un **200 Inertia parfaitement valide pour `auth/login`** :
+
+```ts
+// Sans loginAs() : 302 → /login, suivi, puis 200.
+const response = await client.get('/settings/org').withInertia()
+response.assertStatus(200) // ✅ passe
+response.inertiaProps // ✅ des props, mais celles de la page de login
+response.assertInertiaComponent('settings/org') // ❌ seule assertion qui le voit
+```
+
+C'est pour ça qu'une page se teste par son **composant**, pas seulement par ses props.
+
+### La fabrique : `assertPageContract`
+
+```ts
+import { assertPageContract } from '#tests/support/inertia_page'
+
+const response = await client.get('/boats').loginAs(user).withInertia()
+assertPageContract(assert, response, 'boats/index')
+```
+
+Elle exige un 200, épingle le composant, puis **lit le `defineProps` de `inertia/pages/boats/index.vue`
+sur le disque** et vérifie que le serveur envoie bien chaque prop requise. Le contrat vient donc de
+la page elle-même : renommer `boats` en `items` côté contrôleur casse le test sans qu'on ait touché
+au spec. Le nom de page est typé `keyof InertiaPages` — une faute de frappe ne compile pas.
+
+Deux options, chacune à justifier à l'appel :
+
+- `{ derive: false }` — n'épingle que le composant. Réservé aux pages marketing, seules à déclarer
+  leurs props via un type nommé ; leurs props sont déjà figées, plus strictement, par les snapshots
+  de `props_snapshot.spec.ts`.
+- `{ ignore: [...] }` — pour une prop que le contrôleur omet légitimement.
+
+Les props **différées** (`inertia.defer`, #463) sont lues dans `body().deferredProps` et jamais
+exigées : elles sont absentes de la réponse initiale par construction.
+
+### `assertInertiaPropsContains` ne prouve pas la présence d'une clé
+
+Elle s'appuie sur `containSubset` de chai, dont la comparaison finale est
+`actualValue === expectedValue`. Donc `{ maProp: undefined }` passe **même quand la clé est
+absente**, et `assertInertiaPropsContains({})` est une tautologie. Sur un tableau, c'est un
+`every`/`some` non ordonné et non exhaustif : `{ engines: [{ id: 3 }] }` passe contre
+`[{id:9},{id:3},{id:7}]`. Elle reste bonne pour asserter une **valeur** ; pour une présence, utiliser
+`assertPageContract` ou `Object.prototype.hasOwnProperty`.
+
+### La garde
+
+`tests/unit/hygiene/inertia_pages_covered.spec.ts` croise les `inertia.render('…')` de `app/` et les
+`renderInertia('…')` de `start/` avec les pages épinglées dans `tests/`, et échoue en listant les
+orphelines. Elle échoue aussi sur un rendu ou un épinglage **non littéral** : un nom construit à
+l'exécution échappe au scan statique et la rendrait muette. C'est pourquoi un nom de page s'écrit en
+toutes lettres au point d'appel, sans passer par une variable ni par un helper intermédiaire.
+
+Trois pages sont exemptées, chacune avec son motif dans le code : les deux pages d'erreur ne sont
+rendues qu'en production (`renderStatusPages`), et `home` est une branche morte.
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.

@@ -15,6 +15,7 @@ import { YAMAHA_REFERENCE_PATTERN } from '#shared/helpers/spare_parts'
 import type { AiChatMessage as StoredChatMessage } from '#shared/types/ai'
 import type { PartSearchContext } from '#shared/types/spare_part_chat'
 import { restoreAiService, swapAiService } from '#tests/support/fakes'
+import { assertPageContract } from '#tests/support/inertia_page'
 
 const QUESTION_RESPONSE = JSON.stringify({
   type: 'question',
@@ -139,7 +140,11 @@ test.group('Spare part AI chat (functional, #634)', (group) => {
 
     const page = await client.get(chatUrl(boat.id, engine.id)).loginAs(user).withInertia()
 
-    page.assertStatus(200)
+    // Épingle la page et son contrat de props (#689) : ce spec montait déjà
+    // tout le catalogue moteur nécessaire, dupliquer ce montage ailleurs pour
+    // la seule assertion de contrat n'aurait rien prouvé de plus.
+    assertPageContract(assert, page, 'spare_parts/chat')
+
     const props = page.inertiaProps as {
       engine: { id: number; serialNumber: string | null }
       conversation: unknown
