@@ -5,7 +5,7 @@ import {
   PartSearchMaxMessagesReachedError,
   PartSearchQuotaExhaustedError,
 } from '#exceptions/spare_part_chat_errors'
-import { QuotaExceededError } from '#exceptions/quota_errors'
+import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import PublicPartSearchService from '#services/public_part_search_service'
 import { toPublicPartSearchConversationProps } from '#transformers/spare_part_chat_transformer'
 import {
@@ -111,7 +111,7 @@ export default class PublicPartSearchController {
     } else if (error instanceof PartSearchMaxMessagesReachedError) {
       session.flash('error', i18n.t('flash.publicPartSearch.maxMessagesReached'))
     } else if (error instanceof QuotaExceededError) {
-      session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+      session.flash('error', i18n.t(quotaFlashKey(error)))
     } else if (error instanceof AiInvalidResponseError) {
       session.flash('error', i18n.t('flash.ai.diagnosisInvalidResponse'))
     } else {

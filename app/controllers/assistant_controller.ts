@@ -18,7 +18,7 @@ import {
   NavigationLogNotFoundError,
   NavigationLogValidationError,
 } from '#exceptions/navigation_log_errors'
-import { QuotaExceededError } from '#exceptions/quota_errors'
+import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import {
   ReservationBlacklistedClientError,
   ReservationConflictError,
@@ -169,10 +169,7 @@ export default class AssistantController {
 
   #flashError(error: unknown, session: HttpContext['session'], i18n: HttpContext['i18n']): void {
     if (error instanceof QuotaExceededError) {
-      session.flash(
-        'error',
-        i18n.t(error.feature === 'ai' ? 'flash.quota.aiExceeded' : 'flash.quota.aiTokensExceeded')
-      )
+      session.flash('error', i18n.t(quotaFlashKey(error)))
     } else if (error instanceof AssistantConversationNotFoundError) {
       session.flash('error', i18n.t('flash.assistant.chatNotFound'))
     } else if (error instanceof AssistantMaxMessagesReachedError) {

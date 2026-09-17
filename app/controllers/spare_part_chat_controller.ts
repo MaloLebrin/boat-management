@@ -1,5 +1,5 @@
 import { AiInvalidResponseError } from '#exceptions/ai_errors'
-import { QuotaExceededError } from '#exceptions/quota_errors'
+import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import {
   PartSearchConversationCompletedError,
   PartSearchConversationNotFoundError,
@@ -62,7 +62,7 @@ export default class SparePartChatController {
       })
     } catch (error) {
       if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiExceeded'))
+        session.flash('error', i18n.t(quotaFlashKey(error)))
         return response.redirect(`/boats/${boat.id}/engines/${engineId}/spare-parts`)
       }
       if (error instanceof BoatEquipmentNotFoundError) {
@@ -137,10 +137,7 @@ export default class SparePartChatController {
 
   #flashError(error: unknown, session: HttpContext['session'], i18n: HttpContext['i18n']): void {
     if (error instanceof QuotaExceededError) {
-      session.flash(
-        'error',
-        i18n.t(error.feature === 'ai' ? 'flash.quota.aiExceeded' : 'flash.quota.aiTokensExceeded')
-      )
+      session.flash('error', i18n.t(quotaFlashKey(error)))
     } else if (error instanceof PartSearchConversationNotFoundError) {
       session.flash('error', i18n.t('flash.spareParts.chatNotFound'))
     } else if (error instanceof PartSearchConversationCompletedError) {

@@ -3,7 +3,6 @@ import BoatHullService from '#services/boat_hull_service'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import MaintenanceLogPdfService from '#services/maintenance_log_pdf_service'
 import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { contentDisposition } from '#shared/helpers/content_disposition'
@@ -17,20 +16,12 @@ export default class MaintenanceLogPdfController {
     private quotaService: QuotaService
   ) {}
 
-  async download({ request, response, auth, params, session, i18n }: HttpContext) {
+  async download({ request, response, auth, params, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
 
-    try {
-      this.quotaService.assertCanExport(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t(`flash.quota.exportExceeded`))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanExport(user.organization)
 
     let boat
     try {

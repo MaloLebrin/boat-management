@@ -1,7 +1,6 @@
 import { SpotNotFoundError } from '#exceptions/port_errors'
 import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 import { deferJson } from '#utils/inertia_defer'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import AiAnalysisService from '#services/ai_analysis_service'
 import AuditLogService from '#services/audit_log_service'
 import BoatCatalogService from '#services/boat_catalog_service'
@@ -173,16 +172,7 @@ export default class BoatsController {
     await bouncer.with(BoatPolicy).authorize('create')
 
     await user.load('organization')
-    try {
-      await this.quotaService.assertCanAddBoat(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t(`flash.quota.${error.feature}Exceeded`))
-        session.flash('errorAction', '/settings/billing')
-        return response.redirect().back()
-      }
-      throw error
-    }
+    await this.quotaService.assertCanAddBoat(user.organization)
 
     const payload = await request.validateUsing(createBoatValidator)
 

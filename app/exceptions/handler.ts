@@ -1,7 +1,7 @@
 import app from '@adonisjs/core/services/app'
 import { type HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
-import { QuotaExceededError } from '#exceptions/quota_errors'
+import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import { errors as limiterErrors } from '@adonisjs/limiter'
 import { errors as bouncerErrors } from '@adonisjs/bouncer'
@@ -47,11 +47,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       return ctx.response.redirect().back()
     }
     if (error instanceof QuotaExceededError) {
-      const key =
-        error.feature === 'storage' && error.alreadyOverLimit
-          ? 'flash.quota.storageOverflow'
-          : `flash.quota.${error.feature}Exceeded`
-      ctx.session.flash('error', ctx.i18n.t(key))
+      ctx.session.flash('error', ctx.i18n.t(quotaFlashKey(error)))
       // Upsell (issue #418) : le toast d'erreur quota expose une action « Voir les
       // offres » vers /settings/billing plutôt qu'un simple message éphémère.
       ctx.session.flash('errorAction', '/settings/billing')

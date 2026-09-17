@@ -33,16 +33,16 @@ async function starterAdminWithBoat() {
 /**
  * Refus de quota sur un plan `starter` : message et action d'upsell.
  *
- * Caractérisation avant de retirer les `catch (QuotaExceededError)` que le
- * handler global sait déjà traiter. Le handler flashe le message **et**
- * `errorAction` vers /settings/billing (#418) ; les contrôleurs qui
- * réinterceptaient l'erreur flashaient le même message et perdaient l'action.
- * C'est cette perte que les assertions `assertFlashMissing` figent ici.
+ * Un seul endroit décide désormais des deux — la branche `QuotaExceededError`
+ * du handler global. Les contrôleurs qui réinterceptaient l'erreur rendaient
+ * le même message mais perdaient `errorAction` vers /settings/billing (#418) :
+ * ces cinq routes proposaient donc un refus sans porte de sortie. Le premier
+ * commit de cette PR fige cet état, celui-ci le corrige.
  */
 test.group('Refus de quota — message et upsell (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
-  test("POST /ai/chat refuse l'IA sans proposer les offres", async ({ client }) => {
+  test("POST /ai/chat refuse l'IA en proposant les offres", async ({ client }) => {
     const user = await starterAdmin()
 
     const response = await client
@@ -53,10 +53,10 @@ test.group('Refus de quota — message et upsell (functional)', (group) => {
 
     response.assertStatus(302)
     response.assertFlashMessage('error', AI_EXCEEDED)
-    response.assertFlashMissing('errorAction')
+    response.assertFlashMessage('errorAction', '/settings/billing')
   })
 
-  test("l'export CSV refuse sans proposer les offres", async ({ client }) => {
+  test("l'export CSV refuse en proposant les offres", async ({ client }) => {
     const { user, boat } = await starterAdminWithBoat()
 
     const response = await client
@@ -66,10 +66,10 @@ test.group('Refus de quota — message et upsell (functional)', (group) => {
 
     response.assertStatus(302)
     response.assertFlashMessage('error', EXPORT_EXCEEDED)
-    response.assertFlashMissing('errorAction')
+    response.assertFlashMessage('errorAction', '/settings/billing')
   })
 
-  test('le PDF de carnet de maintenance refuse sans proposer les offres', async ({ client }) => {
+  test('le PDF de carnet de maintenance refuse en proposant les offres', async ({ client }) => {
     const { user, boat } = await starterAdminWithBoat()
 
     const response = await client
@@ -79,20 +79,20 @@ test.group('Refus de quota — message et upsell (functional)', (group) => {
 
     response.assertStatus(302)
     response.assertFlashMessage('error', EXPORT_EXCEEDED)
-    response.assertFlashMissing('errorAction')
+    response.assertFlashMessage('errorAction', '/settings/billing')
   })
 
-  test("le PDF d'historique de maintenance refuse sans proposer les offres", async ({ client }) => {
+  test("le PDF d'historique de maintenance refuse en proposant les offres", async ({ client }) => {
     const user = await starterAdmin()
 
     const response = await client.get('/maintenance/history.pdf').loginAs(user).redirects(0)
 
     response.assertStatus(302)
     response.assertFlashMessage('error', EXPORT_EXCEEDED)
-    response.assertFlashMissing('errorAction')
+    response.assertFlashMessage('errorAction', '/settings/billing')
   })
 
-  test('les périodes tarifaires refusent sans proposer les offres', async ({ client }) => {
+  test('les périodes tarifaires refusent en proposant les offres', async ({ client }) => {
     const { user, boat } = await starterAdminWithBoat()
 
     const response = await client
@@ -103,10 +103,10 @@ test.group('Refus de quota — message et upsell (functional)', (group) => {
 
     response.assertStatus(302)
     response.assertFlashMessage('error', PRICING_EXCEEDED)
-    response.assertFlashMissing('errorAction')
+    response.assertFlashMessage('errorAction', '/settings/billing')
   })
 
-  test('le quota bateaux, lui, propose déjà les offres', async ({ client }) => {
+  test('le quota bateaux propose les offres, comme avant', async ({ client }) => {
     const user = await starterAdmin()
     await BoatFactory.merge({ organizationId: user.organizationId! }).createMany(2)
 

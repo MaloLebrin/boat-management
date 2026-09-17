@@ -5,7 +5,7 @@ import {
   DiagnosisMaxMessagesReachedError,
   DiagnosisQuotaExhaustedError,
 } from '#exceptions/public_diagnosis_errors'
-import { QuotaExceededError } from '#exceptions/quota_errors'
+import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import PublicDiagnosisService from '#services/public_diagnosis_service'
 import { toPublicDiagnosisConversationProps } from '#transformers/public_diagnosis_transformer'
 import {
@@ -111,7 +111,7 @@ export default class PublicDiagnosisController {
     } else if (error instanceof DiagnosisMaxMessagesReachedError) {
       session.flash('error', i18n.t('flash.publicDiagnosis.maxMessagesReached'))
     } else if (error instanceof QuotaExceededError) {
-      session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+      session.flash('error', i18n.t(quotaFlashKey(error)))
     } else if (error instanceof AiInvalidResponseError) {
       session.flash('error', i18n.t('flash.ai.diagnosisInvalidResponse'))
     } else {

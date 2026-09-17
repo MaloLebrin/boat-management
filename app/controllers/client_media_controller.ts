@@ -4,7 +4,7 @@ import { ClientNotFoundError } from '#exceptions/client_errors'
 import MediaService from '#services/media_service'
 import { MediaNotFoundError } from '#exceptions/media_errors'
 import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
+import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import { CloudinaryFolders, CloudinaryService } from '#services/cloudinary_service'
 import { storeBoatDocumentsValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
@@ -38,7 +38,7 @@ export default class ClientMediaController {
       await this.quotaService.assertCanManageClients(user.organization)
     } catch (error) {
       if (error instanceof QuotaExceededError) {
-        ctx.session.flash('error', ctx.i18n.t('flash.quota.clientsExceeded'))
+        ctx.session.flash('error', ctx.i18n.t(quotaFlashKey(error)))
         ctx.response.redirect(BILLING_SETTINGS_PATH)
         return null
       }
