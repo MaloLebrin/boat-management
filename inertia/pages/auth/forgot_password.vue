@@ -8,13 +8,14 @@ export default {
 
 <script setup lang="ts">
 import { Form, Link } from '@adonisjs/inertia/vue'
-import { Head, usePage } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import { useFlash } from '~/composables/use_flash'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
-const page = usePage()
+const { successMessage } = useFlash()
 </script>
 
 <template>
@@ -61,9 +62,9 @@ const page = usePage()
           </p>
 
           <div class="mt-7 flex flex-col gap-3.5">
-            <!-- Flash messages -->
+            <!-- Confirmation d'envoi : état porté par le flash de succès -->
             <div
-              v-if="page.props.flash?.success"
+              v-if="successMessage"
               class="flex flex-col gap-2 rounded-[10px] border p-4 bg-mint-50 border-mint-200"
             >
               <div class="flex items-center gap-2.5">
@@ -93,14 +94,7 @@ const page = usePage()
               </Link>
             </div>
 
-            <div
-              v-else-if="page.props.flash?.error"
-              class="rounded-lg border border-coral-200 bg-danger-soft px-4 py-3 text-sm text-danger-strong"
-            >
-              {{ page.props.flash.error }}
-            </div>
-
-            <template v-if="!page.props.flash?.success">
+            <template v-if="!successMessage">
               <!--
                 `route="password.forgot"` désignait la route GET (`<Form>` reprend
                 `methods[0]` de la route nommée) : la soumission partait en GET,

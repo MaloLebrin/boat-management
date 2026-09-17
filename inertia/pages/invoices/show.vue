@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Head, router, usePage } from '@inertiajs/vue3'
+import { Head, router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
-import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
@@ -20,9 +19,6 @@ const props = defineProps<{
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
-const page = usePage()
-
-const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
 
 const showDeleteModal = ref(false)
 const sendingEmail = ref(false)
@@ -109,12 +105,6 @@ function executeDelete() {
     </nav>
 
     <!-- Flash messages -->
-    <BaseAlert v-if="flash?.success" variant="success" class="mb-6" dismissible>
-      {{ flash.success }}
-    </BaseAlert>
-    <BaseAlert v-if="flash?.error" variant="danger" class="mb-6" dismissible>
-      {{ flash.error }}
-    </BaseAlert>
 
     <!-- Header -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

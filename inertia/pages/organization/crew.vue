@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { Head, router, usePage } from '@inertiajs/vue3'
-import BaseAlert from '~/components/base/BaseAlert.vue'
+import { ref } from 'vue'
+import { Head, router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -17,9 +16,6 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const page = usePage()
-
-const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
 
 const showCreateForm = ref(false)
 const editingMemberId = ref<number | null>(null)
@@ -45,13 +41,6 @@ function deleteCertification(memberId: number, certId: number) {
         {{ t('crew.add') }}
       </BaseButton>
     </div>
-
-    <BaseAlert v-if="flash?.success" variant="success" class="mb-6" dismissible>
-      {{ flash.success }}
-    </BaseAlert>
-    <BaseAlert v-if="flash?.error" variant="danger" class="mb-6" dismissible>
-      {{ flash.error }}
-    </BaseAlert>
 
     <CrewMemberForm v-if="showCreateForm" class="mb-6" @close="showCreateForm = false" />
 

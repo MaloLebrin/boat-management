@@ -9,7 +9,7 @@ export default {
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
 import { Form } from '@adonisjs/inertia/vue'
-import { Head, usePage } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
@@ -17,7 +17,6 @@ import PasswordStrength from '~/components/auth/PasswordStrength.vue'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
-const page = usePage()
 
 defineProps<{ token: string }>()
 
@@ -72,13 +71,6 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
           </p>
 
           <div class="mt-7">
-            <div
-              v-if="page.props.flash?.error"
-              class="mb-5 rounded-lg border border-coral-200 bg-danger-soft px-4 py-3 text-sm text-danger-strong"
-            >
-              {{ page.props.flash.error }}
-            </div>
-
             <Form method="POST" action="/reset-password" #default="{ processing, errors }">
               <input type="hidden" name="token" :value="token" />
               <div class="flex flex-col gap-3.5">

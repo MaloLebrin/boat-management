@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Head, router, useForm, usePage } from '@inertiajs/vue3'
+import { Head, router, useForm } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
-import BaseAlert from '~/components/base/BaseAlert.vue'
 import { useT } from '~/composables/use_t'
 
 type MemberRole = 'admin' | 'member' | 'mechanic' | 'boat_owner'
@@ -26,9 +25,6 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const page = usePage()
-
-const flash = computed(() => page.props.flash as { error?: string; success?: string } | undefined)
 
 const roleOptions = computed(() => [
   { label: t('organization.members.roles.admin'), value: 'admin' },
@@ -71,12 +67,6 @@ function getInitials(member: OrganizationMemberData): string {
     <BaseHeading level="1" class="mb-8">{{ t('organization.members.title') }}</BaseHeading>
 
     <!-- Flash messages -->
-    <BaseAlert v-if="flash?.success" variant="success" class="mb-6" dismissible>
-      {{ flash.success }}
-    </BaseAlert>
-    <BaseAlert v-if="flash?.error" variant="danger" class="mb-6" dismissible>
-      {{ flash.error }}
-    </BaseAlert>
 
     <!-- Invite form -->
     <BaseCard v-if="canManageMembers" class="mb-8">
