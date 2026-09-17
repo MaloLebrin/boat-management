@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useForm, router } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
@@ -9,6 +9,7 @@ import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatBudgetEntryItem } from '#shared/types/budget'
 import { useInlineRowEdit } from '~/composables/use_inline_row_edit'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boatId: number
@@ -51,10 +52,11 @@ const edition = useInlineRowEdit<BoatBudgetEntryItem, ReturnType<typeof editForm
 })
 
 function deleteEntry(entryId: number) {
-  if (!confirm(t('budget.entries.deleteConfirm'))) return
-  router.delete(`/boats/${props.boatId}/budget/entries/${entryId}`, {
-    preserveScroll: true,
-  })
+  confirmDelete(
+    t('budget.entries.deleteConfirm'),
+    `/boats/${props.boatId}/budget/entries/${entryId}`,
+    { preserveScroll: true }
+  )
 }
 
 function getCategoryLabel(category: string): string {

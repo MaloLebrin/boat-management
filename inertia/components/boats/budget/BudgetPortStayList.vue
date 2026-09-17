@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useForm, router } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCombobox, { type ComboboxOption } from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -10,6 +10,7 @@ import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
 import type { PortNameOption } from '#shared/types/port'
 import { useInlineRowEdit } from '~/composables/use_inline_row_edit'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boatId: number
@@ -48,8 +49,7 @@ const edition = useInlineRowEdit<BoatPortStayItem, ReturnType<typeof editForm.da
 })
 
 function deleteStay(stayId: number) {
-  if (!confirm(t('budget.portStay.deleteConfirm'))) return
-  router.delete(`/boats/${props.boatId}/port-stays/${stayId}`, {
+  confirmDelete(t('budget.portStay.deleteConfirm'), `/boats/${props.boatId}/port-stays/${stayId}`, {
     preserveScroll: true,
   })
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import type { MouillageRow } from '~/types/port'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   mouillage: MouillageRow
@@ -28,9 +28,10 @@ function handleDelete() {
     alert(t('ports.mouillages.hasBoats'))
     return
   }
-  if (confirm(t('ports.mouillages.deleteConfirm'))) {
-    router.delete(`/ports/${props.portId}/mouillages/${props.mouillage.id}`)
-  }
+  confirmDelete(
+    t('ports.mouillages.deleteConfirm'),
+    `/ports/${props.portId}/mouillages/${props.mouillage.id}`
+  )
 }
 </script>
 

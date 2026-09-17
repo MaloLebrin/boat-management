@@ -15,6 +15,7 @@ import ClientStatusBadge from '~/components/clients/ClientStatusBadge.vue'
 import { useNavigationTitles } from '~/composables/use_navigation_titles'
 import { useT } from '~/composables/use_t'
 import type { ClientListFilters, ClientRow, ClientsPaginated } from '../../../shared/types/client'
+import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
 
 const props = defineProps<{
   clients: ClientsPaginated
@@ -28,7 +29,10 @@ const { navigationTitleLabel } = useNavigationTitles()
 
 const showCreateForm = ref(false)
 const editingClientId = ref<number | null>(null)
-const deletingClient = ref<ClientRow | null>(null)
+const clientDeletion = useRowDeleteConfirmation<ClientRow>({
+  url: (client) => `/clients/${client.id}`,
+  visit: { preserveScroll: true },
+})
 
 function handlePageChange(newPage: number) {
   router.get(
@@ -43,20 +47,6 @@ function handlePageChange(newPage: number) {
     },
     { preserveScroll: true, preserveState: true, replace: true }
   )
-}
-
-function confirmDelete(client: ClientRow) {
-  deletingClient.value = client
-}
-
-function executeDelete() {
-  if (!deletingClient.value) return
-  router.delete(`/clients/${deletingClient.value.id}`, {
-    preserveScroll: true,
-    onFinish: () => {
-      deletingClient.value = null
-    },
-  })
 }
 
 function getPermitLabel(client: ClientRow): string {
@@ -139,7 +129,7 @@ function getPermitLabel(client: ClientRow): string {
                 type="button"
                 variant="ghost"
                 size="sm"
-                @click="confirmDelete(client)"
+                @click="clientDeletion.ask(client)"
               >
                 {{ t('clients.delete') }}
               </BaseButton>
@@ -167,13 +157,13 @@ function getPermitLabel(client: ClientRow): string {
     </div>
 
     <BaseConfirmModal
-      :open="deletingClient !== null"
+      :open="clientDeletion.isOpen.value"
       :title="t('clients.deleteConfirm.title')"
       :message="t('clients.deleteConfirm.message')"
       :confirm-label="t('clients.delete')"
       :cancel-label="t('clients.form.cancel')"
-      @update:open="deletingClient = null"
-      @confirm="executeDelete"
+      @update:open="clientDeletion.release()"
+      @confirm="clientDeletion.confirm()"
     />
   </div>
 </template>

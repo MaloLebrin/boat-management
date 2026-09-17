@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogCrewRow, CrewMemberOption } from '../../../../../shared/types/crew'
+import { confirmed } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boatId: number
@@ -60,7 +61,7 @@ function removeCrewMember(crewMemberId: number) {
 
   // Removing the last crew member sends an empty list, which clears the whole
   // trip crew. Confirm first so it can't happen by an accidental click.
-  if (newCrew.length === 0 && !window.confirm(t('crew.logCrew.removeLastConfirm'))) {
+  if (newCrew.length === 0 && !confirmed(t('crew.logCrew.removeLastConfirm'))) {
     return
   }
 

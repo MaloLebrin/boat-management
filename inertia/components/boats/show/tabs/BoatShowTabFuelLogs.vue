@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatFuelLogForm from '~/components/boats/show/tabs/BoatFuelLogForm.vue'
 import { useT } from '~/composables/use_t'
@@ -11,6 +10,7 @@ import {
   engineStrokeSuffix,
 } from '~/utils/boat_enum_labels'
 import type { BoatShowDetail, FuelLogRow } from '~/types/boat_show'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -34,8 +34,9 @@ function engineLabel(engineId: number | null): string {
 }
 
 function deleteFuelLog(logId: number) {
-  if (!window.confirm(t('fuel_logs.form.confirmDelete'))) return
-  router.delete(`/boats/${props.boat.id}/fuel-logs/${logId}`, { preserveScroll: true })
+  confirmDelete(t('fuel_logs.form.confirmDelete'), `/boats/${props.boat.id}/fuel-logs/${logId}`, {
+    preserveScroll: true,
+  })
 }
 </script>
 
