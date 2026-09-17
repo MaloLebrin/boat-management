@@ -12,7 +12,9 @@ fichiers via le flag natif `--files` de Japa, chacun avec son propre conteneur P
 check requis pour la protection de branche. En local, `pnpm test` est inchangé et lance
 toujours `unit`, `integration` et `functional` en séquentiel.
 
-Le flag `--files` matche par segment de chemin et **ne supporte pas `**`** : `"dossier/\*"`cible tous les fichiers directement sous ce dossier (un seul niveau) — voir`.github/workflows/ci.yml` pour le détail des filtres par shard.
+Le flag `--files` matche par segment de chemin, sans support du glob récursif `**` :
+`"dossier/*"` cible tous les fichiers directement sous ce dossier (un seul niveau) — voir
+`.github/workflows/ci.yml` pour le détail des filtres par shard.
 
 ## Frontend Inertia (Vitest)
 
