@@ -1,7 +1,9 @@
 import app from '@adonisjs/core/services/app'
 import AiService, { type AiChatMessage } from '#services/ai_service'
 import { CloudinaryService, type CloudinaryUploadResult } from '#services/cloudinary_service'
+import StripeService from '#services/stripe_service'
 import type { AiChatOptions, AiProvider, AiToolCall, AiToolDefinition } from '#shared/types/ai'
+import type Stripe from 'stripe'
 
 /**
  * Fakes partagés des services externes (Cloudinary, IA) pour les suites Japa.
@@ -193,4 +195,60 @@ export function swapAiService(
 
 export function restoreAiService(): void {
   app.container.restore(AiService)
+}
+
+// ── Stripe ──────────────────────────────────────────────────────────────────
+
+/** Ce qu'un test peut asserter après coup sur les appels au faux Stripe. */
+export interface FakeStripe {
+  /** `subscriptionId` de chaque `retrieveSubscription`, dans l'ordre. */
+  retrievedSubscriptionIds: string[]
+  restore(): void
+}
+
+/**
+ * Remplace `StripeService` pour le seul appel réseau du chemin webhook :
+ * `checkout.session.completed` va chercher l'abonnement complet chez Stripe
+ * (`SubscriptionService.syncFromCheckoutSession`).
+ *
+ * `constructWebhookEvent` **reste la vraie implémentation** : la vérification
+ * de signature est l'unique défense d'une route publique, un test ne doit
+ * jamais la court-circuiter. Seule la lecture distante est simulée.
+ *
+ * `moduleForPriceId` / `addonForPriceId` sont eux aussi délégués au vrai
+ * service — ils lisent `env`, pas le réseau, et la réconciliation des modules
+ * en dépend.
+ */
+export function swapStripeService(
+  options: { subscription?: Stripe.Subscription } = {}
+): FakeStripe {
+  const real = new StripeService()
+  const state: FakeStripe = {
+    retrievedSubscriptionIds: [],
+    restore: restoreStripeService,
+  }
+
+  app.container.swap(
+    StripeService,
+    () =>
+      ({
+        constructWebhookEvent: (rawBody: string, signature: string) =>
+          real.constructWebhookEvent(rawBody, signature),
+        moduleForPriceId: (priceId: string) => real.moduleForPriceId(priceId),
+        addonForPriceId: (priceId: string) => real.addonForPriceId(priceId),
+        retrieveSubscription: async (subscriptionId: string) => {
+          state.retrievedSubscriptionIds.push(subscriptionId)
+          if (!options.subscription) {
+            throw new Error('swapStripeService: aucun abonnement fourni à retrieveSubscription')
+          }
+          return options.subscription
+        },
+      }) as unknown as StripeService
+  )
+
+  return state
+}
+
+export function restoreStripeService(): void {
+  app.container.restore(StripeService)
 }

@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import type Stripe from 'stripe'
 import { truncateDb } from '#tests/utils/db'
 import emitter from '@adonisjs/core/services/emitter'
 import Subscription from '#models/subscription'
@@ -6,37 +7,21 @@ import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import { OrganizationFactory } from '#database/factories/organization_factory'
+import { stripeSubscription } from '#tests/support/stripe'
 
 /**
- * Minimal Stripe.Subscription shape needed by syncFromSubscriptionEvent.
- * The period bounds live on the subscription item (current API version).
+ * Le prix par défaut de `stripeSubscription` ne mappe aucun tier : le plan
+ * retombe sur `starter`, ce qui isole les bornes de période du plan.
  */
 function fakeStripeSubscription(
   customerId: string,
-  opts: { anchor: number; periodStart: number; periodEnd: number; status?: string }
+  opts: { status?: Stripe.Subscription.Status } = {}
 ) {
-  return {
+  return stripeSubscription({
     id: 'sub_test_123',
     customer: customerId,
-    status: opts.status ?? 'active',
-    cancel_at_period_end: false,
-    billing_cycle_anchor: opts.anchor,
-    items: {
-      data: [
-        {
-          price: { id: 'price_unmapped', recurring: { interval: 'month', interval_count: 1 } },
-          current_period_start: opts.periodStart,
-          current_period_end: opts.periodEnd,
-        },
-      ],
-    },
-  }
-}
-
-const PERIOD = {
-  anchor: Math.floor(Date.UTC(2020, 0, 1) / 1000),
-  periodStart: Math.floor(Date.UTC(2030, 0, 10) / 1000),
-  periodEnd: Math.floor(Date.UTC(2030, 1, 10) / 1000),
+    ...(opts.status ? { status: opts.status } : {}),
+  })
 }
 
 test.group('SubscriptionService period bounds (functional)', (group) => {
@@ -47,18 +32,12 @@ test.group('SubscriptionService period bounds (functional)', (group) => {
   }) => {
     const org = await OrganizationFactory.merge({ stripeCustomerId: 'cus_period_test' }).create()
 
-    // Anchor is far in the past (2020) while Stripe reports a 2030 period. The old
-    // anchor-loop logic would have advanced the period to land near "now", so
-    // asserting the stored period equals the 2030 item bounds proves Stripe's
-    // authoritative values are used verbatim.
-    const periodStart = Math.floor(Date.UTC(2030, 0, 10) / 1000)
-    const periodEnd = Math.floor(Date.UTC(2030, 1, 10) / 1000)
-    const anchor = Math.floor(Date.UTC(2020, 0, 1) / 1000)
-
+    // Les défauts partagés (`tests/support/stripe.ts`) posent un anchor loin dans
+    // le passé (2020) et une période annoncée par Stripe en 2030. L'ancienne
+    // logique de boucle sur l'anchor aurait avancé la période jusqu'à encadrer
+    // "maintenant" : asserter les bornes 2030 prouve qu'on lit Stripe verbatim.
     const service = new SubscriptionService({} as any, new OrganizationModuleService())
-    await service.syncFromSubscriptionEvent(
-      fakeStripeSubscription('cus_period_test', { anchor, periodStart, periodEnd }) as any
-    )
+    await service.syncFromSubscriptionEvent(fakeStripeSubscription('cus_period_test'))
 
     const sub = await Subscription.query().where('organizationId', org.id).firstOrFail()
     assert.equal(sub.currentPeriodStart.toUTC().toISODate(), '2030-01-10')
@@ -83,7 +62,7 @@ test.group('SubscriptionService sync atomicity (functional)', (group) => {
 
     const service = new SubscriptionService({} as any, new OrganizationModuleService())
     await service.syncFromSubscriptionEvent(
-      fakeStripeSubscription('cus_downgrade', { ...PERIOD, status: 'canceled' }) as any
+      fakeStripeSubscription('cus_downgrade', { status: 'canceled' })
     )
 
     // Both writes committed: org plan downgraded to starter AND subscription row saved.
@@ -117,7 +96,7 @@ test.group('SubscriptionService sync atomicity (functional)', (group) => {
 
     await assert.rejects(() =>
       service.syncFromSubscriptionEvent(
-        fakeStripeSubscription('cus_rollback', { ...PERIOD, status: 'canceled' }) as any
+        fakeStripeSubscription('cus_rollback', { status: 'canceled' })
       )
     )
 

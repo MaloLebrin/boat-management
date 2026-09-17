@@ -11,29 +11,16 @@ import Notification from '#models/notification'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
+import { PRICE_IDS, stripeSubscription, stripeSubscriptionItem } from '#tests/support/stripe'
 
-const PRO_MONTH = 'price_test_pro_month'
-const PERIOD_START = Math.floor(Date.UTC(2030, 0, 10) / 1000)
-const PERIOD_END = Math.floor(Date.UTC(2030, 1, 10) / 1000)
+const PRO_MONTH = PRICE_IDS.proMonth
 
 function fakeSub(customerId: string, priceId: string) {
-  return {
+  return stripeSubscription({
     id: 'sub_upgrade_test',
     customer: customerId,
-    status: 'active',
-    cancel_at_period_end: false,
-    billing_cycle_anchor: Math.floor(Date.UTC(2020, 0, 1) / 1000),
-    items: {
-      data: [
-        {
-          id: 'si_tier',
-          price: { id: priceId, recurring: { interval: 'month', interval_count: 1 } },
-          current_period_start: PERIOD_START,
-          current_period_end: PERIOD_END,
-        },
-      ],
-    },
-  }
+    items: [stripeSubscriptionItem(priceId, { id: 'si_tier' })],
+  })
 }
 
 test.group('Plan upgrade — event dispatch (functional)', (group) => {

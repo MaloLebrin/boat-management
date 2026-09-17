@@ -26,10 +26,10 @@ Le plan courant est stocké directement sur `organizations.plan` (colonne string
 
 En plus du tier, une organisation **Pro** peut souscrire des **modules add-ons** activables à la carte, stockés dans la table `organization_modules` :
 
-| Module          | Prix (mensuel / annuel) | Flags accordés (`MODULE_FLAGS`)         |
-| --------------- | ----------------------- | --------------------------------------- |
-| `charter`       | 15 € / 144 €            | `canManagePricing`                      |
-| `crm_invoicing` | 15 € / 144 €            | `canManageClients`, `canManageInvoices` |
+| Module          | Prix (mensuel / annuel) | Flags accordés (`MODULE_FLAGS`)             |
+| --------------- | ----------------------- | ------------------------------------------- |
+| `charter`       | 15 € / 144 €            | `canManagePricing`, `canManageReservations` |
+| `crm_invoicing` | 15 € / 144 €            | `canManageClients`, `canManageInvoices`     |
 
 - **Source de vérité** : `OrganizationModuleService` (jamais le modèle en direct). Colonne `source` = `subscription` (item Stripe) ou `granted` (offert / grandfathering — insensible à la sync Stripe).
 - **Quotas effectifs** : `resolveEffectiveQuotas(tier, modules)` ([`shared/helpers/plan.ts`](../shared/helpers/plan.ts)) fusionne les flags du tier avec ceux des modules actifs. Helper pur partagé backend (policies, `QuotaService`) / frontend (`use_plan.ts`, navigation) — jamais recombiné ailleurs.
@@ -133,6 +133,10 @@ const event = stripeService.constructWebhookEvent(request.raw(), signature)
 ```
 
 `request.raw()` est toujours populé par le bodyparser AdonisJS avant parsing JSON, ce qui garantit l'intégrité du corps brut nécessaire à la vérification HMAC.
+
+La vérification passe par le **statique** `Stripe.webhooks` et non par une instance : le HMAC est
+purement local, il n'a pas besoin de `STRIPE_SECRET_KEY`. Les coupler ferait répondre 400 à _tous_
+les événements dès que la clé API manque — et Stripe rejouerait indéfiniment (#698).
 
 ### 4.3 Événements traités
 

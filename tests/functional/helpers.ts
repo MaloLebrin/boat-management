@@ -1,4 +1,9 @@
+import { DateTime } from 'luxon'
+import type Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
+import Subscription from '#models/subscription'
+import { OrganizationFactory } from '#database/factories/organization_factory'
+import { PRICE_IDS } from '#tests/support/stripe'
 import type User from '#models/user'
 import OrganizationModuleService from '#services/organization_module_service'
 import { UserFactory } from '#database/factories/user_factory'
@@ -115,4 +120,46 @@ export async function createPlanUserWithProfile(
   type: OrganizationType | null
 ): Promise<User> {
   return UserFactory.with('organization', 1, (org) => org.merge({ plan, type })).create()
+}
+
+/**
+ * Organisation portant un `stripeCustomerId`, sans utilisateur.
+ *
+ * C'est la clé de jointure du webhook : `syncFromCheckoutSession` comme
+ * `syncFromSubscriptionEvent` résolvent l'organisation par
+ * `where('stripe_customer_id', …)` et sortent en silence si rien ne matche.
+ * Aucune des fabriques ci-dessus ne la renseigne.
+ */
+export function createOrgWithStripeCustomer(
+  options: { plan?: PlanTier; customerId?: string; type?: OrganizationType } = {}
+): Promise<Organization> {
+  return OrganizationFactory.merge({
+    plan: options.plan ?? 'starter',
+    stripeCustomerId: options.customerId ?? 'cus_test',
+    ...(options.type ? { type: options.type } : {}),
+  }).create()
+}
+
+/**
+ * Abonnement actif Pro mensuel, aligné sur les price IDs de `.env.test`.
+ *
+ * `SubscriptionFactory` existe mais tire des `stripePriceId` aléatoires, que
+ * `planFromPriceId` ne sait pas résoudre — elle retomberait sur `starter`.
+ */
+export function seedActiveSubscription(
+  organizationId: number,
+  overrides: Partial<Subscription> = {}
+): Promise<Subscription> {
+  return Subscription.create({
+    organizationId,
+    stripeSubscriptionId: 'sub_active_test',
+    stripePriceId: PRICE_IDS.proMonth,
+    planTier: 'pro',
+    status: 'active',
+    billingInterval: 'month',
+    currentPeriodStart: DateTime.now(),
+    currentPeriodEnd: DateTime.now().plus({ months: 1 }),
+    cancelAtPeriodEnd: false,
+    ...overrides,
+  })
 }

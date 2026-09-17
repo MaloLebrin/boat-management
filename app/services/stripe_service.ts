@@ -121,7 +121,12 @@ export default class StripeService {
   constructWebhookEvent(rawBody: string, signature: string): Stripe.Event {
     const secret = env.get('STRIPE_WEBHOOK_SECRET')
     if (!secret) throw new StripeNotConfiguredError()
-    return this.stripe.webhooks.constructEvent(rawBody, signature, secret)
+    // Vérification purement cryptographique (HMAC SHA-256 sur le corps brut) :
+    // aucun appel réseau, donc aucun besoin de la clé API. Passer par
+    // `this.stripe` liait le rejet d'une signature à la présence de
+    // STRIPE_SECRET_KEY — sans elle, l'endpoint répondait 400 à *tous* les
+    // événements et Stripe retentait indéfiniment (#698).
+    return Stripe.webhooks.constructEvent(rawBody, signature, secret)
   }
 
   priceIdFor(planTier: 'pro' | 'enterprise', interval: 'month' | 'year'): string {

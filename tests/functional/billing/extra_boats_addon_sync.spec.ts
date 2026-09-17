@@ -1,37 +1,30 @@
 import { test } from '@japa/runner'
+import type Stripe from 'stripe'
 import { truncateDb } from '#tests/utils/db'
 import OrganizationModule from '#models/organization_module'
 import StripeService from '#services/stripe_service'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import { OrganizationFactory } from '#database/factories/organization_factory'
+import { PRICE_IDS, stripeSubscription, stripeSubscriptionItem } from '#tests/support/stripe'
 
-// IDs de prix factices — doivent correspondre à `.env.test`.
-const PRO_MONTH = 'price_test_pro_month'
-const EXTRA_BOATS_MONTH = 'price_test_extra_boats_month'
-
-const PERIOD_START = Math.floor(Date.UTC(2030, 0, 10) / 1000)
-const PERIOD_END = Math.floor(Date.UTC(2030, 1, 10) / 1000)
+const PRO_MONTH = PRICE_IDS.proMonth
+const EXTRA_BOATS_MONTH = PRICE_IDS.extraBoatsMonth
 
 function item(id: string, priceId: string, quantity = 1) {
-  return {
-    id,
-    quantity,
-    price: { id: priceId, recurring: { interval: 'month', interval_count: 1 } },
-    current_period_start: PERIOD_START,
-    current_period_end: PERIOD_END,
-  }
+  return stripeSubscriptionItem(priceId, { id, quantity })
 }
 
-function fakeSub(customerId: string, opts: { items: ReturnType<typeof item>[]; status?: string }) {
-  return {
+function fakeSub(
+  customerId: string,
+  opts: { items: ReturnType<typeof item>[]; status?: Stripe.Subscription.Status }
+) {
+  return stripeSubscription({
     id: 'sub_addon_test',
     customer: customerId,
-    status: opts.status ?? 'active',
-    cancel_at_period_end: false,
-    billing_cycle_anchor: Math.floor(Date.UTC(2020, 0, 1) / 1000),
-    items: { data: opts.items },
-  }
+    items: opts.items,
+    ...(opts.status ? { status: opts.status } : {}),
+  })
 }
 
 function makeService() {

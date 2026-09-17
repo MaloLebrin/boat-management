@@ -203,6 +203,41 @@ Les prix des **modules** (`charter`, `crm_invoicing`) suivent le même schéma `
 
 ---
 
+## Tester le webhook (#698)
+
+`tests/functional/billing/stripe_webhook.spec.ts` exerce la **vraie** vérification de signature —
+la doubler reviendrait à ne pas tester ce qui protège une route publique. Aucun appel réseau n'a
+lieu : le HMAC est local, et le seul appel distant du chemin (`retrieveSubscription`, sur
+`checkout.session.completed`) passe par `swapStripeService()` de `tests/support/fakes.ts`.
+
+`.env.test` porte `STRIPE_WEBHOOK_SECRET=whsec_test_secret` — une valeur factice, pas un secret :
+elle ne sert qu'à signer les fixtures. `STRIPE_SECRET_KEY` reste **vide**, pour que les chemins
+d'achat continuent de lever `StripeNotConfiguredError` comme les tests existants l'attendent.
+
+Les fabriques vivent dans `tests/support/stripe.ts` :
+
+```ts
+const event = stripeEvent(
+  'customer.subscription.updated',
+  stripeSubscription({
+    customer: 'cus_x',
+    priceId: PRICE_IDS.proMonth,
+  })
+)
+
+const response = await postStripeWebhook(client, event) // signature valide
+await postStripeWebhook(client, event, { signature: null }) // en-tête absent
+await postStripeWebhook(client, event, { payload: tampered }) // corps altéré après signature
+```
+
+**Le piège à connaître** : la signature porte sur les **octets exacts** du corps. Côté client Japa,
+`client.send(x)` n'est _pas_ un setter de corps — c'est la méthode qui exécute la requête, et son
+argument est ignoré. Le handler reçoit alors un `request.raw()` vide et répond 400 sans rien dire.
+Il faut `client.json(payloadString)`, qui transmet la chaîne telle quelle. `postStripeWebhook`
+referme ce piège.
+
+---
+
 ## Diagnostic
 
 | Symptôme                                           | Cause probable                                             | Solution                                                                      |
