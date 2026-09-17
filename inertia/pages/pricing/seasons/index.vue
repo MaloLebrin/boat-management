@@ -9,6 +9,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import PricingSeasonForm from '~/components/pricing/PricingSeasonForm.vue'
 import PricingSeasonList from '~/components/pricing/PricingSeasonList.vue'
 import { useT } from '~/composables/use_t'
+import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
 import type {
   PricingSeasonRow,
   BoatOption,
@@ -26,7 +27,10 @@ const { t } = useT()
 
 const showCreateForm = ref(false)
 const editingSeason = ref<PricingSeasonRow | null>(null)
-const deletingSeason = ref<PricingSeasonRow | null>(null)
+const seasonDeletion = useRowDeleteConfirmation<PricingSeasonRow>({
+  url: (season) => `/pricing/seasons/${season.id}`,
+  visit: { preserveScroll: true },
+})
 
 const boatFilterOptions = computed(() =>
   props.boatOptions.map((b) => ({ label: b.name, value: String(b.id) }))
@@ -43,20 +47,6 @@ function onBoatFilterChange(value: string | number) {
 
 function handleEdit(season: PricingSeasonRow) {
   editingSeason.value = season
-}
-
-function handleDelete(season: PricingSeasonRow) {
-  deletingSeason.value = season
-}
-
-function executeDelete() {
-  if (!deletingSeason.value) return
-  router.delete(`/pricing/seasons/${deletingSeason.value.id}`, {
-    preserveScroll: true,
-    onFinish: () => {
-      deletingSeason.value = null
-    },
-  })
 }
 </script>
 
@@ -109,7 +99,7 @@ function executeDelete() {
         :seasons="seasons"
         :can-delete="canDelete"
         @edit="handleEdit"
-        @delete="handleDelete"
+        @delete="seasonDeletion.ask"
       />
     </div>
 
@@ -123,13 +113,13 @@ function executeDelete() {
     </div>
 
     <BaseConfirmModal
-      :open="deletingSeason !== null"
+      :open="seasonDeletion.isOpen.value"
       :title="t('pricingSeasons.deleteConfirm.title')"
       :message="t('pricingSeasons.deleteConfirm.message')"
       :confirm-label="t('pricingSeasons.delete')"
       :cancel-label="t('pricingSeasons.form.cancel')"
-      @update:open="deletingSeason = null"
-      @confirm="executeDelete"
+      @update:open="seasonDeletion.release()"
+      @confirm="seasonDeletion.confirm()"
     />
   </div>
 </template>
