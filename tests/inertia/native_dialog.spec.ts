@@ -6,10 +6,22 @@ vi.mock('@inertiajs/vue3', async () => {
   return inertiaMock()
 })
 
-import { confirmDelete, confirmed } from '../../inertia/utils/native_dialog'
+import { confirmDelete, confirmed, notify } from '../../inertia/utils/native_dialog'
 
 let answers: boolean[] = []
 let asked: string[] = []
+
+let notified: string[] = []
+
+function stubAlert() {
+  notified = []
+  vi.stubGlobal(
+    'alert',
+    vi.fn((message: string) => {
+      notified.push(message)
+    })
+  )
+}
 
 function stubConfirm(answer: boolean) {
   asked = []
@@ -87,5 +99,23 @@ describe('confirmDelete', () => {
     confirmDelete('Supprimer ?', '/boats/1/incidents/2', { preserveScroll: true })
 
     expect(routerSpies.delete).not.toHaveBeenCalled()
+  })
+})
+
+describe('notify', () => {
+  test('passe le message au dialogue natif', () => {
+    stubAlert()
+
+    notify('Un bateau est encore amarré.')
+
+    expect(notified).toEqual(['Un bateau est encore amarré.'])
+  })
+
+  test('hors navigateur, rien n’est affiché — et rien ne lève', () => {
+    stubAlert()
+    vi.stubGlobal('window', undefined)
+
+    expect(() => notify('Un bateau est encore amarré.')).not.toThrow()
+    expect(notified).toEqual([])
   })
 })

@@ -12,6 +12,7 @@ import PortListTab from '~/components/ports/show/tabs/PortListTab.vue'
 import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 import type { BoatOption, PortShowDetail } from '~/types/port'
+import { notify } from '~/utils/native_dialog'
 
 const props = defineProps<{
   port: PortShowDetail
@@ -43,7 +44,7 @@ function handleDeletePort() {
     props.port.pontoons.some((p) => p.spots.some((s) => s.boat !== null)) ||
     props.port.mouillages.some((m) => m.spots.some((s) => s.boat !== null))
   if (hasBoats) {
-    alert(t('ports.hasBoats'))
+    notify(t('ports.hasBoats'))
     return
   }
   showDeleteConfirm.value = true

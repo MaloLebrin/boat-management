@@ -20,6 +20,19 @@ export function confirmed(message: string): boolean {
 }
 
 /**
+ * Avis bloquant : la même garde SSR que `confirmed`, pour les refus qui
+ * s'annoncent avant toute confirmation (une place encore occupée). Un `alert()`
+ * nu lève côté serveur, et les trois écrans des ports l'écrivaient ainsi.
+ *
+ * Hors navigateur, l'avis est simplement perdu : il informe, il ne garde rien —
+ * le refus, lui, reste porté par l'appelant.
+ */
+export function notify(message: string): void {
+  if (typeof window === 'undefined') return
+  window.alert(message)
+}
+
+/**
  * Confirme, puis supprime. Les options de visite sont transmises **telles
  * quelles** : les sites qui passaient `{ preserveScroll: true }` le gardent,
  * les deux cartes de port qui n'en passaient aucune gardent leur signature à

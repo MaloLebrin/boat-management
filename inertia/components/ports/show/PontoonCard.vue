@@ -5,7 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import type { PontoonRow } from '~/types/port'
-import { confirmDelete } from '~/utils/native_dialog'
+import { confirmDelete, notify } from '~/utils/native_dialog'
 
 const props = defineProps<{
   pontoon: PontoonRow
@@ -25,7 +25,7 @@ function hasBoats(): boolean {
 
 function handleDelete() {
   if (hasBoats()) {
-    alert(t('ports.pontoons.hasBoats'))
+    notify(t('ports.pontoons.hasBoats'))
     return
   }
   confirmDelete(

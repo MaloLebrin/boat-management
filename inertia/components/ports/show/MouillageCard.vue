@@ -5,7 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import type { MouillageRow } from '~/types/port'
-import { confirmDelete } from '~/utils/native_dialog'
+import { confirmDelete, notify } from '~/utils/native_dialog'
 
 const props = defineProps<{
   mouillage: MouillageRow
@@ -25,7 +25,7 @@ function hasBoats(): boolean {
 
 function handleDelete() {
   if (hasBoats()) {
-    alert(t('ports.mouillages.hasBoats'))
+    notify(t('ports.mouillages.hasBoats'))
     return
   }
   confirmDelete(
