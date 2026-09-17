@@ -21,6 +21,14 @@ Référence: `app/abilities/main.ts`.
 
 Référence routes: `start/routes/boats.ts`.
 
+Les cinq routes de la ressource (`show`, `edit`, `update`, `destroy`, `assign`)
+résolvent leur bateau par `BoatContextService` — `resolveBoat(ctx, 'id')`, ou
+`resolveBoatDetail(ctx, 'id')` pour `show`, qui charge la fiche complète. Un
+bateau inexistant ou étranger à l'organisation **redirige vers `/boats`** :
+le service redirige et rend `null`, le contrôleur fait `if (!resolved) return`.
+C'est le même contrat que pour les contrôleurs « sous » un bateau
+(`/boats/:boatId/…`).
+
 ### Boats
 
 - `GET /boats` (`boats.index`)
