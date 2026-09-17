@@ -17,6 +17,16 @@ async function userWithRole(orgId: number, role: 'admin' | 'member'): Promise<Us
   return user
 }
 
+/**
+ * ⚠️ Ces tests appellent les policies **en direct**, donc sans le hook
+ * `before()` — que seul Bouncer exécute. Leurs assertions « cross-org denied »
+ * prouvent que `sameOrg` fait son travail, pas qu'un admin d'une autre
+ * organisation est refusé en production.
+ *
+ * Cette dernière question se décide dans
+ * `tests/integration/permissions/policy_before_hook.spec.ts`, qui passe par un
+ * vrai `Bouncer` (#690).
+ */
 test.group('Policies — admin-only capability checks (integration)', () => {
   test('BoatPolicy.delete: admin allowed, member denied, cross-org denied', async ({ assert }) => {
     const org = await OrganizationFactory.create()

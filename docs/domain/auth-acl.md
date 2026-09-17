@@ -65,7 +65,7 @@ Référence: `app/controllers/home_controller.ts`.
 
 Références:
 
-- Policies: `app/policies/*.ts` (16 fichiers, un par ressource)
+- Policies: `app/policies/*.ts` (19 fichiers, un par ressource)
 - Base class partagée: `app/utils/org_scoped_policy.ts`
 - Taxonomie de capacités: `shared/types/permissions.ts`
 - Middleware d'enregistrement: `app/middleware/initialize_bouncer_middleware.ts` (instancie un `Bouncer` par requête à partir de `#generated/policies`, auto-découvertes via `indexPolicies()` dans `adonisrc.ts`)
@@ -117,9 +117,12 @@ Toutes les policies org-scopées héritent de `OrgScopedPolicy` (`app/utils/org_
 
 ```ts
 export default abstract class OrgScopedPolicy extends BasePolicy {
-  async before(user: User) {
-    // Un admin de l'org court-circuite tout — avant même les méthodes ci-dessous
-    if (user.organizationId && (await user.isAdminOf(user.organizationId))) return true
+  async before(user: User, _action: string, ...resources: unknown[]) {
+    if (!user.organizationId) return
+    // Non-admin : le hook ne tranche pas, la méthode de policy décide
+    if (!(await user.isAdminOf(user.organizationId))) return
+    // Un admin de son org court-circuite tout — sauf sur une ressource étrangère
+    return resources.every((resource) => !this.isForeignResource(user, resource))
   }
   protected async can(user: User, capability: Capability) {
     /* → user.hasPermission(...) */
@@ -138,7 +141,11 @@ async delete(user: User, boat: Boat) {
 }
 ```
 
-**Note importante** : `before()` ne vérifie que le rôle de l'utilisateur, jamais l'organisation de la ressource ciblée. Un admin de l'org A passe donc `before()` même pour une ressource théorique de l'org B — en pratique ce n'est jamais exploitable car chaque Service scope déjà ses requêtes par `organizationId` (la ressource d'une autre org n'est jamais chargée, donc jamais passée à la Policy). C'est un point de vigilance si un futur endpoint oubliait ce scoping.
+**`before()` lit la ressource (#690).** Bouncer transmet l'action et ses arguments au hook — `before(user, action, ...args)` — et un retour booléen **court-circuite entièrement** la méthode de policy. Tant que la signature ne lisait que `user`, un admin de l'org A franchissait `bouncer.with(PortPolicy).authorize('edit', portDeB)` sans que `sameOrg` soit jamais atteint : le point de vigilance signalé ici était réel, seulement masqué par le scoping des Services. Il est refermé — la couche policy refuse désormais elle-même.
+
+La règle : **refuser seulement sur une ressource prouvablement étrangère**. Le hook lit l'organisation sous deux formes — la colonne `organizationId` directe, et la relation `port` chargée (`Mouillage`, `Pontoon` et `Spot` n'ont pas de colonne propre). Quand elle n'est pas lisible — argument absent, payload de validation, relation non préchargée — l'admin passe comme avant. Refuser sur le doute ferait retomber l'admin sur la méthode de policy, qui refuserait un `Mouillage` dont le `port` n'est pas préchargé : un 403 tout neuf sur un chemin aujourd'hui autorisé.
+
+⚠️ Corollaire pour les tests : `before()` n'est **jamais** exécuté quand on instancie une policy à la main (`new BoatPolicy().edit(...)`). Un test qui procède ainsi vérifie `sameOrg`, pas l'autorisation réelle. Ce qu'un admin obtient vraiment se teste à travers un vrai `Bouncer` — `tests/integration/permissions/policy_before_hook.spec.ts`.
 
 `app/utils/org_scoped_policy.ts` vit **hors** de `app/policies/` intentionnellement : `indexPolicies()` (hook `adonisrc.ts`) indexe tout fichier `.ts` du dossier `app/policies/` comme une policy concrète instanciable — une classe abstraite placée là casserait la génération de `#generated/policies`.
 
@@ -148,6 +155,7 @@ async delete(user: User, boat: Boat) {
 2. L'ajouter à `MEMBER_CAPABILITIES` (si member+admin) ou `ADMIN_ONLY_CAPABILITIES` (si admin seul)
 3. Utiliser `this.can(user, 'ma.capacite')` dans la Policy concernée
 4. Étendre `tests/unit/permissions_taxonomy.spec.ts` et `tests/integration/permissions/policies_capabilities.spec.ts`
+5. Déclarer l'action dans le spec unit de la policy (`tests/unit/policies/<policy>.spec.ts`) — la garde `tests/unit/hygiene/policies_covered.spec.ts` échoue si une action publique n'y est nommée nulle part
 
 ### Exposition frontend
 

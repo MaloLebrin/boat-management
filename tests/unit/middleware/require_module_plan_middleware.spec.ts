@@ -2,37 +2,14 @@ import { test } from '@japa/runner'
 import RequireModulePlanMiddleware from '#middleware/require_module_plan_middleware'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
+import { fakeOrganization, fakeUserWithOrganization, makeCtx } from '#tests/support/http_context'
 import type QuotaService from '#services/quota_service'
 import type { ModulePlanFeature } from '#shared/types/plan'
 
-const organization = { id: 7, plan: 'pro' }
+const organization = fakeOrganization()
 
-function makeCtx() {
-  const flashes: Array<[string, string]> = []
-  const redirects: string[] = []
-  const user = {
-    organizationId: 7,
-    organization,
-    load: async () => {},
-  }
-  return {
-    flashes,
-    redirects,
-    ctx: {
-      auth: { getUserOrFail: () => user },
-      session: {
-        flash: (key: string, value: string) => {
-          flashes.push([key, value])
-        },
-      },
-      i18n: { t: (key: string) => `t:${key}` },
-      response: {
-        redirect: (target: string) => {
-          redirects.push(target)
-        },
-      },
-    } as never,
-  }
+function ctxForUser() {
+  return makeCtx({ user: fakeUserWithOrganization(organization) })
 }
 
 function makeMiddleware(denied: ModulePlanFeature[] = []) {
@@ -56,7 +33,7 @@ test.group('RequireModulePlanMiddleware (unit)', () => {
   for (const feature of ['clients', 'invoices', 'pricing', 'reservations'] as const) {
     test(`lets the request through when the ${feature} module is available`, async ({ assert }) => {
       const { middleware, asserted } = makeMiddleware()
-      const { ctx, redirects, flashes } = makeCtx()
+      const { ctx, redirects, flashes } = ctxForUser()
       let nextCalled = 0
 
       await middleware.handle(
@@ -77,7 +54,7 @@ test.group('RequireModulePlanMiddleware (unit)', () => {
       assert,
     }) => {
       const { middleware } = makeMiddleware([feature])
-      const { ctx, redirects, flashes } = makeCtx()
+      const { ctx, redirects, flashes } = ctxForUser()
       let nextCalled = 0
 
       await middleware.handle(
@@ -101,7 +78,7 @@ test.group('RequireModulePlanMiddleware (unit)', () => {
       },
     } as unknown as QuotaService
     const middleware = new RequireModulePlanMiddleware(quotaService)
-    const { ctx, redirects } = makeCtx()
+    const { ctx, redirects } = ctxForUser()
 
     await assert.rejects(
       () => middleware.handle(ctx, async () => {}, { feature: 'clients' }),
