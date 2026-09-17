@@ -35,7 +35,27 @@ export default class BoatContextService {
     param = 'boatId'
   ): Promise<BoatContext<User, Boat> | null> {
     const user = ctx.auth.getUserOrFail()
-    const boat = await this.findBoat(user, Number(ctx.params[param]), ctx.response)
+    const boat = await this.orRedirectToList(
+      () => this.boatService.getForUserOrFail(user, Number(ctx.params[param])),
+      ctx.response
+    )
+    return boat ? { user, boat } : null
+  }
+
+  /**
+   * Même contrat, mais avec les relations de la fiche complète : c'est ce que
+   * charge `boats.show`, et la profondeur de chargement est la seule chose qui
+   * l'y distingue des autres routes de la ressource.
+   */
+  async resolveBoatDetail(
+    ctx: BoatRouteContext,
+    param = 'boatId'
+  ): Promise<BoatContext<User, Boat> | null> {
+    const user = ctx.auth.getUserOrFail()
+    const boat = await this.orRedirectToList(
+      () => this.boatService.getFullDetailForUser(user, Number(ctx.params[param])),
+      ctx.response
+    )
     return boat ? { user, boat } : null
   }
 
@@ -64,13 +84,12 @@ export default class BoatContextService {
     return { ...resolved, reservation }
   }
 
-  private async findBoat(
-    user: User,
-    boatId: number,
+  private async orRedirectToList(
+    load: () => Promise<Boat>,
     response: HttpContext['response']
   ): Promise<Boat | null> {
     try {
-      return await this.boatService.getForUserOrFail(user, boatId)
+      return await load()
     } catch (error) {
       if (error instanceof BoatNotFoundError) {
         response.redirect('/boats')

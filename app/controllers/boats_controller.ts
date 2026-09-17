@@ -34,8 +34,8 @@ import BoatIncidentService from '#services/boat_incident_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import BoatContextService from '#services/boat_context_service'
 import BoatHullService from '#services/boat_hull_service'
-import { BoatNotFoundError } from '#exceptions/boat_errors'
 import { RegistrationNumberTakenError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
@@ -58,6 +58,7 @@ import { initialTabParam } from '#utils/inertia_tab'
 @inject()
 export default class BoatsController {
   constructor(
+    private boatContext: BoatContextService,
     private boatService: BoatHullService,
     private maintenanceService: BoatMaintenanceService,
     private taskService: BoatMaintenanceTaskService,
@@ -221,20 +222,85 @@ export default class BoatsController {
    */
   async show({ inertia, params, request, auth, response, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
-    const user = auth.getUserOrFail()
+    const resolved = await this.boatContext.resolveBoatDetail({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { user, boat } = resolved
 
-    try {
-      const boat = await this.boatService.getFullDetailForUser(user, Number(params.id))
-      await bouncer.with(BoatPolicy).authorize('view', boat)
+    await bouncer.with(BoatPolicy).authorize('view', boat)
 
-      await user.load('organization')
+    await user.load('organization')
 
-      const [
-        boatMedia,
+    const [
+      boatMedia,
+      positionHistory,
+      homePortId,
+      canManageMaintenance,
+      pricingRow,
+      canManageEquipmentActions,
+      canDeleteEquipmentActions,
+      canDeleteIncidents,
+      canCreateFuelLogs,
+      canDeleteFuelLogs,
+      canCreateNavigationLogs,
+      canUpdateNavigationLogs,
+      canDeleteNavigationLogs,
+    ] = await Promise.all([
+      this.mediaService.listForEntity('boat', boat.id),
+      this.boatService.getPositionHistory(boat.id),
+      this.portService.findIdByName(user, boat.homePort),
+      bouncer.with(BoatPolicy).allows('edit', boat),
+      this.pricingService.getForBoat(boat),
+      bouncer.with(EquipmentActionPolicy).allows('create', boat),
+      bouncer.with(EquipmentActionPolicy).allows('delete', boat),
+      bouncer.with(IncidentPolicy).allows('delete', boat),
+      bouncer.with(FuelLogPolicy).allows('create', boat),
+      bouncer.with(FuelLogPolicy).allows('delete', boat),
+      bouncer.with(NavigationLogPolicy).allows('create', boat),
+      bouncer.with(NavigationLogPolicy).allows('update', boat),
+      bouncer.with(NavigationLogPolicy).allows('delete'),
+    ])
+
+    // Le formulaire moteur est monté depuis cette page (carte Moteurs et
+    // modale d'ajout d'équipement) : il lui faut le catalogue (#573). Les
+    // modèles sont rechargés par
+    // `router.reload({ only: ['engineCatalogModels'], data: { engineBrandId } })`.
+    const engineCatalog = await this.engineCatalogService.formProps(request.qs().engineBrandId)
+
+    // Même mécanique pour le formulaire d'équipement générique (#577) : les
+    // modèles sont rechargés par
+    // `router.reload({ only: ['equipmentCatalogModels'], data: { equipmentBrandId } })`.
+    const equipmentCatalog = await this.equipmentCatalogService.formProps(
+      request.qs().equipmentBrandId
+    )
+
+    // Le formulaire voile est aussi monté depuis cette page (carte Voiles et
+    // modale d'ajout) : il lui faut le référentiel des voileries (#578). Pas
+    // de modèles derrière une voilerie, donc pas de rechargement partiel —
+    // une seule liste statique.
+    const sailLoftProps = await this.sailLoftService.formProps()
+
+    const canManageEquipment = canManageMaintenance
+    const canManageDocuments = canManageMaintenance
+    const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
+    const pricingEnabled = user.organization
+      ? await this.quotaService.canManagePricing(user.organization)
+      : false
+    const canManagePricing = pricingEnabled && canManageMaintenance
+    const pricing = pricingRow ? toBoatPricingRow(pricingRow) : null
+    const initialTab = initialTabParam(request)
+
+    return inertia.render('boats/show', {
+      ...toShowShellProps(boat, {
         positionHistory,
+        boatMedia,
         homePortId,
         canManageMaintenance,
-        pricingRow,
+        canManageEquipment,
+        canManageDocuments,
+        canExport,
+        pricing,
+        pricingEnabled,
+        canManagePricing,
         canManageEquipmentActions,
         canDeleteEquipmentActions,
         canDeleteIncidents,
@@ -243,210 +309,132 @@ export default class BoatsController {
         canCreateNavigationLogs,
         canUpdateNavigationLogs,
         canDeleteNavigationLogs,
-      ] = await Promise.all([
-        this.mediaService.listForEntity('boat', boat.id),
-        this.boatService.getPositionHistory(boat.id),
-        this.portService.findIdByName(user, boat.homePort),
-        bouncer.with(BoatPolicy).allows('edit', boat),
-        this.pricingService.getForBoat(boat),
-        bouncer.with(EquipmentActionPolicy).allows('create', boat),
-        bouncer.with(EquipmentActionPolicy).allows('delete', boat),
-        bouncer.with(IncidentPolicy).allows('delete', boat),
-        bouncer.with(FuelLogPolicy).allows('create', boat),
-        bouncer.with(FuelLogPolicy).allows('delete', boat),
-        bouncer.with(NavigationLogPolicy).allows('create', boat),
-        bouncer.with(NavigationLogPolicy).allows('update', boat),
-        bouncer.with(NavigationLogPolicy).allows('delete'),
-      ])
+        initialTab,
+        safetyCompliance: this.safetyComplianceService.forBoat(boat),
+      }),
+      ...engineCatalog,
+      ...equipmentCatalog,
+      ...sailLoftProps,
 
-      // Le formulaire moteur est monté depuis cette page (carte Moteurs et
-      // modale d'ajout d'équipement) : il lui faut le catalogue (#573). Les
-      // modèles sont rechargés par
-      // `router.reload({ only: ['engineCatalogModels'], data: { engineBrandId } })`.
-      const engineCatalog = await this.engineCatalogService.formProps(request.qs().engineBrandId)
-
-      // Même mécanique pour le formulaire d'équipement générique (#577) : les
-      // modèles sont rechargés par
-      // `router.reload({ only: ['equipmentCatalogModels'], data: { equipmentBrandId } })`.
-      const equipmentCatalog = await this.equipmentCatalogService.formProps(
-        request.qs().equipmentBrandId
-      )
-
-      // Le formulaire voile est aussi monté depuis cette page (carte Voiles et
-      // modale d'ajout) : il lui faut le référentiel des voileries (#578). Pas
-      // de modèles derrière une voilerie, donc pas de rechargement partiel —
-      // une seule liste statique.
-      const sailLoftProps = await this.sailLoftService.formProps()
-
-      const canManageEquipment = canManageMaintenance
-      const canManageDocuments = canManageMaintenance
-      const canExport = user.organization ? this.quotaService.canExport(user.organization) : false
-      const pricingEnabled = user.organization
-        ? await this.quotaService.canManagePricing(user.organization)
-        : false
-      const canManagePricing = pricingEnabled && canManageMaintenance
-      const pricing = pricingRow ? toBoatPricingRow(pricingRow) : null
-      const initialTab = initialTabParam(request)
-
-      return inertia.render('boats/show', {
-        ...toShowShellProps(boat, {
-          positionHistory,
-          boatMedia,
-          homePortId,
-          canManageMaintenance,
-          canManageEquipment,
-          canManageDocuments,
-          canExport,
-          pricing,
-          pricingEnabled,
-          canManagePricing,
-          canManageEquipmentActions,
-          canDeleteEquipmentActions,
-          canDeleteIncidents,
-          canCreateFuelLogs,
-          canDeleteFuelLogs,
-          canCreateNavigationLogs,
-          canUpdateNavigationLogs,
-          canDeleteNavigationLogs,
-          initialTab,
-          safetyCompliance: this.safetyComplianceService.forBoat(boat),
+      // Groupe « maintenance » : onglets Aperçu, Historique, Tâches, Fiches,
+      // Actions équipement et Documents administratifs.
+      maintenanceEvents: inertia.defer(
+        deferJson(async () =>
+          toMaintenanceEventRows(await this.maintenanceService.listForBoat(user, boat))
+        ),
+        'maintenance'
+      ),
+      maintenanceTasks: inertia.defer(
+        deferJson(async () =>
+          toMaintenanceTaskRows(await this.taskService.listForBoat(user, boat))
+        ),
+        'maintenance'
+      ),
+      maintenanceSheets: inertia.defer(
+        deferJson(async () =>
+          toMaintenanceSheetRows(await this.sheetService.listForBoat(user, boat))
+        ),
+        'maintenance'
+      ),
+      boatDocuments: inertia.defer(
+        deferJson(() => this.documentService.listForBoat(user, boat)),
+        'maintenance'
+      ),
+      equipmentActions: inertia.defer(
+        deferJson(async () =>
+          toEquipmentActionRows(await this.equipmentActionService.listForBoat(user, boat))
+        ),
+        'maintenance'
+      ),
+      // Jamais `null` ici : le serializer d'Inertia jette « Cannot serialize
+      // an item with null value » quand un callback différé résout `null`
+      // (#478) — l'absence d'analyse est donc portée par la liste vide.
+      aiSuggestions: inertia.defer(
+        deferJson(async () => {
+          if (!user.organizationId) return []
+          const latest = await this.aiAnalysisService.getLatestBoatSuggestions(
+            user.id,
+            boat.id,
+            user.organizationId,
+            toAppLocale(i18n.locale)
+          )
+          return latest ? (JSON.parse(latest.responseText) as AiSuggestion[]) : []
         }),
-        ...engineCatalog,
-        ...equipmentCatalog,
-        ...sailLoftProps,
+        'maintenance'
+      ),
 
-        // Groupe « maintenance » : onglets Aperçu, Historique, Tâches, Fiches,
-        // Actions équipement et Documents administratifs.
-        maintenanceEvents: inertia.defer(
-          deferJson(async () =>
-            toMaintenanceEventRows(await this.maintenanceService.listForBoat(user, boat))
-          ),
-          'maintenance'
+      // Groupe « navigation » : onglets Journal de bord, Carburant, Incidents.
+      navigationLogs: inertia.defer(
+        deferJson(async () =>
+          toNavigationLogRows(await this.navigationLogService.listForBoat(boat))
         ),
-        maintenanceTasks: inertia.defer(
-          deferJson(async () =>
-            toMaintenanceTaskRows(await this.taskService.listForBoat(user, boat))
-          ),
-          'maintenance'
-        ),
-        maintenanceSheets: inertia.defer(
-          deferJson(async () =>
-            toMaintenanceSheetRows(await this.sheetService.listForBoat(user, boat))
-          ),
-          'maintenance'
-        ),
-        boatDocuments: inertia.defer(
-          deferJson(() => this.documentService.listForBoat(user, boat)),
-          'maintenance'
-        ),
-        equipmentActions: inertia.defer(
-          deferJson(async () =>
-            toEquipmentActionRows(await this.equipmentActionService.listForBoat(user, boat))
-          ),
-          'maintenance'
-        ),
-        // Jamais `null` ici : le serializer d'Inertia jette « Cannot serialize
-        // an item with null value » quand un callback différé résout `null`
-        // (#478) — l'absence d'analyse est donc portée par la liste vide.
-        aiSuggestions: inertia.defer(
-          deferJson(async () => {
-            if (!user.organizationId) return []
-            const latest = await this.aiAnalysisService.getLatestBoatSuggestions(
-              user.id,
-              boat.id,
-              user.organizationId,
-              toAppLocale(i18n.locale)
-            )
-            return latest ? (JSON.parse(latest.responseText) as AiSuggestion[]) : []
-          }),
-          'maintenance'
-        ),
-
-        // Groupe « navigation » : onglets Journal de bord, Carburant, Incidents.
-        navigationLogs: inertia.defer(
-          deferJson(async () =>
-            toNavigationLogRows(await this.navigationLogService.listForBoat(boat))
-          ),
-          'navigation'
-        ),
-        fuelLogs: inertia.defer(
-          deferJson(async () => toFuelLogRows(await this.fuelLogService.listForBoat(user, boat))),
-          'navigation'
-        ),
-        incidents: inertia.defer(
-          deferJson(async () => toIncidentRows(await this.incidentService.listForBoat(user, boat))),
-          'navigation'
-        ),
-        portOptions: inertia.defer(
-          deferJson(async () => {
-            const ports = await this.portService.listNamesForOrg(user)
-            return ports.map((p) => ({ id: p.id, name: p.name }))
-          }),
-          'navigation'
-        ),
-        crewMemberOptions: inertia.defer(
-          deferJson(() => this.crewService.listOptionsForOrganization(user.organization)),
-          'navigation'
-        ),
-      })
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        response.redirect('/boats')
-        return
-      }
-      throw error
-    }
+        'navigation'
+      ),
+      fuelLogs: inertia.defer(
+        deferJson(async () => toFuelLogRows(await this.fuelLogService.listForBoat(user, boat))),
+        'navigation'
+      ),
+      incidents: inertia.defer(
+        deferJson(async () => toIncidentRows(await this.incidentService.listForBoat(user, boat))),
+        'navigation'
+      ),
+      portOptions: inertia.defer(
+        deferJson(async () => {
+          const ports = await this.portService.listNamesForOrg(user)
+          return ports.map((p) => ({ id: p.id, name: p.name }))
+        }),
+        'navigation'
+      ),
+      crewMemberOptions: inertia.defer(
+        deferJson(() => this.crewService.listOptionsForOrganization(user.organization)),
+        'navigation'
+      ),
+    })
   }
 
   async edit({ inertia, params, auth, response, bouncer, request }: HttpContext) {
     await auth.authenticate()
-    const user = auth.getUserOrFail()
+    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { user, boat } = resolved
 
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-      await bouncer.with(BoatPolicy).authorize('edit', boat)
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
 
-      const [ports, portOptions, owners, ownerCandidates, brands, catalog] = await Promise.all([
-        this.portService.listWithSpotsForOrg(user),
-        this.portService.listNamesForOrg(user),
-        this.boatOwnerService.listOwners(boat),
-        this.boatOwnerService.listEligibleOwnerCandidates(boat),
-        this.boatCatalogService.listBrands(),
-        this.resolveCatalogModels(request.qs().brandId, boat.manufacturer),
-      ])
+    const [ports, portOptions, owners, ownerCandidates, brands, catalog] = await Promise.all([
+      this.portService.listWithSpotsForOrg(user),
+      this.portService.listNamesForOrg(user),
+      this.boatOwnerService.listOwners(boat),
+      this.boatOwnerService.listEligibleOwnerCandidates(boat),
+      this.boatCatalogService.listBrands(),
+      this.resolveCatalogModels(request.qs().brandId, boat.manufacturer),
+    ])
 
-      return inertia.render('boats/edit', {
-        boat: toEditForm(boat),
-        ports: toPortFormOptions(ports),
-        portOptions,
-        brands,
-        catalogModels: catalog.models,
-        catalogBrandId: catalog.brandId,
-        owners: owners.map((owner) => ({
-          id: owner.id,
-          fullName: owner.fullName,
-          email: owner.email,
-        })),
-        ownerCandidates: ownerCandidates.map((candidate) => ({
-          id: candidate.id,
-          fullName: candidate.fullName,
-          email: candidate.email,
-        })),
-      })
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) {
-        response.redirect('/boats')
-        return
-      }
-      throw error
-    }
+    return inertia.render('boats/edit', {
+      boat: toEditForm(boat),
+      ports: toPortFormOptions(ports),
+      portOptions,
+      brands,
+      catalogModels: catalog.models,
+      catalogBrandId: catalog.brandId,
+      owners: owners.map((owner) => ({
+        id: owner.id,
+        fullName: owner.fullName,
+        email: owner.email,
+      })),
+      ownerCandidates: ownerCandidates.map((candidate) => ({
+        id: candidate.id,
+        fullName: candidate.fullName,
+        email: candidate.email,
+      })),
+    })
   }
 
   async update({ request, params, auth, response, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
-    const user = auth.getUserOrFail()
+    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { user, boat } = resolved
 
-    const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const payload = await request.validateUsing(updateBoatValidator)
@@ -479,42 +467,41 @@ export default class BoatsController {
 
   async destroy({ params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
-    const user = auth.getUserOrFail()
+    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { user, boat } = resolved
 
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-      await bouncer.with(BoatPolicy).authorize('delete', boat)
+    await bouncer.with(BoatPolicy).authorize('delete', boat)
 
-      const org = await this.organizationService.findOrFail(boat.organizationId)
-      const boatName = boat.name
-      const boatId = boat.id
-      await this.boatService.deleteForUser(user, boat, org)
+    const org = await this.organizationService.findOrFail(boat.organizationId)
+    const boatName = boat.name
+    const boatId = boat.id
+    await this.boatService.deleteForUser(user, boat, org)
 
-      await this.auditLogService.log({
-        organizationId: user.organizationId!,
-        userId: user.id,
-        action: 'boat.delete',
-        entityType: 'boat',
-        entityId: boatId,
-        metadata: { name: boatName },
-      })
+    await this.auditLogService.log({
+      organizationId: user.organizationId!,
+      userId: user.id,
+      action: 'boat.delete',
+      entityType: 'boat',
+      entityId: boatId,
+      metadata: { name: boatName },
+    })
 
-      response.redirect('/boats')
-    } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
-      throw error
-    }
+    response.redirect('/boats')
   }
 
   async assign({ request, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    try {
-      const boat = await this.boatService.getForUserOrFail(user, Number(params.id))
-      await bouncer.with(BoatPolicy).authorize('edit', boat)
-      const payload = await request.validateUsing(assignBoatValidator)
+    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return
+    const { boat } = resolved
 
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
+    const payload = await request.validateUsing(assignBoatValidator)
+
+    try {
       if (payload.spotId !== null) {
         await this.spotService.getForUserOrFail(user, payload.spotId)
       }
@@ -522,7 +509,6 @@ export default class BoatsController {
       await this.boatService.updateAssignment(boat, { spotId: payload.spotId })
       return response.redirect().back()
     } catch (error) {
-      if (error instanceof BoatNotFoundError) return response.redirect('/boats')
       if (error instanceof SpotNotFoundError) return response.redirect().back()
       throw error
     }
