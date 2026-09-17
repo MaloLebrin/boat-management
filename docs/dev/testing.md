@@ -67,6 +67,67 @@ chemin privé de son `.spec.ts`. Deux conséquences :
 - un filtre par segment déborde : `boats/engines` matche aussi `boats/boat_engines`, et
   `dossier/*` ne couvre qu'**un seul niveau** (pas de glob récursif `**`).
 
+## Tester l'ACL : deux niveaux, et pourquoi (#690)
+
+Une policy se teste à **deux** endroits, et confondre les deux donne des tests qui passent sans
+rien prouver.
+
+### Niveau 1 — les méthodes de policy, en suite `unit`
+
+Une policy ne touche jamais la base : `OrgScopedPolicy.can()` ne lit que `user.organizationId`
+puis appelle `user.hasPermission()`, et tous les modèles y sont importés en `import type` (donc
+effacés à la compilation). Un faux utilisateur littéral suffit —
+`policyUser()` / `userWithCapabilities()` de `tests/support/policy_user.ts`, adossés au vrai
+`ROLE_PERMISSIONS` plutôt qu'à des capabilities recopiées.
+
+La matrice commune (capability exigée, refus sans elle, isolation entre organisations, compte
+sans organisation) est générée par `testPolicyMatrix()` (`tests/support/policy_matrix.ts`) :
+chaque spec **déclare** ses actions. Les particularités — argument optionnel, règle métier,
+scope via une relation — restent écrites en clair dans leur spec, pas dans la matrice.
+
+### Niveau 2 — le hook `before()`, en suite `integration`
+
+**`before()` n'est jamais exécuté quand on instancie une policy à la main.** Seul le
+`PolicyAuthorizer` de Bouncer l'appelle, et un retour booléen y court-circuite entièrement la
+méthode de policy :
+
+```js
+hookResponse = await policyInstance.before(this.#user, action, ...args)
+if (typeof hookResponse === "boolean" || …) return …   // la méthode n'est jamais atteinte
+```
+
+Conséquence : un `assert.isFalse(await new XPolicy().edit(admin, ressourceÉtrangère))` teste un
+chemin d'appel qui n'existe pas en production. Il vérifie `sameOrg`, pas l'autorisation réelle.
+
+Ce qu'un admin obtient vraiment se teste donc à travers un vrai `Bouncer` —
+`tests/integration/permissions/policy_before_hook.spec.ts` :
+
+```ts
+const bouncer = new Bouncer(() => user, abilities, policies)
+assert.isFalse(await bouncer.with(PortPolicy).allows('edit', portDUneAutreOrg))
+```
+
+Suite `integration` et non `unit` : `isAdminOf` fait une requête SQL.
+
+### La garde
+
+`tests/unit/hygiene/policies_covered.spec.ts` vérifie que toute policy a son spec et que toute
+action publique y est nommée. Comme la garde des shards, elle **relit le disque** au lieu
+d'importer une liste depuis le code testé : une garde qui partage sa source avec sa cible hérite
+de ses angles morts.
+
+### Les middlewares
+
+`makeCtx()` (`tests/support/http_context.ts`) fournit un faux `HttpContext` qui **enregistre** ce
+qu'on lui fait — flashes, redirections, appels d'authentification — au lieu de l'exécuter. Les
+assertions portent sur ces journaux, ce qui rend visible aussi bien ce qui a été fait que ce qui
+ne l'a pas été (`assert.equal(nextCalled, 0)`).
+
+Ses journaux sont des **références vivantes**, jamais des accesseurs : un spec les déstructure
+(`const { ctx, redirects } = makeCtx()`), ce qui figerait la valeur d'un getter au moment de la
+déstructuration — le tableau resterait vide quoi que fasse le middleware, et le test passerait au
+vert pour de mauvaises raisons.
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.
