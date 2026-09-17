@@ -11,7 +11,18 @@ import { formatDate } from '#shared/helpers/date_format'
 import { resolveEngineStrokeType } from '#shared/helpers/engine_stroke'
 import { isEngineKindCaption } from '#shared/helpers/maintenance'
 import { isSailMaterial } from '#shared/types/boat'
-import PDFDocument from 'pdfkit'
+import { createPdfDocument } from '#services/pdf/document'
+import { PDF_COLORS, PDF_PAGE } from '#services/pdf/theme'
+
+const {
+  navy: NAVY,
+  coral: CORAL,
+  greyB: GREY_B,
+  greyM: GREY_M,
+  greyD: GREY_D,
+  white: WHITE,
+} = PDF_COLORS
+const { width: PAGE_W, margin: MARGIN, contentWidth: CONTENT_W } = PDF_PAGE
 
 type EventRow = {
   id: number
@@ -29,17 +40,6 @@ type EventRow = {
   parts: Array<{ name: string; quantity: number | null; notes: string | null }>
 }
 
-const NAVY = '#0b1d2e'
-const CORAL = '#e2674f'
-const GREY_B = '#e0e0e0'
-const GREY_M = '#888888'
-const GREY_D = '#333333'
-const WHITE = '#ffffff'
-
-const PAGE_W = 595.28
-const MARGIN = 48
-const CONTENT_W = PAGE_W - MARGIN * 2
-
 function mechanicalEquipmentStatusColor(status: string | null | undefined): string {
   if (status === 'operational') return '#2e7d32'
   if (status === 'in_maintenance') return '#e65100'
@@ -53,10 +53,7 @@ export default class MaintenanceLogPdfService {
     events: BoatMaintenanceEvent[],
     i18n: I18n
   ): Promise<{ buffer: Buffer; filename: string }> {
-    const doc = new PDFDocument({ margin: MARGIN, size: 'A4' })
-    const chunks: Buffer[] = []
-
-    doc.on('data', (chunk: Buffer) => chunks.push(chunk))
+    const { doc, finish } = createPdfDocument()
 
     const t = (key: string, data?: Record<string, string>) =>
       i18n.t(`boats.maintenanceLog.${key}`, data)
@@ -98,13 +95,11 @@ export default class MaintenanceLogPdfService {
     this.#renderEvents(doc, rows, t)
     this.#renderHistoryByEquipment(doc, boat, rows, t, tOpt)
 
-    doc.end()
-
-    await new Promise<void>((resolve) => doc.on('end', resolve))
+    const buffer = await finish()
 
     const safe = boat.name.replace(/[^a-z0-9]/gi, '_').toLowerCase()
     return {
-      buffer: Buffer.concat(chunks),
+      buffer,
       filename: `${t('title').toLowerCase().replace(/\s+/g, '-')}-${safe}.pdf`,
     }
   }

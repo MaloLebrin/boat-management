@@ -1,0 +1,230 @@
+{
+  "filename": "carnet-d'entretien-hermione.pdf",
+  "calls": [
+    ["font", "Helvetica", null],
+    ["addPage"],
+    ["rect", 0, 0, 595.28, 118],
+    ["fill", "#0b1d2e"],
+    ["fillColor", "#0b1d2e"],
+    [
+      "image",
+      "<public>/web-app-manifest-192x192.png",
+      48,
+      22,
+      {
+        "width": 62,
+        "height": 62
+      }
+    ],
+    ["fillColor", "#ffffff"],
+    ["fontSize", 18],
+    ["font", "Helvetica-Bold"],
+    ["text", "FleetAi", 126, 25],
+    ["fillColor", "#e2674f"],
+    ["fontSize", 10],
+    ["font", "Helvetica"],
+    ["text", "Carnet d'entretien", 126, 49],
+    ["fillColor", "#ffffff"],
+    ["fontSize", 20],
+    ["font", "Helvetica-Bold"],
+    ["text", "Hermione", 126, 67],
+    ["fillColor", "#888888"],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["text", "Généré le <today>", 126, 97],
+    ["rect", 0, 118, 595.28, 3],
+    ["fill", "#e2674f"],
+    ["fillColor", "#e2674f"],
+    ["text", "", 48, 141],
+    ["fillColor", "#000"],
+    ["rect", 36, 141, 523.28, 22],
+    ["fill", "#0b1d2e"],
+    ["fillColor", "#0b1d2e"],
+    ["fillColor", "#ffffff"],
+    ["fontSize", 9],
+    ["font", "Helvetica-Bold"],
+    [
+      "text",
+      "INFORMATIONS BATEAU",
+      48,
+      148,
+      {
+        "width": 499.28,
+        "characterSpacing": 0.5
+      }
+    ],
+    ["fillColor", "#000"],
+    ["text", "", 48, 175],
+    ["fontSize", 8],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    [
+      "text",
+      "Immatriculation",
+      48,
+      175,
+      {
+        "width": 90,
+        "lineBreak": false
+      }
+    ],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "MA123456",
+      142,
+      175,
+      {
+        "width": 145.64,
+        "lineBreak": false
+      }
+    ],
+    ["fontSize", 8],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    [
+      "text",
+      "Propulsion",
+      307.64,
+      175,
+      {
+        "width": 90,
+        "lineBreak": false
+      }
+    ],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "Voilier",
+      401.64,
+      175,
+      {
+        "width": 145.64,
+        "lineBreak": false
+      }
+    ],
+    ["text", "", 48, 189],
+    ["fontSize", 8],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    [
+      "text",
+      "Longueur",
+      48,
+      189,
+      {
+        "width": 90,
+        "lineBreak": false
+      }
+    ],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "10.5 m",
+      142,
+      189,
+      {
+        "width": 145.64,
+        "lineBreak": false
+      }
+    ],
+    ["text", "", 48, 203],
+    ["fillColor", "#000"],
+    ["moveDown", 0.4],
+    ["rect", 48, 206.7, 499.28, 0.5],
+    ["fill", "#e0e0e0"],
+    ["fillColor", "#e0e0e0"],
+    ["moveDown", 0.8],
+    ["rect", 36, 214.1, 523.28, 22],
+    ["fill", "#0b1d2e"],
+    ["fillColor", "#0b1d2e"],
+    ["fillColor", "#ffffff"],
+    ["fontSize", 9],
+    ["font", "Helvetica-Bold"],
+    [
+      "text",
+      "HISTORIQUE DES INTERVENTIONS",
+      48,
+      221.1,
+      {
+        "width": 499.28,
+        "characterSpacing": 0.5
+      }
+    ],
+    ["fillColor", "#000"],
+    ["text", "", 48, 248.1],
+    ["fontSize", 9.5],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    [
+      "text",
+      "2026-04-15",
+      58,
+      248.1,
+      {
+        "continued": true
+      }
+    ],
+    ["fillColor", "#333333"],
+    ["text", "  —  Carénage annuel"],
+    ["fontSize", 7.5],
+    ["font", "Helvetica"],
+    ["fillColor", "#888888"],
+    ["text", "Sujet : Coque", 58, 259.4],
+    ["rect", 38, 246.1, 3, 25.98],
+    ["fill", "#e2674f"],
+    ["fillColor", "#e2674f"],
+    ["fillColor", "#000"],
+    ["moveDown", 0.4],
+    ["rect", 48, 271.54, 499.28, 0.5],
+    ["fill", "#e0e0e0"],
+    ["fillColor", "#e0e0e0"],
+    ["moveDown", 0.6],
+    ["fontSize", 9.5],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#0b1d2e"],
+    [
+      "text",
+      "2026-06-01",
+      58,
+      276.74,
+      {
+        "continued": true
+      }
+    ],
+    ["fillColor", "#333333"],
+    ["text", "  —  Vidange moteur"],
+    ["fontSize", 7.5],
+    ["font", "Helvetica"],
+    ["fillColor", "#888888"],
+    ["text", "Sujet : Moteur", 58, 288.05],
+    ["moveDown", 0.2],
+    ["fontSize", 8.5],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "Huile 15W40, filtre changé",
+      58,
+      298.45,
+      {
+        "width": 489.28
+      }
+    ],
+    ["rect", 38, 274.74, 3, 37.54],
+    ["fill", "#e2674f"],
+    ["fillColor", "#e2674f"],
+    ["fillColor", "#000"],
+    ["moveDown", 0.4],
+    ["rect", 48, 312.21, 499.28, 0.5],
+    ["fill", "#e0e0e0"],
+    ["fillColor", "#e0e0e0"],
+    ["moveDown", 0.6]
+  ]
+}

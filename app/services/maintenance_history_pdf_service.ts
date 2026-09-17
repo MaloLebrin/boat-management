@@ -1,18 +1,18 @@
 import type { MaintenanceEventRow, MaintenanceHistoryFilters } from '#shared/types/maintenance'
 import type { I18n } from '@adonisjs/i18n'
 import { formatDate } from '#shared/helpers/date_format'
-import PDFDocument from 'pdfkit'
+import { createPdfDocument } from '#services/pdf/document'
+import { PDF_COLORS, PDF_PAGE } from '#services/pdf/theme'
 
-const NAVY = '#0b1d2e'
-const CORAL = '#e2674f'
-const GREY_B = '#e0e0e0'
-const GREY_M = '#888888'
-const GREY_D = '#333333'
-const WHITE = '#ffffff'
-
-const PAGE_W = 595.28
-const MARGIN = 48
-const CONTENT_W = PAGE_W - MARGIN * 2
+const {
+  navy: NAVY,
+  coral: CORAL,
+  greyB: GREY_B,
+  greyM: GREY_M,
+  greyD: GREY_D,
+  white: WHITE,
+} = PDF_COLORS
+const { width: PAGE_W, margin: MARGIN, contentWidth: CONTENT_W } = PDF_PAGE
 
 const C_DATE = 60
 const C_BOAT = 110
@@ -26,10 +26,7 @@ export default class MaintenanceHistoryPdfService {
     boatName: string | null,
     i18n: I18n
   ): Promise<{ buffer: Buffer; filename: string }> {
-    const doc = new PDFDocument({ margin: MARGIN, size: 'A4' })
-    const chunks: Buffer[] = []
-
-    doc.on('data', (chunk: Buffer) => chunks.push(chunk))
+    const { doc, finish } = createPdfDocument()
 
     const t = (key: string, data?: Record<string, string>) =>
       i18n.t(`maintenance.history.pdf.${key}`, data)
@@ -38,12 +35,11 @@ export default class MaintenanceHistoryPdfService {
     this.#renderHeader(doc, filters, boatName, t, subjectLabel, i18n.locale)
     this.#renderTable(doc, events, t, subjectLabel)
 
-    doc.end()
-    await new Promise<void>((resolve) => doc.on('end', resolve))
+    const buffer = await finish()
 
     const date = new Date().toISOString().slice(0, 10)
     return {
-      buffer: Buffer.concat(chunks),
+      buffer,
       filename: `historique-maintenance-${date}.pdf`,
     }
   }

@@ -1,0 +1,219 @@
+{
+  "filename": "historique-maintenance-<today-iso>.pdf",
+  "calls": [
+    ["font", "Helvetica", null],
+    ["addPage"],
+    ["rect", 0, 0, 595.28, 90],
+    ["fill", "#0b1d2e"],
+    ["fillColor", "#0b1d2e"],
+    ["fillColor", "#ffffff"],
+    ["fontSize", 18],
+    ["font", "Helvetica-Bold"],
+    ["text", "FleetAi", 48, 22],
+    ["fillColor", "#e2674f"],
+    ["fontSize", 12],
+    ["font", "Helvetica-Bold"],
+    ["text", "Historique de maintenance", 48, 46],
+    ["fillColor", "#888888"],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["text", "Généré le <today>", 48, 66],
+    ["rect", 0, 90, 595.28, 3],
+    ["fill", "#e2674f"],
+    ["fillColor", "#e2674f"],
+    ["fillColor", "#000"],
+    ["fontSize", 8.5],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "Bateau : Hermione  •  Sujet : Moteur  •  Du 2026-01-01  •  Au 2026-12-31  •  Recherche : « moteur »",
+      48,
+      110,
+      {
+        "width": 499.28
+      }
+    ],
+    ["moveDown", 1],
+    ["rect", 48, 129.65, 499.28, 0.5],
+    ["fill", "#e0e0e0"],
+    ["fillColor", "#e0e0e0"],
+    ["moveDown", 0.8],
+    ["fillColor", "#000"],
+    ["fontSize", 9],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#333333"],
+    ["text", "2 événements", 48, 137.51],
+    ["moveDown", 0.6],
+    ["rect", 36, 150.65, 523.28, 20],
+    ["fill", "#0b1d2e"],
+    ["fillColor", "#0b1d2e"],
+    ["fontSize", 8],
+    ["font", "Helvetica-Bold"],
+    ["fillColor", "#ffffff"],
+    [
+      "text",
+      "Date",
+      48,
+      154.65,
+      {
+        "width": 56,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Bateau",
+      108,
+      154.65,
+      {
+        "width": 106,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Sujet",
+      218,
+      154.65,
+      {
+        "width": 76,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Intervention",
+      298,
+      154.65,
+      {
+        "width": 249.28,
+        "lineBreak": false
+      }
+    ],
+    ["fillColor", "#000"],
+    ["text", "", 48, 174.65],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "2026-06-01",
+      48,
+      174.65,
+      {
+        "width": 56,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Hermione",
+      108,
+      174.65,
+      {
+        "width": 106,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Moteur",
+      218,
+      174.65,
+      {
+        "width": 76,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Vidange moteur",
+      298,
+      174.65,
+      {
+        "width": 249.28,
+        "lineBreak": false
+      }
+    ],
+    ["fillColor", "#000"],
+    ["fontSize", 7.5],
+    ["font", "Helvetica"],
+    ["fillColor", "#888888"],
+    [
+      "text",
+      "Huile 15W40, filtre changé",
+      298,
+      186.65,
+      {
+        "width": 249.28
+      }
+    ],
+    ["fontSize", 7.5],
+    ["font", "Helvetica"],
+    ["fillColor", "#888888"],
+    [
+      "text",
+      "2 pièces changées",
+      108,
+      195.32,
+      {
+        "width": 439.28
+      }
+    ],
+    ["fillColor", "#000"],
+    ["rect", 48, 207.99, 499.28, 0.5],
+    ["fill", "#e0e0e0"],
+    ["fillColor", "#e0e0e0"],
+    ["text", "", 48, 211.99],
+    ["fontSize", 8],
+    ["font", "Helvetica"],
+    ["fillColor", "#333333"],
+    [
+      "text",
+      "2026-04-15",
+      48,
+      211.99,
+      {
+        "width": 56,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Hermione",
+      108,
+      211.99,
+      {
+        "width": 106,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Coque",
+      218,
+      211.99,
+      {
+        "width": 76,
+        "lineBreak": false
+      }
+    ],
+    [
+      "text",
+      "Carénage annuel",
+      298,
+      211.99,
+      {
+        "width": 249.28,
+        "lineBreak": false
+      }
+    ],
+    ["fillColor", "#000"],
+    ["fillColor", "#000"],
+    ["rect", 48, 227.99, 499.28, 0.5],
+    ["fill", "#e0e0e0"],
+    ["fillColor", "#e0e0e0"],
+    ["text", "", 48, 231.99]
+  ]
+}
