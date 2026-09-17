@@ -2,7 +2,17 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
 
 vi.mock('@inertiajs/vue3', () => ({
-  usePage: () => ({ props: { appT: { 'settings.billing.usage.of': 'of' }, locale: 'en' } }),
+  usePage: () => ({
+    props: {
+      appT: {
+        'settings.billing.usage.of': 'of',
+        'common.units.kb': 'KB',
+        'common.units.mb': 'MB',
+        'common.units.gb': 'GB',
+      },
+      locale: 'en',
+    },
+  }),
 }))
 
 import SettingsBillingUsageGauge from '../../inertia/components/settings/SettingsBillingUsageGauge.vue'
@@ -35,9 +45,25 @@ describe('SettingsBillingUsageGauge', () => {
     const wrapper = mount(SettingsBillingUsageGauge, {
       props: { label: 'Storage', used: 5 * 1024 * 1024, limit: 100 * 1024 * 1024, isBytes: true },
     })
-    // MB path, not the thousands-separated raw number
-    expect(wrapper.text()).toContain('settings.billing.usage.mb')
+    // MB path, not the thousands-separated raw number. L'unité vient de
+    // `common.units.*` (partagée avec les listes de documents) et non plus
+    // d'une clé propre à la facturation.
+    expect(wrapper.text()).toContain('5 MB')
+    expect(wrapper.text()).toContain('100 MB')
     expect(wrapper.text()).not.toContain('5242880')
+  })
+
+  test('passe au palier Go avec une décimale', () => {
+    const wrapper = mount(SettingsBillingUsageGauge, {
+      props: {
+        label: 'Storage',
+        used: 1.44 * 1024 * 1024 * 1024,
+        limit: 5 * 1024 * 1024 * 1024,
+        isBytes: true,
+      },
+    })
+    expect(wrapper.text()).toContain('1.4 GB')
+    expect(wrapper.text()).toContain('5.0 GB')
   })
 })
 

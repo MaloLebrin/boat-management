@@ -6,7 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import type { MediaRow } from '~/types/boat_show'
 import type { DocumentDeleteConfirm, DocumentListLabels } from '~/types/documents'
-import { formatBytes } from '~/utils/format_bytes'
+import { useByteFormat } from '~/composables/use_byte_format'
 import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
 
 /**
@@ -33,6 +33,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   (e: 'add'): void
 }>()
+
+const { formatFileSize } = useByteFormat()
 
 const documentDeletion = useRowDeleteConfirmation<MediaRow>({
   url: (doc) => props.deleteUrlFor(doc),
@@ -98,7 +100,7 @@ const sorted = computed<MediaRow[]>(() =>
             {{ doc.caption || doc.originalFilename }}
           </p>
           <p class="text-xs text-fg-muted">
-            {{ doc.format.toUpperCase() }} · {{ formatBytes(doc.bytes) }}
+            {{ doc.format.toUpperCase() }} · {{ formatFileSize(doc.bytes) }}
           </p>
         </div>
         <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement de document : pas une navigation -->
