@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -8,6 +7,7 @@ import InspectionDefectModal from '~/components/reservations/inspection/Inspecti
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { BoatEquipmentActionRow } from '~/types/boat_show'
+import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
 
 const props = defineProps<{
   boatId: number
@@ -27,16 +27,11 @@ const { t } = useT()
 const { formatCurrency } = useNumberFormat()
 
 const isModalOpen = ref(false)
-const toDelete = ref<BoatEquipmentActionRow | null>(null)
-
-function confirmDelete() {
-  if (!toDelete.value) return
-  router.delete(
-    `/boats/${props.boatId}/reservations/${props.reservationId}/inspections/${props.inspectionId}/equipment-actions/${toDelete.value.id}`,
-    { preserveScroll: true }
-  )
-  toDelete.value = null
-}
+const defectDeletion = useRowDeleteConfirmation<BoatEquipmentActionRow>({
+  url: (action) =>
+    `/boats/${props.boatId}/reservations/${props.reservationId}/inspections/${props.inspectionId}/equipment-actions/${action.id}`,
+  visit: { preserveScroll: true },
+})
 </script>
 
 <template>
@@ -48,12 +43,12 @@ function confirmDelete() {
       :inspection-id="inspectionId"
     />
     <BaseConfirmModal
-      :open="toDelete !== null"
+      :open="defectDeletion.isOpen.value"
       :title="t('equipmentActions.defects.deleteTitle')"
       :message="t('equipmentActions.form.confirmDelete')"
       :confirm-label="t('equipmentActions.form.delete')"
-      @update:open="toDelete = null"
-      @confirm="confirmDelete"
+      @update:open="defectDeletion.release()"
+      @confirm="defectDeletion.confirm()"
     />
 
     <div class="mb-3 flex items-center justify-between">
@@ -92,7 +87,7 @@ function confirmDelete() {
           v-if="canDelete"
           type="button"
           class="shrink-0 rounded-lg px-2 py-1 text-xs font-medium text-fg-subtle transition-colors hover:bg-danger/10 hover:text-danger"
-          @click="toDelete = action"
+          @click="defectDeletion.ask(action)"
         >
           {{ t('equipmentActions.form.delete') }}
         </button>

@@ -100,7 +100,7 @@ describe('pages/pricing/seasons — confirmation dans l’app', () => {
     w.unmount()
   })
 
-  test('confirmer supprime et referme aussitôt ; le `onFinish` ne relâche rien', async () => {
+  test('confirmer supprime et referme aussitôt, sans rappel de fin de visite', async () => {
     const w = mountPage()
     w.findComponent({ name: 'PricingSeasonList' }).vm.$emit('delete', season)
     await w.vm.$nextTick()
@@ -114,12 +114,9 @@ describe('pages/pricing/seasons — confirmation dans l’app', () => {
     // La modale a émis `update:open: false` avec son `confirm`.
     expect(modal(w).exists()).toBe(false)
 
-    // Le rappel de fin de visite retrouve une cible déjà relâchée : sans effet.
-    const options = routerSpies.delete.mock.calls.at(-1)![1] as { onFinish: () => void }
-    options.onFinish()
-    await w.vm.$nextTick()
-
-    expect(modal(w).exists()).toBe(false)
+    // Le `onFinish: () => (cible = null)` d'origine ne relâchait rien que la
+    // modale n'ait déjà relâché : la visite ne porte plus que `preserveScroll`.
+    expect(routerSpies.delete.mock.calls.at(-1)![1]).toEqual({ preserveScroll: true })
     w.unmount()
   })
 })
@@ -192,12 +189,7 @@ describe('pages/invoices — confirmation dans l’app', () => {
       expect.objectContaining({ preserveScroll: true })
     )
     expect(modal(w).exists()).toBe(false)
-
-    const options = routerSpies.delete.mock.calls.at(-1)![1] as { onFinish: () => void }
-    options.onFinish()
-    await w.vm.$nextTick()
-
-    expect(modal(w).exists()).toBe(false)
+    expect(routerSpies.delete.mock.calls.at(-1)![1]).toEqual({ preserveScroll: true })
     w.unmount()
   })
 })
