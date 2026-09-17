@@ -128,6 +128,64 @@ Ses journaux sont des **références vivantes**, jamais des accesseurs : un spec
 déstructuration — le tableau resterait vide quoi que fasse le middleware, et le test passerait au
 vert pour de mauvaises raisons.
 
+## Tester les refus de validation (#688)
+
+### `assertHasValidationError()` ne fonctionne pas — ne pas la chercher
+
+`@adonisjs/session/plugins/api_client` expose bien la macro, mais elle lit le flash **`errors`** :
+
+```js
+ApiResponse.macro('assertHasValidationError', function (field) {
+  this.assert.property(this.flashMessage('errors'), field) // → undefined
+})
+```
+
+AdonisJS v7 range les erreurs de validation dans **`inputErrorsBag`**, et c'est ce sac que le
+middleware Inertia relit pour construire la prop `errors` des pages. Passer par
+`tests/support/validation.ts`, c'est donc asserter exactement ce que le formulaire Vue recevra.
+
+### Deux familles d'échec, à ne pas confondre
+
+| Nature               | Levée par                                  | Flash            | Rendu         | Assertion                     |
+| -------------------- | ------------------------------------------ | ---------------- | ------------- | ----------------------------- |
+| Contrainte de schéma | VineJS, avant le contrôleur                | `inputErrorsBag` | sous le champ | `assertFieldErrors`           |
+| Règle métier         | le service (`ReservationValidationError`…) | `error`          | toast         | `assertBusinessRuleRejection` |
+
+Une règle qui migre d'une couche à l'autre change donc de rendu pour l'utilisateur. Un test qui
+confond les deux ne le verrait pas.
+
+### Le patron : un témoin, puis une mutation par cas
+
+```ts
+const VALID = { name: 'Sea Breeze' }
+
+test('the reference payload passes the validator and creates the boat', async ({
+  client,
+  assert,
+}) => {
+  assertNoFieldErrors(assert, await post(client))
+  assert.lengthOf(await Boat.all(), 1)
+})
+
+test('rejects a navigationCategory outside A-D', async ({ client, assert }) => {
+  assertFieldErrors(assert, await post(client, { navigationCategory: 'E' }), ['navigationCategory'])
+})
+```
+
+Le témoin est ce qui rend les autres cas probants : il prouve que `VALID` franchit le validateur,
+donc que tout refus qui suit vient de la seule mutation. Et `assertFieldErrors` exige l'**égalité
+stricte** du jeu de champs fautifs — sans quoi un payload cassé ailleurs passerait pour la preuve
+d'une contrainte jamais atteinte.
+
+### Le piège des gardes en amont
+
+Une route d'écriture traverse `auth`, la garde de plan ou de module, la policy et le quota **avant**
+le validateur. Un utilisateur mal choisi produit alors une 302 sans la moindre erreur de champ, et
+un test qui n'asserterait que le statut passerait au vert sans avoir jamais atteint le schéma.
+C'est arrivé en écrivant `ports_validation.spec.ts` : `createEnterprisePlanUser()` n'a pas de
+membership, donc pas la capability `ports.create` — il fallait `createEnterpriseAdminUser()`. Les
+deux assertions ci-dessus le détectent ; un `assertStatus(302)` seul, non.
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.
