@@ -1,25 +1,71 @@
 # Tests
 
-## Backend (Japa)
+## Suites
 
-Script: `pnpm test` (alias `node ace test`).
-Répertoire: `tests/` (unit/functional, selon la suite).
+| Suite            | Répertoire          | Commande            | Isolation DB                             |
+| ---------------- | ------------------- | ------------------- | ---------------------------------------- |
+| `unit`           | `tests/unit`        | `pnpm test`         | aucune (pas de DB)                       |
+| `integration`    | `tests/integration` | `pnpm test`         | `testUtils.db().withGlobalTransaction()` |
+| `functional`     | `tests/functional`  | `pnpm test`         | `truncateDb()` (`tests/utils/db.ts`)     |
+| `browser`        | `tests/browser`     | `pnpm test:e2e`     | `truncateDb()`                           |
+| Inertia (Vitest) | `tests/inertia`     | `pnpm test:inertia` | —                                        |
 
-**CI** : le job `test-backend` tourne en 4 shards parallèles (`unit-integration`,
-`functional-boats`, `functional-core`, `functional-other`), équilibrés par nombre de
-fichiers via le flag natif `--files` de Japa, chacun avec son propre conteneur Postgres
-éphémère. Un job d'agrégation `test-backend` (`needs` sur les 4 shards) reste l'unique
-check requis pour la protection de branche. En local, `pnpm test` est inchangé et lance
-toujours `unit`, `integration` et `functional` en séquentiel.
+`pnpm test` lance `unit`, `integration` et `functional`. **La suite `browser` n'en fait pas
+partie** : elle demande Chromium (`pnpm exec playwright install chromium`) et se lance à part
+avec `pnpm test:e2e`. En CI elle a son propre job, `test-e2e`.
 
-Le flag `--files` matche par segment de chemin, sans support du glob récursif `**` :
-`"dossier/*"` cible tous les fichiers directement sous ce dossier (un seul niveau) — voir
-`.github/workflows/ci.yml` pour le détail des filtres par shard.
+La base de test est le service `postgres_test` du `docker-compose.yml` (profil `test`, port
+hôte `5432`) : `pnpm test:db:up` avant, `pnpm test:db:down` après. Voir `docs/dev/setup.md`.
 
-## Frontend Inertia (Vitest)
+### Pourquoi `truncateDb()` et pas une transaction globale
 
-Script: `pnpm test:inertia` (alias `vitest run`).
-Répertoire: `tests/inertia` (selon la structure du repo).
+Pour `functional` et `browser`, le serveur HTTP tourne bien dans le même process, mais ses
+handlers passent par des **connexions DB distinctes** : une transaction globale ouverte côté
+test leur est invisible, et les données créées par le test n'existent pas pour le handler.
+D'où le truncate entre chaque test. `tests/bootstrap.ts` porte ce choix dans `configureSuite`.
+
+## CI — shards générés depuis l'arborescence
+
+Le job `test-backend` tourne en shards parallèles, chacun avec son propre conteneur Postgres
+éphémère. Un job d'agrégation `test-backend` (`needs` sur la matrice et sur les shards) reste
+l'unique check requis pour la protection de branche.
+
+La matrice **n'est pas écrite à la main** : le job `test-backend-matrix` exécute
+`scripts/ci_test_shards.mjs`, qui balaie `tests/functional/` et répartit les specs. Avant
+(#687), les filtres `--files` étaient une allowlist de répertoires — créer
+`tests/functional/reservations/` produisait des tests qui passaient en local et ne tournaient
+jamais en CI, sans qu'aucun job n'échoue.
+
+```bash
+node scripts/ci_test_shards.mjs --explain     # la répartition, lisible
+node scripts/ci_test_shards.mjs               # le JSON consommé par la CI
+node scripts/ci_test_shards.mjs --shards=6    # simuler un autre découpage
+```
+
+**Répartition au fichier près, pas au répertoire.** `tests/functional/boats/` pèse à lui seul
+~40 % des tests fonctionnels : tant qu'il était l'unité indivisible d'un shard, il fixait le
+chemin critique quel que soit le nombre de shards. Le packing se fait donc fichier par
+fichier, pondéré par le nombre de `test(...)` de chaque fichier, par LPT.
+
+**Si la CI devient trop longue** : augmenter `FUNCTIONAL_SHARD_COUNT` dans
+`scripts/ci_test_shards.mjs`. Rien d'autre à toucher — la matrice, les noms de jobs et les
+filtres suivent. Le plancher reste l'installation des dépendances et le démarrage de Postgres
+par shard (~1 min), donc au-delà d'une poignée de shards le gain se tasse.
+
+`tests/unit/hygiene/ci_shards.spec.ts` garde l'invariant : il rejoue l'algorithme de filtrage
+de Japa sur les filtres émis et échoue en **nommant** tout spec qui ne serait couvert par
+aucun shard (ou par plusieurs).
+
+### Sémantique de `--files`
+
+Japa (`FilesManager#grep`) retient un fichier si son chemin absolu `endsWith()` le filtre, ou
+si chaque segment du filtre, lu depuis la fin, est un **suffixe** du segment correspondant du
+chemin privé de son `.spec.ts`. Deux conséquences :
+
+- un chemin relatif complet (`tests/functional/boats/engines.spec.ts`) désigne exactement un
+  fichier — c'est ce qu'émet le générateur ;
+- un filtre par segment déborde : `boats/engines` matche aussi `boats/boat_engines`, et
+  `dossier/*` ne couvre qu'**un seul niveau** (pas de glob récursif `**`).
 
 ## Navigateur (Japa + Playwright)
 
