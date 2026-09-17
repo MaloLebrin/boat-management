@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
+import { useChatConversation } from '~/composables/use_chat_conversation'
 import BaseButton from '~/components/base/BaseButton.vue'
 import PartsAiChatComposer from '~/components/marketing/parts_ai/PartsAiChatComposer.vue'
 import PartsAiChatMessage from '~/components/marketing/parts_ai/PartsAiChatMessage.vue'
@@ -27,46 +27,18 @@ const props = defineProps<{
 
 const { t } = useT()
 
-const processing = ref(false)
-/** Message affiché en optimiste pendant l'appel Mistral synchrone. */
-const pendingMessage = ref<string | null>(null)
-/** Après une recherche terminée, repasse le composer en mode « nouvelle conversation ». */
-const startingNew = ref(false)
-
 const exhausted = computed(
   () => props.quota.limit !== null && props.quota.used >= props.quota.limit
 )
 
-const showThread = computed(() => props.conversation !== null && !startingNew.value)
-
-const composerMode = computed<'start' | 'reply' | null>(() => {
-  if (props.conversation === null || startingNew.value) {
-    return exhausted.value ? null : 'start'
-  }
-  return props.conversation.status === 'active' ? 'reply' : null
-})
-
-function submit(payload: PublicPartSearchStartInput) {
-  const isStart = composerMode.value === 'start'
-  const url = isStart
-    ? '/parts-ai/conversations'
-    : `/parts-ai/conversations/${props.conversation!.token}/messages`
-  const data = isStart ? { ...payload } : { message: payload.message }
-
-  pendingMessage.value = payload.message
-  router.post(url, data, {
-    preserveScroll: true,
+const { processing, pendingMessage, showThread, composerMode, submit, startNew } =
+  useChatConversation<PublicPartSearchConversationProps, PublicPartSearchStartInput>({
+    conversation: () => props.conversation,
+    startUrl: () => '/parts-ai/conversations',
+    replyUrl: (conversation) => `/parts-ai/conversations/${conversation.token}/messages`,
     only: ['conversation', 'quota', 'errors', 'flash'],
-    onStart: () => {
-      processing.value = true
-    },
-    onFinish: () => {
-      processing.value = false
-      pendingMessage.value = null
-      startingNew.value = false
-    },
+    canStart: () => !exhausted.value,
   })
-}
 </script>
 
 <template>
@@ -121,7 +93,7 @@ function submit(payload: PublicPartSearchStartInput) {
       v-if="showThread && conversation?.status === 'completed' && !exhausted"
       class="flex justify-center"
     >
-      <BaseButton variant="outline" @click="startingNew = true">
+      <BaseButton variant="outline" @click="startNew">
         {{ t('publicPartSearch.new_conversation') }}
       </BaseButton>
     </div>

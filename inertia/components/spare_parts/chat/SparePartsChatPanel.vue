@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import SparePartsChatComposer from '~/components/spare_parts/chat/SparePartsChatComposer.vue'
@@ -9,6 +8,7 @@ import SparePartsChatResultCard from '~/components/spare_parts/chat/SparePartsCh
 import type { PartSearchConversationProps } from '#shared/types/spare_part_chat'
 import type { SparePartsEngineProps } from '#shared/types/spare_parts'
 import { useT } from '~/composables/use_t'
+import { useChatConversation } from '~/composables/use_chat_conversation'
 
 /**
  * Panneau du chat de recherche de références (#634) — décalqué de
@@ -24,43 +24,23 @@ const props = defineProps<{
 
 const { t } = useT()
 
-const processing = ref(false)
-/** Message affiché en optimiste pendant l'appel Mistral synchrone. */
-const pendingMessage = ref<string | null>(null)
-/** Après une recherche terminée, repasse le composer en mode « nouvelle recherche ». */
-const startingNew = ref(false)
+/** Racine des références du moteur : le repli manuel et le chat en dérivent. */
+const sparePartsUrl = computed(
+  () => `/boats/${props.boatId}/engines/${props.engine.id}/spare-parts`
+)
+const conversationsUrl = computed(() => `${sparePartsUrl.value}/chat/conversations`)
 
-const showThread = computed(() => props.conversation !== null && !startingNew.value)
+const { processing, pendingMessage, showThread, composerMode, submit, startNew } =
+  useChatConversation<PartSearchConversationProps, { message: string }>({
+    conversation: () => props.conversation,
+    startUrl: () => conversationsUrl.value,
+    replyUrl: (conversation) => `${conversationsUrl.value}/${conversation.token}/messages`,
+    only: ['conversation', 'errors', 'flash'],
+  })
 
-const composerMode = computed<'start' | 'reply' | null>(() => {
-  if (props.conversation === null || startingNew.value) return 'start'
-  return props.conversation.status === 'active' ? 'reply' : null
-})
-
-const identifyHref = computed(() => `/boats/${props.boatId}/engines/${props.engine.id}/spare-parts`)
-
-function submit(message: string) {
-  const isStart = composerMode.value === 'start'
-  const base = `/boats/${props.boatId}/engines/${props.engine.id}/spare-parts/chat/conversations`
-  const url = isStart ? base : `${base}/${props.conversation!.token}/messages`
-
-  pendingMessage.value = message
-  router.post(
-    url,
-    { message },
-    {
-      preserveScroll: true,
-      only: ['conversation', 'errors', 'flash'],
-      onStart: () => {
-        processing.value = true
-      },
-      onFinish: () => {
-        processing.value = false
-        pendingMessage.value = null
-        startingNew.value = false
-      },
-    }
-  )
+/** Le composer émet le texte seul ; la charge utile de l'API est `{ message }`. */
+function submitMessage(message: string) {
+  submit({ message })
 }
 </script>
 
@@ -93,7 +73,7 @@ function submit(message: string) {
       <p class="text-sm font-semibold text-fg">{{ t('parts.ai.identificationFailedTitle') }}</p>
       <p class="mt-1 text-sm text-fg-muted">{{ t('parts.ai.identificationFailedText') }}</p>
       <Link
-        :href="identifyHref"
+        :href="sparePartsUrl"
         class="mt-2 inline-block text-sm font-medium text-brand hover:underline"
       >
         {{ t('parts.ai.manualFallbackCta') }}
@@ -112,11 +92,11 @@ function submit(message: string) {
       v-if="composerMode !== null"
       :mode="composerMode"
       :processing="processing"
-      @submit="submit"
+      @submit="submitMessage"
     />
 
     <div v-if="showThread && conversation?.status === 'completed'" class="flex justify-center">
-      <BaseButton variant="outline" @click="startingNew = true">
+      <BaseButton variant="outline" @click="startNew">
         {{ t('parts.ai.newSearch') }}
       </BaseButton>
     </div>
