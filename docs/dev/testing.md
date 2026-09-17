@@ -248,6 +248,60 @@ toutes lettres au point d'appel, sans passer par une variable ni par un helper i
 Trois pages sont exemptées, chacune avec son motif dans le code : les deux pages d'erreur ne sont
 rendues qu'en production (`renderStatusPages`), et `home` est une branche morte.
 
+## Tester un job et un listener (#699)
+
+### Le piège : tester le service, croire tester le cron
+
+Les sept crons de `start/scheduler.ts` **délèguent** tous à un service, et les services sont bien
+couverts. Mais un spec qui instancie le service à la main —
+`new NotificationScanService(new NotificationService())` — ne passe jamais par le job. Un
+`execute()` vidé de son corps passerait alors toute la suite, et personne ne recevrait plus rien.
+
+Un job se teste donc **par le conteneur**, comme la production l'exécute :
+
+```ts
+const job = await app.container.make(PurgeAuditLogs)
+await job.execute()
+```
+
+Les jobs vivent dans `tests/integration/jobs/`, les listeners dans `tests/integration/listeners/` :
+pas de serveur HTTP à démarrer, et la transaction globale de la suite suffit.
+
+### Le piège de la suite `integration` : une transaction pour tout le fichier
+
+`withGlobalTransaction()` est posé par `configureSuite`, donc **une** transaction enveloppe la suite
+entière — pas un test. Les lignes insérées par un test restent visibles des suivants. Un test qui
+réutilise une clé unique posée par son voisin mesure alors autre chose que ce qu'il croit (vécu sur
+`queue_dedup.spec.ts` : le second `enqueueUnique` échouait sur la contrainte, et le tableau
+d'appels observé restait vide). Donner à chaque test ses propres clés.
+
+### Un listener se juge à son effet observable
+
+Un événement est émis puis oublié : rien, côté appelant, ne constate qu'un listener a travaillé. On
+asserte donc la trace — une `Notification` en base, un e-mail mis en file, un job dispatché — et
+**pour qui** :
+
+```ts
+const listener = await app.container.make(OnOrganizationMemberJoined)
+await listener.handle(new OrganizationMemberJoined(membership, org))
+
+assert.sameMembers(
+  notified.map((n) => n.userId),
+  admins.map((a) => a.id)
+)
+```
+
+Quand l'effet est une mise en file plutôt qu'une ligne, échanger le service par le conteneur
+(`app.container.swap(EmailQueueService, …)`) et observer les appels ; ne pas oublier
+`app.container.restore(…)` en `teardown`.
+
+### La garde
+
+`tests/unit/hygiene/scheduled_jobs_covered.spec.ts` vérifie que tout job est nommé par un spec, que
+tout cron l'est aussi, et que l'ordre des deux crons IA est respecté. Une exemption est tolérable sur
+un job à la demande, **jamais sur un cron** : personne ne constate l'absence de résultat d'une tâche
+planifiée.
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.
