@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatIncidentForm from '~/components/boats/show/tabs/BoatIncidentForm.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import type { BoatIncidentRow, BoatShowDetail, IncidentStatus } from '~/types/boat_show'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -48,8 +48,11 @@ function closeForm() {
 }
 
 function deleteIncident(incidentId: number) {
-  if (!window.confirm(t('incidents.form.confirmDelete'))) return
-  router.delete(`/boats/${props.boat.id}/incidents/${incidentId}`, { preserveScroll: true })
+  confirmDelete(
+    t('incidents.form.confirmDelete'),
+    `/boats/${props.boat.id}/incidents/${incidentId}`,
+    { preserveScroll: true }
+  )
 }
 </script>
 

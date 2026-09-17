@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -7,6 +6,7 @@ import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 import { wearStateVariant } from '~/utils/status_variants'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   parts: BoatShowEnginePart[]
@@ -38,10 +38,11 @@ function openEdit(part: BoatShowEnginePart) {
 }
 
 function deletePart(partId: number) {
-  if (!window.confirm(t('boats.engineShow.parts.confirmDelete'))) return
-  router.delete(`/boats/${props.boatId}/engines/${props.engineId}/parts/${partId}`, {
-    preserveScroll: true,
-  })
+  confirmDelete(
+    t('boats.engineShow.parts.confirmDelete'),
+    `/boats/${props.boatId}/engines/${props.engineId}/parts/${partId}`,
+    { preserveScroll: true }
+  )
 }
 </script>
 

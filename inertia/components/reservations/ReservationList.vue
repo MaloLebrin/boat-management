@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
@@ -13,6 +12,7 @@ import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { ClientOption } from '#shared/types/client'
 import type { BoatReservationRow } from '~/types/reservation'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boatId: number
@@ -35,8 +35,9 @@ function openEdit(row: BoatReservationRow) {
 }
 
 function deleteReservation(id: number) {
-  if (!window.confirm(t('reservations.form.confirmDelete'))) return
-  router.delete(`/boats/${props.boatId}/reservations/${id}`, { preserveScroll: true })
+  confirmDelete(t('reservations.form.confirmDelete'), `/boats/${props.boatId}/reservations/${id}`, {
+    preserveScroll: true,
+  })
 }
 </script>
 

@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import type { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { mountWithStubs, routerSpies } from './helpers/mount'
 import type { BoatBudgetEntryItem, BoatPortStayItem } from '../../shared/types/budget'

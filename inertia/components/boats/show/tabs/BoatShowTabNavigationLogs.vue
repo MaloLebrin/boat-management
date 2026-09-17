@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
@@ -17,6 +16,7 @@ import type {
   NavigationLogPortOption,
 } from '~/types/boat_show'
 import type { CrewMemberOption } from '../../../../../shared/types/crew'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = withDefaults(
   defineProps<{
@@ -66,8 +66,11 @@ function portLabel(portId: number | null, portName: string | null): string {
 }
 
 function deleteLog(logId: number) {
-  if (!window.confirm(t('navigation_logs.deleteConfirm'))) return
-  router.delete(`/boats/${props.boat.id}/navigation-logs/${logId}`, { preserveScroll: true })
+  confirmDelete(
+    t('navigation_logs.deleteConfirm'),
+    `/boats/${props.boat.id}/navigation-logs/${logId}`,
+    { preserveScroll: true }
+  )
 }
 </script>
 

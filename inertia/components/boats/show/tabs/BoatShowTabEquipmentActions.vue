@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseSegmentedControl from '~/components/base/BaseSegmentedControl.vue'
@@ -12,6 +11,7 @@ import type {
   EquipmentActionStatus,
   EquipmentActionType,
 } from '~/types/boat_show'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -67,8 +67,11 @@ function closeModal() {
 }
 
 function deleteAction(id: number) {
-  if (!window.confirm(t('equipmentActions.form.confirmDelete'))) return
-  router.delete(`/boats/${props.boat.id}/equipment-actions/${id}`, { preserveScroll: true })
+  confirmDelete(
+    t('equipmentActions.form.confirmDelete'),
+    `/boats/${props.boat.id}/equipment-actions/${id}`,
+    { preserveScroll: true }
+  )
 }
 </script>
 
