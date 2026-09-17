@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { CameraIcon, PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { Form } from '@adonisjs/inertia/vue'
-import { useForm } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useNetworkStatus } from '~/composables/use_network_status'
+import { usePhotoUpload } from '~/composables/use_photo_upload'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MediaRow } from '~/types/boat_show'
-import { computed } from 'vue'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -15,34 +13,13 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { isOnline } = useNetworkStatus()
-const fileInput = ref<HTMLInputElement>()
-const cameraInput = ref<HTMLInputElement>()
-const form = useForm({ files: [] as File[] })
+const { form, fileInput, cameraInput, isOnline, onFileChange } = usePhotoUpload(
+  () => `/boats/${props.boat.id}/photos`
+)
 
 const photos = computed<MediaRow[]>(() =>
   props.boat.media.filter((m) => m.kind === 'photo').sort((a, b) => a.position - b.position)
 )
-
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement
-  form.files = input.files ? Array.from(input.files) : []
-  if (form.files.length > 0) submitPhotos()
-}
-
-function submitPhotos() {
-  // Refus explicite hors-ligne : la file IndexedDB ne transporte pas de multipart (#621)
-  if (!isOnline.value) return
-  form.post(`/boats/${props.boat.id}/photos`, {
-    forceFormData: true,
-    preserveScroll: true,
-    onSuccess: () => {
-      form.reset()
-      if (fileInput.value) fileInput.value.value = ''
-      if (cameraInput.value) cameraInput.value.value = ''
-    },
-  })
-}
 </script>
 
 <template>
