@@ -1,0 +1,261 @@
+{
+  "t": {
+    "meta": {
+      "title": "About",
+      "description": "FleetAi is a French startup founded in 2024 in Marseille. Our mission: give rental operators, schools and marinas the digital tools they deserve."
+    },
+    "about": {
+      "hero": {
+        "line1": "Giving",
+        "line1Highlight": "maritime professionals",
+        "line2": "the tools of",
+        "line2Highlight": "land businesses.",
+        "subtitle": "Marinas, schools and rental operators manage their fleet with Excel, Post-its and the yard's collective memory. We think they deserve better — and we've been building it since 2024."
+      },
+      "origin": {
+        "eyebrow": "OUR STORY",
+        "title": "Born from a spreadsheet, a rainy Sunday, and a lost rental weekend.",
+        "paragraphs": [
+          "In 2023, Anaïs managed a marina of 18 sailboats in Marseille. Maintenance lived in a shared Excel, binders at the yard, and Yann the mechanic's memory.",
+          "One Saturday in June, a client discovered at departure that his sailboat's battery was flat. It was noted somewhere. Weekend cancelled. Negative margin. Forced smile.",
+          "On Sunday, she called Théo (ex-Doctolib, sailor). Three months later, FleetAi had its first client: her own marina.",
+          "Today, 40+ fleets across France use FleetAi. We've never strayed far from the dock."
+        ],
+        "captionDate": "MARSEILLE · 2024",
+        "captionSub": "Original office · quai du Port"
+      },
+      "values": {
+        "eyebrow": "WHAT GUIDES US",
+        "title": "Four",
+        "titleHighlight": "non-negotiable principles.",
+        "items": [
+          {
+            "n": "01",
+            "title": "Field first",
+            "desc": "Every feature is tested on a dock before it ships. We go to see Marc, Yann and Sophie — not the other way around.",
+            "extra": "In 2025, the team spent 84 days in the field."
+          },
+          {
+            "n": "02",
+            "title": "Immutable data",
+            "desc": "An entry cannot be modified. That's the contract. Your fleet's traceability is worth as much as a boat.",
+            "extra": "28,240 events stored since 2024. Zero lost."
+          },
+          {
+            "n": "03",
+            "title": "No AI bullshit",
+            "desc": "FleetAi suggests, it doesn't decide. You stay the captain. AI is useful when it's honest about its limits.",
+            "extra": "Your data is never used to train the model."
+          },
+          {
+            "n": "04",
+            "title": "One tide for bugs",
+            "desc": "Critical bugs are fixed within 6 hours. Others within 7 days. No rotten backlog.",
+            "extra": "Median resolution time in 2025: 3h47."
+          }
+        ]
+      },
+      "team": {
+        "eyebrow": "THE TEAM",
+        "title": "8 people,",
+        "titleHighlight": "one nautical average age.",
+        "subtitle": "Marseille, Paris, La Rochelle. Everyone has sailed, many still do. Nobody tolerates Excel.",
+        "members": [
+          {
+            "n": "Anaïs Mercier",
+            "r": "Co-founder · CEO",
+            "b": "12 years as skipper · ex-marina Marseille",
+            "emoji": "⛵",
+            "color": "coral"
+          },
+          {
+            "n": "Théo Roussel",
+            "r": "Co-founder · CTO",
+            "b": "Ex-Doctolib · sailing since childhood",
+            "emoji": "💻",
+            "color": "navy"
+          },
+          {
+            "n": "Sophie Bart",
+            "r": "Head of Design",
+            "b": "Marina lover · ex-Notion",
+            "emoji": "✏️",
+            "color": "mint"
+          },
+          {
+            "n": "Lucas Petit",
+            "r": "Engineer",
+            "b": "Ex-Datadog · real-time specialist",
+            "emoji": "⚡",
+            "color": "navy"
+          },
+          {
+            "n": "Marc Dubois",
+            "r": "Customer Success",
+            "b": "Former yard manager · La Rochelle",
+            "emoji": "🔧",
+            "color": "coral"
+          },
+          {
+            "n": "Élodie Vidal",
+            "r": "Mobile engineer",
+            "b": "Ex-Alan · coastal navigation",
+            "emoji": "📱",
+            "color": "mint"
+          },
+          {
+            "n": "Pierre Garnier",
+            "r": "AI engineer",
+            "b": "Ex-Mistral AI · open-source project",
+            "emoji": "🤖",
+            "color": "navy"
+          },
+          {
+            "n": "Camille Roux",
+            "r": "Mobile designer",
+            "b": "Ex-Doctolib · field UX",
+            "emoji": "🎨",
+            "color": "coral"
+          }
+        ],
+        "hiringTitle": "We're hiring.",
+        "hiringSubtitle": "3 open roles · Backend engineer, Sales, Customer success"
+      },
+      "numbers": {
+        "eyebrow": "SINCE 2024",
+        "title": "Growth without",
+        "titleHighlight": "losing our bearings.",
+        "stats": [
+          {
+            "value": "40+",
+            "label": "fleets onboarded"
+          },
+          {
+            "value": "680",
+            "label": "boats tracked"
+          },
+          {
+            "value": "28,240",
+            "label": "events stored"
+          },
+          {
+            "value": "€1.2M",
+            "label": "raised (seed · 2025)"
+          }
+        ],
+        "investorsLabel": "BACKED BY",
+        "investors": ["Kima Ventures", "Frst", "Bpifrance", "SailFund", "Marina Angels"]
+      },
+      "timeline": {
+        "eyebrow": "LOGBOOK",
+        "title": "Two years",
+        "titleHighlight": "under sail.",
+        "subtitle": "No surprise pivots, no surprise fundraises. Just a clear heading.",
+        "items": [
+          {
+            "d": "May 2026",
+            "t": "Enterprise plan launch",
+            "sub": "5 large fleets in pilot · public API",
+            "tone": "coral"
+          },
+          {
+            "d": "Jan 2026",
+            "t": "FleetAi v2 · Mistral Large",
+            "sub": "Conversational scheduling generalised",
+            "tone": "mint"
+          },
+          {
+            "d": "Sep 2025",
+            "t": "Seed €1.2M · Kima + Frst",
+            "sub": "Bpifrance non-dilutive complement",
+            "tone": "coral"
+          },
+          {
+            "d": "Jun 2025",
+            "t": "30th client · SailCorp",
+            "sub": "First fleet with more than 30 boats",
+            "tone": "mint"
+          },
+          {
+            "d": "Mar 2025",
+            "t": "iOS / Android mobile app",
+            "sub": "Log from the dock, in wellies",
+            "tone": "mint"
+          },
+          {
+            "d": "Nov 2024",
+            "t": "First external client",
+            "sub": "École de la Mer · La Rochelle",
+            "tone": ""
+          },
+          {
+            "d": "Jun 2024",
+            "t": "First event logged",
+            "sub": "Marina Bleue · oil change L'Albatros · 12.4m",
+            "tone": ""
+          },
+          {
+            "d": "Apr 2024",
+            "t": "FleetAi is founded",
+            "sub": "Anaïs & Théo · Marseille kitchen",
+            "tone": "coral"
+          }
+        ]
+      },
+      "office": {
+        "eyebrow": "OUR OFFICES",
+        "title": "The only office",
+        "titleHighlight": "overlooking its users.",
+        "body": "Our headquarters is on quai du Port, Marseille. Six minutes' walk from the Vieux-Port, ten minutes by boat from the marina that started it all. Paris outpost for sales.",
+        "locationLabel": "Address",
+        "hoursLabel": "Hours",
+        "teamLabel": "Team",
+        "locations": [
+          {
+            "city": "Marseille",
+            "addr": "12 quai du Port · 13002",
+            "role": "HQ · product team"
+          },
+          {
+            "city": "Paris",
+            "addr": "25 rue de la Banque · 75002",
+            "role": "outpost · sales team"
+          },
+          {
+            "city": "Remote",
+            "addr": "across France",
+            "role": "15% of the team remote"
+          }
+        ],
+        "officeCards": [
+          {
+            "city": "Marseille",
+            "role": "HQ · product & engineering",
+            "addr": "12 quai du Port · 13002 Marseille",
+            "hours": "Mon–Fri · 9am–6pm",
+            "team": "6 people",
+            "hint": "6 min walk from the Vieux-Port, just past the Town Hall. Ring on the 3rd floor.",
+            "gradient": "from-navy-900 to-navy-800"
+          },
+          {
+            "city": "Paris",
+            "role": "Sales outpost",
+            "addr": "25 rue de la Banque · 75002 Paris",
+            "hours": "by appointment",
+            "team": "2 people",
+            "hint": "Near the Bourse · metro line 3, Bourse station.",
+            "gradient": "from-coral-500 to-coral-400"
+          }
+        ]
+      },
+      "finalCta": {
+        "title": "Join the",
+        "titleHighlight": "40+ fleets.",
+        "subtitle": "Start for free with the Starter plan. No credit card required.",
+        "primaryCta": "Create my organisation",
+        "secondaryCta": "Try the demo",
+        "demoLoginPath": "/demo"
+      }
+    }
+  }
+}

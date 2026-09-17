@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "title": "Mentions légales",
+    "description": "Mentions légales de FleetAi : éditeur du service, directeur de la publication, hébergeur, propriété intellectuelle et médiation de la consommation."
+  },
+  "legalNotice": {
+    "hero": {
+      "eyebrow": "Légal",
+      "title": "Mentions",
+      "titleHighlight": "légales",
+      "subtitle": "L'identité de l'éditeur de FleetAi et de son hébergeur, publiée en application de la loi pour la confiance dans l'économie numérique (LCEN).",
+      "updatedLabel": "Dernière mise à jour :",
+      "updatedDate": "16 août 2026"
+    },
+    "sections": [
+      {
+        "title": "Éditeur du service",
+        "body": "Le site fleetai.app et le logiciel FleetAi sont édités par :",
+        "entries": [
+          {
+            "label": "Dénomination sociale",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "Forme juridique",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "Capital social",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "Siège social",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "Immatriculation (RCS / SIREN)",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "Numéro de TVA intracommunautaire",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "E-mail",
+            "value": "support@fleetai.app"
+          },
+          {
+            "label": "Téléphone",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          }
+        ]
+      },
+      {
+        "title": "Directeur de la publication",
+        "body": "Le directeur de la publication est le représentant légal de la société éditrice.",
+        "entries": [
+          {
+            "label": "Directeur de la publication",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          }
+        ]
+      },
+      {
+        "title": "Hébergement",
+        "body": "Les données du service et le site sont hébergés dans l'Union européenne par :",
+        "entries": [
+          {
+            "label": "Hébergeur",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "Adresse",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "Contact",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          }
+        ]
+      },
+      {
+        "title": "Propriété intellectuelle",
+        "body": "La marque FleetAi, le logo, l'interface, les textes, les illustrations et le code du service sont protégés par le droit de la propriété intellectuelle et restent la propriété exclusive de l'éditeur. Votre abonnement vous confère un droit d'usage personnel et non exclusif du service, sans transfert de propriété. Toute reproduction, extraction ou réutilisation, totale ou partielle, sans autorisation écrite préalable est interdite. Les données que vous importez dans FleetAi restent les vôtres : elles ne sont pas concernées par cette clause."
+      },
+      {
+        "title": "Données personnelles et cookies",
+        "body": "Le traitement des données personnelles (finalités, base légale, durées de conservation, sous-traitants, exercice de vos droits) est décrit en détail dans notre politique de confidentialité. Pour toute demande relative à vos données, écrivez-nous à l'adresse indiquée ci-dessous."
+      },
+      {
+        "title": "Signalement d'un contenu illicite",
+        "body": "Conformément à l'article 6-I-5 de la LCEN, tout contenu manifestement illicite hébergé sur le service peut nous être signalé par e-mail à support@fleetai.app. Le signalement doit préciser la date, la description du contenu, son emplacement et les motifs pour lesquels il devrait être retiré."
+      },
+      {
+        "title": "Médiation de la consommation",
+        "body": "Si vous êtes consommateur et qu'une réclamation adressée à notre support n'a pas abouti, vous pouvez recourir gratuitement à un médiateur de la consommation (article L612-1 du code de la consommation) :",
+        "entries": [
+          {
+            "label": "Médiateur",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          },
+          {
+            "label": "Saisine du médiateur",
+            "value": "Information à compléter — nous écrire à support@fleetai.app"
+          }
+        ]
+      },
+      {
+        "title": "Droit applicable",
+        "body": "Les présentes mentions légales sont soumises au droit français. Les conditions d'utilisation du service figurent dans les CGU, celles de souscription des abonnements payants dans les CGV."
+      }
+    ],
+    "contact": {
+      "title": "Une question sur ces mentions ?",
+      "body": "Pour toute demande relative à l'éditeur du service, à un signalement ou à vos données, écrivez-nous.",
+      "email": "support@fleetai.app"
+    }
+  }
+}

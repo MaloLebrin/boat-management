@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "title": "Sales terms",
+    "description": "FleetAi sales terms: subscription, prices, payment, renewal, withdrawal, termination and mediation."
+  },
+  "salesTerms": {
+    "hero": {
+      "eyebrow": "Legal",
+      "title": "Sales",
+      "titleHighlight": "terms",
+      "subtitle": "How paid FleetAi subscriptions are ordered, billed, renewed and cancelled.",
+      "updatedLabel": "Last updated:",
+      "updatedDate": "August 16, 2026"
+    },
+    "sections": [
+      {
+        "title": "Purpose and scope",
+        "body": "These general terms and conditions of sale (\"sales terms\") govern subscriptions to paid FleetAi plans, whichever plan is chosen. They complement the terms of service, which govern the use of the platform: where the two conflict on a sales matter (price, payment, term, termination), these sales terms prevail. They apply to businesses and consumers alike; clauses that only apply to consumers are identified as such."
+      },
+      {
+        "title": "Placing an order",
+        "body": "Subscriptions are taken out online from your FleetAi workspace:",
+        "bullets": [
+          "You pick a plan and a billing period (monthly or annual), optionally adding modules and quantity-based add-ons.",
+          "A summary shows the details of the order and its amount before any payment.",
+          "Confirming the payment constitutes acceptance of these sales terms and forms the contract.",
+          "A confirmation email summarising the subscription is sent to you."
+        ]
+      },
+      {
+        "title": "Prices",
+        "body": "The applicable prices are those displayed on the Pricing page on the day of the order. They are stated in euros, excluding tax: VAT at the applicable statutory rate is added to the invoice, unless the reverse charge applies to EU business customers with a valid VAT number. The Starter plan is free and has no time limit."
+      },
+      {
+        "title": "Payment",
+        "body": "Payment is made by card through our payment provider Stripe:",
+        "bullets": [
+          "Subscriptions are payable in advance, at sign-up and then on every renewal date.",
+          "Card details are entered and stored by Stripe: FleetAi never has access to them and does not store them.",
+          "Invoices are available at any time from your organisation's billing area.",
+          "Modules and add-ons activated mid-period are prorated on the next invoice."
+        ]
+      },
+      {
+        "title": "Term and renewal",
+        "body": "The subscription runs for the period chosen (one month or one year) and renews automatically on the same terms at each renewal date, until cancelled. Under article L215-1 of the French consumer code, consumer customers are informed by email, at the latest one month before the end of the renewal window, that they may choose not to renew."
+      },
+      {
+        "title": "Right of withdrawal",
+        "body": "Consumers have fourteen days from the order to withdraw, without giving a reason and at no cost, by writing to support@fleetai.app. Because FleetAi is a digital service supplied immediately, by subscribing you expressly ask for performance to begin before that period ends: under article L221-28 of the French consumer code you then waive your right of withdrawal once the service has been fully performed. This right does not apply to business customers. The free, no-commitment Starter plan lets you try the service before any paid subscription."
+      },
+      {
+        "title": "Termination",
+        "body": "You may cancel your subscription at any time, with no notice period and no fee, from the billing area or by email. Cancellation takes effect at the end of the period already paid for: the service stays available until that date and no prorated refund is due. After that, the organisation moves to the free plan. FleetAi may terminate the subscription in the event of a serious breach of the terms of service, after a formal notice left unanswered for fifteen days."
+      },
+      {
+        "title": "Failed payment",
+        "body": "If a payment fails, an automatic reminder is sent and further attempts are made. If the payment is not settled within fifteen days, the paid subscription is suspended and the organisation reverts to the free plan quotas: your data stays accessible, only adding new data beyond the quotas is blocked. For business customers, statutory late-payment interest and the flat-rate recovery fee of €40 apply automatically."
+      },
+      {
+        "title": "Price changes",
+        "body": "Prices may change. Any change affecting an ongoing subscription is notified to you by email at least thirty days before it takes effect, which happens at the next renewal. If the new price does not suit you, you may cancel before that date: the period already paid for stays billed at the original price."
+      },
+      {
+        "title": "Delivery of the service",
+        "body": "Access to the features of the chosen plan opens as soon as the payment is confirmed. The service is delivered online and available 24/7, subject to maintenance windows and incidents beyond our control. Support is reachable by email at support@fleetai.app; the availability and response-time commitments specific to the Enterprise plan are set out in the corresponding service agreement."
+      },
+      {
+        "title": "Warranties and conformity",
+        "body": "FleetAi is supplied in accordance with its commercial description and with the terms of service. Consumer customers benefit from the statutory warranty of conformity for digital content and services (articles L224-25-12 et seq. of the French consumer code), regardless of any commercial warranty. Cost estimates and suggestions produced by the AI features are decision-support tools: they are neither a technical survey nor a guarantee of outcome."
+      },
+      {
+        "title": "Liability",
+        "body": "For business customers, FleetAi's liability under the subscription is limited to the amounts actually paid over the twelve months preceding the triggering event, and does not cover indirect damage such as loss of business or revenue. None of these limitations applies in the event of gross negligence, wilful misconduct or personal injury, nor do they restrict the rights granted to consumers by law."
+      },
+      {
+        "title": "Your data and portability",
+        "body": "Your data remains yours. It can be exported from the service throughout the subscription and for up to thirty days after it ends, after which it is deleted or anonymised as described in our privacy policy. Deleting an organisation is permanent."
+      },
+      {
+        "title": "Complaints and mediation",
+        "body": "Any complaint must first be sent to us at support@fleetai.app, and we undertake to answer it. Failing a satisfactory resolution, consumers may refer the matter free of charge to the consumer mediator whose details appear in our legal notice."
+      },
+      {
+        "title": "Governing law and jurisdiction",
+        "body": "These sales terms are governed by French law. Failing an amicable resolution, disputes will be brought before the competent French courts. Consumers keep the right to bring proceedings before the courts of their place of residence or of the place where the service is provided."
+      }
+    ],
+    "contact": {
+      "title": "A question about your subscription?",
+      "body": "For any question about signing up, an invoice or a cancellation, write to us.",
+      "email": "support@fleetai.app"
+    }
+  }
+}

@@ -1,0 +1,441 @@
+{
+  "t": {
+    "meta": {
+      "title": "Tarifs",
+      "description": "Un prix par flotte, pas par utilisateur. Plan gratuit pour 2 bateaux · 20 €/mois (16 € en annuel) pour jusqu'à 8 bateaux · Entreprise 99 €/mois (79 € en annuel)."
+    },
+    "pricing": {
+      "hero": {
+        "eyebrowLabel": "TARIFS",
+        "title": "Un prix",
+        "titleHighlight": "par flotte.",
+        "subtitle": "Tu paies pour le nombre de bateaux que tu gères, pas au siège. Starter : 1 utilisateur · Pro : jusqu'à 5 · Entreprise : illimité.",
+        "monthlyLabel": "Mensuel",
+        "annualLabel": "Annuel",
+        "annualBadge": "−20 %"
+      },
+      "tierFeaturedBadge": "Recommandé",
+      "billedAnnuallyNote": "Facturé annuellement.",
+      "tierFreeLabel": "Gratuit",
+      "tiers": [
+        {
+          "name": "Starter",
+          "tag": "Pour démarrer",
+          "price": 0,
+          "pricePer": "/ mois",
+          "sub": "Idéal pour 1 ou 2 bateaux personnels",
+          "feats": [
+            ["Jusqu'à 2 bateaux"],
+            ["1 utilisateur"],
+            ["Historique illimité", "immuable, exportable"],
+            ["Saisie événements & tâches"],
+            ["Support email", "réponse sous 48h"],
+            ["2 diagnostics de panne IA", "sur le chat public, sans date limite"]
+          ],
+          "cta": "Démarrer gratuitement",
+          "ctaVariant": "outline"
+        },
+        {
+          "name": "Pro",
+          "tag": "Le plus populaire",
+          "price": 20,
+          "pricePer": "/ mois",
+          "priceAnnual": 16,
+          "priceAnnualPer": "/ mois",
+          "sub": "Jusqu'à 8 bateaux · jusqu'à 5 utilisateurs",
+          "featured": true,
+          "feats": [
+            ["Jusqu'à 8 bateaux"],
+            ["Jusqu'à 5 utilisateurs", "mécanos, skippers, chantiers"],
+            ["FleetAi IA", "copilote Mistral"],
+            ["Calendrier + Kanban"],
+            ["Documents & assurances", "20 Go"],
+            ["Export PDF / CSV"],
+            ["App mobile complète"],
+            ["Notifications email"],
+            ["Support prioritaire", "sous 4h"]
+          ],
+          "cta": "Choisir Pro",
+          "ctaVariant": "primary"
+        },
+        {
+          "name": "Entreprise",
+          "tag": "Grande flotte",
+          "price": 99,
+          "pricePer": "/ mois",
+          "priceAnnual": 79,
+          "priceAnnualPer": "/ mois",
+          "sub": "Au-delà de 8 bateaux · besoins spécifiques",
+          "feats": [
+            ["Bateaux illimités"],
+            ["Cartographie marina", "pontons, mouillages, places"],
+            ["SLA 99,9 % garanti"],
+            ["Hébergement dédié", "option on-premise EU"],
+            ["Onboarding accompagné", "2 jours sur site"],
+            ["DPO & audit RGPD"],
+            ["Account manager dédié"]
+          ],
+          "cta": "Choisir Entreprise",
+          "ctaVariant": "secondary"
+        }
+      ],
+      "reassurance": [
+        {
+          "icon": "✓",
+          "label": "Sans engagement"
+        },
+        {
+          "icon": "✓",
+          "label": "Sans carte bleue"
+        },
+        {
+          "icon": "✓",
+          "label": "Annulation en 1 clic"
+        },
+        {
+          "icon": "✓",
+          "label": "Migration gratuite"
+        },
+        {
+          "icon": "✓",
+          "label": "RGPD & hébergement UE"
+        }
+      ],
+      "roi": {
+        "eyebrow": "CALCULATEUR",
+        "title": "Combien tu",
+        "titleHighlight": "économises",
+        "subtitle": "Estimation basée sur les données de 40+ flottes accompagnées. Ajuste les curseurs avec ta réalité.",
+        "profileLabel": "Ton profil",
+        "boatsLabel": "Bateaux",
+        "hourlyLabel": "Coût horaire moyen",
+        "studyNote": "Étude interne 2025 sur 40 flottes — ajuste les paramètres avec ta réalité.",
+        "savingsLabel": "Économies estimées · annuelles",
+        "perMonthLabel": "soit {amount} / mois",
+        "timeLabel": "Temps gagné équipe",
+        "maintLabel": "Maintenances ratées évitées",
+        "fleetideLabel": "Optimisations FleetAi",
+        "fleetCostLabel": "Coût FleetAi",
+        "roiLabel": "ROI net",
+        "ctaLabel": "Tester avec ma flotte",
+        "profiles": {
+          "loueurs": {
+            "label": "Loueur",
+            "emoji": "⛵"
+          },
+          "ecoles": {
+            "label": "École",
+            "emoji": "🎓"
+          },
+          "marinas": {
+            "label": "Marina",
+            "emoji": "🏗"
+          },
+          "armateurs": {
+            "label": "Armateur",
+            "emoji": "⚓"
+          }
+        }
+      },
+      "testimonials": {
+        "eyebrow": "RETOURS SUR INVESTISSEMENT",
+        "title": "Ils ont",
+        "titleHighlight": "rentabilisé",
+        "items": [
+          {
+            "stat": "2 mois",
+            "statLabel": "pour rentabiliser",
+            "quote": "À 14 bateaux, le calcul a été rapide : une seule maintenance ratée évitée, et FleetAi était payé.",
+            "name": "Marc Lefèvre",
+            "org": "Marina Bleue · 22 bateaux",
+            "role": "Gérant",
+            "plan": "Plan Pro"
+          },
+          {
+            "stat": "8h / sem",
+            "statLabel": "gagnées par l'équipe",
+            "quote": "On a viré un mi-temps admin. Les mécanos saisissent depuis le ponton, l'admin gère les exceptions.",
+            "name": "Anaïs Mercier",
+            "org": "SailCorp · 38 bateaux",
+            "role": "Co-fondatrice",
+            "plan": "Plan Pro"
+          },
+          {
+            "stat": "×4,5",
+            "statLabel": "ROI annuel",
+            "quote": "380 € investis pour 1 700 € économisés en optimisations FleetAi. Je ne vois pas le débat.",
+            "name": "Thomas Garnier",
+            "org": "École de la Mer · 14 dériveurs",
+            "role": "Directeur pédagogique",
+            "plan": "Plan Pro"
+          }
+        ]
+      },
+      "configurator": {
+        "eyebrow": "CONFIGURATEUR",
+        "title": "Composez",
+        "titleHighlight": "ton offre.",
+        "subtitle": "Pars du socle Pro et active les modules dont tu as besoin — le prix se met à jour en direct.",
+        "baseName": "Socle Pro",
+        "baseDesc": "Le cœur FleetAi, toujours inclus.",
+        "basePriceMonthly": 20,
+        "basePriceAnnual": 16,
+        "modulesLabel": "AJOUTE TES MODULES",
+        "perMonth": "/mois",
+        "perYear": "/an",
+        "totalLabel": "Ton total",
+        "annualSaveLabel": "Tu économises",
+        "billedAnnuallyNote": "Facturé annuellement.",
+        "ctaLabel": "Commencer avec cette offre",
+        "ctaHref": "/signup",
+        "modules": [
+          {
+            "key": "charter",
+            "icon": "📅",
+            "name": "Location",
+            "desc": "Réservations, états des lieux, contrats et tarification saisonnière pour les loueurs.",
+            "priceMonthly": 15,
+            "priceAnnual": 12,
+            "features": ["Tarif par bateau", "Périodes saisonnières"]
+          },
+          {
+            "key": "crm_invoicing",
+            "icon": "🧾",
+            "name": "CRM & Facturation",
+            "desc": "Fiches clients, RGPD, devis et factures.",
+            "priceMonthly": 15,
+            "priceAnnual": 12,
+            "features": ["Fiches clients & RGPD", "Devis & factures"]
+          }
+        ],
+        "enterprise": {
+          "name": "Entreprise",
+          "priceMonthly": 99,
+          "priceAnnual": 79,
+          "note": "Tous les modules inclus, sans limite.",
+          "ctaLabel": "Voir Entreprise"
+        },
+        "extraBoats": {
+          "name": "Bateaux supplémentaires",
+          "desc": "Au-delà des bateaux inclus dans le socle Pro, à la carte.",
+          "priceMonthly": 4,
+          "priceAnnual": 3,
+          "perBoatLabel": "/bateau/mois"
+        }
+      },
+      "detailedTable": {
+        "eyebrow": "COMPARATIF DÉTAILLÉ",
+        "title": "Comparer les plans,",
+        "titleHighlight": "ligne par ligne.",
+        "subtitle": "Aucune surprise dans les CGU. Tout est ici.",
+        "expandAll": "Tout déplier",
+        "collapseAll": "Tout replier",
+        "addonLabel": "Add-on",
+        "billedAnnuallyNote": "Facturé annuellement.",
+        "planHeaders": [
+          {
+            "name": "Starter",
+            "price": "Gratuit",
+            "cta": "Démarrer"
+          },
+          {
+            "name": "Pro",
+            "priceMonthly": 20,
+            "priceAnnual": 16,
+            "pricePer": "/ mois",
+            "cta": "Choisir Pro"
+          },
+          {
+            "name": "Entreprise",
+            "priceMonthly": 99,
+            "priceAnnual": 79,
+            "pricePer": "/ mois",
+            "cta": "Contact"
+          }
+        ],
+        "groups": [
+          {
+            "title": "Cœur du produit",
+            "rows": [
+              ["Bateaux gérés", "2", "jusqu'à 8", "illimités"],
+              ["Utilisateurs", "1", "jusqu'à 5", "illimités"],
+              ["Historique immuable", true, true, true],
+              ["Application en marque blanche", false, false, true]
+            ]
+          },
+          {
+            "title": "Maintenance",
+            "rows": [
+              ["Saisie événements illimitée", true, true, true],
+              ["Planification calendaire", false, true, true],
+              ["Planification heures moteur", false, true, true],
+              ["Regroupement automatique", false, true, true],
+              ["Photos d'équipement & d'intervention", true, true, true],
+              ["Carnet d'entretien PDF", false, true, true],
+              ["Suivi pièces & stock", false, true, true],
+              ["Cartographie marina (pontons, mouillages, places)", false, false, true]
+            ]
+          },
+          {
+            "title": "Équipe & collaboration",
+            "rows": [
+              ["Rôles & permissions granulaires", false, "basique", "avancé"],
+              ["Audit log", false, "90 jours", "illimité"],
+              ["Notifications email", true, true, true]
+            ]
+          },
+          {
+            "title": "FleetAi · IA",
+            "rows": [
+              ["Copilote conversationnel", false, true, true],
+              ["Suggestions contextuelles", false, true, true],
+              ["Programmation conversationnelle", false, true, true],
+              ["Modèle Mistral hébergé EU", false, true, true],
+              ["Personnalisation du modèle", false, false, true],
+              ["Tokens / mois", false, "1M", "illimités"],
+              [
+                "Diagnostic de panne public",
+                "2 à vie",
+                "sans plafond de conversations",
+                "sans plafond de conversations"
+              ]
+            ]
+          },
+          {
+            "title": "Documents & assurances",
+            "rows": [
+              ["Stockage documents", "1 Go", "20 Go", "illimité"],
+              ["Rappels expiration assurances", false, true, true],
+              ["Export PDF / CSV", false, true, true]
+            ]
+          },
+          {
+            "title": "Support & accompagnement",
+            "rows": [
+              ["Support email", "48h", "4h", "< 1h"],
+              ["Support chat", false, true, true],
+              ["Support téléphone", false, false, true],
+              ["Account Manager dédié", false, false, true],
+              ["Formation initiale en visio", false, "1h", "1 journée"],
+              ["SLA de disponibilité", "99 %", "99,5 %", "99,9 %"]
+            ]
+          },
+          {
+            "title": "Modules add-ons",
+            "rows": [
+              ["Tarification par bateau & saisons", false, "addon", true],
+              ["Fiches clients (CRM)", false, "addon", true],
+              ["Devis & factures", false, "addon", true]
+            ]
+          }
+        ]
+      },
+      "extras": {
+        "eyebrow": "OPTIONS & SERVICES",
+        "title": "Au-delà de l'abonnement.",
+        "subtitle": "Quelques services à la carte pour démarrer plus vite ou aller plus loin.",
+        "items": [
+          {
+            "icon": "⚓",
+            "title": "Migration depuis Excel",
+            "sub": "Notre équipe importe ta flotte et 5 ans d'historique.",
+            "price": "Gratuit",
+            "priceSub": "plans Pro et +",
+            "tone": "mint"
+          },
+          {
+            "icon": "🚀",
+            "title": "Onboarding accompagné",
+            "sub": "2 sessions de 90 min avec un expert pour configurer ton organisation.",
+            "price": "490 €",
+            "priceSub": "forfait unique",
+            "tone": "coral"
+          },
+          {
+            "icon": "🔗",
+            "title": "Intégration sur mesure",
+            "sub": "API custom, connecteurs tiers, plateforme de réservation.",
+            "price": "Sur devis",
+            "priceSub": "plans Entreprise",
+            "tone": "bone"
+          }
+        ]
+      },
+      "modules": {
+        "eyebrow": "MODULES ADD-ONS",
+        "title": "Ne paie que ce que tu utilises",
+        "subtitle": "Active des modules métier en complément de ton plan Pro, facturés séparément.",
+        "note": "Disponibles sur le plan Pro.",
+        "pricePer": "/mois",
+        "includedLabel": "Tous les modules sont inclus dans Entreprise.",
+        "items": [
+          {
+            "icon": "📅",
+            "name": "Location",
+            "desc": "Réservations, états des lieux, contrats et tarification saisonnière pour les loueurs.",
+            "price": 15
+          },
+          {
+            "icon": "🧾",
+            "name": "CRM & Facturation",
+            "desc": "Fiches clients, RGPD, devis et factures.",
+            "price": 15
+          }
+        ]
+      },
+      "faq": {
+        "eyebrow": "FAQ TARIFS",
+        "title": "Les questions qu'on nous pose",
+        "titleHighlight": "vraiment.",
+        "subtitle": "Si la tienne n'est pas listée, on répond en 4h en jours ouvrés.",
+        "ctaLabel": "Poser une question",
+        "items": [
+          {
+            "q": "Le plan Starter est-il vraiment gratuit ?",
+            "a": "Oui, gratuit à vie : jusqu'à 2 bateaux, 1 utilisateur, historique illimité. Pas de carte bancaire, pas de date limite. Tu passes sur Pro ou Entreprise quand tu veux depuis tes réglages, et tu peux revenir sur Starter sans perdre tes données."
+          },
+          {
+            "q": "Comment je paie pour les bateaux ?",
+            "a": "Tu paies un forfait par plan, peu importe le nombre exact de bateaux dans la fourchette. Au-delà des 8 bateaux du plan Pro, tu ajoutes des bateaux supplémentaires à 4 €/bateau/mois, ou tu passes en Entreprise (bateaux illimités) — pas de coupure, pas de surfacturation surprise."
+          },
+          {
+            "q": "Y a-t-il un engagement ?",
+            "a": "Non. Mensuel ou annuel, tu peux annuler à tout moment en 1 clic depuis ton compte. L'annuel offre simplement -20 % en échange de ton engagement annuel."
+          },
+          {
+            "q": "Et la TVA ?",
+            "a": "Les prix affichés sont hors taxes. La TVA (20 % pour les clients français B2C, exonération pour les clients B2B intra-UE avec numéro TVA valide) est appliquée à la facturation."
+          },
+          {
+            "q": "Que se passe-t-il si j'annule ?",
+            "a": "Tu gardes l'accès jusqu'à la fin de la période payée. Ensuite, tu retombes sur le plan Starter gratuit pendant 90 jours pour exporter tes données."
+          },
+          {
+            "q": "Vous prenez quels moyens de paiement ?",
+            "a": "Carte bleue (Visa, Mastercard, AmEx), SEPA prélèvement, virement bancaire (annuel uniquement). Facturation Stripe sécurisée."
+          },
+          {
+            "q": "Peut-on tester FleetAi en plan Starter ?",
+            "a": "L'IA complète de FleetAi (copilote, suggestions, programmation conversationnelle) est réservée aux plans Pro et Entreprise. Le plan Starter reste gratuit pour le suivi de flotte, la maintenance et l'historique, et inclut 2 diagnostics de panne IA — tu passes au Pro quand tu veux pour débloquer le reste."
+          },
+          {
+            "q": "Vous faites des tarifs étudiants / associatifs ?",
+            "a": "Oui — 50 % de réduction pour les écoles à but non lucratif et associations sportives. Contacte-nous avec ton numéro SIRET."
+          },
+          {
+            "q": "Puis-je essayer l'IA sans compte ?",
+            "a": "Oui. Le diagnostic de panne moteur est ouvert à tout le monde depuis le site : tu décris ta panne, l'assistant te pose quelques questions puis t'oriente vers les causes probables, de la moins chère à la plus chère à vérifier. C'est gratuit et sans inscription, dans la limite de 2 diagnostics — les plans Pro et Entreprise, eux, n'ont pas de plafond de conversations, seulement leur quota de tokens IA mensuel."
+          }
+        ]
+      },
+      "finalCta": {
+        "title": "Le plan Starter,",
+        "titleHighlight": "gratuit à vie.",
+        "subtitle": "Sans carte bleue. Sans engagement. Configure ta flotte en 5 minutes.",
+        "primaryCta": "Créer mon organisation",
+        "secondaryCta": "Essayer la démo",
+        "demoLoginPath": "/demo"
+      }
+    }
+  }
+}

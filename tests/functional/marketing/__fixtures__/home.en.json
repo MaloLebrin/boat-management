@@ -1,0 +1,562 @@
+{
+  "t": {
+    "brand": {
+      "name": "FleetAi",
+      "tagline": "Fleet intelligence"
+    },
+    "meta": {
+      "title": "You manage your fleet in Excel.",
+      "description": "FleetAi replaces your shared spreadsheet with a tool that knows your boats, anticipates maintenance, and alerts you before delays."
+    },
+    "home": {
+      "hero": {
+        "cta": {
+          "primary": "Start for free",
+          "secondary": "Try the demo"
+        },
+        "caption": "Free Starter plan forever - no credit card - setup in 5 min",
+        "content": {
+          "loueurs": {
+            "title": "You manage your fleet in Excel.",
+            "titleHighlight": "You can do better.",
+            "subtitle": "FleetAi replaces your shared spreadsheet with a tool that knows your boats, anticipates maintenance, and alerts you before delays."
+          },
+          "ecoles": {
+            "title": "Your instructors waste time.",
+            "titleHighlight": "Your boats too.",
+            "subtitle": "Centralize your fleet status, share it with instructors, and never miss a safety deadline again."
+          },
+          "marinas": {
+            "title": "Your owners ask where their boat stands.",
+            "titleHighlight": "Answer them.",
+            "subtitle": "Give each owner a clear view of their boat: history, upcoming tasks, real-time status."
+          }
+        }
+      },
+      "socialProof": {
+        "eyebrow": "40+ FLEETS HAVE DITCHED EXCEL",
+        "logos": [
+          "Marina Bleue",
+          "SailCorp",
+          "Sea School",
+          "Silver Port",
+          "Yacht Concept",
+          "Cap d'Antibes",
+          "Southern Sails",
+          "La Rochelle Nautic"
+        ]
+      },
+      "problem": {
+        "title": "The shared Excel survives every season.",
+        "titleHighlight": "Your boats don't.",
+        "items": [
+          {
+            "number": "01",
+            "label": "PROBLEM",
+            "title": "Data evaporates",
+            "stat": "73%",
+            "statSub": "of fleets lose history every year",
+            "body": "A closed Excel, an archived WhatsApp, a mechanic who leaves. The history disappears with them."
+          },
+          {
+            "number": "02",
+            "label": "PROBLEM",
+            "title": "Reminders come too late",
+            "stat": "€1,200",
+            "statSub": "average cost of preventable breakdown",
+            "body": "When you remember the oil change, it's often after the damage. Too late."
+          },
+          {
+            "number": "03",
+            "label": "PROBLEM",
+            "title": "Nobody is in sync",
+            "stat": "4h/week",
+            "statSub": "lost searching for information",
+            "body": "The skipper doesn't know what the mechanic did. The mechanic doesn't know what the skipper saw."
+          }
+        ]
+      },
+      "pillars": {
+        "title": "Three things,",
+        "titleHighlight": "done right.",
+        "items": [
+          {
+            "number": "I",
+            "title": "Immutable history",
+            "description": "Every intervention, every part, every engine hour. Nothing is lost, nothing is reinvented. You build a fleet memory that lasts across seasons."
+          },
+          {
+            "number": "II",
+            "title": "Intelligent scheduling",
+            "description": "Calendar or engine hours — FleetAi calculates thresholds and alerts you before delays. No surprises, no preventable breakdowns."
+          },
+          {
+            "number": "III",
+            "title": "Contextual copilot",
+            "description": "The FleetAi assistant reads your fleet and suggests what to do — not fluff, concrete actions based on your data.",
+            "isAi": true
+          }
+        ]
+      },
+      "modularOffer": {
+        "eyebrow": "MODULAR PRICING",
+        "title": "One core,",
+        "titleHighlight": "your modules.",
+        "subtitle": "Start on the Pro plan, then switch on only the business modules you need. No rebuild, no hidden commitment.",
+        "baseName": "Pro plan",
+        "baseDesc": "The full FleetAi core: fleet, maintenance, AI, documents.",
+        "basePrice": 20,
+        "pricePer": "/mo",
+        "modulesLabel": "THE CORE",
+        "note": "Modules available on the Pro plan — all included in Enterprise.",
+        "ctaLabel": "Build my plan",
+        "ctaHref": "/en/pricing",
+        "modules": [
+          {
+            "icon": "📅",
+            "name": "Charter",
+            "desc": "Reservations, inspections, contracts, per-boat pricing and seasonal periods.",
+            "price": 15
+          },
+          {
+            "icon": "🧾",
+            "name": "CRM & Invoicing",
+            "desc": "Client records, quotes and invoices.",
+            "price": 15
+          }
+        ]
+      },
+      "features": [
+        {
+          "eyebrow": "IMMUTABLE HISTORY",
+          "title": "Every intervention stays",
+          "titleHighlight": "written in stone.",
+          "body": "A recorded event cannot be modified. That's the contract. You build a reliable history that adds value at resale.",
+          "bullets": [
+            "Complete timeline per boat",
+            "Parts and associated costs",
+            "PDF export for resale or audit",
+            "Instant search in history"
+          ]
+        },
+        {
+          "eyebrow": "INTELLIGENT SCHEDULING",
+          "title": "Calendar or engine hours —",
+          "titleHighlight": "the app calculates.",
+          "body": "Set your thresholds once. FleetAi calculates alert dates and notifies you 14 days before each deadline.",
+          "bullets": [
+            "Reminders by date or engine hours",
+            "Calendar and Kanban view",
+            "Team assignment",
+            "Automatic recurrence"
+          ]
+        },
+        {
+          "eyebrow": "FLEETAI - AI COPILOT",
+          "title": "An assistant that",
+          "titleHighlight": "knows your boats.",
+          "body": "Ask a question, get a contextual answer. FleetAi reads your fleet and suggests the next action.",
+          "bullets": [
+            "Natural language questions",
+            "Suggestions based on your data",
+            "One-click actions",
+            "Powered by Mistral AI"
+          ]
+        }
+      ],
+      "personas": {
+        "title": "Built for every operator",
+        "subtitle": "Whether you manage 3 or 30 boats, FleetAi adapts to your organization.",
+        "ctaLabel": "Try for free",
+        "items": [
+          {
+            "key": "loueurs",
+            "icon": "⛵",
+            "tabLabel": "Rentals",
+            "title": "Rental & charter operators",
+            "subtitle": "Maximize uptime. Never lose a rental day to unplanned maintenance.",
+            "bullets": [
+              "Full maintenance history per boat, always accessible",
+              "AI alerts you 14 days before any critical service",
+              "PDF reports ready for insurance audits"
+            ],
+            "quote": {
+              "text": "We went from 14 poorly tracked boats to 22 perfectly managed — without hiring.",
+              "author": "Marc Lefèvre",
+              "role": "Marina Bleue - Fleet manager"
+            },
+            "stat": {
+              "value": "-80%",
+              "label": "time spent on maintenance tracking"
+            }
+          },
+          {
+            "key": "ecoles",
+            "icon": "🎓",
+            "tabLabel": "Sailing schools",
+            "title": "Sailing schools",
+            "subtitle": "Safety first, between lessons and maintenance windows.",
+            "bullets": [
+              "Safety equipment tracking with expiration alerts",
+              "Maintenance calendar respecting lesson schedules",
+              "Shareable boat status for instructors"
+            ],
+            "quote": {
+              "text": "Our instructors now check boat status before each lesson. It changed our safety culture overnight.",
+              "author": "Celine Morel",
+              "role": "Ecole Bleue - Director"
+            },
+            "stat": {
+              "value": "100%",
+              "label": "safety inspections passed"
+            }
+          },
+          {
+            "key": "marinas",
+            "icon": "🏗",
+            "tabLabel": "Marinas",
+            "title": "Marinas & ports",
+            "subtitle": "Give each owner a clear view of their boat.",
+            "bullets": [
+              "Dock view with status of each boat",
+              "Self-service owner portal",
+              "Integrated service billing"
+            ],
+            "quote": {
+              "text": "Owners don't call me anymore to ask about their boat status. They check the app.",
+              "author": "Jean-Pierre Duval",
+              "role": "Silver Port - Director"
+            },
+            "stat": {
+              "value": "3x",
+              "label": "fewer owner calls"
+            }
+          },
+          {
+            "key": "armateurs",
+            "icon": "⚓",
+            "tabLabel": "Private owners",
+            "title": "Private owners",
+            "subtitle": "Know exactly what's done, what's due, and what to budget next.",
+            "bullets": [
+              "Digital log, always with you on your phone",
+              "PDF export for resale — prove every service",
+              "AI suggestions based on your actual engine hours"
+            ],
+            "quote": {
+              "text": "When I sold my boat, the buyer's first question was about maintenance. I had everything in PDF.",
+              "author": "Thomas Berger",
+              "role": "Private owner - 2 boats"
+            },
+            "stat": {
+              "value": "+15%",
+              "label": "resale value with complete history"
+            }
+          }
+        ]
+      },
+      "statsBand": [
+        {
+          "value": "40+",
+          "label": "fleets"
+        },
+        {
+          "value": "680",
+          "label": "boats"
+        },
+        {
+          "value": "28,240",
+          "label": "events"
+        },
+        {
+          "value": "4.8/5",
+          "label": "satisfaction"
+        }
+      ],
+      "comparison": {
+        "title": "Excel, paper, or a tool built for the sea?",
+        "subtitle": "Why FleetAi",
+        "cols": {
+          "feature": "Feature",
+          "excel": "Shared Excel",
+          "paper": "Paper logbook",
+          "fleetai": "FleetAi"
+        },
+        "rows": [
+          {
+            "feature": "Immutable history",
+            "excel": "no",
+            "paper": "partial",
+            "fleetai": "yes"
+          },
+          {
+            "feature": "Automatic reminders",
+            "excel": "no",
+            "paper": "no",
+            "fleetai": "yes"
+          },
+          {
+            "feature": "Multi-user",
+            "excel": "partial",
+            "paper": "no",
+            "fleetai": "yes"
+          },
+          {
+            "feature": "Mobile on dock",
+            "excel": "no",
+            "paper": "yes",
+            "fleetai": "yes"
+          },
+          {
+            "feature": "AI suggestions",
+            "excel": "no",
+            "paper": "no",
+            "fleetai": "yes"
+          },
+          {
+            "feature": "PDF resale export",
+            "excel": "no",
+            "paper": "partial",
+            "fleetai": "yes"
+          },
+          {
+            "feature": "Hour threshold management",
+            "excel": "manual",
+            "paper": "no",
+            "fleetai": "auto"
+          },
+          {
+            "feature": "Secure backup",
+            "excel": "partial",
+            "paper": "no",
+            "fleetai": "yes EU"
+          },
+          {
+            "feature": "Real-time team access",
+            "excel": "partial",
+            "paper": "no",
+            "fleetai": "yes"
+          }
+        ]
+      },
+      "testimonials": {
+        "title": "Trusted by real operators",
+        "items": [
+          {
+            "quote": "We used to manage 14 boats in Excel. Now we manage 22 without hiring anyone.",
+            "author": "Marc Lefèvre",
+            "role": "Marina Bleue - 22 boats",
+            "featured": true
+          },
+          {
+            "quote": "Since FleetAi, I know what needs doing before it starts squeaking.",
+            "author": "Sophie Martin",
+            "role": "BaySail Co. - 8 charter boats"
+          },
+          {
+            "quote": "The AI suggestions caught an oil change I'd pushed three times.",
+            "author": "Julien Petit",
+            "role": "Charter operator - 12 motorboats"
+          },
+          {
+            "quote": "Migrating from our Excel took two hours.",
+            "author": "Isabelle Roux",
+            "role": "Co-founder - BaySail Co."
+          }
+        ]
+      },
+      "security": {
+        "title": "Your data stays yours",
+        "subtitle": "Security & compliance",
+        "items": [
+          {
+            "icon": "🇪🇺",
+            "title": "EU hosting",
+            "description": "OVHcloud Strasbourg - no transfer outside EU"
+          },
+          {
+            "icon": "🔒",
+            "title": "Encryption",
+            "description": "TLS 1.3 in transit, AES-256 at rest"
+          },
+          {
+            "icon": "📋",
+            "title": "GDPR",
+            "description": "Dedicated DPO - deletion on request within 30 days"
+          },
+          {
+            "icon": "🛡",
+            "title": "SOC 2",
+            "description": "Certification in progress - annual audit"
+          },
+          {
+            "icon": "💾",
+            "title": "Backups",
+            "description": "Daily - 30-day retention - 1-click restore"
+          }
+        ]
+      },
+      "faq": {
+        "title": "Everything rental operators ask us",
+        "subtitle": "We answer your most frequent questions.",
+        "cta": {
+          "label": "Try for free",
+          "href": "/signup"
+        },
+        "items": [
+          {
+            "q": "What is fleet maintenance management software?",
+            "a": "A platform that centralizes each boat's maintenance history, schedules upcoming maintenance by calendar or hour thresholds, and alerts before critical operations become overdue."
+          },
+          {
+            "q": "Does FleetAi replace my mechanic?",
+            "a": "No. FleetAi helps you know when and what to schedule. Your mechanic remains essential for doing the work."
+          },
+          {
+            "q": "My boats don't have connected sensors. Does it still work?",
+            "a": "Yes. FleetAi is designed for manual entry of engine hours."
+          },
+          {
+            "q": "How much does FleetAi cost for 15 boats?",
+            "a": "The Pro plan covers up to 8 boats for €20/month (€16/month billed annually). Beyond that you add extra boats at €4/boat/month: 15 boats comes to €48/month on Pro. The Enterprise plan (€99/month) lifts the boat limit entirely. No hidden fees."
+          },
+          {
+            "q": "Can I migrate from another tool?",
+            "a": "Yes — we import Excel, Google Sheets, Airtable and CSV/PDF exports from your existing tools."
+          },
+          {
+            "q": "Is my data kept if I cancel my subscription?",
+            "a": "For 90 days after cancellation, you can export to CSV/PDF. After that, permanent deletion (GDPR)."
+          },
+          {
+            "q": "Does the AI see other customers' data?",
+            "a": "No. Each organization is isolated. The AI only sees your data."
+          },
+          {
+            "q": "How many users can I add?",
+            "a": "Starter: 1 user. Pro: up to 5 users. Enterprise: unlimited. You pay per organization, not per seat."
+          }
+        ]
+      },
+      "diagnosis": {
+        "eyebrow": "FREE TRIAL",
+        "title": "Engine acting up?",
+        "titleHighlight": "Ask the AI.",
+        "subtitle": "Describe the breakdown in two sentences: the assistant asks the right questions, then points you to the likely causes — no account, straight from the site.",
+        "items": [
+          "A few targeted questions to pin down the symptom",
+          "Likely causes, ordered from the cheapest to the most expensive to check",
+          "One concrete next step, for you or for your mechanic"
+        ],
+        "ctaLabel": "Diagnose my breakdown",
+        "ctaHref": "/en/engine-diagnosis-ai",
+        "note": "Free, no account · 2 diagnoses included",
+        "disclaimer": "The assistant helps you narrow things down: it replaces neither your engine manual nor a professional."
+      },
+      "demo": {
+        "eyebrow": "PRODUCT DEMO",
+        "title": "Two minutes to see",
+        "titleHighlight": "the difference.",
+        "subtitle": "Try the app freely on a demo fleet, or write to us through the contact form — no jargon, no PowerPoint.",
+        "items": [
+          "Live fleet dashboard configured with your boats",
+          "Maintenance history and real-time alerts",
+          "FleetAi AI assistant on your specific use cases",
+          "Initial setup done in under 15 minutes"
+        ],
+        "ctaLabel": "Write to us",
+        "ctaHref": "/contact",
+        "secondaryLabel": "See pricing",
+        "noCommitment": "No commitment · Reply within 24h",
+        "tryDemoLabel": "Try the demo",
+        "tryDemoSubtitle": "Instant access · Data auto-reset · No sign-up required",
+        "demoLoginPath": "/demo"
+      },
+      "finalCta": {
+        "title": "Start for free, upgrade when you need to.",
+        "titleHighlight": "No commitment.",
+        "subtitle": "Create your organization, import your boats, and let FleetAi show you what you're missing.",
+        "primaryCta": "Create my organization",
+        "secondaryCta": "Try the demo"
+      },
+      "caseStudy": {
+        "title": "How a marina reduced maintenance delays by 80%",
+        "subtitle": "Case study",
+        "company": "Marina Bleue — 22-boat fleet",
+        "challengeLabel": "The challenge",
+        "challenge": "Maintenance tracked across 4 shared Excel files, frequent safety delays, and 3 h/week lost to team coordination.",
+        "solutionLabel": "The solution",
+        "solution": "FleetAi deployed in 2 days — history imported from Excel, automatic alerts activated, team onboarded in 30 min.",
+        "resultsLabel": "The results",
+        "results": [
+          "Zero safety delays since rollout",
+          "Complete maintenance history accessible in one click",
+          "Monthly report generated automatically"
+        ],
+        "metrics": [
+          {
+            "value": "−80%",
+            "label": "fewer maintenance delays"
+          },
+          {
+            "value": "2 d",
+            "label": "to onboard"
+          },
+          {
+            "value": "3 h",
+            "label": "saved per week"
+          }
+        ],
+        "cta": {
+          "text": "Estimate your maintenance costs",
+          "href": "/en/maintenance-cost-simulator"
+        }
+      },
+      "howItWorks": {
+        "title": "Up and running in 3 steps",
+        "subtitle": "No long training, no complex integration, no risk.",
+        "items": [
+          {
+            "step": "01",
+            "title": "Import your fleet",
+            "description": "From Excel, CSV, or manual entry. All your boats and equipment are ready in under 10 minutes.",
+            "detail": "Supported formats: Excel, CSV, Google Sheets"
+          },
+          {
+            "step": "02",
+            "title": "Schedule maintenance",
+            "description": "FleetAi automatically generates tasks based on the calendar or engine-hour intervals for each piece of equipment.",
+            "detail": "Email alerts before every due date"
+          },
+          {
+            "step": "03",
+            "title": "Navigate with AI",
+            "description": "Every morning, your dashboard surfaces urgent tasks, upcoming deadlines, and anomalies detected by the AI.",
+            "detail": "Automatic weekly report sent to your inbox"
+          }
+        ],
+        "timeline": {
+          "title": "Onboarding timeline",
+          "items": [
+            {
+              "day": "Day 1",
+              "label": "Fleet imported"
+            },
+            {
+              "day": "Day 7",
+              "label": "First alerts live"
+            },
+            {
+              "day": "Day 30",
+              "label": "Measurable ROI"
+            }
+          ]
+        }
+      },
+      "preview": {
+        "title": "Zero maintenance delays.",
+        "subtitle": "FleetAi monitors your fleet 24/7, alerts you before critical deadlines, and frees up your time for what really matters."
+      }
+    }
+  }
+}

@@ -1,0 +1,261 @@
+{
+  "t": {
+    "meta": {
+      "title": "À propos",
+      "description": "FleetAi est une startup française fondée en 2024 à Marseille. Notre mission : donner aux loueurs, écoles et marinas les outils numériques qu'ils méritent."
+    },
+    "about": {
+      "hero": {
+        "line1": "Donner aux",
+        "line1Highlight": "gens de la mer",
+        "line2": "les outils des",
+        "line2Highlight": "gens de la terre.",
+        "subtitle": "Les marinas, écoles et loueurs gèrent leur flotte avec Excel, des post-its et la mémoire du chantier. Nous pensons qu'ils méritent mieux — et nous le construisons depuis 2024."
+      },
+      "origin": {
+        "eyebrow": "NOTRE HISTOIRE",
+        "title": "Né d'un classeur, d'un dimanche pluvieux, et d'un weekend de location perdu.",
+        "paragraphs": [
+          "En 2023, Anaïs gérait une marina de 18 voiliers à Marseille. La maintenance vivait dans un Excel partagé, des classeurs au chantier, et la mémoire de Yann, le mécano.",
+          "Un samedi de juin, un client a découvert au démarrage que la batterie de son voilier était à plat. C'était noté quelque part. Weekend annulé. Marge négative. Sourire forcé.",
+          "Le dimanche, elle a appelé Théo (ex-Doctolib, voileux). Trois mois plus tard, FleetAi avait son premier client : sa propre marina.",
+          "Aujourd'hui, 40+ flottes en France utilisent FleetAi. On ne s'est jamais éloignés du ponton."
+        ],
+        "captionDate": "MARSEILLE · 2024",
+        "captionSub": "Bureau historique · quai du Port"
+      },
+      "values": {
+        "eyebrow": "CE QUI NOUS GUIDE",
+        "title": "Quatre principes",
+        "titleHighlight": "non négociables.",
+        "items": [
+          {
+            "n": "01",
+            "title": "Le terrain d'abord",
+            "desc": "Chaque fonctionnalité est testée sur un ponton avant d'arriver dans l'app. On va voir Marc, Yann et Sophie — pas l'inverse.",
+            "extra": "En 2025, l'équipe a passé 84 jours sur le terrain."
+          },
+          {
+            "n": "02",
+            "title": "Les données immuables",
+            "desc": "Un événement saisi ne se modifie pas. C'est le contrat. La traçabilité de ta flotte vaut autant qu'un bateau.",
+            "extra": "28 240 événements stockés depuis 2024. Zéro perdu."
+          },
+          {
+            "n": "03",
+            "title": "Pas de bullshit IA",
+            "desc": "FleetAi propose, ne décide pas. Tu restes le capitaine. L'IA est utile quand elle est honnête sur ses limites.",
+            "extra": "Tes données ne servent jamais à entraîner le modèle."
+          },
+          {
+            "n": "04",
+            "title": "Une seule marée pour les bugs",
+            "desc": "Les bugs critiques sont corrigés sous 6h. Les autres sous 7 jours. Pas de backlog pourri.",
+            "extra": "Délai de résolution médian en 2025 : 3h47."
+          }
+        ]
+      },
+      "team": {
+        "eyebrow": "L'ÉQUIPE",
+        "title": "8 personnes,",
+        "titleHighlight": "une moyenne d'âge nautique.",
+        "subtitle": "Marseille, Paris, La Rochelle. Tous ont navigué, beaucoup naviguent encore. Aucun ne supporte Excel.",
+        "members": [
+          {
+            "n": "Anaïs Mercier",
+            "r": "Co-fondatrice · CEO",
+            "b": "12 ans de skipper · ex-marina Marseille",
+            "emoji": "⛵",
+            "color": "coral"
+          },
+          {
+            "n": "Théo Roussel",
+            "r": "Co-fondateur · CTO",
+            "b": "Ex-Doctolib · voile depuis l'enfance",
+            "emoji": "💻",
+            "color": "navy"
+          },
+          {
+            "n": "Sophie Bart",
+            "r": "Head of Design",
+            "b": "Amoureuse des marinas · ex-Notion",
+            "emoji": "✏️",
+            "color": "mint"
+          },
+          {
+            "n": "Lucas Petit",
+            "r": "Ingénieur",
+            "b": "Ex-Datadog · spécialisé temps réel",
+            "emoji": "⚡",
+            "color": "navy"
+          },
+          {
+            "n": "Marc Dubois",
+            "r": "Customer Success",
+            "b": "Ancien chef de chantier · La Rochelle",
+            "emoji": "🔧",
+            "color": "coral"
+          },
+          {
+            "n": "Élodie Vidal",
+            "r": "Ingénieure mobile",
+            "b": "Ex-Alan · navigation côtière",
+            "emoji": "📱",
+            "color": "mint"
+          },
+          {
+            "n": "Pierre Garnier",
+            "r": "Ingénieur IA",
+            "b": "Ex-Mistral AI · projet open-source",
+            "emoji": "🤖",
+            "color": "navy"
+          },
+          {
+            "n": "Camille Roux",
+            "r": "Designer mobile",
+            "b": "Ex-Doctolib · UX terrain",
+            "emoji": "🎨",
+            "color": "coral"
+          }
+        ],
+        "hiringTitle": "Nous recrutons.",
+        "hiringSubtitle": "3 postes ouverts · Ingénieur backend, Sales, Customer success"
+      },
+      "numbers": {
+        "eyebrow": "DEPUIS 2024",
+        "title": "Une croissance",
+        "titleHighlight": "sans embarcation.",
+        "stats": [
+          {
+            "value": "40+",
+            "label": "flottes accompagnées"
+          },
+          {
+            "value": "680",
+            "label": "bateaux suivis"
+          },
+          {
+            "value": "28 240",
+            "label": "événements stockés"
+          },
+          {
+            "value": "1,2 M€",
+            "label": "levés (seed · 2025)"
+          }
+        ],
+        "investorsLabel": "SOUTENUS PAR",
+        "investors": ["Kima Ventures", "Frst", "Bpifrance", "SailFund", "Marina Angels"]
+      },
+      "timeline": {
+        "eyebrow": "JOURNAL DE BORD",
+        "title": "Deux ans",
+        "titleHighlight": "à la voile.",
+        "subtitle": "Aucune levée surprise, aucun pivot. Juste un cap clair.",
+        "items": [
+          {
+            "d": "Mai 2026",
+            "t": "Lancement plan Entreprise",
+            "sub": "5 grandes flottes en pilote · API publique",
+            "tone": "coral"
+          },
+          {
+            "d": "Janv 2026",
+            "t": "FleetAi v2 · Mistral Large",
+            "sub": "Programmation conversationnelle généralisée",
+            "tone": "mint"
+          },
+          {
+            "d": "Sept 2025",
+            "t": "Seed 1,2 M€ · Kima + Frst",
+            "sub": "Bpifrance non-dilutif en complément",
+            "tone": "coral"
+          },
+          {
+            "d": "Juin 2025",
+            "t": "30e cliente · SailCorp",
+            "sub": "Première flotte à plus de 30 bateaux",
+            "tone": "mint"
+          },
+          {
+            "d": "Mars 2025",
+            "t": "App mobile iOS / Android",
+            "sub": "Saisie depuis le ponton, en bottes",
+            "tone": "mint"
+          },
+          {
+            "d": "Nov 2024",
+            "t": "Première cliente externe",
+            "sub": "École de la Mer · La Rochelle",
+            "tone": ""
+          },
+          {
+            "d": "Juin 2024",
+            "t": "Premier événement saisi",
+            "sub": "Marina Bleue · vidange L'Albatros · 12,4 m",
+            "tone": ""
+          },
+          {
+            "d": "Avril 2024",
+            "t": "FleetAi est fondé",
+            "sub": "Anaïs & Théo · cuisine de Marseille",
+            "tone": "coral"
+          }
+        ]
+      },
+      "office": {
+        "eyebrow": "NOS BUREAUX",
+        "title": "Le seul bureau",
+        "titleHighlight": "avec vue sur ses utilisateurs.",
+        "body": "Notre siège est au quai du Port, à Marseille. Six minutes à pied du Vieux-Port, dix minutes en bateau de la marina qui a tout déclenché. Antenne à Paris pour le commercial.",
+        "locationLabel": "Adresse",
+        "hoursLabel": "Horaires",
+        "teamLabel": "Équipe",
+        "locations": [
+          {
+            "city": "Marseille",
+            "addr": "12 quai du Port · 13002",
+            "role": "siège · équipe produit"
+          },
+          {
+            "city": "Paris",
+            "addr": "25 rue de la Banque · 75002",
+            "role": "antenne · équipe commerciale"
+          },
+          {
+            "city": "Remote",
+            "addr": "partout en France",
+            "role": "15 % de l'équipe en télétravail"
+          }
+        ],
+        "officeCards": [
+          {
+            "city": "Marseille",
+            "role": "Siège · produit & ingénierie",
+            "addr": "12 quai du Port · 13002 Marseille",
+            "hours": "lun-ven · 9h-18h",
+            "team": "6 personnes",
+            "hint": "À 6 min à pied du Vieux-Port, juste après la Mairie. Sonne au 3e étage.",
+            "gradient": "from-navy-900 to-navy-800"
+          },
+          {
+            "city": "Paris",
+            "role": "Antenne commerciale",
+            "addr": "25 rue de la Banque · 75002 Paris",
+            "hours": "sur rendez-vous",
+            "team": "2 personnes",
+            "hint": "Près de la Bourse · ligne 3 station Bourse.",
+            "gradient": "from-coral-500 to-coral-400"
+          }
+        ]
+      },
+      "finalCta": {
+        "title": "Rejoins les",
+        "titleHighlight": "40+ flottes.",
+        "subtitle": "Commence gratuitement avec le plan Starter. Aucune carte bleue requise.",
+        "primaryCta": "Créer mon organisation",
+        "secondaryCta": "Essayer la démo",
+        "demoLoginPath": "/demo"
+      }
+    }
+  }
+}

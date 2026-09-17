@@ -1,0 +1,189 @@
+{
+  "contactSent": false,
+  "t": {
+    "meta": {
+      "title": "Contact",
+      "description": "Une question, une démo, un partenariat ? Parle-nous de ta flotte. On répond sous 4h en jours ouvrés."
+    },
+    "contact": {
+      "hero": {
+        "eyebrow": "CONTACT",
+        "title": "Parle-nous de",
+        "titleHighlight": "ta flotte.",
+        "subtitle": "On répond sous 4h en jours ouvrés. Pas de bot. C'est l'un de nous qui te lit."
+      },
+      "channels": [
+        {
+          "icon": "✦",
+          "title": "Démo en accès libre",
+          "desc": "Explore FleetAi sur une flotte de démo. Accès instantané, sans inscription.",
+          "cta": "Lancer la démo",
+          "tone": "navy",
+          "href": "/demo",
+          "kind": "demo"
+        },
+        {
+          "icon": "▶",
+          "title": "Tester sans parler",
+          "desc": "Plan Starter gratuit, configuré en 5 minutes. Sans CB.",
+          "cta": "Créer mon compte",
+          "tone": "coral",
+          "href": "/signup",
+          "kind": "internal"
+        },
+        {
+          "icon": "👤",
+          "title": "Support client",
+          "desc": "Tu es déjà client ? L'équipe support répond sous 4h.",
+          "cta": "support@fleetai.app",
+          "tone": "",
+          "href": "mailto:support@fleetai.app",
+          "kind": "external"
+        },
+        {
+          "icon": "⚡",
+          "title": "Partenariats & presse",
+          "desc": "Journaliste, chantier, intégrateur, école — parlons.",
+          "cta": "press@fleetai.app",
+          "tone": "",
+          "href": "mailto:press@fleetai.app",
+          "kind": "external"
+        }
+      ],
+      "form": {
+        "anchorId": "contact-form",
+        "action": "/contact",
+        "eyebrow": "FORMULAIRE",
+        "title": "Écris-nous.",
+        "subjectLabel": "Sujet",
+        "subjects": [
+          {
+            "value": "demo",
+            "label": "Démo"
+          },
+          {
+            "value": "pricing",
+            "label": "Tarifs"
+          },
+          {
+            "value": "migration",
+            "label": "Migration"
+          },
+          {
+            "value": "technical",
+            "label": "Question technique"
+          },
+          {
+            "value": "partnership",
+            "label": "Partenariat"
+          },
+          {
+            "value": "other",
+            "label": "Autre"
+          }
+        ],
+        "fleetSizes": ["1-4", "5-20", "20+"],
+        "firstNameLabel": "Prénom *",
+        "firstNamePlaceholder": "Marc",
+        "lastNameLabel": "Nom *",
+        "lastNamePlaceholder": "Lefèvre",
+        "emailLabel": "Email pro *",
+        "emailPlaceholder": "marc@marina-bleue.fr",
+        "orgLabel": "Organisation",
+        "orgPlaceholder": "Marina Bleue",
+        "fleetSizeLabel": "Taille de flotte",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Quelques mots sur ta flotte et ton besoin…",
+        "privacyText": "J'accepte que mes informations soient traitées pour répondre à ma demande.",
+        "privacyLinkLabel": "Politique de confidentialité",
+        "submitLabel": "Envoyer",
+        "sendingLabel": "Envoi…",
+        "successTitle": "Message envoyé.",
+        "successBody": "Merci ! On te répond sous 4 heures en jours ouvrés, à l'adresse que tu viens de nous laisser. Un accusé de réception vient de partir.",
+        "successNewLabel": "Écrire un autre message",
+        "errorGeneric": "L'envoi a échoué. Vérifie les champs en rouge et réessaie.",
+        "responseTime": "Réponse garantie sous 4 heures en jours ouvrés.",
+        "otherMeansTitle": "AUTRES MOYENS",
+        "sidebarContacts": [
+          {
+            "icon": "📞",
+            "label": "+33 4 91 00 00 00",
+            "sub": "lun-ven · 9h-18h",
+            "href": "tel:+33491000000"
+          },
+          {
+            "icon": "✉",
+            "label": "hello@fleetai.app",
+            "sub": "support & général",
+            "href": "mailto:hello@fleetai.app"
+          },
+          {
+            "icon": "⚡",
+            "label": "press@fleetai.app",
+            "sub": "presse & partenariats",
+            "href": "mailto:press@fleetai.app"
+          }
+        ],
+        "ctaTitle": "Teste FleetAi en 5 min, sans nous parler.",
+        "ctaSubtitle": "Plan Starter gratuit à vie, sans carte bleue, sans appel commercial.",
+        "ctaButton": "Créer mon organisation"
+      },
+      "offices": {
+        "eyebrow": "BUREAUX",
+        "title": "Passe nous voir",
+        "titleHighlight": "au port.",
+        "subtitle": "Préviens nous avant — on a un Optimist sous le bureau si tu veux faire un tour.",
+        "addrLabel": "Adresse",
+        "hoursLabel": "Horaires",
+        "teamLabel": "Équipe",
+        "items": [
+          {
+            "city": "Marseille",
+            "role": "Siège · produit & ingénierie",
+            "addr": "12 quai du Port · 13002 Marseille",
+            "hours": "lun-ven · 9h-18h",
+            "team": "6 personnes",
+            "hint": "À 6 min à pied du Vieux-Port, juste après la Mairie. Sonne au 3e étage.",
+            "gradient": "from-navy-900 to-navy-800"
+          },
+          {
+            "city": "Paris",
+            "role": "Antenne commerciale",
+            "addr": "25 rue de la Banque · 75002 Paris",
+            "hours": "sur rendez-vous",
+            "team": "2 personnes",
+            "hint": "Près de la Bourse · ligne 3 station Bourse.",
+            "gradient": "from-coral-500 to-coral-400"
+          }
+        ]
+      },
+      "faq": {
+        "eyebrow": "QUESTIONS RAPIDES",
+        "title": "Avant que tu n'écrives",
+        "titleHighlight": "vraiment.",
+        "items": [
+          {
+            "q": "Combien de temps pour avoir une réponse ?",
+            "a": "Sous 4 heures en jours ouvrés, en français. La nuit et le weekend, on lit mais on ne répond pas."
+          },
+          {
+            "q": "Puis-je voir FleetAi en action avant de m'inscrire ?",
+            "a": "Oui — la démo est en accès libre sur une flotte d'exemple, sans inscription. Pour parler de ta propre flotte, écris-nous via le formulaire : on te répond sous 4h en jours ouvrés."
+          },
+          {
+            "q": "Vous parlez anglais ?",
+            "a": "Oui, l'équipe est bilingue FR/EN. Si tu écris en anglais, on te répondra en anglais."
+          },
+          {
+            "q": "Je suis intégrateur / consultant, vous avez un programme partenaire ?",
+            "a": "Oui, contacte partners@fleetai.app — commission 20 % sur la première année."
+          },
+          {
+            "q": "J'ai un bug. Je vous écris où ?",
+            "a": "Si tu es client, depuis l'app (icône en bas à droite) — sinon support@fleetai.app. Bugs critiques traités sous 6h."
+          }
+        ]
+      }
+    }
+  }
+}
