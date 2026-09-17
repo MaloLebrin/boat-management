@@ -2,13 +2,11 @@ import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import app from '@adonisjs/core/services/app'
 import Stripe from 'stripe'
-import { DateTime } from 'luxon'
-import Subscription from '#models/subscription'
 import OrganizationModuleService from '#services/organization_module_service'
 import StripeService from '#services/stripe_service'
 import { UserFactory } from '#database/factories/user_factory'
 import OrganizationMembership from '#models/organization_membership'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, seedActiveSubscription } from '#tests/functional/helpers'
 
 async function createAdminOnPlan(plan: 'starter' | 'pro' | 'enterprise') {
   const user = await UserFactory.with('organization', 1, (org) => org.merge({ plan })).create()
@@ -20,20 +18,6 @@ async function createAdminOnPlan(plan: 'starter' | 'pro' | 'enterprise') {
     })
   }
   return user
-}
-
-async function seedActiveSubscription(organizationId: number) {
-  await Subscription.create({
-    organizationId,
-    stripeSubscriptionId: 'sub_active_test',
-    stripePriceId: 'price_test_pro_month',
-    planTier: 'pro',
-    status: 'active',
-    billingInterval: 'month',
-    currentPeriodStart: DateTime.now(),
-    currentPeriodEnd: DateTime.now().plus({ months: 1 }),
-    cancelAtPeriodEnd: false,
-  })
 }
 
 test.group('Billing module management (functional)', (group) => {
