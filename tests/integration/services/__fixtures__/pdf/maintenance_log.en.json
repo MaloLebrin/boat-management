@@ -8,7 +8,7 @@
     ["fillColor", "#0b1d2e"],
     [
       "image",
-      "/Users/malolebrin/Documents/3d-website/.claude/worktrees/refactor/public/web-app-manifest-192x192.png",
+      "<public>/web-app-manifest-192x192.png",
       48,
       22,
       {

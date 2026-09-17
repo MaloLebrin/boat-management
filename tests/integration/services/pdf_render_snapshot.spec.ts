@@ -59,12 +59,17 @@ const SPIED = [
 
 type Entry = unknown[]
 
-function normalizeValue(value: unknown, replacements: Array<[string, string]>): unknown {
+type Replacement = [string | RegExp, string]
+
+function normalizeValue(value: unknown, replacements: Replacement[]): unknown {
   // JSON n'a pas d'`undefined` : un argument optionnel absent devient `null`.
   if (value === undefined) return null
   if (typeof value === 'number') return Math.round(value * 100) / 100
   if (typeof value === 'string') {
-    return replacements.reduce((s, [from, to]) => s.split(from).join(to), value)
+    return replacements.reduce(
+      (s, [from, to]) => (typeof from === 'string' ? s.split(from).join(to) : s.replace(from, to)),
+      value
+    )
   }
   if (Buffer.isBuffer(value)) return '<buffer>'
   if (typeof value === 'function') return '<fn>'
@@ -102,18 +107,25 @@ async function recordCalls(run: () => Promise<unknown>): Promise<Entry[]> {
 }
 
 async function snapshot(
-  assert: { deepEqual: (a: unknown, b: unknown) => void },
+  assert: {
+    deepEqual: (a: unknown, b: unknown, message?: string) => void
+    equal: (a: unknown, b: unknown, message?: string) => void
+  },
   name: string,
   locale: 'fr' | 'en',
   run: () => Promise<{ buffer: Buffer; filename: string }>,
-  ids: Array<[string, string]> = []
+  ids: Replacement[] = []
 ) {
   let result: { buffer: Buffer; filename: string } | undefined
   const calls = await recordCalls(async () => {
     result = await run()
   })
-  const replacements: Array<[string, string]> = [
+  const replacements: Replacement[] = [
+    // Chemin absolu du logo (`app.publicPath`) : diffère entre le poste et le CI.
+    [app.publicPath(), '<public>'],
     [formatDate(new Date(), locale), '<today>'],
+    // Nom de fichier de l'historique : `historique-maintenance-YYYY-MM-DD.pdf`.
+    [new Date().toISOString().slice(0, 10), '<today-iso>'],
     ...ids,
   ]
   const actual = {
@@ -126,7 +138,18 @@ async function snapshot(
     mkdirSync(FIXTURES_DIR, { recursive: true })
     writeFileSync(file, JSON.stringify(actual, null, 2) + '\n')
   }
-  assert.deepEqual(actual, JSON.parse(readFileSync(file, 'utf8')))
+  // Assertions ciblées : un échec désigne le premier appel qui diverge, lisible
+  // dans le log du CI (un `deepEqual` global n'y affiche que `{ …(2) }`).
+  const expected = JSON.parse(readFileSync(file, 'utf8')) as typeof actual
+  assert.equal(actual.filename, expected.filename, `${name}.${locale} — filename`)
+  const length = Math.max(actual.calls.length, expected.calls.length)
+  for (let i = 0; i < length; i++) {
+    assert.deepEqual(
+      actual.calls[i],
+      expected.calls[i],
+      `${name}.${locale} — call #${i}: ${JSON.stringify(actual.calls[i])} != ${JSON.stringify(expected.calls[i])}`
+    )
+  }
 }
 
 async function organizationOf(user: { organizationId: number | null }) {
@@ -353,8 +376,10 @@ test.group('PDF services — render snapshot (integration)', () => {
         locale,
         () => service.generate(contract, org, i18nManager.locale(locale)),
         [
-          [`#${contract.id}`, '#<id>'],
-          [`contrat-location-${contract.id}`, 'contrat-location-<id>'],
+          // Expression régulière : `#1` ne doit pas mordre sur la couleur `#1e3a5f`
+          // quand la base de test est neuve (petits identifiants, cas du CI).
+          [new RegExp(`#${contract.id}(?![0-9a-f])`, 'g'), '#<id>'],
+          [new RegExp(`contrat-location-${contract.id}(?!\\d)`, 'g'), 'contrat-location-<id>'],
         ]
       )
     })

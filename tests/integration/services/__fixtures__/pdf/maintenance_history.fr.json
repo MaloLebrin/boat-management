@@ -1,5 +1,5 @@
 {
-  "filename": "historique-maintenance-2026-09-16.pdf",
+  "filename": "historique-maintenance-<today-iso>.pdf",
   "calls": [
     ["font", "Helvetica", null],
     ["addPage"],
