@@ -1,7 +1,4 @@
-import { router } from '@inertiajs/vue3'
-
-/** Options de visite acceptées par `router.delete`, dérivées de sa signature. */
-type DeleteVisitOptions = Parameters<typeof router.delete>[1]
+import { deleteVisit, type DeleteVisitOptions } from '~/utils/delete_visit'
 
 /**
  * Garde de confirmation native, partagée par les dix-huit suppressions gardées
@@ -40,9 +37,5 @@ export function notify(message: string): void {
  */
 export function confirmDelete(message: string, url: string, options?: DeleteVisitOptions): void {
   if (!confirmed(message)) return
-  if (options === undefined) {
-    router.delete(url)
-    return
-  }
-  router.delete(url, options)
+  deleteVisit(url, options)
 }
