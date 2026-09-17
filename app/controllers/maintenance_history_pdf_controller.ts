@@ -1,7 +1,6 @@
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import MaintenanceHistoryPdfService from '#services/maintenance_history_pdf_service'
 import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { contentDisposition } from '#shared/helpers/content_disposition'
@@ -14,20 +13,12 @@ export default class MaintenanceHistoryPdfController {
     private quotaService: QuotaService
   ) {}
 
-  async download({ request, response, auth, session, i18n }: HttpContext) {
+  async download({ request, response, auth, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
 
-    try {
-      this.quotaService.assertCanExport(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t(`flash.quota.exportExceeded`))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanExport(user.organization)
 
     const { events, filters, boatName } = await this.maintenanceService.getHistoryEventsForPdf(
       user,

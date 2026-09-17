@@ -4,7 +4,6 @@ import BoatFuelLogService from '#services/boat_fuel_log_service'
 import NavigationLogService from '#services/navigation_log_service'
 import BudgetService from '#services/budget_service'
 import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import { buildCsv, csvFilename } from '#services/csv_export_service'
 import { budgetYearValidator } from '#validators/budget_validator'
 import { inject } from '@adonisjs/core'
@@ -23,20 +22,12 @@ export default class CsvExportController {
     private quotaService: QuotaService
   ) {}
 
-  async maintenance({ response, auth, params, session, i18n }: HttpContext) {
+  async maintenance({ response, auth, params }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
 
-    try {
-      this.quotaService.assertCanExport(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.exportExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanExport(user.organization)
 
     const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
     if (!resolved) return
@@ -77,20 +68,12 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async fuelLogs({ response, auth, params, session, i18n }: HttpContext) {
+  async fuelLogs({ response, auth, params }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
 
-    try {
-      this.quotaService.assertCanExport(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.exportExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanExport(user.organization)
 
     const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
     if (!resolved) return
@@ -128,20 +111,12 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async navigationLogs({ response, auth, params, session, i18n }: HttpContext) {
+  async navigationLogs({ response, auth, params }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
 
-    try {
-      this.quotaService.assertCanExport(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.exportExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanExport(user.organization)
 
     const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
     if (!resolved) return
@@ -188,20 +163,12 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async budget({ response, auth, bouncer, params, request, session, i18n }: HttpContext) {
+  async budget({ response, auth, bouncer, params, request, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
 
-    try {
-      this.quotaService.assertCanExport(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.exportExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanExport(user.organization)
 
     const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
     if (!resolved) return

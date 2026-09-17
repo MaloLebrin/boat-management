@@ -5,7 +5,6 @@ import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BoatPricingService from '#services/boat_pricing_service'
 import { InvalidPricingRangeError } from '#exceptions/boat_pricing_errors'
 import QuotaService from '#services/quota_service'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import BoatPolicy from '#policies/boat_policy'
 import { upsertBoatPricingValidator } from '#validators/boat_pricing'
 
@@ -32,15 +31,7 @@ export default class BoatPricingController {
       throw error
     }
 
-    try {
-      await this.quotaService.assertCanManagePricing(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.pricingExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    await this.quotaService.assertCanManagePricing(user.organization)
 
     await bouncer.with(BoatPolicy).authorize('manage', boat)
 

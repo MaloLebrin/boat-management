@@ -13,7 +13,6 @@ import {
   InvitationExpiredError,
   InvitationNotFoundError,
 } from '#exceptions/organization_errors'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import {
   acceptInvitationValidator,
   declineInvitationValidator,
@@ -74,11 +73,6 @@ export default class OrganizationInvitationsController {
     } catch (error) {
       if (error instanceof AlreadyMemberError) {
         session.flash('error', i18n.t('flash.invitation.alreadyMember'))
-        return response.redirect().back()
-      }
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t(`flash.quota.${error.feature}Exceeded`))
-        session.flash('errorAction', '/settings/billing')
         return response.redirect().back()
       }
       if (error instanceof BoatOwnerInvitationRequiresBoatsError) {

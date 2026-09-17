@@ -7,7 +7,6 @@ import {
   MemberNotFoundError,
   UserNotFoundError,
 } from '#exceptions/organization_errors'
-import { QuotaExceededError } from '#exceptions/quota_errors'
 import QuotaService from '#services/quota_service'
 import { inviteMemberValidator, updateMemberRoleValidator } from '#validators/organization_member'
 import { inject } from '@adonisjs/core'
@@ -55,11 +54,6 @@ export default class OrganizationMembersController {
         metadata: { email: payload.email, role: payload.role },
       })
     } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.membersExceeded'))
-        session.flash('errorAction', '/settings/billing')
-        return response.redirect().back()
-      }
       if (error instanceof UserNotFoundError) {
         session.flash('error', i18n.t('flash.members.userNotFound'))
         return response.redirect().back()

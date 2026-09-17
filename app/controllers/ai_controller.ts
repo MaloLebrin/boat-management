@@ -11,7 +11,7 @@ import { BoatNotFoundError } from '#exceptions/boat_errors'
 import DashboardService from '#services/dashboard_service'
 import QuotaService from '#services/quota_service'
 import { AiInvalidResponseError } from '#exceptions/ai_errors'
-import { QuotaExceededError } from '#exceptions/quota_errors'
+import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import { aiChatValidator, engineDiagnosisValidator } from '#validators/ai'
 import { toAppLocale } from '#shared/helpers/locale_path'
 import { errors as bouncerErrors } from '@adonisjs/bouncer'
@@ -35,15 +35,7 @@ export default class AiController {
     const user = auth.getUserOrFail()
 
     await user.load('organization')
-    try {
-      this.quotaService.assertCanUseAI(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanUseAI(user.organization)
 
     const { messages } = await request.validateUsing(aiChatValidator)
 
@@ -62,15 +54,7 @@ export default class AiController {
     const user = auth.getUserOrFail()
 
     await user.load('organization')
-    try {
-      this.quotaService.assertCanUseAI(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanUseAI(user.organization)
 
     try {
       const data = await this.dashboardService.getForUser(user)
@@ -84,7 +68,7 @@ export default class AiController {
       )
     } catch (error) {
       if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+        session.flash('error', i18n.t(quotaFlashKey(error)))
       } else {
         session.flash('error', i18n.t('flash.ai.analysisError'))
       }
@@ -99,15 +83,7 @@ export default class AiController {
     const boatId = Number(params.id)
 
     await user.load('organization')
-    try {
-      this.quotaService.assertCanUseAI(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanUseAI(user.organization)
 
     try {
       const boat = await this.boatService.getForUserOrFail(user, boatId)
@@ -130,7 +106,7 @@ export default class AiController {
       if (error instanceof BoatNotFoundError) {
         // no flash — boat not found is handled silently
       } else if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+        session.flash('error', i18n.t(quotaFlashKey(error)))
       } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
         throw error
       } else {
@@ -154,15 +130,7 @@ export default class AiController {
     const engineId = Number(params.engineId)
 
     await user.load('organization')
-    try {
-      this.quotaService.assertCanUseAI(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanUseAI(user.organization)
 
     try {
       const boat = await this.boatService.getForUserOrFail(user, boatId)
@@ -190,7 +158,7 @@ export default class AiController {
       } else if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))
       } else if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+        session.flash('error', i18n.t(quotaFlashKey(error)))
       } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
         throw error
       } else {
@@ -211,15 +179,7 @@ export default class AiController {
     const user = auth.getUserOrFail()
 
     await user.load('organization')
-    try {
-      this.quotaService.assertCanUseAI(user.organization)
-    } catch (error) {
-      if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiExceeded'))
-        return response.redirect().back()
-      }
-      throw error
-    }
+    this.quotaService.assertCanUseAI(user.organization)
 
     const payload = await request.validateUsing(engineDiagnosisValidator)
 
@@ -256,7 +216,7 @@ export default class AiController {
       } else if (error instanceof EngineNotDiagnosticEligibleError) {
         session.flash('error', i18n.t('flash.diagnostic.notEligible'))
       } else if (error instanceof QuotaExceededError) {
-        session.flash('error', i18n.t('flash.quota.aiTokensExceeded'))
+        session.flash('error', i18n.t(quotaFlashKey(error)))
       } else if (error instanceof AiInvalidResponseError) {
         session.flash('error', i18n.t('flash.ai.diagnosisInvalidResponse'))
       } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
