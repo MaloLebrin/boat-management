@@ -228,6 +228,9 @@ const SCENARIOS: Record<string, (service: EmailQueueService) => Promise<unknown>
 function normalize(captured: Captured): Captured {
   const json = JSON.stringify(captured)
     .replace(/:(\d{13})(?=["\\])/g, ':<ts>')
+    // Avant `:<yyyy-MM>`, sinon la date du jour d'une clé de dédup (`doc-expiry`)
+    // reste dans la fixture et la suite échoue au changement de jour.
+    .replace(/:(\d{4})-(\d{2})-(\d{2})(?=["\\])/g, ':<yyyy-MM-dd>')
     .replace(/:(\d{4})-(\d{2})(?=["\\])/g, ':<yyyy-MM>')
     .replace(/http:\/\/localhost:\d+/g, '<app-url>')
   return JSON.parse(json) as Captured
