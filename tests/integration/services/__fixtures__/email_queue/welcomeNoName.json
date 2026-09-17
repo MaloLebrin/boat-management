@@ -1,0 +1,13 @@
+{
+  "key": "email:alice@example.com:welcome:alice@example.com",
+  "jobName": "SendEmail",
+  "queue": "emails",
+  "payload": {
+    "to": "alice@example.com",
+    "subject": "Bienvenue sur FleetAi / Welcome to FleetAi",
+    "text": "Bonjour alice@example.com,\n\nBienvenue sur FleetAi, votre plateforme de gestion de flotte.\n\nHello alice@example.com,\n\nWelcome to FleetAi, your fleet management platform.\n\nAccess your dashboard: /dashboard",
+    "html": "<!DOCTYPE html>\n<html lang=\"fr\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>FleetAi</title>\n  </head>\n  <body style=\"margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background-color:#f4f4f7;\">\n    <table\n      role=\"presentation\"\n      width=\"100%\"\n      cellspacing=\"0\"\n      cellpadding=\"0\"\n      style=\"max-width:600px;margin:0 auto;background-color:#ffffff;\"\n    >\n      <tr>\n        <td\n          style=\"padding:40px 30px;text-align:center;background-color:#1e3a5f;\"\n        >\n            <h1 style=\"margin:0;color:#ffffff;font-size:28px;\">\n              FleetAi\n            </h1>\n        </td>\n      </tr>\n      <tr>\n        <td style=\"padding:40px 30px;\">    <h2 style=\"margin:0 0 20px;color:#333333;font-size:22px;\">\n      Bienvenue alice@example.com / Welcome alice@example.com\n    </h2>\n    <p style=\"margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;\">\n      Merci d'avoir rejoint FleetAi. Nous sommes ravis de vous accueillir sur notre plateforme de gestion de flotte.\n    </p>\n    <p style=\"margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;\">\n      Thank you for joining FleetAi. We are excited to have you on our fleet management platform.\n    </p>\n    <table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" style=\"margin:0 auto;\">\n      <tr>\n        <td style=\"border-radius:6px;background-color:#1e3a5f;\">\n          <a\n            href=\"<app-url>/dashboard\"\n            style=\"display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;\"\n          >\n            Go to Dashboard\n      </a>\n        </td>\n      </tr>\n    </table></td>\n      </tr>\n      <tr>\n        <td\n          style=\"padding:20px 30px;text-align:center;background-color:#f4f4f7;color:#888888;font-size:12px;\"\n        >\n          <p style=\"margin:0;\">FleetAi - Boat Fleet Management</p>\n        </td>\n      </tr>\n    </table>\n  </body>\n</html>\n",
+    "correlationId": "welcome:alice@example.com",
+    "dedupKey": "email:alice@example.com:welcome:alice@example.com"
+  }
+}

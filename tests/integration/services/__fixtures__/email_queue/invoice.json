@@ -1,0 +1,12 @@
+{
+  "key": "invoice:42:9:<ts>",
+  "jobName": "SendInvoiceEmail",
+  "queue": "emails",
+  "payload": {
+    "invoiceId": 9,
+    "organizationId": 42,
+    "to": "client@example.com",
+    "locale": "fr",
+    "dedupKey": "invoice:42:9:<ts>"
+  }
+}
