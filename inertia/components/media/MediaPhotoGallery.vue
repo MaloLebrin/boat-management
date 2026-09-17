@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { CameraIcon, PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
-import { useForm } from '@inertiajs/vue3'
-import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import { useNetworkStatus } from '~/composables/use_network_status'
+import { usePhotoUpload } from '~/composables/use_photo_upload'
 import { useT } from '~/composables/use_t'
 import type { MediaRow } from '~/types/boat_show'
 import { confirmDelete } from '~/utils/native_dialog'
@@ -17,30 +15,9 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { isOnline } = useNetworkStatus()
-const fileInput = ref<HTMLInputElement>()
-const cameraInput = ref<HTMLInputElement>()
-const form = useForm({ files: [] as File[] })
-
-function onFileChange(e: Event) {
-  const input = e.target as HTMLInputElement
-  form.files = input.files ? Array.from(input.files) : []
-  if (form.files.length > 0) submitPhotos()
-}
-
-function submitPhotos() {
-  // Refus explicite hors-ligne : la file IndexedDB ne transporte pas de multipart (#621)
-  if (!isOnline.value) return
-  form.post(props.uploadUrl, {
-    forceFormData: true,
-    preserveScroll: true,
-    onSuccess: () => {
-      form.reset()
-      if (fileInput.value) fileInput.value.value = ''
-      if (cameraInput.value) cameraInput.value.value = ''
-    },
-  })
-}
+const { form, fileInput, cameraInput, isOnline, onFileChange } = usePhotoUpload(
+  () => props.uploadUrl
+)
 
 function deletePhoto(mediaId: number) {
   confirmDelete(t('media.photos.confirmDelete'), props.deleteUrlFor(mediaId), {

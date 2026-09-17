@@ -393,13 +393,21 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 ## Galerie photo partagée
 
 `inertia/components/media/MediaPhotoGallery.vue` — galerie réutilisable pilotée par props
-(`uploadUrl`, `deleteUrlFor`, `photos`, `canUpload`, `canDelete`). Upload via `useForm` +
-`form.post(..., { forceFormData: true })`, suppression via `router.delete`. i18n : `media.photos.*`.
+(`uploadUrl`, `deleteUrlFor`, `photos`, `canUpload`, `canDelete`). Suppression via
+`router.delete`. i18n : `media.photos.*`.
+
+L'envoi lui-même vient de `inertia/composables/use_photo_upload.ts` — `usePhotoUpload(url)`
+porte le formulaire multipart (`forceFormData`), les `ref` des deux entrées de fichiers,
+`isOnline` et le refus explicite hors-ligne (#621). L'URL est acceptée en getter : côté
+bateau elle dérive d'une prop. Les `ref` restent rendues à l'appelant, qui ouvre le
+sélecteur depuis ses propres zones (état vide, tuile d'ajout, zone de dépôt).
 
 Deux boutons d'upload (#485) : « Ajouter » ouvre le sélecteur (input `multiple`) et
 « Prendre une photo » ouvre l'appareil photo via un **second input** `capture="environment"`
 sans `multiple` — `capture` sur l'input principal supprimerait la sélection multiple sur
-iOS/Android. Même montage dans `BoatPhotoGallery.vue` (fiche bateau).
+iOS/Android. Même montage dans `BoatPhotoGallery.vue` (fiche bateau), qui partage le
+composable mais garde son propre rendu : i18n `boats.show.mediaUpload.*`, légendes des
+photos, tuile d'ajout en fin de grille, grille à quatre colonnes, suppression par `<Form>`.
 
 Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos » des six équipements —
 `EngineShowTabPhotos`, `EnginePartShowTabPhotos`, `SailShowTabPhotos`, `RigShowTabPhotos`,
