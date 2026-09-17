@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Form, Link } from '@adonisjs/inertia/vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import BoatFormHullFields from '~/components/boats/hull/BoatFormHullFields.vue'
 import BoatOwnersManager from '~/components/boats/BoatOwnersManager.vue'
 import type { BoatEditPayload, PortForForm, PropulsionTypeUi } from '~/types/boat_form'
@@ -11,6 +11,7 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import { useDeleteConfirmation } from '~/composables/use_delete_confirmation'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
 
@@ -37,20 +38,21 @@ const props = defineProps<{
 const propulsionType = ref<PropulsionTypeUi>(parsePropulsionType(props.boat.propulsionType))
 const showSailFields = computed(() => propulsionType.value === 'sailboat')
 
-const showDeleteConfirm = ref(false)
 const deleting = ref(false)
 
-function confirmDeleteBoat() {
-  showDeleteConfirm.value = true
-}
-
-function executeDeleteBoat() {
-  deleting.value = true
-  router.delete(`/boats/${props.boat.id}`, {
+const deletion = useDeleteConfirmation({
+  url: () => `/boats/${props.boat.id}`,
+  visit: {
     onFinish: () => {
       deleting.value = false
     },
-  })
+  },
+})
+
+/** Le chargement du bouton se pose avant la visite, comme avant le composable. */
+function executeDeleteBoat() {
+  deleting.value = true
+  deletion.confirm()
 }
 </script>
 
@@ -99,7 +101,7 @@ function executeDeleteBoat() {
           variant="danger"
           size="sm"
           :disabled="deleting"
-          @click="confirmDeleteBoat"
+          @click="deletion.ask()"
         >
           {{ t('common.delete') }}
         </BaseButton>
@@ -114,12 +116,12 @@ function executeDeleteBoat() {
     </div>
 
     <BaseConfirmModal
-      :open="showDeleteConfirm"
+      :open="deletion.isOpen.value"
       :title="t('boats.edit.deleteConfirm.title')"
       :message="t('boats.edit.deleteConfirm.message', { name: boat.name })"
       :confirm-label="t('common.delete')"
       :cancel-label="t('boats.edit.cancel')"
-      @update:open="showDeleteConfirm = $event"
+      @update:open="deletion.release()"
       @confirm="executeDeleteBoat"
     />
   </div>
