@@ -10,8 +10,6 @@ import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
 import NavigationActiveCard from '~/components/boats/show/tabs/NavigationActiveCard.vue'
 import { useBoatShowTabs } from '~/composables/use_boat_show_tabs'
 import { useT } from '~/composables/use_t'
-import { boatCategoryLabel } from '~/utils/boat_category_label'
-import { propulsionLabel } from '~/utils/boat_propulsion_label'
 import type {
   AiSuggestion,
   BoatCreateIntent,
@@ -30,6 +28,7 @@ import type {
 import type { BoatPricingRow } from '../../../shared/types/boat_pricing'
 import type { SafetyComplianceReport } from '../../../shared/types/safety'
 import type { CrewMemberOption } from '../../../shared/types/crew'
+import { boatCategoryLabel, propulsionLabel } from '~/utils/boat_enum_labels'
 
 const { t } = useT()
 

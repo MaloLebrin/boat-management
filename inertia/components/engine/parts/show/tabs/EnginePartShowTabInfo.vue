@@ -3,20 +3,13 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
+import { wearStateVariant } from '~/utils/status_variants'
 
 defineProps<{
   part: BoatShowEnginePart
 }>()
 
 const { t } = useT()
-
-function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neutral' | 'danger' {
-  if (state === 'new') return 'success'
-  if (state === 'good') return 'info'
-  if (state === 'worn') return 'warning'
-  if (state === 'to_replace') return 'danger'
-  return 'neutral'
-}
 </script>
 
 <template>

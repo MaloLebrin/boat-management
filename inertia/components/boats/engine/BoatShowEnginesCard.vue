@@ -15,6 +15,7 @@ import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { engineFuelLabel, engineStrokeShortLabel } from '~/utils/boat_enum_labels'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
+import { equipmentStatusVariant } from '~/utils/status_variants'
 
 const props = withDefaults(
   defineProps<{
@@ -42,13 +43,6 @@ const totalEngineHours = computed(() => {
   if (enginesWithHours.length === 0) return null
   return enginesWithHours.reduce((sum, e) => sum + (e.hours ?? 0), 0)
 })
-
-function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutral' {
-  if (status === 'operational') return 'success'
-  if (status === 'in_maintenance') return 'info'
-  if (status === 'out_of_service') return 'warning'
-  return 'neutral'
-}
 </script>
 
 <template>
@@ -94,7 +88,7 @@ function statusVariant(status: string): 'success' | 'info' | 'warning' | 'neutra
               <BaseBadge v-if="e.fuel" variant="neutral">
                 {{ engineFuelLabel(t, e.fuel) }}
               </BaseBadge>
-              <BaseBadge :variant="statusVariant(e.status)">
+              <BaseBadge :variant="equipmentStatusVariant(e.status)">
                 {{ t(`equipment.status.${e.status}`) }}
               </BaseBadge>
             </div>

@@ -4,17 +4,12 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { FleetIncidentRow } from '../../../shared/types/navigation'
+import { incidentStatusVariant } from '~/utils/status_variants'
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
 
 defineProps<{ row: FleetIncidentRow }>()
-
-const statusVariant: Record<string, 'danger' | 'warning' | 'neutral'> = {
-  open: 'danger',
-  in_progress: 'warning',
-  closed: 'neutral',
-}
 </script>
 
 <template>
@@ -28,7 +23,7 @@ const statusVariant: Record<string, 'danger' | 'warning' | 'neutral'> = {
       >
         {{ row.boatName }}
       </Link>
-      <BaseBadge :variant="statusVariant[row.status]">
+      <BaseBadge :variant="incidentStatusVariant(row.status)">
         {{ t(`incidents.status.${row.status}`) }}
       </BaseBadge>
     </div>

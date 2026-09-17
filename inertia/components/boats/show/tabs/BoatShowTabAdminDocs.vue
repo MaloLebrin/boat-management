@@ -7,6 +7,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BoatAdminDocumentFormModal from '~/components/boats/show/modals/BoatAdminDocumentFormModal.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatDocumentRow, BoatShowDetail } from '~/types/boat_show'
+import { documentStatusVariant } from '~/utils/status_variants'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -27,12 +28,6 @@ function openCreate() {
 function openEdit(doc: BoatDocumentRow) {
   editingDocument.value = doc
   isFormModalOpen.value = true
-}
-
-const statusVariant: Record<string, 'success' | 'warning' | 'neutral' | 'danger'> = {
-  valid: 'success',
-  expiring_soon: 'warning',
-  expired: 'danger',
 }
 </script>
 
@@ -74,7 +69,7 @@ const statusVariant: Record<string, 'success' | 'warning' | 'neutral' | 'danger'
             <p class="truncate text-sm font-semibold text-fg">
               {{ doc.customTypeLabel || t(`boats.adminDocs.types.${doc.type}`) }}
             </p>
-            <BaseBadge :variant="statusVariant[doc.status]">
+            <BaseBadge :variant="documentStatusVariant(doc.status)">
               {{ t(`boats.adminDocs.status.${doc.status}`) }}
             </BaseBadge>
           </div>

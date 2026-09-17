@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
+import { wearStateVariant } from '~/utils/status_variants'
 
 const props = defineProps<{
   parts: BoatShowEnginePart[]
@@ -41,14 +42,6 @@ function deletePart(partId: number) {
   router.delete(`/boats/${props.boatId}/engines/${props.engineId}/parts/${partId}`, {
     preserveScroll: true,
   })
-}
-
-function wearStateVariant(state: string): 'success' | 'info' | 'warning' | 'neutral' | 'danger' {
-  if (state === 'new') return 'success'
-  if (state === 'good') return 'info'
-  if (state === 'worn') return 'warning'
-  if (state === 'to_replace') return 'danger'
-  return 'neutral'
 }
 </script>
 
