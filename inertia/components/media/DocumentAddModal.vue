@@ -1,18 +1,33 @@
 <script setup lang="ts">
 import { DocumentArrowUpIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { useForm } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import { useT } from '~/composables/use_t'
-import { engineDisplayTitle } from '~/utils/boat_enum_labels'
-import type { BoatShowEngine } from '~/types/boat_show'
+import { formatBytes } from '~/utils/format_bytes'
+import type { DocumentModalLabels } from '~/types/documents'
 
-const props = defineProps<{
-  boat: { id: number; name: string }
-  engine: BoatShowEngine
-  open: boolean
-}>()
+/**
+ * Modale d'ajout de documents (PDF, tableurs, Word) — générique (vague 3.1).
+ * Le domaine appelant fournit l'URL d'envoi et ses libellés déjà traduits :
+ * chaque écran garde son vocabulaire (« Légende » ici, « Libellé » là) sans
+ * porter sa copie du glisser-déposer.
+ */
+const props = withDefaults(
+  defineProps<{
+    open: boolean
+    uploadUrl: string
+    title: string
+    subtitle: string
+    labels: DocumentModalLabels
+    /** Libellé du bouton de fermeture de la modale (`common.close` par défaut). */
+    closeLabel?: string
+    /** Conserver la position de défilement après l'envoi. */
+    preserveScroll?: boolean
+  }>(),
+  { closeLabel: undefined, preserveScroll: false }
+)
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
@@ -23,14 +38,6 @@ const fileInput = ref<HTMLInputElement>()
 const isDragging = ref(false)
 
 const form = useForm({ files: [] as File[], caption: '' })
-
-const engineTitle = computed(() => engineDisplayTitle(t, props.engine))
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} o`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} Ko`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`
-}
 
 function onFileChange(e: Event) {
   const input = e.target as HTMLInputElement
@@ -63,8 +70,9 @@ function close() {
 
 function submit() {
   if (form.files.length === 0) return
-  form.post(`/boats/${props.boat.id}/engines/${props.engine.id}/documents`, {
+  form.post(props.uploadUrl, {
     forceFormData: true,
+    ...(props.preserveScroll ? { preserveScroll: true } : {}),
     onSuccess: () => close(),
   })
 }
@@ -73,9 +81,9 @@ function submit() {
 <template>
   <BaseModal
     :open="open"
-    :title="t('boats.show.mediaUpload.modalTitle')"
-    :subtitle="t('boats.engineShow.documents.modalSubtitle', { name: engineTitle })"
-    :close-label="t('common.close')"
+    :title="title"
+    :subtitle="subtitle"
+    :close-label="closeLabel ?? t('common.close')"
     size="xl"
     @update:open="close"
   >
@@ -102,8 +110,8 @@ function submit() {
         @drop="onDrop"
       >
         <DocumentArrowUpIcon class="mx-auto h-10 w-10 text-fg-subtle" />
-        <p class="mt-3 font-semibold text-fg">{{ t('boats.show.mediaUpload.dropzone') }}</p>
-        <p class="mt-1 text-sm text-fg-muted">{{ t('boats.show.mediaUpload.documentFormats') }}</p>
+        <p class="mt-3 font-semibold text-fg">{{ labels.dropzone }}</p>
+        <p class="mt-1 text-sm text-fg-muted">{{ labels.formats }}</p>
         <BaseButton
           variant="secondary"
           size="sm"
@@ -111,7 +119,7 @@ function submit() {
           type="button"
           @click.stop="fileInput?.click()"
         >
-          {{ t('boats.show.mediaUpload.browse') }}
+          {{ labels.browse }}
         </BaseButton>
       </div>
 
@@ -119,7 +127,7 @@ function submit() {
         v-if="form.files.length > 0"
         class="rounded-lg border border-border bg-surface-elevated px-4 py-3 text-sm"
       >
-        <p class="font-semibold text-fg">{{ t('boats.show.mediaUpload.selectedFiles') }}</p>
+        <p class="font-semibold text-fg">{{ labels.selectedFiles }}</p>
         <ul class="mt-1 space-y-1">
           <li
             v-for="(file, index) in form.files"
@@ -142,8 +150,8 @@ function submit() {
       <p v-if="form.errors.files" class="text-sm text-danger">{{ form.errors.files }}</p>
 
       <div>
-        <label class="block text-sm font-semibold text-fg mb-1">
-          {{ t('boats.show.mediaUpload.caption') }}
+        <label class="mb-1 block text-sm font-semibold text-fg">
+          {{ labels.caption }}
         </label>
         <input
           v-model="form.caption"
@@ -158,11 +166,7 @@ function submit() {
           {{ t('common.cancel') }}
         </BaseButton>
         <BaseButton type="button" :disabled="!form.files.length || form.processing" @click="submit">
-          {{
-            form.processing
-              ? t('boats.show.mediaUpload.uploading')
-              : t('boats.show.mediaUpload.upload')
-          }}
+          {{ form.processing ? labels.uploading : labels.upload }}
         </BaseButton>
       </div>
     </div>
