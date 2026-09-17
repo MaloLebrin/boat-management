@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import NavigationLogEntryEditForm from '~/components/boats/navigation-log/NavigationLogEntryEditForm.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogEntryRow } from '~/types/boat_show'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boatId: number
@@ -20,10 +20,11 @@ const { formatDateTime } = useDateFormat()
 const editingEntryId = ref<number | null>(null)
 
 function deleteEntry(entry: NavigationLogEntryRow) {
-  if (!window.confirm(t('navigation_logs.entries.deleteConfirm'))) return
-  router.delete(`/boats/${props.boatId}/navigation-logs/${props.logId}/entries/${entry.id}`, {
-    preserveScroll: true,
-  })
+  confirmDelete(
+    t('navigation_logs.entries.deleteConfirm'),
+    `/boats/${props.boatId}/navigation-logs/${props.logId}/entries/${entry.id}`,
+    { preserveScroll: true }
+  )
 }
 
 function formatCoords(entry: NavigationLogEntryRow): string | null {

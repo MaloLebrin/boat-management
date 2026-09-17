@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { PencilIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
 import type { PontoonRow } from '~/types/port'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   pontoon: PontoonRow
@@ -28,9 +28,10 @@ function handleDelete() {
     alert(t('ports.pontoons.hasBoats'))
     return
   }
-  if (confirm(t('ports.pontoons.deleteConfirm'))) {
-    router.delete(`/ports/${props.portId}/pontoons/${props.pontoon.id}`)
-  }
+  confirmDelete(
+    t('ports.pontoons.deleteConfirm'),
+    `/ports/${props.portId}/pontoons/${props.pontoon.id}`
+  )
 }
 </script>
 

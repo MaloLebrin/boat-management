@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Head, router } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
@@ -20,6 +19,7 @@ import type {
   InvoicesPaginated,
 } from '../../../shared/types/invoice'
 import type { ClientOption } from '../../../shared/types/client'
+import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
 
 const props = defineProps<{
   invoices: InvoicesPaginated
@@ -33,7 +33,10 @@ const { t } = useT()
 const { formatCurrency } = useNumberFormat()
 const { formatDate } = useDateFormat()
 
-const deletingInvoice = ref<InvoiceRow | null>(null)
+const invoiceDeletion = useRowDeleteConfirmation<InvoiceRow>({
+  url: (invoice) => `/invoices/${invoice.id}`,
+  visit: { preserveScroll: true },
+})
 
 function handlePageChange(newPage: number) {
   router.get(
@@ -52,20 +55,6 @@ function handlePageChange(newPage: number) {
     },
     { preserveScroll: true, preserveState: true, replace: true }
   )
-}
-
-function confirmDelete(invoice: InvoiceRow) {
-  deletingInvoice.value = invoice
-}
-
-function executeDelete() {
-  if (!deletingInvoice.value) return
-  router.delete(`/invoices/${deletingInvoice.value.id}`, {
-    preserveScroll: true,
-    onFinish: () => {
-      deletingInvoice.value = null
-    },
-  })
 }
 
 function formatTotal(invoice: InvoiceRow): string {
@@ -129,7 +118,7 @@ function formatTotal(invoice: InvoiceRow): string {
               type="button"
               variant="ghost"
               size="sm"
-              @click="confirmDelete(invoice)"
+              @click="invoiceDeletion.ask(invoice)"
             >
               {{ t('invoices.delete') }}
             </BaseButton>
@@ -156,13 +145,13 @@ function formatTotal(invoice: InvoiceRow): string {
     </div>
 
     <BaseConfirmModal
-      :open="deletingInvoice !== null"
+      :open="invoiceDeletion.isOpen.value"
       :title="t('invoices.deleteConfirm.title')"
       :message="t('invoices.deleteConfirm.message')"
       :confirm-label="t('invoices.delete')"
       :cancel-label="t('invoices.form.cancel')"
-      @update:open="deletingInvoice = null"
-      @confirm="executeDelete"
+      @update:open="invoiceDeletion.release()"
+      @confirm="invoiceDeletion.confirm()"
     />
   </div>
 </template>

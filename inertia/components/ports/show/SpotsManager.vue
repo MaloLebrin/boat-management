@@ -9,6 +9,7 @@ import SpotFormModal from '~/components/ports/modals/SpotFormModal.vue'
 import { useT } from '~/composables/use_t'
 import { routes } from '~/utils/routes'
 import type { BoatOption, SpotRow } from '~/types/port'
+import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
 
 const props = defineProps<{
   portId: number
@@ -22,8 +23,9 @@ const { t } = useT()
 
 const showSpotModal = ref(false)
 const editingSpot = ref<{ id: number; name: string; description: string | null } | null>(null)
-const showDeleteConfirm = ref(false)
-const spotToDelete = ref<SpotRow | null>(null)
+const spotDeletion = useRowDeleteConfirmation<SpotRow>({
+  url: (spot) => routes.spots.destroy(spot.id),
+})
 const assigningSpot = ref<SpotRow | null>(null)
 const showAssignModal = ref(false)
 
@@ -35,17 +37,6 @@ function handleAddSpot() {
 function handleEditSpot(spot: SpotRow) {
   editingSpot.value = { id: spot.id, name: spot.name, description: spot.description }
   showSpotModal.value = true
-}
-
-function handleDeleteSpot(spot: SpotRow) {
-  spotToDelete.value = spot
-  showDeleteConfirm.value = true
-}
-
-function confirmDeleteSpot() {
-  if (!spotToDelete.value) return
-  router.delete(routes.spots.destroy(spotToDelete.value.id))
-  spotToDelete.value = null
 }
 
 function handleModalClose(open: boolean) {
@@ -121,7 +112,7 @@ function handleAssignConfirm({ spotId, boatId }: { spotId: number; boatId: numbe
             <PencilIcon class="h-4 w-4" />
             <span class="sr-only">{{ t('common.edit') }}</span>
           </BaseButton>
-          <BaseButton variant="ghost" size="sm" @click="handleDeleteSpot(spot)">
+          <BaseButton variant="ghost" size="sm" @click="spotDeletion.ask(spot)">
             <TrashIcon class="h-4 w-4 text-danger" />
             <span class="sr-only">{{ t('common.delete') }}</span>
           </BaseButton>
@@ -139,10 +130,10 @@ function handleAssignConfirm({ spotId, boatId }: { spotId: number; boatId: numbe
     />
 
     <BaseConfirmModal
-      :open="showDeleteConfirm"
+      :open="spotDeletion.isOpen.value"
       :title="t('ports.spots.deleteConfirm')"
-      @update:open="showDeleteConfirm = $event"
-      @confirm="confirmDeleteSpot"
+      @update:open="spotDeletion.release()"
+      @confirm="spotDeletion.confirm()"
     />
 
     <BoatAssignModal

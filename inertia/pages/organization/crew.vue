@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Head, router } from '@inertiajs/vue3'
+import { Head } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -9,6 +9,7 @@ import CrewCertificationForm from '~/components/crew/CrewCertificationForm.vue'
 import CrewCertificationBadge from '~/components/crew/CrewCertificationBadge.vue'
 import { useT } from '~/composables/use_t'
 import type { CrewMemberRow } from '../../../shared/types/crew'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   crewMembers: CrewMemberRow[]
@@ -22,13 +23,15 @@ const editingMemberId = ref<number | null>(null)
 const addingCertMemberId = ref<number | null>(null)
 
 function deleteMember(id: number) {
-  if (!window.confirm(t('crew.deleteConfirm'))) return
-  router.delete(`/crew/${id}`, { preserveScroll: true })
+  confirmDelete(t('crew.deleteConfirm'), `/crew/${id}`, { preserveScroll: true })
 }
 
 function deleteCertification(memberId: number, certId: number) {
-  if (!window.confirm(t('crew.certificationDeleteConfirm'))) return
-  router.delete(`/crew/${memberId}/certifications/${certId}`, { preserveScroll: true })
+  confirmDelete(
+    t('crew.certificationDeleteConfirm'),
+    `/crew/${memberId}/certifications/${certId}`,
+    { preserveScroll: true }
+  )
 }
 </script>
 

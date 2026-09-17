@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { DocumentTextIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { Form } from '@adonisjs/inertia/vue'
-import { router } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import type { MediaRow } from '~/types/boat_show'
 import type { DocumentDeleteConfirm, DocumentListLabels } from '~/types/documents'
 import { formatBytes } from '~/utils/format_bytes'
+import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
 
 /**
  * Liste de documents d'une ressource (bateau, moteur, pièce, client) —
@@ -34,28 +34,25 @@ const emit = defineEmits<{
   (e: 'add'): void
 }>()
 
-const docToDelete = ref<MediaRow | null>(null)
+const documentDeletion = useRowDeleteConfirmation<MediaRow>({
+  url: (doc) => props.deleteUrlFor(doc),
+  visit: { preserveScroll: true },
+})
 
 const sorted = computed<MediaRow[]>(() =>
   [...props.documents].sort((a, b) => a.position - b.position)
 )
-
-function confirmDelete() {
-  if (!docToDelete.value) return
-  router.delete(props.deleteUrlFor(docToDelete.value), { preserveScroll: true })
-  docToDelete.value = null
-}
 </script>
 
 <template>
   <BaseConfirmModal
     v-if="deleteConfirm"
-    :open="docToDelete !== null"
+    :open="documentDeletion.isOpen.value"
     :title="deleteConfirm.title"
     :message="deleteConfirm.message"
     :confirm-label="deleteConfirm.confirmLabel"
-    @update:open="docToDelete = null"
-    @confirm="confirmDelete"
+    @update:open="documentDeletion.release()"
+    @confirm="documentDeletion.confirm()"
   />
 
   <div :class="dense ? 'space-y-4' : 'space-y-6'">
@@ -119,7 +116,7 @@ function confirmDelete() {
             type="button"
             class="shrink-0 rounded-lg p-1.5 text-fg-subtle transition-colors hover:bg-danger/10 hover:text-danger"
             :title="labels.delete"
-            @click="docToDelete = doc"
+            @click="documentDeletion.ask(doc)"
           >
             <TrashIcon class="h-4 w-4" />
           </button>
