@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import InspectionChecklist from '~/components/reservations/inspection/InspectionChecklist.vue'
@@ -10,6 +9,7 @@ import { usePendingInspection } from '~/composables/use_pending_inspection'
 import { useT } from '~/composables/use_t'
 import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { InspectionKind, InspectionWithPhotos } from '~/types/inspection'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boatId: number
@@ -39,8 +39,11 @@ const pendingInspection = usePendingInspection(props.boatId, props.reservationId
 
 function deleteInspection() {
   if (!props.inspection) return
-  if (!window.confirm(t('inspections.form.confirmDelete'))) return
-  router.delete(`${basePath}/inspections/${props.inspection.id}`, { preserveScroll: true })
+  confirmDelete(
+    t('inspections.form.confirmDelete'),
+    `${basePath}/inspections/${props.inspection.id}`,
+    { preserveScroll: true }
+  )
 }
 </script>
 

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { CameraIcon, PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
-import { router, useForm } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useT } from '~/composables/use_t'
 import type { MediaRow } from '~/types/boat_show'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   uploadUrl: string
@@ -42,8 +43,9 @@ function submitPhotos() {
 }
 
 function deletePhoto(mediaId: number) {
-  if (!window.confirm(t('media.photos.confirmDelete'))) return
-  router.delete(props.deleteUrlFor(mediaId), { preserveScroll: true })
+  confirmDelete(t('media.photos.confirmDelete'), props.deleteUrlFor(mediaId), {
+    preserveScroll: true,
+  })
 }
 </script>
 

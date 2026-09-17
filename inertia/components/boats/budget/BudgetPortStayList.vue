@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useForm, router } from '@inertiajs/vue3'
+import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCombobox, { type ComboboxOption } from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -9,6 +9,7 @@ import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatPortStayItem } from '#shared/types/budget'
 import type { PortNameOption } from '#shared/types/port'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boatId: number
@@ -60,8 +61,7 @@ function submitEdit(stayId: number) {
 }
 
 function deleteStay(stayId: number) {
-  if (!confirm(t('budget.portStay.deleteConfirm'))) return
-  router.delete(`/boats/${props.boatId}/port-stays/${stayId}`, {
+  confirmDelete(t('budget.portStay.deleteConfirm'), `/boats/${props.boatId}/port-stays/${stayId}`, {
     preserveScroll: true,
   })
 }

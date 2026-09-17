@@ -14,6 +14,7 @@ import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import { MAINTENANCE_SHEET_TEMPLATES } from '#shared/constants/maintenance/maintenance_sheet_content'
 import type { BoatShowDetail, MaintenanceSheetRow } from '~/types/boat_show'
+import { confirmed } from '~/utils/confirm_delete'
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
@@ -63,13 +64,6 @@ const progressText = computed(() => {
 const formattedDate = computed(() =>
   props.sheet.performedAt ? formatDate(props.sheet.performedAt) : ''
 )
-
-function confirmDelete() {
-  if (window.confirm(t('boats.sheets.confirmDelete'))) {
-    return true
-  }
-  return false
-}
 </script>
 
 <template>
@@ -126,7 +120,7 @@ function confirmDelete() {
         :action="{ url: `/boats/${boat.id}/maintenance-sheets/${sheet.id}`, method: 'delete' }"
         @submit="
           (e: Event) => {
-            if (!confirmDelete()) e.preventDefault()
+            if (!confirmed(t('boats.sheets.confirmDelete'))) e.preventDefault()
           }
         "
         #default="{ processing }"

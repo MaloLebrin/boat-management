@@ -7,6 +7,7 @@ import ContractStatusBadge from '~/components/reservations/contract/ContractStat
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { RentalContractRow } from '~/types/rental_contract'
+import { confirmDelete } from '~/utils/confirm_delete'
 
 const props = defineProps<{
   boatId: number
@@ -50,8 +51,7 @@ function submitSignedDocument() {
 }
 
 function destroy() {
-  if (!window.confirm(t('rentalContracts.actions.confirmDelete'))) return
-  router.delete(basePath, { preserveScroll: true })
+  confirmDelete(t('rentalContracts.actions.confirmDelete'), basePath, { preserveScroll: true })
 }
 </script>
 
