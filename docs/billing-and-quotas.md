@@ -221,7 +221,26 @@ Exporter                (selon implémentation)       assertCanExport()
 
 ### 5.4 `QuotaExceededError`
 
-Définie dans `app/exceptions/quota_errors.ts`. Porte `{ resource, limit, current, upgradeTier }`. Le handler global AdonisJS la capture et renvoie une réponse flash d'erreur avec le plan de mise à niveau suggéré.
+Définie dans `app/exceptions/quota_errors.ts`. Porte `{ feature, limit, current, upgradeTo, alreadyOverLimit }`.
+
+**Le handler global est le seul à traiter un refus de quota** : il flashe le
+message et l'action `errorAction` vers `/settings/billing` (l'upsell « Voir les
+offres », #418), puis redirige en arrière. Un contrôleur n'intercepte donc pas
+`QuotaExceededError` pour reproduire ce comportement — il la laisse remonter.
+
+Deux cas justifient encore un `catch` :
+
+- **rediriger ailleurs** que vers la page précédente (`client_media_controller`
+  vers la facturation, `spare_part_chat_controller` vers la fiche pièces, les
+  middlewares de plan qui gardent l'entrée d'une page) ;
+- **flasher sans rediriger**, quand la méthode poursuit et choisit sa propre
+  destination (`ai_controller`, `assistant_controller`, les deux chats
+  publics).
+
+Dans ces cas, la clé du message vient de **`quotaFlashKey(error)`**, jamais
+d'un littéral : `flash.quota.${feature}Exceeded` ne marche pas pour
+`ai_tokens`, dont la clé traduite est `aiTokensExceeded`. `quotaFlashKey` porte
+aussi le cas du stockage déjà dépassé (`storageOverflow`).
 
 ---
 
