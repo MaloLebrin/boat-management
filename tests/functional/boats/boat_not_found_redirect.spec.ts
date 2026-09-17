@@ -64,10 +64,10 @@ test.group('Boats — bateau invisible (functional)', (group) => {
     response.assertHeader('location', '/boats')
   })
 
-  // Anomalie constatée, figée telle quelle avant refactorisation : `update` est
-  // le seul à résoudre son bateau hors du `try`, l'erreur part donc au handler
-  // global au lieu de rediriger. Le bateau est bien protégé — mais par un 500.
-  test('PUT /boats/:id échoue en 500 au lieu de rediriger', async ({ client, assert }) => {
+  // Corrigé en passant par `BoatContextService` : `update` résolvait son bateau
+  // hors du `try`, l'erreur partait donc au handler global et la route
+  // répondait 500 là où les quatre autres redirigeaient.
+  test('PUT /boats/:id redirige vers la liste', async ({ client, assert }) => {
     const { intruder, boat } = await foreignBoat()
     const nameBefore = boat.name
 
@@ -77,7 +77,8 @@ test.group('Boats — bateau invisible (functional)', (group) => {
       .loginAs(intruder)
       .redirects(0)
 
-    response.assertStatus(500)
+    response.assertStatus(302)
+    response.assertHeader('location', '/boats')
     await boat.refresh()
     assert.equal(boat.name, nameBefore)
   })
