@@ -111,6 +111,25 @@ export async function createStarterPlanUser(): Promise<User> {
 }
 
 /**
+ * Admin d'une organisation au plan `starter`.
+ *
+ * À ne pas confondre avec `createStarterPlanUser()`, qui n'a **pas** de
+ * membership : sur une route gardée par une policy *puis* par le plan, un
+ * utilisateur sans membership est refusé par la policy — le test passerait au
+ * vert sans jamais atteindre la garde de plan qu'il prétend vérifier. C'est le
+ * piège des gardes en amont, documenté dans `docs/dev/testing.md` (#688).
+ */
+export async function createStarterAdminUser(): Promise<User> {
+  const user = await createStarterPlanUser()
+  await OrganizationMembership.create({
+    userId: user.id,
+    organizationId: user.organizationId!,
+    role: 'admin',
+  })
+  return user
+}
+
+/**
  * Crée un utilisateur dans une organisation d'un plan et d'un profil déclarés,
  * sans membership. Sert aux tests de la garde de profil sur la cartographie de
  * port : c'est le couple (plan, `organizations.type`) qui décide, pas le rôle.
