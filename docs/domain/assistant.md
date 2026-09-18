@@ -76,17 +76,31 @@ Le plafond annoncé de `message` pour `answer` est de 1500 caractères (600 avan
 
 Le modèle répond `{"type":"propose_action","message":"…","action":{"kind":"…",…}}` — vocabulaire fermé de neuf kinds (`ASSISTANT_ACTION_KINDS`), décrits au modèle par une ligne de contrat chacun (`buildActionLines`), **limitée aux kinds autorisés à l'utilisateur** (capability du rôle + flag de plan effectif, `ASSISTANT_ACTION_META` — source unique partagée prompt/validation/contrôleur/front).
 
-| `kind`               | Service exécuté                                                               | Capability               | Flag plan               |
-| -------------------- | ----------------------------------------------------------------------------- | ------------------------ | ----------------------- |
-| `create_task`        | `BoatMaintenanceTaskService.createForBoat`                                    | `maintenance.create`     | —                       |
-| `add_engine_hours`   | `BoatEngineService.incrementHours` (incrément, jamais un total)               | `boats.edit`             | —                       |
-| `start_trip`         | `NavigationLogService.createForBoat` (une seule sortie en cours/bateau)       | `navigation_logs.create` | —                       |
-| `close_trip`         | `NavigationLogService.closeTrip` (sortie `in_progress` re-résolue au confirm) | `navigation_logs.update` | —                       |
-| `log_fuel`           | `BoatFuelLogService.createForBoat`                                            | `fuel_logs.create`       | —                       |
-| `report_incident`    | `BoatIncidentService.createForBoat` (statut forcé `open`)                     | `incidents.create`       | —                       |
-| `create_reservation` | `BoatReservationService.create` (auto-devis, blacklist, conflits)             | `boats.manage`           | `canManageReservations` |
-| `create_client`      | `ClientService.create` (jamais `gdprConsent` — acte humain)                   | `clients.create`         | `canManageClients`      |
-| `set_part_stock`     | `BoatEnginePartService.update` (pièce relue, seul le stock change)            | `boats.edit`             | —                       |
+| `kind`               | Service exécuté                                                               | Capability annoncée      | Policy au confirm            | Flag plan               |
+| -------------------- | ----------------------------------------------------------------------------- | ------------------------ | ---------------------------- | ----------------------- |
+| `create_task`        | `BoatMaintenanceTaskService.createForBoat`                                    | `maintenance.create`     | `MaintenancePolicy.create`   | —                       |
+| `add_engine_hours`   | `BoatEngineService.incrementHours` (incrément, jamais un total)               | `boats.edit`             | `BoatPolicy.edit`            | —                       |
+| `start_trip`         | `NavigationLogService.createForBoat` (une seule sortie en cours/bateau)       | `navigation_logs.create` | `NavigationLogPolicy.create` | —                       |
+| `close_trip`         | `NavigationLogService.closeTrip` (sortie `in_progress` re-résolue au confirm) | `navigation_logs.update` | `NavigationLogPolicy.update` | —                       |
+| `log_fuel`           | `BoatFuelLogService.createForBoat`                                            | `fuel_logs.create`       | `FuelLogPolicy.create`       | —                       |
+| `report_incident`    | `BoatIncidentService.createForBoat` (statut forcé `open`)                     | `incidents.create`       | `IncidentPolicy.create`      | —                       |
+| `create_reservation` | `BoatReservationService.create` (auto-devis, blacklist, conflits)             | `boats.manage`           | `BoatPolicy.manage`          | `canManageReservations` |
+| `create_client`      | `ClientService.create` (jamais `gdprConsent` — acte humain)                   | `clients.create`         | `ClientPolicy.create`        | `canManageClients`      |
+| `set_part_stock`     | `BoatEnginePartService.update` (pièce relue, seul le stock change)            | `boats.edit`             | `BoatPolicy.edit`            | —                       |
+
+**Les deux dernières colonnes sont deux déclarations de la même règle**, dans deux fichiers qui ne se
+lisent pas l'un l'autre (#697). `ASSISTANT_ACTION_META` sert le prompt, la validation de proposition et
+le masquage du bouton ; `authorizeConfirm` appelle une méthode de policy, qui relit sa propre
+capability. Elles coïncident, et rien dans le typage ne l'impose : `tests/unit/hygiene/assistant_action_capabilities.spec.ts`
+relit les trois sources sur le disque et fait tomber la divergence. Sans elle, un méta plus permissif
+que la confirmation afficherait un bouton qui refuse (famille #456), et un méta plus strict ferait de
+la branche d'exécution du code mort.
+
+**Le drapeau de plan n'est pas une capability** : le Bouncer ne le connaît pas. Il est re-vérifié dans
+`AssistantActionsService.execute`, donc **après** `authorizeConfirm`, sur les quotas effectifs (tier +
+modules + add-ons). Les deux refus rendent deux messages différents — `Access denied` pour le rôle,
+`Your role or plan no longer allows this action.` pour le plan — et un seul des deux est réparable par
+l'utilisateur lui-même.
 
 **Cycle** : parse structurel (`parseProposedAction`) → `AssistantActionsService.validateProposal` (kind autorisé, ids prouvés org via roster ou requêtes bornées, dénormalisations `boatName`/`engineLabel`/`oldStock`…) **avant** le save unique → stockage en `pending_action` (union discriminée `AssistantPendingAction` ; blobs legacy sans `kind` enveloppés en `create_task` à la lecture, aucune migration) → le fil est suspendu → carte de confirmation générique par kind (`AssistantActionCard` + `AssistantActionSummary`, bouton masqué sans la capability **ni le flag de plan**) → `POST …/action/confirm` **sans aucun payload** : bateau rechargé (`resolveBoat`), Bouncer par kind (`authorizeConfirm`), flag de plan re-vérifié à l'exécution, service métier qui revalide ses règles, carte de résultat (`action_done` — `task_created` conservée pour `create_task`), journal d'audit (`engine.add_hours`, `navigation_log.create`…), flash i18n.
 
@@ -120,4 +134,6 @@ Le modèle répond `{"type":"propose_action","message":"…","action":{"kind":"�
 - `tests/functional/assistant/assistant_tools.spec.ts` — filtrage par rôle et par plan, cloisonnement inter-org, coercion.
 - `tests/functional/assistant/assistant_chat.spec.ts` — boucle scriptée (fake `AiService` en file de réponses) : outil exécuté, bornes, relance corrective, tokens sommés, rien persisté en échec, `propose_action` rangé en pending, contexte de page dans le prompt.
 - `tests/functional/assistant/assistant_actions.spec.ts` — confirmation par kind (écriture réelle + audit + carte), Bouncer, plan re-vérifié, blob legacy sans `kind`, entité disparue.
+- `tests/functional/assistant/action_confirmation_guard.spec.ts` (#697) — la matrice complète des refus : les neuf kinds face à un `boat_owner`, chacun avec un témoin en base (aucune des dix tables écrites par le copilote ne bouge, journal d'audit compris) ; le contre-exemple `mechanic`, qui confirme `create_task` et rien d'autre ; `create_reservation` de bout en bout ; et la **révocation d'un module entre la proposition et la confirmation**, pour les deux kinds à drapeau.
+- `tests/unit/hygiene/assistant_action_capabilities.spec.ts` (#697) — la capability annoncée et la policy appliquée ne peuvent plus diverger en silence.
 - `tests/inertia/assistant_message.spec.ts` / `assistant_action_card` / `assistant_panel` — badge de source, cartes de proposition et de résultat par kind, chips de démarrage, pied de consommation.
