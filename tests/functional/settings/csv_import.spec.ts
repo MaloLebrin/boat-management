@@ -3,9 +3,15 @@ import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
 
-const VALID_CSV = `date,title,subject,notes,engine_caption,sail_caption,cost
-2024-01-15,Vidange moteur,Moteur,RAS,,,150
-2024-02-20,Révision voile,Voilure,OK,,Grand-voile,0
+// ⚠️ Séparateur **point-virgule** et sujets tirés de `VALID_SUBJECTS`.
+// Ce littéral était écrit en virgules, avec les libellés « Moteur » et
+// « Voilure » : tout tenait dans une seule colonne, `missingHeaders` n'était
+// jamais vide, et les deux tests ci-dessous observaient la redirection d'erreur
+// d'en-têtes — la même que celle qu'ils attendaient. Ils passaient donc sans
+// rien exercer du gating de plan qu'ils prétendent couvrir (#693).
+const VALID_CSV = `date;title;subject;notes;engine_caption;sail_caption;cost
+2024-01-15;Vidange moteur;engine;RAS;Moteur bâbord;;150
+2024-02-20;Révision voile;sail;OK;;Grand-voile;0
 `
 
 const INVALID_ROW_CSV = `date;title;subject;notes;engine_caption;sail_caption;cost
@@ -15,43 +21,35 @@ const INVALID_ROW_CSV = `date;title;subject;notes;engine_caption;sail_caption;co
 test.group('CSV import preview (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
-  test('POST /settings/import/preview redirige vers /settings/import pour un plan starter', async ({
-    client,
-  }) => {
-    const user = await UserFactory.with('organization', 1, (org) =>
-      org.merge({ plan: 'starter' })
-    ).create()
-    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+  // ⚠️ `/settings/import` redirige vers lui-même **dans les deux cas** : succès
+  // comme erreur d'en-têtes. Asserter la seule `location` ne distingue donc
+  // rien — c'est ce que faisaient ces deux tests. Ce qui sépare les deux, c'est
+  // la présence de `pendingImport` en session (#693).
+  for (const plan of ['starter', 'pro'] as const) {
+    test(`POST /settings/import/preview prépare l'import en plan ${plan}`, async ({
+      client,
+      assert,
+    }) => {
+      const user = await UserFactory.with('organization', 1, (org) => org.merge({ plan })).create()
+      const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
-    const response = await client
-      .post('/settings/import/preview')
-      .loginAs(user)
-      .fields({ type: 'maintenance', boatId: String(boat.id) })
-      .file('file', Buffer.from(VALID_CSV), { filename: 'import.csv', contentType: 'text/csv' })
-      .redirects(0)
+      const response = await client
+        .post('/settings/import/preview')
+        .loginAs(user)
+        .fields({ type: 'maintenance', boatId: String(boat.id) })
+        .file('file', Buffer.from(VALID_CSV), { filename: 'import.csv', contentType: 'text/csv' })
+        .redirects(0)
 
-    response.assertStatus(302)
-    response.assertHeader('location', '/settings/import')
-  })
+      response.assertStatus(302)
+      response.assertHeader('location', '/settings/import')
 
-  test('POST /settings/import/preview redirige vers /settings/import pour un plan pro', async ({
-    client,
-  }) => {
-    const user = await UserFactory.with('organization', 1, (org) =>
-      org.merge({ plan: 'pro' })
-    ).create()
-    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
-
-    const response = await client
-      .post('/settings/import/preview')
-      .loginAs(user)
-      .fields({ type: 'maintenance', boatId: String(boat.id) })
-      .file('file', Buffer.from(VALID_CSV), { filename: 'import.csv', contentType: 'text/csv' })
-      .redirects(0)
-
-    response.assertStatus(302)
-    response.assertHeader('location', '/settings/import')
-  })
+      // Le constat que ces deux cas établissent : l'import **n'est pas gardé
+      // par le plan**. Le `starter` prépare son import comme le `pro`.
+      const pending = response.session('pendingImport') as { validRows: unknown[] } | undefined
+      assert.isDefined(pending)
+      assert.lengthOf(pending!.validRows, 2)
+    })
+  }
 
   test('POST /settings/import/preview redirige vers /login si non authentifié', async ({
     client,

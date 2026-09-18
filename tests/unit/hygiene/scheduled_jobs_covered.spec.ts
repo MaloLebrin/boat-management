@@ -27,12 +27,12 @@ const SCHEDULER = join(ROOT, 'start/scheduler.ts')
  * Jobs volontairement non couverts ici, chacun avec son motif et son issue.
  * Une exemption sans raison écrite est une régression déguisée.
  */
-const EXEMPT = new Map<string, string>([
-  [
-    'process_boat_maintenance_import',
-    "import CSV de maintenance — couvert par le domaine maintenance (#693), avec ses fichiers d'exemple.",
-  ],
-])
+/**
+ * Vide depuis #693 : les deux placeholders qui y figuraient (`process_media`,
+ * `process_boat_maintenance_import`) ont désormais leur spec. Toute nouvelle
+ * entrée doit porter son motif, et ce motif doit être vérifiable.
+ */
+const EXEMPT = new Map<string, string>()
 
 function jobFiles(): string[] {
   return readdirSync(JOBS_DIR)

@@ -98,6 +98,45 @@ Les clés `key` sont **stables à vie** (elles préfixent les clés i18n
 Elles ne sont pas encore persistées : `operation_key` sur les tâches et les
 événements reste une extension v2, nécessaire aux statistiques par opération.
 
+## Planning: les cinq seaux
+
+`/planning` est l'écran de pilotage quotidien. `PlanningService.getPlanningForOrg()` ventile les
+tâches de l'organisation en cinq listes, **entièrement en mémoire** (Luxon), à partir de
+`DateTime.now().startOf('day')`.
+
+| Seau      | Règle                                                                                              |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| `undated` | `dueAt` **et** `dueEngineHours` tous deux nuls — un **ET**, pas un OU                              |
+| `overdue` | tâche datée dont `dueAt < aujourd'hui`, ou tâche horaire dont `heures courantes >= dueEngineHours` |
+| `soon`    | tâche datée due dans **0 à 30 jours inclus**, ou tâche horaire à **1 à 50 heures** du terme        |
+| `planned` | tout le reste : ni en retard, ni bientôt dû                                                        |
+| `done`    | `status = 'done'` — requête SQL **séparée**, donc jamais en double avec les autres                 |
+
+Quatre points qui ne se devinent pas :
+
+- **`kind` est décidé par `dueEngineHours !== null`.** Une tâche portant les deux échéances est
+  classée sur les **heures** ; son `dueAt` est ignoré par le classement.
+- **Une tâche horaire sans `boatEngineId` résolu** (ou dont le moteur est introuvable) a
+  `currentEngineHours = null` : les deux prédicats renvoient `false` et elle atterrit en `planned`,
+  **quel que soit son retard**. Elle devient donc invisible du pilotage. Comportement constaté,
+  figé par `tests/functional/planning/buckets.spec.ts`.
+- **`doneTasks` est plafonné à 20** (tri `updatedAt` décroissant) ; `doneTasksTotal` porte le total
+  réel.
+- **L'isolation ne tient qu'au `where('organizationId', …)` sur les bateaux**, puis au
+  `whereIn('boatId', …)` sur les tâches. Il n'y a **aucun bouncer** sur `/planning` : un mécanicien y
+  accède alors que `/boats/:id` lui répond 403, et le filtrage fin est laissé à l'UI via les
+  capabilities.
+
+`countDueTasksForOrg()` réutilise les **mêmes** prédicats pour ne renvoyer que `{ overdue, soon }`.
+Elle n'alimente **aucun badge de navigation** : son unique appelant est `AssistantStarterService`,
+pour les suggestions de démarrage du copilote.
+
+⚠️ **Ne pas confondre avec les seuils du dashboard ci-dessous** (14 jours / 10 heures) : ce sont deux
+fonctionnalités distinctes, avec des seuils différents.
+
+Référence : `app/services/planning_service.ts`. Le regroupement des tâches `planned` réservé au plan
+Pro est documenté à part dans `docs/domain/task-grouping.md`.
+
 ## Dashboard: “urgent maintenance”
 
 La homepage connectée rend `inertia/pages/dashboard.vue` via `DashboardService.getForUser()`.
