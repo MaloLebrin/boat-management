@@ -26,7 +26,7 @@
     "typecheck": "tsc -b && vue-tsc --noEmit --project inertia/tsconfig.json",
     "test:inertia": "vitest run",
     "test:inertia:coverage": "vitest run --coverage",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "imports": {
     "#controllers/*": "./app/controllers/*.js",
