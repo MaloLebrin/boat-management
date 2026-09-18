@@ -4,6 +4,7 @@ import BoatHullService from '#services/boat_hull_service'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import FuelLogPolicy from '#policies/fuel_log_policy'
 import { createBoatFuelLogValidator } from '#validators/boat_fuel_log'
+import { CREATE_FUEL_LOG_ACTION } from '#shared/constants/offline_queue'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -33,8 +34,9 @@ export default class BoatFuelLogsController {
 
     const payload = await request.validateUsing(createBoatFuelLogValidator)
 
+    let fuelLog
     try {
-      await this.fuelLogService.createForBoat(user, boat, {
+      fuelLog = await this.fuelLogService.createForBoat(user, boat, {
         fueledAt: payload.fueledAt,
         quantityLiters: payload.quantityLiters,
         pricePerLiter: payload.pricePerLiter ?? null,
@@ -48,12 +50,17 @@ export default class BoatFuelLogsController {
     } catch (error) {
       if (error instanceof BoatFuelLogValidationError) {
         session.flash('error', i18n.t(`flash.fuelLog.${error.errorCode}`))
+        // Refus métier sur un plein enfilé hors-ligne : sans marqueur, la file
+        // le prendrait pour un succès et le détruirait (#727).
+        session.flash('rejectedType', CREATE_FUEL_LOG_ACTION)
         response.redirect(`/boats/${boat.id}?tab=fuel`)
         return
       }
       throw error
     }
 
+    session.flash('createdResourceType', CREATE_FUEL_LOG_ACTION)
+    session.flash('createdResourceId', String(fuelLog.id))
     session.flash('success', i18n.t('flash.fuelLog.created'))
     response.redirect(`/boats/${boat.id}?tab=fuel`)
   }

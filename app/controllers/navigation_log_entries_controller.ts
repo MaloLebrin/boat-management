@@ -10,6 +10,7 @@ import {
   createNavigationLogEntryValidator,
   updateNavigationLogEntryValidator,
 } from '#validators/navigation_log'
+import { CREATE_NAVIGATION_LOG_ENTRY_ACTION } from '#shared/constants/offline_queue'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
@@ -34,8 +35,9 @@ export default class NavigationLogEntriesController {
 
     const payload = await request.validateUsing(createNavigationLogEntryValidator)
 
+    let entry
     try {
-      await this.entryService.createForLog(
+      entry = await this.entryService.createForLog(
         boat,
         Number(ctx.params.logId),
         {
@@ -52,13 +54,19 @@ export default class NavigationLogEntriesController {
         { allowCompleted }
       )
     } catch (error) {
-      if (this.flashKnownError(error, session, i18n)) {
+      // Le refus qui coûte le plus cher : un équipier saisit ses points en mer,
+      // le skipper clôture la sortie depuis le quai, et chaque point refusé
+      // était **jeté** au retour du réseau, sans trace, sous un toast de succès
+      // (#727).
+      if (this.flashKnownError(error, session, i18n, CREATE_NAVIGATION_LOG_ENTRY_ACTION)) {
         response.redirect().back()
         return
       }
       throw error
     }
 
+    session.flash('createdResourceType', CREATE_NAVIGATION_LOG_ENTRY_ACTION)
+    session.flash('createdResourceId', String(entry.id))
     session.flash('success', i18n.t('flash.navigationLogEntry.created'))
     response.redirect().back()
   }
@@ -139,26 +147,34 @@ export default class NavigationLogEntriesController {
     return resolved?.boat ?? null
   }
 
+  /**
+   * `rejectedType` n'est posé que pour les chemins **enfilés hors-ligne** : la
+   * création (#727). `update` et `destroy` passent ici sans identifiant — le
+   * verrou de l'édition est l'objet de #725.
+   */
   private flashKnownError(
     error: unknown,
     session: HttpContext['session'],
-    i18n: HttpContext['i18n']
+    i18n: HttpContext['i18n'],
+    rejectedType?: string
   ): boolean {
-    if (error instanceof NavigationLogNotFoundError) {
-      session.flash('error', i18n.t('flash.navigationLog.notFound'))
+    const reject = (key: string) => {
+      session.flash('error', i18n.t(key))
+      if (rejectedType) session.flash('rejectedType', rejectedType)
       return true
+    }
+
+    if (error instanceof NavigationLogNotFoundError) {
+      return reject('flash.navigationLog.notFound')
     }
     if (error instanceof NavigationLogEntryNotFoundError) {
-      session.flash('error', i18n.t('flash.navigationLogEntry.notFound'))
-      return true
+      return reject('flash.navigationLogEntry.notFound')
     }
     if (error instanceof NavigationLogEntryNotEditableError) {
-      session.flash('error', i18n.t('flash.navigationLogEntry.notEditable'))
-      return true
+      return reject('flash.navigationLogEntry.notEditable')
     }
     if (error instanceof NavigationLogValidationError) {
-      session.flash('error', i18n.t(`flash.navigationLogEntry.${error.errorCode}`))
-      return true
+      return reject(`flash.navigationLogEntry.${error.errorCode}`)
     }
     return false
   }

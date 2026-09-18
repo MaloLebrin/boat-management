@@ -30,6 +30,7 @@ import {
   updateEquipmentStatusValidator,
   upsertBoatRigValidator,
 } from '#validators/boat_equipment'
+import { INCREMENT_ENGINE_HOURS_ACTION } from '#shared/constants/offline_queue'
 import { toAppLocale } from '#shared/helpers/locale_path'
 import type { AiSuggestion } from '#shared/types/ai'
 import { deferJson } from '#utils/inertia_defer'
@@ -633,6 +634,11 @@ export default class BoatEquipmentController {
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))
+        // Un incrément enfilé hors-ligne dont le moteur a disparu entre-temps :
+        // le marqueur le range dans « échecs » au lieu de le laisser disparaître
+        // avec les heures saisies (#727). Pas de `createdResourceId` ici —
+        // l'action n'ouvre aucune ressource dont d'autres dépendraient.
+        session.flash('rejectedType', INCREMENT_ENGINE_HOURS_ACTION)
         response.redirect(`/boats/${boat.id}`)
         return
       }
