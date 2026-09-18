@@ -15,6 +15,7 @@ import {
   closeNavigationLogValidator,
   updateNavigationLogValidator,
 } from '#validators/navigation_log'
+import { CREATE_NAVIGATION_LOG_ACTION } from '#shared/constants/offline_queue'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -87,8 +88,9 @@ export default class NavigationLogsController {
 
     const payload = await request.validateUsing(createNavigationLogValidator)
 
+    let log
     try {
-      await this.navigationLogService.createForBoat(boat, {
+      log = await this.navigationLogService.createForBoat(boat, {
         departedAt: payload.departedAt,
         tzOffsetMinutes: payload.tzOffsetMinutes,
         departurePortId: payload.departurePortId ?? null,
@@ -102,12 +104,21 @@ export default class NavigationLogsController {
     } catch (error) {
       if (error instanceof NavigationLogInProgressError) {
         session.flash('error', i18n.t('flash.navigationLog.alreadyInProgress'))
+        // Sans ce marqueur, `drainQueue` lit une redirection Inertia réussie et
+        // **supprime l'action de la file** : la sortie saisie en mer est perdue
+        // sous un toast de succès (#727).
+        session.flash('rejectedType', CREATE_NAVIGATION_LOG_ACTION)
         response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
         return
       }
       throw error
     }
 
+    // Résolution de dépendances (#622/#727) : une sortie créée hors-ligne peut
+    // porter un `tempId` que ses points référencent. L'ID réel remonte ici pour
+    // que la file réécrive les actions filles avant de les rejouer.
+    session.flash('createdResourceType', CREATE_NAVIGATION_LOG_ACTION)
+    session.flash('createdResourceId', String(log.id))
     session.flash('success', i18n.t('flash.navigationLog.created'))
     response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
   }

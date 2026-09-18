@@ -62,9 +62,10 @@ les 58 cas concernés entièrement verts.
 
 ## Le vocabulaire d'actions
 
-`shared/constants/offline_queue.ts` ne déclare que les trois actions des états
-des lieux. Les autres sont des **littéraux écrits à la main des deux côtés** —
-c'est la dette **#726**.
+`shared/constants/offline_queue.ts` déclare les trois actions des états des
+lieux et, depuis #727, les quatre créations du domaine terrain — celles dont le
+backend parle. Les autres restent des **littéraux écrits à la main des deux
+côtés** : c'est la dette **#726**.
 
 | Type                          | Conflit détecté | `rejectedType` | Carte `FIELDS_BY_TYPE` |
 | ----------------------------- | --------------- | -------------- | ---------------------- |
@@ -75,10 +76,10 @@ c'est la dette **#726**.
 | `close-navigation-log`        | ✅              | —              | ✅                     |
 | `update-sheet-item`           | ✅              | —              | ✅                     |
 | `update-navigation-log-entry` | ❌ **#725**     | ❌             | ❌                     |
-| `create-navigation-log`       | —               | ❌ **#727**    | —                      |
-| `create-navigation-log-entry` | —               | ❌ **#727**    | —                      |
-| `create-fuel-log`             | —               | ❌ **#727**    | —                      |
-| `increment-engine-hours`      | —               | ❌ **#727**    | —                      |
+| `create-navigation-log`       | —               | ✅             | —                      |
+| `create-navigation-log-entry` | —               | ✅             | —                      |
+| `create-fuel-log`             | —               | ✅             | —                      |
+| `increment-engine-hours`      | —               | ✅             | —                      |
 
 `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` compare les deux
 moitiés en relisant les sources, et porte les cases vides ci-dessus en
@@ -89,9 +90,10 @@ traitées.
 
 - **pas de `conflictType`** (#725) : la mutation écrase la version du serveur,
   dernier rejeu gagnant, sans que personne n'arbitre ;
-- **pas de `rejectedType`** (#727) : un refus métier rendu en `flash('error')` +
+- **pas de `rejectedType`** : un refus métier rendu en `flash('error')` +
   redirection est **indistinguable d'un succès**. `drainQueue` supprime l'action
-  de la file et affiche « synchronisation réussie » — la saisie est perdue ;
+  de la file et affiche « synchronisation réussie » — la saisie est perdue.
+  C'était le cas des quatre créations du domaine terrain jusqu'à #727 ;
 - **pas de `FIELDS_BY_TYPE`** : la modale s'ouvre, demande de trancher, et
   n'affiche aucune ligne.
 
@@ -117,9 +119,12 @@ que le serveur ne renvoie pas `createdResourceId`, tous les dépendants
 **cascadent en `failed`** avec `dependencyBlocked`.
 
 Un seul écran pose un `tempId` aujourd'hui : le formulaire d'état des lieux. Les
-quatre créations du domaine terrain n'en posent pas — ce qui rend l'absence de
-`createdResourceType` chez elles inoffensive **pour l'instant**, et armée pour le
-jour où l'une d'elles en posera un (#727).
+quatre créations du domaine terrain n'en posent pas — mais les trois qui ouvrent
+une ressource (`create-navigation-log`, `create-navigation-log-entry`,
+`create-fuel-log`) renvoient désormais `createdResourceType` /
+`createdResourceId` (#727) : le jour où l'une d'elles posera un `tempId`, ses
+dépendants seront résolus au lieu de cascader en `dependencyBlocked`.
+`increment-engine-hours` n'ouvre aucune ressource et n'en renvoie pas.
 
 ## Où c'est testé
 
@@ -130,6 +135,7 @@ jour où l'une d'elles en posera un (#727).
 | `tests/functional/navigation/offline_conflict_payload.spec.ts` | `conflictData` porte les champs de la modale               |
 | `tests/functional/boats/navigation_logs.spec.ts`               | le contrôleur pose son flash de conflit                    |
 | `tests/functional/boats/inspections.spec.ts`                   | `rejectedType`, `createdResourceType`, `createdResourceId` |
+| `tests/functional/boats/offline_replay_markers.spec.ts`        | les mêmes marqueurs sur les quatre créations du terrain    |
 | `tests/functional/boats/maintenance_sheets.spec.ts`            | le conflit de ligne de fiche                               |
 | `tests/inertia/offline_pending_queue.spec.ts`                  | la lecture côté composant                                  |
 | `tests/browser/offline_queue.spec.ts`                          | **le raccord complet, dans un vrai navigateur** (#700)     |
@@ -168,8 +174,7 @@ Deux contraintes à connaître avant d'en écrire un autre :
 
 ## Constats ouverts
 
-| #    | Constat                                                                               |
-| ---- | ------------------------------------------------------------------------------------- |
-| #725 | `update-navigation-log-entry` : seule mutation enfilée sans verrou optimiste          |
-| #726 | vocabulaire d'actions écrit à la main des deux côtés                                  |
-| #727 | un refus métier sur un rejeu passe pour un succès — l'action est supprimée de la file |
+| #    | Constat                                                                      |
+| ---- | ---------------------------------------------------------------------------- |
+| #725 | `update-navigation-log-entry` : seule mutation enfilée sans verrou optimiste |
+| #726 | vocabulaire d'actions écrit à la main des deux côtés                         |

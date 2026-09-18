@@ -44,21 +44,8 @@ const ENQUEUED_WITHOUT_SERVER_ANSWER = new Map<string, string>([
       "n'a aucune détection de conflit : c'est la seule mutation enfilée hors-ligne sans " +
       'verrou optimiste. Suivi par #725 — quand elle en aura un, retirer cette exemption.',
   ],
-  // Les quatre créations du domaine terrain : leurs refus métier sont rendus en
-  // `flash('error')` + redirection, sans `rejectedType`. `drainQueue` ne peut
-  // alors pas les distinguer d'un succès et **supprime l'action de la file** —
-  // un point de journal refusé est perdu en silence, sous un toast de succès.
-  // Suivi par #727.
-  [
-    'create-navigation-log',
-    'refus « une sortie déjà en cours » rendu sans `rejectedType` — suivi par #727',
-  ],
-  [
-    'create-navigation-log-entry',
-    'refus « sortie clôturée » rendu sans `rejectedType` — suivi par #727',
-  ],
-  ['create-fuel-log', 'refus métier rendu sans `rejectedType` — suivi par #727'],
-  ['increment-engine-hours', 'refus métier rendu sans `rejectedType` — suivi par #727'],
+  // Les quatre créations du domaine terrain ont reçu leur `rejectedType` en
+  // #727 : elles ne sont plus exemptées, la garde les couvre comme les autres.
 ])
 
 /** Les trois clés de flash qui transportent un identifiant d'action. */
