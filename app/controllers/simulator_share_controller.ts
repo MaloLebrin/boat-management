@@ -2,6 +2,7 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { simulatorShareValidator } from '#validators/simulator_share'
 import SimulatorShareService from '#services/simulator_share_service'
+import { computeSimulatorCosts } from '#shared/simulator_costs'
 import { marketingPath } from '#shared/helpers/locale_path'
 import type { AppLocale } from '#shared/helpers/locale_path'
 
@@ -25,7 +26,14 @@ export default class SimulatorShareController {
       ...payload.input,
       winteringZone: payload.input.winteringZone ?? undefined,
     }
-    const share = await this.simulatorShareService.create(input, payload.breakdown, locale)
+    // Le breakdown est produit ici, à partir du seul `input` validé : le
+    // partage reste cohérent avec la grille de coûts en vigueur, et aucun
+    // montant venu de l'appelant n'atteint la page de lecture (#730).
+    const share = await this.simulatorShareService.create(
+      input,
+      computeSimulatorCosts(input),
+      locale
+    )
     const path = locale === 'fr' ? `/simulateur/r/${share.token}` : `/simulator/r/${share.token}`
     return response.redirect(path)
   }

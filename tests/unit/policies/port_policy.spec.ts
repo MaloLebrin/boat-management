@@ -14,6 +14,14 @@ import { userWithCapabilities } from '#tests/support/policy_user'
 
 testPolicyMatrix('PortPolicy (unit)', () => new PortPolicy(), [
   {
+    // Pendant de `view` sans ressource, pour la liste (#723) : `GET /ports`
+    // n'a pas de port à passer.
+    name: 'viewAny',
+    capability: 'ports.view',
+    allowedRoles: ['admin', 'member'],
+    deniedRoles: ['mechanic', 'boat_owner'],
+  },
+  {
     name: 'view',
     capability: 'ports.view',
     resource: orgResource,
