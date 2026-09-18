@@ -503,6 +503,36 @@ Deux pièges dans ce contexte factice, tous deux rencontrés :
 ouvrent réellement le JSON. Quand une valeur est consommée par du code, l'assertion doit la
 consommer aussi.
 
+### Un refus sans témoin ne prouve rien (#697)
+
+`response.assertFlashMessage('error', 'Access denied')` prouve qu'un message a été posé. Il ne
+distingue **pas** « le Bouncer a arrêté l'action » de « l'action a écrit, puis la réponse a
+redirigé » : les deux rendent le même 302 et le même flash. Un refus doit donc toujours s'accompagner
+d'un **témoin en base**, relevé avant et comparé après :
+
+```ts
+const before = await ledger(decor) // un cliché de tout ce que l'action peut écrire
+const response = await confirm(client, token, user)
+response.assertFlashMessage('error', ACCESS_DENIED)
+assert.deepEqual(await ledger(decor), before, 'l’action a écrit malgré le refus')
+```
+
+Le cliché vaut mieux qu'un compteur sur la seule table attendue : une action mal rangée écrirait
+ailleurs, et un compteur ciblé ne la verrait pas. Le journal d'audit en fait partie — une écriture
+sans ligne d'audit est un bug distinct, et l'inverse aussi.
+
+### Une matrice de refus a besoin de son contre-exemple
+
+Neuf refus d'affilée sont compatibles avec une route cassée, un middleware trop large ou un décor
+qui n'a jamais été valide. Il faut donc, **dans le même décor et avec les mêmes données**, au moins
+un cas qui passe. Dans `action_confirmation_guard.spec.ts`, c'est le `mechanic` : il confirme
+`create_task` — sa seule capability — et se fait refuser les huit autres. Sans lui, la matrice
+resterait verte sur un `/assistant/conversations/:token/action/confirm` renvoyant 302 pour tout le
+monde.
+
+C'est la même règle que la mesure de #695 avait imposée : un refus vérifié sur un seul rôle n'est pas
+une règle ACL, c'est une observation.
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.

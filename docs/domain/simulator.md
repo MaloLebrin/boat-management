@@ -33,13 +33,54 @@ Fallback (accès direct /signup sans simulateur) :
 
 Référence : `start/routes/marketing.ts`
 
-| Méthode | URL | Nom | Controller |
-|---|---|---|---|
-| GET | `/fr/simulateur-cout-entretien` | `marketing.fr.simulator` | `MarketingController#simulator` |
-| GET | `/en/maintenance-cost-simulator` | `marketing.en.simulator` | `MarketingController#simulator` |
-| POST | `/simulator/session` | `simulator.session` | `SimulatorController#saveSession` |
+| Méthode | URL                              | Nom                       | Controller                        |
+| ------- | -------------------------------- | ------------------------- | --------------------------------- |
+| GET     | `/fr/simulateur-cout-entretien`  | `marketing.fr.simulator`  | `MarketingController#simulator`   |
+| GET     | `/en/maintenance-cost-simulator` | `marketing.en.simulator`  | `MarketingController#simulator`   |
+| POST    | `/simulator/session`             | `simulator.session`       | `SimulatorController#saveSession` |
+| POST    | `/simulator/lead`                | `simulator.lead`          | `SimulatorLeadController#store`   |
+| POST    | `/boats/from-simulator`          | `simulator.create_boat`   | `SimulatorController#createBoat`  |
+| POST    | `/simulator/share`               | `simulator.share.store`   | `SimulatorShareController#store`  |
+| GET     | `/simulateur/r/:token`           | `simulator.share.show.fr` | `SimulatorShareController#show`   |
+| GET     | `/simulator/r/:token`            | `simulator.share.show.en` | `SimulatorShareController#show`   |
 
-La route POST `/simulator/session` est publique (pas de middleware auth). Elle stocke les données en session et redirige vers `/signup`.
+Seule `/boats/from-simulator` porte `middleware.auth()`. **Les trois POST publics (`session`, `lead`,
+`share`) n'ont aucun throttle** — là où `/contact`, `/diagnosis-ai` et `/parts-ai` en portent un
+chacun : constat #731.
+
+---
+
+## Partage d'un résultat (#697)
+
+`POST /simulator/share` est la seule route d'**écriture en base** du simulateur accessible sans
+authentification. Elle crée une ligne `simulator_shares` et redirige vers sa lecture :
+
+```
+POST /simulator/share  { input, breakdown, locale? }
+  → token = randomBytes(6).toString('hex')     // 12 hex, aucune reprise en cas de collision
+  → 302 /simulateur/r/<token>   (locale 'fr', la valeur par défaut)
+     ou /simulator/r/<token>    (toute autre valeur, 'en' comprise)
+```
+
+`GET /simulateur|simulator/r/:token` rend `marketing/simulator_share` avec quatre props — `token`,
+`input`, `breakdown`, `locale` — relues telles quelles depuis la ligne. Un jeton inconnu redirige
+**toujours** vers `/fr/simulateur-cout-entretien`, y compris depuis la route anglaise : constat #732.
+
+### Ce que le serveur ne fait pas
+
+- **Il ne recalcule rien.** `breakdown` est stocké tel que l'appelant l'a envoyé ; `simulatorShareValidator`
+  n'en vérifie que la forme. Le calculateur est pourtant partagé et disponible côté serveur. Un lien
+  forgé affiche donc n'importe quel montant sous la mise en page FleetAi : constat #730.
+- **Il ne borne pas `locale`.** `vine.string().optional()` contre une colonne `varchar(10)` : onze
+  caractères rendent un **500**, et une locale bidon plus courte est stockée puis servie à une page
+  qui type sa prop `'en' | 'fr'` : constat #729.
+
+### Où c'est testé
+
+| Fichier                                                       | Couvre                                                                                                                       |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide et invalide                                                                         |
+| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, les refus du validateur, et les quatre constats ci-dessus en caractérisation |
 
 ---
 
@@ -57,19 +98,19 @@ type SimulatorWearLevel = 'new' | 'good' | 'worn' | 'to_replace'
 // Données collectées dans le simulateur
 interface SimulatorBoatInput {
   boatType: SimulatorBoatType
-  lengthM: number           // 2–30 m
-  yearBuilt: number         // 1950–année courante
+  lengthM: number // 2–30 m
+  yearBuilt: number // 1950–année courante
   navigationCategory: 'A' | 'B' | 'C' | 'D'
   hasDedicatedEngine: boolean
   hullWear: SimulatorWearLevel
-  engineWear: SimulatorWearLevel | null   // null si pas de moteur
+  engineWear: SimulatorWearLevel | null // null si pas de moteur
   safetyWear: SimulatorWearLevel
-  riggingWear: SimulatorWearLevel | null  // null si motorboat/rib
+  riggingWear: SimulatorWearLevel | null // null si motorboat/rib
 }
 
 // Résultat du calcul
 interface SimulatorCostBreakdown {
-  categories: SimulatorCostCategory[]   // { key, minCost, maxCost }
+  categories: SimulatorCostCategory[] // { key, minCost, maxCost }
   totalMin: number
   totalMax: number
 }
@@ -82,6 +123,7 @@ interface SimulatorCostBreakdown {
 Référence : `app/validators/simulator.ts`
 
 Validator VineJS `simulatorValidator` — valide `SimulatorBoatInput` :
+
 - `boatType` : `vine.enum(SIMULATOR_BOAT_TYPES)`
 - `lengthM` : `vine.number().range([2, 30])`
 - `yearBuilt` : `vine.number().range([1950, currentYear])`
@@ -98,32 +140,32 @@ Calcul **purement côté frontend** (pas d'appel serveur). Fonction exportée : 
 
 ### Coûts de base annuels par tranche de longueur (€)
 
-| Longueur | Coque | Moteur | Sécurité | Électricité | Mouillage |
-|---|---|---|---|---|---|
-| < 6 m | 250–350 | 300–400 | 120–180 | 100–150 | 60–100 |
-| 6–9 m | 500–700 | 450–650 | 180–250 | 150–220 | 100–150 |
-| 9–12 m | 900–1 300 | 700–900 | 250–350 | 200–300 | 150–220 |
-| 12–15 m | 1 500–2 100 | 1 000–1 400 | 350–500 | 300–400 | 200–280 |
-| > 15 m | 2 500–3 500 | 1 600–2 000 | 450–600 | 450–550 | 250–350 |
+| Longueur | Coque       | Moteur      | Sécurité | Électricité | Mouillage |
+| -------- | ----------- | ----------- | -------- | ----------- | --------- |
+| < 6 m    | 250–350     | 300–400     | 120–180  | 100–150     | 60–100    |
+| 6–9 m    | 500–700     | 450–650     | 180–250  | 150–220     | 100–150   |
+| 9–12 m   | 900–1 300   | 700–900     | 250–350  | 200–300     | 150–220   |
+| 12–15 m  | 1 500–2 100 | 1 000–1 400 | 350–500  | 300–400     | 200–280   |
+| > 15 m   | 2 500–3 500 | 1 600–2 000 | 450–600  | 450–550     | 250–350   |
 
 ### Gréement (voiliers/catamarans uniquement, €)
 
-| Longueur | Base |
-|---|---|
-| < 6 m | 300–500 |
-| 6–9 m | 500–900 |
-| 9–12 m | 800–1 400 |
-| 12–15 m | 1 200–1 800 |
-| > 15 m | 1 800–2 500 |
+| Longueur | Base        |
+| -------- | ----------- |
+| < 6 m    | 300–500     |
+| 6–9 m    | 500–900     |
+| 9–12 m   | 800–1 400   |
+| 12–15 m  | 1 200–1 800 |
+| > 15 m   | 1 800–2 500 |
 
 ### Multiplicateurs par état d'usure
 
-| État | Multiplicateur |
-|---|---|
-| `new` | × 0.5 |
-| `good` | × 1.0 |
-| `worn` | × 1.5 |
-| `to_replace` | × 2.5 |
+| État         | Multiplicateur |
+| ------------ | -------------- |
+| `new`        | × 0.5          |
+| `good`       | × 1.0          |
+| `worn`       | × 1.5          |
+| `to_replace` | × 2.5          |
 
 ### Logique conditionnelle
 
@@ -138,13 +180,13 @@ Calcul **purement côté frontend** (pas d'appel serveur). Fonction exportée : 
 
 La liste des étapes est **calculée dynamiquement** côté frontend selon le type de bateau.
 
-| Ordre | Clé | Composant | Condition |
-|---|---|---|---|
-| 1 | `boat` | `SimulatorStepBoat.vue` | Toujours |
-| 2 | `hull` | `SimulatorStepHull.vue` | Toujours |
-| 3 | `engine` | `SimulatorStepEngine.vue` | `motorboat`/`rib` ou `hasDedicatedEngine` |
-| 4 | `safety` | `SimulatorStepSafety.vue` | Toujours |
-| 5 | `rigging` | `SimulatorStepRigging.vue` | `sailboat`/`catamaran` uniquement |
+| Ordre | Clé       | Composant                  | Condition                                 |
+| ----- | --------- | -------------------------- | ----------------------------------------- |
+| 1     | `boat`    | `SimulatorStepBoat.vue`    | Toujours                                  |
+| 2     | `hull`    | `SimulatorStepHull.vue`    | Toujours                                  |
+| 3     | `engine`  | `SimulatorStepEngine.vue`  | `motorboat`/`rib` ou `hasDedicatedEngine` |
+| 4     | `safety`  | `SimulatorStepSafety.vue`  | Toujours                                  |
+| 5     | `rigging` | `SimulatorStepRigging.vue` | `sailboat`/`catamaran` uniquement         |
 
 ---
 
@@ -152,33 +194,33 @@ La liste des étapes est **calculée dynamiquement** côté frontend selon le ty
 
 ### Backend
 
-| Fichier | Rôle |
-|---|---|
-| `shared/types/simulator.ts` | Types partagés backend ↔ frontend (incl. `SimulatorLeadPayload`) |
-| `app/validators/simulator.ts` | Validation VineJS — `SimulatorBoatInput` |
-| `app/validators/simulator_lead.ts` | Validation VineJS — `SimulatorLeadPayload` |
-| `app/controllers/simulator_controller.ts` | `saveSession()` — stocke en session + redirect /signup |
-| `app/controllers/simulator_lead_controller.ts` | `store()` — capture email lead, upsert, redirect back |
-| `app/controllers/marketing_controller.ts` | Méthode `simulator()` — rendu Inertia |
-| `app/models/simulator_lead.ts` | Model Lucid — table `simulator_leads` |
-| `app/services/simulator_lead_service.ts` | `create()` — upsert sur email |
-| `app/services/boat_hull_service.ts` | `createFromSimulator()` — création bateau post-signup |
-| `app/controllers/new_account_controller.ts` | Détecte session `simulatorBoat` après inscription |
-| `start/routes/marketing.ts` | Routes GET (FR/EN) + POST /simulator/session + POST /simulator/lead |
+| Fichier                                        | Rôle                                                                |
+| ---------------------------------------------- | ------------------------------------------------------------------- |
+| `shared/types/simulator.ts`                    | Types partagés backend ↔ frontend (incl. `SimulatorLeadPayload`)    |
+| `app/validators/simulator.ts`                  | Validation VineJS — `SimulatorBoatInput`                            |
+| `app/validators/simulator_lead.ts`             | Validation VineJS — `SimulatorLeadPayload`                          |
+| `app/controllers/simulator_controller.ts`      | `saveSession()` — stocke en session + redirect /signup              |
+| `app/controllers/simulator_lead_controller.ts` | `store()` — capture email lead, upsert, redirect back               |
+| `app/controllers/marketing_controller.ts`      | Méthode `simulator()` — rendu Inertia                               |
+| `app/models/simulator_lead.ts`                 | Model Lucid — table `simulator_leads`                               |
+| `app/services/simulator_lead_service.ts`       | `create()` — upsert sur email                                       |
+| `app/services/boat_hull_service.ts`            | `createFromSimulator()` — création bateau post-signup               |
+| `app/controllers/new_account_controller.ts`    | Détecte session `simulatorBoat` après inscription                   |
+| `start/routes/marketing.ts`                    | Routes GET (FR/EN) + POST /simulator/session + POST /simulator/lead |
 
 ### Frontend
 
-| Fichier | Rôle |
-|---|---|
-| `inertia/pages/marketing/simulator.vue` | Page principale, gestion des étapes |
-| `inertia/composables/use_simulator_costs.ts` | Calcul des coûts (pure function) |
-| `inertia/components/marketing/simulator/SimulatorStepBoat.vue` | Étape 1 : type, longueur, année, catégorie, moteur |
-| `inertia/components/marketing/simulator/SimulatorStepHull.vue` | Étape 2 : état de la coque |
-| `inertia/components/marketing/simulator/SimulatorStepEngine.vue` | Étape 3 : état du moteur |
-| `inertia/components/marketing/simulator/SimulatorStepSafety.vue` | Étape 4 : état du matériel de sécurité |
-| `inertia/components/marketing/simulator/SimulatorStepRigging.vue` | Étape 5 : état du gréement (voiliers/cata) |
-| `inertia/components/marketing/simulator/SimulatorResultCard.vue` | Tableau coûts par catégorie + total |
-| `inertia/components/marketing/simulator/SimulatorCtaCard.vue` | CTA signup + formulaire email capture (visiteurs non-auth) |
+| Fichier                                                           | Rôle                                                       |
+| ----------------------------------------------------------------- | ---------------------------------------------------------- |
+| `inertia/pages/marketing/simulator.vue`                           | Page principale, gestion des étapes                        |
+| `inertia/composables/use_simulator_costs.ts`                      | Calcul des coûts (pure function)                           |
+| `inertia/components/marketing/simulator/SimulatorStepBoat.vue`    | Étape 1 : type, longueur, année, catégorie, moteur         |
+| `inertia/components/marketing/simulator/SimulatorStepHull.vue`    | Étape 2 : état de la coque                                 |
+| `inertia/components/marketing/simulator/SimulatorStepEngine.vue`  | Étape 3 : état du moteur                                   |
+| `inertia/components/marketing/simulator/SimulatorStepSafety.vue`  | Étape 4 : état du matériel de sécurité                     |
+| `inertia/components/marketing/simulator/SimulatorStepRigging.vue` | Étape 5 : état du gréement (voiliers/cata)                 |
+| `inertia/components/marketing/simulator/SimulatorResultCard.vue`  | Tableau coûts par catégorie + total                        |
+| `inertia/components/marketing/simulator/SimulatorCtaCard.vue`     | CTA signup + formulaire email capture (visiteurs non-auth) |
 
 ### i18n
 
@@ -196,6 +238,7 @@ async createFromSimulator(organizationId: number, data: SimulatorBoatInput): Pro
 ```
 
 Mappe `SimulatorBoatInput` → modèle `Boat` :
+
 - `name` : `"Mon bateau {boatType} {lengthM}m"` (nom par défaut modifiable ensuite)
 - `propulsionType` : `'motorboat'` si `motorboat`/`rib`, sinon `data.boatType`
 - `type`, `lengthM`, `yearBuilt`, `navigationCategory` : copiés directement
@@ -207,6 +250,7 @@ La session `simulatorBoat` est **supprimée après usage** (`session.forget('sim
 ## Référence réglementaire
 
 Le barème de coûts est inspiré de la **Division 240 – Annexe 240-A.2** (Registre de Vérification Spéciale) qui définit les catégories de vérification :
+
 - Équipements de sécurité (gilets, extincteurs, signaux, VHF, EPIRB)
 - Coque / construction
 - Propulsion
