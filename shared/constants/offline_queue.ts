@@ -10,3 +10,11 @@
 export const CREATE_INSPECTION_ACTION = 'create-inspection'
 export const UPDATE_INSPECTION_ACTION = 'update-inspection'
 export const CREATE_INSPECTION_DEFECT_ACTION = 'create-inspection-defect'
+
+/**
+ * L'édition d'un point de journal (#725) : la seule mutation enfilée hors-ligne
+ * qui n'avait aucun verrou optimiste. Elle descend ici parce que le backend en
+ * parle désormais — il renvoie son `conflictType`. Le rapatriement des autres
+ * identifiants encore écrits en littéral des deux côtés reste l'objet de #726.
+ */
+export const UPDATE_NAVIGATION_LOG_ENTRY_ACTION = 'update-navigation-log-entry'

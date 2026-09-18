@@ -3,6 +3,7 @@ import { truncateDb } from '#tests/utils/db'
 import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatMaintenanceSheetFactory } from '#database/factories/boat_maintenance_sheet_factory'
+import { NavigationLogEntryFactory } from '#database/factories/navigation_log_entry_factory'
 import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
 import { createAdminUser } from '#tests/functional/helpers'
 import { DateTime } from 'luxon'
@@ -46,6 +47,17 @@ const CLOSE_LOG_FIELDS = [
   'seaState',
   'crewCount',
   'notes',
+]
+
+/** `FIELDS_BY_TYPE['update-navigation-log-entry']` (#725). */
+const UPDATE_LOG_ENTRY_FIELDS = [
+  'recordedAt',
+  'latitude',
+  'longitude',
+  'cogDeg',
+  'sogKn',
+  'sailConfig',
+  'note',
 ]
 
 /** `FIELDS_BY_TYPE['update-sheet-item']`. */
@@ -151,6 +163,43 @@ test.group('Conflit hors-ligne — la charge utile de la sortie', (group) => {
     // le plus discrètement si le modèle sérialisé maigrit.
     assertShowsFields(assert, data, CLOSE_LOG_FIELDS, 'close-navigation-log')
     assert.equal(data.notes, 'version du serveur')
+  })
+
+  test('« update-navigation-log-entry » porte les sept champs de son point', async ({
+    client,
+    assert,
+  }) => {
+    // Le type que #725 vient de brancher : sans carte de champs ni charge
+    // utile, la modale se serait ouverte **vide** — `rows` est un tableau vide
+    // quand `FIELDS_BY_TYPE` ne connaît pas le type.
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const log = await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      status: 'in_progress',
+    }).create()
+    const entry = await NavigationLogEntryFactory.merge({
+      navigationLogId: log.id,
+      organizationId: user.organizationId!,
+      cogDeg: 215,
+      sailConfig: 'GV 1 ris + génois',
+      note: 'version du serveur',
+    }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/navigation-logs/${log.id}/entries/${entry.id}`)
+      .loginAs(user)
+      .form({ note: 'rejeu hors-ligne', _expectedUpdatedAt: STALE })
+      .redirects(0)
+
+    response.assertFlashMessage('conflictType', 'update-navigation-log-entry')
+    const data = parseConflictData(response)
+
+    assertShowsFields(assert, data, UPDATE_LOG_ENTRY_FIELDS, 'update-navigation-log-entry')
+    assert.equal(data.cogDeg, 215)
+    assert.equal(data.sailConfig, 'GV 1 ris + génois')
+    assert.equal(data.note, 'version du serveur')
   })
 
   test('« update-sheet-item » porte les deux champs de sa ligne', async ({ client, assert }) => {
