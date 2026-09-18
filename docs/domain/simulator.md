@@ -56,7 +56,7 @@ chacun : constat #731.
 authentification. Elle crée une ligne `simulator_shares` et redirige vers sa lecture :
 
 ```
-POST /simulator/share  { input, breakdown, locale? }
+POST /simulator/share  { input, locale? }
   → token = randomBytes(6).toString('hex')     // 12 hex, aucune reprise en cas de collision
   → 302 /simulateur/r/<token>   (locale 'fr', la valeur par défaut)
      ou /simulator/r/<token>    (toute autre valeur, 'en' comprise)
@@ -66,21 +66,28 @@ POST /simulator/share  { input, breakdown, locale? }
 `input`, `breakdown`, `locale` — relues telles quelles depuis la ligne. Un jeton inconnu redirige
 **toujours** vers `/fr/simulateur-cout-entretien`, y compris depuis la route anglaise : constat #732.
 
+### Ce que le serveur recalcule
+
+- **`breakdown`.** Le payload n'en porte plus (#730) : `SimulatorShareController.store` appelle
+  `computeSimulatorCosts(input)` — le calculateur partagé de `shared/simulator_costs.ts` — et stocke
+  ce qu'il rend. Un `breakdown` encore envoyé par un client en cache est ignoré (VineJS écarte les
+  champs inconnus). Avant, les montants de l'appelant étaient stockés tels quels : la route étant
+  publique et non authentifiée, n'importe qui pouvait forger un lien attribuant à FleetAi une
+  estimation qu'elle n'a pas produite — un coût minimum négatif ou un total minimum supérieur au
+  maximum compris. Le partage reste en outre cohérent si la grille de coûts évolue.
+
 ### Ce que le serveur ne fait pas
 
-- **Il ne recalcule rien.** `breakdown` est stocké tel que l'appelant l'a envoyé ; `simulatorShareValidator`
-  n'en vérifie que la forme. Le calculateur est pourtant partagé et disponible côté serveur. Un lien
-  forgé affiche donc n'importe quel montant sous la mise en page FleetAi : constat #730.
 - **Il ne borne pas `locale`.** `vine.string().optional()` contre une colonne `varchar(10)` : onze
   caractères rendent un **500**, et une locale bidon plus courte est stockée puis servie à une page
   qui type sa prop `'en' | 'fr'` : constat #729.
 
 ### Où c'est testé
 
-| Fichier                                                       | Couvre                                                                                                                       |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide et invalide                                                                         |
-| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, les refus du validateur, et les quatre constats ci-dessus en caractérisation |
+| Fichier                                                       | Couvre                                                                                                                                                      |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide et invalide                                                                                                        |
+| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, le recalcul serveur du breakdown, les refus du validateur, et les trois constats ouverts en caractérisation |
 
 ---
 
