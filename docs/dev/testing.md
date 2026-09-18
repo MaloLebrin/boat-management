@@ -437,6 +437,42 @@ Le bodyparser détecte le type **réel** du fichier, pas le `contentType` décla
 validateur, et le test compte zéro envoi sans qu'aucune assertion ne dise pourquoi. Écrire les octets
 magiques : `Buffer.from('\xff\xd8\xff\xe0 fake jpeg', 'binary')`.
 
+## Mesurer avant d'asserter (#695)
+
+### Une issue décrit une intention, pas un comportement
+
+Sur #695, trois des scénarios demandés décrivaient un code qui n'existe pas : « place d'une autre
+organisation → 403/404 » (c'est un **302 vers `/ports`**, sans flash), « member → création autorisée,
+suppression refusée » (le member est refusé **sur les trois**), « place déjà occupée → refus » (c'est
+une **éviction**). Les écrire de mémoire aurait produit trois tests rouges, puis la tentation de
+« corriger » un code qui n'avait rien demandé.
+
+La parade tient en un fichier jetable : une spec `zz_probe.spec.ts` qui appelle les routes visées et
+`console.info` le statut, la `location`, le flash et l'état de la base. Dix minutes, puis
+`rm`. Ce que la sonde renvoie devient l'assertion ; ce qu'on croyait savoir reste dehors.
+
+### Nommer la couche qui tient vraiment l'invariant
+
+Tester que l'`organizationId` d'une place ne se lit pas du payload semblait couvrir le service. La
+mutation le dément : faire lire `payload.organizationId` au service ne change **rien** — VineJS ne
+laisse passer que les clés déclarées. L'invariant est tenu par le **validateur**.
+
+Même famille que l'unicité `(réservation, kind)` tenue par un index Postgres (#694). Dans les deux
+cas, la bonne réaction n'est pas de retirer le test — il vérifie le comportement de bout en bout,
+qui est ce qui compte — mais d'écrire dans le test **quelle couche** le porte, pour que la prochaine
+personne ne déplace pas la garde en croyant la dupliquer.
+
+### Un test de rôle a besoin de son contre-exemple
+
+Un fichier qui n'assemble que des refus reste vert si l'organisation est mal montée, si un middleware
+refuse trop large, ou si l'acteur n'a simplement pas de session. Le cas passant joué **dans le même
+décor** — ici l'admin qui crée la place que le member n'a pas pu créer — est ce qui distingue « le
+rôle est refusé » de « tout le monde est refusé ».
+
+Attention au contre-exemple qui n'en est pas un : asserter qu'un member **lit** la page du port ne
+prouve pas que sa capacité `ports.view` est lue, puisque cette route n'autorise rien du tout (#723).
+Un contre-exemple doit porter sur le mécanisme qu'on prétend mesurer.
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.
