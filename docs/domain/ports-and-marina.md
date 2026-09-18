@@ -169,6 +169,29 @@ rend `302` et laisse la position inchangée (`null` si le ponton n'avait jamais
 | `tests/functional/boats/boats_assign.spec.ts`           | l'éviction et le scoping de `spot_id`             |
 | `tests/functional/boats/boat_berth_history.spec.ts`     | les séjours à quai (#721, #722)                   |
 | `tests/functional/ports/ports_pages_contract.spec.ts`   | les 4 pages Inertia (#689)                        |
+| `tests/browser/marina_canvas.spec.ts`                   | **le geste** : drag, mode édition, affectation    |
+
+### Le geste, et non plus seulement la route (#700)
+
+`layout_positions.spec.ts` prouve les deux routes de position, leur isolation inter-organisations
+et les bornes exactes du canvas. Il ne dit rien de ce qui les atteint. Trois choses ne sont
+observables qu'au navigateur :
+
+- **le glisser-déposer persiste réellement** — on mesure `positionX/Y` en base après le geste, pas
+  des pixels ;
+- **le mode édition garde le geste** : hors édition, le même mouvement n'émet aucune requête. La
+  garde est `if (!props.editMode) return` dans `MarinaCanvas.startPontoonDrag` — et elle protège
+  aussi le clic sur une place, qui sans elle démarre un drag et capture le pointeur ;
+- **l'affectation depuis le plan** : clic sur une place → `BoatAssignModal` → `boat.spotId` en base.
+
+Trois `data-testid` en production rendent ce parcours déterministe :
+`marina-pontoon-{id}` et `marina-mouillage-{id}` sur les `<g>` déplaçables, `marina-spot-{id}` sur
+les `<g>` de place. Sans eux, un ponton ne s'atteint que par son `<text>` de nom remonté en
+`xpath=..`, et les noms de places sont tronqués à 6 caractères dans le rendu (3 pour les
+mouillages) — non uniques par construction.
+
+Le rendu est du **SVG inline**, pas un `<canvas>` : les `<g>`, `<rect>` et `<text>` sont de vrais
+nœuds DOM. C'est ce qui rend le plan adressable ; un vrai `<canvas>` ne le serait pas.
 
 ## Constats ouverts
 

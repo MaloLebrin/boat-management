@@ -3,7 +3,11 @@ import type User from '#models/user'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { BoatMaintenanceEventFactory } from '#database/factories/boat_maintenance_event_factory'
-import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
+import {
+  createAdminUser,
+  createCharterAdminUser,
+  createEnterpriseAdminUser,
+} from '#tests/functional/helpers'
 
 /**
  * Shared helpers for the browser (e2e) suite.
@@ -16,6 +20,13 @@ import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/he
  */
 
 export { createAdminUser, createEnterpriseAdminUser }
+
+/**
+ * An admin whose organization holds the `charter` module — without it,
+ * `requireModulePlan({ feature: 'reservations' })` redirects the 22 routes of
+ * the domain to `/settings/billing` before any screen renders (#700).
+ */
+export { createCharterAdminUser }
 
 /**
  * The plaintext password every factory-built user is created with

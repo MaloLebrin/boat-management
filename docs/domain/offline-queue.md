@@ -132,12 +132,39 @@ jour où l'une d'elles en posera un (#727).
 | `tests/functional/boats/inspections.spec.ts`                   | `rejectedType`, `createdResourceType`, `createdResourceId` |
 | `tests/functional/boats/maintenance_sheets.spec.ts`            | le conflit de ligne de fiche                               |
 | `tests/inertia/offline_pending_queue.spec.ts`                  | la lecture côté composant                                  |
+| `tests/browser/offline_queue.spec.ts`                          | **le raccord complet, dans un vrai navigateur** (#700)     |
 
 > ⚠️ **Le flash ne franchit pas deux appels client en test.**
 > `SESSION_DRIVER=memory` : `page.props.flash` revient vide sur la requête
 > suivante, même en reportant le cookie de session. C'est pourquoi la traversée
 > du middleware se teste au niveau du middleware. Détaillé dans
 > `docs/dev/testing.md`.
+
+### Le cycle complet, mesuré dans un navigateur (#700)
+
+Cette limite a une conséquence longtemps restée sans réponse : **les deux moitiés du protocole
+étaient prouvées séparément, jamais cousues**. Dans un vrai navigateur le cookie de session porte
+le flash, et la couture devient observable — c'est le seul endroit où elle l'est.
+
+`tests/browser/offline_queue.spec.ts` (6 cas) mesure, sur `/boats/:id?tab=navigation-logs` :
+
+| Cas                                | Ce qu'il fixe                                                                |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| création hors-ligne                | la saisie entre dans la file, **zéro ligne en base**                         |
+| retour en ligne                    | l'événement `online` relayé par `default.vue` vide la file et écrit la ligne |
+| bouton « Sync now »                | l'autre voie de déclenchement, isolée de la première                         |
+| édition serveur pendant la coupure | la modale de conflit s'ouvre et **la file se met en pause**                  |
+| « Use server version »             | l'action est abandonnée, la ligne serveur intacte                            |
+| « Keep my changes »                | l'action est ré-enfilée avec `_expectedUpdatedAt` et franchit le verrou      |
+
+Deux contraintes à connaître avant d'en écrire un autre :
+
+- **Ne jamais naviguer pendant la coupure.** Le service worker est désactivé sous test
+  (`vite.config.ts`, #496) : aucune page n'est en cache. `enqueue()` court côté client avant toute
+  requête réseau, le parcours n'en a pas besoin.
+- **Isoler le bouton de l'événement.** `setOffline(false)` émet `online`, que `default.vue` relaie
+  à `drainQueue` : pour mesurer le bouton seul, il faut fermer la page **avant** de rétablir le
+  réseau (IndexedDB est attaché au contexte, la file survit).
 
 ## Constats ouverts
 

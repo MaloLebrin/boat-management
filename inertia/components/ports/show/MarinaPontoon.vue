@@ -48,6 +48,7 @@ function handleSpotClick(spot: SpotRow) {
 
 <template>
   <g
+    :data-testid="`marina-pontoon-${pontoon.id}`"
     :transform="`translate(${x}, ${y})`"
     :style="{ cursor: editMode ? 'grab' : 'pointer' }"
     @pointerdown="$emit('pointerdown', $event)"
@@ -68,6 +69,7 @@ function handleSpotClick(spot: SpotRow) {
     <g
       v-for="(spot, i) in visibleSpots"
       :key="spot.id"
+      :data-testid="`marina-spot-${spot.id}`"
       :transform="`translate(${SLOT_GAP + i * (SLOT_W + SLOT_GAP)}, ${PIER_H + 5})`"
       style="cursor: pointer"
       @click.stop="handleSpotClick(spot)"
