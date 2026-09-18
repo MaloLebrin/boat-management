@@ -13,13 +13,15 @@ import type { SimulatorBoatInput, SimulatorCostBreakdown } from '#shared/types/s
  * consultable par n'importe qui via `/simulateur/r/:token`. Les deux routes de
  * lecture étaient couvertes ; celle qui écrit ne l'était pas.
  *
- * Quatre comportements mesurés ici sont **caractérisés, pas validés** — ils
- * portent chacun leur constat :
+ * Trois comportements mesurés ici sont encore **caractérisés, pas validés** —
+ * ils portent chacun leur constat :
  *
- * - une `locale` de onze caractères rend un **500** (#729) ;
  * - le `breakdown` n'est jamais recalculé côté serveur (#730) ;
  * - aucun throttle ne borne la route (#731) ;
  * - un jeton inconnu renvoie toujours vers la page FR (#732).
+ *
+ * La borne sur `locale` (#729), elle, est posée : les deux cas correspondants
+ * sont passés en validation dans « ce que le validateur de partage refuse ».
  */
 
 const INPUT: SimulatorBoatInput = {
@@ -161,6 +163,34 @@ test.group('Simulateur — ce que le validateur de partage refuse', (group) => {
     assert.lengthOf(await SimulatorShare.all(), 0)
   })
 
+  test('#729 — une locale de onze caractères est refusée avant l’insertion', async ({
+    client,
+    assert,
+  }) => {
+    // La colonne est un `varchar(10)` : sans borne côté validateur, la
+    // contrainte de schéma était atteinte **après** la validation et remontait
+    // en 500 de base de données sur une route publique.
+    const response = await client
+      .post('/simulator/share')
+      .json({ input: INPUT, breakdown: BREAKDOWN, locale: 'zz-ZZ-nope!' })
+      .redirects(0)
+
+    assertFieldErrors(assert, response, ['locale'])
+    assert.lengthOf(await SimulatorShare.all(), 0)
+  })
+
+  test('#729 — une locale bidon plus courte est refusée elle aussi', async ({ client, assert }) => {
+    // La page de lecture déclare `locale: 'en' | 'fr'` dans ses props : rien
+    // d'autre ne doit pouvoir être stocké, même de longueur acceptable.
+    const response = await client
+      .post('/simulator/share')
+      .json({ input: INPUT, breakdown: BREAKDOWN, locale: 'zz-ZZ' })
+      .redirects(0)
+
+    assertFieldErrors(assert, response, ['locale'])
+    assert.lengthOf(await SimulatorShare.all(), 0)
+  })
+
   test('une longueur hors bornes est refusée', async ({ client, assert }) => {
     const response = await client
       .post('/simulator/share')
@@ -172,7 +202,7 @@ test.group('Simulateur — ce que le validateur de partage refuse', (group) => {
   })
 })
 
-test.group('Simulateur — les quatre frontières que la route ne tient pas', (group) => {
+test.group('Simulateur — les trois frontières que la route ne tient pas', (group) => {
   group.each.setup(() => truncateDb())
 
   /**
@@ -180,37 +210,6 @@ test.group('Simulateur — les quatre frontières que la route ne tient pas', (g
    * comportement souhaitable. Chacun tombera le jour où son constat sera
    * traité — c'est le signal qu'on veut.
    */
-
-  test('#729 — une locale de onze caractères rend un 500', async ({ client, assert }) => {
-    // `vine.string().optional()` ne borne rien ; la colonne est `varchar(10)`.
-    // La contrainte de schéma est donc atteinte **après** la validation, et
-    // remonte en erreur de base de données brute sur une route publique.
-    const response = await client
-      .post('/simulator/share')
-      .json({ input: INPUT, breakdown: BREAKDOWN, locale: 'zz-ZZ-nope!' })
-      .redirects(0)
-
-    response.assertStatus(500)
-    assert.lengthOf(await SimulatorShare.all(), 0)
-  })
-
-  test('#729 — une locale bidon plus courte est stockée et servie', async ({ client, assert }) => {
-    // La page déclare `locale: 'en' | 'fr'` dans ses props. Le serveur peut lui
-    // en envoyer une autre : le type ment.
-    const created = await client
-      .post('/simulator/share')
-      .json({ input: INPUT, breakdown: BREAKDOWN, locale: 'zz-ZZ' })
-      .redirects(0)
-
-    created.assertStatus(302)
-    // Tout ce qui n'est pas 'fr' part sur le chemin anglais, locale inconnue
-    // comprise.
-    assert.match(String(created.header('location')), /^\/simulator\/r\//)
-
-    const read = await client.get(String(created.header('location'))).withInertia()
-    const props = read.inertiaProps as { locale: string }
-    assert.equal(props.locale, 'zz-ZZ')
-  })
 
   test('#730 — le serveur stocke les montants de l’appelant sans les recalculer', async ({
     client,
