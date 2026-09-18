@@ -57,8 +57,9 @@ export default abstract class OrgScopedPolicy extends BasePolicy {
    * L'organisation d'une ressource, ou `null` si elle n'est pas lisible.
    *
    * Deux formes couvrent le modèle de données : la colonne directe, et la
-   * relation `port` chargée — `Mouillage`, `Pontoon` et `Spot` n'ont pas de
-   * colonne `organization_id`, ils héritent celle de leur port.
+   * relation `port` chargée — `Mouillage` et `Pontoon` n'ont pas de colonne
+   * `organization_id`, ils héritent celle de leur port. `Spot`, lui, en porte
+   * une (`NOT NULL`) et passe donc par la première forme.
    */
   private organizationIdOf(resource: unknown): number | null {
     if (typeof resource !== 'object' || resource === null) return null
