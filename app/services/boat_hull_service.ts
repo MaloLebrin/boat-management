@@ -381,15 +381,15 @@ export default class BoatHullService {
     newSpotId: number | null,
     trx?: TransactionClientContract
   ) {
-    await BoatPositionHistory.query({ client: trx })
-      .where('boatId', boat.id)
-      .whereNull('endedAt')
-      .update({ endedAt: DateTime.now().toSQL() })
+    // Ne clôt que le séjour en cours : le dernier point de position du bateau
+    // n'a rien à voir avec son amarrage et reste ouvert (#722).
+    await BoatPositionHistory.closeOpenOfKind(boat.id, 'berth', trx)
 
     if (newSpotId !== null) {
       await BoatPositionHistory.create(
         {
           boatId: boat.id,
+          kind: 'berth',
           spotId: newSpotId,
           startedAt: DateTime.now(),
           endedAt: null,

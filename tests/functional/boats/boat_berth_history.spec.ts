@@ -16,19 +16,20 @@ import { createAdminUser, createStarterAdminUser } from '#tests/functional/helpe
  * à jour. Ce qu'aucun test ne regardait, c'est **la trace** que l'opération
  * laisse dans `boat_position_history` — et c'est là que ça se gâte.
  *
- * Deux caractérisations suivies par leurs issues :
- *
  * - **#722** — la table sert à la fois aux points de position et aux séjours à
- *   quai, et chacun des deux clôt « toutes les lignes ouvertes » du bateau,
- *   sans distinguer leur nature ;
- * - **#721** — la route vit hors du groupe gardé par `requirePortsPlan`, et une
- *   place étrangère y est un no-op silencieux.
+ *   quai. Chacun des deux clôturait « toutes les lignes ouvertes » du bateau
+ *   sans distinguer leur nature ; la colonne `kind` sépare désormais les deux,
+ *   et le groupe dédié ci-dessous le prouve dans les deux sens ;
+ * - **#721** — caractérisation toujours ouverte : la route vit hors du groupe
+ *   gardé par `requirePortsPlan`, et une place étrangère y est un no-op
+ *   silencieux.
  */
 
 /** Le séjour en cours d'un bateau, ou `null` s'il n'est amarré nulle part. */
 async function openStay(boatId: number): Promise<BoatPositionHistory | null> {
   return BoatPositionHistory.query()
     .where('boatId', boatId)
+    .where('kind', 'berth')
     .whereNull('endedAt')
     .orderBy('id', 'desc')
     .first()
@@ -78,7 +79,10 @@ test.group('Amarrage — la trace laissée dans l’historique', (group) => {
       .form({ spotId: second.id })
       .redirects(0)
 
-    const open = await BoatPositionHistory.query().where('boatId', boat.id).whereNull('endedAt')
+    const open = await BoatPositionHistory.query()
+      .where('boatId', boat.id)
+      .where('kind', 'berth')
+      .whereNull('endedAt')
     assert.lengthOf(open, 1, 'un bateau ne peut être à deux endroits à la fois')
     assert.equal(open[0].spotId, second.id)
 
@@ -138,20 +142,16 @@ test.group('Amarrage — la trace laissée dans l’historique', (group) => {
   })
 })
 
-test.group('⚠️ Amarrage — deux usages d’une même table qui se ferment (#722)', (group) => {
+test.group('Amarrage — les deux natures de ligne ne se ferment plus (#722)', (group) => {
   group.each.setup(() => truncateDb())
 
   /**
-   * **Caractérisation, pas validation.** `BoatPositionService.store` et
-   * `BoatHullService._logBerthChange` clôturent tous deux par
-   * `whereNull('endedAt')`, sans distinguer un point de position d'un séjour à
-   * quai. Les deux se marchent donc dessus.
+   * Les deux sens de la collision corrigée par `kind`. Chacun des deux tests
+   * échoue si l'on retire le `.where('kind', …)` de la clôture correspondante
+   * — vérifié en le retirant.
    */
 
-  test('un point GPS clôt le séjour à quai, alors que le bateau reste amarré', async ({
-    client,
-    assert,
-  }) => {
+  test('un point GPS laisse le séjour à quai ouvert', async ({ client, assert }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const spot = await makeSpot(user.organizationId!)
@@ -168,19 +168,16 @@ test.group('⚠️ Amarrage — deux usages d’une même table qui se ferment (
       .form({ latitude: 43.2965, longitude: 5.3698 })
       .redirects(0)
 
-    const stays = await BoatPositionHistory.query()
-      .where('boatId', boat.id)
-      .whereNotNull('spotId')
-      .whereNull('endedAt')
+    const stay = await openStay(boat.id)
+    assert.isNotNull(stay, 'le séjour a été clos par l’enregistrement de position')
+    assert.equal(stay!.spotId, spot.id)
 
-    assert.lengthOf(stays, 0, "le séjour a été clos par l'enregistrement de position")
-    // Et pourtant le bateau est toujours à sa place : l'écran dit vrai,
-    // l'historique ment.
+    // L'historique dit maintenant la même chose que l'écran.
     const moored = await Boat.findOrFail(boat.id)
     assert.equal(moored.spotId, spot.id)
   })
 
-  test('… et réciproquement, amarrer clôt le point de position ouvert', async ({
+  test('… et réciproquement, amarrer laisse le point de position ouvert', async ({
     client,
     assert,
   }) => {
@@ -202,10 +199,71 @@ test.group('⚠️ Amarrage — deux usages d’une même table qui se ferment (
 
     const positions = await BoatPositionHistory.query()
       .where('boatId', boat.id)
-      .whereNotNull('latitude')
+      .where('kind', 'position')
       .whereNull('endedAt')
 
-    assert.lengthOf(positions, 0)
+    assert.lengthOf(positions, 1)
+    assert.equal(Number(positions[0].latitude), 43.2965)
+  })
+
+  test('chaque nature se clôt elle-même : deux points GPS, un seul ouvert', async ({
+    client,
+    assert,
+  }) => {
+    // Le pendant du test précédent : séparer les natures ne doit pas relâcher
+    // la clôture *à l'intérieur* d'une nature.
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const spot = await makeSpot(user.organizationId!)
+
+    await client
+      .patch(`/boats/${boat.id}/assignment`)
+      .loginAs(user)
+      .form({ spotId: spot.id })
+      .redirects(0)
+    await client
+      .post(`/boats/${boat.id}/position`)
+      .loginAs(user)
+      .form({ latitude: 43.2965, longitude: 5.3698 })
+      .redirects(0)
+    await client
+      .post(`/boats/${boat.id}/position`)
+      .loginAs(user)
+      .form({ latitude: 43.3, longitude: 5.4 })
+      .redirects(0)
+
+    const open = await BoatPositionHistory.query().where('boatId', boat.id).whereNull('endedAt')
+    assert.lengthOf(open, 2, 'un séjour ouvert + un seul point de position ouvert')
+
+    const kinds = open.map((row) => row.kind).sort()
+    assert.deepEqual(kinds, ['berth', 'position'])
+
+    const all = await BoatPositionHistory.query().where('boatId', boat.id)
+    assert.lengthOf(all, 3)
+  })
+
+  test('la nature est écrite sur chaque ligne', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const spot = await makeSpot(user.organizationId!)
+
+    await client
+      .patch(`/boats/${boat.id}/assignment`)
+      .loginAs(user)
+      .form({ spotId: spot.id })
+      .redirects(0)
+    await client
+      .post(`/boats/${boat.id}/position`)
+      .loginAs(user)
+      .form({ latitude: 43.2965, longitude: 5.3698 })
+      .redirects(0)
+
+    const rows = await BoatPositionHistory.query().where('boatId', boat.id).orderBy('id')
+    assert.lengthOf(rows, 2)
+    assert.equal(rows[0].kind, 'berth')
+    assert.equal(rows[0].spotId, spot.id)
+    assert.equal(rows[1].kind, 'position')
+    assert.isNull(rows[1].spotId)
   })
 })
 

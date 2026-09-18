@@ -5,13 +5,13 @@ import { DateTime } from 'luxon'
 
 export default class BoatPositionService {
   async storeManualPosition(boat: Boat, payload: BoatPositionPayload) {
-    await BoatPositionHistory.query()
-      .where('boatId', boat.id)
-      .whereNull('endedAt')
-      .update({ endedAt: DateTime.now().toSQL() })
+    // Ne clôt que le point de position précédent : le séjour à quai en cours,
+    // s'il y en a un, ne regarde pas où le bateau est passé (#722).
+    await BoatPositionHistory.closeOpenOfKind(boat.id, 'position')
 
     await BoatPositionHistory.create({
       boatId: boat.id,
+      kind: 'position',
       spotId: null,
       latitude: payload.latitude,
       longitude: payload.longitude,
