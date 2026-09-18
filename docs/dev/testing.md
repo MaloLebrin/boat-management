@@ -473,6 +473,36 @@ Attention au contre-exemple qui n'en est pas un : asserter qu'un member **lit** 
 prouve pas que sa capacité `ports.view` est lue, puisque cette route n'autorise rien du tout (#723).
 Un contre-exemple doit porter sur le mécanisme qu'on prétend mesurer.
 
+## Un flash ne franchit pas deux appels client (#696)
+
+`SESSION_DRIVER=memory` en test. Le store vit le temps d'une requête : poser un flash puis appeler
+`client.get(...)` pour lire `page.props.flash` renvoie **un objet vide**, même en reportant le cookie
+`adonis-session` d'un appel à l'autre. C'est `response.assertFlashMessage(...)` — qui lit le store de
+_cette_ réponse — qui existe pour ça.
+
+Conséquence pratique : un test ne peut pas jouer « le contrôleur flashe, la page suivante le lit ».
+Cette traversée se teste **là où elle est observable**, en appelant
+`InertiaMiddleware.share()` sur un contexte dont la session porte les clés voulues
+(`tests/unit/middleware/inertia_offline_protocol.spec.ts`). Sans utilisateur authentifié, tous les
+résolveurs de plan, branding, notifications et assistant se court-circuitent, et les props
+paresseuses ne sont pas évaluées : le contexte factice tient en vingt lignes.
+
+Deux pièges dans ce contexte factice, tous deux rencontrés :
+
+- `flashMessages.get(key, fallback)` prend un **second argument**. `getValidationErrors` du
+  middleware de base appelle `get('inputErrorsBag', {})` et fait un `Object.entries` du résultat :
+  un faux `get` à un seul argument fait tomber tout le fichier sur une cause sans rapport ;
+- `request.header()` et `request.cookie()` sont appelés par le même chemin — les omettre donne la
+  même erreur opaque.
+
+### Asserter la présence d'une clé n'est pas asserter son contenu
+
+`response.assertFlashMessage('conflictData')` prouve que la clé est là. Le front, lui, fait
+`JSON.parse` dessus et y lit des champs nommés. Mesuré : remplacer la charge utile par
+`JSON.stringify({})` laisse **23 tests de journal de bord verts** et n'en fait tomber que ceux qui
+ouvrent réellement le JSON. Quand une valeur est consommée par du code, l'assertion doit la
+consommer aussi.
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.
