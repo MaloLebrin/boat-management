@@ -57,6 +57,7 @@ function handleSpotClick(spot: SpotRow) {
 
 <template>
   <g
+    :data-testid="`marina-mouillage-${mouillage.id}`"
     :transform="`translate(${x + RX}, ${y + RY})`"
     :style="{ cursor: editMode ? 'grab' : 'pointer' }"
     @pointerdown="handlePointerDown"
@@ -92,6 +93,7 @@ function handleSpotClick(spot: SpotRow) {
     <g
       v-for="spot in spotPositions"
       :key="spot.id"
+      :data-testid="`marina-spot-${spot.id}`"
       :transform="`translate(${spot.sx - (spot.boat ? SPOT_OCCUPIED_SIZE : SPOT_SIZE) / 2}, ${spot.sy - (spot.boat ? SPOT_OCCUPIED_SIZE : SPOT_SIZE) / 2})`"
       style="cursor: pointer"
       @click.stop="handleSpotClick(spot)"

@@ -537,6 +537,62 @@ une règle ACL, c'est une observation.
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.
 
+### Ce qu'on met dans cette suite — et ce qu'on n'y met pas (#700)
+
+**Un test navigateur ne se justifie que s'il prouve ce qu'aucun autre niveau ne peut prouver.**
+Une règle métier, un refus d'ACL, une garde de module, un IDOR, une transition de statut : tout
+cela se démontre plus vite, plus précisément et plus solidement en fonctionnel — c'est le parti
+pris de tout l'épic #686. Le redoubler ici coûte des minutes de CI pour zéro information.
+
+Ce qui reste au navigateur, et rien d'autre :
+
+| Ce que ça prouve                                                       | Exemple dans la suite                                   |
+| ---------------------------------------------------------------------- | ------------------------------------------------------- |
+| Un état du navigateur qu'aucun client HTTP n'a                         | `offline_queue.spec.ts` — `navigator.onLine`, IndexedDB |
+| Un flash qui doit survivre d'une requête à l'autre                     | le conflit hors-ligne, ci-dessous                       |
+| Une jointure de session entre deux contrôleurs                         | `simulator_to_signup.spec.ts`                           |
+| Un geste (glisser-déposer, sélecteur de fichier caché, téléchargement) | `marina_canvas.spec.ts`, `rental_navigation.spec.ts`    |
+| Qu'un humain **atteigne** un écran depuis un autre                     | `rental_navigation.spec.ts`                             |
+
+### Le conflit hors-ligne n'est mesurable qu'ici
+
+`use_offline_queue` détecte un conflit en relisant un **flash Inertia** (`conflictData` +
+`conflictType`) posé sur une 302, dans `onSuccess` du rejeu. La suite `functional` tourne avec
+`SESSION_DRIVER=memory` : le flash ne survit pas d'une requête à l'autre, et c'est précisément
+pourquoi `tests/unit/middleware/inertia_offline_protocol.spec.ts` se rabat sur un test unitaire du
+middleware. Dans un vrai navigateur, le cookie de session porte le flash — la couture devient
+observable, et seulement là.
+
+Les deux moitiés du protocole restent prouvées ailleurs (≈39 cas Vitest sur le composable avec
+`fake-indexeddb`, le verrou optimiste côté serveur par `offline_conflict_payload.spec.ts`). La
+suite navigateur ne prouve que le raccord : `navigator.onLine` → IndexedDB → événement `online` →
+rejeu → base.
+
+### Deux pièges mesurés
+
+**`locator.dragTo()` ne marche pas sur le plan de port.** Il émet `mousedown/mousemove/mouseup` ;
+`MarinaCanvas` écoute `pointerdown/pointermove/pointerup`. Il faut passer par `page.mouse`, que
+Chromium traduit en événements pointeur, avec au moins un pas intermédiaire — sans `pointermove`,
+`onSvgPointerUp` n'a aucune position à émettre.
+
+**Un test qui prouve qu'il ne s'est rien passé ne peut pas se contenter de lire la base.** Le
+contre-exemple du mode lecture (« le même geste ne déplace rien ») passait même la garde
+`editMode` retirée : le PATCH mettait une seconde à arriver, l'assertion courait avant. On observe
+donc les **requêtes sortantes** (`page.on('request', …)`) plutôt qu'un état à un instant choisi.
+C'est le pendant, côté navigateur, de la règle du témoin en base de #697.
+
+### La limite tactile : on vit avec (#700)
+
+`browserContext` est créé sans options par `@japa/browser-client`, donc `hasTouch` et `isMobile`
+ne peuvent pas être passés (détail plus bas). La question posée par #700 — vivre avec, ou ouvrir
+un contexte Playwright dédié hors `@japa/browser-client` — est tranchée : **on vit avec**.
+
+Un second harnais de test dans la même suite, avec son propre `chromium.launch()`, son propre
+cycle de vie et sa propre authentification, se paie en maintenance permanente pour un ou deux cas.
+Ce qui n'est donc **pas** mesuré, et qu'il faut savoir : les variantes `pointer-coarse:` ne
+s'activent jamais, et les cibles tactiles (#494) ne sont pas vérifiées à la taille où un doigt les
+atteint. Les breakpoints CSS, eux, le sont (`mobile_field.spec.ts`).
+
 ### Viewport mobile (#500)
 
 `tests/browser/mobile_field.spec.ts` valide les écrans terrain en 390×844 : absence de
