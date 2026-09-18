@@ -35,6 +35,12 @@ export interface FakeCloudinaryOptions {
    * simule une panne Cloudinary au milieu d'un lot.
    */
   failUploadAt?: number
+  /**
+   * Réponse de `downloadAsBuffer`. Par défaut un PDF minimal — la branche
+   * `format === 'pdf' → resourceType 'raw'` des contrôleurs de téléchargement.
+   * Passer une image permet de couvrir l'autre branche (#692).
+   */
+  download?: { buffer: Buffer; contentType: string }
 }
 
 export interface FakeCloudinary {
@@ -48,6 +54,13 @@ export interface FakeCloudinary {
   deletedFiles: Array<{ publicId: string; resourceType: 'image' | 'raw' }>
   /** Dossiers passés à `deleteFolder`, dans l'ordre. */
   deletedFolders: string[]
+  /**
+   * Appels à `downloadAsBuffer`, dans l'ordre. Sans ça, un test de
+   * téléchargement ne peut prouver ni **quel** média a été servi, ni que le
+   * `resourceType` dérivé du format est le bon — deux choses qu'un simple
+   * `assertStatus(200)` laisse passer (#692).
+   */
+  downloaded: Array<{ publicId: string; resourceType: 'image' | 'raw'; format: string }>
   restore(): void
 }
 
@@ -78,8 +91,9 @@ function fakeUploadResult(publicId: string, kind: 'image' | 'document'): Cloudin
 
 /**
  * Remplace `CloudinaryService` par un fake en mémoire. Aucun appel réseau :
- * les uploads renvoient un résultat plausible, les suppressions sont
- * enregistrées, `downloadAsBuffer` renvoie un PDF minimal.
+ * les uploads renvoient un résultat plausible, les suppressions et les
+ * téléchargements sont enregistrés, et `downloadAsBuffer` renvoie un PDF
+ * minimal — ou ce que `options.download` lui dicte.
  */
 export function swapFakeCloudinary(options: FakeCloudinaryOptions = {}): FakeCloudinary {
   const prefix = options.prefix ?? 'fake-upload'
@@ -89,7 +103,12 @@ export function swapFakeCloudinary(options: FakeCloudinaryOptions = {}): FakeClo
     deletedPublicIds: [],
     deletedFiles: [],
     deletedFolders: [],
+    downloaded: [],
     restore: restoreCloudinary,
+  }
+  const download = options.download ?? {
+    buffer: Buffer.from('%PDF-1.4 fake'),
+    contentType: 'application/pdf',
   }
   let attempts = 0
 
@@ -117,10 +136,14 @@ export function swapFakeCloudinary(options: FakeCloudinaryOptions = {}): FakeClo
         deleteFolder: async (folder: string) => {
           state.deletedFolders.push(folder)
         },
-        downloadAsBuffer: async () => ({
-          buffer: Buffer.from('%PDF-1.4 fake'),
-          contentType: 'application/pdf',
-        }),
+        downloadAsBuffer: async (
+          publicId: string,
+          resourceType: 'image' | 'raw',
+          format: string
+        ) => {
+          state.downloaded.push({ publicId, resourceType, format })
+          return download
+        },
       }) as unknown as CloudinaryService
   )
 

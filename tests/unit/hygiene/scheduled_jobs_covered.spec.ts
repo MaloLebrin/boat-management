@@ -29,10 +29,6 @@ const SCHEDULER = join(ROOT, 'start/scheduler.ts')
  */
 const EXEMPT = new Map<string, string>([
   [
-    'process_media',
-    'traitement des médias — couvert par le domaine bateau (#692), avec les fabriques Cloudinary.',
-  ],
-  [
     'process_boat_maintenance_import',
     "import CSV de maintenance — couvert par le domaine maintenance (#693), avec ses fichiers d'exemple.",
   ],

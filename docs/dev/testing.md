@@ -302,6 +302,49 @@ tout cron l'est aussi, et que l'ordre des deux crons IA est respecté. Une exemp
 un job à la demande, **jamais sur un cron** : personne ne constate l'absence de résultat d'une tâche
 planifiée.
 
+## Tester un téléchargement et son en-tête (#692)
+
+### L'assertion utile porte sur l'en-tête, pas sur l'octet
+
+`@japa/api-client` **n'expose pas le corps binaire** d'une réponse. Un test de téléchargement se juge
+donc sur trois choses : le statut, `Content-Type`, et `Content-Disposition`. Le corps sert au mieux à
+distinguer un vrai document d'une réponse vide, via `Content-Length` — et encore : le fake Cloudinary
+renvoie 13 octets, donc un seuil de taille n'a de sens que sur un PDF réellement généré
+(`crew_role_pdf.spec.ts`), pas sur un média servi par le fake.
+
+### Le nom de fichier vient de l'utilisateur
+
+Tout endpoint qui écrit `attachment; filename="${…}"` à partir d'une donnée stockée expose un
+_header splitting_. `contentDisposition()` (`shared/helpers/content_disposition.ts`) est le seul
+point qui a le droit de construire cet en-tête : il remplace les caractères de contrôle, le
+guillemet et l'antislash par `_` dans `filename`, et transmet le nom complet percent-encodé dans
+`filename*`.
+
+Son test unitaire ne suffit pas : il prouve que le helper est correct, pas que la route l'appelle.
+Le cas à écrire côté HTTP est un média dont le `originalFilename` contient `\r\n`, un guillemet et
+des accents — et l'assertion est que l'en-tête ne contient **ni CR ni LF** et qu'aucun en-tête
+parasite n'apparaît dans la réponse.
+
+⚠️ À savoir avant d'écrire la mutation de contrôle : **Node refuse lui-même un en-tête contenant un
+CRLF** (`ERR_INVALID_CHAR`). Remplacer le helper par une interpolation brute ne produit donc pas une
+réponse corrompue mais une requête qui meurt — et, dans une suite Japa, une exécution qui **se
+bloque** au lieu d'échouer. Pour une mutation à l'échec lisible, altérer plutôt l'argument passé au
+helper (retirer l'extension, par exemple).
+
+### Observer le service externe, pas seulement le statut
+
+Un `assertStatus(200)` ne dit pas **quel** média a été servi : un scoping cassé renvoie 200 sur le
+document d'autrui. `swapFakeCloudinary()` (`tests/support/fakes.ts`) enregistre les `publicId`
+téléchargés et supprimés — c'est là que se prouvent l'IDOR fermé (`downloaded` vide) et la
+suppression effective (`deletedPublicIds`).
+
+### Le piège du plan sans membership
+
+`createStarterPlanUser()` ne crée **pas** de membership. Sur une route gardée par une policy _puis_
+par le plan, un tel utilisateur est refusé par la policy — le test passe au vert sans jamais
+atteindre la garde de plan qu'il prétend vérifier. Utiliser `createStarterAdminUser()`. Même famille
+de piège que « le piège des gardes en amont » plus haut (#688).
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.
