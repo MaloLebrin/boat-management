@@ -1,6 +1,13 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import { contactThrottle, publicDiagnosisThrottle, publicPartSearchThrottle } from '#start/limiter'
+import {
+  contactThrottle,
+  publicDiagnosisThrottle,
+  publicPartSearchThrottle,
+  simulatorLeadThrottle,
+  simulatorSessionThrottle,
+  simulatorShareThrottle,
+} from '#start/limiter'
 
 const MarketingController = () => import('#controllers/marketing_controller')
 const MarketingFeaturesController = () => import('#controllers/marketing_features_controller')
@@ -98,13 +105,19 @@ router
   .as('marketing.contact.store')
   .use(contactThrottle)
 
-router.post('/simulator/session', [SimulatorController, 'saveSession']).as('simulator.session')
+router
+  .post('/simulator/session', [SimulatorController, 'saveSession'])
+  .as('simulator.session')
+  .use(simulatorSessionThrottle)
 router
   .post('/boats/from-simulator', [SimulatorController, 'createBoat'])
   .as('simulator.create_boat')
   .use(middleware.auth())
 
-router.post('/simulator/lead', [SimulatorLeadController, 'store']).as('simulator.lead')
+router
+  .post('/simulator/lead', [SimulatorLeadController, 'store'])
+  .as('simulator.lead')
+  .use(simulatorLeadThrottle)
 
 // Chat IA public de diagnostic (#602) — POST non localisés (pattern /contact),
 // la page les cible quelle que soit la locale de l'URL de rendu.
@@ -130,6 +143,9 @@ router
 
 const SimulatorShareController = () => import('#controllers/simulator_share_controller')
 
-router.post('/simulator/share', [SimulatorShareController, 'store']).as('simulator.share.store')
+router
+  .post('/simulator/share', [SimulatorShareController, 'store'])
+  .as('simulator.share.store')
+  .use(simulatorShareThrottle)
 router.get('/simulateur/r/:token', [SimulatorShareController, 'show']).as('simulator.share.show.fr')
 router.get('/simulator/r/:token', [SimulatorShareController, 'show']).as('simulator.share.show.en')

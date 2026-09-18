@@ -44,9 +44,15 @@ Référence : `start/routes/marketing.ts`
 | GET     | `/simulateur/r/:token`           | `simulator.share.show.fr` | `SimulatorShareController#show`   |
 | GET     | `/simulator/r/:token`            | `simulator.share.show.en` | `SimulatorShareController#show`   |
 
-Seule `/boats/from-simulator` porte `middleware.auth()`. **Les trois POST publics (`session`, `lead`,
-`share`) n'ont aucun throttle** — là où `/contact`, `/diagnosis-ai` et `/parts-ai` en portent un
-chacun : constat #731.
+Seule `/boats/from-simulator` porte `middleware.auth()`. Les trois POST publics portent chacun un
+throttle dédié depuis #731 — compteurs séparés, pour qu'une rafale sur l'un ne consomme pas le budget
+des autres :
+
+| Route                | Throttle (`start/limiter.ts`) | Débit           | Pourquoi                                                                                                         |
+| -------------------- | ----------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `/simulator/session` | `simulatorSessionThrottle`    | 6 / minute / IP | écrit en session, sans authentification — même débit que le diagnostic public                                    |
+| `/simulator/share`   | `simulatorShareThrottle`      | 6 / minute / IP | écrit une ligne `simulator_shares` par appel                                                                     |
+| `/simulator/lead`    | `simulatorLeadThrottle`       | 5 / 10 min / IP | le plus exposé : crée un prospect **et** déclenche deux jobs d'e-mail — même budget que le formulaire de contact |
 
 ---
 
@@ -56,21 +62,28 @@ chacun : constat #731.
 authentification. Elle crée une ligne `simulator_shares` et redirige vers sa lecture :
 
 ```
-POST /simulator/share  { input, breakdown, locale? }
+POST /simulator/share  { input, locale? }
   → token = randomBytes(6).toString('hex')     // 12 hex, aucune reprise en cas de collision
   → 302 /simulateur/r/<token>   (locale 'fr', la valeur par défaut)
      ou /simulator/r/<token>    (toute autre valeur, 'en' comprise)
 ```
 
 `GET /simulateur|simulator/r/:token` rend `marketing/simulator_share` avec quatre props — `token`,
-`input`, `breakdown`, `locale` — relues telles quelles depuis la ligne. Un jeton inconnu redirige
-**toujours** vers `/fr/simulateur-cout-entretien`, y compris depuis la route anglaise : constat #732.
+`input`, `breakdown`, `locale` — relues telles quelles depuis la ligne. Un jeton inconnu (périmé ou
+mal recopié) renvoie au simulateur de la **route empruntée** (#732), via
+`marketingPath('simulator', locale)` : `/simulateur/r/:token` → `/fr/simulateur-cout-entretien`,
+`/simulator/r/:token` → `/en/maintenance-cost-simulator`. La locale se déduit du nom de route
+(`simulator.share.show.fr` / `.en`), les deux servant la même méthode.
 
-### Ce que le serveur ne fait pas
+### Ce que le serveur recalcule
 
-- **Il ne recalcule rien.** `breakdown` est stocké tel que l'appelant l'a envoyé ; `simulatorShareValidator`
-  n'en vérifie que la forme. Le calculateur est pourtant partagé et disponible côté serveur. Un lien
-  forgé affiche donc n'importe quel montant sous la mise en page FleetAi : constat #730.
+- **`breakdown`.** Le payload n'en porte plus (#730) : `SimulatorShareController.store` appelle
+  `computeSimulatorCosts(input)` — le calculateur partagé de `shared/simulator_costs.ts` — et stocke
+  ce qu'il rend. Un `breakdown` encore envoyé par un client en cache est ignoré (VineJS écarte les
+  champs inconnus). Avant, les montants de l'appelant étaient stockés tels quels : la route étant
+  publique et non authentifiée, n'importe qui pouvait forger un lien attribuant à FleetAi une
+  estimation qu'elle n'a pas produite — un coût minimum négatif ou un total minimum supérieur au
+  maximum compris. Le partage reste en outre cohérent si la grille de coûts évolue.
 
 ### Ce que le serveur borne
 
@@ -81,10 +94,11 @@ POST /simulator/share  { input, breakdown, locale? }
 
 ### Où c'est testé
 
-| Fichier                                                       | Couvre                                                                                                                                      |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide et invalide                                                                                        |
-| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, les refus du validateur (locale comprise), et les trois constats ouverts en caractérisation |
+| Fichier                                                        | Couvre                                                                                                                        |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `tests/functional/simulator/simulator_share.spec.ts`           | les deux routes de lecture, jeton valide, et la cible de repli par locale sur jeton inconnu                                   |
+| `tests/functional/simulator/simulator_share_creation.spec.ts`  | la création, l'aller-retour création → lecture, le recalcul serveur du breakdown et les refus du validateur (locale comprise) |
+| `tests/functional/simulator/simulator_public_throttle.spec.ts` | la borne des trois POST publics et la séparation de leurs compteurs                                                           |
 
 ---
 
