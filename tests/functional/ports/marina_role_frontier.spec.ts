@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import Pontoon from '#models/pontoon'
 import Spot from '#models/spot'
+import { MouillageFactory } from '#database/factories/mouillage_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { SpotFactory } from '#database/factories/spot_factory'
@@ -16,19 +17,17 @@ import type { ApiClient, ApiResponse } from '@japa/api-client'
 import type User from '#models/user'
 
 /**
- * La frontière des rôles sur la marina, au niveau HTTP (#695).
+ * La frontière des rôles sur la marina, au niveau HTTP (#695, #719).
  *
  * Tout se joue dans une organisation **Entreprise** : sans cela, le refus
  * observé serait celui de `requirePortsPlan`, qui passe avant la policy, et le
  * fichier changerait de sujet sans rien dire. Le dernier cas met les deux
  * refus côte à côte, justement parce qu'ils se ressemblent.
  *
- * ⚠️ Le cas `member` est une **caractérisation** (#719) : la matrice de
- * permissions lui accorde `spots.view`, `spots.create` et `spots.edit`, mais
- * aucune route ne lit `SpotPolicy` — `SpotsController` autorise via
- * `PortPolicy`, donc `ports.create/edit/delete`, qui sont admin-only. Ces
- * capacités sont inatteignables, et le member est refusé sur les trois
- * écritures. Ces tests tomberont le jour où #719 sera tranchée.
+ * Le member tient ce que la matrice lui promet (#719) : les routes de place
+ * lisent `SpotPolicy`, donc `spots.create` et `spots.edit`, qu'il a. La
+ * suppression (`spots.delete`) et toute l'infrastructure — ports, pontons,
+ * mouillages, positions — restent admin-only via `PortPolicy`.
  */
 
 /** Le refus d'autorisation, mesuré : 302 vers l'accueil marketing. */
@@ -40,19 +39,21 @@ const PLAN_UPSELL_PATH = '/settings/billing'
 interface MarinaDecor {
   portId: number
   pontoonId: number
+  mouillageId: number
   spotId: number
 }
 
 async function seedMarina(organizationId: number): Promise<MarinaDecor> {
   const port = await PortFactory.merge({ organizationId }).create()
   const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
+  const mouillage = await MouillageFactory.merge({ portId: port.id }).create()
   const spot = await SpotFactory.merge({
     organizationId,
     pontoonId: pontoon.id,
     name: 'B12',
   }).create()
 
-  return { portId: port.id, pontoonId: pontoon.id, spotId: spot.id }
+  return { portId: port.id, pontoonId: pontoon.id, mouillageId: mouillage.id, spotId: spot.id }
 }
 
 /** Tout ce que ces routes savent écrire, photographié d'un bloc. */
@@ -71,22 +72,8 @@ interface Face {
   run: (client: ApiClient, user: User, decor: MarinaDecor) => Promise<ApiResponse>
 }
 
-/** Les cinq écritures du domaine qu'un non-admin peut tenter. */
-const WRITE_FACES: Face[] = [
-  {
-    name: 'créer une place sous un ponton',
-    run: (client, user, decor) =>
-      client
-        .post(`/ports/${decor.portId}/pontoons/${decor.pontoonId}/spots`)
-        .loginAs(user)
-        .form({ name: 'PIRATE' })
-        .redirects(0),
-  },
-  {
-    name: 'renommer une place',
-    run: (client, user, decor) =>
-      client.put(`/spots/${decor.spotId}`).loginAs(user).form({ name: 'PIRATE' }).redirects(0),
-  },
+/** Les écritures que la matrice réserve à l'admin. */
+const ADMIN_ONLY_FACES: Face[] = [
   {
     name: 'supprimer une place',
     run: (client, user, decor) =>
@@ -112,22 +99,72 @@ const WRITE_FACES: Face[] = [
   },
 ]
 
-test.group('Marina — un member est refusé sur toutes les écritures (#719)', (group) => {
+test.group('Marina — un member gère les places, pas l’infrastructure (#719)', (group) => {
   group.each.setup(() => truncateDb())
 
-  for (const face of WRITE_FACES) {
+  async function memberWithMarina() {
+    const admin = await createEnterpriseAdminUser()
+    const member = await createMemberUser(admin.organizationId!)
+    const decor = await seedMarina(admin.organizationId!)
+    return { member, decor }
+  }
+
+  test('un member crée une place sous un ponton', async ({ client, assert }) => {
+    const { member, decor } = await memberWithMarina()
+
+    const response = await client
+      .post(`/ports/${decor.portId}/pontoons/${decor.pontoonId}/spots`)
+      .loginAs(member)
+      .form({ name: 'B13' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+    const created = await Spot.findByOrFail('name', 'B13')
+    assert.equal(created.pontoonId, decor.pontoonId)
+  })
+
+  test('un member crée une place sous un mouillage', async ({ client, assert }) => {
+    const { member, decor } = await memberWithMarina()
+
+    const response = await client
+      .post(`/ports/${decor.portId}/mouillages/${decor.mouillageId}/spots`)
+      .loginAs(member)
+      .form({ name: 'M1' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+    const created = await Spot.findByOrFail('name', 'M1')
+    assert.equal(created.mouillageId, decor.mouillageId)
+  })
+
+  test('un member renomme une place', async ({ client, assert }) => {
+    const { member, decor } = await memberWithMarina()
+
+    const response = await client
+      .put(`/spots/${decor.spotId}`)
+      .loginAs(member)
+      .form({ name: 'B12-bis' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('error')
+    const spot = await Spot.findOrFail(decor.spotId)
+    assert.equal(spot.name, 'B12-bis')
+  })
+
+  for (const face of ADMIN_ONLY_FACES) {
     test(`« ${face.name} » est refusé à un member`, async ({ client, assert }) => {
-      const admin = await createEnterpriseAdminUser()
-      const member = await createMemberUser(admin.organizationId!)
-      const decor = await seedMarina(admin.organizationId!)
+      const { member, decor } = await memberWithMarina()
       const before = await marinaState()
 
       const response = await face.run(client, member, decor)
 
       // Le refus d'autorisation éjecte vers `/`, la page d'accueil **marketing**,
       // dont le layout ne rend aucun toast : le message ne parvient jamais à
-      // l'utilisateur. Même défaut que celui corrigé en #456 pour le gating de
-      // module, resté entier sur le chemin des autorisations.
+      // l'utilisateur. C'est pourquoi le front ne propose plus ces actions à
+      // qui ne peut pas les faire (`SpotsManager`, #719).
       response.assertStatus(302)
       response.assertHeader('location', '/')
       response.assertFlashMessage('error', ACCESS_DENIED)
@@ -140,54 +177,40 @@ test.group('Marina — un member est refusé sur toutes les écritures (#719)', 
     })
   }
 
-  test('il a pourtant les capacités `spots.*` que la matrice lui promet', async ({
+  test('la place d’une autre organisation reste introuvable pour un member', async ({
     client,
     assert,
   }) => {
-    // Le cœur de #719 : la capacité est bien accordée côté matrice, elle n'est
-    // simplement lue par aucune route. C'est ce test qui nomme la divergence —
-    // les cinq précédents ne montrent qu'un refus, sans dire pourquoi il
-    // surprend.
-    const admin = await createEnterpriseAdminUser()
-    const member = await createMemberUser(admin.organizationId!)
+    // La capacité ne suffit pas : `PUT`/`DELETE /spots/:id` n'ont aucun port
+    // dans l'URL, et c'est le scoping du service qui les isole.
+    const { member } = await memberWithMarina()
+    const otherAdmin = await createEnterpriseAdminUser()
+    const foreign = await seedMarina(otherAdmin.organizationId!)
+    const before = await marinaState()
 
-    assert.isTrue(
-      await member.hasPermission(member.organizationId!, 'spots.create'),
-      'la matrice a changé : ce fichier doit être relu avec #719'
-    )
-    assert.isFalse(await member.hasPermission(member.organizationId!, 'ports.create'))
-
-    // Et c'est `ports.create` — via `PortPolicy` — que `SpotsController` lit.
-    const decor = await seedMarina(admin.organizationId!)
     const response = await client
-      .post(`/ports/${decor.portId}/pontoons/${decor.pontoonId}/spots`)
+      .put(`/spots/${foreign.spotId}`)
       .loginAs(member)
       .form({ name: 'PIRATE' })
       .redirects(0)
 
     response.assertStatus(302)
-    assert.lengthOf(await Spot.all(), 1)
+    response.assertHeader('location', '/ports')
+    assert.deepEqual(await marinaState(), before)
   })
 
-  test("l'admin de la même organisation, lui, écrit sans difficulté", async ({
-    client,
-    assert,
-  }) => {
+  test("l'admin de la même organisation supprime une place", async ({ client, assert }) => {
     // Le contre-exemple indispensable : sans lui, un refus **global** — un
     // middleware trop large, une organisation mal montée — passerait pour la
     // frontière de rôle qu'on croit mesurer.
     const admin = await createEnterpriseAdminUser()
     const decor = await seedMarina(admin.organizationId!)
 
-    const response = await client
-      .post(`/ports/${decor.portId}/pontoons/${decor.pontoonId}/spots`)
-      .loginAs(admin)
-      .form({ name: 'B13' })
-      .redirects(0)
+    const response = await client.delete(`/spots/${decor.spotId}`).loginAs(admin).redirects(0)
 
     response.assertStatus(302)
     response.assertFlashMissing('error')
-    assert.lengthOf(await Spot.all(), 2)
+    assert.lengthOf(await Spot.all(), 0)
   })
 })
 
@@ -281,13 +304,15 @@ test.group('Marina — les deux refus qu’il ne faut pas confondre', (group) =>
     byPlan.assertStatus(302)
     byPlan.assertHeader('location', PLAN_UPSELL_PATH)
 
+    // Le refus de rôle se mesure sur un mechanic : depuis #719, un member a
+    // `spots.create` et cette même requête lui réussirait.
     const enterpriseAdmin = await createEnterpriseAdminUser()
-    const member = await createMemberUser(enterpriseAdmin.organizationId!)
+    const mechanic = await createMechanicUser(enterpriseAdmin.organizationId!)
     const enterpriseDecor = await seedMarina(enterpriseAdmin.organizationId!)
 
     const byRole = await client
       .post(`/ports/${enterpriseDecor.portId}/pontoons/${enterpriseDecor.pontoonId}/spots`)
-      .loginAs(member)
+      .loginAs(mechanic)
       .form({ name: 'PIRATE' })
       .redirects(0)
 

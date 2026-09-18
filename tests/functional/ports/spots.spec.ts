@@ -15,9 +15,10 @@ import { createEnterpriseAdminUser } from '#tests/functional/helpers'
  *
  * Deux d'entre elles — `PUT /spots/:id` et `DELETE /spots/:id` — vivent **hors
  * du préfixe `/ports/:portId`**. Elles n'ont donc aucun port dans l'URL pour se
- * raccrocher : leur isolation multi-tenant repose entièrement sur
- * `SpotService.getForUserOrFail`, et pas — contrairement à ce qu'annonçait
- * l'issue — sur `SpotPolicy`, qu'aucun contrôleur n'instancie (#719).
+ * raccrocher : leur isolation multi-tenant repose d'abord sur
+ * `SpotService.getForUserOrFail`, qui charge la place avant toute autorisation.
+ * Le `sameOrg` de `SpotPolicy`, branchée depuis #719, n'est qu'une seconde
+ * ligne : une place étrangère n'arrive jamais jusqu'à elle.
  *
  * Chaque refus est asserté **avec un témoin** : la redirection seule ne prouve
  * rien, la requête aurait pu écrire puis rediriger.

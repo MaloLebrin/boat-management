@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BoatAssignModal from '~/components/ports/modals/BoatAssignModal.vue'
 import SpotFormModal from '~/components/ports/modals/SpotFormModal.vue'
+import { usePermissions } from '~/composables/use_permissions'
 import { useT } from '~/composables/use_t'
 import { routes } from '~/utils/routes'
 import type { BoatOption, SpotRow } from '~/types/port'
@@ -20,6 +21,9 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+// Chaque bouton suit la capacité que sa route lit (#719) : un member crée et
+// renomme, seul l'admin supprime ; amarrer passe par `BoatPolicy.edit`.
+const { can } = usePermissions()
 
 const showSpotModal = ref(false)
 const editingSpot = ref<{ id: number; name: string; description: string | null } | null>(null)
@@ -84,7 +88,7 @@ function handleAssignConfirm({ spotId, boatId }: { spotId: number; boatId: numbe
   <div class="space-y-3">
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-semibold text-fg">{{ t('ports.spots.title') }}</h3>
-      <BaseButton size="sm" variant="secondary" @click="handleAddSpot">
+      <BaseButton v-if="can('spots.create')" size="sm" variant="secondary" @click="handleAddSpot">
         <PlusIcon class="h-4 w-4" />
         {{ t('ports.spots.add') }}
       </BaseButton>
@@ -104,15 +108,30 @@ function handleAssignConfirm({ spotId, boatId }: { spotId: number; boatId: numbe
           <p v-else class="text-xs text-fg-subtle">{{ t('ports.spots.free') }}</p>
         </div>
         <div class="flex items-center gap-1 ml-2">
-          <BaseButton variant="ghost" size="sm" @click="handleAssignSpot(spot)">
+          <BaseButton
+            v-if="can('boats.edit')"
+            variant="ghost"
+            size="sm"
+            @click="handleAssignSpot(spot)"
+          >
             <LinkIcon class="h-4 w-4" />
             <span class="sr-only">{{ t('ports.spots.assign') }}</span>
           </BaseButton>
-          <BaseButton variant="ghost" size="sm" @click="handleEditSpot(spot)">
+          <BaseButton
+            v-if="can('spots.edit')"
+            variant="ghost"
+            size="sm"
+            @click="handleEditSpot(spot)"
+          >
             <PencilIcon class="h-4 w-4" />
             <span class="sr-only">{{ t('common.edit') }}</span>
           </BaseButton>
-          <BaseButton variant="ghost" size="sm" @click="spotDeletion.ask(spot)">
+          <BaseButton
+            v-if="can('spots.delete')"
+            variant="ghost"
+            size="sm"
+            @click="spotDeletion.ask(spot)"
+          >
             <TrashIcon class="h-4 w-4 text-danger" />
             <span class="sr-only">{{ t('common.delete') }}</span>
           </BaseButton>

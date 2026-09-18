@@ -58,7 +58,7 @@ ajoutée ailleurs passerait inaperçue.
 > redescendue en Starter continue donc d'amarrer sur ses places héritées, alors
 > que toute la section lui est fermée. Constat #721.
 
-## Autorisations : la policy appliquée n'est pas celle qu'on croit
+## Autorisations
 
 | Route                                   | Policy réellement appelée                 | Capacité lue               |
 | --------------------------------------- | ----------------------------------------- | -------------------------- |
@@ -67,18 +67,21 @@ ajoutée ailleurs passerait inaperçue.
 | `GET /ports/:id/edit`, `PUT /ports/:id` | `PortPolicy.edit`                         | `ports.edit`               |
 | `DELETE /ports/:id`                     | `PortPolicy.delete`                       | `ports.delete`             |
 | pontons, mouillages, positions          | `PortPolicy.create` / `.edit` / `.delete` | idem                       |
-| **les 4 routes de place**               | **`PortPolicy`**, pas `SpotPolicy`        | `ports.create/edit/delete` |
+| les 4 routes de place                   | `SpotPolicy.create` / `.edit` / `.delete` | `spots.create/edit/delete` |
 
-Deux conséquences à connaître avant de lire la matrice de `auth-acl.md` :
+Un `member` gère donc les **places** de son port — il les crée et les renomme —
+mais pas l'infrastructure qui les porte : ports, pontons, mouillages et
+positions restent admin-only, comme la suppression d'une place
+(`spots.delete`). `PUT` et `DELETE /spots/:id` chargent la place **avant**
+d'autoriser, pour que `SpotPolicy` vérifie aussi `sameOrg` sur la ressource.
+Le gestionnaire de places (`SpotsManager`) n'affiche que les boutons dont
+l'utilisateur a la capacité (#719).
 
-- `SpotPolicy` existe, a sa spec unitaire, et **n'est instanciée par aucun
-  contrôleur**. Les capacités `spots.view/create/edit` accordées au rôle
-  `member` sont donc inatteignables : un member est refusé sur les trois
-  écritures de place. Constat #719 ;
-- `index` et `show` n'autorisent rien du tout. Seul le scoping d'organisation
-  des services les protège : un `mechanic` — et même un `boat_owner`, dont le
-  jeu de capacités est volontairement vide — lit la page du port, ses places, et
-  la liste nominative des bateaux de l'organisation. Constat #723.
+`index` et `show`, eux, n'autorisent rien du tout. Seul le scoping
+d'organisation des services les protège : un `mechanic` — et même un
+`boat_owner`, dont le jeu de capacités est volontairement vide — lit la page du
+port, ses places, et la liste nominative des bateaux de l'organisation.
+Constat #723.
 
 Les deux refus ne se ressemblent qu'en apparence : une **lecture** refusée rend
 un `403`, une **écriture** refusée renvoie `302 → /`, la page d'accueil
@@ -165,6 +168,7 @@ rend `302` et laisse la position inchangée (`null` si le ponton n'avait jamais
 | `tests/functional/ports/spots.spec.ts`                  | les 4 routes de place, hiérarchie et isolation    |
 | `tests/functional/ports/spot_deletion_frontier.spec.ts` | l'asymétrie de suppression (#720)                 |
 | `tests/functional/ports/marina_role_frontier.spec.ts`   | member, mechanic, boat_owner (#719, #723)         |
+| `tests/inertia/spots_manager_permissions.spec.ts`       | les boutons de place gardés par capacité (#719)   |
 | `tests/functional/ports/layout_positions.spec.ts`       | isolation et bornes du glisser-déposer            |
 | `tests/functional/boats/boats_assign.spec.ts`           | l'éviction et le scoping de `spot_id`             |
 | `tests/functional/boats/boat_berth_history.spec.ts`     | les séjours à quai (#721, #722)                   |
@@ -174,7 +178,6 @@ rend `302` et laisse la position inchangée (`null` si le ponton n'avait jamais
 
 | #    | Constat                                                                                         |
 | ---- | ----------------------------------------------------------------------------------------------- |
-| #719 | `SpotPolicy` n'est appelée nulle part ; les capacités `spots.*` du member sont inatteignables   |
 | #720 | `DELETE /spots/:id` démarre un bateau en silence                                                |
 | #721 | `PATCH /boats/:id/assignment` hors de la garde de plan, et no-op silencieux sur place étrangère |
 | #722 | `boat_position_history` : positions et séjours se ferment mutuellement                          |

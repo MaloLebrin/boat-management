@@ -101,7 +101,7 @@ Chaque action sensible d'une ressource est identifiée par une **capacité** nom
 | Entretien                  | `maintenance.view`, `maintenance.create`, `maintenance.edit`                              | `maintenance.delete`                                                         |
 | Factures/devis             | `invoices.create`, `invoices.update`                                                      | `invoices.delete`                                                            |
 | Tarification               | `pricing_seasons.create`, `pricing_seasons.update`                                        | `pricing_seasons.delete`                                                     |
-| Spots                      | `spots.view`, `spots.create`, `spots.edit` ⚠⚠                                             | `spots.delete` ⚠⚠                                                            |
+| Spots                      | `spots.view`, `spots.create`, `spots.edit`                                                | `spots.delete`                                                               |
 | Ports                      | `ports.view`                                                                              | `ports.create`, `ports.edit`, `ports.delete` ⚠                               |
 | Mouillages                 | `mouillages.view`                                                                         | `mouillages.create`, `mouillages.edit`, `mouillages.delete` ⚠                |
 | Abonnement                 | `subscription.view`                                                                       | `subscription.manage`                                                        |
@@ -109,7 +109,7 @@ Chaque action sensible d'une ressource est identifiée par une **capacité** nom
 
 `*` `boats.reservations.delete` porte en plus une règle métier propre à la ressource : un member ne peut supprimer que les réservations **non confirmées** (`reservation.status !== 'confirmed'`), vérifiée après la capacité dans `BoatPolicy.deleteReservation`.
 
-`⚠⚠` **Les quatre capacités `spots.*` ne sont lues par aucune route** (#719). `SpotsController` autorise ses quatre routes via `PortPolicy` — donc `ports.create`, `ports.edit` et `ports.delete`, admin-only. `SpotPolicy` existe et a sa spec unitaire, mais aucun contrôleur ne l'instancie : un member est refusé sur la création, le renommage et la suppression d'une place, malgré ce que promet cette ligne. La divergence est figée par `tests/functional/ports/marina_role_frontier.spec.ts` et suivie par #719 — la trancher, c'est choisir laquelle des deux colonnes a raison.
+Les places (`spots.*`) sont lues par `SpotPolicy` depuis #719 : un member crée et renomme une place, seul l'admin la supprime. L'infrastructure qui les porte — ports, pontons, mouillages et leurs positions — reste sous `PortPolicy`, donc admin-only (voir `⚠` ci-dessous).
 
 `⚠` Ports et Mouillages sont **admin-only sur create/edit/delete** (contrairement à toutes les autres ressources, où member peut créer/éditer et seul delete est admin-only). C'est un choix hérité, préservé tel quel lors de l'introduction des capacités — pas encore tranché s'il s'agit d'une règle métier voulue ou d'un oubli historique. `PortPolicy.edit/delete` et `MouillagePolicy.edit/delete` vérifient malgré tout `sameOrg` (comme `view`) en plus de la capacité, par défense en profondeur : le jour où `ports.edit`/`mouillages.edit` seraient déplacées vers les capacités partagées, l'isolation multi-tenant reste garantie sans action supplémentaire.
 
