@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { APP_LOCALES } from '#shared/helpers/locale_path'
 
 export const simulatorShareValidator = vine.compile(
   vine.object({
@@ -25,6 +26,10 @@ export const simulatorShareValidator = vine.compile(
       totalMin: vine.number(),
       totalMax: vine.number(),
     }),
-    locale: vine.string().optional(),
+    // Bornée à la paire de locales de l'app (#729) : la colonne est un
+    // `varchar(10)`, et la page de lecture type sa prop `'en' | 'fr'`. Un
+    // `vine.string()` laissait passer onze caractères — 500 à l'insertion — et
+    // une locale bidon plus courte jusqu'à la prop.
+    locale: vine.enum(APP_LOCALES).optional(),
   })
 )
