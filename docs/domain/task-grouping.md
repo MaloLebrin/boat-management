@@ -57,7 +57,9 @@ PlanningTaskGroup.vue  ← carte pliable par groupe
 
 ### Entrée / sortie
 
-- **Entrée** : `PlanningTask[]` — toutes les tâches de l'organisation (open + done)
+- **Entrée** : `PlanningTask[]` — en pratique **`plannedTasks` uniquement**, c'est-à-dire les tâches
+  ouvertes qui ne sont ni en retard ni bientôt dues (voir §4). Le service lui-même ne filtre pas sur
+  `status` : c'est l'appelant qui ne lui passe que des tâches ouvertes.
 - **Sortie** : `TaskGroup[]` — groupes d'au moins 2 tâches
 
 ### Critères d'inclusion
@@ -67,10 +69,13 @@ Une tâche est candidate au clustering si et seulement si :
 | Condition | Valeur attendue |
 | --------- | --------------- |
 | `kind`    | `'date'`        |
-| `status`  | `'open'`        |
 | `dueAt`   | non null        |
 
-Les tâches `kind === 'hours'` (déclenchées par heures moteur) et les tâches `done` sont **exclues**.
+Les tâches `kind === 'hours'` (déclenchées par heures moteur) sont **exclues** par le service.
+
+⚠️ Le service **ne lit jamais `status`**. Les tâches `done` sont absentes parce que l'appelant ne les
+lui transmet pas, pas parce qu'il les écarte. Passer une autre collection au grouper regrouperait
+donc des tâches terminées sans garde-fou.
 
 ### Critères de regroupement
 
@@ -88,22 +93,29 @@ Deux tâches sont dans le même groupe si elles partagent :
 3. Balayage glissant avec deux pointeurs i, j :
    - seed = sorted[i]
    - bucket = [seed]
-   - latestDate = seed.dueAt
-   - tant que sorted[j] a même boatId/subject ET dueAt - latestDate ≤ 7 jours :
+   - tant que sorted[j] a même boatId/subject ET dueAt - seed.dueAt ≤ 7 jours :
        ajouter sorted[j] au bucket
-       latestDate = sorted[j].dueAt
        j++
    - si bucket.length >= 2 : émettre un TaskGroup
    - i = j
 ```
 
-La comparaison de proximité est faite avec `DateTime.diff(latestDate, 'days').days` (Luxon) — ce qui mesure l'écart entre la dernière tâche déjà groupée et la suivante candidate, et non entre seed et candidate. Cela permet de constituer des groupes chaînés (tâche A→B à 4 jours, B→C à 4 jours → groupe ABC de 8 jours de span) tant que chaque saut individuel est ≤ 7 jours.
+La comparaison de proximité est faite avec `candidateDate.diff(seedDate, 'days').days` : `seedDate`
+est calculé **une fois avant la boucle** et n'est jamais réaffecté. La fenêtre est donc **ancrée sur
+la première tâche du groupe**, jamais glissante.
+
+⚠️ Conséquence, contre-intuitive et vérifiée par un test unitaire dédié
+(`does not transitively group A=j1 B=j5 C=j11`) : le regroupement **n'est pas transitif**, et le span
+d'un groupe **ne peut jamais dépasser 7 jours**. Trois tâches à J+1, J+5 et J+11 donnent un groupe de
+deux (J+1, J+5), pas un groupe de trois. Une version antérieure de ce document décrivait une fenêtre
+chaînée produisant des groupes de 8 jours de span : c'était faux, et un tel groupe est impossible.
 
 ### Structure d'un `TaskGroup`
 
 ```ts
 interface TaskGroup {
-  id: string // "<boatId>-<subject>-<earliestDueAt>" — stable dans la session
+  id: string // `${seed.boatId}-${seed.subject}-${seed.dueAt}` — le seed étant le plus ancien du
+  // groupe (tri ASC), cela revient à `<boatId>-<subject>-<earliestDueAt>`
   subject: string
   boatId: number
   boatName: string
@@ -155,9 +167,11 @@ interface PlanningResult {
   overdueTasks: PlanningTask[]
   soonTasks: PlanningTask[]
   plannedTasks: PlanningTask[]
-  doneTasks: PlanningTask[]
-  groups: TaskGroup[] // ← ajouté
-  canGroupTasks: boolean // ← ajouté
+  undatedTasks: PlanningTask[]
+  doneTasks: PlanningTask[] // plafonné à 20, trié par `updatedAt` décroissant
+  doneTasksTotal: number // le vrai total, que le plafond ci-dessus masque
+  groups: TaskGroup[]
+  canGroupTasks: boolean
 }
 ```
 
@@ -170,17 +184,20 @@ interface PlanningResult {
 Aucune logique ajoutée — passe-plat transparent vers Inertia :
 
 ```ts
-const { tasks, overdueTasks, soonTasks, plannedTasks, doneTasks, groups, canGroupTasks } =
-  await this.planningService.getPlanningForOrg(user)
-
-return inertia.render('planning/index', {
+const {
   tasks,
   overdueTasks,
   soonTasks,
   plannedTasks,
+  undatedTasks,
   doneTasks,
-  groups, // TaskGroup[]
-  canGroupTasks, // boolean
+  doneTasksTotal,
+  groups,
+  canGroupTasks,
+} = await this.planningService.getPlanningForOrg(user)
+
+return inertia.render('planning/index', {
+  /* les neuf props ci-dessus */
 })
 ```
 
@@ -295,21 +312,29 @@ Fichiers : `resources/lang/fr/planning.json`, `resources/lang/en/planning.json`.
 
 ## 10. Tests
 
-`tests/unit/task_grouping_service.spec.ts` — 11 cas Japa.
+`tests/unit/task_grouping_service.spec.ts` — 11 cas Japa sur le service lui-même, et
+`tests/functional/planning/task_grouping.spec.ts` — 8 cas sur l'écran, ajoutés par #693 (gating de
+plan, groupe effectif, et le piège des échéances proches décrit ci-dessous).
 
-| Cas                                             | Résultat attendu                           |
-| ----------------------------------------------- | ------------------------------------------ |
-| Tableau vide                                    | `[]`                                       |
-| Une seule tâche                                 | `[]` (min. 2 tâches pour former un groupe) |
-| 2 tâches même sujet, 4 jours d'écart            | 1 groupe de 2 tâches                       |
-| 2 tâches même sujet, 8 jours d'écart            | `[]`                                       |
-| 2 tâches sujets différents, 1 jour d'écart      | `[]`                                       |
-| 2 tâches bateaux différents, même sujet         | `[]`                                       |
-| 2 tâches `kind === 'hours'`                     | `[]`                                       |
-| 2 tâches `status === 'done'`                    | `[]`                                       |
-| 2 tâches même sujet, exactement 7 jours d'écart | 1 groupe (borne inclusive)                 |
-| 4 tâches (2×engine + 2×hull), 2 jours d'écart   | 2 groupes indépendants                     |
-| Vérification du format de l'`id`                | `"<boatId>-<subject>-<earliestDueAt>"`     |
+| Cas                                             | Résultat attendu                                    |
+| ----------------------------------------------- | --------------------------------------------------- |
+| Tableau vide                                    | `[]`                                                |
+| Une seule tâche                                 | `[]` (min. 2 tâches pour former un groupe)          |
+| 2 tâches même sujet, 4 jours d'écart            | 1 groupe de 2 tâches                                |
+| 2 tâches même sujet, 8 jours d'écart            | `[]`                                                |
+| 2 tâches sujets différents, 1 jour d'écart      | `[]`                                                |
+| 2 tâches bateaux différents, même sujet         | `[]`                                                |
+| 2 tâches `kind === 'hours'`                     | `[]`                                                |
+| 2 tâches même sujet, exactement 7 jours d'écart | 1 groupe (borne inclusive)                          |
+| 3 tâches à J+1, J+5 et J+11                     | 1 groupe de 2 — le regroupement n'est pas transitif |
+| 4 tâches (2×engine + 2×hull), 2 jours d'écart   | 2 groupes indépendants                              |
+| Vérification du format de l'`id`                | `"<boatId>-<subject>-<earliestDueAt>"`              |
+
+⚠️ **Piège pour tout test fonctionnel du regroupement.** Le service ne reçoit que `plannedTasks`
+(§4). Deux tâches à J+3 et J+5, même bateau et même sujet, sont dans `soonTasks` et ne produisent
+donc **aucun groupe** : un test écrit avec ces dates passerait au vert en ne prouvant rien. Il faut
+des échéances au-delà de la borne de 30 jours du seau « bientôt dû » — d'où les J+60 de
+`tests/functional/planning/task_grouping.spec.ts`.
 
 ---
 

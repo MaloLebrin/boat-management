@@ -345,6 +345,45 @@ par le plan, un tel utilisateur est refusé par la policy — le test passe au v
 atteindre la garde de plan qu'il prétend vérifier. Utiliser `createStarterAdminUser()`. Même famille
 de piège que « le piège des gardes en amont » plus haut (#688).
 
+## Écrire un test qui ne se confirme pas lui-même (#693)
+
+### Assertion littérale plutôt que formule rejouée
+
+Un test qui calcule sa valeur attendue avec **la même expression que le code** ne teste que sa propre
+arithmétique. `markDone` calcule la prochaine échéance par `doneAt.plus({ months: n })` ; un test qui
+assert `doneAt.plus({ months: 12 })` reste vrai quelle que soit la valeur réelle de `doneAt`. Écrire
+la date en clair (`'2027-02-10'`) coûte une ligne et donne un échec qui **nomme** la date lue et la
+date voulue.
+
+Le contre-exemple utile : ce test-là attrapait bien un changement de base de calcul
+(`dueAt` au lieu de `doneAt`), parce que les deux dates diffèrent dans sa fixture. Mais il ne le doit
+qu'à sa fixture, pas à son assertion.
+
+### Vérifier le seuil, pas le milieu
+
+Un test d'échéance « dans 3 jours → bientôt dû » reste vert si le seuil passe de 30 à 60 jours. Les
+cas qui valent d'être écrits sont **les deux côtés de la borne** : J+30 et J+31, 50 heures et 51.
+Vérifié par mutation — décaler `soonDateThreshold` d'un jour ne doit faire tomber **qu'un** test,
+celui de la borne.
+
+### Se placer dans le bon état amont
+
+`TaskGroupingService` ne reçoit que `plannedTasks`. Deux tâches à J+3 et J+5, même bateau et même
+sujet, sont donc dans `soon` et ne forment **aucun groupe** : un test de regroupement écrit avec ces
+dates passe au vert en ne prouvant rien. Même famille que « le piège des gardes en amont » (#688) :
+avant d'asserter un mécanisme, s'assurer que la donnée l'atteint.
+
+Le contrôle qui le prouve : faire passer `tasks` au lieu de `plannedTasks` au grouper. Si **aucun**
+test ne tombe, c'est que les tests de regroupement ne regardent rien.
+
+### Une redirection identique des deux côtés ne sépare rien
+
+`/settings/import/preview` redirige vers `/settings/import` en cas de succès **comme** d'erreur
+d'en-têtes. Asserter la seule `location` ne distingue donc pas les deux — deux tests du dépôt
+validaient ainsi un « CSV valide » qui était en réalité rejeté, faute d'être écrit avec le bon
+séparateur. Ce qui sépare les deux cas, c'est l'effet : ici, la présence de `pendingImport` en
+session (`response.session('pendingImport')`).
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.
