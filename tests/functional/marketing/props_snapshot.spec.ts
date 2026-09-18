@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { APP_LOCALES, marketingPath } from '#shared/helpers/locale_path'
+import { readSharedPropKeys } from '#tests/support/inertia_shared_props'
 import type { MarketingPage } from '#shared/helpers/locale_path'
 
 /**
@@ -25,27 +26,18 @@ const PAGES: MarketingPage[] = [
   'legalNotice',
 ]
 
-/** Props partagées par le middleware Inertia, hors contrat de la page. */
-const SHARED_KEYS = new Set([
-  'errors',
-  'locale',
-  'theme',
-  'appT',
-  'path',
-  'flash',
-  'demoSessionStartedAt',
-  'demoSessionDurationMs',
-  'user',
-  'currentPlan',
-  'organizationType',
-  'activeModules',
-  'activeAddons',
-  'branding',
-  'notifications',
-  'vapidPublicKey',
-  'permissions',
-  'assistantConversation',
-])
+/**
+ * Props partagées par le middleware Inertia, hors contrat de la page —
+ * **dérivées de `share` plutôt que recopiées** (#710).
+ *
+ * Cette liste était écrite en dur : ajouter une prop partagée dans
+ * `InertiaMiddleware.share` faisait tomber les vingt fixtures d'un coup, sans
+ * que le diff dise pourquoi. Elle se lit désormais dans le middleware, si bien
+ * qu'une prop partagée ajoutée continue d'être écartée ici — et ne produit
+ * qu'un seul échec, celui de `tests/unit/hygiene/inertia_shared_props.spec.ts`,
+ * qui la nomme et demande si elle a sa place sur les pages publiques.
+ */
+const SHARED_KEYS = new Set(readSharedPropKeys())
 
 const FIXTURES_DIR = new URL('./__fixtures__/', import.meta.url).pathname
 const UPDATE = process.env.UPDATE_MARKETING_FIXTURES === '1'
