@@ -71,8 +71,6 @@ router
       .delete('boats/:id/owners/:userId', [BoatOwnersController, 'destroy'])
       .as('boats.owners.destroy')
 
-    router.patch('boats/:id/assignment', [controllers.Boats, 'assign']).as('boats.assign')
-
     router.post('boats/:boatId/engines', [controllers.BoatEquipment, 'storeEngine'])
     router
       .get('boats/:boatId/engines/:engineId', [controllers.BoatEquipment, 'showEngine'])
