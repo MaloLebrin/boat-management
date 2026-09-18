@@ -355,6 +355,9 @@
   "pontoons": {
     "hasBoats": "Cannot delete this pontoon: boats are assigned to it."
   },
+  "spots": {
+    "hasBoat": "Cannot delete this berth: {name} is moored there. Free it first."
+  },
   "mouillages": {
     "hasBoats": "Cannot delete this mooring: boats are assigned to it."
   },

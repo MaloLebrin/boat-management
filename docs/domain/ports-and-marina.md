@@ -118,19 +118,25 @@ Une place étrangère passée à `PATCH /boats/:id/assignment` est ignorée sans
 message : les deux branches du `try/catch` rendent le même
 `redirect().back()`. Constat #721.
 
-## Supprimer : trois comportements différents
+## Supprimer : un étage occupé est toujours refusé
 
-| Cible              | Occupée par un bateau                                                                      |
-| ------------------ | ------------------------------------------------------------------------------------------ |
-| Port               | refusé — `PortHasBoatsError` + flash                                                       |
-| Ponton / mouillage | refusé — `PontoonHasBoatsError` / `MouillageHasBoatsError` + flash                         |
-| **Place**          | **acceptée** — `boats.spot_id` est `ON DELETE SET NULL`, le bateau est démarré sans un mot |
+| Cible              | Occupée par un bateau                                                       |
+| ------------------ | --------------------------------------------------------------------------- |
+| Port               | refusé — `PortHasBoatsError` + flash                                        |
+| Ponton / mouillage | refusé — `PontoonHasBoatsError` / `MouillageHasBoatsError` + flash          |
+| Place              | refusé — `SpotHasBoatError` + flash `flash.spots.hasBoat` nommant le bateau |
 
-La garde des deux premiers étages se contourne donc au troisième : pour vider un
-ponton occupé, il suffit d'en supprimer les places une à une. Constat #720.
+L'exploitant démarre le bateau d'abord (`PATCH /boats/:id/assignment` avec
+`spotId` vide), puis supprime la place. Avant #720, la place se supprimait et
+`boats.spot_id ON DELETE SET NULL` démarrait le bateau en silence, laissant son
+séjour à quai ouvert sur une place disparue — la garde du ponton se contournait
+place par place. Côté écran, `SpotsManager` prévient (`ports.spots.hasBoat`)
+avant d'ouvrir la confirmation, comme `PontoonCard`.
 
 Supprimer un ponton ou un mouillage **cascade** sur ses places
-(`ON DELETE CASCADE`), qui cascadent à leur tour en `SET NULL` sur les bateaux.
+(`ON DELETE CASCADE`), qui cascadent à leur tour en `SET NULL` sur les bateaux —
+filet que plus aucun chemin applicatif n'atteint, puisque chaque étage refuse
+avant d'écrire.
 
 ## `boat_position_history` : une table, deux usages
 
@@ -166,7 +172,7 @@ rend `302` et laisse la position inchangée (`null` si le ponton n'avait jamais
 | `tests/functional/ports/ports_plan_gating.spec.ts`      | le refus de plan, Starter et Pro                  |
 | `tests/functional/ports/ports_profile_gating.spec.ts`   | le refus de profil `private` (#604)               |
 | `tests/functional/ports/spots.spec.ts`                  | les 4 routes de place, hiérarchie et isolation    |
-| `tests/functional/ports/spot_deletion_frontier.spec.ts` | l'asymétrie de suppression (#720)                 |
+| `tests/functional/ports/spot_deletion_frontier.spec.ts` | le refus aux deux étages (#720)                   |
 | `tests/functional/ports/marina_role_frontier.spec.ts`   | member, mechanic, boat_owner (#719, #723)         |
 | `tests/inertia/spots_manager_permissions.spec.ts`       | les boutons de place gardés par capacité (#719)   |
 | `tests/functional/ports/layout_positions.spec.ts`       | isolation et bornes du glisser-déposer            |
@@ -178,7 +184,6 @@ rend `302` et laisse la position inchangée (`null` si le ponton n'avait jamais
 
 | #    | Constat                                                                                         |
 | ---- | ----------------------------------------------------------------------------------------------- |
-| #720 | `DELETE /spots/:id` démarre un bateau en silence                                                |
 | #721 | `PATCH /boats/:id/assignment` hors de la garde de plan, et no-op silencieux sur place étrangère |
 | #722 | `boat_position_history` : positions et séjours se ferment mutuellement                          |
 | #723 | `GET /ports` et `GET /ports/:id` n'autorisent rien                                              |

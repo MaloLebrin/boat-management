@@ -1,11 +1,13 @@
+import Boat from '#models/boat'
 import Spot from '#models/spot'
 import type Mouillage from '#models/mouillage'
 import type Pontoon from '#models/pontoon'
 import type Port from '#models/port'
 import type User from '#models/user'
 import type { SpotPayload } from '#shared/types/spot'
-import { SpotNotFoundError } from '#exceptions/port_errors'
+import { SpotHasBoatError, SpotNotFoundError } from '#exceptions/port_errors'
 import { inject } from '@adonisjs/core'
+import db from '@adonisjs/lucid/services/db'
 
 @inject()
 export default class SpotService {
@@ -52,7 +54,23 @@ export default class SpotService {
     return spot
   }
 
+  /**
+   * Refuse de supprimer une place occupée (#720), comme `PontoonService.deleteForPort`
+   * refuse un ponton occupé : la clé `boats.spot_id` est `ON DELETE SET NULL`,
+   * la laisser faire démarrerait le bateau sans le dire et laisserait son
+   * séjour à quai ouvert sur une place disparue.
+   */
   async delete(spot: Spot) {
-    await spot.delete()
+    await db.transaction(async (trx) => {
+      const occupant = await Boat.query()
+        .useTransaction(trx)
+        .where('spotId', spot.id)
+        .select('id', 'name')
+        .first()
+
+      if (occupant) throw new SpotHasBoatError(occupant.name)
+
+      await spot.useTransaction(trx).delete()
+    })
   }
 }

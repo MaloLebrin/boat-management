@@ -10,19 +10,13 @@ import { SpotFactory } from '#database/factories/spot_factory'
 import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 /**
- * ⚠️ **Caractérisation, pas validation** (#695, suivi par #720).
+ * Supprimer un amarrage occupé est refusé **aux deux étages** (#720).
  *
- * Deux suppressions voisines, deux comportements opposés — et c'est leur écart
- * qui est le signal, pas chaque cas pris isolément. C'est pourquoi ils sont
- * dans le même fichier, joués sur le **même décor** :
- *
- * - supprimer un **ponton** occupé est refusé, avec un flash ;
- * - supprimer une **place** de ce même ponton passe, et le bateau est démarré
- *   sans un mot — la clé étrangère `boats.spot_id` est `ON DELETE SET NULL`.
- *
- * Autrement dit, la garde d'un étage se contourne à l'étage du dessous. Ces
- * tests figent l'état actuel ; ils tomberont le jour où #720 sera tranchée, et
- * c'est exactement ce qu'on leur demande.
+ * Avant, seul le ponton était gardé : sa place, elle, se supprimait, et la clé
+ * `boats.spot_id ON DELETE SET NULL` démarrait le bateau sans un mot. Il
+ * suffisait donc de vider un ponton place par place pour contourner sa garde.
+ * Les deux étages sont joués sur le **même décor**, pour que l'écart, s'il
+ * revient, se voie ici.
  */
 
 interface MooredBoat {
@@ -55,8 +49,6 @@ test.group('Marina — supprimer un amarrage occupé, aux deux étages', (group)
 
     response.assertStatus(302)
     response.assertHeader('location', `/ports/${portId}`)
-    // `PontoonService.deleteForPort` compte les bateaux amarrés sur les places
-    // du ponton et lève `PontoonHasBoatsError` avant toute écriture.
     response.assertFlashMessage('error', 'Cannot delete this pontoon: boats are assigned to it.')
 
     assert.isNotNull(await Pontoon.find(pontoon.id))
@@ -65,40 +57,33 @@ test.group('Marina — supprimer un amarrage occupé, aux deux étages', (group)
     assert.equal(moored.spotId, spot.id)
   })
 
-  test('sa place, elle, se supprime — et démarre le bateau en silence', async ({
+  test('sa place occupée est protégée de même, et le flash nomme le bateau', async ({
     client,
     assert,
   }) => {
     const user = await createEnterpriseAdminUser()
-    const { pontoon, spot, boat } = await seedMooredBoat(user.organizationId!)
+    const { pontoon, spot, boat, portId } = await seedMooredBoat(user.organizationId!)
 
-    const response = await client.delete(`/spots/${spot.id}`).loginAs(user).redirects(0)
+    const response = await client
+      .delete(`/spots/${spot.id}`)
+      .header('referer', `/ports/${portId}`)
+      .loginAs(user)
+      .redirects(0)
 
     response.assertStatus(302)
+    response.assertHeader('location', `/ports/${portId}`)
+    response.assertFlashMessage(
+      'error',
+      `Cannot delete this berth: ${boat.name} is moored there. Free it first.`
+    )
 
-    assert.isNull(await Spot.find(spot.id), 'la place occupée a bien été supprimée')
-    const unmoored = await Boat.findOrFail(boat.id)
-    assert.isNull(unmoored.spotId, 'le bateau a été démarré par la cascade SET NULL')
-    // Le ponton, lui, est toujours là : la protection de l'étage du dessus n'a
-    // servi à rien, il suffisait de vider ses places une à une.
+    assert.isNotNull(await Spot.find(spot.id), 'la place occupée est conservée')
+    const moored = await Boat.findOrFail(boat.id)
+    assert.equal(moored.spotId, spot.id, 'le bateau reste amarré')
     assert.isNotNull(await Pontoon.find(pontoon.id))
   })
 
-  test('… sans le moindre message pour le dire', async ({ client }) => {
-    const user = await createEnterpriseAdminUser()
-    const { spot } = await seedMooredBoat(user.organizationId!)
-
-    const response = await client.delete(`/spots/${spot.id}`).loginAs(user).redirects(0)
-
-    // Aucun flash, d'aucune nature : l'exploitant revient sur l'écran précédent
-    // et son bateau a perdu son amarrage sans qu'on l'en informe.
-    response.assertFlashMissing('error')
-    response.assertFlashMissing('success')
-  })
-
-  test('le ponton devient supprimable une fois ses places retirées', async ({ client, assert }) => {
-    // Le contournement complet, joué de bout en bout : c'est la démonstration
-    // que la garde du ponton ne protège rien de plus qu'un clic.
+  test('le contournement place par place ne vide plus le ponton', async ({ client, assert }) => {
     const user = await createEnterpriseAdminUser()
     const { pontoon, spot, boat, portId } = await seedMooredBoat(user.organizationId!)
 
@@ -108,9 +93,30 @@ test.group('Marina — supprimer un amarrage occupé, aux deux étages', (group)
       .loginAs(user)
       .redirects(0)
 
+    response.assertFlashMessage('error', 'Cannot delete this pontoon: boats are assigned to it.')
+    assert.isNotNull(await Pontoon.find(pontoon.id))
+    const moored = await Boat.findOrFail(boat.id)
+    assert.equal(moored.spotId, spot.id)
+  })
+
+  test('une fois le bateau démarré, la place se supprime sans flash', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createEnterpriseAdminUser()
+    const { spot, boat } = await seedMooredBoat(user.organizationId!)
+
+    await client
+      .patch(`/boats/${boat.id}/assignment`)
+      .loginAs(user)
+      .form({ spotId: '' })
+      .redirects(0)
+    const unmoored = await Boat.findOrFail(boat.id)
+    assert.isNull(unmoored.spotId, 'le bateau est démarré')
+    const response = await client.delete(`/spots/${spot.id}`).loginAs(user).redirects(0)
+
     response.assertStatus(302)
-    assert.isNull(await Pontoon.find(pontoon.id))
-    const reloaded = await Boat.findOrFail(boat.id)
-    assert.isNull(reloaded.spotId)
+    response.assertFlashMissing('error')
+    assert.isNull(await Spot.find(spot.id))
   })
 })

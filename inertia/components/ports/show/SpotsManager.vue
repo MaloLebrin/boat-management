@@ -8,6 +8,7 @@ import BoatAssignModal from '~/components/ports/modals/BoatAssignModal.vue'
 import SpotFormModal from '~/components/ports/modals/SpotFormModal.vue'
 import { usePermissions } from '~/composables/use_permissions'
 import { useT } from '~/composables/use_t'
+import { notify } from '~/utils/native_dialog'
 import { routes } from '~/utils/routes'
 import type { BoatOption, SpotRow } from '~/types/port'
 import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
@@ -46,6 +47,16 @@ function handleEditSpot(spot: SpotRow) {
 function handleModalClose(open: boolean) {
   showSpotModal.value = open
   if (!open) editingSpot.value = null
+}
+
+// Une place occupée ne se supprime pas (#720) : le serveur refuse, on le dit
+// avant d'ouvrir une confirmation qui n'aboutirait pas.
+function handleDeleteSpot(spot: SpotRow) {
+  if (spot.boat) {
+    notify(t('ports.spots.hasBoat', { name: spot.boat.name }))
+    return
+  }
+  spotDeletion.ask(spot)
 }
 
 function handleAssignSpot(spot: SpotRow) {
@@ -130,7 +141,7 @@ function handleAssignConfirm({ spotId, boatId }: { spotId: number; boatId: numbe
             v-if="can('spots.delete')"
             variant="ghost"
             size="sm"
-            @click="spotDeletion.ask(spot)"
+            @click="handleDeleteSpot(spot)"
           >
             <TrashIcon class="h-4 w-4 text-danger" />
             <span class="sr-only">{{ t('common.delete') }}</span>

@@ -25,6 +25,7 @@
     "manage": "Manage spots",
     "occupied": "Occupied",
     "free": "Free",
+    "hasBoat": "This berth is occupied by {name}. Free it before deleting.",
     "occupiedBy": "Occupied by {name}",
     "assign": "Assign a boat",
     "assignTitle": "Assign a boat — Berth {name}",

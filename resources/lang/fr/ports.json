@@ -25,6 +25,7 @@
     "manage": "Gérer les places",
     "occupied": "Occupé",
     "free": "Libre",
+    "hasBoat": "Cette place est occupée par {name}. Libérez-la avant de la supprimer.",
     "occupiedBy": "Occupé par {name}",
     "assign": "Affecter un bateau",
     "assignTitle": "Affecter un bateau — Place {name}",

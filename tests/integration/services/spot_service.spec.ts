@@ -1,7 +1,9 @@
 import { test } from '@japa/runner'
 import SpotService from '#services/spot_service'
 import Spot from '#models/spot'
-import { SpotNotFoundError } from '#exceptions/port_errors'
+import Boat from '#models/boat'
+import { SpotHasBoatError, SpotNotFoundError } from '#exceptions/port_errors'
+import { BoatFactory } from '#database/factories/boat_factory'
 import { UserFactory } from '#database/factories/user_factory'
 import { PortFactory } from '#database/factories/port_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
@@ -193,5 +195,36 @@ test.group('SpotService', () => {
 
     const found = await Spot.find(spot.id)
     assert.isNull(found)
+  })
+
+  test('delete refuse une place occupée et nomme le bateau (#720)', async ({ assert }) => {
+    const user = await UserFactory.with('organization').create()
+    const port = await PortFactory.merge({ organizationId: user.organizationId! }).create()
+    const pontoon = await PontoonFactory.merge({ portId: port.id }).create()
+    const spot = await Spot.create({
+      organizationId: user.organizationId!,
+      pontoonId: pontoon.id,
+      mouillageId: null,
+      name: 'A1',
+      description: null,
+    })
+    const boat = await BoatFactory.merge({
+      organizationId: user.organizationId!,
+      name: 'Belle Île',
+      spotId: spot.id,
+    }).create()
+    const svc = new SpotService()
+
+    try {
+      await svc.delete(spot)
+      assert.fail('la suppression aurait dû être refusée')
+    } catch (error) {
+      assert.instanceOf(error, SpotHasBoatError)
+      assert.equal((error as SpotHasBoatError).boatName, 'Belle Île')
+    }
+
+    assert.isNotNull(await Spot.find(spot.id))
+    const moored = await Boat.findOrFail(boat.id)
+    assert.equal(moored.spotId, spot.id)
   })
 })

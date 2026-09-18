@@ -355,6 +355,9 @@
   "pontoons": {
     "hasBoats": "Impossible de supprimer ce ponton : des bateaux y sont assignés."
   },
+  "spots": {
+    "hasBoat": "Impossible de supprimer cette place : {name} y est amarré. Libérez-la d'abord."
+  },
   "mouillages": {
     "hasBoats": "Impossible de supprimer ce mouillage : des bateaux y sont assignés."
   },
