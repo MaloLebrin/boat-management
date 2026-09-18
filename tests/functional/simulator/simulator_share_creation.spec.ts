@@ -13,13 +13,16 @@ import type { SimulatorBoatInput, SimulatorCostBreakdown } from '#shared/types/s
  * consultable par n'importe qui via `/simulateur/r/:token`. Les deux routes de
  * lecture étaient couvertes ; celle qui écrit ne l'était pas.
  *
- * Quatre comportements mesurés ici sont **caractérisés, pas validés** — ils
+ * Trois comportements mesurés ici sont encore **caractérisés, pas validés** — ils
  * portent chacun leur constat :
  *
  * - une `locale` de onze caractères rend un **500** (#729) ;
  * - le `breakdown` n'est jamais recalculé côté serveur (#730) ;
- * - aucun throttle ne borne la route (#731) ;
- * - un jeton inconnu renvoie toujours vers la page FR (#732).
+ * - aucun throttle ne borne la route (#731).
+ *
+ * La cible de repli d'un jeton inconnu (#732), elle, suit désormais la route
+ * empruntée : les deux locales sont mesurées en validation dans
+ * `simulator_share.spec.ts`.
  */
 
 const INPUT: SimulatorBoatInput = {
@@ -172,7 +175,7 @@ test.group('Simulateur — ce que le validateur de partage refuse', (group) => {
   })
 })
 
-test.group('Simulateur — les quatre frontières que la route ne tient pas', (group) => {
+test.group('Simulateur — les trois frontières que la route ne tient pas', (group) => {
   group.each.setup(() => truncateDb())
 
   /**
@@ -251,12 +254,5 @@ test.group('Simulateur — les quatre frontières que la route ne tient pas', (g
     }
 
     assert.lengthOf(await SimulatorShare.all(), 10)
-  })
-
-  test('#732 — un jeton inconnu renvoie vers la page FR, même en anglais', async ({ client }) => {
-    const response = await client.get('/simulator/r/deadbeef0000').redirects(0)
-
-    response.assertStatus(302)
-    response.assertHeader('location', '/fr/simulateur-cout-entretien')
   })
 })
