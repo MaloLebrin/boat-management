@@ -296,6 +296,24 @@ plomberie).
 - `cost` (decimal 10,2, nullable)
 - `notes` (nullable)
 
+### boat_position_history
+
+Deux natures de ligne dans une même table, distinguées par `kind` (#722). À ne pas confondre avec
+`boat_port_stays`, qui est une saisie libre de séjour (`portName`, `cost`), sans lien avec la marina.
+
+- `id`, `boatId`
+- `kind` : `berth` | `position` — **la nature de la ligne**, défaut `position`, indexée avec `boatId`
+- séjour à quai (`kind='berth'`) : `spotId` (FK `spots`, `SET NULL`)
+- point de position (`kind='position'`) : `latitude` / `longitude` (decimal 10,7), `speedKnots`
+  (decimal 5,2), `headingDegrees`, `source` (`manual | ais | gps`, défaut `manual`)
+- `startedAt`, `endedAt` (nullable) — `endedAt IS NULL` = ligne en cours
+- `notes` (nullable)
+
+Les deux natures partagent la convention de ligne ouverte mais **pas** la clôture : celle-ci passe
+par `BoatPositionHistory.closeOpenOfKind(boatId, kind)` et ne balaie que sa propre nature. Un bateau
+amarré qui émet des positions a donc deux lignes ouvertes, une par nature. `boats.spotId` reste la
+source de vérité de l'amarrage — détail dans `docs/domain/ports-and-marina.md`.
+
 ### boat_budget_entries
 
 - `id`, `boatId`
@@ -502,6 +520,7 @@ Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap 
   saisie
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
+- `Boat 1..n BoatPositionHistory` via `boat_position_history.boatId` (cascade) ; `Spot 0..n BoatPositionHistory` via `spotId` (`SET NULL`), sur les seules lignes `kind='berth'` (#722)
 - `Boat 1..n BoatPortStay`
 - `Boat 1..n BoatBudgetEntry`
 - `User 1..n AiAnalysis` via `ai_analyses.userId` (`organizationId` scope les lectures, `boatId` distingue flotte et bateau)
