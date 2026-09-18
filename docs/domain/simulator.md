@@ -44,9 +44,15 @@ Référence : `start/routes/marketing.ts`
 | GET     | `/simulateur/r/:token`           | `simulator.share.show.fr` | `SimulatorShareController#show`   |
 | GET     | `/simulator/r/:token`            | `simulator.share.show.en` | `SimulatorShareController#show`   |
 
-Seule `/boats/from-simulator` porte `middleware.auth()`. **Les trois POST publics (`session`, `lead`,
-`share`) n'ont aucun throttle** — là où `/contact`, `/diagnosis-ai` et `/parts-ai` en portent un
-chacun : constat #731.
+Seule `/boats/from-simulator` porte `middleware.auth()`. Les trois POST publics portent chacun un
+throttle dédié depuis #731 — compteurs séparés, pour qu'une rafale sur l'un ne consomme pas le budget
+des autres :
+
+| Route                | Throttle (`start/limiter.ts`) | Débit           | Pourquoi                                                                                                         |
+| -------------------- | ----------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `/simulator/session` | `simulatorSessionThrottle`    | 6 / minute / IP | écrit en session, sans authentification — même débit que le diagnostic public                                    |
+| `/simulator/share`   | `simulatorShareThrottle`      | 6 / minute / IP | écrit une ligne `simulator_shares` par appel                                                                     |
+| `/simulator/lead`    | `simulatorLeadThrottle`       | 5 / 10 min / IP | le plus exposé : crée un prospect **et** déclenche deux jobs d'e-mail — même budget que le formulaire de contact |
 
 ---
 
@@ -88,10 +94,11 @@ mal recopié) renvoie au simulateur de la **route empruntée** (#732), via
 
 ### Où c'est testé
 
-| Fichier                                                       | Couvre                                                                                                                                                               |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide, et la cible de repli par locale sur jeton inconnu                                                                          |
-| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, le recalcul serveur du breakdown, les refus du validateur (locale comprise), et le constat ouvert en caractérisation |
+| Fichier                                                        | Couvre                                                                                                                        |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `tests/functional/simulator/simulator_share.spec.ts`           | les deux routes de lecture, jeton valide, et la cible de repli par locale sur jeton inconnu                                   |
+| `tests/functional/simulator/simulator_share_creation.spec.ts`  | la création, l'aller-retour création → lecture, le recalcul serveur du breakdown et les refus du validateur (locale comprise) |
+| `tests/functional/simulator/simulator_public_throttle.spec.ts` | la borne des trois POST publics et la séparation de leurs compteurs                                                           |
 
 ---
 
