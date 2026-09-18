@@ -13,13 +13,15 @@ import type { SimulatorBoatInput, SimulatorCostBreakdown } from '#shared/types/s
  * consultable par n'importe qui via `/simulateur/r/:token`. Les deux routes de
  * lecture étaient couvertes ; celle qui écrit ne l'était pas.
  *
- * Quatre comportements mesurés ici sont **caractérisés, pas validés** — ils
+ * Trois comportements mesurés ici sont encore **caractérisés, pas validés** — ils
  * portent chacun leur constat :
  *
  * - une `locale` de onze caractères rend un **500** (#729) ;
  * - le `breakdown` n'est jamais recalculé côté serveur (#730) ;
- * - aucun throttle ne borne la route (#731) ;
  * - un jeton inconnu renvoie toujours vers la page FR (#732).
+ *
+ * Le throttle (#731), lui, est posé : la rafale est mesurée en validation dans
+ * `simulator_public_throttle.spec.ts`.
  */
 
 const INPUT: SimulatorBoatInput = {
@@ -172,7 +174,7 @@ test.group('Simulateur — ce que le validateur de partage refuse', (group) => {
   })
 })
 
-test.group('Simulateur — les quatre frontières que la route ne tient pas', (group) => {
+test.group('Simulateur — les trois frontières que la route ne tient pas', (group) => {
   group.each.setup(() => truncateDb())
 
   /**
@@ -237,20 +239,6 @@ test.group('Simulateur — les quatre frontières que la route ne tient pas', (g
     const read = await client.get(String(created.header('location'))).withInertia()
     const props = read.inertiaProps as { breakdown: SimulatorCostBreakdown }
     assert.deepEqual(props.breakdown, forged)
-  })
-
-  test('#731 — dix créations à la suite passent toutes', async ({ client, assert }) => {
-    // `/contact`, `/diagnosis-ai` et `/parts-ai` portent chacune un throttle.
-    // Les trois POST publics du simulateur n'en ont aucun.
-    for (let index = 0; index < 10; index += 1) {
-      const response = await client
-        .post('/simulator/share')
-        .json({ input: INPUT, breakdown: BREAKDOWN })
-        .redirects(0)
-      response.assertStatus(302)
-    }
-
-    assert.lengthOf(await SimulatorShare.all(), 10)
   })
 
   test('#732 — un jeton inconnu renvoie vers la page FR, même en anglais', async ({ client }) => {
