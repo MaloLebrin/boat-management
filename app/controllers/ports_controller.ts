@@ -13,9 +13,10 @@ export default class PortsController {
     private boatListService: BoatListService
   ) {}
 
-  async index({ inertia, auth }: HttpContext) {
+  async index({ inertia, auth, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
+    await bouncer.with(PortPolicy).authorize('viewAny')
 
     const ports = await this.portService.listForUser(user)
 
@@ -39,16 +40,23 @@ export default class PortsController {
     return response.redirect(`/ports/${port.id}`)
   }
 
-  async show({ inertia, params, auth, response }: HttpContext) {
+  async show({ inertia, params, auth, response, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
     try {
-      const [port, boats] = await Promise.all([
+      // L'autorisation passe **avant** le chargement des relations (#723) : la
+      // page sert les pontons, les mouillages, les places, les taux
+      // d'occupation — et la liste nominative des bateaux de l'organisation.
+      // Un rôle sans `ports.view` n'a rien à y voir. Même ordre que `edit()`.
+      const port = await this.portService.getForUserOrFail(user, Number(params.id))
+      await bouncer.with(PortPolicy).authorize('view', port)
+
+      const [portWithRelations, boats] = await Promise.all([
         this.portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id)),
         this.boatListService.listNamesForOrg(user),
       ])
-      return inertia.render('ports/show', { port, boats })
+      return inertia.render('ports/show', { port: portWithRelations, boats })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
       throw error

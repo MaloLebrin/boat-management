@@ -1,0 +1,10 @@
+# 2026-09-18 — Simulateur : le breakdown d'un partage est recalculé côté serveur (#730)
+
+`POST /simulator/share` est publique et non authentifiée, et stockait les montants envoyés par l'appelant **tels quels**. Le validateur n'en vérifiait que la forme — ni la cohérence interne, ni le rapport à l'`input`. N'importe qui pouvait donc forger un lien de partage affichant n'importe quelle estimation sous la mise en page du simulateur FleetAi.
+
+- **Cause.** `SimulatorShareController.store` passait `payload.breakdown` au service sans le regarder, alors que le calculateur `shared/simulator_costs.ts` est du code partagé, disponible côté serveur. Mesuré : un coût minimum négatif et un total minimum mille fois supérieur au maximum étaient acceptés, stockés, puis servis.
+- **Correctif.** Le partage ne porte plus que l'`input` et la locale. `breakdown` disparaît de `simulatorShareValidator`, et `store()` appelle `computeSimulatorCosts(input)` pour produire les montants stockés. Un `breakdown` encore présent dans le payload d'un client en cache est ignoré : VineJS écarte les champs inconnus, aucune rupture pour les onglets ouverts.
+- **Front.** `inertia/pages/marketing/simulator.vue` — `shareResults()` n'envoie plus que `{ input, locale }`. La page affichait déjà `computeSimulatorCosts(input)` : les montants du lien partagé sont exactement ceux qu'elle montre.
+- **Effet de bord souhaitable.** Un partage reste cohérent si la grille de coûts évolue — il rend ce que le calculateur en vigueur produit pour cet `input`, pas un instantané figé.
+- **Tests.** `simulator_share_creation.spec.ts` : le cas de caractérisation #730 est remplacé par un groupe « le breakdown vient du serveur » — montants forgés ignorés au stockage comme à la lecture, `totalMin ≤ totalMax` garanti, payload sans `breakdown` accepté, et deux `input` distincts donnant deux breakdowns distincts. Le cas « un breakdown sans totaux est refusé » disparaît avec le champ.
+- **Docs.** `docs/domain/simulator.md` : constat #730 remplacé par une section « ce que le serveur recalcule ».

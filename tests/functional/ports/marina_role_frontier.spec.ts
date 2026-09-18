@@ -223,27 +223,43 @@ test.group('Marina — mechanic et boat_owner n’y ont aucune prise', (group) =
   ] as const
 
   for (const role of roles) {
-    test(`⚠️ un ${role.name} voit pourtant toute la marina (#723)`, async ({ client, assert }) => {
-      // **Caractérisation, pas validation.** `PortsController.index` et
-      // `show` n'appellent aucun `bouncer.authorize` — seuls le scoping
-      // d'organisation les protège. La capacité `ports.view` existe et n'est
-      // lue nulle part.
+    test(`un ${role.name} ne voit pas la marina (#723)`, async ({ client }) => {
+      // `PortsController.index` et `show` lisent désormais `ports.view`, comme
+      // toutes les autres méthodes du contrôleur.
       //
       // Le cas sérieux est `boat_owner`, dont le jeu de capacités est
       // **volontairement vide** pour qu'il ne touche aucun écran staff : la
-      // page du port lui sert les pontons, les places, et la liste nominative
-      // des bateaux de l'organisation. Ces deux cas tomberont quand #723 sera
-      // corrigée, et diront où.
+      // page du port lui servait les pontons, les places, et la liste
+      // nominative des bateaux de l'organisation — donc les bateaux des autres
+      // clients de l'exploitant.
       const admin = await createEnterpriseAdminUser()
       const user = await role.make(admin.organizationId!)
       const decor = await seedMarina(admin.organizationId!)
 
       const index = await client.get('/ports').loginAs(user)
-      index.assertStatus(200)
+      index.assertStatus(403)
+
+      const show = await client.get(`/ports/${decor.portId}`).loginAs(user)
+      show.assertStatus(403)
+    })
+
+    test(`un ${role.name} refusé sur la marina ne reçoit aucune donnée`, async ({
+      client,
+      assert,
+    }) => {
+      // Le 403 doit être un refus, pas une page rendue avec un bandeau : ni la
+      // liste des ports, ni la prop `boats` nominative ne doivent atteindre la
+      // réponse.
+      const admin = await createEnterpriseAdminUser()
+      const user = await role.make(admin.organizationId!)
+      const decor = await seedMarina(admin.organizationId!)
 
       const show = await client.get(`/ports/${decor.portId}`).loginAs(user).withInertia()
-      show.assertStatus(200)
-      assert.property(show.inertiaProps as Record<string, unknown>, 'boats')
+
+      show.assertStatus(403)
+      const props = (show.inertiaProps ?? {}) as Record<string, unknown>
+      assert.notProperty(props, 'boats')
+      assert.notProperty(props, 'port')
     })
 
     test(`un ${role.name} ne crée pas de place`, async ({ client, assert }) => {

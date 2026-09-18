@@ -140,9 +140,11 @@ function restart() {
 
 function shareResults() {
   if (!costBreakdown.value) return
+  // Seuls l'`input` et la locale partent : le serveur recalcule le breakdown
+  // avec le même `computeSimulatorCosts` (#730).
   router.post(
     '/simulator/share',
-    { input: formData.value, breakdown: costBreakdown.value, locale: locale.value },
+    { input: formData.value, locale: locale.value },
     { preserveScroll: false }
   )
 }
