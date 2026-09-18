@@ -63,8 +63,11 @@ POST /simulator/share  { input, locale? }
 ```
 
 `GET /simulateur|simulator/r/:token` rend `marketing/simulator_share` avec quatre props — `token`,
-`input`, `breakdown`, `locale` — relues telles quelles depuis la ligne. Un jeton inconnu redirige
-**toujours** vers `/fr/simulateur-cout-entretien`, y compris depuis la route anglaise : constat #732.
+`input`, `breakdown`, `locale` — relues telles quelles depuis la ligne. Un jeton inconnu (périmé ou
+mal recopié) renvoie au simulateur de la **route empruntée** (#732), via
+`marketingPath('simulator', locale)` : `/simulateur/r/:token` → `/fr/simulateur-cout-entretien`,
+`/simulator/r/:token` → `/en/maintenance-cost-simulator`. La locale se déduit du nom de route
+(`simulator.share.show.fr` / `.en`), les deux servant la même méthode.
 
 ### Ce que le serveur recalcule
 
@@ -85,10 +88,10 @@ POST /simulator/share  { input, locale? }
 
 ### Où c'est testé
 
-| Fichier                                                       | Couvre                                                                                                                                                                       |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide et invalide                                                                                                                         |
-| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, le recalcul serveur du breakdown, les refus du validateur (locale comprise), et les deux constats ouverts en caractérisation |
+| Fichier                                                       | Couvre                                                                                                                                                               |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide, et la cible de repli par locale sur jeton inconnu                                                                          |
+| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, le recalcul serveur du breakdown, les refus du validateur (locale comprise), et le constat ouvert en caractérisation |
 
 ---
 

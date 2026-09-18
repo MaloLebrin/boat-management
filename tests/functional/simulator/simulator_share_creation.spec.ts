@@ -14,16 +14,16 @@ import type { SimulatorBoatInput, SimulatorCostBreakdown } from '#shared/types/s
  * consultable par n'importe qui via `/simulateur/r/:token`. Les deux routes de
  * lecture étaient couvertes ; celle qui écrit ne l'était pas.
  *
- * Deux comportements mesurés ici sont encore **caractérisés, pas validés** —
- * ils portent chacun leur constat :
+ * Un seul comportement mesuré ici est encore **caractérisé, pas validé** :
  *
- * - aucun throttle ne borne la route (#731) ;
- * - un jeton inconnu renvoie toujours vers la page FR (#732).
+ * - aucun throttle ne borne la route (#731).
  *
- * Deux autres sont posés : la borne sur `locale` (#729), passée en validation
- * dans « ce que le validateur de partage refuse », et le recalcul du
- * `breakdown` (#730) — le serveur produit les montants à partir du seul
- * `input`, et le payload n'en porte plus.
+ * Trois autres sont posés : la borne sur `locale` (#729), passée en validation
+ * dans « ce que le validateur de partage refuse » ; le recalcul du `breakdown`
+ * (#730) — le serveur produit les montants à partir du seul `input`, et le
+ * payload n'en porte plus ; et la cible de repli d'un jeton inconnu (#732), qui
+ * suit désormais la route empruntée — les deux locales sont mesurées dans
+ * `simulator_share.spec.ts`.
  */
 
 const INPUT: SimulatorBoatInput = {
@@ -261,7 +261,7 @@ test.group('Simulateur — ce que le validateur de partage refuse', (group) => {
   })
 })
 
-test.group('Simulateur — les deux frontières que la route ne tient pas', (group) => {
+test.group('Simulateur — la frontière que la route ne tient pas', (group) => {
   group.each.setup(() => truncateDb())
 
   /**
@@ -279,12 +279,5 @@ test.group('Simulateur — les deux frontières que la route ne tient pas', (gro
     }
 
     assert.lengthOf(await SimulatorShare.all(), 10)
-  })
-
-  test('#732 — un jeton inconnu renvoie vers la page FR, même en anglais', async ({ client }) => {
-    const response = await client.get('/simulator/r/deadbeef0000').redirects(0)
-
-    response.assertStatus(302)
-    response.assertHeader('location', '/fr/simulateur-cout-entretien')
   })
 })
