@@ -25,8 +25,17 @@ Permettre à une entreprise de location/charter de :
    bornes.
 
 La **tarification est une fonctionnalité du plan Enterprise** (gating
-`canManagePricing`). Les réservations, elles, sont disponibles pour toute
-organisation ; le calcul automatique ne s'active que si un tarif de base est
+`canManagePricing`). Les **réservations le sont tout autant** : depuis #595,
+les deux groupes de routes — celui par bateau (`start/routes/boats.ts`) et la
+vue flotte (`start/routes/reservations.ts`) — portent
+`middleware.requireModulePlan({ feature: 'reservations' })`, soit le tier
+Enterprise, soit le module add-on `charter` sur le socle Pro. Une organisation
+`starter` ou `pro` sans module est redirigée vers `/settings/billing` avant
+d'atteindre le contrôleur, sur les lectures **comme** sur les écritures.
+Exhaustivité tenue par `tests/unit/hygiene/charter_routes_gated.spec.ts`,
+comportement par `tests/functional/reservations/module_guard.spec.ts` (#694).
+
+Le calcul automatique du total, lui, ne s'active que si un tarif de base est
 configuré sur le bateau.
 
 ---
@@ -66,22 +75,26 @@ unitairement.
 
 Modèle : `app/models/boat_reservation.ts`.
 
-| Colonne                         | Type               | Notes                                        |
-| ------------------------------- | ------------------ | -------------------------------------------- |
-| `id`                            | pk                 |                                              |
-| `boat_id`                       | fk → boats         |                                              |
-| `organization_id`               | fk → organizations | scope org                                    |
-| `status`                        | enum               | `option` \| `confirmed` \| `cancelled`       |
-| `type`                          | enum?              | Type de prestation (#585) — voir ci-dessous  |
-| `starts_at` / `ends_at`         | datetime           | Luxon `DateTime` (heure incluse)             |
-| `client_name`                   | string             | **client en texte libre — pas de FK client** |
-| `client_email` / `client_phone` | string?            | dénormalisés                                 |
-| `notes`                         | text?              |                                              |
-| `total_price`                   | decimal(., 2)?     | stocké en **string** côté Lucid (précision)  |
-| `created_at` / `updated_at`     | timestamps         |                                              |
+| Colonne                         | Type               | Notes                                           |
+| ------------------------------- | ------------------ | ----------------------------------------------- |
+| `id`                            | pk                 |                                                 |
+| `boat_id`                       | fk → boats         |                                                 |
+| `organization_id`               | fk → organizations | scope org                                       |
+| `status`                        | enum               | `option` \| `confirmed` \| `cancelled`          |
+| `type`                          | enum?              | Type de prestation (#585) — voir ci-dessous     |
+| `starts_at` / `ends_at`         | datetime           | Luxon `DateTime` (heure incluse)                |
+| `client_id`                     | fk → clients?      | Lien CRM optionnel (#275), `ON DELETE SET NULL` |
+| `client_name`                   | string             | Instantané dénormalisé, conservé même sans lien |
+| `client_email` / `client_phone` | string?            | dénormalisés                                    |
+| `notes`                         | text?              |                                                 |
+| `total_price`                   | decimal(., 2)?     | stocké en **string** côté Lucid (précision)     |
+| `created_at` / `updated_at`     | timestamps         |                                                 |
 
-> ℹ️ Le client est **dénormalisé** (pas de `client_id`). Il n'y a **ni caution
-> ni devise** sur la réservation : ces informations vivent sur `boat_pricing`.
+> ℹ️ Le client est **dénormalisé** — nom, e-mail et téléphone sont recopiés sur
+> la réservation — mais un `client_id` optionnel le relie au CRM depuis #275 :
+> supprimer le client annule la clé étrangère et laisse l'instantané intact. Il
+> n'y a en revanche **ni caution ni devise** sur la réservation : ces
+> informations vivent sur `boat_pricing`.
 
 **Type de prestation (#585).** `bareboat` | `skippered` | `day_charter` |
 `cabin` | `other` (`RESERVATION_TYPES`, `shared/types/reservation.ts`),
@@ -143,6 +156,7 @@ Modèle : `app/models/pricing_season.ts`. Index composite
 | Action                               | Contrôle                                                                                                                                                                                                                                                                                                                      |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Voir/créer/éditer une réservation    | `bouncer.with(BoatPolicy)` — `view` (index) / `manage` (mutations), même org que le bateau                                                                                                                                                                                                                                    |
+| Supprimer une réservation            | `BoatPolicy.deleteReservation` — capacité `boats.reservations.delete` **et** `status !== 'confirmed'` : une réservation confirmée n'est jamais supprimable, quel que soit le rôle. L'annuler d'abord                                                                                                                          |
 | Gérer le tarif de base & les saisons | **capacité `canManagePricing`** : tier Enterprise ou module add-on `charter` sur le socle Pro (#327) — `quotaService.assertCanManagePricing(org)`. Un accès sans la capacité est redirigé vers `/settings/billing` (`BILLING_SETTINGS_PATH`), jamais vers `/` qui mène à la home marketing publique sans flash visible (#456) |
 | Suppression d'une saison             | admins de l'org uniquement (`PricingSeasonPolicy.before`)                                                                                                                                                                                                                                                                     |
 
@@ -180,7 +194,7 @@ Réf. routes : `start/routes/boats.ts` (per-boat) et `start/routes/reservations.
 | `GET /boats/:boatId/reservations`                   | `BoatReservationsController.index`           | Page `boats/reservations` (calendrier, liste, formulaire). **Expose `boatPricing` + `pricingSeasons`** (#294) |
 | `POST /boats/:boatId/reservations`                  | `.store` (`createBoatReservationValidator`)  | Crée la réservation                                                                                           |
 | `PATCH /boats/:boatId/reservations/:reservationId`  | `.update` (`updateBoatReservationValidator`) | Modifie                                                                                                       |
-| `DELETE /boats/:boatId/reservations/:reservationId` | `.destroy`                                   | Supprime                                                                                                      |
+| `DELETE /boats/:boatId/reservations/:reservationId` | `.destroy`                                   | Supprime — **jamais une `confirmed`** (voir ACL ci-dessus)                                                    |
 | `GET /reservations` (`reservations.index`)          | `ReservationsController.index`               | Vue flotte **lecture seule** (timeline + filtre `?boatId=`)                                                   |
 
 > La **création/édition se fait uniquement depuis le formulaire par bateau**
