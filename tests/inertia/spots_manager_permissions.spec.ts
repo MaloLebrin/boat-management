@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from 'vitest'
-import { mountWithStubs } from './helpers/mount'
+import { mountWithStubs, routerSpies } from './helpers/mount'
 import type { SpotRow } from '../../inertia/types/port'
 import { ROLE_PERMISSIONS } from '../../shared/types/permissions'
 import type { OrgRole } from '../../shared/types/organization'
@@ -22,9 +22,9 @@ import SpotsManager from '../../inertia/components/ports/show/SpotsManager.vue'
 
 const spot = { id: 5, name: 'A1', positionX: null, positionY: null, boat: null } as SpotRow
 
-function mountAs(role: OrgRole) {
+function mountAs(role: OrgRole, spots: SpotRow[] = [spot]) {
   return mountWithStubs(SpotsManager, {
-    props: { portId: 3, pontoonId: 4, spots: [spot], boats: [] } as Record<string, unknown>,
+    props: { portId: 3, pontoonId: 4, spots, boats: [] } as Record<string, unknown>,
     pageProps: { permissions: { role, capabilities: [...ROLE_PERMISSIONS[role]] } },
     stubs: {
       SpotFormModal: { template: '<div />' },
@@ -62,6 +62,38 @@ describe('SpotsManager — boutons gardés par capacité (#719)', () => {
   test('la liste des places reste lisible sans aucune capacité', () => {
     const w = mountAs('boat_owner')
     expect(w.text()).toContain('A1')
+    w.unmount()
+  })
+})
+
+describe('SpotsManager — une place occupée ne se supprime pas (#720)', () => {
+  function deleteButton(w: ReturnType<typeof mountAs>) {
+    return w.findAll('button').find((b) => b.text().trim() === 'common.delete')!
+  }
+
+  test('une place occupée prévient au lieu d’ouvrir la confirmation', async () => {
+    window.alert = vi.fn()
+    const occupied = { ...spot, boat: { id: 9, name: 'Belle Île' } } as SpotRow
+    const w = mountAs('admin', [occupied])
+
+    await deleteButton(w).trigger('click')
+
+    expect(window.alert).toHaveBeenCalledWith('ports.spots.hasBoat')
+    expect(w.find('[data-base-confirm-modal]').exists()).toBe(false)
+    expect(routerSpies.delete).not.toHaveBeenCalled()
+    w.unmount()
+  })
+
+  test('une place libre ouvre la confirmation, puis supprime', async () => {
+    window.alert = vi.fn()
+    const w = mountAs('admin')
+
+    await deleteButton(w).trigger('click')
+    expect(window.alert).not.toHaveBeenCalled()
+    expect(w.find('[data-base-confirm-modal]').exists()).toBe(true)
+
+    await w.find('[data-confirm]').trigger('click')
+    expect(routerSpies.delete).toHaveBeenCalledWith('/spots/5')
     w.unmount()
   })
 })

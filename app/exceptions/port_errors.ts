@@ -27,6 +27,20 @@ export class SpotNotFoundError extends Error {
 }
 
 /**
+ * Refus de supprimer une place occupée (#720), par symétrie avec
+ * `PontoonHasBoatsError` : sans elle, `boats.spot_id ON DELETE SET NULL`
+ * démarrait le bateau en silence. Porte le nom du bateau pour que le flash
+ * dise lequel libérer.
+ */
+export class SpotHasBoatError extends Error {
+  name = 'SpotHasBoatError'
+
+  constructor(readonly boatName: string) {
+    super(`Spot is occupied by boat "${boatName}"`)
+  }
+}
+
+/**
  * Refus de la cartographie de port lié au **profil** de l'organisation (compte
  * particulier), et non à son plan : aucun changement d'abonnement ne la
  * débloquera, d'où une erreur distincte de `QuotaExceededError` — le message

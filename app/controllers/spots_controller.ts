@@ -2,6 +2,7 @@ import {
   MouillageNotFoundError,
   PontoonNotFoundError,
   PortNotFoundError,
+  SpotHasBoatError,
   SpotNotFoundError,
 } from '#exceptions/port_errors'
 import MouillageService from '#services/mouillage_service'
@@ -78,7 +79,7 @@ export default class SpotsController {
     }
   }
 
-  async destroy({ params, auth, response, bouncer }: HttpContext) {
+  async destroy({ params, auth, response, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -89,6 +90,10 @@ export default class SpotsController {
       return response.redirect().back()
     } catch (error) {
       if (error instanceof SpotNotFoundError) return response.redirect('/ports')
+      if (error instanceof SpotHasBoatError) {
+        session.flash('error', i18n.t('flash.spots.hasBoat', { name: error.boatName }))
+        return response.redirect().back()
+      }
       throw error
     }
   }
