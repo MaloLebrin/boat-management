@@ -5,7 +5,7 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
 import { SpotFactory } from '#database/factories/spot_factory'
 import { UserFactory } from '#database/factories/user_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 async function makeSpot(organizationId: number) {
   const pontoon = await PontoonFactory.with('port', 1, (p) => p.merge({ organizationId })).create()
@@ -16,7 +16,7 @@ test.group('Boats assign (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
   test('PATCH /boats/:id/assignment assigns a free spot to a boat', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const spot = await makeSpot(user.organizationId!)
 
@@ -36,7 +36,7 @@ test.group('Boats assign (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const spot = await makeSpot(user.organizationId!)
     const occupant = await BoatFactory.merge({
       organizationId: user.organizationId!,
@@ -63,7 +63,7 @@ test.group('Boats assign (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const spot = await makeSpot(user.organizationId!)
     const boat = await BoatFactory.merge({
       organizationId: user.organizationId!,
@@ -89,7 +89,7 @@ test.group('Boats assign (functional)', (group) => {
     // assign() now authorizes via BoatPolicy.edit like the other mutations.
     // A non-admin member of the same org is permitted (same rule as update),
     // so legitimate access must keep working after the authorize call was added.
-    const admin = await createAdminUser()
+    const admin = await createEnterpriseAdminUser()
     const member = await UserFactory.merge({ organizationId: admin.organizationId! }).create()
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const spot = await makeSpot(admin.organizationId!)
@@ -110,8 +110,8 @@ test.group('Boats assign (functional)', (group) => {
     client,
     assert,
   }) => {
-    const owner = await createAdminUser()
-    const outsider = await UserFactory.with('organization').create()
+    const owner = await createEnterpriseAdminUser()
+    const outsider = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
     const spot = await makeSpot(outsider.organizationId!)
 
@@ -132,7 +132,7 @@ test.group('Boats assign (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const spot = await makeSpot(user.organizationId!)
     const occupant = await BoatFactory.merge({
       organizationId: user.organizationId!,
@@ -155,7 +155,7 @@ test.group('Boats assign (functional)', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const spot = await makeSpot(user.organizationId!)
     const boat = await BoatFactory.merge({
       organizationId: user.organizationId!,
@@ -175,7 +175,7 @@ test.group('Boats assign (functional)', (group) => {
   })
 
   test('POST /boats rejects cross-org spotId on creation', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const otherUser = await UserFactory.with('organization').create()
     const foreignSpot = await makeSpot(otherUser.organizationId!)
 
@@ -192,7 +192,7 @@ test.group('Boats assign (functional)', (group) => {
   })
 
   test('PUT /boats/:id rejects cross-org spotId on update', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const ownSpot = await makeSpot(user.organizationId!)
     const otherUser = await UserFactory.with('organization').create()
     const foreignSpot = await makeSpot(otherUser.organizationId!)

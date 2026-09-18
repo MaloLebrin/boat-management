@@ -40,6 +40,17 @@ interface RouteFacts {
  */
 const MARINA_SEGMENT = /(^|\/)(ports|spots)(\/|$)/
 
+/**
+ * Routes du domaine qui n'ont **aucun** segment `ports`/`spots` : le prédicat
+ * ne peut pas les deviner, on les nomme. L'amarrage d'un bateau écrit
+ * `boats.spot_id` sous une URL `/boats` (#721).
+ */
+const MARINA_ROUTES_OUTSIDE_PREFIX = ['/boats/:id/assignment']
+
+function isMarinaRoute(pattern: string): boolean {
+  return MARINA_SEGMENT.test(pattern) || MARINA_ROUTES_OUTSIDE_PREFIX.includes(pattern)
+}
+
 function routeFacts(): RouteFacts[] {
   router.commit()
 
@@ -66,7 +77,7 @@ function routeFacts(): RouteFacts[] {
 }
 
 function marinaRoutes(): RouteFacts[] {
-  return routeFacts().filter((route) => MARINA_SEGMENT.test(route.pattern))
+  return routeFacts().filter((route) => isMarinaRoute(route.pattern))
 }
 
 function label(route: RouteFacts): string {
@@ -81,8 +92,8 @@ test.group('Hygiene — toute route de la marina porte la garde de plan', () => 
 
     assert.isAbove(
       routes.length,
-      17,
-      `la découverte ne renvoie que ${routes.length} routes — le domaine en compte 19`
+      18,
+      `la découverte ne renvoie que ${routes.length} routes — le domaine en compte 20`
     )
 
     // Les quatre sous-familles. Un prédicat qui n'attraperait plus que les
@@ -134,19 +145,15 @@ test.group('Hygiene — toute route de la marina porte la garde de plan', () => 
     )
   })
 
-  test("l'amarrage d'un bateau, lui, échappe à la garde (constat #721)", ({ assert }) => {
-    // `PATCH /boats/:id/assignment` écrit `boats.spot_id` : il touche donc une
-    // place, mais il vit dans `start/routes/boats.ts`, hors du groupe gardé.
-    // Une organisation redescendue en Starter garde ainsi la main sur ses
-    // amarrages alors que toute la section /ports lui est fermée.
-    //
-    // **Constat figé, pas règle voulue** : si l'issue #721 tranche pour la
-    // garde, ce test tombe et c'est exactement ce qu'on veut — il nomme alors
-    // l'endroit à mettre à jour.
-    const assignment = routeFacts().find((route) => route.pattern.includes('boats/:id/assignment'))
+  test("l'amarrage d'un bateau, hors préfixe, est lui aussi gardé (#721)", ({ assert }) => {
+    // `PATCH /boats/:id/assignment` écrit `boats.spot_id` sous une URL `/boats`.
+    // Déclarée autrefois dans `start/routes/boats.ts`, elle laissait une
+    // organisation redescendue en Starter amarrer sur ses places héritées. Elle
+    // vit désormais dans le groupe gardé de `start/routes/ports.ts`.
+    const assignment = marinaRoutes().find((route) => route.pattern === '/boats/:id/assignment')
 
-    assert.isDefined(assignment, "la route d'amarrage a disparu")
-    assert.isFalse(MARINA_SEGMENT.test(assignment!.pattern))
-    assert.notInclude(assignment!.middleware, 'requirePortsPlan')
+    assert.isDefined(assignment, "la route d'amarrage a disparu du domaine")
+    assert.include(assignment!.middleware, 'requirePortsPlan')
+    assert.include(assignment!.middleware, 'auth')
   })
 })
