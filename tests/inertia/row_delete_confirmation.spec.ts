@@ -3,6 +3,7 @@ import { mountWithStubs, routerSpies } from './helpers/mount'
 import type { InvoiceRow, InvoicesPaginated } from '../../shared/types/invoice'
 import type { PricingSeasonRow } from '../../shared/types/pricing_season'
 import type { SpotRow } from '../../inertia/types/port'
+import { ROLE_PERMISSIONS } from '../../shared/types/permissions'
 
 /**
  * Caractérisation des suppressions confirmées **dans l'app** (modale
@@ -205,6 +206,10 @@ describe('SpotsManager — suppression sans options de visite', () => {
         spots: [spot],
         boats: [],
       } as Record<string, unknown>,
+      // Le bouton n'est rendu qu'avec `spots.delete` (#719), capacité admin.
+      pageProps: {
+        permissions: { role: 'admin', capabilities: [...ROLE_PERMISSIONS.admin] },
+      },
       stubs: {
         SpotFormModal: { template: '<div />' },
         BoatAssignModal: { template: '<div />' },

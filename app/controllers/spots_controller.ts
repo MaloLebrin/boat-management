@@ -8,7 +8,7 @@ import MouillageService from '#services/mouillage_service'
 import PontoonService from '#services/pontoon_service'
 import PortService from '#services/port_service'
 import SpotService from '#services/spot_service'
-import PortPolicy from '#policies/port_policy'
+import SpotPolicy from '#policies/spot_policy'
 import { createSpotValidator, updateSpotValidator } from '#validators/spot'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -27,7 +27,7 @@ export default class SpotsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      await bouncer.with(SpotPolicy).authorize('create')
       const port = await this.portService.getForUserOrFail(user, Number(params.portId))
       const pontoon = await this.pontoonService.getForPortOrFail(port.id, Number(params.pontoonId))
       const payload = await request.validateUsing(createSpotValidator)
@@ -45,7 +45,7 @@ export default class SpotsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('create')
+      await bouncer.with(SpotPolicy).authorize('create')
       const port = await this.portService.getForUserOrFail(user, Number(params.portId))
       const mouillage = await this.mouillageService.getForPortOrFail(
         port.id,
@@ -67,8 +67,8 @@ export default class SpotsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('edit')
       const spot = await this.spotService.getForUserOrFail(user, Number(params.id))
+      await bouncer.with(SpotPolicy).authorize('edit', spot)
       const payload = await request.validateUsing(updateSpotValidator)
       await this.spotService.update(spot, payload)
       return response.redirect().back()
@@ -83,8 +83,8 @@ export default class SpotsController {
     const user = auth.getUserOrFail()
 
     try {
-      await bouncer.with(PortPolicy).authorize('delete')
       const spot = await this.spotService.getForUserOrFail(user, Number(params.id))
+      await bouncer.with(SpotPolicy).authorize('delete', spot)
       await this.spotService.delete(spot)
       return response.redirect().back()
     } catch (error) {
