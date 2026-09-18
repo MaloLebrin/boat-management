@@ -384,6 +384,59 @@ validaient ainsi un « CSV valide » qui était en réalité rejeté, faute d'ê
 séparateur. Ce qui sépare les deux cas, c'est l'effet : ici, la présence de `pendingImport` en
 session (`response.session('pendingImport')`).
 
+## Éprouver une garde (#694)
+
+### Une garde prouvée sur des GET d'index ne prouve rien des écritures
+
+Le refus du module Location était testé sur quatre pages d'index. C'est le cas où le refus coûte le
+moins : une redirection sur un écran n'écrit rien de toute façon. Les treize routes d'**écriture** du
+même sous-groupe n'étaient jamais éprouvées, alors que ce sont elles qui créent des réservations, des
+états des lieux et des contrats.
+
+### Le témoin qui sépare « refusé » de « redirigé »
+
+Un test qui assert la seule `location` prouve une redirection. Il ne prouve pas que rien n'a été
+écrit : la requête aurait pu écrire, **puis** rediriger. Le témoin tient en trois lignes — photographier
+la base avant, après, et comparer :
+
+```ts
+const before = await domainState() // compte les six tables du domaine
+const response = await face.call(client, user, ctx)
+response.assertStatus(302)
+assert.deepEqual(await domainState(), before, `« ${face.name} » a écrit malgré le refus`)
+```
+
+### Une garde posée sur un groupe se teste sur la table de routage
+
+Les vingt-deux routes du domaine réservations n'ont pas leur garde : elles en **héritent** du groupe.
+Une route déclarée d'un cran trop haut serait ouverte à tout le monde, et aucun test du domaine ne le
+dirait — ils emploient tous un acteur qui a le module. La table de routage, elle, sait : les
+middlewares **nommés** y restent introspectables avec leurs arguments.
+
+```ts
+router.commit()
+for (const entry of route.middleware.all()) {
+  if (entry.name === 'requireModulePlan') console.log(entry.args) // { feature: 'reservations' }
+}
+```
+
+`tests/unit/hygiene/charter_routes_gated.spec.ts` s'en sert pour que la route ajoutée demain soit
+couverte sans que personne n'y pense.
+
+### Deux refus qui se ressemblent n'ont pas la même cause
+
+Sur ces routes, la garde de module passe **avant** la policy. Tester la frontière d'un rôle dans une
+organisation qui n'a pas le module mesure donc le module en croyant mesurer le rôle. Les deux refus ne
+se ressemblent d'ailleurs qu'en apparence : un rôle sans capacité obtient **403** en lecture et
+**302 vers `/`** en écriture, un module manquant **302 vers `/settings/billing`**.
+
+### Un buffer de texte n'est pas une image
+
+Le bodyparser détecte le type **réel** du fichier, pas le `contentType` déclaré :
+`.file('files[]', Buffer.from('fake-jpeg'), { contentType: 'image/jpeg' })` est rejeté par le
+validateur, et le test compte zéro envoi sans qu'aucune assertion ne dise pourquoi. Écrire les octets
+magiques : `Buffer.from('\xff\xd8\xff\xe0 fake jpeg', 'binary')`.
+
 ## Navigateur (Japa + Playwright)
 
 Script : `pnpm test:e2e` (alias `node ace test browser`). Répertoire : `tests/browser`.

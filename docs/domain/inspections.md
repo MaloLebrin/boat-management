@@ -16,8 +16,20 @@ Réservation
 ```
 
 Une inspection est unique par `(réservation, kind)` — au plus un check-out et
-un check-in. L'écran (`/boats/:boatId/reservations/:reservationId/inspection`)
-affiche les deux panneaux côte à côte (onglets sous `lg`, #495).
+un check-in. L'unicité est tenue par l'**index unique Postgres**
+`(reservation_id, kind)` ; la vérification applicative de
+`createForReservation` n'est qu'un doublon de confort — la retirer ne change
+rien d'observable, l'index prend le relais (`23505` → même erreur métier).
+Un second état des lieux du même type répond **302 + flash
+`inspections.kindAlreadyExists`**, et n'écrase pas le premier.
+
+L'écran (`/boats/:boatId/reservations/:reservationId/inspection`) affiche les
+deux panneaux côte à côte (onglets sous `lg`, #495).
+
+> ⚠️ **L'ordre de la prop `inspections` n'est pas celui du séjour.**
+> `listForReservation` trie `orderBy('kind', 'asc')`, et `checkin` précède
+> `checkout` dans l'alphabet : le **retour** arrive donc en premier, quel que
+> soit l'ordre de création. Chercher par `kind`, jamais par position (#694).
 
 ## Checklist structurée (#584)
 
@@ -73,7 +85,13 @@ n'est pas `ok` (validator `requiredWhen` + garde UI) et effacée au retour à
    note (cibles tactiles ≥ 44 px, acquis de l'épic #481).
 2. Un point en `damage` propose une **action d'équipement pré-remplie**
    (libellé du point + note du constat) via le lien inspection → action déjà
-   en place (#311).
+   en place (#311). ⚠️ C'est une **affordance d'interface**, pas une règle du
+   domaine : le `v-if="row?.state === 'damage' && canManageActions"` de
+   `InspectionChecklistItem.vue` décide seul de l'afficher.
+   `createFromInspection` ne lit jamais `boat_inspection_items` — une action se
+   crée depuis un état des lieux dont tous les points sont `ok`, ou qui n'en a
+   aucun. Figé par `tests/functional/reservations/inspection_round_trip.spec.ts`
+   (#694).
 3. Au check-in, chaque point affiche l'état qu'il avait au check-out de la même
    réservation ; une **dégradation** (l'état a empiré) est mise en évidence.
 4. `notes` reste disponible pour le hors-checklist — aucun champ supprimé, les
@@ -90,6 +108,11 @@ n'est pas `ok` (validator `requiredWhen` + garde UI) et effacée au retour à
 | `app/controllers/boat_inspections_controller.ts`                         | `show`, CRUD, `setItem`, `destroyItem`, actions équipement |
 | `inertia/components/reservations/inspection/InspectionChecklist.vue`     | Sections, progression, modal d'action pré-remplie          |
 | `inertia/components/reservations/inspection/InspectionChecklistItem.vue` | Ligne : tap `ok`, note, comparaison, dégradation           |
+| `inertia/components/reservations/inspection/InspectionDefectModal.vue`   | Saisie de l'action pré-remplie depuis un point `damage`    |
+| `inertia/components/reservations/inspection/InspectionDefects.vue`       | Liste des actions rattachées à l'état des lieux            |
+| `inertia/components/reservations/inspection/InspectionPhotos.vue`        | Galerie et ajout de clichés                                |
+| `inertia/components/reservations/inspection/InspectionComparison.vue`    | Confrontation départ / retour                              |
+| `inertia/components/reservations/inspection/InspectionPanel.vue`         | Un panneau (un `kind`) avec son formulaire                 |
 
 ## Routes
 
@@ -108,15 +131,32 @@ les items — `preserveScroll` côté client), jamais par du JSON.
 
 ## Permissions
 
+**Avant toute policy, la garde de module.** Le sous-groupe de routes porte
+`middleware.requireModulePlan({ feature: 'reservations' })` (#595) : une
+organisation sans le module Location est redirigée vers `/settings/billing`
+**avant** d'atteindre le contrôleur. C'est la première cause d'un 302
+inexpliqué en test — l'acteur doit venir de `createCharterAdminUser()`.
+Exhaustivité tenue par `tests/unit/hygiene/charter_routes_gated.spec.ts`.
+
 `InspectionPolicy` (org scope + abilities `inspections.*`) : `view` pour la
 page, `create`/`edit`/`delete` pour les mutations — les items relèvent de
 `edit`. Les actions d'équipement passent par `EquipmentActionPolicy`.
+`mechanic` et `boat_owner` n'ont **aucune** de ces abilities : une lecture leur
+répond `403`, une écriture `302` vers `/` avec un flash que le layout marketing
+ne rend pas (#694).
 
 ## Photos
 
-Les photos restent au niveau de l'inspection (pipeline média existant,
-`equipment_media`) — le rattachement par item envisagé dans #584 est resté hors
-périmètre, le pipeline n'étant pas générique par item.
+Les photos restent au niveau de l'inspection — le rattachement par item
+envisagé dans #584 est resté hors périmètre, le pipeline n'étant pas générique
+par item.
+
+Le stockage est la table **polymorphe `media`**, indexée par
+`(entity_type, entity_id)` avec `entity_type = 'inspection'` — et non
+`equipment_media`, qui n'est pas une table mais le nom d'un service et d'une
+page de doc. Le dossier Cloudinary embarque le `kind`
+(`…/reservations/:id/inspections/checkout` ou `…/checkin`) : les clichés du
+départ et ceux du retour ne peuvent pas se mélanger.
 
 ## Hors-ligne (#491, #622)
 
