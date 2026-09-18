@@ -42,7 +42,17 @@ export default class SubscriptionService {
     }
   }
 
-  async syncFromCheckoutSession(session: Stripe.Checkout.Session): Promise<void> {
+  /**
+   * `trx` optionnel (#703) : quand le webhook fournit sa transaction, la
+   * synchro s'y inscrit au lieu d'en ouvrir une seconde, pour que la trace
+   * d'idempotence et les écritures qu'elle couvre soient commitées **ensemble**.
+   * Sans `trx`, le comportement est inchangé — la synchro ouvre et commite la
+   * sienne, comme tous les appelants directs (tests de service compris).
+   */
+  async syncFromCheckoutSession(
+    session: Stripe.Checkout.Session,
+    trx?: TransactionClientContract
+  ): Promise<void> {
     if (!session.subscription || !session.customer) return
 
     const org = await Organization.query()
@@ -56,21 +66,15 @@ export default class SubscriptionService {
     const plan = this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, plan)
 
-    const { planChange, removed } = await db.transaction(async (trx) => {
-      await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
-      const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
-        org.id,
-        desiredModules,
-        trx
-      )
-      return { planChange: await this.applyOrgPlan(org, plan, trx), removed: reconciled.removed }
-    })
-
-    await this.dispatchPlanChange(org, planChange, plan)
-    await this.dispatchModuleDeactivations(org, removed)
+    await this.runInTransaction(trx, (tx) =>
+      this.applySync(org, stripeSub, tierItem, plan, desiredModules, tx)
+    )
   }
 
-  async syncFromSubscriptionEvent(stripeSub: Stripe.Subscription): Promise<void> {
+  async syncFromSubscriptionEvent(
+    stripeSub: Stripe.Subscription,
+    trx?: TransactionClientContract
+  ): Promise<void> {
     const org = await Organization.query()
       .where('stripe_customer_id', String(stripeSub.customer))
       .first()
@@ -82,18 +86,56 @@ export default class SubscriptionService {
       stripeSub.status === 'canceled' ? 'starter' : this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, newPlan)
 
-    const { planChange, removed } = await db.transaction(async (trx) => {
-      await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
-      const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
-        org.id,
-        desiredModules,
-        trx
-      )
-      return { planChange: await this.applyOrgPlan(org, newPlan, trx), removed: reconciled.removed }
-    })
+    await this.runInTransaction(trx, (tx) =>
+      this.applySync(org, stripeSub, tierItem, newPlan, desiredModules, tx)
+    )
+  }
 
-    await this.dispatchPlanChange(org, planChange, newPlan)
-    await this.dispatchModuleDeactivations(org, removed)
+  /**
+   * Exécute `work` dans la transaction fournie, ou dans une transaction
+   * ouverte pour l'occasion. Rejoindre celle de l'appelant plutôt que d'en
+   * ouvrir une seconde est ce qui rend l'écriture de la trace d'idempotence et
+   * la synchro atomiques (#703) : deux transactions distinctes laisseraient une
+   * fenêtre où l'événement est marqué traité sans l'avoir été, ou l'inverse.
+   */
+  private async runInTransaction(
+    trx: TransactionClientContract | undefined,
+    work: (tx: TransactionClientContract) => Promise<void>
+  ): Promise<void> {
+    if (trx) return work(trx)
+    await db.transaction(work)
+  }
+
+  /**
+   * Le corps de la synchro, transaction fournie.
+   *
+   * Les events de changement de plan et de désactivation de module partent
+   * **après commit** via `trx.after('commit')` : leurs listeners envoient des
+   * e-mails et des notifications, qui ne doivent jamais s'appuyer sur une
+   * transaction encore annulable. Le hook vaut aussi bien pour la transaction
+   * ouverte ici que pour celle du webhook — Lucid attend ses handlers
+   * `after:commit` avant de rendre la main.
+   */
+  private async applySync(
+    org: Organization,
+    stripeSub: Stripe.Subscription,
+    tierItem: Stripe.SubscriptionItem,
+    plan: PlanTier,
+    desiredModules: DesiredSubscriptionModule[],
+    trx: TransactionClientContract
+  ): Promise<void> {
+    await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
+    const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
+      org.id,
+      desiredModules,
+      trx
+    )
+    const planChange = await this.applyOrgPlan(org, plan, trx)
+
+    trx.after('commit', async () => {
+      await this.dispatchPlanChange(org, planChange, plan)
+      await this.dispatchModuleDeactivations(org, reconciled.removed)
+    })
   }
 
   /**
