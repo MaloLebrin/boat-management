@@ -76,18 +76,19 @@ POST /simulator/share  { input, locale? }
   estimation qu'elle n'a pas produite — un coût minimum négatif ou un total minimum supérieur au
   maximum compris. Le partage reste en outre cohérent si la grille de coûts évolue.
 
-### Ce que le serveur ne fait pas
+### Ce que le serveur borne
 
-- **Il ne borne pas `locale`.** `vine.string().optional()` contre une colonne `varchar(10)` : onze
-  caractères rendent un **500**, et une locale bidon plus courte est stockée puis servie à une page
-  qui type sa prop `'en' | 'fr'` : constat #729.
+- **`locale`.** `vine.enum(APP_LOCALES)` (#729) : seules `'fr'` et `'en'` passent, tout le reste est
+  refusé en erreur de validation avant l'insertion. Avant, `vine.string().optional()` contre une
+  colonne `varchar(10)` rendait un **500** sur onze caractères, et laissait une locale bidon plus
+  courte se stocker puis se servir à une page qui type sa prop `'en' | 'fr'`.
 
 ### Où c'est testé
 
-| Fichier                                                       | Couvre                                                                                                                                                      |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide et invalide                                                                                                        |
-| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, le recalcul serveur du breakdown, les refus du validateur, et les trois constats ouverts en caractérisation |
+| Fichier                                                       | Couvre                                                                                                                                                                       |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/functional/simulator/simulator_share.spec.ts`          | les deux routes de lecture, jeton valide et invalide                                                                                                                         |
+| `tests/functional/simulator/simulator_share_creation.spec.ts` | la création, l'aller-retour création → lecture, le recalcul serveur du breakdown, les refus du validateur (locale comprise), et les deux constats ouverts en caractérisation |
 
 ---
 
