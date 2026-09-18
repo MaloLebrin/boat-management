@@ -14,15 +14,19 @@ import type { SimulatorBoatInput, SimulatorCostBreakdown } from '#shared/types/s
  * consultable par n'importe qui via `/simulateur/r/:token`. Les deux routes de
  * lecture étaient couvertes ; celle qui écrit ne l'était pas.
  *
- * Un seul comportement mesuré ici est encore **caractérisé, pas validé** :
+ * Les quatre constats que ce fichier caractérisait sont désormais **tous
+ * traités**, et mesurés en validation :
  *
- * - un jeton inconnu renvoie toujours vers la page FR (#732).
+ * - la borne sur `locale` (#729) — deux refus de validation dans « ce que le
+ *   validateur de partage refuse » ;
+ * - le recalcul du `breakdown` (#730) — le serveur produit les montants à
+ *   partir du seul `input`, et le payload n'en porte plus ;
+ * - le throttle (#731) — la rafale est mesurée dans
+ *   `simulator_public_throttle.spec.ts` ;
+ * - la cible de repli d'un jeton inconnu (#732) — elle suit la route
+ *   empruntée, les deux locales sont mesurées dans `simulator_share.spec.ts`.
  *
- * Trois autres sont posés : la borne sur `locale` (#729), passée en validation
- * dans « ce que le validateur de partage refuse » ; le recalcul du `breakdown`
- * (#730) — le serveur produit les montants à partir du seul `input`, et le
- * payload n'en porte plus ; et le throttle (#731), dont la rafale est mesurée
- * dans `simulator_public_throttle.spec.ts`.
+ * Il ne reste donc ici aucun groupe de caractérisation.
  */
 
 const INPUT: SimulatorBoatInput = {
@@ -257,22 +261,5 @@ test.group('Simulateur — ce que le validateur de partage refuse', (group) => {
 
     assertFieldErrors(assert, response, ['input.lengthM'])
     assert.lengthOf(await SimulatorShare.all(), 0)
-  })
-})
-
-test.group('Simulateur — la frontière que la route ne tient pas', (group) => {
-  group.each.setup(() => truncateDb())
-
-  /**
-   * Caractérisation : ces cas figent le comportement **actuel**, pas le
-   * comportement souhaitable. Chacun tombera le jour où son constat sera
-   * traité — c'est le signal qu'on veut.
-   */
-
-  test('#732 — un jeton inconnu renvoie vers la page FR, même en anglais', async ({ client }) => {
-    const response = await client.get('/simulator/r/deadbeef0000').redirects(0)
-
-    response.assertStatus(302)
-    response.assertHeader('location', '/fr/simulateur-cout-entretien')
   })
 })
