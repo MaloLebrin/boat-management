@@ -21,6 +21,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/domain/notifications.md` — notifications par utilisateur (cloche + page, temps réel SSE via Transmit, events → listeners)
   - `docs/domain/contact.md` — formulaire de contact public (`POST /contact`, throttle, persistance, notification équipe + accusé de réception)
   - `docs/domain/ports-and-marina.md` — ports, pontons, mouillages, places et plan interactif (Entreprise, profil professionnel)
+  - `docs/domain/offline-queue.md` — file hors-ligne : les cinq clés de flash, le vocabulaire d'actions, le verrou optimiste et la résolution des ID temporaires
   - `docs/domain/navigation-logs.md` — journal de bord (sorties, points de log GPS au tap avec COG/SOG, carte du tracé, offline)
 - **Données**: `docs/data/schema.md`
 - **Frontend (Inertia/Vue)**:

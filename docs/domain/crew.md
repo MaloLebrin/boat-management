@@ -65,11 +65,29 @@ vie (permis français, CRR, PSC1) ne proposent rien.
 
 Référence : `app/policies/crew_member_policy.ts`.
 
-| Action   | Règle                                               |
-| -------- | --------------------------------------------------- |
-| `create` | membre de l'organisation (`organizationId != null`) |
-| `update` | membre de l'organisation                            |
-| `delete` | admin de l'organisation uniquement (via `before()`) |
+| Action   | Capacité lue  | Qui passe                    |
+| -------- | ------------- | ---------------------------- |
+| `create` | `crew.create` | admin, member                |
+| `update` | `crew.update` | admin, member                |
+| `delete` | `crew.delete` | admin seulement (admin-only) |
+
+Trois choses à connaître avant de lire ce tableau (#696) :
+
+- **`GET /crew` autorise sur `create`, pas sur une lecture.** `CrewMemberPolicy`
+  n'a pas de méthode `view`, et `CrewMembersController.index` appelle
+  `authorize('create')`. Lire la liste exige donc la capacité de créer. Sans
+  conséquence aujourd'hui — `mechanic` et `boat_owner`, les deux rôles sans
+  `crew.create`, n'ont rien à faire sur cet écran — mais un rôle en lecture
+  seule serait refusé. Figé par `tests/functional/crew/crew_members.spec.ts`.
+- **Aucune des trois méthodes ne prend de ressource.** Elles ne vérifient que la
+  capacité, jamais l'appartenance. Toute l'isolation multi-tenant de
+  `PUT /crew/:id` et `DELETE /crew/:id` — qui ne portent pas d'organisation dans
+  leur URL — tient au `where('organizationId', …)` de
+  `CrewService.getForOrganizationOrFail`.
+- **Une fiche d'une autre organisation ne rend pas un 404** : le service lève
+  `CrewMemberNotFoundError`, le contrôleur pose le flash `crew.notFound` et
+  renvoie **302 vers `/crew`**. Un refus de rôle, lui, renvoie 302 vers `/` en
+  écriture et **403** en lecture.
 
 ## Routes → controllers → services → UI
 
