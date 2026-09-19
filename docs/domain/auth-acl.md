@@ -147,7 +147,18 @@ async delete(user: User, boat: Boat) {
 
 **`before()` lit la ressource (#690).** Bouncer transmet l'action et ses arguments au hook — `before(user, action, ...args)` — et un retour booléen **court-circuite entièrement** la méthode de policy. Tant que la signature ne lisait que `user`, un admin de l'org A franchissait `bouncer.with(PortPolicy).authorize('edit', portDeB)` sans que `sameOrg` soit jamais atteint : le point de vigilance signalé ici était réel, seulement masqué par le scoping des Services. Il est refermé — la couche policy refuse désormais elle-même.
 
-La règle : **refuser seulement sur une ressource prouvablement étrangère**. Le hook lit l'organisation sous deux formes — la colonne `organizationId` directe, et la relation `port` chargée (`Mouillage` et `Pontoon` n'ont pas de colonne propre ; `Spot`, lui, porte un `organization_id` `NOT NULL` depuis la création de la table et se compare donc directement). Quand elle n'est pas lisible — argument absent, payload de validation, relation non préchargée — l'admin passe comme avant. Refuser sur le doute ferait retomber l'admin sur la méthode de policy, qui refuserait un `Mouillage` dont le `port` n'est pas préchargé : un 403 tout neuf sur un chemin aujourd'hui autorisé.
+**Le hook distingue trois situations, pas deux (#771).** Il rendait un booléen dans tous les cas, ce qui revenait à traiter « je n'ai pas pu vérifier » comme « autorisé ». Désormais :
+
+| Situation                                          | Retour      | Effet                                                   |
+| -------------------------------------------------- | ----------- | ------------------------------------------------------- |
+| Aucune ressource passée (`create`, `viewMembers`…) | `true`      | laissez-passer admin, il n'y a rien à vérifier          |
+| Organisation lisible et **identique**              | `true`      | laissez-passer admin                                    |
+| Organisation lisible et **différente**             | `false`     | refus, la méthode de policy n'est pas atteinte          |
+| Organisation **non lisible**                       | `undefined` | le hook **ne tranche pas**, la méthode de policy décide |
+
+Une seule ressource étrangère suffit à refuser ; une seule ressource illisible suffit à s'abstenir, même si les autres sont légitimes.
+
+`organizationIdOf` reconnaît une **liste close** de formes : la colonne `organizationId` directe (c'est la forme de **tous** les sites d'appel actuels — `Boat`, `Port`, `Spot`, `BoatReservation`, `Invoice`), la relation `port` préchargée (`Mouillage`, `Pontoon`, qui n'ont pas de colonne propre) et la relation `boat` préchargée. Tout le reste est illisible. Étendre cette liste est préférable à laisser une forme y retomber : depuis #771, « illisible » ne veut plus dire « autorisé », il veut dire « à la policy de voir ».
 
 ⚠️ Corollaire pour les tests : `before()` n'est **jamais** exécuté quand on instancie une policy à la main (`new BoatPolicy().edit(...)`). Un test qui procède ainsi vérifie `sameOrg`, pas l'autorisation réelle. Ce qu'un admin obtient vraiment se teste à travers un vrai `Bouncer` — `tests/integration/permissions/policy_before_hook.spec.ts`.
 
