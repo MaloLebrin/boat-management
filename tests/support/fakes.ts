@@ -2,6 +2,8 @@ import app from '@adonisjs/core/services/app'
 import AiService, { type AiChatMessage } from '#services/ai_service'
 import { CloudinaryService, type CloudinaryUploadResult } from '#services/cloudinary_service'
 import StripeService from '#services/stripe_service'
+import SubscriptionService from '#services/subscription_service'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import type { AiChatOptions, AiProvider, AiToolCall, AiToolDefinition } from '#shared/types/ai'
 import type Stripe from 'stripe'
 
@@ -274,4 +276,75 @@ export function swapStripeService(
 
 export function restoreStripeService(): void {
   app.container.restore(StripeService)
+}
+
+/** Ce qu'un test peut asserter après coup sur les appels à la synchro. */
+export interface CountingSubscriptionService {
+  /** Un compteur par méthode de synchro, dans l'ordre d'appel. */
+  calls: { checkoutSession: number; subscriptionEvent: number }
+  restore(): void
+}
+
+/**
+ * Compte les appels à `SubscriptionService` **sans** changer ce qu'il fait
+ * (#703).
+ *
+ * Prouver qu'un rejeu de webhook n'écrit rien par l'état final est un piège :
+ * la synchro passe par un `updateOrCreate` clé sur l'organisation, qui réécrit
+ * les mêmes valeurs. Un état final identique ne distingue donc pas « rien n'a
+ * été fait » de « la même chose a été refaite » — et c'est exactement la
+ * différence qui compte, puisque la moindre écriture non idempotente ajoutée
+ * au chemin de synchro serait dupliquée par le rejeu.
+ *
+ * Ce compteur mesure donc ce qui a **atteint** le service. Il délègue au vrai
+ * service, pour que le premier passage produise un état réel sur lequel la
+ * suite du test s'appuie.
+ *
+ * `failFirstCall` fait échouer le premier appel, afin de vérifier que la trace
+ * d'idempotence est bien annulée avec la synchro — sans quoi un traitement en
+ * échec marquerait l'événement comme traité et Stripe ne le rejouerait pour
+ * rien.
+ */
+export async function swapCountingSubscriptionService(
+  options: { failFirstCall?: boolean } = {}
+): Promise<CountingSubscriptionService> {
+  const real = await app.container.make(SubscriptionService)
+
+  const state: CountingSubscriptionService = {
+    calls: { checkoutSession: 0, subscriptionEvent: 0 },
+    restore: () => app.container.restore(SubscriptionService),
+  }
+
+  let failuresLeft = options.failFirstCall ? 1 : 0
+  const guard = () => {
+    if (failuresLeft > 0) {
+      failuresLeft -= 1
+      throw new Error('swapCountingSubscriptionService: échec simulé de la synchro')
+    }
+  }
+
+  app.container.swap(
+    SubscriptionService,
+    () =>
+      ({
+        syncFromCheckoutSession: async (
+          session: Stripe.Checkout.Session,
+          trx?: TransactionClientContract
+        ) => {
+          state.calls.checkoutSession += 1
+          guard()
+          return real.syncFromCheckoutSession(session, trx)
+        },
+        syncFromSubscriptionEvent: async (
+          subscription: Stripe.Subscription,
+          trx?: TransactionClientContract
+        ) => {
+          state.calls.subscriptionEvent += 1
+          guard()
+          return real.syncFromSubscriptionEvent(subscription, trx)
+        },
+      }) as unknown as SubscriptionService
+  )
+
+  return state
 }

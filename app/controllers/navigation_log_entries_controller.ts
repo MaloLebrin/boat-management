@@ -1,5 +1,6 @@
 import NavigationLogEntryService from '#services/navigation_log_entry_service'
 import {
+  NavigationLogEntryConflictError,
   NavigationLogEntryNotEditableError,
   NavigationLogEntryNotFoundError,
   NavigationLogNotFoundError,
@@ -14,6 +15,7 @@ import { CREATE_NAVIGATION_LOG_ENTRY_ACTION } from '#shared/constants/offline_qu
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import { UPDATE_NAVIGATION_LOG_ENTRY_ACTION } from '#shared/constants/offline_queue'
 
 @inject()
 export default class NavigationLogEntriesController {
@@ -90,6 +92,7 @@ export default class NavigationLogEntriesController {
         // that are `undefined` and only writes those explicitly provided (a null
         // clears the value). See #180.
         {
+          expectedUpdatedAt: payload._expectedUpdatedAt,
           recordedAt: payload.recordedAt,
           tzOffsetMinutes: payload.tzOffsetMinutes,
           latitude: payload.latitude,
@@ -103,6 +106,14 @@ export default class NavigationLogEntriesController {
         { allowCompleted }
       )
     } catch (error) {
+      // Conflit de verrou optimiste (#725) : la version du serveur part au
+      // client, qui ouvre la modale d'arbitrage au lieu d'écraser en silence.
+      if (error instanceof NavigationLogEntryConflictError) {
+        session.flash('conflictData', JSON.stringify(error.currentEntry))
+        session.flash('conflictType', UPDATE_NAVIGATION_LOG_ENTRY_ACTION)
+        response.redirect().back()
+        return
+      }
       if (this.flashKnownError(error, session, i18n)) {
         response.redirect().back()
         return
