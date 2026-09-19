@@ -38,21 +38,9 @@ const CONFLICT_MODAL = join(ROOT, 'inertia/components/ConflictResolutionModal.vu
  * déguisée.
  */
 const ENQUEUED_WITHOUT_SERVER_ANSWER = new Map<string, string>([
-  // Les quatre créations du domaine terrain : leurs refus métier sont rendus en
-  // `flash('error')` + redirection, sans `rejectedType`. `drainQueue` ne peut
-  // alors pas les distinguer d'un succès et **supprime l'action de la file** —
-  // un point de journal refusé est perdu en silence, sous un toast de succès.
-  // Suivi par #727.
-  [
-    'create-navigation-log',
-    'refus « une sortie déjà en cours » rendu sans `rejectedType` — suivi par #727',
-  ],
-  [
-    'create-navigation-log-entry',
-    'refus « sortie clôturée » rendu sans `rejectedType` — suivi par #727',
-  ],
-  ['create-fuel-log', 'refus métier rendu sans `rejectedType` — suivi par #727'],
-  ['increment-engine-hours', 'refus métier rendu sans `rejectedType` — suivi par #727'],
+  // Plus aucune exemption : les quatre créations du domaine terrain ont reçu
+  // leur `rejectedType` en #727, et l'édition d'un point de journal son verrou
+  // optimiste en #725. La garde couvre désormais tout le vocabulaire enfilé.
 ])
 
 /** Les trois clés de flash qui transportent un identifiant d'action. */

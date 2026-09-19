@@ -7,6 +7,7 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useGpsBurst } from '~/composables/use_gps_burst'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { CREATE_NAVIGATION_LOG_ENTRY_ACTION } from '#shared/constants/offline_queue'
 import { useT } from '~/composables/use_t'
 import { nowDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
 
@@ -83,7 +84,7 @@ function handleSubmit() {
 
   if (!isOnline.value) {
     enqueue({
-      type: 'create-navigation-log-entry',
+      type: CREATE_NAVIGATION_LOG_ENTRY_ACTION,
       url,
       method: 'post',
       payload: form.data() as unknown as Record<string, unknown>,
