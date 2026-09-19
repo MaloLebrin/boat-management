@@ -27,6 +27,7 @@ export type Capability =
   | 'equipmentActions.create'
   | 'equipmentActions.edit'
   | 'equipmentActions.delete'
+  | 'import.run'
   | 'incidents.view'
   | 'incidents.create'
   | 'incidents.edit'
@@ -74,6 +75,10 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'invitations.manage',
   'ai.configure',
   'branding.configure',
+  // Import CSV en masse (#715) : réservé à l'admin, comme `maintenance.delete`.
+  // Écrire un historique d'entretien que seul un admin peut ensuite corriger
+  // n'est pas du même ordre qu'une saisie unitaire.
+  'import.run',
   'boats.delete',
   'clients.delete',
   'clients.anonymize',

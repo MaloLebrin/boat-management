@@ -14,6 +14,7 @@ defineProps<{
   boats: CsvBoatOption[]
   preview: CsvImportPreviewData | null
   hasPendingImport: boolean
+  canImport: boolean
 }>()
 
 const { t } = useT()
@@ -22,6 +23,11 @@ const { t } = useT()
 <template>
   <Head :title="t('settings.import.title')" />
   <SettingsShell>
-    <SettingsImportTab :boats="boats" :preview="preview" :has-pending-import="hasPendingImport" />
+    <SettingsImportTab
+      :boats="boats"
+      :preview="preview"
+      :has-pending-import="hasPendingImport"
+      :can-import="canImport"
+    />
   </SettingsShell>
 </template>

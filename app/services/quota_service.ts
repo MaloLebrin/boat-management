@@ -240,6 +240,33 @@ export default class QuotaService {
     }
   }
 
+  /**
+   * Import CSV de l'historique d'entretien (#715) — capacité de **tier pure**,
+   * comme la cartographie de port : aucun module ni add-on ne l'accorde, elle
+   * suit donc `PLAN_LIMITS` et non les quotas effectifs. Réservée à Entreprise :
+   * reprendre un historique en masse est une opération de migration, qui
+   * accompagne l'offre supérieure.
+   *
+   * Distincte de `canExport` (Pro et Entreprise), qui ouvre les **exports** de
+   * la même page `/settings/import` : sortir ses propres données n'est pas une
+   * migration.
+   */
+  canImport(org: Organization | null): boolean {
+    this.#assertOrganization(org)
+    return PLAN_LIMITS[org.plan].canImport
+  }
+
+  assertCanImport(org: Organization | null): void {
+    this.#assertOrganization(org)
+    if (!PLAN_LIMITS[org.plan].canImport) {
+      throw new QuotaExceededError('import', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org.plan),
+      })
+    }
+  }
+
   storageLimitBytes(org: Organization | null): number | null {
     this.#assertOrganization(org)
     const gb = PLAN_LIMITS[org.plan].storageGb

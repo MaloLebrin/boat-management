@@ -17,6 +17,12 @@ const props = defineProps<{
   boats: CsvBoatOption[]
   preview: CsvImportPreviewData | null
   hasPendingImport: boolean
+  /**
+   * Plan Entreprise **et** capability `import.run` (admin seul) — #715. Faux,
+   * la page garde ses exports : ils s'arrêtent à `canExport`, ouvert dès le
+   * plan Pro et à tous les rôles.
+   */
+  canImport: boolean
 }>()
 
 const selectedBoatId = ref<string | ''>('')
@@ -128,7 +134,9 @@ function handleCancel() {
     <BaseCard>
       <BaseHeading level="3" class="mb-4">{{ t('settings.import.importSection') }}</BaseHeading>
 
-      <div v-if="!preview" class="space-y-4">
+      <p v-if="!canImport" class="text-sm text-fg-muted">{{ t('settings.import.restricted') }}</p>
+
+      <div v-else-if="!preview" class="space-y-4">
         <BaseSelect
           v-model="selectedBoatId"
           :label="t('settings.import.boatLabel')"

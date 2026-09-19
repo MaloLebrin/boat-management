@@ -30,6 +30,14 @@ export interface PlanQuotas {
    * de l'offre supérieure.
    */
   canManagePorts: boolean
+  /**
+   * Import CSV de l'historique d'entretien (`/settings/import`) — Entreprise
+   * uniquement (#715). Capacité de tier pure : aucun module ni add-on ne
+   * l'accorde. À ne pas confondre avec `canExport`, qui ouvre les **exports**
+   * de la même page dès le plan Pro : reprendre un historique en masse est une
+   * opération de migration, la sortie de ses propres données ne l'est pas.
+   */
+  canImport: boolean
 }
 
 export interface QuotaUsage {
@@ -77,6 +85,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManageReservations: false,
     canManageInvoices: false,
     canManagePorts: false,
+    canImport: false,
   },
   pro: {
     maxBoats: 8,
@@ -94,6 +103,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManageReservations: false,
     canManageInvoices: false,
     canManagePorts: false,
+    canImport: false,
   },
   enterprise: {
     maxBoats: null,
@@ -111,6 +121,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManageReservations: true,
     canManageInvoices: true,
     canManagePorts: true,
+    canImport: true,
   },
 }
 

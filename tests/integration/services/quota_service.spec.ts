@@ -222,6 +222,39 @@ test.group('QuotaService (unit)', () => {
     assert.equal(error!.upgradeTo, 'pro')
   })
 
+  // ── canImport / assertCanImport (#715) ───────────────────────────────────
+
+  test('canImport est faux en starter et en pro, vrai en enterprise', async ({ assert }) => {
+    const svc = await app.container.make(QuotaService)
+
+    assert.isFalse(svc.canImport(await OrganizationFactory.merge({ plan: 'starter' }).make()))
+    assert.isFalse(svc.canImport(await OrganizationFactory.merge({ plan: 'pro' }).make()))
+    assert.isTrue(svc.canImport(await OrganizationFactory.merge({ plan: 'enterprise' }).make()))
+  })
+
+  test("assertCanImport throw en pro, avec l'upsell vers enterprise", async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'pro' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    let error: QuotaExceededError | undefined
+    try {
+      svc.assertCanImport(org)
+    } catch (e) {
+      error = e as QuotaExceededError
+    }
+
+    assert.instanceOf(error, QuotaExceededError)
+    assert.equal(error!.feature, 'import')
+    assert.equal(error!.upgradeTo, 'enterprise')
+  })
+
+  test('assertCanImport passe en enterprise', async ({ assert }) => {
+    const org = await OrganizationFactory.merge({ plan: 'enterprise' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    assert.doesNotThrow(() => svc.assertCanImport(org))
+  })
+
   // ── canManagePorts / assertCanManagePorts (#604) ─────────────────────────
 
   test('canManagePorts retourne false pour le plan starter', async ({ assert }) => {

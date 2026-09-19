@@ -7,6 +7,7 @@ const ADMIN_ONLY: Capability[] = [
   'invitations.manage',
   'ai.configure',
   'branding.configure',
+  'import.run',
   'boats.delete',
   'clients.delete',
   'clients.anonymize',
