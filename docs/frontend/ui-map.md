@@ -329,6 +329,13 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 - Page : `inertia/pages/settings/notifications.vue` → `components/settings/tabs/SettingsNotificationsTab.vue` (prop `pushSubscriptions`, servie par `SettingsController.notifications`), section visible pour **tous les rôles**.
 - Gestion du Web Push : activer/désactiver **cet appareil** (`use_push_notifications.ts` — `subscribe()` uniquement sur geste utilisateur), liste des appareils abonnés (`user_agent`, dates) et retrait par appareil (`DELETE /push/subscriptions/:id`). Sur iOS hors PWA installée, `IosInstallHint.vue` remplace le bouton. Détail : `docs/frontend/pwa.md` § Web Push.
 
+### Settings — organisation (`/settings/org`, #761)
+
+- Page : `inertia/pages/settings/org.vue` → `components/settings/tabs/SettingsOrgTab.vue` (prop `organization` — `id` et `name` seulement, servie par `SettingsController.org`).
+- **Un écran, deux audiences** : **ouvrir** la page est `members.view` (admin + member, comme `/settings/members` — `SettingsShell` conditionne les deux onglets à cette même capability), **renommer** est `organization.manage` (admin seul, #761). Le formulaire n'est rendu que sous `can('organization.manage')` ; sinon le nom s'affiche en lecture seule (`BaseInput` `disabled`) avec `settings.org.readOnlyHint`. Sans cette distinction, un member gardait un formulaire que `PUT /settings/org` refuse.
+- Les deux gardes sont côté backend, pas seulement dans le rendu : `authorize('viewMembers')` sur le `GET`, `authorize('manageOrganization')` sur le `PUT` — un mechanic ou un boat_owner qui tape l'URL reçoit la page 403.
+- Le logo de l'organisation ne vit **pas** ici mais sur `/settings/branding` (`branding.configure`), avec le reste de la marque.
+
 ### Settings — facturation (`/settings/billing`)
 
 - Page : `inertia/pages/settings/billing.vue` → `components/settings/tabs/SettingsBillingTab.vue` (props `plan`, `quotaUsage`, `subscription`, `orgModules`, `orgAddons`, servies par `SettingsController.billing`)
