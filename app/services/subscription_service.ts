@@ -114,6 +114,12 @@ export default class SubscriptionService {
   /**
    * Le corps de la synchro, transaction fournie.
    *
+   * La garde d'appartenance (#705) vit **ici**, donc dans la transaction : hors
+   * d'elle, une livraison concurrente pourrait insérer la ligne entre le
+   * contrôle et l'écriture, et l'on retomberait sur la violation d'unicité
+   * brute — la 500 rejouée indéfiniment que l'issue décrit. Rien n'est écrit
+   * quand elle se déclenche : ni `subscriptions`, ni le plan, ni les modules.
+   *
    * Les events de changement de plan et de désactivation de module partent
    * **après commit** via `trx.after('commit')` : leurs listeners envoient des
    * e-mails et des notifications, qui ne doivent jamais s'appuyer sur une
@@ -129,6 +135,12 @@ export default class SubscriptionService {
     desiredModules: DesiredSubscriptionModule[],
     trx: TransactionClientContract
   ): Promise<void> {
+    const heldBy = await this.subscriptionHolderElsewhere(org.id, stripeSub.id, trx)
+    if (heldBy !== null) {
+      this.logSubscriptionOwnershipConflict(stripeSub, org, heldBy)
+      return
+    }
+
     await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
     const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
       org.id,
@@ -235,6 +247,67 @@ export default class SubscriptionService {
       }
     }
     return desired
+  }
+
+  /**
+   * Organisation qui détient déjà ce `sub_…`, si ce n'est pas celle qu'on
+   * s'apprête à synchroniser (#705). `null` sinon.
+   *
+   * `subscriptions` porte **deux** clés d'unicité : `organization_id` (une
+   * organisation a au plus un abonnement) et `stripe_subscription_id` (un
+   * abonnement Stripe appartient à au plus une organisation). L'upsert de
+   * synchro n'est clé que sur la première : si un `sub_…` rattaché à
+   * l'organisation A arrive sur l'organisation B — abonnement déplacé d'un
+   * client à l'autre côté Stripe, `stripe_customer_id` réattribué, deux
+   * organisations créées depuis le même client —, l'upsert ne trouve rien sur
+   * `organizationId = B`, tente un `INSERT`, et PostgreSQL rejette sur la
+   * seconde contrainte. L'erreur remontait brute : **500**, donc rejeu Stripe
+   * indéfini sur un conflit qu'aucun rejeu ne résoudra.
+   *
+   * La lecture se fait **dans la transaction de synchro** : hors d'elle, une
+   * livraison concurrente pourrait insérer la ligne entre le contrôle et
+   * l'écriture, et l'on retomberait sur la violation brute.
+   */
+  private async subscriptionHolderElsewhere(
+    organizationId: number,
+    stripeSubscriptionId: string,
+    trx: TransactionClientContract
+  ): Promise<number | null> {
+    const existing = await Subscription.query({ client: trx })
+      .select('id', 'organization_id')
+      .where('stripeSubscriptionId', stripeSubscriptionId)
+      .whereNot('organizationId', organizationId)
+      .first()
+
+    return existing?.organizationId ?? null
+  }
+
+  /**
+   * Conflit d'attribution : on n'écrit rien et on le dit fort (#705).
+   *
+   * `error` et non `warn` : deux organisations revendiquent le même abonnement
+   * Stripe, c'est une incohérence de données qui demande un arbitrage humain,
+   * pas une reprise automatique. Deviner laquelle garde l'abonnement
+   * reviendrait à retirer son plan payant à l'une des deux sur la foi d'un
+   * webhook.
+   *
+   * Le contrôleur répond **200** : le rejeu ne résoudra jamais un conflit
+   * d'attribution, le faire rejouer ne ferait qu'empiler les livraisons.
+   */
+  private logSubscriptionOwnershipConflict(
+    stripeSub: Stripe.Subscription,
+    organization: Organization,
+    heldByOrganizationId: number
+  ): void {
+    logger.error(
+      {
+        stripeSubscriptionId: stripeSub.id,
+        stripeCustomerId: String(stripeSub.customer),
+        eventOrganizationId: organization.id,
+        heldByOrganizationId,
+      },
+      'Stripe subscription already attached to another organization, sync skipped'
+    )
   }
 
   private async upsertSubscription(

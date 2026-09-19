@@ -709,3 +709,192 @@ test.group('Stripe webhook — abonnement sans item (functional, #704)', (group)
     assert.lengthOf(await Subscription.all(), 0)
   })
 })
+
+/**
+ * Un `sub_…` déjà rattaché à une autre organisation (#705).
+ *
+ * `subscriptions` porte deux clés d'unicité — `organization_id` et
+ * `stripe_subscription_id` — et l'upsert de synchro n'est clé que sur la
+ * première. Si un abonnement rattaché à l'organisation A arrive sur
+ * l'organisation B (abonnement déplacé d'un client à l'autre côté Stripe,
+ * `stripe_customer_id` réattribué, deux organisations créées depuis le même
+ * client), l'upsert ne trouvait rien sur `organizationId = B`, tentait un
+ * `INSERT`, et PostgreSQL rejetait sur la seconde contrainte : **500**, donc
+ * rejeu Stripe indéfini sur un conflit qu'aucun rejeu ne résoudra.
+ *
+ * Le conflit est désormais détecté avant l'écriture, dans la transaction.
+ */
+test.group('Stripe webhook — abonnement rattaché ailleurs (functional, #705)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  const OTHER_CUSTOMER = 'cus_webhook_other'
+  const SHARED_SUB = 'sub_shared'
+
+  /**
+   * Organisation A, porteuse de `sub_shared` en Pro.
+   *
+   * L'événement d'amorçage porte son **propre** `event.id` : depuis la
+   * déduplication de #703, réutiliser `evt_test` ferait écarter l'événement que
+   * chaque test poste ensuite — la garde d'appartenance ne serait jamais
+   * atteinte, et les cas « rien n'a été écrit » passeraient pour la mauvaise
+   * raison.
+   */
+  async function seedHolder(client: Parameters<typeof postStripeWebhook>[0]) {
+    const holder = await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+    await postStripeWebhook(
+      client,
+      subscriptionEvent(
+        'customer.subscription.updated',
+        {
+          id: SHARED_SUB,
+          customer: CUSTOMER,
+          priceId: PRICE_IDS.proMonth,
+        },
+        'evt_seed_holder'
+      )
+    )
+    return holder
+  }
+
+  test('an event moving the subscription to another organization is acknowledged, not a 500', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const holder = await seedHolder(client)
+    const claimant = await createOrgWithStripeCustomer({ customerId: OTHER_CUSTOMER })
+    const before = await Subscription.query().where('organizationId', holder.id).firstOrFail()
+
+    const events = emitter.fake()
+    cleanup(() => emitter.restore())
+
+    const response = await postStripeWebhook(
+      client,
+      subscriptionEvent('customer.subscription.updated', {
+        id: SHARED_SUB,
+        customer: OTHER_CUSTOMER,
+        priceId: PRICE_IDS.proMonth,
+      })
+    )
+
+    // 200 : le rejeu ne résoudra jamais un conflit d'attribution. Avant #705,
+    // la violation de contrainte remontait brute en 500 et Stripe rejouait.
+    response.assertStatus(200)
+    response.assertBodyContains({ received: true })
+
+    // Aucune ligne créée pour l'organisation revendiquante, aucun plan accordé.
+    await claimant.refresh()
+    assert.equal(claimant.plan, 'starter')
+    assert.isNull(await Subscription.query().where('organizationId', claimant.id).first())
+    assert.lengthOf(await Subscription.all(), 1)
+
+    // L'abonnement de l'organisation A est intact, pas seulement « équivalent ».
+    await holder.refresh()
+    assert.equal(holder.plan, 'pro')
+    const after = await Subscription.query().where('organizationId', holder.id).firstOrFail()
+    assert.equal(after.id, before.id)
+    assert.equal(after.stripeSubscriptionId, SHARED_SUB)
+    assert.equal(after.planTier, 'pro')
+    assert.equal(after.updatedAt.toISO(), before.updatedAt.toISO())
+
+    events.assertNotEmitted(OrganizationPlanUpgraded)
+    events.assertNotEmitted(OrganizationPlanDowngraded)
+  })
+
+  test('the modules of the claiming organization are left alone', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    await seedHolder(client)
+    const claimant = await createOrgWithStripeCustomer({ customerId: OTHER_CUSTOMER, plan: 'pro' })
+    await new OrganizationModuleService().grantModule(claimant.id, 'charter', {
+      source: 'granted',
+    })
+
+    cleanup(() => emitter.restore())
+    emitter.fake()
+
+    const response = await postStripeWebhook(
+      client,
+      subscriptionEvent('customer.subscription.updated', {
+        id: SHARED_SUB,
+        customer: OTHER_CUSTOMER,
+        items: [
+          stripeSubscriptionItem(PRICE_IDS.proMonth, { id: 'si_tier' }),
+          stripeSubscriptionItem(PRICE_IDS.crmMonth, { id: 'si_crm' }),
+        ],
+      })
+    )
+
+    response.assertStatus(200)
+    // La réconciliation des modules vit dans la même transaction que l'upsert :
+    // la garde doit court-circuiter les deux, pas seulement l'écriture de
+    // `subscriptions`. Sans quoi un conflit d'attribution activerait quand même
+    // le module CRM porté par l'événement.
+    assert.deepEqual(await activeModules(claimant.id), ['charter'])
+  })
+
+  test('the holding organization keeps syncing its own subscription', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const holder = await seedHolder(client)
+    await createOrgWithStripeCustomer({ customerId: OTHER_CUSTOMER })
+
+    cleanup(() => emitter.restore())
+    emitter.fake()
+
+    // Le chemin normal ne doit pas être gêné par la garde : c'est la même
+    // organisation, la ligne existante est la sienne.
+    const response = await postStripeWebhook(
+      client,
+      subscriptionEvent('customer.subscription.updated', {
+        id: SHARED_SUB,
+        customer: CUSTOMER,
+        priceId: PRICE_IDS.enterpriseMonth,
+      })
+    )
+
+    response.assertStatus(200)
+    await holder.refresh()
+    assert.equal(holder.plan, 'enterprise')
+    const subscription = await Subscription.query().where('organizationId', holder.id).firstOrFail()
+    assert.equal(subscription.planTier, 'enterprise')
+    assert.lengthOf(await Subscription.all(), 1)
+  })
+
+  test('checkout.session.completed on a subscription held elsewhere writes nothing', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const holder = await seedHolder(client)
+    const claimant = await createOrgWithStripeCustomer({ customerId: OTHER_CUSTOMER })
+
+    const stripe = swapStripeService({
+      subscription: stripeSubscription({
+        id: SHARED_SUB,
+        customer: OTHER_CUSTOMER,
+        priceId: PRICE_IDS.proMonth,
+      }),
+    })
+    cleanup(() => stripe.restore())
+
+    const response = await postStripeWebhook(
+      client,
+      stripeEvent(
+        'checkout.session.completed',
+        stripeCheckoutSession({ customer: OTHER_CUSTOMER, subscription: SHARED_SUB })
+      )
+    )
+
+    response.assertStatus(200)
+    await claimant.refresh()
+    assert.equal(claimant.plan, 'starter')
+    assert.lengthOf(await Subscription.all(), 1)
+    const held = await Subscription.query().where('organizationId', holder.id).firstOrFail()
+    assert.equal(held.planTier, 'pro')
+  })
+})

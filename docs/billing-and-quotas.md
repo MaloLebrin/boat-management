@@ -192,6 +192,8 @@ Avec les modules add-ons, un abonnement Stripe porte **plusieurs items** : un it
 
 `Subscription.updateOrCreate({ organizationId }, { ... })` — un seul enregistrement par organisation (contrainte UNIQUE sur `organization_id`).
 
+**Garde d'attribution (#705).** `subscriptions` porte **deux** clés d'unicité : `organization_id` et `stripe_subscription_id`. L'upsert n'étant clé que sur la première, un `sub_…` rattaché à l'organisation A qui arriverait sur l'organisation B (abonnement déplacé d'un client à l'autre côté Stripe, `stripe_customer_id` réattribué, deux organisations créées depuis le même client) déclenchait un `INSERT` rejeté par PostgreSQL sur la seconde — une 500, donc un rejeu Stripe indéfini. `subscriptionHolderElsewhere(organizationId, stripeSubscriptionId, trx)` détecte désormais le conflit **dans la transaction de synchro**, avant toute écriture : rien n'est écrit (ni `subscriptions`, ni le plan, ni les modules), le conflit est loggé en `error` avec les deux `organizationId`, et le webhook répond **200**. C'est une incohérence de données qui demande un arbitrage humain : deviner laquelle des deux organisations garde l'abonnement reviendrait à retirer son plan payant à l'autre sur la foi d'un webhook.
+
 **Calcul des bornes de période (Stripe v22+)** : les champs `current_period_start/end` ont été supprimés de l'objet `Stripe.Subscription` en v22. La méthode `getPeriodBounds()` les recalcule à partir de `billing_cycle_anchor` et des champs `recurring.interval` / `recurring.interval_count` du prix :
 
 ```ts
