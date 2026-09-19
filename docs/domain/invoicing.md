@@ -266,20 +266,32 @@ transitionne `draft → sent` après l'enfilement.
 
 Raccourci métier : générer un devis pré-rempli depuis une réservation.
 
-- **Action** : bouton « Créer un devis » sur la liste des réservations
-  (`FleetReservationList`, Enterprise) → `POST /invoices/from-reservation/:id`.
+- **Action** : bouton « Créer un devis » sur la liste flotte
+  (`FleetReservationList`) **et** sur la liste par bateau
+  (`ReservationList`, `/boats/:id/reservations`, #735) →
+  `POST /invoices/from-reservation/:id`. Le contrôleur redirige vers la fiche du
+  devis créé, donc le parcours se termine sur le document quel que soit l'écran
+  de départ.
 - **Pré-remplissage** (`InvoiceService.createQuoteFromReservation`) : devis
   brouillon `DEV-` lié à `reservation_id` ; **client résolu par l'email snapshot**
   de la réservation (à défaut, `client_name` texte libre conservé comme snapshot) ;
   **une ligne** tarifée depuis le `total_price` de la réservation (qui reflète
   déjà la tarification #284 quand disponible, sinon le montant saisi).
 - **Lien bidirectionnel** :
-  - _Réservation → documents_ : colonne « Documents » de la liste des réservations
-    (`ReservationsController.index` → `InvoiceService.listLinksByReservationIds`,
-    lookup groupé org-scopé), + flag `canCreateQuote`.
+  - _Réservation → documents_ : colonne « Documents » des deux listes de
+    réservations (`ReservationsController.index` et
+    `BoatReservationsController.index` → `InvoiceService.listLinksByReservationIds`,
+    lookup groupé org-scopé), + flag `canCreateQuote`. Sur la liste par bateau la
+    colonne est masquée quand elle n'a rien à montrer (ni document lié, ni droit
+    d'en créer).
   - _Document → réservation_ : la fiche facture transforme la réservation liée en
     lien vers la page des réservations du bateau (`toInvoiceDetail` expose
     `reservationBoatId`).
+
+`canCreateQuote` combine deux gardes, identiques sur les deux écrans :
+`QuotaService.canManageInvoices` (module facturation actif) **et**
+`InvoicePolicy.create` (capability `invoices.create`) — sans la seconde, le
+bouton menait à un 403 (#735).
 
 > **⚠️ Dette assumée (dépendance #275)** : l'issue #288 dépend de #275 (FK
 > `client_id` sur `boat_reservations`), **non livré**. En attendant, la résolution
