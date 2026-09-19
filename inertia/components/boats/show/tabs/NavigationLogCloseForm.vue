@@ -7,6 +7,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { CLOSE_NAVIGATION_LOG_ACTION } from '#shared/constants/offline_queue'
 import { useT } from '~/composables/use_t'
 import { nowDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
 import type {
@@ -73,7 +74,7 @@ function handleSubmit() {
 
   if (!isOnline.value) {
     enqueue({
-      type: 'close-navigation-log',
+      type: CLOSE_NAVIGATION_LOG_ACTION,
       url: `/boats/${props.boatId}/navigation-logs/${props.log.id}/close`,
       method: 'patch',
       payload: {

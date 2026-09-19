@@ -3,14 +3,25 @@ import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import { useT } from '~/composables/use_t'
 import type { ConflictState } from '~/composables/use_offline_queue'
+import {
+  CLOSE_NAVIGATION_LOG_ACTION,
+  UPDATE_INSPECTION_ACTION,
+  UPDATE_NAVIGATION_LOG_ACTION,
+  UPDATE_NAVIGATION_LOG_ENTRY_ACTION,
+  UPDATE_SHEET_ITEM_ACTION,
+  type OfflineActionType,
+} from '#shared/constants/offline_queue'
 
 const props = defineProps<{ conflict: ConflictState }>()
 const emit = defineEmits<{ resolve: [choice: 'local' | 'server'] }>()
 const { t } = useT()
 
-const FIELDS_BY_TYPE: Record<string, string[]> = {
-  'update-navigation-log': ['windForceBeaufort', 'seaState', 'crewCount', 'notes'],
-  'close-navigation-log': [
+// Les clés viennent de `shared/constants/offline_queue.ts` (#726) : le même
+// identifiant que le contrôleur flashe et que le formulaire enfile, donc un
+// renommage casse ici à la compilation au lieu d'ouvrir une modale vide.
+const FIELDS_BY_TYPE: Partial<Record<OfflineActionType, string[]>> = {
+  [UPDATE_NAVIGATION_LOG_ACTION]: ['windForceBeaufort', 'seaState', 'crewCount', 'notes'],
+  [CLOSE_NAVIGATION_LOG_ACTION]: [
     'arrivedAt',
     'arrivalPortName',
     'distanceNm',
@@ -21,7 +32,7 @@ const FIELDS_BY_TYPE: Record<string, string[]> = {
     'crewCount',
     'notes',
   ],
-  'update-navigation-log-entry': [
+  [UPDATE_NAVIGATION_LOG_ENTRY_ACTION]: [
     'recordedAt',
     'latitude',
     'longitude',
@@ -30,19 +41,19 @@ const FIELDS_BY_TYPE: Record<string, string[]> = {
     'sailConfig',
     'note',
   ],
-  'update-sheet-item': ['isDone', 'notes'],
-  'update-inspection': ['performedAt', 'fuelLevel', 'engineHours', 'notes'],
+  [UPDATE_SHEET_ITEM_ACTION]: ['isDone', 'notes'],
+  [UPDATE_INSPECTION_ACTION]: ['performedAt', 'fuelLevel', 'engineHours', 'notes'],
 }
 
 // Chaque type d'action a son propre namespace de libellés de champs
-const LABEL_PREFIX_BY_TYPE: Record<string, string> = {
-  'update-sheet-item': 'common.sheetItem.field',
-  'update-inspection': 'inspections.fields',
+const LABEL_PREFIX_BY_TYPE: Partial<Record<OfflineActionType, string>> = {
+  [UPDATE_SHEET_ITEM_ACTION]: 'common.sheetItem.field',
+  [UPDATE_INSPECTION_ACTION]: 'inspections.fields',
 }
 
 // La description parle de « cette sortie » : un état des lieux a la sienne (#622).
-const DESCRIPTION_BY_TYPE: Record<string, string> = {
-  'update-inspection': 'common.offline.conflict.descriptionInspection',
+const DESCRIPTION_BY_TYPE: Partial<Record<OfflineActionType, string>> = {
+  [UPDATE_INSPECTION_ACTION]: 'common.offline.conflict.descriptionInspection',
 }
 
 const rows = computed(() => {

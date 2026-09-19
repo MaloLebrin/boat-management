@@ -77,6 +77,8 @@
   "offline.queue.type.create-navigation-log": "Nouvelle sortie",
   "offline.queue.type.update-navigation-log": "Modification de sortie",
   "offline.queue.type.close-navigation-log": "Clôture de sortie",
+  "offline.queue.type.create-navigation-log-entry": "Nouveau point de journal",
+  "offline.queue.type.update-navigation-log-entry": "Modification de point de journal",
   "offline.queue.type.create-fuel-log": "Avitaillement",
   "offline.queue.type.increment-engine-hours": "Heures moteur",
   "offline.queue.type.create-incident": "Nouvel incident",

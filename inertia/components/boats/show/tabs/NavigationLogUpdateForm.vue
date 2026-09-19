@@ -7,6 +7,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { UPDATE_NAVIGATION_LOG_ACTION } from '#shared/constants/offline_queue'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogRow } from '~/types/boat_show'
 
@@ -42,7 +43,7 @@ const form = useForm({
 function handleSubmit() {
   if (!isOnline.value) {
     enqueue({
-      type: 'update-navigation-log',
+      type: UPDATE_NAVIGATION_LOG_ACTION,
       url: `/boats/${props.boatId}/navigation-logs/${props.log.id}`,
       method: 'patch',
       payload: {

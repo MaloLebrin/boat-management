@@ -4,6 +4,7 @@ import { onBeforeUnmount, ref, watch } from 'vue'
 import BoatMaintenanceSheetItemRow from '~/components/boats/sheets/BoatMaintenanceSheetItemRow.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { UPDATE_SHEET_ITEM_ACTION } from '#shared/constants/offline_queue'
 import { useT } from '~/composables/use_t'
 import type {
   BoatShowDetail,
@@ -58,7 +59,7 @@ function pushUpdate(item: SheetItemRow, isDone: boolean, notes: string) {
     // `_expectedUpdatedAt` : le rejeu refuse d'écraser un item modifié entre-temps ;
     // `dedupeKey` : deux mises à jour du même item fusionnent en une seule action
     enqueue({
-      type: 'update-sheet-item',
+      type: UPDATE_SHEET_ITEM_ACTION,
       url: itemUrl(item),
       method: 'put',
       payload: {
@@ -66,7 +67,7 @@ function pushUpdate(item: SheetItemRow, isDone: boolean, notes: string) {
         notes,
         ...(item.updatedAt ? { _expectedUpdatedAt: item.updatedAt } : {}),
       },
-      dedupeKey: `update-sheet-item:${itemUrl(item)}`,
+      dedupeKey: `${UPDATE_SHEET_ITEM_ACTION}:${itemUrl(item)}`,
     })
     return
   }

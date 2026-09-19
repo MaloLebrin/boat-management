@@ -62,30 +62,41 @@ les 58 cas concernés entièrement verts.
 
 ## Le vocabulaire d'actions
 
-`shared/constants/offline_queue.ts` déclare les trois actions des états des
-lieux et, depuis #727 et #725, les cinq actions du domaine terrain — celles
-dont le backend parle. Les autres restent des **littéraux écrits à la main des
-deux côtés** : c'est la dette **#726**.
+`shared/constants/offline_queue.ts` est, depuis **#726**, la **source unique**
+du vocabulaire : chaque identifiant y est déclaré une fois, et les deux moitiés
+l'importent — contrôleurs, formulaires Vue et les trois cartes de
+`ConflictResolutionModal.vue`. Le fichier exporte aussi `OFFLINE_ACTION_TYPES`
+et l'union fermée `OfflineActionType`, qui type le `type` d'une `QueuedAction` :
+un renommage casse désormais à la compilation plutôt qu'en mer.
 
-| Type                          | Conflit détecté | `rejectedType` | Carte `FIELDS_BY_TYPE` |
-| ----------------------------- | --------------- | -------------- | ---------------------- |
-| `create-inspection`           | —               | ✅             | —                      |
-| `update-inspection`           | ✅              | ✅             | ✅                     |
-| `create-inspection-defect`    | —               | ✅             | —                      |
-| `update-navigation-log`       | ✅              | —              | ✅                     |
-| `close-navigation-log`        | ✅              | —              | ✅                     |
-| `update-sheet-item`           | ✅              | —              | ✅                     |
-| `update-navigation-log-entry` | ✅              | —              | ✅                     |
-| `create-navigation-log`       | —               | ✅             | —                      |
-| `create-navigation-log-entry` | —               | ✅             | —                      |
-| `create-fuel-log`             | —               | ✅             | —                      |
-| `increment-engine-hours`      | —               | ✅             | —                      |
+| Type                          | Constante                            | Conflit détecté | `rejectedType` | Carte `FIELDS_BY_TYPE` |
+| ----------------------------- | ------------------------------------ | --------------- | -------------- | ---------------------- |
+| `create-inspection`           | `CREATE_INSPECTION_ACTION`           | —               | ✅             | —                      |
+| `update-inspection`           | `UPDATE_INSPECTION_ACTION`           | ✅              | ✅             | ✅                     |
+| `create-inspection-defect`    | `CREATE_INSPECTION_DEFECT_ACTION`    | —               | ✅             | —                      |
+| `update-navigation-log`       | `UPDATE_NAVIGATION_LOG_ACTION`       | ✅              | —              | ✅                     |
+| `close-navigation-log`        | `CLOSE_NAVIGATION_LOG_ACTION`        | ✅              | —              | ✅                     |
+| `update-sheet-item`           | `UPDATE_SHEET_ITEM_ACTION`           | ✅              | —              | ✅                     |
+| `update-navigation-log-entry` | `UPDATE_NAVIGATION_LOG_ENTRY_ACTION` | ✅              | —              | ✅                     |
+| `create-navigation-log`       | `CREATE_NAVIGATION_LOG_ACTION`       | —               | ✅             | —                      |
+| `create-navigation-log-entry` | `CREATE_NAVIGATION_LOG_ENTRY_ACTION` | —               | ✅             | —                      |
+| `create-fuel-log`             | `CREATE_FUEL_LOG_ACTION`             | —               | ✅             | —                      |
+| `increment-engine-hours`      | `INCREMENT_ENGINE_HOURS_ACTION`      | —               | ✅             | —                      |
+| `create-incident`             | `CREATE_INCIDENT_ACTION`             | —               | ❌             | —                      |
+| `update-incident`             | `UPDATE_INCIDENT_ACTION`             | ❌              | ❌             | —                      |
 
-`tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` compare les deux
-moitiés en relisant les sources. Il portait les cases vides ci-dessus en
-**exemptions motivées** ; il n'en reste aucune depuis #727 et #725 — la garde
-couvre tout le vocabulaire enfilé. Un « — » dans le tableau signale désormais
-un marqueur qui n'a pas lieu d'être, pas un marqueur qui manque.
+`tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` relit les sources — il
+n'importe pas les constantes, une garde qui partagerait sa source avec sa cible
+hériterait de ses angles morts. Il tient trois choses : **aucun littéral** ne
+réapparaît (le contournement qui rouvrirait #726), les deux moitiés se
+**répondent**, et aucune constante déclarée n'est **morte**.
+
+Les deux ❌ du tableau sont les incidents, seul trou restant : ils sont enfilés
+hors-ligne mais `BoatIncidentsController` rend ses refus métier en
+`flash('error')` + redirection, sans `rejectedType` — exactement le défaut que
+#727 a corrigé pour les quatre créations du domaine terrain. La garde les porte
+en **exemptions motivées** plutôt que de les ignorer. Un « — » signale au
+contraire un marqueur qui n'a pas lieu d'être.
 
 ### Ce que coûte une case vide
 
@@ -179,6 +190,6 @@ Deux contraintes à connaître avant d'en écrire un autre :
 
 ## Constats ouverts
 
-| #    | Constat                                              |
-| ---- | ---------------------------------------------------- |
-| #726 | vocabulaire d'actions écrit à la main des deux côtés |
+| #   | Constat                                                                          |
+| --- | -------------------------------------------------------------------------------- |
+| —   | les incidents s'enfilent sans `rejectedType` ni verrou optimiste (cf. ci-dessus) |
