@@ -1,5 +1,9 @@
 import cloudinary from '#config/cloudinary'
-import { CloudinaryDownloadError, MissingTmpPathError } from '#exceptions/media_errors'
+import {
+  CloudinaryDownloadError,
+  MissingTmpPathError,
+  PdfCompressionTimeoutError,
+} from '#exceptions/media_errors'
 import { PdfService } from '#services/pdf_service'
 import type { CloudinaryUploadOptions } from '#shared/types/media'
 import { inject } from '@adonisjs/core'
@@ -148,7 +152,16 @@ export class CloudinaryService {
         options
       )
     } catch (error) {
-      logger.warn({ error }, 'PDF compression failed, uploading original file')
+      if (error instanceof PdfCompressionTimeoutError) {
+        // Journalisé à part (#772) : un pic de timeouts est un signal d'abus,
+        // il ne doit pas se noyer dans les avertissements de compression.
+        logger.warn(
+          { error, reason: 'pdf_compression_timeout' },
+          'PDF compression timed out, uploading original file'
+        )
+      } else {
+        logger.warn({ error }, 'PDF compression failed, uploading original file')
+      }
       return this.upload(file, folder, 'raw', options)
     } finally {
       if (compressedResult) {
