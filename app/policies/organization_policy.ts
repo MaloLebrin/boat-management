@@ -19,6 +19,16 @@ export default class OrganizationPolicy extends OrgScopedPolicy {
     return this.can(user, 'branding.configure')
   }
 
+  /**
+   * Import CSV (`/settings/import`) — admin seul (#715). L'import écrit en
+   * masse dans l'historique d'entretien, que seul `maintenance.delete` permet
+   * ensuite de corriger : ouvrir l'écriture plus largement que la correction
+   * laisserait un historique que son auteur ne peut pas défaire.
+   */
+  async runImport(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'import.run')
+  }
+
   async viewAuditLog(user: User): Promise<AuthorizerResponse> {
     return this.can(user, 'audit_log.view')
   }

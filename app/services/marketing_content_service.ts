@@ -939,6 +939,7 @@ export default class MarketingContentService {
                 ],
                 [t('table_g5_r3'), false, true, true],
                 this.pricingTable.flagRow(t, 'table_g5_r4', 'canExport'),
+                this.pricingTable.flagRow(t, 'table_g5_r5', 'canImport'),
               ] as PricingTableRow[],
             },
             {

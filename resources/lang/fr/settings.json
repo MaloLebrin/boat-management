@@ -8,7 +8,7 @@
     "ai": "Personnalisation IA",
     "auditLog": "Journal d'activité",
     "branding": "Marque blanche",
-    "import": "Import CSV",
+    "import": "Import / Export",
     "notifications": "Notifications"
   },
   "org": {
@@ -265,6 +265,7 @@
   "import": {
     "title": "Import / Export CSV",
     "importSection": "Import CSV",
+    "restricted": "L'import CSV est réservé aux administrateurs des organisations au plan Entreprise. Les exports ci-dessus restent disponibles sur votre plan.",
     "exportSection": "Export CSV",
     "boatLabel": "Bateau",
     "boatPlaceholder": "Sélectionner un bateau",

@@ -8,7 +8,7 @@
     "ai": "AI customisation",
     "auditLog": "Activity log",
     "branding": "White label",
-    "import": "CSV Import",
+    "import": "Import / Export",
     "notifications": "Notifications"
   },
   "org": {
@@ -265,6 +265,7 @@
   "import": {
     "title": "Import / Export CSV",
     "importSection": "CSV Import",
+    "restricted": "CSV import is reserved to administrators of organisations on the Enterprise plan. The exports above stay available on your plan.",
     "exportSection": "CSV Export",
     "boatLabel": "Boat",
     "boatPlaceholder": "Select a boat",

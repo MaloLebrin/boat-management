@@ -3,7 +3,14 @@ import { truncateDb } from '#tests/utils/db'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
 import { BoatFactory } from '#database/factories/boat_factory'
-import { createAdminUser, createBoatOwnerUser, createMechanicUser } from '#tests/functional/helpers'
+import type { ApiClient } from '@japa/api-client'
+import type User from '#models/user'
+import {
+  createBoatOwnerUser,
+  createEnterpriseAdminUser,
+  createMechanicUser,
+  createMemberUser,
+} from '#tests/functional/helpers'
 
 /**
  * L'import CSV de maintenance, de la prévisualisation à l'écriture (#693).
@@ -12,6 +19,10 @@ import { createAdminUser, createBoatOwnerUser, createMechanicUser } from '#tests
  * en base, et il n'avait aucun test : la couverture existante s'arrêtait à
  * `/preview`. Le job `ProcessBoatMaintenanceImport` ne fait rien — l'import est
  * intégralement synchrone, dans la requête.
+ *
+ * ⚠️ Depuis #715, l'import exige le plan Entreprise **et** la capability
+ * `import.run` (admin seul) : tous les cas nominaux passent donc par
+ * `createEnterpriseAdminUser()`.
  *
  * ⚠️ Le séparateur est le **point-virgule**, et les sujets doivent appartenir à
  * `VALID_SUBJECTS` (`engine`, `sail`, `hull`…), pas à leur libellé français.
@@ -45,6 +56,21 @@ interface PendingImport {
   validRows: unknown[]
 }
 
+/** Prévisualisation réelle, pour disposer d'un `pendingImport` importable. */
+async function previewAs(client: ApiClient, user: User, boatId: number): Promise<PendingImport> {
+  const response = await client
+    .post('/settings/import/preview')
+    .loginAs(user)
+    .fields({ type: 'maintenance', boatId: String(boatId) })
+    .file('file', Buffer.from(TWO_VALID_ROWS), {
+      filename: 'import.csv',
+      contentType: 'text/csv',
+    })
+    .redirects(0)
+
+  return response.session('pendingImport') as PendingImport
+}
+
 test.group('Import CSV — la confirmation écrit en base', (group) => {
   group.each.setup(() => truncateDb())
 
@@ -52,7 +78,7 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const preview = await client
@@ -99,7 +125,7 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const preview = await client
@@ -131,7 +157,7 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
   })
 
   test('une ligne invalide est écartée, les lignes valides passent', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const preview = await client
@@ -162,7 +188,7 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
   })
 
   test("des en-têtes manquants n'importent rien du tout", async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const preview = await client
@@ -183,7 +209,7 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
   })
 
   test('confirmer sans prévisualisation en cours ne crée rien', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client
@@ -201,9 +227,9 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
     client,
     assert,
   }) => {
-    const owner = await createAdminUser()
+    const owner = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
-    const attacker = await createAdminUser()
+    const attacker = await createEnterpriseAdminUser()
 
     const response = await client
       .post('/settings/import/preview')
@@ -233,30 +259,40 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
   })
 })
 
-test.group('Import CSV — aucune garde de rôle (constat, pas validation)', (group) => {
+test.group('Import CSV — la garde de rôle (#715)', (group) => {
   group.each.setup(() => truncateDb())
 
   /**
-   * ⚠️ Ces deux cas **caractérisent un trou d'autorisation**, ils ne le
-   * valident pas.
+   * Ces cas **constataient** un trou d'autorisation ; ils le referment.
    *
-   * `/settings/import` — prévisualisation **et** confirmation — n'est protégé
+   * `/settings/import` — prévisualisation comme confirmation — n'était protégé
    * que par `middleware.auth()` : ni policy, ni capability. Un `mechanic`,
    * dont les droits s'arrêtent à la maintenance, et un `boat_owner`, qui n'a
-   * **aucune** capability, écrivent donc tous deux dans l'historique de
-   * maintenance de n'importe quel bateau que leur organisation leur rend.
+   * **aucune** capability, écrivaient donc tous deux dans l'historique
+   * d'entretien de n'importe quel bateau que leur organisation leur rend.
    *
-   * Figé ici pour que le durcissement soit un choix visible, et suivi dans une
-   * issue dédiée.
+   * La capability retenue est `import.run`, **admin seul** — alignée sur
+   * `maintenance.delete` et non sur `maintenance.create` : un import en masse
+   * écrit un historique que seul un admin peut ensuite corriger.
+   *
+   * L'organisation est au plan Entreprise dans tous les cas : c'est bien le
+   * rôle qui refuse ici, pas le plan (piège des gardes en amont, cf.
+   * `docs/dev/testing.md`).
    */
-  for (const role of ['mechanic', 'boat_owner'] as const) {
-    test(`un ${role} réussit un import de bout en bout`, async ({ client, assert }) => {
-      const admin = await createAdminUser()
+  for (const role of ['mechanic', 'member', 'boat_owner'] as const) {
+    test(`un ${role} ne peut ni prévisualiser ni confirmer un import`, async ({
+      client,
+      assert,
+    }) => {
+      const admin = await createEnterpriseAdminUser()
+      const orgId = admin.organizationId!
       const user =
         role === 'mechanic'
-          ? await createMechanicUser(admin.organizationId!)
-          : await createBoatOwnerUser(admin.organizationId!)
-      const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+          ? await createMechanicUser(orgId)
+          : role === 'member'
+            ? await createMemberUser(orgId)
+            : await createBoatOwnerUser(orgId)
+      const boat = await BoatFactory.merge({ organizationId: orgId }).create()
 
       const preview = await client
         .post('/settings/import/preview')
@@ -268,17 +304,67 @@ test.group('Import CSV — aucune garde de rôle (constat, pas validation)', (gr
         })
         .redirects(0)
 
-      const pending = preview.session('pendingImport') as PendingImport | undefined
-      assert.isDefined(pending, `${role} n'a pas pu prévisualiser`)
+      preview.assertStatus(302)
+      assert.isUndefined(preview.session('pendingImport'), `${role} a préparé un import`)
 
-      await client
+      // Le refus doit tenir même avec une prévisualisation **valide** déjà en
+      // session : la confirmation ne s'appuie pas sur ce que la
+      // prévisualisation a autorisé, elle vérifie pour son propre compte.
+      // Celle-ci est préparée par l'admin, donc parfaitement importable — sans
+      // garde, la confirmation écrirait ses deux lignes.
+      const pending = await previewAs(client, admin, boat.id)
+      assert.lengthOf(pending.validRows, 2)
+
+      const confirm = await client
         .post('/settings/import/confirm')
         .loginAs(user)
-        .withSession({ pendingImport: pending! })
+        .withSession({ pendingImport: pending })
         .fields({ type: 'maintenance', boatId: String(boat.id) })
         .redirects(0)
 
-      assert.lengthOf(await BoatMaintenanceEvent.query().where('boatId', boat.id), 2)
+      confirm.assertStatus(302)
+      assert.lengthOf(await BoatMaintenanceEvent.query().where('boatId', boat.id), 0)
     })
   }
+
+  test("un mechanic ne peut pas non plus annuler l'import en cours", async ({ client, assert }) => {
+    const admin = await createEnterpriseAdminUser()
+    const mechanic = await createMechanicUser(admin.organizationId!)
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const pending = await previewAs(client, admin, boat.id)
+
+    const response = await client
+      .post('/settings/import/cancel')
+      .loginAs(mechanic)
+      .withSession({ pendingImport: pending, hasPendingImport: true })
+      .redirects(0)
+
+    response.assertStatus(302)
+    // La prévisualisation de l'admin survit : le mechanic n'a rien purgé.
+    assert.isDefined(response.session('pendingImport'))
+  })
+
+  test("l'écran reste ouvert au mechanic pour ses exports, section d'import fermée", async ({
+    client,
+  }) => {
+    const admin = await createEnterpriseAdminUser()
+    const mechanic = await createMechanicUser(admin.organizationId!)
+
+    const response = await client.get('/settings/import').loginAs(mechanic).withInertia()
+
+    // `/settings/import` est l'écran Import **et** Export : les exports
+    // s'arrêtent à `canExport` (Pro et Entreprise, tous rôles), seul l'import
+    // exige `import.run`.
+    response.assertStatus(200)
+    response.assertInertiaPropsContains({ canImport: false })
+  })
+
+  test("un admin Entreprise garde l'écran et sa section d'import", async ({ client }) => {
+    const admin = await createEnterpriseAdminUser()
+
+    const response = await client.get('/settings/import').loginAs(admin).withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaPropsContains({ canImport: true })
+  })
 })

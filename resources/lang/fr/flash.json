@@ -281,6 +281,7 @@
     "reservationsExceeded": "Les réservations, états des lieux et contrats de location font partie du module Location — inclus dans le plan Entreprise, ou disponible en add-on sur le plan Pro.",
     "invoicesExceeded": "Les devis et factures font partie du module CRM & Facturation — inclus dans le plan Entreprise, ou disponible en add-on sur le plan Pro.",
     "portsExceeded": "La cartographie de port (pontons, mouillages, places) est réservée au plan Entreprise. Passez au plan Entreprise pour cartographier votre marina.",
+    "importExceeded": "L'import CSV est réservé au plan Entreprise. Passez au plan Entreprise pour reprendre votre historique d'entretien.",
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur."
   },

@@ -306,7 +306,8 @@
             "rows": [
               ["Stockage documents", "1 Go", "20 Go", "illimité"],
               ["Rappels expiration assurances", false, true, true],
-              ["Export PDF / CSV", false, true, true]
+              ["Export PDF / CSV", false, true, true],
+              ["Import CSV (reprise d'historique)", false, false, true]
             ]
           },
           {

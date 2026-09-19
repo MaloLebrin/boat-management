@@ -1,6 +1,6 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createStarterAdminUser } from '#tests/functional/helpers'
 
 const AI_CUSTOMIZATION_FLASH =
   'Customising the AI prompt requires the Enterprise plan. AI and the Copilot are available on Pro, but the business context can only be tailored on Enterprise.'
@@ -64,6 +64,29 @@ test.group('Plan-gated settings sections (functional)', (group) => {
       'error',
       'White labelling (logo and colours) requires the Enterprise plan.'
     )
+  })
+
+  /**
+   * `/settings/import` est l'écran Import **et** Export (#715) : en Pro il
+   * garde ses exports (`canExport`), seule la section d'import se ferme. En
+   * Starter il ne sert plus rien — d'où la redirection avec l'upsell.
+   */
+  test('a Pro org keeps the import screen, without its import section', async ({ client }) => {
+    const user = await createAdminUser()
+
+    const response = await client.get('/settings/import').loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaPropsContains({ canImport: false })
+  })
+
+  test('a Starter org is redirected away from the import screen', async ({ client }) => {
+    const user = await createStarterAdminUser()
+
+    const response = await client.get('/settings/import').loginAs(user).redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/settings/billing')
   })
 
   test('an Enterprise org reaches both sections', async ({ client }) => {

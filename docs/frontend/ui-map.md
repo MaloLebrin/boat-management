@@ -332,7 +332,13 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
   - `SettingsBillingModules.vue` — modules add-ons (`charter`, `crm_invoicing`)
   - `SettingsBillingExtraBoats.vue` — add-on quantitatif `extra_boats` (stepper). Même distinction plan/abonnement que les modules : la branche « Pro sans abonnement actif » propose de finaliser l'abonnement, la branche Starter affiche « Disponible à partir du plan Pro »
 - **Plan ≠ abonnement** : `plan` est une colonne de `organizations`, `subscription` l'abonnement Stripe actif. Tout libellé qui les confond finit par nier au client un plan qu'il possède — c'est le bug #456. Les libellés « Nécessite un plan Pro actif » sont réservés au vrai Starter.
-- Écrans gatés (`/invoices`, `/pricing/seasons`, `/clients`, `/settings/ai`, `/settings/branding`) : la redirection d'upsell vise `/settings/billing` (`BILLING_SETTINGS_PATH`) et **jamais** `/`, qui redirige sur `/en` — le layout public ne rend aucun toast, le flash y serait perdu (#456).
+- Écrans gatés (`/invoices`, `/pricing/seasons`, `/clients`, `/settings/ai`, `/settings/branding`, `/settings/import`) : la redirection d'upsell vise `/settings/billing` (`BILLING_SETTINGS_PATH`) et **jamais** `/`, qui redirige sur `/en` — le layout public ne rend aucun toast, le flash y serait perdu (#456).
+
+### Settings — import / export CSV (`/settings/import`)
+
+- Page : `inertia/pages/settings/import.vue` → `components/settings/tabs/SettingsImportTab.vue` (props `boats`, `preview`, `hasPendingImport`, `canImport`, servies par `CsvImportController.show`).
+- **Un écran, deux fonctions aux droits différents** (#715). Les **exports** (maintenance, avitaillements, journal de bord) suivent `canExport` : plan Pro ou Entreprise, tous rôles. L'**import** exige le plan Entreprise **et** la capability `import.run` (admin seul) — c'est la prop `canImport`, vraie seulement si les deux tiennent, qui rend la section d'import ; sinon le bloc affiche `settings.import.restricted` et le formulaire disparaît, exports compris intacts.
+- La page ne redirige vers `/settings/billing` que si **ni** l'import **ni** l'export n'est accordé (plan Starter) — personne n'atteint un écran vide. L'entrée de nav « Import / Export » de `SettingsShell` reste, elle, conditionnée à `canExport`.
 
 ## Pages d'erreur (403 / 404 / 500)
 

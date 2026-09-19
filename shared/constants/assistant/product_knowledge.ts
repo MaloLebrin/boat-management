@@ -1144,8 +1144,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Import CSV',
     },
     body: {
-      en: 'On Pro and Enterprise plans, the Import page (/settings/import) imports maintenance history from a CSV file (semicolon-separated). Required columns are date (YYYY-MM-DD), title and subject; optional ones are notes, engine caption, sail caption and cost. The import always starts with a dry run: the file is parsed and validated line by line, errors are reported with their line numbers, and nothing is written until you confirm. The actual import runs in a transaction — if a line fails, everything is rolled back.',
-      fr: 'Sur les plans Pro et Entreprise, la page Import (/settings/import) importe l’historique d’entretien depuis un fichier CSV (séparé par des points-virgules). Les colonnes requises sont la date (AAAA-MM-JJ), le titre et le sujet ; les optionnelles sont les notes, la légende moteur, la légende voile et le coût. L’import commence toujours par un essai à blanc : le fichier est analysé et validé ligne par ligne, les erreurs sont rapportées avec leur numéro de ligne, et rien n’est écrit avant votre confirmation. L’import réel s’exécute en transaction — si une ligne échoue, tout est annulé.',
+      en: 'On the Enterprise plan, and for administrators only, the Import page (/settings/import) imports maintenance history from a CSV file (semicolon-separated). The exports on the same page stay open to every role from the Pro plan onwards. Required columns are date (YYYY-MM-DD), title and subject; optional ones are notes, engine caption, sail caption and cost. The import always starts with a dry run: the file is parsed and validated line by line, errors are reported with their line numbers, and nothing is written until you confirm. The actual import runs in a transaction — if a line fails, everything is rolled back.',
+      fr: 'Sur le plan Entreprise, et pour les administrateurs seulement, la page Import (/settings/import) importe l’historique d’entretien depuis un fichier CSV (séparé par des points-virgules). Les exports de la même page restent ouverts à tous les rôles dès le plan Pro. Les colonnes requises sont la date (AAAA-MM-JJ), le titre et le sujet ; les optionnelles sont les notes, la légende moteur, la légende voile et le coût. L’import commence toujours par un essai à blanc : le fichier est analysé et validé ligne par ligne, les erreurs sont rapportées avec leur numéro de ligne, et rien n’est écrit avant votre confirmation. L’import réel s’exécute en transaction — si une ligne échoue, tout est annulé.',
     },
     keywords: [
       'import',
@@ -1160,7 +1160,7 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'preview',
     ],
     navTarget: 'settings.import',
-    planFlag: 'canExport',
+    planFlag: 'canImport',
   },
   {
     id: 'csv-pdf-export',

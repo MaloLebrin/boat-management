@@ -31,6 +31,15 @@ testPolicyMatrix('OrganizationPolicy (unit)', () => new OrganizationPolicy(), [
     allowedRoles: ['admin'],
     deniedRoles: ['member', 'mechanic', 'boat_owner'],
   },
+  // Import CSV en masse (#715) : aligné sur `maintenance.delete`, pas sur
+  // `maintenance.create` — un mechanic écrivait tout l'historique sans jamais
+  // pouvoir le corriger.
+  {
+    name: 'runImport',
+    capability: 'import.run',
+    allowedRoles: ['admin'],
+    deniedRoles: ['member', 'mechanic', 'boat_owner'],
+  },
   {
     name: 'viewAuditLog',
     capability: 'audit_log.view',

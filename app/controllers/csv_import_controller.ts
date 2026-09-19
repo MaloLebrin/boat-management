@@ -1,10 +1,14 @@
 import BoatHullService from '#services/boat_hull_service'
+import QuotaService from '#services/quota_service'
+import OrganizationPolicy from '#policies/organization_policy'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import { parseMaintenanceCsv, importMaintenanceRows } from '#services/csv_import_service'
 import { csvPreviewValidator, csvConfirmValidator } from '#validators/csv_import'
 import type { CsvImportPreviewData, CsvPreviewRow, MaintenanceImportRow } from '#shared/types/csv'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import type User from '#models/user'
+import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 import { promises as fs } from 'node:fs'
 
 interface PendingImport {
@@ -15,11 +19,32 @@ interface PendingImport {
 
 @inject()
 export default class CsvImportController {
-  constructor(private boatService: BoatHullService) {}
+  constructor(
+    private boatService: BoatHullService,
+    private quotaService: QuotaService
+  ) {}
 
-  async show({ inertia, session, auth }: HttpContext) {
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
+  /**
+   * L'écran `/settings/import` sert **deux** fonctions : les exports CSV
+   * (`canExport`, ouvert dès le plan Pro et à tous les rôles) et l'import
+   * d'historique (Entreprise + admin). Il reste donc ouvert à qui n'a que les
+   * exports — c'est `canImport` qui décide de la section d'import, côté front
+   * comme sur les trois routes qui agissent. Personne n'y arrive les mains
+   * vides : sans l'un ni l'autre, on repart sur la facturation avec l'upsell.
+   */
+  async show({ inertia, session, auth, bouncer, response, i18n }: HttpContext) {
+    const user = await auth.authenticate()
+    await user.load('organization')
+
+    const canImport =
+      this.quotaService.canImport(user.organization) &&
+      (await bouncer.with(OrganizationPolicy).allows('runImport'))
+
+    if (!canImport && !this.quotaService.canExport(user.organization)) {
+      session.flash('error', i18n.t('flash.quota.exportExceeded'))
+      session.flash('errorAction', BILLING_SETTINGS_PATH)
+      return response.redirect(BILLING_SETTINGS_PATH)
+    }
 
     const boats = await this.boatService.listForUser(user)
     const rawPreview = session.flashMessages.get('importPreview') as string | undefined
@@ -28,12 +53,35 @@ export default class CsvImportController {
       boats: boats.map((b) => ({ id: b.id, name: b.name })),
       preview: rawPreview ? (JSON.parse(rawPreview) as CsvImportPreviewData) : null,
       hasPendingImport: (session.get('hasPendingImport') ?? false) as boolean,
+      canImport,
     })
   }
 
-  async preview({ request, response, session, auth, i18n }: HttpContext) {
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
+  /**
+   * Garde des trois routes qui agissent (#715) : plan Entreprise **puis**
+   * capability `import.run` (admin seul). Avant, seul `middleware.auth()` les
+   * couvrait — un `mechanic`, et même un `boat_owner` qui n'a aucune
+   * capability, écrivaient en masse dans l'historique d'entretien de n'importe
+   * quel bateau de leur organisation.
+   *
+   * Le plan d'abord : sur une organisation qui n'a pas l'import du tout,
+   * l'upsell vers la facturation dit plus qu'un 403 de rôle.
+   */
+  private async authorizeImport({
+    auth,
+    bouncer,
+  }: Pick<HttpContext, 'auth' | 'bouncer'>): Promise<User> {
+    const user = await auth.authenticate()
+    await user.load('organization')
+
+    this.quotaService.assertCanImport(user.organization)
+    await bouncer.with(OrganizationPolicy).authorize('runImport')
+
+    return user
+  }
+
+  async preview({ request, response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await this.authorizeImport({ auth, bouncer })
 
     const payload = await request.validateUsing(csvPreviewValidator)
 
@@ -89,9 +137,8 @@ export default class CsvImportController {
     return response.redirect('/settings/import')
   }
 
-  async confirm({ request, response, session, auth, i18n }: HttpContext) {
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
+  async confirm({ request, response, session, auth, bouncer, i18n }: HttpContext) {
+    const user = await this.authorizeImport({ auth, bouncer })
 
     await request.validateUsing(csvConfirmValidator)
 
@@ -125,7 +172,9 @@ export default class CsvImportController {
     return response.redirect('/settings/import')
   }
 
-  async cancel({ response, session }: HttpContext) {
+  async cancel({ response, session, auth, bouncer }: HttpContext) {
+    await this.authorizeImport({ auth, bouncer })
+
     session.forget('pendingImport')
     session.forget('hasPendingImport')
     return response.redirect('/settings/import')
