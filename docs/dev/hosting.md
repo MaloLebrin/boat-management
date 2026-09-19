@@ -154,6 +154,21 @@ Ghostscript est installé dans l'image (compression des PDFs uploadés, voir
 `app/services/pdf_service.ts`). Sans lui, le PDF original part sans compression
 — warning loggé, pas de crash.
 
+Le `Dockerfile` pose un **plancher de version** (`ghostscript>=10.03`) plutôt
+que de prendre ce que sert le dépôt Alpine au jour du build : la version
+déployée doit être une décision. Un numéro exact n'est volontairement pas
+épinglé — il casserait le build au premier retrait du paquet de l'index.
+
+L'appel est borné (#772) : `timeout` de 30 s avec `killSignal: 'SIGKILL'`,
+`maxBuffer` à 8 Mo, `-dSAFER` explicite et `-f` avant le chemin d'entrée.
+Ghostscript tourne sur un fichier intégralement fourni par l'utilisateur, et
+le worker de queue a une concurrence de 5 : sans limite de temps, quelques
+PDFs coûteux bloquaient toute la file (e-mails et notifications compris). Un
+dépassement lève `PdfCompressionTimeoutError`, retombe sur le PDF non
+compressé et se journalise avec `reason: 'pdf_compression_timeout'` — un pic
+de timeouts est un signal d'abus, à distinguer des échecs de compression
+ordinaires.
+
 ## Voir aussi
 
 - `docs/dev/setup.md` — environnement local
