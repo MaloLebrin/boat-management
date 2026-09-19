@@ -7,6 +7,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { CREATE_INCIDENT_ACTION, UPDATE_INCIDENT_ACTION } from '#shared/constants/offline_queue'
 import { useT } from '~/composables/use_t'
 import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
 import type { BoatIncidentRow, IncidentStatus, IncidentType } from '~/types/boat_show'
@@ -87,7 +88,7 @@ function handleSubmit() {
 
   if (!isOnline.value) {
     enqueue({
-      type: props.editingIncident ? 'update-incident' : 'create-incident',
+      type: props.editingIncident ? UPDATE_INCIDENT_ACTION : CREATE_INCIDENT_ACTION,
       url: actionUrl.value,
       method: props.editingIncident ? 'put' : 'post',
       payload: form.data() as unknown as Record<string, unknown>,

@@ -15,7 +15,11 @@ import {
   closeNavigationLogValidator,
   updateNavigationLogValidator,
 } from '#validators/navigation_log'
-import { CREATE_NAVIGATION_LOG_ACTION } from '#shared/constants/offline_queue'
+import {
+  CLOSE_NAVIGATION_LOG_ACTION,
+  CREATE_NAVIGATION_LOG_ACTION,
+  UPDATE_NAVIGATION_LOG_ACTION,
+} from '#shared/constants/offline_queue'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -163,7 +167,7 @@ export default class NavigationLogsController {
       }
       if (error instanceof NavigationLogConflictError) {
         session.flash('conflictData', JSON.stringify(error.currentLog))
-        session.flash('conflictType', 'update-navigation-log')
+        session.flash('conflictType', UPDATE_NAVIGATION_LOG_ACTION)
         response.redirect().back()
         return
       }
@@ -218,7 +222,7 @@ export default class NavigationLogsController {
       }
       if (error instanceof NavigationLogConflictError) {
         session.flash('conflictData', JSON.stringify(error.currentLog))
-        session.flash('conflictType', 'close-navigation-log')
+        session.flash('conflictType', CLOSE_NAVIGATION_LOG_ACTION)
         response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
         return
       }

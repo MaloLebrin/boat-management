@@ -10,6 +10,7 @@ import { updateSheetItemValidator } from '#validators/boat_maintenance_sheet'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import { UPDATE_SHEET_ITEM_ACTION } from '#shared/constants/offline_queue'
 
 @inject()
 export default class BoatMaintenanceSheetItemsController {
@@ -54,7 +55,7 @@ export default class BoatMaintenanceSheetItemsController {
       }
       if (error instanceof BoatMaintenanceSheetItemConflictError) {
         session.flash('conflictData', JSON.stringify(error.currentItem))
-        session.flash('conflictType', 'update-sheet-item')
+        session.flash('conflictType', UPDATE_SHEET_ITEM_ACTION)
         response.redirect().back()
         return
       }

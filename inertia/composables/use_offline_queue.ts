@@ -3,6 +3,7 @@ import { openDB } from 'idb'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { useT } from '~/composables/use_t'
+import type { OfflineActionType } from '#shared/constants/offline_queue'
 
 const DB_NAME = 'fleetide-offline-queue'
 const STORE_NAME = 'actions'
@@ -20,7 +21,14 @@ const TEMP_ID_PREFIX = 'tmp_'
 
 export interface QueuedAction {
   id?: number
-  type: string
+  /**
+   * Union fermée (#726) : l'identifiant vient de
+   * `shared/constants/offline_queue.ts`, le même que le contrôleur renvoie dans
+   * `conflictType` / `rejectedType` / `createdResourceType`. Le rapprochement
+   * de `drainQueue` étant une égalité de chaînes, un type libre laissait un
+   * renommage d'un seul côté passer la compilation et casser en mer.
+   */
+  type: OfflineActionType
   url: string
   method: 'post' | 'patch' | 'put'
   payload: Record<string, unknown>

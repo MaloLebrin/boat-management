@@ -77,6 +77,8 @@
   "offline.queue.type.create-navigation-log": "New trip log",
   "offline.queue.type.update-navigation-log": "Trip log update",
   "offline.queue.type.close-navigation-log": "Trip log closure",
+  "offline.queue.type.create-navigation-log-entry": "New log entry",
+  "offline.queue.type.update-navigation-log-entry": "Log entry update",
   "offline.queue.type.create-fuel-log": "Fuel entry",
   "offline.queue.type.increment-engine-hours": "Engine hours",
   "offline.queue.type.create-incident": "New incident",
