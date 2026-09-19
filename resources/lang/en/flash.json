@@ -68,7 +68,8 @@
   "auth": {
     "passwordResetSent": "If this email is associated with an account, you will receive a reset link.",
     "passwordResetSuccess": "Password updated. You can now log in.",
-    "passwordResetTokenInvalid": "This reset link is invalid or has expired."
+    "passwordResetTokenInvalid": "This reset link is invalid or has expired.",
+    "loginRateLimit": "Too many sign-in attempts. Please try again later."
   },
   "settings": {
     "profileUpdated": "Profile updated.",

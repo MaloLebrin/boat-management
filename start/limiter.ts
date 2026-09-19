@@ -1,8 +1,62 @@
 import limiter from '@adonisjs/limiter/services/main'
 
-export const authThrottle = limiter.define('auth', () => {
-  return limiter.allowRequests(10).every('1 minute')
+/**
+ * Les trois POST d'authentification ont chacun **leur** compteur (#767).
+ *
+ * Ils partageaient `authThrottle` : un utilisateur qui se trompait plusieurs
+ * fois de mot de passe consommait le budget qui lui aurait permis de demander
+ * un lien de réinitialisation — c'est-à-dire de se sortir d'affaire.
+ *
+ * Tous trois explicitent en plus leur clé. `authThrottle` était le seul
+ * limiteur du fichier à ne pas le faire, et retombait sur la clé par défaut.
+ */
+export const loginThrottle = limiter.define('login_ip', (ctx) => {
+  return limiter.allowRequests(10).every('1 minute').usingKey(`login_ip_${ctx.request.ip()}`)
 })
+
+export const forgotPasswordThrottle = limiter.define('forgot_password', (ctx) => {
+  return limiter.allowRequests(10).every('1 minute').usingKey(`forgot_pwd_${ctx.request.ip()}`)
+})
+
+export const resetPasswordThrottle = limiter.define('reset_password', (ctx) => {
+  return limiter.allowRequests(10).every('1 minute').usingKey(`reset_pwd_${ctx.request.ip()}`)
+})
+
+/**
+ * Compteur de connexion **par compte** (#767).
+ *
+ * Le bornage par IP ne couvre pas le credential stuffing distribué : 10
+ * tentatives/minute/IP, mais depuis 200 IP résidentielles cela fait 2 000
+ * tentatives/minute sur la même adresse, et le compteur de la victime
+ * n'existait pas.
+ *
+ * Il n'est pas monté en middleware de route mais consommé dans
+ * `SessionController.store` via `penalize()`, ce qui change tout :
+ *
+ * - seules les tentatives **en échec** décomptent — un utilisateur qui se
+ *   connecte dix fois dans l'heure depuis plusieurs appareils n'est pas puni ;
+ * - une connexion réussie **remet le compteur à zéro** ;
+ * - au-delà du plafond, les identifiants ne sont même plus vérifiés.
+ *
+ * Fenêtre à l'heure : c'est la durée qui rend le stuffing distribué coûteux,
+ * là où une fenêtre à la minute se contourne en ralentissant.
+ */
+export const LOGIN_ACCOUNT_LIMIT = { requests: 10, duration: '1 hour' } as const
+
+export function loginAccountLimiter() {
+  return limiter.use(LOGIN_ACCOUNT_LIMIT)
+}
+
+/**
+ * Clé du compteur par compte.
+ *
+ * Normalisée comme le fait `User.normalizeEmail` (`app/models/user.ts`) :
+ * sans ça, changer la casse de l'adresse suffirait à repartir d'un compteur
+ * vierge.
+ */
+export function loginAccountKey(email: string): string {
+  return `login_account_${email.trim().toLowerCase()}`
+}
 
 export const aiThrottle = limiter.define('ai', (ctx) => {
   return limiter

@@ -87,8 +87,8 @@ export default defineConfig({
     // parallèle (Promise.all) ; comme '#start/limiter' dépend d'un module à
     // top-level await (@adonisjs/limiter/services/main → `await app.booted`),
     // en faire une seconde racine concurrente au graphe des routes crée une
-    // course où `authThrottle` peut être lu en TDZ dans start/routes/auth.ts
-    // ("Cannot access 'authThrottle' before initialization"). Le module est de
+    // course où un limiteur peut être lu en TDZ dans start/routes/auth.ts
+    // ("Cannot access 'loginThrottle' before initialization"). Le module est de
     // toute façon chargé comme dépendance des routes (auth/ai/demo), donc ce
     // preload était redondant.
     () => import('#start/transmit'),
