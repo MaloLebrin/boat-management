@@ -5,8 +5,10 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
+import { usePermissions } from '~/composables/use_permissions'
 
 const { t } = useT()
+const { can } = usePermissions()
 
 defineProps<{
   organization: {
@@ -14,12 +16,22 @@ defineProps<{
     name: string
   }
 }>()
+
+// #761 — l'onglet s'ouvre à `members.view` (cf. `SettingsShell`), le renommage
+// est réservé à `organization.manage`. Sans cette distinction, un member voyait
+// un formulaire que le backend refuse désormais : `PUT /settings/org` passe par
+// `OrganizationPolicy.manageOrganization`.
+const canManage = can('organization.manage')
 </script>
 
 <template>
   <div>
     <BaseHeading level="2" class="mb-6">{{ t('settings.org.title') }}</BaseHeading>
-    <Form :action="{ url: '/settings/org', method: 'put' }" #default="{ processing, errors }">
+    <Form
+      v-if="canManage"
+      :action="{ url: '/settings/org', method: 'put' }"
+      #default="{ processing, errors }"
+    >
       <BaseCard>
         <div class="space-y-6">
           <BaseInput
@@ -39,5 +51,17 @@ defineProps<{
         </template>
       </BaseCard>
     </Form>
+    <BaseCard v-else>
+      <div class="space-y-6">
+        <BaseInput
+          name="name"
+          :label="t('settings.org.nameLabel')"
+          :model-value="organization.name"
+          readonly
+          disabled
+        />
+        <p class="text-fg-muted text-sm">{{ t('settings.org.readOnlyHint') }}</p>
+      </div>
+    </BaseCard>
   </div>
 </template>
