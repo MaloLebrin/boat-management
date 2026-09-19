@@ -183,7 +183,8 @@ C'est ici que le downgrade vers Starter s'opère automatiquement à l'annulation
 
 Avec les modules add-ons, un abonnement Stripe porte **plusieurs items** : un item de base (le tier Pro/Enterprise) + un item par module. La sync gère cela ainsi :
 
-- **`resolveTierItem(stripeSub)`** : retient le premier item dont le prix mappe un tier (via `planFromPriceId`). L'item du tier n'est plus forcément à l'index 0 — c'est lui qui fixe le plan, les bornes de période et l'intervalle de facturation.
+- **`resolveTierItem(stripeSub)`** : retient le premier item dont le prix mappe un tier (via `planFromPriceId`). L'item du tier n'est plus forcément à l'index 0 — c'est lui qui fixe le plan, les bornes de période et l'intervalle de facturation. Rend **`null`** sur un abonnement sans aucun item (#704) : il ne décrit aucun plan et ne porte aucune borne de période.
+- **Abonnement sans item (#704)** : `syncFromCheckoutSession` et `syncFromSubscriptionEvent` sortent alors sans rien écrire — ni `subscriptions`, ni le plan de l'organisation, ni les modules — en loggant l'événement ignoré en `warn`, et le webhook répond **200**. Un 4xx/5xx ferait rejouer Stripe indéfiniment sur un événement qu'aucun rejeu ne peut rendre traitable. Corollaire assumé : un `customer.subscription.deleted` arrivant sans item **ne rétrograde pas** l'organisation — l'annulation se traite sur l'événement qui porte ses items.
 - **`desiredModulesFrom(stripeSub, plan)`** : mappe chaque item de module via `StripeService.moduleForPriceId(priceId)`. Un abonnement annulé (plan `starter`) ne conserve aucun module.
 - **`OrganizationModuleService.reconcileSubscriptionModules(orgId, desired, trx)`** : dans la même transaction que l'upsert, retire les modules `subscription` absents des items, ajoute/actualise les désirés (avec leur `stripe_subscription_item_id`), et **ne touche jamais un module `granted`**.
 

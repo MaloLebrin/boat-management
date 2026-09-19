@@ -567,3 +567,145 @@ test.group('Stripe webhook — déduplication par event.id (functional, #703)', 
     assert.lengthOf(await ProcessedStripeEvent.all(), 0)
   })
 })
+
+/**
+ * Abonnement sans aucun item (#704).
+ *
+ * `resolveTierItem` se terminait par un repli `?? items.data[0]` : sur un
+ * `items.data` vide il rendait `undefined` — sans que son type de retour le
+ * dise —, et l'appelant déréférençait `item.price.id`. `TypeError`, remontée en
+ * **500**. Or un 5xx est, pour Stripe, une livraison échouée : l'événement
+ * était rejoué indéfiniment, puisqu'il produisait toujours la même erreur.
+ *
+ * Le cas n'est pas théorique : un abonnement dont le dernier item vient d'être
+ * retiré arrive avec `items.data` vide.
+ *
+ * Ces tests prouvent le refus **explicite** : 200 (l'événement a été reçu et
+ * compris, rien à en faire) et aucune écriture — pas « écrit la même chose ».
+ */
+test.group('Stripe webhook — abonnement sans item (functional, #704)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  test('customer.subscription.updated with no items is acknowledged without touching anything', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const org = await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+
+    // État de départ réel : un abonnement Pro déjà synchronisé. Sans lui, un
+    // « aucune ligne touchée » ne prouverait rien — il n'y aurait rien à
+    // toucher.
+    await postStripeWebhook(
+      client,
+      subscriptionEvent('customer.subscription.updated', {
+        id: 'sub_pro',
+        customer: CUSTOMER,
+        priceId: PRICE_IDS.proMonth,
+      })
+    )
+    const before = await Subscription.query().where('organizationId', org.id).firstOrFail()
+
+    const events = emitter.fake()
+    cleanup(() => emitter.restore())
+
+    const response = await postStripeWebhook(
+      client,
+      subscriptionEvent('customer.subscription.updated', {
+        id: 'sub_pro',
+        customer: CUSTOMER,
+        items: [],
+      })
+    )
+
+    // 200 et non 400 : un rejeu ne peut pas faire apparaître d'item, le faire
+    // rejouer ne ferait qu'accumuler les livraisons sur un événement
+    // intraitable.
+    response.assertStatus(200)
+    response.assertBodyContains({ received: true })
+
+    await org.refresh()
+    assert.equal(org.plan, 'pro')
+
+    const after = await Subscription.query().where('organizationId', org.id).firstOrFail()
+    assert.equal(after.planTier, before.planTier)
+    assert.equal(after.stripePriceId, before.stripePriceId)
+    assert.equal(after.status, before.status)
+    // La preuve que la ligne n'a pas été réécrite à l'identique : `updated_at`
+    // aurait bougé.
+    assert.equal(after.updatedAt.toISO(), before.updatedAt.toISO())
+    assert.lengthOf(await Subscription.all(), 1)
+
+    events.assertNotEmitted(OrganizationPlanUpgraded)
+    events.assertNotEmitted(OrganizationPlanDowngraded)
+    events.assertNotEmitted(OrganizationModuleDeactivated)
+  })
+
+  test('customer.subscription.deleted with no items does not downgrade on a guess', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const org = await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+
+    await postStripeWebhook(
+      client,
+      subscriptionEvent('customer.subscription.updated', {
+        id: 'sub_pro',
+        customer: CUSTOMER,
+        priceId: PRICE_IDS.proMonth,
+      })
+    )
+
+    const events = emitter.fake()
+    cleanup(() => emitter.restore())
+
+    const response = await postStripeWebhook(
+      client,
+      subscriptionEvent('customer.subscription.deleted', {
+        id: 'sub_pro',
+        customer: CUSTOMER,
+        status: 'canceled',
+        items: [],
+      })
+    )
+
+    // Comportement assumé, pas un oubli : un abonnement sans item ne décrit
+    // aucun plan, et une annulation se traite sur l'événement qui porte ses
+    // items. L'organisation reste donc sur son plan — c'est pourquoi le service
+    // logge ce cas en `warn` et non en `info`.
+    response.assertStatus(200)
+    await org.refresh()
+    assert.equal(org.plan, 'pro')
+    events.assertNotEmitted(OrganizationPlanDowngraded)
+  })
+
+  test('checkout.session.completed on an itemless subscription writes nothing', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const org = await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+    const stripe = swapStripeService({
+      subscription: stripeSubscription({ id: 'sub_empty', customer: CUSTOMER, items: [] }),
+    })
+    cleanup(() => stripe.restore())
+
+    const response = await postStripeWebhook(
+      client,
+      stripeEvent(
+        'checkout.session.completed',
+        stripeCheckoutSession({ customer: CUSTOMER, subscription: 'sub_empty' })
+      )
+    )
+
+    response.assertStatus(200)
+    // L'abonnement a bien été lu chez Stripe : la sortie a lieu après, sur son
+    // contenu, et non sur un court-circuit en amont.
+    assert.deepEqual(stripe.retrievedSubscriptionIds, ['sub_empty'])
+
+    await org.refresh()
+    assert.equal(org.plan, 'starter')
+    assert.lengthOf(await Subscription.all(), 0)
+  })
+})
