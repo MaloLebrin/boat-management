@@ -160,7 +160,8 @@ export function stripeCheckoutSession(options: {
  * `signedWebhookRequest`, qui sérialise une fois et rend les deux ensemble.
  */
 export function signedWebhookRequest(event: Stripe.Event): { payload: string; signature: string } {
-  const secret = env.get('STRIPE_WEBHOOK_SECRET')
+  // `Env.schema.secret` depuis #769 : la valeur se lit par `.release()`.
+  const secret = env.get('STRIPE_WEBHOOK_SECRET')?.release()
   if (!secret) throw new Error('STRIPE_WEBHOOK_SECRET manque dans .env.test')
 
   const payload = JSON.stringify(event)
