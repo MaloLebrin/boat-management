@@ -13,6 +13,22 @@ import { errors as bouncerErrors } from '@adonisjs/bouncer'
  */
 const FORM_SUBMISSION_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 
+/**
+ * Routes dont le dépassement de débit rend un flash d'erreur plutôt qu'une 429
+ * brute, par nom de route → clé i18n.
+ *
+ * Une allowlist et non une règle générale : toutes les routes throttlées ne
+ * veulent pas de ce traitement. Les trois POST publics du simulateur et les
+ * chats IA publics répondent à du JavaScript qui lit le statut, pas à un
+ * formulaire classique — leur rendre une 302 masquerait le refus au lieu de le
+ * signaler. Ici, ce sont des écrans de formulaire pleine page : une 429 brute
+ * y est un cul-de-sac (#766).
+ */
+const RATE_LIMIT_FLASH_ROUTES: Record<string, string> = {
+  'demo.login': 'flash.demo.rateLimitError',
+  'signup.store': 'flash.auth.signupRateLimit',
+}
+
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
    * In debug mode, the exception handler will display verbose errors
@@ -42,9 +58,12 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
-    if (error instanceof limiterErrors.E_TOO_MANY_REQUESTS && ctx.route?.name === 'demo.login') {
-      ctx.session.flash('error', ctx.i18n.t('flash.demo.rateLimitError'))
-      return ctx.response.redirect().back()
+    if (error instanceof limiterErrors.E_TOO_MANY_REQUESTS) {
+      const flashKey = ctx.route?.name ? RATE_LIMIT_FLASH_ROUTES[ctx.route.name] : undefined
+      if (flashKey) {
+        ctx.session.flash('error', ctx.i18n.t(flashKey))
+        return ctx.response.redirect().back()
+      }
     }
     if (error instanceof QuotaExceededError) {
       ctx.session.flash('error', ctx.i18n.t(quotaFlashKey(error)))
