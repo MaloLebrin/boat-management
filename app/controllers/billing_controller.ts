@@ -4,6 +4,7 @@ import {
   StripeNotConfiguredError,
 } from '#exceptions/billing_errors'
 import StripeService from '#services/stripe_service'
+import StripeWebhookService from '#services/stripe_webhook_service'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import { addonActionValidator, checkoutValidator, moduleActionValidator } from '#validators/billing'
@@ -18,6 +19,7 @@ export default class BillingController {
   constructor(
     private stripeService: StripeService,
     private subscriptionService: SubscriptionService,
+    private stripeWebhookService: StripeWebhookService,
     private organizationModuleService: OrganizationModuleService
   ) {}
 
@@ -291,24 +293,12 @@ export default class BillingController {
       return response.badRequest({ error: 'Invalid signature' })
     }
 
-    await this.handleEvent(event)
+    // Déduplication par `event.id` puis aiguillage, dans une seule transaction
+    // (#703). Un rejeu ressort `false` et n'a rien écrit ; la réponse est la
+    // même dans les deux cas — l'événement a bien été reçu, c'est tout ce que
+    // Stripe attend de savoir.
+    await this.stripeWebhookService.process(event)
 
     return response.ok({ received: true })
-  }
-
-  private async handleEvent(event: Stripe.Event) {
-    switch (event.type) {
-      case 'checkout.session.completed':
-        await this.subscriptionService.syncFromCheckoutSession(
-          event.data.object as Stripe.Checkout.Session
-        )
-        break
-      case 'customer.subscription.updated':
-      case 'customer.subscription.deleted':
-        await this.subscriptionService.syncFromSubscriptionEvent(
-          event.data.object as Stripe.Subscription
-        )
-        break
-    }
   }
 }

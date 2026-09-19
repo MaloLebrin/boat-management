@@ -3,7 +3,7 @@ import { truncateDb } from '#tests/utils/db'
 import Boat from '#models/boat'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
-import { createAdminUser } from '#tests/functional/helpers'
+import { createAdminUser, createEnterpriseAdminUser } from '#tests/functional/helpers'
 
 /**
  * Bateau d'une autre organisation : les cinq routes de la ressource bateau
@@ -15,7 +15,9 @@ test.group('Boats — bateau invisible (functional)', (group) => {
 
   async function foreignBoat() {
     const owner = await createAdminUser()
-    const intruder = await createAdminUser()
+    // Plan Entreprise : `PATCH /boats/:id/assignment` est sous la garde marina
+    // (#721) — un plan inférieur serait refusé avant même de chercher le bateau.
+    const intruder = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()
     return { intruder, boat }
   }

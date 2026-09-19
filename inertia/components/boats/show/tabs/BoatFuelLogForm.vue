@@ -7,6 +7,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { CREATE_FUEL_LOG_ACTION } from '#shared/constants/offline_queue'
 import { useT } from '~/composables/use_t'
 import { useBoatOptions } from '~/composables/use_boat_options'
 import { engineKindLabel, engineSerialSuffix, engineStrokeSuffix } from '~/utils/boat_enum_labels'
@@ -68,7 +69,7 @@ watch(
 function handleSubmit() {
   if (!isOnline.value) {
     enqueue({
-      type: 'create-fuel-log',
+      type: CREATE_FUEL_LOG_ACTION,
       url: `/boats/${props.boat.id}/fuel-logs`,
       method: 'post',
       payload: form.data() as Record<string, unknown>,

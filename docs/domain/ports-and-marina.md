@@ -39,7 +39,7 @@ comparent directement.
 
 ## Deux gardes en amont, pas une
 
-Les **19 routes** du groupe de `start/routes/ports.ts` passent par
+Les **20 routes** du groupe de `start/routes/ports.ts` passent par
 `middleware.auth()` puis `middleware.requirePortsPlan()`, qui refuse deux fois :
 
 | Cas                                                          | Redirection                                             |
@@ -53,16 +53,18 @@ C'est indispensable parce que la garde vient du **groupe** : `PUT /spots/:id` et
 `DELETE /spots/:id` n'ont même pas le préfixe `/ports`, et une route « spots »
 ajoutée ailleurs passerait inaperçue.
 
-> ⚠️ **`PATCH /boats/:id/assignment` échappe à cette garde** : elle écrit
-> `boats.spot_id` mais vit dans `start/routes/boats.ts`. Une organisation
-> redescendue en Starter continue donc d'amarrer sur ses places héritées, alors
-> que toute la section lui est fermée. Constat #721.
+> **`PATCH /boats/:id/assignment` est gardé lui aussi** : son URL est sous
+> `/boats`, mais la route écrit `boats.spot_id` et n'est appelée que depuis le
+> plan de marina. Elle est donc déclarée dans le groupe de `start/routes/ports.ts`
+> — une organisation redescendue en Starter ne peut plus amarrer sur ses places
+> héritées (#721).
 
 ## Autorisations
 
 | Route                                   | Policy réellement appelée                 | Capacité lue               |
 | --------------------------------------- | ----------------------------------------- | -------------------------- |
-| `GET /ports`, `GET /ports/:id`          | **aucune** (constat #723)                 | —                          |
+| `GET /ports`                            | `PortPolicy.viewAny`                      | `ports.view`               |
+| `GET /ports/:id`                        | `PortPolicy.view`                         | `ports.view`               |
 | `GET /ports/new`, `POST /ports`         | `PortPolicy.create`                       | `ports.create`             |
 | `GET /ports/:id/edit`, `PUT /ports/:id` | `PortPolicy.edit`                         | `ports.edit`               |
 | `DELETE /ports/:id`                     | `PortPolicy.delete`                       | `ports.delete`             |
@@ -77,11 +79,18 @@ d'autoriser, pour que `SpotPolicy` vérifie aussi `sameOrg` sur la ressource.
 Le gestionnaire de places (`SpotsManager`) n'affiche que les boutons dont
 l'utilisateur a la capacité (#719).
 
-`index` et `show`, eux, n'autorisent rien du tout. Seul le scoping
-d'organisation des services les protège : un `mechanic` — et même un
-`boat_owner`, dont le jeu de capacités est volontairement vide — lit la page du
-port, ses places, et la liste nominative des bateaux de l'organisation.
-Constat #723.
+`index` et `show` lisent `ports.view` depuis #723. `index` n'a pas de ressource
+à passer : il appelle `PortPolicy.viewAny`, la capacité seule. `show` charge le
+port **avant** d'autoriser, comme `edit`, pour que `PortPolicy.view` vérifie
+aussi `sameOrg` — et surtout pour que l'autorisation passe avant le chargement
+des relations et de la liste nominative des bateaux.
+
+Avant, ces deux lectures n'autorisaient rien : seul le scoping d'organisation
+des services les protégeait. Un `mechanic` — et même un `boat_owner`, dont le
+jeu de capacités est **volontairement vide** pour qu'il ne touche aucun écran
+staff — lisait la page du port, ses pontons, ses places, ses taux d'occupation,
+et la liste nominative des bateaux de l'organisation : donc les bateaux des
+autres clients de l'exploitant.
 
 Les deux refus ne se ressemblent qu'en apparence : une **lecture** refusée rend
 un `403`, une **écriture** refusée renvoie `302 → /`, la page d'accueil
@@ -114,9 +123,9 @@ satisfaisable, en démarrant l'occupant précédent **dans la même transaction*
 avant d'amarrer le nouveau. Amarrer sur une place occupée n'est donc pas refusé,
 c'est une **éviction silencieuse**.
 
-Une place étrangère passée à `PATCH /boats/:id/assignment` est ignorée sans
-message : les deux branches du `try/catch` rendent le même
-`redirect().back()`. Constat #721.
+Une place étrangère passée à `PATCH /boats/:id/assignment` est refusée : le
+bateau garde sa place et un flash `flash.spot.notInOrg` l'explique, comme sur
+`POST /boats` et `PUT /boats/:id` (#721).
 
 ## Supprimer : un étage occupé est toujours refusé
 
@@ -182,20 +191,20 @@ rend `302` et laisse la position inchangée (`null` si le ponton n'avait jamais
 
 ## Où c'est testé
 
-| Fichier                                                 | Ce qu'il prouve                                   |
-| ------------------------------------------------------- | ------------------------------------------------- |
-| `tests/unit/hygiene/ports_routes_gated.spec.ts`         | les 19 routes portent `auth` + `requirePortsPlan` |
-| `tests/functional/ports/ports_plan_gating.spec.ts`      | le refus de plan, Starter et Pro                  |
-| `tests/functional/ports/ports_profile_gating.spec.ts`   | le refus de profil `private` (#604)               |
-| `tests/functional/ports/spots.spec.ts`                  | les 4 routes de place, hiérarchie et isolation    |
-| `tests/functional/ports/spot_deletion_frontier.spec.ts` | le refus aux deux étages (#720)                   |
-| `tests/functional/ports/marina_role_frontier.spec.ts`   | member, mechanic, boat_owner (#719, #723)         |
-| `tests/inertia/spots_manager_permissions.spec.ts`       | les boutons de place gardés par capacité (#719)   |
-| `tests/functional/ports/layout_positions.spec.ts`       | isolation et bornes du glisser-déposer            |
-| `tests/functional/boats/boats_assign.spec.ts`           | l'éviction et le scoping de `spot_id`             |
-| `tests/functional/boats/boat_berth_history.spec.ts`     | les séjours à quai et leur nature (#722, #721)    |
-| `tests/functional/ports/ports_pages_contract.spec.ts`   | les 4 pages Inertia (#689)                        |
-| `tests/browser/marina_canvas.spec.ts`                   | **le geste** : drag, mode édition, affectation    |
+| Fichier                                                 | Ce qu'il prouve                                                      |
+| ------------------------------------------------------- | -------------------------------------------------------------------- |
+| `tests/unit/hygiene/ports_routes_gated.spec.ts`         | les 20 routes portent `auth` + `requirePortsPlan`                    |
+| `tests/functional/ports/ports_plan_gating.spec.ts`      | le refus de plan, Starter et Pro                                     |
+| `tests/functional/ports/ports_profile_gating.spec.ts`   | le refus de profil `private` (#604)                                  |
+| `tests/functional/ports/spots.spec.ts`                  | les 4 routes de place, hiérarchie et isolation                       |
+| `tests/functional/ports/spot_deletion_frontier.spec.ts` | le refus aux deux étages (#720)                                      |
+| `tests/functional/ports/marina_role_frontier.spec.ts`   | member, mechanic, boat_owner (#719, #723)                            |
+| `tests/inertia/spots_manager_permissions.spec.ts`       | les boutons de place gardés par capacité (#719)                      |
+| `tests/functional/ports/layout_positions.spec.ts`       | isolation et bornes du glisser-déposer                               |
+| `tests/functional/boats/boats_assign.spec.ts`           | l'éviction et le scoping de `spot_id`                                |
+| `tests/functional/boats/boat_berth_history.spec.ts`     | séjours à quai, leur nature, garde marina de l'amarrage (#721, #722) |
+| `tests/functional/ports/ports_pages_contract.spec.ts`   | les 4 pages Inertia (#689)                                           |
+| `tests/browser/marina_canvas.spec.ts`                   | **le geste** : drag, mode édition, affectation                       |
 
 ### Le geste, et non plus seulement la route (#700)
 
@@ -221,7 +230,5 @@ nœuds DOM. C'est ce qui rend le plan adressable ; un vrai `<canvas>` ne le sera
 
 ## Constats ouverts
 
-| #    | Constat                                                                                         |
-| ---- | ----------------------------------------------------------------------------------------------- |
-| #721 | `PATCH /boats/:id/assignment` hors de la garde de plan, et no-op silencieux sur place étrangère |
-| #723 | `GET /ports` et `GET /ports/:id` n'autorisent rien                                              |
+Aucun. Les constats que cette page portait — #719, #720, #721, #722, #723 — sont tous traités ;
+le détail de chacun vit dans `docs/changelog/`.

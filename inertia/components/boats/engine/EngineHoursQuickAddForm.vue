@@ -6,6 +6,7 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { INCREMENT_ENGINE_HOURS_ACTION } from '#shared/constants/offline_queue'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -29,7 +30,7 @@ function submit() {
   // ne peut pas entrer en conflit avec une saisie en ligne intercalée
   if (!isOnline.value) {
     enqueue({
-      type: 'increment-engine-hours',
+      type: INCREMENT_ENGINE_HOURS_ACTION,
       url: `/boats/${props.boatId}/engines/${props.engineId}/hours`,
       method: 'patch',
       payload: { hoursIncrement: value },

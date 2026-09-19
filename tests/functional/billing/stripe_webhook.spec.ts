@@ -3,12 +3,13 @@ import emitter from '@adonisjs/core/services/emitter'
 import { truncateDb } from '#tests/utils/db'
 import OrganizationModule from '#models/organization_module'
 import Subscription from '#models/subscription'
+import ProcessedStripeEvent from '#models/processed_stripe_event'
 import OrganizationModuleService from '#services/organization_module_service'
 import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
 import { createOrgWithStripeCustomer } from '#tests/functional/helpers'
-import { swapStripeService } from '#tests/support/fakes'
+import { swapCountingSubscriptionService, swapStripeService } from '#tests/support/fakes'
 import {
   PRICE_IDS,
   postStripeWebhook,
@@ -389,5 +390,180 @@ test.group('Stripe webhook — checkout and inert events (functional)', (group) 
 
     await org.refresh()
     assert.equal(org.plan, 'pro')
+  })
+})
+
+/**
+ * Déduplication par `event.id` (#703).
+ *
+ * Stripe livre **au moins une fois**, jamais exactement une fois : il rejoue à
+ * chaque réponse non-2xx, et parfois même après un 2xx. Rien ne gardait trace
+ * des événements déjà traités, et chaque livraison était rejouée intégralement.
+ *
+ * Si le rejeu était jusqu'ici inoffensif, c'était par **effet de bord** :
+ * l'upsert de synchro, clé sur l'organisation, réécrivait les mêmes valeurs.
+ * D'où la forme de ces tests — ils comptent ce qui **atteint** la synchro,
+ * plutôt que de comparer l'état final. Un état final identique ne distingue pas
+ * « rien n'a été fait » de « la même chose a été refaite », et c'est exactement
+ * la différence que la déduplication apporte : la moindre écriture non
+ * idempotente ajoutée au chemin de synchro serait dupliquée par le rejeu sans
+ * qu'un test d'état final ne bronche.
+ */
+test.group('Stripe webhook — déduplication par event.id (functional, #703)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  test('replaying the same event id never reaches the sync a second time', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    cleanup(() => emitter.restore())
+    emitter.fake()
+
+    const org = await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+    const sync = await swapCountingSubscriptionService()
+    cleanup(() => sync.restore())
+
+    const event = subscriptionEvent(
+      'customer.subscription.updated',
+      { id: 'sub_pro', customer: CUSTOMER, priceId: PRICE_IDS.proMonth },
+      'evt_dedup'
+    )
+
+    const first = await postStripeWebhook(client, event)
+    const second = await postStripeWebhook(client, event)
+
+    first.assertStatus(200)
+    // Le rejeu est acquitté comme une livraison neuve : Stripe n'a pas à savoir
+    // que l'événement avait déjà été vu, il attend seulement un 2xx.
+    second.assertStatus(200)
+    second.assertBodyContains({ received: true })
+
+    // Le cœur du test : la synchro n'a été atteinte qu'une fois.
+    assert.equal(sync.calls.subscriptionEvent, 1)
+
+    // Et le premier passage a bien fait son travail — sans quoi « une seule
+    // fois » serait vrai en n'ayant rien fait du tout.
+    await org.refresh()
+    assert.equal(org.plan, 'pro')
+    assert.lengthOf(await ProcessedStripeEvent.all(), 1)
+  })
+
+  test('two different event ids are both processed', async ({ client, assert, cleanup }) => {
+    cleanup(() => emitter.restore())
+    emitter.fake()
+
+    await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+    const sync = await swapCountingSubscriptionService()
+    cleanup(() => sync.restore())
+
+    // Témoin : la garde déduplique sur `event.id`, pas sur le contenu. Deux
+    // événements distincts portant le même abonnement doivent tous deux passer,
+    // sans quoi une annulation suivant une mise à jour serait avalée.
+    await postStripeWebhook(
+      client,
+      subscriptionEvent(
+        'customer.subscription.updated',
+        { id: 'sub_pro', customer: CUSTOMER, priceId: PRICE_IDS.proMonth },
+        'evt_first'
+      )
+    )
+    await postStripeWebhook(
+      client,
+      subscriptionEvent(
+        'customer.subscription.updated',
+        { id: 'sub_pro', customer: CUSTOMER, priceId: PRICE_IDS.proMonth },
+        'evt_second'
+      )
+    )
+
+    assert.equal(sync.calls.subscriptionEvent, 2)
+    assert.lengthOf(await ProcessedStripeEvent.all(), 2)
+  })
+
+  test('an event whose processing fails is not marked as processed', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    cleanup(() => emitter.restore())
+    emitter.fake()
+
+    const org = await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+    const sync = await swapCountingSubscriptionService({ failFirstCall: true })
+    cleanup(() => sync.restore())
+
+    const event = subscriptionEvent(
+      'customer.subscription.updated',
+      { id: 'sub_pro', customer: CUSTOMER, priceId: PRICE_IDS.proMonth },
+      'evt_retry'
+    )
+
+    // Première livraison : la synchro échoue, la transaction est annulée — donc
+    // la trace aussi. C'est tout l'intérêt d'écrire la trace **dans** la
+    // transaction de synchro : commitée à part, elle marquerait l'événement
+    // traité alors qu'il ne l'a pas été, et Stripe ne le rejouerait jamais.
+    const failed = await postStripeWebhook(client, event)
+    assert.equal(failed.status(), 500)
+    assert.lengthOf(await ProcessedStripeEvent.all(), 0)
+
+    // Le rejeu de Stripe aboutit.
+    const retried = await postStripeWebhook(client, event)
+    retried.assertStatus(200)
+
+    assert.equal(sync.calls.subscriptionEvent, 2)
+    await org.refresh()
+    assert.equal(org.plan, 'pro')
+    assert.lengthOf(await ProcessedStripeEvent.all(), 1)
+  })
+
+  test('an unhandled event type is recorded too, so its replay costs nothing', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    cleanup(() => emitter.restore())
+    emitter.fake()
+
+    await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+
+    const event = stripeEvent(
+      'invoice.payment_failed',
+      stripeSubscription({ customer: CUSTOMER, priceId: PRICE_IDS.proMonth }),
+      'evt_unhandled'
+    )
+
+    const response = await postStripeWebhook(client, event)
+    response.assertStatus(200)
+
+    const recorded = await ProcessedStripeEvent.all()
+    assert.lengthOf(recorded, 1)
+    // Le type est conservé pour le diagnostic : savoir *quoi* a été rejoué sans
+    // rouvrir les logs Stripe.
+    assert.equal(recorded[0].type, 'invoice.payment_failed')
+    assert.equal(recorded[0].stripeEventId, 'evt_unhandled')
+  })
+
+  test('a signature failure records nothing — the event was never read', async ({
+    client,
+    assert,
+  }) => {
+    await createOrgWithStripeCustomer({ customerId: CUSTOMER })
+
+    const response = await postStripeWebhook(
+      client,
+      subscriptionEvent(
+        'customer.subscription.updated',
+        { customer: CUSTOMER, priceId: PRICE_IDS.proMonth },
+        'evt_forged'
+      ),
+      { signature: 't=1700000000,v1=deadbeef' }
+    )
+
+    response.assertStatus(400)
+    // La déduplication vient **après** la vérification de signature : un
+    // `event.id` choisi par un tiers ne doit pas pouvoir bloquer la livraison
+    // légitime qui portera le même id.
+    assert.lengthOf(await ProcessedStripeEvent.all(), 0)
   })
 })

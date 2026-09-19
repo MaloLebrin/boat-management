@@ -558,3 +558,14 @@ Référence: `database/seeders/billing_module_states_seeder.ts` (environnements 
 - crée une organisation par état de la matrice plan/abonnement/module de `/settings/billing` (Starter, Pro sans/avec abonnement, modules `subscription`/`granted`, add-on `extra_boats`, Enterprise avec/sans lignes `organization_modules`)
 - crée de l’historique de maintenance
 - crée des tasks “planned” pour les entrées ayant une `dueAt`
+
+### processed_stripe_events
+
+Trace des webhooks Stripe déjà traités (#703). Stripe livre **au moins une fois**, jamais exactement une fois : il rejoue à chaque réponse non-2xx, et parfois après un 2xx. C'est l'index unique sur `stripeEventId` qui rend `POST /webhooks/stripe` idempotent — avant lui, le rejeu n'était inoffensif que par effet de bord.
+
+- `id`
+- `stripeEventId` (unique) — l'`event.id` Stripe, réservé **avant** le traitement et dans la même transaction que lui
+- `type` — type de l'événement (`customer.subscription.updated`…), pour le diagnostic
+- `processedAt` (timestamp)
+
+Purgée au-delà de 30 jours par le cron `daily-purge-processed-stripe-events` (02:00). Aucune clé étrangère : la ligne n'appartient à aucune organisation, elle décrit une livraison.

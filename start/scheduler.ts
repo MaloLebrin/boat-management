@@ -1,5 +1,6 @@
 import SendReminderEmails from '#jobs/send_reminder_emails'
 import PurgeAuditLogs from '#jobs/purge_audit_logs'
+import PurgeProcessedStripeEvents from '#jobs/purge_processed_stripe_events'
 import ResetAiTokenUsage from '#jobs/reset_ai_token_usage'
 import ResetDemoData from '#jobs/reset_demo_data'
 import MarkOverdueInvoices from '#jobs/mark_overdue_invoices'
@@ -16,6 +17,14 @@ await PurgeAuditLogs.schedule({})
   .cron('0 3 * * *')
   .timezone('Europe/Paris')
   .id('daily-purge-audit-logs')
+  .run()
+
+// À 02:00, avant la purge des journaux d'audit : deux suppressions de masse
+// qui ne se marchent pas dessus, sur une table sans jointure.
+await PurgeProcessedStripeEvents.schedule({})
+  .cron('0 2 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-purge-processed-stripe-events')
   .run()
 
 await ResetAiTokenUsage.schedule({})

@@ -5,7 +5,7 @@ import BoatPositionHistory from '#models/boat_position_history'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PontoonFactory } from '#database/factories/pontoon_factory'
 import { SpotFactory } from '#database/factories/spot_factory'
-import { createAdminUser, createStarterAdminUser } from '#tests/functional/helpers'
+import { createEnterpriseAdminUser, createStarterAdminUser } from '#tests/functional/helpers'
 
 /**
  * L'historique des séjours à quai, et les deux constats qu'il révèle (#695).
@@ -20,9 +20,9 @@ import { createAdminUser, createStarterAdminUser } from '#tests/functional/helpe
  *   quai. Chacun des deux clôturait « toutes les lignes ouvertes » du bateau
  *   sans distinguer leur nature ; la colonne `kind` sépare désormais les deux,
  *   et le groupe dédié ci-dessous le prouve dans les deux sens ;
- * - **#721** — caractérisation toujours ouverte : la route vit hors du groupe
- *   gardé par `requirePortsPlan`, et une place étrangère y est un no-op
- *   silencieux.
+ * - **#721** — corrigé sur `main` : la route d'affectation vit sous la garde
+ *   `requirePortsPlan`, et une place étrangère y est refusée avec un flash.
+ *   C'est pourquoi les tests d'affectation passent par un admin **Entreprise**.
  */
 
 /** Le séjour en cours d'un bateau, ou `null` s'il n'est amarré nulle part. */
@@ -46,7 +46,7 @@ test.group('Amarrage — la trace laissée dans l’historique', (group) => {
   group.each.setup(() => truncateDb())
 
   test('amarrer un bateau ouvre un séjour sur la place', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const spot = await makeSpot(user.organizationId!)
 
@@ -63,7 +63,7 @@ test.group('Amarrage — la trace laissée dans l’historique', (group) => {
   })
 
   test('le déplacer clôt le séjour précédent et en ouvre un seul', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const first = await makeSpot(user.organizationId!)
     const second = await makeSpot(user.organizationId!)
@@ -91,7 +91,7 @@ test.group('Amarrage — la trace laissée dans l’historique', (group) => {
   })
 
   test('le démarrer clôt le séjour sans en rouvrir', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const spot = await makeSpot(user.organizationId!)
     const boat = await BoatFactory.merge({
       organizationId: user.organizationId!,
@@ -116,7 +116,7 @@ test.group('Amarrage — la trace laissée dans l’historique', (group) => {
     // L'éviction est déjà testée côté `boats.spot_id` ; sa moitié historique ne
     // l'était pas. Un évincé dont le séjour reste ouvert donnerait deux bateaux
     // « en cours » sur la même place.
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const spot = await makeSpot(user.organizationId!)
     const occupant = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const newcomer = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
@@ -152,7 +152,9 @@ test.group('Amarrage — les deux natures de ligne ne se ferment plus (#722)', (
    */
 
   test('un point GPS laisse le séjour à quai ouvert', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    // Admin Entreprise : depuis #721, `PATCH /boats/:id/assignment` est sous la
+    // garde de plan marina — un admin Pro y serait refusé avant d'écrire.
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const spot = await makeSpot(user.organizationId!)
 
@@ -181,7 +183,7 @@ test.group('Amarrage — les deux natures de ligne ne se ferment plus (#722)', (
     client,
     assert,
   }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const spot = await makeSpot(user.organizationId!)
 
@@ -212,7 +214,7 @@ test.group('Amarrage — les deux natures de ligne ne se ferment plus (#722)', (
   }) => {
     // Le pendant du test précédent : séparer les natures ne doit pas relâcher
     // la clôture *à l'intérieur* d'une nature.
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const spot = await makeSpot(user.organizationId!)
 
@@ -243,7 +245,7 @@ test.group('Amarrage — les deux natures de ligne ne se ferment plus (#722)', (
   })
 
   test('la nature est écrite sur chaque ligne', async ({ client, assert }) => {
-    const user = await createAdminUser()
+    const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const spot = await makeSpot(user.organizationId!)
 
@@ -267,15 +269,16 @@ test.group('Amarrage — les deux natures de ligne ne se ferment plus (#722)', (
   })
 })
 
-test.group('⚠️ Amarrage — la route hors de la garde marina (#721)', (group) => {
+test.group('Amarrage — la garde marina et le refus d’une place étrangère (#721)', (group) => {
   group.each.setup(() => truncateDb())
 
-  test('un admin Starter amarre encore sur une place héritée', async ({ client, assert }) => {
-    // **Caractérisation, pas validation.** Toute la section `/ports` est fermée
-    // à cette organisation — `ports_plan_gating.spec.ts` le prouve, `portOptions`
-    // est même vidé de ses formulaires. Mais `PATCH /boats/:id/assignment` est
-    // déclarée dans `start/routes/boats.ts`, hors du groupe gardé : la place
-    // héritée d'un abonnement Entreprise passé reste utilisable.
+  test('un admin Starter ne peut plus amarrer sur une place héritée', async ({
+    client,
+    assert,
+  }) => {
+    // Toute la section `/ports` est fermée à cette organisation — la route
+    // d'amarrage l'est désormais aussi : la place héritée d'un abonnement
+    // Entreprise passé n'est plus utilisable.
     const user = await createStarterAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
     const spot = await makeSpot(user.organizationId!)
@@ -287,23 +290,20 @@ test.group('⚠️ Amarrage — la route hors de la garde marina (#721)', (group
       .redirects(0)
 
     response.assertStatus(302)
-    const moored = await Boat.findOrFail(boat.id)
-    assert.equal(moored.spotId, spot.id)
+    response.assertHeader('location', '/settings/billing')
+    response.assertFlashMessage(
+      'error',
+      'Port mapping (pontoons, moorings, berths) is reserved to the Enterprise plan. Upgrade to Enterprise to map your marina.'
+    )
 
-    // Le contraste, dans la même organisation : la marina, elle, est bien
-    // fermée.
-    const ports = await client.get('/ports').loginAs(user).redirects(0)
-    ports.assertStatus(302)
-    ports.assertHeader('location', '/settings/billing')
+    const untouched = await Boat.findOrFail(boat.id)
+    assert.isNull(untouched.spotId)
+    assert.isNull(await openStay(boat.id))
   })
 
-  test('une place étrangère est ignorée sans le dire', async ({ client, assert }) => {
-    // **Caractérisation, pas validation.** Les deux branches du `try/catch`
-    // rendent le même `redirect().back()` : l'utilisateur revient sur un écran
-    // inchangé, sans flash, et son bateau n'a pas bougé. L'isolation fonctionne
-    // — c'est le retour qui manque.
-    const user = await createAdminUser()
-    const outsider = await createAdminUser()
+  test('une place étrangère est refusée avec un flash', async ({ client, assert }) => {
+    const user = await createEnterpriseAdminUser()
+    const outsider = await createEnterpriseAdminUser()
     const own = await makeSpot(user.organizationId!)
     const foreign = await makeSpot(outsider.organizationId!)
     const boat = await BoatFactory.merge({
@@ -318,9 +318,9 @@ test.group('⚠️ Amarrage — la route hors de la garde marina (#721)', (group
       .redirects(0)
 
     response.assertStatus(302)
-    response.assertFlashMissing('error')
+    response.assertFlashMessage('error', 'This spot does not belong to your organisation.')
 
     const kept = await Boat.findOrFail(boat.id)
-    assert.equal(kept.spotId, own.id, 'le bateau a gardé sa place — seul le message manque')
+    assert.equal(kept.spotId, own.id)
   })
 })

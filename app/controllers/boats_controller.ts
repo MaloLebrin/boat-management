@@ -480,7 +480,7 @@ export default class BoatsController {
     response.redirect('/boats')
   }
 
-  async assign({ request, params, auth, response, bouncer }: HttpContext) {
+  async assign({ request, params, auth, response, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
@@ -499,7 +499,10 @@ export default class BoatsController {
       await this.boatService.updateAssignment(boat, { spotId: payload.spotId })
       return response.redirect().back()
     } catch (error) {
-      if (error instanceof SpotNotFoundError) return response.redirect().back()
+      if (error instanceof SpotNotFoundError) {
+        session.flash('error', i18n.t('flash.spot.notInOrg'))
+        return response.redirect().back()
+      }
       throw error
     }
   }

@@ -39,6 +39,31 @@ export const publicPartSearchThrottle = limiter.define('public_part_search', (ct
     .usingKey(`public_parts_${ctx.auth.user?.id ?? ctx.request.ip()}`)
 })
 
+// Les trois POST publics du simulateur (#731) : aucune authentification, et
+// chacun écrit en base. Compteurs séparés — une rafale sur l'un ne doit pas
+// consommer le budget des autres.
+//
+// `session` et `share` reprennent le débit du diagnostic public (6/min) : ils
+// n'écrivent qu'une ligne, mais rien ne les borne côté client.
+export const simulatorSessionThrottle = limiter.define('simulator_session', (ctx) => {
+  return limiter
+    .allowRequests(6)
+    .every('1 minute')
+    .usingKey(`simulator_session_${ctx.request.ip()}`)
+})
+
+export const simulatorShareThrottle = limiter.define('simulator_share', (ctx) => {
+  return limiter.allowRequests(6).every('1 minute').usingKey(`simulator_share_${ctx.request.ip()}`)
+})
+
+// `lead` est le plus exposé des trois : il crée un prospect **et** déclenche
+// deux jobs d'e-mail (`send_simulator_report_job`, `send_simulator_nurturing_job`).
+// Même budget que le formulaire de contact — l'autre formulaire public qui
+// envoie du courrier — et non celui des deux routes ci-dessus.
+export const simulatorLeadThrottle = limiter.define('simulator_lead', (ctx) => {
+  return limiter.allowRequests(5).every('10 minutes').usingKey(`simulator_lead_${ctx.request.ip()}`)
+})
+
 // Abonnements Web Push (#497) : le navigateur ne (ré)abonne qu'à l'activation
 // ou au chargement — au-delà, c'est un script.
 export const pushThrottle = limiter.define('push', (ctx) => {
