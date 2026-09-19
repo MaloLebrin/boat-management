@@ -1,3 +1,4 @@
+import { stampAuthSession } from '#utils/auth_session'
 import AuditLogService from '#services/audit_log_service'
 import DemoService from '#services/demo_service'
 import UserService from '#services/user_service'
@@ -23,6 +24,7 @@ export default class SessionController {
     const { email, password, remember } = await request.validateUsing(loginValidator)
     const user = await this.userService.verifyCredentials(email, password)
     await auth.use('web').login(user, remember ?? false)
+    stampAuthSession(session)
     // #451 — filet de sécurité : une session navigateur qui traîne encore un
     // `demoSessionStartedAt` (session démo antérieure) ne doit pas le transmettre
     // au compte réel qui vient de s'authentifier.

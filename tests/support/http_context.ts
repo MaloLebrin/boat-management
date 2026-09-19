@@ -30,6 +30,8 @@ export interface FakeCtxOptions {
   defaultGuard?: string
   /** Erreur levée par `auth.authenticateUsing()`. */
   authenticateError?: Error
+  /** Valeurs initiales de `ctx.session`. */
+  session?: Record<string, unknown>
 }
 
 export interface FakeCtx {
@@ -46,6 +48,10 @@ export interface FakeCtx {
   checkedGuards: Array<string | undefined>
   /** Arguments reçus par `auth.authenticateUsing()`. */
   authenticateCalls: Array<{ guards: unknown; options: unknown }>
+  /** Contenu vivant de `ctx.session`, hors flashes. */
+  sessionStore: Record<string, unknown>
+  /** Gardes passées à `auth.use(...).logout()`. */
+  logoutCalls: string[]
 }
 
 export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
@@ -55,6 +61,8 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
   const checkedGuards: Array<string | undefined> = []
   const authenticateCalls: Array<{ guards: unknown; options: unknown }> = []
   const state = { reflashCount: 0 }
+  const sessionStore: Record<string, unknown> = { ...(options.session ?? {}) }
+  const logoutCalls: string[] = []
 
   const ctx = {
     auth: {
@@ -64,7 +72,12 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
       check: async () => options.authenticated ?? false,
       use: (guard?: string) => {
         checkedGuards.push(guard)
-        return { check: async () => options.authenticated ?? false }
+        return {
+          check: async () => options.authenticated ?? false,
+          logout: async () => {
+            logoutCalls.push(guard ?? options.defaultGuard ?? 'web')
+          },
+        }
       },
       authenticateUsing: async (guards: unknown, authOptions: unknown) => {
         authenticateCalls.push({ guards, options: authOptions })
@@ -78,12 +91,51 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
       reflash: () => {
         state.reflashCount++
       },
+      get: (key: string) => sessionStore[key],
+      put: (key: string, value: unknown) => {
+        sessionStore[key] = value
+      },
+      forget: (key: string) => {
+        delete sessionStore[key]
+      },
     },
     i18n: { t: (key: string) => `t:${key}` },
     response: {
-      redirect: (target: string, clearQs?: boolean) => {
-        redirects.push(target)
-        redirectCalls.push({ target, clearQs })
+      /**
+       * Les deux formes de `response.redirect()` : la forme courte
+       * `redirect(target, forward)` et la forme fluide
+       * `redirect().withQs(forward).toPath(target)`, que les middlewares
+       * utilisent pour se soustraire au `forwardQueryString` global de
+       * `config/app.ts`. Les deux alimentent le même journal.
+       */
+      redirect: (target?: string, clearQs?: boolean) => {
+        if (typeof target === 'string') {
+          redirects.push(target)
+          redirectCalls.push({ target, clearQs })
+          return
+        }
+
+        let pendingQs: boolean | undefined
+        const builder = {
+          withQs: (forward?: boolean) => {
+            pendingQs = forward
+            return builder
+          },
+          status: () => builder,
+          clearQs: () => {
+            pendingQs = false
+            return builder
+          },
+          toPath: (path: string) => {
+            redirects.push(path)
+            redirectCalls.push({ target: path, clearQs: pendingQs })
+          },
+          back: () => {
+            redirects.push('back')
+            redirectCalls.push({ target: 'back', clearQs: pendingQs })
+          },
+        }
+        return builder
       },
     },
   } as never as HttpContext
@@ -102,6 +154,8 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
     reflash: state,
     checkedGuards,
     authenticateCalls,
+    sessionStore,
+    logoutCalls,
   }
 }
 

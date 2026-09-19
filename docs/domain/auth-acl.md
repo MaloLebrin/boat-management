@@ -30,6 +30,47 @@ Référence routes: `start/routes/auth.ts`.
   - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `home`
 
+### Révocation des accès au changement de mot de passe (#763)
+
+Changer son mot de passe est le seul geste de remédiation offert à quelqu'un
+qui pense son compte compromis. Il ne révoquait rien : l'attaquant déjà
+connecté le restait, jusqu'à **cinq jours** pour une session (`age: '5d'`,
+`clearWithBrowser: false`) et **trente** pour un remember-me — et ce dernier
+suffit à se réauthentifier sans le mot de passe.
+
+`PasswordResetService.revokeAllAccess(user)` coupe les deux :
+
+1. **remember-me** — supprimés un par un via l'API du provider
+   (`User.rememberMeTokens.all()` / `.delete()`), pas par un `DELETE` brut ;
+2. **sessions** — `users.sessions_valid_after` est daté.
+   `RevokedSessionMiddleware` (monté en dernier dans `router.use`, après la
+   locale dont il a besoin pour flasher) compare cette date à l'estampille de
+   la session courante et déconnecte vers `/login` si la session est
+   antérieure.
+
+**Le point de conception, et son piège.** Avec `SESSION_DRIVER=cookie` les
+sessions ne sont pas listables côté serveur : le discriminant doit être porté
+par l'utilisateur. L'estampille est posée par `stampAuthSession()` sur les
+**trois points d'entrée** (`SessionController.store`,
+`NewAccountController.store`, `DemoController.login`), jamais paresseusement
+par le middleware — sinon deux choses cassent, dans les deux sens :
+
+- posée au vol, la session de l'attaquant se réestampillerait à « maintenant »
+  et survivrait ;
+- pas posée du tout, la connexion légitime qui **suit** une réinitialisation
+  serait coupée dès sa première requête.
+
+Une session sans estampille est donc traitée comme antérieure à toute
+révocation (échec fermé). Les sessions ouvertes au moment du déploiement n'en
+ont pas, mais `sessions_valid_after` vaut `null` pour tout le monde jusqu'à la
+première réinitialisation : personne n'est déconnecté par la migration.
+
+Le changement depuis les réglages (`PUT /settings/password`) applique la même
+révocation, puis **réestampille la session courante** avec la valeur même de
+`sessions_valid_after` : la comparaison du middleware étant stricte (`<`), une
+estampille égale survit. Celui qui agit reste connecté, ses autres appareils
+non — ce que dit le message de succès.
+
 ### Logout
 
 - `POST /logout` (auth-only)

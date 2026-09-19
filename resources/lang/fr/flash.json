@@ -68,7 +68,8 @@
   "auth": {
     "passwordResetSent": "Si cet email est associé à un compte, vous recevrez un lien de réinitialisation.",
     "passwordResetSuccess": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter.",
-    "passwordResetTokenInvalid": "Ce lien de réinitialisation est invalide ou expiré."
+    "passwordResetTokenInvalid": "Ce lien de réinitialisation est invalide ou expiré.",
+    "sessionRevoked": "Votre mot de passe a été changé. Veuillez vous reconnecter."
   },
   "settings": {
     "profileUpdated": "Profil mis à jour.",
@@ -86,7 +87,8 @@
     "aiApiKeyRemoved": "Clé API IA retirée.",
     "aiSettingsRequirePlan": "Les réglages IA nécessitent un plan avec accès à l’IA.",
     "aiProviderUpdated": "Fournisseur IA mis à jour.",
-    "aiProviderKeyMissing": "Ajoutez d’abord une clé API pour ce fournisseur."
+    "aiProviderKeyMissing": "Ajoutez d’abord une clé API pour ce fournisseur.",
+    "passwordUpdatedOtherDevicesSignedOut": "Mot de passe mis à jour. Vos autres appareils ont été déconnectés."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",
