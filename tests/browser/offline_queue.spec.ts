@@ -54,6 +54,15 @@ function closeForm(page: Page) {
   return page.locator('form').filter({ has: page.locator('#arrivedAt') })
 }
 
+/**
+ * L'écran de conflit se cible par son rôle depuis #734 : il passe par
+ * `BaseModal`, donc il porte `role="dialog"`, `aria-modal` et un nom accessible.
+ * Avant, faute de ces attributs, il fallait viser son titre puis ses boutons.
+ */
+function conflictDialog(page: Page) {
+  return page.getByRole('dialog', { name: 'Conflict detected' })
+}
+
 async function decor(): Promise<{ user: User; boat: Boat }> {
   const user = await createAdminUser()
   const boat = await createBoatForUser(user, {
@@ -196,7 +205,19 @@ test.group('E2E · Offline queue', (group) => {
 
     await browserContext.setOffline(false)
 
-    await page.getByRole('heading', { name: 'Conflict detected' }).waitFor()
+    const dialog = conflictDialog(page)
+    await dialog.waitFor()
+
+    // #734 : un lecteur d'écran doit annoncer la modale et n'offrir aucune
+    // sortie neutre — le seul arbitrage est l'un des deux boutons.
+    assert.equal(await dialog.getAttribute('aria-modal'), 'true')
+    assert.deepEqual(await dialog.getByRole('button').allInnerTexts(), [
+      'Use server version',
+      'Keep my changes',
+    ])
+    await page.keyboard.press('Escape')
+    await dialog.waitFor()
+
     // La file est en pause tant que l'arbitrage n'est pas rendu.
     await page.assertExists('[data-test="queue-group"]')
 
@@ -227,7 +248,7 @@ test.group('E2E · Offline queue', (group) => {
     log.updatedAt = DateTime.now().plus({ minutes: 5 })
     await log.save()
     await browserContext.setOffline(false)
-    await page.getByRole('heading', { name: 'Conflict detected' }).waitFor()
+    await conflictDialog(page).waitFor()
 
     await page.getByRole('button', { name: 'Use server version' }).click()
 
@@ -259,7 +280,7 @@ test.group('E2E · Offline queue', (group) => {
     log.updatedAt = DateTime.now().plus({ minutes: 5 })
     await log.save()
     await browserContext.setOffline(false)
-    await page.getByRole('heading', { name: 'Conflict detected' }).waitFor()
+    await conflictDialog(page).waitFor()
 
     // `resolveConflict('local')` ré-enfile l'action avec le `updatedAt` du
     // serveur : le second passage franchit le verrou optimiste.
