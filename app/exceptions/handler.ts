@@ -46,6 +46,15 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       ctx.session.flash('error', ctx.i18n.t('flash.demo.rateLimitError'))
       return ctx.response.redirect().back()
     }
+    // Le compteur de connexion **par IP** (#767). Le compteur par compte, lui,
+    // est consommé dans `SessionController.store` et flashe la **même** clé :
+    // distinguer les deux ferait du refus un signal sur l'activité visant ce
+    // compte. Une 429 brute sur un formulaire pleine page est par ailleurs un
+    // cul-de-sac — le visiteur perd sa saisie.
+    if (error instanceof limiterErrors.E_TOO_MANY_REQUESTS && ctx.route?.name === 'login.store') {
+      ctx.session.flash('error', ctx.i18n.t('flash.auth.loginRateLimit'))
+      return ctx.response.redirect().back()
+    }
     if (error instanceof QuotaExceededError) {
       ctx.session.flash('error', ctx.i18n.t(quotaFlashKey(error)))
       // Upsell (issue #418) : le toast d'erreur quota expose une action « Voir les

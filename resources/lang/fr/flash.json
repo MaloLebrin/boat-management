@@ -68,7 +68,8 @@
   "auth": {
     "passwordResetSent": "Si cet email est associé à un compte, vous recevrez un lien de réinitialisation.",
     "passwordResetSuccess": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter.",
-    "passwordResetTokenInvalid": "Ce lien de réinitialisation est invalide ou expiré."
+    "passwordResetTokenInvalid": "Ce lien de réinitialisation est invalide ou expiré.",
+    "loginRateLimit": "Trop de tentatives de connexion. Veuillez réessayer plus tard."
   },
   "settings": {
     "profileUpdated": "Profil mis à jour.",
