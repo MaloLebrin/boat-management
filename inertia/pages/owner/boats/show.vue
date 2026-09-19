@@ -9,22 +9,13 @@ import BoatOwnerReservationsTab from '~/components/owner/BoatOwnerReservationsTa
 import BoatOwnerInvoicesTab from '~/components/owner/BoatOwnerInvoicesTab.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatOwnerBoatSummary } from '../../../../shared/types/boat'
+import type { BoatOwnerMaintenanceEventRow } from '../../../../shared/types/maintenance'
 import type { BoatReservationRow } from '~/types/reservation'
 import type { InvoiceRow } from '../../../../shared/types/invoice'
 
-interface OwnerMaintenanceEvent {
-  id: number
-  title: string
-  subject: string
-  notes: string | null
-  performedAt: string
-  engineCaption: string | null
-  sailCaption: string | null
-}
-
 const props = defineProps<{
   boat: BoatOwnerBoatSummary
-  maintenanceEvents: OwnerMaintenanceEvent[]
+  maintenanceEvents: BoatOwnerMaintenanceEventRow[]
   reservations: BoatReservationRow[]
   invoices: InvoiceRow[]
 }>()

@@ -55,6 +55,29 @@ export type MaintenanceEventRow = {
   totalCost: number | null
 }
 
+/**
+ * Événement d'entretien tel que le voit un **propriétaire de bateau** (#781).
+ *
+ * Volontairement plus pauvre que `MaintenanceEventRow` : `boat_owner` est le
+ * rôle le moins privilégié du produit, souvent externe à l'organisation qui
+ * exploite la flotte. Cette liste est donc la liste des champs que la page
+ * `inertia/pages/owner/boats/show.vue` consomme réellement — pas une copie des
+ * colonnes de `boat_maintenance_events`.
+ *
+ * En particulier, les pièces (`parts`) n'y figurent pas : leur `unitPrice` est
+ * le prix d'achat côté exploitant, et c'est exactement le genre de colonne
+ * qu'on ne veut pas voir partir chez le propriétaire.
+ */
+export type BoatOwnerMaintenanceEventRow = {
+  id: number
+  title: string
+  subject: string
+  notes: string | null
+  performedAt: string
+  engineCaption: string | null
+  sailCaption: string | null
+}
+
 export type MaintenanceHistorySort = 'recent' | 'oldest'
 
 export type MaintenanceHistoryFilters = {
