@@ -85,7 +85,12 @@
   "actions": {
     "createQuote": "Créer un devis",
     "inspection": "État des lieux",
-    "contract": "Contrat de location"
+    "contract": "Contrat de location",
+    "inspectionFor": "État des lieux de {client}",
+    "contractFor": "Contrat de location de {client}",
+    "editFor": "Modifier la réservation de {client}",
+    "deleteFor": "Supprimer la réservation de {client}",
+    "createQuoteFor": "Créer un devis pour {client}"
   },
   "types": {
     "bareboat": "Coque nue",

@@ -466,6 +466,36 @@ Quatre écrans lisent des listes de valeurs qui ne vivent **jamais** dans le com
   une saisie), et `engineFuelLabel()` l'affichage (onglet Carburant, `FuelLogRow.vue`,
   `FuelLogCard.vue`).
 
+## Actions de ligne révélées au survol (#735)
+
+Les tableaux qui cachent leurs actions (`opacity-0 group-hover:opacity-100`) doivent
+en faire autant au clavier et les nommer :
+
+- ajouter `group-focus-within:opacity-100` — sans lui, la cible reste invisible à la
+  tabulation, `group-hover` ne réagissant qu'à la souris ;
+- une icône seule n'a **pas** de nom accessible : un attribut `title` ne suffit pas et
+  le SVG n'a pas de `<title>`. Poser un `aria-label`, de préférence contextualisé par
+  la ligne (`reservations.actions.contractFor` → « Rental contract for {client} »),
+  sinon vingt lignes annoncent toutes le même nom.
+
+Référence : `ReservationList.vue` (état des lieux, contrat, modifier, supprimer). Les
+tests navigateur ciblent alors l'action par son rôle et son nom accessible plutôt que
+par `[title="…"]` — ce que voit Playwright est ce qu'annonce un lecteur d'écran.
+
+## Reservations — chemin vers la facture (#735)
+
+Les deux listes de réservations portent la même colonne « Documents » : les devis et
+factures déjà émis (`linkedInvoices`) et le bouton « Créer un devis » sous le flag
+`canCreateQuote`.
+
+- `reservations/index.vue` → `FleetReservationList.vue` (page flotte) ;
+- `boats/reservations.vue` → `ReservationList.vue` (`/boats/:id/reservations`, l'écran
+  de l'état des lieux de retour). La colonne y est masquée quand elle n'a rien à
+  montrer, pour ne pas ajouter une colonne vide aux orgs sans facturation.
+
+Le bouton poste sur `POST /invoices/from-reservation/:id` (`router.post`,
+`preserveScroll`) et le contrôleur redirige vers la fiche du devis.
+
 ## Repli carte mobile des tableaux (#493)
 
 Les écrans terrain ne laissent jamais un tableau en scroll horizontal seul sur mobile : chaque

@@ -1,16 +1,21 @@
 import { test } from '@japa/runner'
+import Invoice from '#models/invoice'
 import RentalContract from '#models/rental_contract'
 import { BoatReservationFactory } from '#database/factories/boat_reservation_factory'
 import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 import { truncateDb } from '#tests/utils/db'
-import { createBoatForUser, createCharterAdminUser } from '#tests/browser/helpers'
+import {
+  createBoatForUser,
+  createCharterAdminUser,
+  createEnterpriseAdminUser,
+} from '#tests/browser/helpers'
 import type Boat from '#models/boat'
 import type BoatReservation from '#models/boat_reservation'
 import type User from '#models/user'
 
 /**
- * La location, réduite aux trois maillons que le navigateur seul peut prouver
- * (#700).
+ * La location, réduite aux maillons que le navigateur seul peut prouver
+ * (#700, #735).
  *
  * Ce domaine est déjà couvert en profondeur côté HTTP — `rental_contracts.spec.ts`
  * (génération, envoi, signature, remplacement, suppression, IDOR),
@@ -20,22 +25,26 @@ import type User from '#models/user'
  * routes). Rejouer ce parcours en entier ici coûterait des minutes de CI pour
  * zéro information.
  *
- * Restent trois choses qu'un appel HTTP ne peut pas établir :
+ * Restent quatre choses qu'un appel HTTP ne peut pas établir :
  *
  * 1. **qu'un humain atteigne l'écran de contrat** — les actions de
- *    `ReservationList` sont des icônes sans texte, révélées au survol
- *    (`opacity-0 group-hover:opacity-100`), et leur seul libellé est un
- *    attribut `title` ;
+ *    `ReservationList` sont des icônes sans texte, révélées au survol ou au
+ *    focus clavier (`opacity-0 group-hover:opacity-100
+ *    group-focus-within:opacity-100`), nommées par un `aria-label` (#735) ;
  * 2. **que le bouton « Upload signed contract » ouvre bien le sélecteur de
  *    fichier** — l'`<input type="file">` est `class="hidden"` et piloté par un
  *    bouton proxy qui soumet tout seul au `change` ;
  * 3. **que « Download PDF » produise un vrai téléchargement** — le lien porte
  *    `external-href` et `target="_blank"`, et le serveur répond
- *    `Content-Disposition: attachment`.
+ *    `Content-Disposition: attachment` ;
+ * 4. **qu'on puisse facturer sans quitter l'écran de la location** (#735) — le
+ *    devis se crée depuis la liste par bateau et la visite Inertia doit suivre
+ *    la redirection du contrôleur jusqu'à la fiche du document.
  */
 
-async function decor(): Promise<{ user: User; boat: Boat; reservation: BoatReservation }> {
-  const user = await createCharterAdminUser()
+async function decorFor(
+  user: User
+): Promise<{ user: User; boat: Boat; reservation: BoatReservation }> {
   const boat = await createBoatForUser(user, {
     name: 'Charter Trawler',
     propulsionType: 'motorboat',
@@ -48,6 +57,10 @@ async function decor(): Promise<{ user: User; boat: Boat; reservation: BoatReser
     clientEmail: 'camille@example.com',
   }).create()
   return { user, boat, reservation }
+}
+
+async function decor(): Promise<{ user: User; boat: Boat; reservation: BoatReservation }> {
+  return decorFor(await createCharterAdminUser())
 }
 
 test.group('E2E · Rental navigation', (group) => {
@@ -64,11 +77,10 @@ test.group('E2E · Rental navigation', (group) => {
     const page = await visit(`/boats/${boat.id}/reservations`)
     await page.waitForLoadState('networkidle')
 
-    // Le seul point d'accroche est le `title` : ces boutons n'ont ni texte ni
-    // `aria-label`, et leur SVG n'a pas de `<title>`. Playwright survole avant
-    // de cliquer, ce qui lève l'`opacity-0` — un lecteur d'écran, lui,
-    // annoncerait un bouton sans nom.
-    await page.locator('[title="Rental contract"]').first().click()
+    // L'action porte désormais un nom accessible qui nomme le client (#735),
+    // donc on la cible par son rôle plutôt que par son `title` : ce que voit
+    // Playwright est exactement ce qu'annonce un lecteur d'écran.
+    await page.getByRole('link', { name: 'Rental contract for Camille Voile' }).first().click()
 
     await page.waitForURL(`**/boats/${boat.id}/reservations/${reservation.id}/contract`)
     await page.assertTextContains('h1', 'Rental contract')
@@ -111,6 +123,30 @@ test.group('E2E · Rental navigation', (group) => {
     // à la première signature seulement (`attachSignedDocument`).
     assert.isNotNull(contract.mediaId)
     assert.isNotNull(contract.signedAt)
+  })
+
+  test('a quote can be created from the per-boat reservation list', async ({
+    browserContext,
+    visit,
+    assert,
+  }) => {
+    // Enterprise : le module facturation conditionne à la fois la route
+    // `POST /invoices/from-reservation/:id` et l'affichage du bouton.
+    const { user, boat, reservation } = await decorFor(await createEnterpriseAdminUser())
+    await browserContext.loginAs(user)
+
+    const page = await visit(`/boats/${boat.id}/reservations`)
+    await page.waitForLoadState('networkidle')
+
+    await page.getByRole('button', { name: 'Create a quote for Camille Voile' }).click()
+
+    // Le contrôleur redirige vers la fiche du devis : c'est cette redirection,
+    // suivie par la visite Inertia, qui ferme le parcours location → facture.
+    await page.waitForURL('**/invoices/*')
+
+    const quote = await Invoice.query().where('reservationId', reservation.id).firstOrFail()
+    assert.equal(quote.kind, 'quote')
+    assert.include(page.url(), `/invoices/${quote.id}`)
   })
 
   test('the Download PDF link produces a real download', async ({

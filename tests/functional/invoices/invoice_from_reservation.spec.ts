@@ -168,4 +168,51 @@ test.group('Invoice from reservation (functional)', (group) => {
     const props = response.inertiaProps as { canCreateQuote: boolean }
     assert.isFalse(props.canCreateQuote)
   })
+
+  /**
+   * L'écran où la location se termine — `/boats/:id/reservations`, celui de
+   * l'état des lieux de retour — doit lui aussi mener à la facture (#735) :
+   * jusqu'ici seule la page flotte portait le devis et le lien vers le document.
+   */
+  test('the per-boat reservation list exposes the create-quote flag and the linked document', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createEnterpriseAdminUser()
+    const reservation = await createReservation(user.organizationId!, { totalPrice: '100.00' })
+
+    await client.post(`/invoices/from-reservation/${reservation.id}`).loginAs(user).redirects(0)
+    const quote = await Invoice.query().where('reservationId', reservation.id).firstOrFail()
+
+    const response = await client
+      .get(`/boats/${reservation.boatId}/reservations`)
+      .loginAs(user)
+      .withInertia()
+
+    response.assertInertiaComponent('boats/reservations')
+    const props = response.inertiaProps as {
+      canCreateQuote: boolean
+      reservations: Array<{ id: number; linkedInvoices: Array<{ id: number; number: string }> }>
+    }
+    assert.isTrue(props.canCreateQuote)
+    const row = props.reservations.find((r) => r.id === reservation.id)
+    assert.exists(row)
+    assert.deepInclude(row!.linkedInvoices, { id: quote.id, number: quote.number })
+  })
+
+  test('the per-boat reservation list hides the create-quote flag without invoicing', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createCharterAdminUser() // pro + module Location, sans facturation
+    const reservation = await createReservation(user.organizationId!, { totalPrice: '100.00' })
+
+    const response = await client
+      .get(`/boats/${reservation.boatId}/reservations`)
+      .loginAs(user)
+      .withInertia()
+
+    const props = response.inertiaProps as { canCreateQuote: boolean }
+    assert.isFalse(props.canCreateQuote)
+  })
 })

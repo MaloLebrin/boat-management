@@ -19,6 +19,7 @@ const props = defineProps<{
   boatPricing: BoatPricingRow | null
   pricingSeasons: PricingSeasonRow[]
   clientOptions: ClientOption[]
+  canCreateQuote: boolean
 }>()
 
 const { t } = useT()
@@ -125,6 +126,7 @@ onMounted(() => {
         :boat-id="boat.id"
         :reservations="reservations"
         :can-manage="canManage"
+        :can-create-quote="canCreateQuote"
         :boat-pricing="boatPricing"
         :pricing-seasons="pricingSeasons"
         :client-options="clientOptions"

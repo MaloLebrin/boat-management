@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { router } from '@inertiajs/vue3'
+import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
@@ -21,6 +23,7 @@ const props = defineProps<{
   boatPricing: BoatPricingRow | null
   pricingSeasons: PricingSeasonRow[]
   clientOptions?: ClientOption[]
+  canCreateQuote?: boolean
 }>()
 
 const { t } = useT()
@@ -32,6 +35,21 @@ const editModalOpen = ref(false)
 function openEdit(row: BoatReservationRow) {
   editingReservation.value = row
   editModalOpen.value = true
+}
+
+/**
+ * La colonne Documents ne s'affiche que si elle a quelque chose à montrer :
+ * un devis déjà émis, ou le droit d'en créer un. Sans facturation, elle
+ * resterait une colonne vide sur toute la largeur du tableau.
+ */
+const showDocuments = computed(
+  () =>
+    props.canCreateQuote === true ||
+    props.reservations.some((r) => (r.linkedInvoices?.length ?? 0) > 0)
+)
+
+function createQuote(reservationId: number) {
+  router.post(`/invoices/from-reservation/${reservationId}`, {}, { preserveScroll: true })
 }
 
 function deleteReservation(id: number) {
@@ -59,6 +77,9 @@ function deleteReservation(id: number) {
             <th class="px-4 pb-3">{{ t('reservations.columns.status') }}</th>
             <th class="px-4 pb-3">{{ t('reservations.columns.type') }}</th>
             <th class="px-4 pb-3 text-right">{{ t('reservations.columns.price') }}</th>
+            <th v-if="showDocuments" class="px-4 pb-3 text-right">
+              {{ t('reservations.columns.documents') }}
+            </th>
             <th v-if="canManage" class="px-4 pb-3 last:pr-0" />
           </tr>
         </thead>
@@ -103,14 +124,36 @@ function deleteReservation(id: number) {
             <td class="px-4 py-3 text-right font-medium text-fg">
               {{ row.totalPrice ? `${row.totalPrice} €` : '—' }}
             </td>
+            <td v-if="showDocuments" class="px-4 py-3 text-right">
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                <Link
+                  v-for="doc in row.linkedInvoices"
+                  :key="doc.id"
+                  :href="`/invoices/${doc.id}`"
+                  class="text-sm font-medium text-brand underline"
+                >
+                  {{ doc.number }}
+                </Link>
+                <BaseButton
+                  v-if="canCreateQuote"
+                  variant="secondary"
+                  size="sm"
+                  :aria-label="t('reservations.actions.createQuoteFor', { client: row.clientName })"
+                  @click="createQuote(row.id)"
+                >
+                  {{ t('reservations.actions.createQuote') }}
+                </BaseButton>
+              </div>
+            </td>
             <td v-if="canManage" class="px-4 py-3 last:pr-0">
               <div
-                class="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+                class="flex items-center justify-end gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
               >
                 <BaseButton
                   variant="ghost"
                   size="sm"
                   :title="t('reservations.actions.inspection')"
+                  :aria-label="t('reservations.actions.inspectionFor', { client: row.clientName })"
                   route="boats.reservations.inspection.show"
                   :params="{ boatId, reservationId: row.id }"
                 >
@@ -127,6 +170,7 @@ function deleteReservation(id: number) {
                   variant="ghost"
                   size="sm"
                   :title="t('reservations.actions.contract')"
+                  :aria-label="t('reservations.actions.contractFor', { client: row.clientName })"
                   route="boats.reservations.contract.show"
                   :params="{ boatId, reservationId: row.id }"
                 >
@@ -143,6 +187,7 @@ function deleteReservation(id: number) {
                   variant="ghost"
                   size="sm"
                   :title="t('reservations.form.edit')"
+                  :aria-label="t('reservations.actions.editFor', { client: row.clientName })"
                   @click="openEdit(row)"
                 >
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -158,6 +203,7 @@ function deleteReservation(id: number) {
                   variant="danger"
                   size="sm"
                   :title="t('reservations.form.delete')"
+                  :aria-label="t('reservations.actions.deleteFor', { client: row.clientName })"
                   @click="deleteReservation(row.id)"
                 >
                   <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
