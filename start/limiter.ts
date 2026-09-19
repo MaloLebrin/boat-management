@@ -4,6 +4,22 @@ export const authThrottle = limiter.define('auth', () => {
   return limiter.allowRequests(10).every('1 minute')
 })
 
+// `POST /signup` (#766) : le seul des quatre POST du groupe `guest()` à n'avoir
+// aucun limiteur, alors que c'est celui qui **écrit** — un utilisateur, une
+// organisation, une adhésion, et les effets de bord du parcours de création.
+//
+// Fenêtre à l'heure plutôt qu'à la minute : une inscription légitime est un
+// événement rare, et `authThrottle` (10/min) ne borne rien sur la durée.
+//
+// 5 et non 3 : l'arbitrage est le même que pour `simulatorLeadThrottle`, mais
+// dans l'autre sens. Une marina qui ouvre les comptes de son équipe le jour de
+// son onboarding est derrière une seule IP, et trois créations d'affilée sont
+// un scénario ordinaire. 5/h laisse passer cette séance tout en ramenant le
+// plafond quotidien de « illimité » à 120.
+export const signupThrottle = limiter.define('signup', (ctx) => {
+  return limiter.allowRequests(5).every('1 hour').usingKey(`signup_${ctx.request.ip()}`)
+})
+
 export const aiThrottle = limiter.define('ai', (ctx) => {
   return limiter
     .allowRequests(20)
