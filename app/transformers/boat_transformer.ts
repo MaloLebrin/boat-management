@@ -110,10 +110,10 @@ export function toEditForm(boat: Boat) {
 
 export function toShowShellProps(boat: Boat, ctx: BoatShowShellContext) {
   const positionHistory = ctx.positionHistory.map(toPositionHistoryEntry)
-  const latestGpsPosition =
-    positionHistory.find((p) => p.latitude !== null && p.endedAt === null) ??
-    positionHistory.find((p) => p.latitude !== null) ??
-    null
+  // `kind === 'position'` : depuis #722 un séjour à quai ouvert cohabite avec
+  // les points de position, et ne doit pas être pris pour le dernier point.
+  const gpsPositions = positionHistory.filter((p) => p.kind === 'position' && p.latitude !== null)
+  const latestGpsPosition = gpsPositions.find((p) => p.endedAt === null) ?? gpsPositions[0] ?? null
 
   return {
     boat: toBoatDetail(boat, ctx),
@@ -293,6 +293,7 @@ function toSpot(spot: NonNullable<Boat['spot']>) {
 function toPositionHistoryEntry(h: BoatPositionHistory) {
   return {
     id: h.id,
+    kind: h.kind,
     spotId: h.spotId,
     spotName: h.spot?.name ?? null,
     pontoonName: h.spot?.pontoon?.name ?? null,

@@ -147,22 +147,38 @@ Supprimer un ponton ou un mouillage **cascade** sur ses places
 filet que plus aucun chemin applicatif n'atteint, puisque chaque étage refuse
 avant d'écrire.
 
-## `boat_position_history` : une table, deux usages
+## `boat_position_history` : une table, deux natures (#722)
 
-La table porte deux choses que rien ne distingue :
+La table porte deux choses, désormais distinguées par la colonne `kind` :
 
-- un **point de position** — `latitude`, `longitude`, `speed_knots`,
-  `heading_degrees`, `source` — écrit par `POST /boats/:boatId/position` ;
-- un **séjour à quai** — `spot_id` — écrit par
+- `kind='position'` — un **point de position** : `latitude`, `longitude`,
+  `speed_knots`, `heading_degrees`, `source`, écrit par
+  `POST /boats/:boatId/position` ;
+- `kind='berth'` — un **séjour à quai** : `spot_id`, écrit par
   `BoatHullService._logBerthChange`, à la création d'un bateau, à sa mise à jour
   et à chaque amarrage.
 
-Les deux emploient la même convention de ligne ouverte (`ended_at IS NULL`) et
-le même geste de clôture (`whereNull('endedAt')`), qui ne regarde pas la nature
-de la ligne. Enregistrer une position GPS clôt donc le séjour à quai en cours
-alors que `boats.spot_id` dit toujours amarré, et réciproquement. Constat #722.
+Les deux partagent la convention de ligne ouverte (`ended_at IS NULL`), mais
+**plus le geste de clôture**. Tant que celui-ci s'écrivait des deux côtés en
+`whereNull('endedAt')` sans regarder la nature de la ligne, enregistrer une
+position GPS clôturait le séjour à quai en cours alors que `boats.spot_id`
+disait toujours amarré — et réciproquement. La clôture vit maintenant dans
+`BoatPositionHistory.closeOpenOfKind(boatId, kind, trx?)` et porte toujours son
+`kind` : elle ne balaie que les lignes de sa propre nature. Un bateau amarré qui
+émet des positions a donc **deux lignes ouvertes**, une par nature, et c'est
+l'état correct.
 
-Aucun écran ne s'en aperçoit : tous lisent `boats.spot_id`, jamais l'historique.
+Aucun écran ne s'en apercevait : tous lisent `boats.spot_id`, jamais
+l'historique. C'est précisément pourquoi l'historique des séjours pouvait être
+faux sans que rien ne le montre.
+
+`boats.spot_id` reste la source de vérité de l'amarrage. La migration
+`1849000001000_alter_boat_position_history_add_kind` s'en sert pour réparer
+l'existant : elle classe les lignes (`spot_id IS NOT NULL` ⇒ séjour) puis rouvre
+les séjours faussement clos — un bateau amarré dont le **dernier** séjour porte
+cette même place tout en étant clos. Une clôture légitime (démarrage,
+déplacement, éviction) ouvre toujours une ligne plus récente ou laisse
+`boats.spot_id` à `null`, donc aucun séjour réellement terminé n'est rouvert.
 
 ## Bornes du plan interactif
 
@@ -175,20 +191,20 @@ rend `302` et laisse la position inchangée (`null` si le ponton n'avait jamais
 
 ## Où c'est testé
 
-| Fichier                                                 | Ce qu'il prouve                                         |
-| ------------------------------------------------------- | ------------------------------------------------------- |
-| `tests/unit/hygiene/ports_routes_gated.spec.ts`         | les 20 routes portent `auth` + `requirePortsPlan`       |
-| `tests/functional/ports/ports_plan_gating.spec.ts`      | le refus de plan, Starter et Pro                        |
-| `tests/functional/ports/ports_profile_gating.spec.ts`   | le refus de profil `private` (#604)                     |
-| `tests/functional/ports/spots.spec.ts`                  | les 4 routes de place, hiérarchie et isolation          |
-| `tests/functional/ports/spot_deletion_frontier.spec.ts` | le refus aux deux étages (#720)                         |
-| `tests/functional/ports/marina_role_frontier.spec.ts`   | member, mechanic, boat_owner (#719, #723)               |
-| `tests/inertia/spots_manager_permissions.spec.ts`       | les boutons de place gardés par capacité (#719)         |
-| `tests/functional/ports/layout_positions.spec.ts`       | isolation et bornes du glisser-déposer                  |
-| `tests/functional/boats/boats_assign.spec.ts`           | l'éviction et le scoping de `spot_id`                   |
-| `tests/functional/boats/boat_berth_history.spec.ts`     | séjours à quai, garde marina de l'amarrage (#721, #722) |
-| `tests/functional/ports/ports_pages_contract.spec.ts`   | les 4 pages Inertia (#689)                              |
-| `tests/browser/marina_canvas.spec.ts`                   | **le geste** : drag, mode édition, affectation          |
+| Fichier                                                 | Ce qu'il prouve                                                      |
+| ------------------------------------------------------- | -------------------------------------------------------------------- |
+| `tests/unit/hygiene/ports_routes_gated.spec.ts`         | les 20 routes portent `auth` + `requirePortsPlan`                    |
+| `tests/functional/ports/ports_plan_gating.spec.ts`      | le refus de plan, Starter et Pro                                     |
+| `tests/functional/ports/ports_profile_gating.spec.ts`   | le refus de profil `private` (#604)                                  |
+| `tests/functional/ports/spots.spec.ts`                  | les 4 routes de place, hiérarchie et isolation                       |
+| `tests/functional/ports/spot_deletion_frontier.spec.ts` | le refus aux deux étages (#720)                                      |
+| `tests/functional/ports/marina_role_frontier.spec.ts`   | member, mechanic, boat_owner (#719, #723)                            |
+| `tests/inertia/spots_manager_permissions.spec.ts`       | les boutons de place gardés par capacité (#719)                      |
+| `tests/functional/ports/layout_positions.spec.ts`       | isolation et bornes du glisser-déposer                               |
+| `tests/functional/boats/boats_assign.spec.ts`           | l'éviction et le scoping de `spot_id`                                |
+| `tests/functional/boats/boat_berth_history.spec.ts`     | séjours à quai, leur nature, garde marina de l'amarrage (#721, #722) |
+| `tests/functional/ports/ports_pages_contract.spec.ts`   | les 4 pages Inertia (#689)                                           |
+| `tests/browser/marina_canvas.spec.ts`                   | **le geste** : drag, mode édition, affectation                       |
 
 ### Le geste, et non plus seulement la route (#700)
 
@@ -214,6 +230,5 @@ nœuds DOM. C'est ce qui rend le plan adressable ; un vrai `<canvas>` ne le sera
 
 ## Constats ouverts
 
-| #    | Constat                                                                |
-| ---- | ---------------------------------------------------------------------- |
-| #722 | `boat_position_history` : positions et séjours se ferment mutuellement |
+Aucun. Les constats que cette page portait — #719, #720, #721, #722, #723 — sont tous traités ;
+le détail de chacun vit dans `docs/changelog/`.

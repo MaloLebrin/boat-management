@@ -139,6 +139,7 @@ function makePositionHistory(overrides: Partial<BoatPositionHistory> = {}): Boat
   return {
     id: 1,
     boatId: 1,
+    kind: 'position' as const,
     spotId: null,
     spot: null,
     latitude: 43.7,
@@ -565,6 +566,36 @@ test.group('toShowShellProps — latestGpsPosition', () => {
     })
     const result = toShowShellProps(makeBoat(), ctx)
     assert.isNull(result.latestGpsPosition)
+  })
+
+  test('un séjour à quai ouvert ne devient pas le dernier point GPS (#722)', ({ assert }) => {
+    // Depuis #722 les deux natures cohabitent ouvertes : un séjour sans
+    // coordonnées ne doit pas être élu « dernière position connue ».
+    const stay = makePositionHistory({
+      id: 3,
+      kind: 'berth',
+      spotId: 7,
+      latitude: null,
+      longitude: null,
+      endedAt: null,
+    })
+    const gps = makePositionHistory({
+      id: 2,
+      kind: 'position',
+      latitude: 43.7,
+      endedAt: null,
+    })
+    const ctx = makeShellContext({
+      positionHistory: [stay, gps] as unknown as BoatPositionHistory[],
+    })
+    const result = toShowShellProps(makeBoat(), ctx)
+
+    assert.isNotNull(result.latestGpsPosition)
+    assert.equal(result.latestGpsPosition!.id, 2)
+    // La nature voyage jusqu'au front : l'onglet Position s'en sert pour ne
+    // tracer que les points sur la carte.
+    assert.equal(result.positionHistory[0]!.kind, 'berth')
+    assert.equal(result.positionHistory[1]!.kind, 'position')
   })
 })
 

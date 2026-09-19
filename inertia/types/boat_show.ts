@@ -17,7 +17,7 @@ import type {
   EquipmentActionType as EquipmentActionTypeValue,
   EquipmentReferenceType as EquipmentReferenceTypeValue,
 } from '../../shared/types/equipment_action'
-import type { GenericEquipmentCategory } from '../../shared/types/boat'
+import type { BoatPositionHistoryKind, GenericEquipmentCategory } from '../../shared/types/boat'
 import type { SheetType } from '../../shared/types/maintenance'
 
 /**
@@ -152,6 +152,8 @@ export type BoatSafetyEquipmentDetail = BoatShowSafetyEquipment & {
 
 export type BoatPositionHistoryRow = {
   id: number
+  /** Séjour à quai (`berth`) ou point de position (`position`) — #722. */
+  kind: BoatPositionHistoryKind
   spotId: number | null
   spotName: string | null
   pontoonName: string | null
