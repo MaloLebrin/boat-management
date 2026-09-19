@@ -267,6 +267,9 @@
     "conversationCompleted": "This diagnosis is complete. Start a new conversation to describe another breakdown.",
     "maxMessagesReached": "This conversation has reached its maximum size. Start a new conversation."
   },
+  "publicAi": {
+    "dailyBudgetExhausted": "Our free AI assistants have reached today's usage limit. Create an account to keep going — your plan comes with its own AI budget."
+  },
   "publicPartSearch": {
     "quotaExhausted": "You have used your free part searches. Create an account to keep maintaining your boat with FleetAi.",
     "notFound": "Conversation not found.",

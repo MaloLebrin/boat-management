@@ -5,6 +5,7 @@ import {
   DiagnosisMaxMessagesReachedError,
   DiagnosisQuotaExhaustedError,
 } from '#exceptions/public_diagnosis_errors'
+import { PublicAiDailyBudgetExhaustedError } from '#exceptions/public_ai_budget_errors'
 import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import PublicDiagnosisService from '#services/public_diagnosis_service'
 import { toPublicDiagnosisConversationProps } from '#transformers/public_diagnosis_transformer'
@@ -63,7 +64,8 @@ export default class PublicDiagnosisController {
           brand: payload.brand ?? null,
           hours: payload.hours ?? null,
         },
-        toAppLocale(i18n.locale)
+        toAppLocale(i18n.locale),
+        request.ip()
       )
       if (user === null) {
         session.put(PUBLIC_DIAGNOSIS_SESSION_KEY, [...sessionTokens, conversation.token])
@@ -86,7 +88,8 @@ export default class PublicDiagnosisController {
         user,
         sessionTokens,
         String(params.token),
-        payload.message
+        payload.message,
+        request.ip()
       )
     } catch (error) {
       this.#flashError(error, session, i18n)
@@ -102,7 +105,12 @@ export default class PublicDiagnosisController {
   }
 
   #flashError(error: unknown, session: HttpContext['session'], i18n: HttpContext['i18n']): void {
-    if (error instanceof DiagnosisQuotaExhaustedError) {
+    if (error instanceof PublicAiDailyBudgetExhaustedError) {
+      // Dégradation propre (#762) : la surface publique a épuisé son budget de
+      // tokens du jour, toutes IP confondues. Message distinct du plafond
+      // personnel — le visiteur n'y est pour rien.
+      session.flash('error', i18n.t('flash.publicAi.dailyBudgetExhausted'))
+    } else if (error instanceof DiagnosisQuotaExhaustedError) {
       session.flash('error', i18n.t('flash.publicDiagnosis.quotaExhausted'))
     } else if (error instanceof DiagnosisConversationNotFoundError) {
       session.flash('error', i18n.t('flash.publicDiagnosis.notFound'))

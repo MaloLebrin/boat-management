@@ -12,6 +12,7 @@ import AiService from '#services/ai_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import EngineCatalogService from '#services/engine_catalog_service'
 import EnginePartReferenceService from '#services/engine_part_reference_service'
+import PublicAiBudgetService from '#services/public_ai_budget_service'
 import {
   buildEngineIdentificationSystemPrompt,
   buildPartSearchFinalTurnInstruction,
@@ -46,7 +47,10 @@ const MAX_MODEL_LINES = 150
  * Trois régimes de quota, calqués sur `PublicDiagnosisService` (#602) :
  * - visiteur anonyme : `PUBLIC_PART_SEARCH_LIFETIME_LIMIT` conversations,
  *   comptées par la session (liste de tokens) — qui sert aussi de preuve de
- *   propriété pour poster dans une conversation ;
+ *   propriété pour poster dans une conversation. Depuis #762, ce compteur de
+ *   session n'est plus qu'un **confort d'UX** : vider ses cookies le remet à
+ *   zéro. Le garde-fou est `PublicAiBudgetService`, qui compte par IP et par
+ *   jour en base, et borne les tokens de toute la surface publique ;
  * - plan sans IA (`starter`) : même plafond, compté en base sur
  *   `organization_id` (la ligne de conversation EST le compteur) ;
  * - plan avec IA (`pro`/`enterprise`) : aucun plafond de conversations, le
@@ -66,7 +70,8 @@ export default class PublicPartSearchService {
     private aiService: AiService,
     private aiTokenQuotaService: AiTokenQuotaService,
     private engineCatalogService: EngineCatalogService,
-    private partReferenceService: EnginePartReferenceService
+    private partReferenceService: EnginePartReferenceService,
+    private publicAiBudgetService: PublicAiBudgetService
   ) {}
 
   async getQuota(user: User | null, sessionTokens: string[]): Promise<PublicPartSearchQuotaProps> {
@@ -122,13 +127,23 @@ export default class PublicPartSearchService {
     user: User | null,
     sessionTokens: string[],
     input: PublicPartSearchStartInput,
-    locale: AiSuggestionLocale
+    locale: AiSuggestionLocale,
+    ip: string
   ): Promise<AiPartSearchConversation> {
     if (user === null) {
+      // Budget global d'abord : un refus de budget dit autre chose qu'un
+      // refus de plafond personnel, et le visiteur mérite le bon message.
+      await this.publicAiBudgetService.assertDailyBudgetAvailable()
+
+      // Le compteur de session reste comme confort d'UX ; celui d'en dessous,
+      // persistant et par IP, est le garde-fou (#762).
       if (sessionTokens.length >= PUBLIC_PART_SEARCH_LIFETIME_LIMIT) {
         throw new PartSearchQuotaExhaustedError()
       }
-      return this.#createConversation(null, input, locale)
+      if (!(await this.publicAiBudgetService.reserveConversation('part_search', ip))) {
+        throw new PartSearchQuotaExhaustedError()
+      }
+      return this.#createConversation(null, input, locale, ip)
     }
 
     await this.#loadOrganization(user)
@@ -141,14 +156,14 @@ export default class PublicPartSearchService {
         if (used >= PUBLIC_PART_SEARCH_LIFETIME_LIMIT) {
           throw new PartSearchQuotaExhaustedError()
         }
-        return this.#createConversation(user, input, locale)
+        return this.#createConversation(user, input, locale, ip)
       })
     }
 
     return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
       const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
       this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
-      return this.#createConversation(user, input, locale)
+      return this.#createConversation(user, input, locale, ip)
     })
   }
 
@@ -160,7 +175,8 @@ export default class PublicPartSearchService {
     user: User | null,
     sessionTokens: string[],
     token: string,
-    message: string
+    message: string,
+    ip: string
   ): Promise<AiPartSearchConversation> {
     const conversation = await this.#findOwnedOrFail(user, sessionTokens, token)
 
@@ -179,18 +195,25 @@ export default class PublicPartSearchService {
         return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
           const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
           this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
-          return this.#exchange(conversation, message, user)
+          return this.#exchange(conversation, message, user, ip)
         })
       }
+    } else {
+      // Chaque tour est un appel Mistral de plus : le budget se vérifie à
+      // chaque message, pas seulement à l'ouverture (#762). Le plafond de
+      // conversations, lui, ne compte que les ouvertures — le nombre de tours
+      // est déjà borné par `PART_SEARCH_MAX_USER_MESSAGES`.
+      await this.publicAiBudgetService.assertDailyBudgetAvailable()
     }
 
-    return this.#exchange(conversation, message, user)
+    return this.#exchange(conversation, message, user, ip)
   }
 
   async #createConversation(
     user: User | null,
     input: PublicPartSearchStartInput,
-    locale: AiSuggestionLocale
+    locale: AiSuggestionLocale,
+    ip: string
   ): Promise<AiPartSearchConversation> {
     const catalogBrand = await this.engineCatalogService.resolveBrand(input.brand)
 
@@ -215,7 +238,7 @@ export default class PublicPartSearchService {
     conversation.result = null
     conversation.tokensUsed = 0
 
-    return this.#exchange(conversation, input.message, user)
+    return this.#exchange(conversation, input.message, user, ip)
   }
 
   /**
@@ -226,7 +249,8 @@ export default class PublicPartSearchService {
   async #exchange(
     conversation: AiPartSearchConversation,
     userMessage: string,
-    user: User | null
+    user: User | null,
+    ip: string
   ): Promise<AiPartSearchConversation> {
     const pendingMessages: AiChatMessage[] = [
       ...conversation.messages,
@@ -298,10 +322,14 @@ export default class PublicPartSearchService {
     await conversation.save()
 
     // Suivi des coûts : les tokens des plans avec IA émargent au quota
-    // mensuel existant ; ceux des anonymes/starter restent tracés sur la
-    // conversation (`tokensUsed`) sans compteur d'org.
+    // mensuel existant ; ceux des anonymes émargent au budget public (#762) ;
+    // ceux d'un `starter` connecté restent tracés sur la conversation
+    // (`tokensUsed`) sans compteur d'org — il est identifié et son plafond de
+    // conversations est compté en base.
     if (user !== null && this.#hasAiPlan(user)) {
       await this.aiTokenQuotaService.recordUsage(user.organization, tokensUsed)
+    } else if (user === null) {
+      await this.publicAiBudgetService.recordTokens('part_search', ip, tokensUsed)
     }
 
     return conversation

@@ -502,6 +502,32 @@ Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap 
 - `twdDeg`, `twaDeg`, `weatherSnapshot` (jsonb) — **réservés à l'itération météo GRIB**, jamais écrits aujourd'hui
 - `createdAt`, `updatedAt`
 
+### public_ai_usages
+
+Compteurs journaliers de la surface IA publique (#762) — doc de domaine :
+`docs/domain/public-ai-surface.md`.
+
+- `id`
+- `day` (date, indexée)
+- `surface` : `diagnosis` | `part_search` pour une ligne par visiteur, `all`
+  pour la ligne agrégée
+- `clientKey` : HMAC-SHA256 de l'IP salé par `APP_KEY` **et par le jour**, ou
+  le littéral `global` pour la ligne agrégée. **Jamais l'IP en clair** — ce
+  serait un journal d'adresses de visiteurs ; le sel journalier empêche de
+  recouper deux jours
+- `conversations` (int) — ce que comptait la session avant #762
+- `tokensUsed` (bigint) — les tokens des anonymes n'apparaissaient nulle part,
+  `ai_token_usages` ne compte que les organisations
+- `createdAt`, `updatedAt`
+- **unique `(day, surface, client_key)`** : c'est elle qui rend la réservation
+  atomique — le `INSERT … ON CONFLICT … WHERE conversations < ?` du service
+  compte dessus pour refuser une deuxième conversation simultanée au-delà du
+  plafond
+
+Purgée sans cron : chaque ligne meurt en 24 h d'utilité, et
+`assertDailyBudgetAvailable()` balaye les lignes au-delà de
+`PUBLIC_AI_USAGE_RETENTION_DAYS` (7 jours) au premier passage de la journée.
+
 ## Relations (résumé)
 
 - `Organization 1..n User` via `users.organizationId`

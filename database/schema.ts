@@ -1829,6 +1829,7 @@ export class InvoiceSchema extends BaseModel {
     'number',
     'organizationId',
     'paidAt',
+    'paymentMethod',
     'reservationId',
     'sourceQuoteId',
     'status',
@@ -1863,6 +1864,8 @@ export class InvoiceSchema extends BaseModel {
   declare organizationId: number
   @column.date()
   declare paidAt: DateTime | null
+  @column()
+  declare paymentMethod: string | null
   @column()
   declare reservationId: number | null
   @column()
@@ -2438,6 +2441,36 @@ export class ProcessedStripeEventSchema extends BaseModel {
   declare stripeEventId: string
   @column()
   declare type: string
+}
+
+export class PublicAiUsageSchema extends BaseModel {
+  static $columns = [
+    'clientKey',
+    'conversations',
+    'createdAt',
+    'day',
+    'id',
+    'surface',
+    'tokensUsed',
+    'updatedAt',
+  ] as const
+  $columns = PublicAiUsageSchema.$columns
+  @column()
+  declare clientKey: string
+  @column()
+  declare conversations: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.date()
+  declare day: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare surface: string
+  @column()
+  declare tokensUsed: bigint | number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
 }
 
 export class PushSubscriptionSchema extends BaseModel {
