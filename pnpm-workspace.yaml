@@ -1,3 +1,37 @@
+# Planchers de version sur des dépendances **transitives** vulnérables (#765).
+#
+# Les trois paquets ci-dessous sont les seuls avis de `pnpm audit` réellement
+# dans le chemin d'exécution ; le reste ne concerne que l'outillage de test et
+# de build. Aucun n'est une dépendance directe : la version est imposée par un
+# paquet intermédiaire, d'où l'override.
+#
+# Chaque plancher reste **à l'intérieur** de la plage déclarée par le paquet
+# qui dépend — ce ne sont pas des majeures forcées :
+#
+# - `axios` : `@inertiajs/core` déclare `^1.16.0`, `laravel-precognition`
+#   `^1.4.0`. Part dans le bundle client. 16 avis, dont GHSA-q8qp-cvcw-x6jj
+#   (pollution de prototype dans l'adaptateur HTTP) et GHSA-3w6x-2g7m-8v23
+#   (altération invisible d'une réponse JSON via `parseReviver`).
+#   → **retirer** quand `@inertiajs/*` et `laravel-precognition` tireront
+#   eux-mêmes >= 1.18.0.
+# - `nodemailer` : `@adonisjs/mail` déclarait `^8.0.7` jusqu'à sa 10.3.0 ; la
+#   10.4.0, vers laquelle cette PR monte, déclare `^9.0.3`. L'override ne fait
+#   donc que porter le plancher à 9.1.1 à l'intérieur de cette plage. Traite
+#   des adresses et des contenus fournis par l'utilisateur (formulaire de
+#   contact, rapports du simulateur, relances).
+#   → **retirer** quand `@adonisjs/mail` déclarera `^9.1.1` ou plus.
+# - `ws` : `@mistralai/mistralai` déclare `^8.18.0`. Sur tous les appels IA.
+#   GHSA-96hv-2xvq-fx4p et GHSA-58qx-3vcg-4xpx (divulgation de mémoire non
+#   initialisée).
+#   → **retirer** quand `@mistralai/mistralai` tirera >= 8.21.0.
+#
+# ⚠️ Emplacement : depuis pnpm 10, le champ `pnpm` de `package.json` n'est plus
+# lu (pnpm 12 le signale explicitement au install). Les overrides vivent ici.
+overrides:
+  axios: '>=1.18.0 <2'
+  nodemailer: '>=9.1.1 <10'
+  ws: '>=8.21.0 <9'
+
 allowBuilds:
   '@google/genai': false
   '@swc/core': true
