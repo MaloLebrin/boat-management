@@ -274,7 +274,7 @@
       "maintenance": "Événements de maintenance"
     },
     "fileLabel": "Fichier CSV",
-    "fileHint": "Format : UTF-8 ou UTF-8 BOM, séparateur `;`. Taille max : 5 Mo.",
+    "fileHint": "Format : UTF-8 ou UTF-8 BOM, séparateur `;`. Taille max : {size} Mo, {rows} lignes.",
     "previewButton": "Prévisualiser",
     "confirmButton": "{count, plural, one {Importer # ligne} other {Importer # lignes}}",
     "cancelButton": "Annuler",
@@ -303,7 +303,7 @@
       "openButton": "Aide",
       "stepsTitle": "Flux d'import CSV",
       "step1": "Sélectionnez un bateau et le type de données (maintenance).",
-      "step2": "Uploadez votre fichier CSV (UTF-8, séparateur ;, max 5 Mo).",
+      "step2": "Uploadez votre fichier CSV (UTF-8, séparateur ;, max {size} Mo et {rows} lignes).",
       "step3": "Vérifiez l'aperçu : les lignes valides sont surlignées, les erreurs sont signalées colonne par colonne.",
       "step4": "Confirmez pour persister les lignes valides en base de données.",
       "formatTitle": "Format attendu (maintenance)",

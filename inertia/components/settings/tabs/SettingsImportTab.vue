@@ -7,11 +7,22 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import CsvHelpModal from '~/components/settings/CsvHelpModal.vue'
 import { useT } from '~/composables/use_t'
+import { CSV_IMPORT_MAX_FILE_SIZE_MB, CSV_IMPORT_MAX_ROWS } from '#shared/constants/csv_import'
 import { routes } from '~/utils/routes'
 import { MAINTENANCE_CSV_HEADERS } from '../../../../shared/types/csv'
 import type { CsvBoatOption, CsvImportPreviewData } from '../../../../shared/types/csv'
 
 const { t } = useT()
+
+/**
+ * Bornes du fichier, reprises des constantes partagées (#774) : l'aide
+ * annonçait « max 5 Mo » sans plafond de lignes, c'est-à-dire une limite que
+ * le code n'appliquait pas.
+ */
+const csvLimits = {
+  size: String(CSV_IMPORT_MAX_FILE_SIZE_MB),
+  rows: String(CSV_IMPORT_MAX_ROWS),
+}
 
 const props = defineProps<{
   boats: CsvBoatOption[]
@@ -161,7 +172,9 @@ function handleCancel() {
             accept=".csv"
             class="block w-full text-sm text-fg-muted file:mr-4 file:rounded-lg file:border-0 file:bg-brand/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand hover:file:bg-brand/20"
           />
-          <p class="mt-1 text-xs text-fg-muted">{{ t('settings.import.fileHint') }}</p>
+          <p class="mt-1 text-xs text-fg-muted">
+            {{ t('settings.import.fileHint', csvLimits) }}
+          </p>
           <p class="mt-1 text-xs text-fg-muted">
             {{ t('settings.import.templateHint', { headers: templateHeaders }) }}
           </p>

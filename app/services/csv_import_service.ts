@@ -1,3 +1,4 @@
+import { CSV_IMPORT_INSERT_CHUNK, CSV_IMPORT_MAX_ROWS } from '#shared/constants/csv_import'
 import type {
   CsvImportType,
   CsvPreviewRowKeys,
@@ -105,10 +106,29 @@ export interface CsvParseResult {
   validRows: MaintenanceImportRow[]
   totalRows: number
   missingHeaders: string[]
+  /**
+   * Le fichier dépasse `CSV_IMPORT_MAX_ROWS` (#774). Le parse s'arrête là :
+   * inutile de valider des lignes qu'on refusera, et surtout inutile de les
+   * garder en mémoire.
+   */
+  tooManyRows: boolean
 }
 
 export function parseMaintenanceCsv(content: string, _type: CsvImportType): CsvParseResult {
   const { headers, rows } = parseCsvContent(content)
+
+  // Refus avant validation (#774) : le parse ne bornait rien, et un fichier de
+  // 5 Mo — ce que le validateur laissait passer — fait plusieurs dizaines de
+  // milliers de lignes, toutes validées puis conservées.
+  if (rows.length > CSV_IMPORT_MAX_ROWS) {
+    return {
+      previewRows: [],
+      validRows: [],
+      totalRows: rows.length,
+      missingHeaders: [],
+      tooManyRows: true,
+    }
+  }
 
   const requiredHeaders = MAINTENANCE_CSV_HEADERS.filter(
     (h) => !['notes', 'engine_caption', 'sail_caption', 'cost'].includes(h)
@@ -141,9 +161,21 @@ export function parseMaintenanceCsv(content: string, _type: CsvImportType): CsvP
     }
   }
 
-  return { previewRows, validRows, totalRows: rows.length, missingHeaders }
+  return { previewRows, validRows, totalRows: rows.length, missingHeaders, tooManyRows: false }
 }
 
+/**
+ * Insère les lignes validées, **par lots** (#774).
+ *
+ * L'insertion se faisait ligne à ligne, à raison de deux `INSERT` par ligne :
+ * un import de quelques milliers de lignes tenait un verrou long et gonflait
+ * le WAL. Les lots de `CSV_IMPORT_INSERT_CHUNK` ramènent ça à deux `INSERT`
+ * par lot.
+ *
+ * La transaction unique est **conservée** : le contrat documenté est un
+ * rollback global si une ligne échoue, et le plafond de lignes borne
+ * désormais sa durée.
+ */
 export async function importMaintenanceRows(
   boatId: number,
   rows: MaintenanceImportRow[],
@@ -152,9 +184,11 @@ export async function importMaintenanceRows(
   const totalCostLabel = i18n.t('maintenance.history.timeline.totalCost')
 
   return await db.transaction(async (trx) => {
-    for (const row of rows) {
-      const event = await BoatMaintenanceEvent.create(
-        {
+    for (let start = 0; start < rows.length; start += CSV_IMPORT_INSERT_CHUNK) {
+      const chunk = rows.slice(start, start + CSV_IMPORT_INSERT_CHUNK)
+
+      const events = await BoatMaintenanceEvent.createMany(
+        chunk.map((row) => ({
           boatId,
           subject: row.subject,
           performedAt: DateTime.fromISO(row.performedAt),
@@ -166,22 +200,29 @@ export async function importMaintenanceRows(
           boatSailId: null,
           boatRigId: null,
           boatSafetyEquipmentId: null,
-        },
+        })),
         { client: trx }
       )
 
-      if (row.cost !== null) {
-        await BoatMaintenancePart.create(
-          {
-            maintenanceEventId: event.id,
-            name: totalCostLabel,
-            quantity: 1,
-            unitPrice: String(row.cost),
-            notes: null,
-            enginePartId: null,
-          },
-          { client: trx }
-        )
+      // `createMany` préserve l'ordre : l'événement d'indice i correspond à la
+      // ligne d'indice i, ce dont dépend l'association du coût.
+      const parts = chunk.flatMap((row, index) =>
+        row.cost === null
+          ? []
+          : [
+              {
+                maintenanceEventId: events[index].id,
+                name: totalCostLabel,
+                quantity: 1,
+                unitPrice: String(row.cost),
+                notes: null,
+                enginePartId: null,
+              },
+            ]
+      )
+
+      if (parts.length > 0) {
+        await BoatMaintenancePart.createMany(parts, { client: trx })
       }
     }
   })

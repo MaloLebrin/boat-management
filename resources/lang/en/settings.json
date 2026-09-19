@@ -274,7 +274,7 @@
       "maintenance": "Maintenance events"
     },
     "fileLabel": "CSV file",
-    "fileHint": "Format: UTF-8 or UTF-8 BOM, `;` separator. Max size: 5 MB.",
+    "fileHint": "Format: UTF-8 or UTF-8 BOM, `;` separator. Max size: {size} MB, {rows} rows.",
     "previewButton": "Preview",
     "confirmButton": "{count, plural, one {Import # row} other {Import # rows}}",
     "cancelButton": "Cancel",
@@ -303,7 +303,7 @@
       "openButton": "Help",
       "stepsTitle": "CSV import flow",
       "step1": "Select a boat and the data type (maintenance).",
-      "step2": "Upload your CSV file (UTF-8, ; separator, max 5 MB).",
+      "step2": "Upload your CSV file (UTF-8, ; separator, max {size} MB and {rows} rows).",
       "step3": "Review the preview: valid rows are highlighted, errors are flagged column by column.",
       "step4": "Confirm to persist the valid rows to the database.",
       "formatTitle": "Expected format (maintenance)",

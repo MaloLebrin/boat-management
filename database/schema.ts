@@ -1829,6 +1829,7 @@ export class InvoiceSchema extends BaseModel {
     'number',
     'organizationId',
     'paidAt',
+    'paymentMethod',
     'reservationId',
     'sourceQuoteId',
     'status',
@@ -1863,6 +1864,8 @@ export class InvoiceSchema extends BaseModel {
   declare organizationId: number
   @column.date()
   declare paidAt: DateTime | null
+  @column()
+  declare paymentMethod: string | null
   @column()
   declare reservationId: number | null
   @column()
@@ -2323,6 +2326,25 @@ export class PasswordResetTokenSchema extends BaseModel {
   declare id: number
   @column()
   declare token: string
+}
+
+export class PendingImportSchema extends BaseModel {
+  static $columns = ['boatId', 'createdAt', 'id', 'rows', 'type', 'updatedAt', 'userId'] as const
+  $columns = PendingImportSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare rows: any
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
 }
 
 export class PontoonSchema extends BaseModel {
