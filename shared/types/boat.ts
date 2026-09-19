@@ -4,6 +4,20 @@ import type { ArmamentZone } from '#shared/types/safety'
 
 export type BoatPositionSource = 'manual' | 'ais' | 'gps'
 
+/**
+ * Nature d'une ligne de `boat_position_history` (#722).
+ *
+ * - `berth` — un **séjour à quai** : `spotId`, ouvert à l'amarrage, clos au
+ *   départ ou au déplacement ;
+ * - `position` — un **point de position** : `latitude`/`longitude`, clos par le
+ *   point suivant.
+ *
+ * Les deux cohabitent dans la même table et emploient la même convention de
+ * ligne ouverte (`endedAt === null`) — la clôture ne balaie que les lignes de
+ * sa propre nature.
+ */
+export type BoatPositionHistoryKind = 'berth' | 'position'
+
 export type BoatPositionPayload = {
   latitude: number
   longitude: number

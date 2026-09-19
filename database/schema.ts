@@ -1063,6 +1063,7 @@ export class BoatPositionHistorySchema extends BaseModel {
     'endedAt',
     'headingDegrees',
     'id',
+    'kind',
     'latitude',
     'longitude',
     'notes',
@@ -1083,6 +1084,8 @@ export class BoatPositionHistorySchema extends BaseModel {
   declare headingDegrees: number | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare kind: string
   @column()
   declare latitude: string | null
   @column()

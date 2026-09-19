@@ -24,7 +24,9 @@ const saving = ref(false)
 let map: import('leaflet').Map | null = null
 
 async function initMap() {
-  const gpsPoints = props.positionHistory.filter((p) => p.latitude !== null && p.longitude !== null)
+  const gpsPoints = props.positionHistory.filter(
+    (p) => p.kind === 'position' && p.latitude !== null && p.longitude !== null
+  )
   if (gpsPoints.length === 0) return
 
   const L = await import('leaflet')

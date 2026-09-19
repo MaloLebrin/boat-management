@@ -64,6 +64,8 @@ export default class SubscriptionService {
 
     const stripeSub = await this.stripeService.retrieveSubscription(String(session.subscription))
     const tierItem = this.resolveTierItem(stripeSub)
+    if (!tierItem) return this.skipItemlessSubscription(stripeSub, org.id)
+
     const plan = this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, plan)
 
@@ -83,6 +85,8 @@ export default class SubscriptionService {
     if (!org) return
 
     const tierItem = this.resolveTierItem(stripeSub)
+    if (!tierItem) return this.skipItemlessSubscription(stripeSub, org.id)
+
     const newPlan =
       stripeSub.status === 'canceled' ? 'starter' : this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, newPlan)
@@ -172,12 +176,46 @@ export default class SubscriptionService {
    * (#327), il n'est plus forcément à l'index 0. On retient le premier item
    * dont le prix mappe un tier ; à défaut (aucun tier reconnu), le premier item
    * fait foi pour les bornes de période — le plan retombe alors sur `starter`.
+   *
+   * `null` sur un abonnement **sans aucun item** (#704). Le repli
+   * `?? data[0]` rendait alors `undefined` sans que le type le dise, et
+   * l'appelant déréférençait `item.price.id` : `TypeError`, remontée en 500 —
+   * donc rejouée indéfiniment par Stripe, puisque l'événement produira
+   * toujours la même erreur. Le cas n'est pas théorique : un abonnement dont le
+   * dernier item vient d'être retiré arrive avec `items.data` vide.
    */
-  private resolveTierItem(stripeSub: Stripe.Subscription): Stripe.SubscriptionItem {
+  private resolveTierItem(stripeSub: Stripe.Subscription): Stripe.SubscriptionItem | null {
+    if (stripeSub.items.data.length === 0) return null
+
     const tierItem = stripeSub.items.data.find(
       (item) => this.planFromPriceId(item.price.id) !== 'starter'
     )
     return tierItem ?? stripeSub.items.data[0]
+  }
+
+  /**
+   * Sortie propre sur un abonnement sans item (#704) : il ne décrit aucun plan
+   * et ne porte aucune borne de période, il n'y a donc rien à synchroniser.
+   *
+   * Rien n'est écrit — ni `subscriptions`, ni le plan de l'organisation, ni les
+   * modules —, et le contrôleur répond **200** : l'événement a bien été reçu et
+   * compris. Un 4xx/5xx ferait rejouer Stripe pour rien, un rejeu ne peut pas
+   * faire apparaître d'item.
+   *
+   * Loggé en `warn` et non en `info` : un `customer.subscription.deleted` sans
+   * item est ignoré ici, donc **ne rétrograde pas** l'organisation. Si ce cas
+   * se présentait en production, l'organisation resterait sur son plan payant
+   * jusqu'à un événement porteur d'items — cela doit se voir dans les logs.
+   */
+  private skipItemlessSubscription(stripeSub: Stripe.Subscription, organizationId: number): void {
+    logger.warn(
+      {
+        stripeSubscriptionId: stripeSub.id,
+        organizationId,
+        status: stripeSub.status,
+      },
+      'Stripe subscription has no items, nothing to sync'
+    )
   }
 
   /**
