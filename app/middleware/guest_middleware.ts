@@ -23,7 +23,15 @@ export default class GuestMiddleware {
     for (let guard of options.guards || [ctx.auth.defaultGuard]) {
       if (await ctx.auth.use(guard).check()) {
         ctx.session.reflash()
-        return ctx.response.redirect(this.redirectTo, true)
+        // Surtout pas de report de query string (#770). Un utilisateur déjà
+        // connecté qui clique sur son lien de réinitialisation atterrissait
+        // sur `/dashboard?token=<token encore valide>` : le token partait
+        // alors dans l'historique, dans les journaux d'accès du reverse
+        // proxy, et dans le `Referer` des sous-requêtes de la page.
+        //
+        // `withQs(false)` est explicite parce que `config/app.ts` active
+        // `forwardQueryString` globalement.
+        return ctx.response.redirect().withQs(false).toPath(this.redirectTo)
       }
     }
 

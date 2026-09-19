@@ -17,8 +17,15 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export interface FakeRedirect {
   target: string
-  /** 2ᵉ argument de `response.redirect()` : conserve la query string. */
-  clearQs?: boolean
+  /**
+   * Report de la query string sur la destination.
+   *
+   * Vaut le 2ᵉ argument de `response.redirect(target, forward)` pour la forme
+   * courte, ou l'argument de `.withQs(forward)` pour la forme fluide. `true`
+   * **conserve** la query string, `false` la jette — l'inverse de ce que
+   * laissait entendre l'ancien nom du champ (#770).
+   */
+  forwardQs?: boolean
 }
 
 export interface FakeCtxOptions {
@@ -38,7 +45,7 @@ export interface FakeCtx {
   flashes: Array<[string, string]>
   /** Cibles passées à `response.redirect()`, dans l'ordre. */
   redirects: string[]
-  /** Idem, avec le second argument — le `true` de `GuestMiddleware` compte. */
+  /** Idem, avec le report de query string — le `false` de `GuestMiddleware` compte. */
   redirectCalls: FakeRedirect[]
   /** Compteur d'appels à `session.reflash()` — objet mutable, pas un nombre figé. */
   reflash: { reflashCount: number }
@@ -81,9 +88,40 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
     },
     i18n: { t: (key: string) => `t:${key}` },
     response: {
-      redirect: (target: string, clearQs?: boolean) => {
-        redirects.push(target)
-        redirectCalls.push({ target, clearQs })
+      /**
+       * Les deux formes de `response.redirect()` : la forme courte
+       * `redirect(target, forward)` et la forme fluide
+       * `redirect().withQs(forward).toPath(target)` que `GuestMiddleware`
+       * utilise depuis #770. Les deux alimentent le même journal.
+       */
+      redirect: (target?: string, forwardQs?: boolean) => {
+        if (typeof target === 'string') {
+          redirects.push(target)
+          redirectCalls.push({ target, forwardQs })
+          return
+        }
+
+        let pendingForwardQs: boolean | undefined
+        const builder = {
+          withQs: (forward?: boolean) => {
+            pendingForwardQs = forward
+            return builder
+          },
+          status: () => builder,
+          clearQs: () => {
+            pendingForwardQs = false
+            return builder
+          },
+          toPath: (path: string) => {
+            redirects.push(path)
+            redirectCalls.push({ target: path, forwardQs: pendingForwardQs })
+          },
+          back: () => {
+            redirects.push('back')
+            redirectCalls.push({ target: 'back', forwardQs: pendingForwardQs })
+          },
+        }
+        return builder
       },
     },
   } as never as HttpContext
