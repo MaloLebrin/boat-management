@@ -34,6 +34,24 @@ l'application de démarrer. Le point de départ est toujours `.env.example`
 | `APP_KEY`      | secret 32 octets      | `node ace generate:key`                                   |
 | `QUEUE_DRIVER` | `database`            | Les workers lisent la file en base                        |
 
+### Secrets et journaux (#769)
+
+Toute variable dont le nom contient `KEY`, `SECRET`, `PASSWORD`, `TOKEN` ou
+`CREDENTIAL` est déclarée en `Env.schema.secret` — le type qui masque la valeur
+dès qu'elle est sérialisée ou journalisée. Deux exceptions, publiques par
+conception puisqu'elles partent dans le navigateur : `STRIPE_PUBLIC_KEY` et
+`VAPID_PUBLIC_KEY`. Une valeur `Secret` se lit par `.release()`.
+
+`config/logger.ts` déclare en plus une liste `redact` (`[redacted]`). C'est un
+filet **indépendant** du typage : `Env.schema.secret` protège ce qu'on lit
+depuis `env`, `redact` protège ce qui transite par le logger quel qu'en soit
+l'émetteur — un `logger.error({ err, config })`, une erreur `pg` ou
+`nodemailer` qui embarque sa configuration de connexion, un `logger.info({ req })`
+qui traîne un en-tête `Cookie`.
+
+`tests/unit/config/secrets_and_redaction.spec.ts` tient les deux règles : c'est
+lui qui empêchera la prochaine variable d'être ajoutée sans protection.
+
 `APP_DOMAIN`, `LETSENCRYPT_EMAIL` et `IMAGE_TAG` ne sont pas lues par
 l'application : elles n'alimentent que Compose et le `Caddyfile`.
 
