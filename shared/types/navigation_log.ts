@@ -81,6 +81,12 @@ export interface CreateNavigationLogEntryPayload {
 }
 
 export interface UpdateNavigationLogEntryPayload {
+  /**
+   * Verrou optimiste (#725) : l'`updated_at` que le client croit à jour. Le
+   * service refuse d'écrire si l'horodatage a bougé depuis — c'est ce qui
+   * distingue « ma version est périmée » d'un refus métier.
+   */
+  expectedUpdatedAt?: string
   recordedAt?: Date | string | DateTime
   /** getTimezoneOffset() of the submitting browser — used to shift the naive local datetime to UTC */
   tzOffsetMinutes?: number
@@ -139,6 +145,23 @@ export interface NavigationLogPortOption {
 export interface NavigationLogEngineOption {
   id: number
   label: string
+}
+
+/**
+ * La version **serveur** d'un point de journal, telle que la modale de conflit
+ * la met en regard de la saisie locale (#725). Les champs sont exactement ceux
+ * que `FIELDS_BY_TYPE['update-navigation-log-entry']` affiche.
+ */
+export interface ConflictLogEntrySnapshot {
+  id: number
+  updatedAt: string
+  recordedAt: string
+  latitude: number | null
+  longitude: number | null
+  cogDeg: number | null
+  sogKn: number | null
+  sailConfig: string | null
+  note: string | null
 }
 
 export interface ConflictLogSnapshot {

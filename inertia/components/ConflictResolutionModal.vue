@@ -21,6 +21,15 @@ const FIELDS_BY_TYPE: Record<string, string[]> = {
     'crewCount',
     'notes',
   ],
+  'update-navigation-log-entry': [
+    'recordedAt',
+    'latitude',
+    'longitude',
+    'cogDeg',
+    'sogKn',
+    'sailConfig',
+    'note',
+  ],
   'update-sheet-item': ['isDone', 'notes'],
   'update-inspection': ['performedAt', 'fuelLevel', 'engineHours', 'notes'],
 }
