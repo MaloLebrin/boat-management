@@ -97,7 +97,7 @@ function createQuote(reservationId: number) {
                   v-for="doc in row.linkedInvoices"
                   :key="doc.id"
                   :href="`/invoices/${doc.id}`"
-                  class="text-sm font-medium text-primary underline"
+                  class="text-sm font-medium text-brand underline"
                 >
                   {{ doc.number }}
                 </Link>
@@ -105,6 +105,7 @@ function createQuote(reservationId: number) {
                   v-if="canCreateQuote"
                   variant="secondary"
                   size="sm"
+                  :aria-label="t('reservations.actions.createQuoteFor', { client: row.clientName })"
                   @click="createQuote(row.id)"
                 >
                   {{ t('reservations.actions.createQuote') }}

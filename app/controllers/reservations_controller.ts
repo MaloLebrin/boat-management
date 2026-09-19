@@ -6,6 +6,7 @@ import {
   toFleetCalendarEntries,
 } from '#transformers/boat_reservation_transformer'
 import BoatPolicy from '#policies/boat_policy'
+import InvoicePolicy from '#policies/invoice_policy'
 import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -46,9 +47,12 @@ export default class ReservationsController {
     ])
 
     // Surface the reservation ↔ document link (org-scoped batch lookup) and
-    // whether the org may generate quotes (Enterprise gating).
+    // whether the org may generate quotes (Enterprise gating). La capability
+    // compte aussi : sans `invoices.create`, le bouton mènerait à un 403 (#735).
     const canCreateQuote =
-      user.organization !== null && (await this.quotaService.canManageInvoices(user.organization))
+      user.organization !== null &&
+      (await this.quotaService.canManageInvoices(user.organization)) &&
+      (await bouncer.with(InvoicePolicy).allows('create'))
     const linksByReservation =
       user.organizationId !== null
         ? await this.invoiceService.listLinksByReservationIds(

@@ -85,7 +85,12 @@
   "actions": {
     "createQuote": "Create a quote",
     "inspection": "Inspection",
-    "contract": "Rental contract"
+    "contract": "Rental contract",
+    "inspectionFor": "Inspection for {client}",
+    "contractFor": "Rental contract for {client}",
+    "editFor": "Edit the reservation for {client}",
+    "deleteFor": "Delete the reservation for {client}",
+    "createQuoteFor": "Create a quote for {client}"
   },
   "types": {
     "bareboat": "Bareboat",
