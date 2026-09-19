@@ -581,17 +581,62 @@ contre-exemple du mode lecture (« le même geste ne déplace rien ») passait m
 donc les **requêtes sortantes** (`page.on('request', …)`) plutôt qu'un état à un instant choisi.
 C'est le pendant, côté navigateur, de la règle du témoin en base de #697.
 
-### La limite tactile : on vit avec (#700)
+### Mesurer une cible tactile : un contexte dédié, le temps d'un test (#736)
 
-`browserContext` est créé sans options par `@japa/browser-client`, donc `hasTouch` et `isMobile`
-ne peuvent pas être passés (détail plus bas). La question posée par #700 — vivre avec, ou ouvrir
-un contexte Playwright dédié hors `@japa/browser-client` — est tranchée : **on vit avec**.
+Le contexte injecté dans chaque test par `@japa/browser-client` est créé **une fois pour toute la
+suite** : ses `contextOptions` valent pour tous les specs. Y activer `isMobile`/`hasTouch`
+émulerait un téléphone partout, y compris là où on mesure des écrans desktop. C'est cela, la
+limite — pas l'absence d'option. Conséquence par défaut : le pointeur reste `fine`, les variantes
+`pointer-coarse:` ne s'activent jamais, et `mobile_field.spec.ts` ne valide que des breakpoints
+CSS.
 
-Un second harnais de test dans la même suite, avec son propre `chromium.launch()`, son propre
-cycle de vie et sa propre authentification, se paie en maintenance permanente pour un ou deux cas.
-Ce qui n'est donc **pas** mesuré, et qu'il faut savoir : les variantes `pointer-coarse:` ne
-s'activent jamais, et les cibles tactiles (#494) ne sont pas vérifiées à la taille où un doigt les
-atteint. Les breakpoints CSS, eux, le sont (`mobile_field.spec.ts`).
+`tests/browser/touch_targets.spec.ts` ouvre donc **son propre contexte**, le temps d'un test :
+
+```ts
+const context = await browser.newContext({
+  baseURL: BASE_URL,
+  viewport: { width: 390, height: 844 },
+  isMobile: true,
+  hasTouch: true,
+})
+try {
+  await context.loginAs(user)
+  const page = await context.visit('/dashboard')
+  // …
+} finally {
+  await context.close()
+}
+```
+
+**Les deux difficultés annoncées par #736 n'existent pas** — à condition de partir du navigateur
+de la suite (`browser`, injecté dans le test) plutôt que d'un second `chromium.launch()` :
+`decorateBrowser()` enveloppe `browser.newContext()`, donc tout contexte créé depuis lui reçoit
+les décorateurs des plugins — `loginAs()` de `authBrowserClient`, `visit()` du client navigateur.
+Ne reste que le cycle de vie du seul contexte, fermé en `finally` (avec `forceExit: true`, une
+fuite passerait inaperçue). Le navigateur, lui, reste celui de la suite : il n'est ni relancé ni
+à fermer, et l'échappatoire `PLAYWRIGHT_CHROMIUM_EXECUTABLE` de `tests/bootstrap.ts` continue de
+s'appliquer.
+
+### Ce qu'on mesure quand on mesure 44 px
+
+La pseudo-zone tactile de #494 est un `::before` absolu : invisible, et **hors** de la boîte que
+retourne `getBoundingClientRect()`. Un `boundingBox()` Playwright sur un `BaseButton` `size="sm"`
+renvoie donc 32 px, quel que soit l'état de la zone. La cible réelle est l'union de la boîte
+visible et de la boîte du pseudo-élément, lue par `getComputedStyle(el, '::before')` — les
+utilitaires `-inset-*` la centrent sur le contrôle, les deux boîtes sont concentriques.
+
+Cette union seule se confirmerait elle-même : elle décrit ce que le CSS déclare, pas ce qu'un
+doigt atteint. Le contrôle qui la rend probante est un `elementFromPoint` sur les quatre bords de
+l'union — une zone recouverte par un voisin, ou neutralisée par `pointer-events`, mesurerait
+44 px sans rien recevoir.
+
+**Périmètre volontairement étroit** : les onglets de la bottom nav (#492) et le bouton de saisie
+d'une sortie en mer (`/navigation/logbook`, 32 px visuels). Tout le reste des cibles tactiles se
+prouve moins cher en Vitest (`touch_targets.spec.ts`, assertions de classes).
+
+Le fichier porte enfin sa propre date de péremption : un cas asserte que le contexte de la suite,
+lui, reste en pointeur `fine`. Le jour où `@japa/browser-client` émulera le tactile, il tombe — il
+n'y aura alors plus qu'à mesurer depuis `mobile_field.spec.ts` et à supprimer le fichier.
 
 ### Viewport mobile (#500)
 
@@ -599,13 +644,12 @@ atteint. Les breakpoints CSS, eux, le sont (`mobile_field.spec.ts`).
 débordement horizontal, bottom nav visible sous `lg` seulement, replis carte des tableaux,
 drawer pleine hauteur.
 
-**Limite à connaître** : le `browserContext` injecté par `@japa/browser-client` est créé **sans
-options** — impossible d'y passer `viewport`, `isMobile` ou `hasTouch`. La voie fiable est
-`page.setViewportSize({ width, height })` après `visit()`. Conséquence : les breakpoints CSS sont
-validés, mais **le tactile n'est pas émulé** — les cibles tactiles (#494) ne sont pas testées
-comme un vrai doigt les atteindrait, et les variantes `pointer-coarse:` ne s'activent pas (le
-pointeur émulé reste `fine`). Une mesure réelle demanderait un contexte Playwright dédié hors
-`@japa/browser-client`.
+**Limite à connaître** : le `browserContext` injecté dans le test est partagé par toute la suite,
+on n'y règle donc ni `viewport` ni `hasTouch` pour un spec seul. La voie fiable ici est
+`page.setViewportSize({ width, height })` après `visit()`. Conséquence : ce fichier valide les
+breakpoints CSS, mais **le tactile n'y est pas émulé** — le pointeur reste `fine` et les variantes
+`pointer-coarse:` ne s'activent pas. Les cibles tactiles (#494) se mesurent donc ailleurs, dans le
+contexte dédié de `touch_targets.spec.ts` (ci-dessus).
 
 ## Typecheck / lint
 

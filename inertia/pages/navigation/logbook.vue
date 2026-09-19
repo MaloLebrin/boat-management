@@ -65,6 +65,7 @@ function onEmptyAction() {
           variant="primary"
           size="sm"
           type="button"
+          data-testid="logbook-quick-add"
           @click="showQuickAdd = true"
         >
           {{ t('navigation.logbook.quickAdd') }}
