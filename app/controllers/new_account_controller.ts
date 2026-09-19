@@ -1,3 +1,4 @@
+import { stampAuthSession } from '#utils/auth_session'
 import { signupValidator } from '#validators/user'
 import UserService from '#services/user_service'
 import EmailQueueService from '#services/email_queue_service'
@@ -27,6 +28,7 @@ export default class NewAccountController {
     const { user } = await this.userService.signupWithOrganization(payload)
 
     await auth.use('web').login(user)
+    stampAuthSession(session)
     user.lastLoginAt = DateTime.now()
     await user.save()
 

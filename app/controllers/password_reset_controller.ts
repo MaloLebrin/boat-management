@@ -52,6 +52,10 @@ export default class PasswordResetController {
     }
 
     await this.passwordResetService.invalidateTokensForEmail(record.email)
+    // Sans ça, la victime voit un message de succès pendant que l'attaquant
+    // reste connecté — cinq jours pour une session, trente pour un
+    // remember-me (#763).
+    await this.passwordResetService.revokeAllAccessForEmail(record.email)
 
     session.flash('success', i18n.t('flash.auth.passwordResetSuccess'))
     return response.redirect().toPath('/login')

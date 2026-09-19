@@ -20,6 +20,12 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - `fullName`
 - `organizationId` (nullable)
 - `lastLoginAt` (nullable)
+- `sessionsValidAfter` (nullable, non sérialisé, #763) — toute session ouverte
+  **avant** cet instant est révoquée par `RevokedSessionMiddleware`. Daté à la
+  réinitialisation du mot de passe et au changement depuis les réglages.
+  `null` = aucune révocation, l'état de tous les comptes avant la migration.
+  Avec `SESSION_DRIVER=cookie` les sessions ne sont pas listables côté
+  serveur : le discriminant doit être porté par l'utilisateur
 - préférences d'interface, nullables — retombent sur le cookie puis sur un défaut :
   - `locale` (`en` | `fr`, #414)
   - `theme` (`system` | `light` | `dark`, #416)
