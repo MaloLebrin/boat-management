@@ -251,14 +251,18 @@ export default class AssistantChatService {
     user: User,
     turn: AssistantTurnContext
   ): Promise<AiAssistantConversation> {
-    return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
-      const active = await this.organizationAiKeyService.resolveActiveKey(user.organization)
-      if (active === null) {
-        const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
-        this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
-      }
-      return this.#exchange(conversation, message, user, active, turn)
-    })
+    return this.organizationAiKeyService
+      .resolveActiveKey(user.organization)
+      .then(async (active) => {
+        // BYOK : l'organisation paie sa propre clé, donc pas de réservation
+        // sur le quota de l'app (#776 conserve cette exception).
+        if (active !== null) {
+          return this.#exchange(conversation, message, user, active, turn)
+        }
+        return this.aiTokenQuotaService.withReservedTokens(user.organization, () =>
+          this.#exchange(conversation, message, user, active, turn)
+        )
+      })
   }
 
   /**
