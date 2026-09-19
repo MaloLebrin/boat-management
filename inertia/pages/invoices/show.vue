@@ -8,9 +8,11 @@ import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
 import InvoiceLinesCard from '~/components/invoices/InvoiceLinesCard.vue'
+import InvoicePaymentCard from '~/components/invoices/InvoicePaymentCard.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useDeleteConfirmation } from '~/composables/use_delete_confirmation'
 import { useT } from '~/composables/use_t'
+import { canEditInvoice, canEditInvoicePayment } from '#shared/helpers/invoice_lifecycle'
 import type { InvoiceDetail } from '../../../shared/types/invoice'
 
 const props = defineProps<{
@@ -40,6 +42,10 @@ const canMarkPaid = computed(
     props.invoice.status !== 'paid' &&
     props.invoice.status !== 'cancelled'
 )
+// Une facture émise est figée (#717) : plus de bouton « Modifier », mais un bloc
+// dédié pour corriger son paiement.
+const canEdit = computed(() => canEditInvoice(props.invoice))
+const canEditPayment = computed(() => canEditInvoicePayment(props.invoice))
 
 function sendByEmail() {
   router.post(
@@ -113,6 +119,8 @@ function markPaid() {
           <InvoiceStatusBadge :status="invoice.status" />
         </div>
         <p class="mt-1 text-fg-muted">{{ t(`invoices.kind.${invoice.kind}`) }}</p>
+        <!-- Facture émise : dire pourquoi le bouton « Modifier » a disparu (#717). -->
+        <p v-if="!canEdit" class="mt-1 text-sm text-fg-muted">{{ t('invoices.lockedNotice') }}</p>
         <p v-if="invoice.sourceQuote" class="mt-1 text-sm text-fg-muted">
           <Link :href="`/invoices/${invoice.sourceQuote.id}`" class="underline hover:text-fg">
             {{ t('invoices.show.convertedFrom', { number: invoice.sourceQuote.number }) }}
@@ -161,7 +169,7 @@ function markPaid() {
         >
           {{ t('invoices.actions.markPaid') }}
         </BaseButton>
-        <Link :href="`/invoices/${invoice.id}/edit`">
+        <Link v-if="canEdit" :href="`/invoices/${invoice.id}/edit`">
           <BaseButton variant="secondary" size="sm" type="button">
             {{ t('invoices.edit') }}
           </BaseButton>
@@ -194,6 +202,16 @@ function markPaid() {
           <dt class="text-fg-muted">{{ t('invoices.show.paidOn') }}</dt>
           <dd class="font-medium text-fg">{{ formatDate(invoice.paidAt) }}</dd>
         </div>
+        <div v-if="invoice.paidAt">
+          <dt class="text-fg-muted">{{ t('invoices.show.paymentMethod') }}</dt>
+          <dd class="font-medium text-fg">
+            {{
+              invoice.paymentMethod
+                ? t(`invoices.paymentMethods.${invoice.paymentMethod}`)
+                : t('invoices.paymentMethods.none')
+            }}
+          </dd>
+        </div>
         <div>
           <dt class="text-fg-muted">{{ t('invoices.show.client') }}</dt>
           <dd class="font-medium text-fg">{{ invoice.clientName ?? t('invoices.noClient') }}</dd>
@@ -213,6 +231,9 @@ function markPaid() {
         </div>
       </dl>
     </BaseCard>
+
+    <!-- Paiement d'une facture émise (#717) -->
+    <InvoicePaymentCard v-if="canEditPayment" :invoice="invoice" class="mt-4" />
 
     <!-- Lines + totals -->
     <InvoiceLinesCard :invoice="invoice" class="mt-4" />

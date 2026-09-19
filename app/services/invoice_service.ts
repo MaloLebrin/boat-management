@@ -3,6 +3,8 @@ import {
   NotAQuoteError,
   QuoteAlreadyConvertedError,
   CannotMarkPaidError,
+  InvoiceLockedError,
+  CannotEditPaymentError,
 } from '#exceptions/invoice_errors'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
@@ -11,6 +13,7 @@ import InvoiceCounter from '#models/invoice_counter'
 import InvoiceLine from '#models/invoice_line'
 import type Organization from '#models/organization'
 import { computeInvoiceTotals } from '#shared/helpers/invoice_totals'
+import { canEditInvoice, canEditInvoicePayment } from '#shared/helpers/invoice_lifecycle'
 import { toDateTime } from '#shared/helpers/date'
 import {
   clampInt,
@@ -20,6 +23,7 @@ import {
 } from '#shared/helpers/query'
 import type {
   InvoiceListFilters,
+  InvoicePaymentMethod,
   InvoiceKind,
   InvoiceStatus,
   InvoiceSortField,
@@ -53,6 +57,11 @@ interface ServiceCreateInvoicePayload {
 }
 
 type ServiceUpdateInvoicePayload = ServiceCreateInvoicePayload
+
+interface ServiceUpdatePaymentPayload {
+  paidAt?: Date | string | DateTime | null
+  paymentMethod?: InvoicePaymentMethod | null
+}
 
 const VALID_STATUSES: InvoiceStatus[] = ['draft', 'sent', 'paid', 'overdue', 'cancelled']
 const VALID_KINDS: InvoiceKind[] = ['quote', 'invoice']
@@ -279,7 +288,15 @@ export default class InvoiceService {
     })
   }
 
+  /**
+   * Réécriture complète d'un document. Refusée sur une **facture émise** (#717) :
+   * une pièce comptable sortie du brouillon ne se réécrit pas — ni ses montants,
+   * ni sa date d'émission, ni son statut. Seul son paiement reste modifiable,
+   * via `updatePayment`.
+   */
   async update(invoice: Invoice, payload: ServiceUpdateInvoicePayload): Promise<Invoice> {
+    if (!canEditInvoice(invoice)) throw new InvoiceLockedError()
+
     return db.transaction(async (trx) => {
       // Compute totals
       const totals = computeInvoiceTotals(payload.lines, payload.taxRate)
@@ -303,6 +320,15 @@ export default class InvoiceService {
       invoice.reservationId = reservationId
       invoice.clientName = clientName
       invoice.status = payload.status ?? invoice.status
+      // `paid_at` suit le statut, toujours : un document qui n'est pas payé ne
+      // porte aucune date de paiement, et un document qui bascule en `paid` par
+      // le formulaire est horodaté (#717).
+      if (invoice.status === 'paid') {
+        invoice.paidAt = invoice.paidAt ?? DateTime.now()
+      } else {
+        invoice.paidAt = null
+        invoice.paymentMethod = null
+      }
       invoice.issuedAt = toDateTime(payload.issuedAt)
       invoice.dueAt = payload.dueAt ? toDateTime(payload.dueAt) : null
       invoice.subtotal = String(totals.subtotal)
@@ -499,6 +525,37 @@ export default class InvoiceService {
     invoice.status = 'paid'
     invoice.paidAt = paidAt ?? DateTime.now()
     await invoice.save()
+    return invoice
+  }
+
+  /**
+   * La seule écriture qu'une facture émise accepte encore (#717) : sa date et son
+   * moyen de paiement. Le statut suit la date pour que l'invariant
+   * `paid_at is not null ⇔ status = 'paid'` tienne —
+   *
+   * - une date posée règle la facture (`status = 'paid'`) ;
+   * - une date effacée la remet à `sent` (le job quotidien la rebasculera en
+   *   `overdue` si l'échéance est passée).
+   *
+   * Refusée sur un devis, un brouillon (qui passe par le formulaire d'édition)
+   * et une facture annulée, qui n'encaisse rien.
+   */
+  async updatePayment(invoice: Invoice, payload: ServiceUpdatePaymentPayload): Promise<Invoice> {
+    if (!canEditInvoicePayment(invoice)) throw new CannotEditPaymentError()
+
+    const paidAt = payload.paidAt ? toDateTime(payload.paidAt) : null
+
+    invoice.paidAt = paidAt
+    invoice.status = paidAt ? 'paid' : 'sent'
+    // Clé absente = champ non soumis : le moyen déjà enregistré est conservé.
+    // Un paiement annulé, lui, n'en garde aucun.
+    invoice.paymentMethod = paidAt
+      ? payload.paymentMethod === undefined
+        ? invoice.paymentMethod
+        : payload.paymentMethod
+      : null
+    await invoice.save()
+
     return invoice
   }
 

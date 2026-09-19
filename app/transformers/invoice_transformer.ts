@@ -13,6 +13,7 @@ export function toInvoiceRow(invoice: Invoice): InvoiceRow {
     issuedAt: invoice.issuedAt?.toISODate() ?? null,
     dueAt: invoice.dueAt?.toISODate() ?? null,
     paidAt: invoice.paidAt?.toISODate() ?? null,
+    paymentMethod: invoice.paymentMethod ?? null,
     sourceQuoteId: invoice.sourceQuoteId,
     subtotal: Number.parseFloat(invoice.subtotal),
     taxRate: Number.parseFloat(invoice.taxRate),

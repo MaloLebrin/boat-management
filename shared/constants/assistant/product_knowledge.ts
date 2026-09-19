@@ -915,6 +915,34 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageInvoices',
   },
   {
+    id: 'invoice-issued-lock',
+    title: {
+      en: 'An issued invoice is locked, only its payment can be corrected',
+      fr: 'Une facture émise est figée, seul son paiement se corrige',
+    },
+    body: {
+      en: 'Once an invoice leaves the draft status — sent, paid, overdue or cancelled — it becomes an accounting document and can no longer be rewritten: not its lines or amounts, not its number, not its issue date, not its status. The Edit button disappears from the document page and the list. Only the payment date and the payment method (cash, card, bank transfer, cheque, other) can still be corrected, from the Payment block on the invoice page; setting a date marks the invoice paid, clearing it puts the invoice back to sent. A cancelled invoice has no payment to correct. Quotes, and invoices still in draft, stay fully editable. To correct an amount on an issued invoice, issue a new document rather than rewriting it.',
+      fr: 'Dès qu’une facture quitte le brouillon — envoyée, payée, en retard ou annulée — elle devient une pièce comptable et ne se réécrit plus : ni ses lignes ou ses montants, ni son numéro, ni sa date d’émission, ni son statut. Le bouton Modifier disparaît de la fiche et de la liste. Seuls la date et le moyen de paiement (espèces, carte, virement, chèque, autre) restent corrigeables, depuis le bloc Paiement de la fiche ; poser une date règle la facture, l’effacer la remet à envoyée. Une facture annulée n’a aucun paiement à corriger. Les devis, et les factures encore en brouillon, restent librement modifiables. Pour corriger un montant sur une facture émise, émettez un nouveau document plutôt que de la réécrire.',
+    },
+    keywords: [
+      'facture emise',
+      'issued invoice',
+      'verrouillee',
+      'locked',
+      'modifier',
+      'edit',
+      'paiement',
+      'payment',
+      'moyen de paiement',
+      'payment method',
+      'date de paiement',
+      'brouillon',
+      'draft',
+    ],
+    navTarget: 'invoices.index',
+    planFlag: 'canManageInvoices',
+  },
+  {
     id: 'members-roles',
     title: {
       en: 'Members, roles and invitations',

@@ -117,7 +117,8 @@
     "notes": "Notes",
     "convertedFrom": "Created from quote {number}",
     "convertedTo": "Converted to invoice {number}",
-    "viewReservation": "View reservation"
+    "viewReservation": "View reservation",
+    "paymentMethod": "Payment method"
   },
   "actions": {
     "downloadPdf": "Download PDF",
@@ -140,5 +141,22 @@
     },
     "subject": "{kindTitle} {number} from {orgName}",
     "text": "Hello,\n\nPlease find attached {kind} no. {number}.\n\nTotal amount: {total}\n\nBest regards,\n{orgName}"
-  }
+  },
+  "paymentMethods": {
+    "cash": "Cash",
+    "card": "Card",
+    "transfer": "Bank transfer",
+    "check": "Cheque",
+    "other": "Other",
+    "none": "Not specified"
+  },
+  "payment": {
+    "title": "Payment",
+    "description": "An issued invoice is locked: its amounts, number and issue date can no longer be changed. Only the payment date and method can still be corrected here.",
+    "paidAt": "Payment date",
+    "paidAtHint": "Leave empty to cancel the recorded payment.",
+    "method": "Payment method",
+    "submit": "Save payment"
+  },
+  "lockedNotice": "Issued invoice: it can no longer be edited. Only its payment date and method can still be corrected; anything else needs a credit note."
 }

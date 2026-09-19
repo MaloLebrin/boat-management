@@ -246,7 +246,10 @@
     "alreadyConverted": "Ce devis a déjà été converti en facture.",
     "paid": "Facture marquée comme payée.",
     "cannotMarkPaid": "Ce document ne peut pas être marqué comme payé.",
-    "quoteFromReservation": "Devis créé depuis la réservation."
+    "quoteFromReservation": "Devis créé depuis la réservation.",
+    "locked": "Cette facture est émise : elle n'est plus modifiable. Seul son paiement peut être corrigé.",
+    "paymentUpdated": "Paiement mis à jour.",
+    "cannotEditPayment": "Le paiement de ce document ne peut pas être modifié."
   },
   "rentalContracts": {
     "created": "Contrat de location créé.",
