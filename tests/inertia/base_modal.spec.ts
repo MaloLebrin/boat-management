@@ -38,3 +38,57 @@ test('releases body scroll when unmounted while still open (#358)', () => {
   w.unmount()
   expect(document.body.style.overflow).toBe('')
 })
+
+test('nomme le dialogue par son titre (#734)', () => {
+  const w = mount(BaseModal, {
+    props: { open: true, title: 'Conflict detected' },
+    global: { stubs: { teleport: true } },
+  })
+  const dialog = w.get('[role="dialog"]')
+  expect(dialog.attributes('aria-modal')).toBe('true')
+  const labelledBy = dialog.attributes('aria-labelledby')
+  expect(w.get(`#${labelledBy}`).text()).toBe('Conflict detected')
+})
+
+test('sans titre, garde un nom accessible de repli', () => {
+  const w = mount(BaseModal, {
+    props: { open: true },
+    global: { stubs: { teleport: true } },
+  })
+  const dialog = w.get('[role="dialog"]')
+  expect(dialog.attributes('aria-label')).toBe('Modal')
+  expect(dialog.attributes('aria-labelledby')).toBeUndefined()
+})
+
+test('dismissible: false ferme toute sortie neutre (#734)', async () => {
+  const w = mount(BaseModal, {
+    props: { open: true, title: 'Blocking', dismissible: false },
+    global: { stubs: { teleport: true } },
+  })
+
+  // Pas de croix dans l'en-tête…
+  expect(w.findAll('button')).toHaveLength(0)
+
+  // …ni fermeture au clic sur l'arrière-plan…
+  await w.get('.fixed.inset-0.z-50').trigger('click')
+  expect(w.emitted('update:open')).toBeUndefined()
+
+  // …ni à la touche Échap.
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+  await w.vm.$nextTick()
+  expect(w.emitted('update:open')).toBeUndefined()
+})
+
+test('une modale ordinaire reste fermable au clic sur l’arrière-plan et à Échap', async () => {
+  const w = mount(BaseModal, {
+    props: { open: true, title: 'Ordinary' },
+    global: { stubs: { teleport: true } },
+  })
+
+  await w.get('.fixed.inset-0.z-50').trigger('click')
+  expect(w.emitted('update:open')).toEqual([[false]])
+
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+  await w.vm.$nextTick()
+  expect(w.emitted('update:open')).toEqual([[false], [false]])
+})

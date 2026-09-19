@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import ConflictResolutionModal from '../../inertia/components/ConflictResolutionModal.vue'
 
 vi.mock('@inertiajs/vue3', () => ({
@@ -56,6 +56,11 @@ const conflict = {
   },
 }
 
+// `BaseModal` verrouille le scroll du body tant qu'une modale est ouverte.
+afterEach(() => {
+  document.body.style.overflow = ''
+})
+
 const mountModal = (props = { conflict }) =>
   mount(ConflictResolutionModal, {
     props,
@@ -103,6 +108,26 @@ describe('ConflictResolutionModal', () => {
     const wrapper = mountModal()
     expect(wrapper.text()).not.toContain('_expectedUpdatedAt')
     expect(wrapper.text()).not.toContain('2026-06-25T10:00')
+  })
+
+  describe('accessibilité (#734)', () => {
+    test('le panneau est un dialogue modal pour les technologies d’assistance', () => {
+      const dialog = mountModal().get('[role="dialog"]')
+      expect(dialog.attributes('aria-modal')).toBe('true')
+    })
+
+    test('le dialogue est nommé par son titre', () => {
+      const wrapper = mountModal()
+      const labelledBy = wrapper.get('[role="dialog"]').attributes('aria-labelledby')
+      expect(labelledBy).toBeTruthy()
+      expect(wrapper.get(`#${labelledBy}`).text()).toBe('Conflict detected')
+    })
+
+    test('aucune sortie neutre : seuls les deux choix referment la modale', () => {
+      const wrapper = mountModal()
+      const labels = wrapper.findAll('button').map((b) => b.text())
+      expect(labels).toEqual(['Use server', 'Keep mine'])
+    })
   })
 
   describe('dark mode (#416)', () => {

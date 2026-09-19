@@ -133,7 +133,7 @@ export const BASE_STUBS = {
   },
   BaseModal: {
     name: 'BaseModal',
-    props: ['open', 'title', 'subtitle', 'closeLabel', 'size'],
+    props: ['open', 'title', 'subtitle', 'closeLabel', 'size', 'dismissible'],
     emits: ['update:open', 'close'],
     template:
       '<div v-if="open" data-base-modal role="dialog"><h2 v-if="title">{{ title }}</h2><p v-if="subtitle">{{ subtitle }}</p><slot /><slot name="footer" /></div>',

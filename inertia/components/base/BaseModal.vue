@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, watch } from 'vue'
+import { onBeforeUnmount, onMounted, useId, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 
 const props = withDefaults(
@@ -9,20 +9,37 @@ const props = withDefaults(
     subtitle?: string
     closeLabel?: string
     size?: 'md' | 'lg' | 'xl' | '2xl'
+    /**
+     * Une modale bloquante (résolution de conflit hors-ligne, #734) n'a pas de
+     * sortie neutre : ni croix, ni clic sur le fond, ni Échap — seule une action
+     * du pied de modale la referme.
+     */
+    dismissible?: boolean
   }>(),
-  { title: undefined, subtitle: undefined, closeLabel: 'Close', size: 'lg' }
+  {
+    title: undefined,
+    subtitle: undefined,
+    closeLabel: 'Close',
+    size: 'lg',
+    dismissible: true,
+  }
 )
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
 }>()
 
+// `useId()` : deux modales montées sur la même page ne doivent pas partager
+// l'identifiant qui porte le nom accessible du dialogue.
+const titleId = useId()
+
 function close() {
+  if (!props.dismissible) return
   emit('update:open', false)
 }
 
 function onKeyDown(e: KeyboardEvent) {
-  if (!props.open) return
+  if (!props.open || !props.dismissible) return
   if (e.key === 'Escape') {
     e.preventDefault()
     close()
@@ -71,16 +88,17 @@ onBeforeUnmount(() => {
           ]"
           role="dialog"
           aria-modal="true"
-          :aria-label="title || 'Modal'"
+          :aria-labelledby="title ? titleId : undefined"
+          :aria-label="title ? undefined : 'Modal'"
         >
           <div class="flex items-center justify-between gap-4 border-b border-border px-5 py-4">
             <div>
-              <p v-if="title" class="font-display text-base font-semibold text-fg">
+              <h2 v-if="title" :id="titleId" class="font-display text-base font-semibold text-fg">
                 {{ title }}
-              </p>
+              </h2>
               <p v-if="subtitle" class="mt-0.5 text-xs text-fg-muted">{{ subtitle }}</p>
             </div>
-            <div class="ml-auto">
+            <div v-if="dismissible" class="ml-auto">
               <BaseButton variant="ghost" size="sm" type="button" @click="close">
                 {{ closeLabel }}
               </BaseButton>
