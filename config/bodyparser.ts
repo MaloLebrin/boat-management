@@ -1,8 +1,17 @@
 import { defineConfig } from '@adonisjs/core/bodyparser'
 
 /**
- * Payload size limit applied only to the batch upload routes below.
- * Worst case is a document batch: up to 20 files x 20mb each.
+ * Plafond de charge utile des routes d'envoi groupé.
+ *
+ * ⚠️ Il n'y a **plus une valeur unique** (#764) : `largeUploadLimitFor()`
+ * (`shared/constants/media.ts`) la dérive du motif de route — 200 Mo pour un
+ * lot de photos (20 × 10 Mo), 400 Mo pour un lot de documents (20 × 20 Mo).
+ * Les 400 Mo appliqués partout valaient le double de ce qu'un lot de photos
+ * peut légitimement atteindre, et donc le double de ce que le validateur
+ * laissera jamais passer.
+ *
+ * Cette constante reste exportée comme **borne haute** de la famille, pour
+ * les tests et la documentation.
  */
 export const LARGE_UPLOAD_LIMIT = '400mb'
 
