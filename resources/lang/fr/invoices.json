@@ -117,7 +117,8 @@
     "notes": "Notes",
     "convertedFrom": "Créé depuis le devis {number}",
     "convertedTo": "Converti en facture {number}",
-    "viewReservation": "Voir la réservation"
+    "viewReservation": "Voir la réservation",
+    "paymentMethod": "Moyen de paiement"
   },
   "actions": {
     "downloadPdf": "Télécharger le PDF",
@@ -140,5 +141,22 @@
     },
     "subject": "{kindTitle} {number} de {orgName}",
     "text": "Bonjour,\n\nVeuillez trouver ci-joint {kind} n° {number}.\n\nMontant total : {total}\n\nCordialement,\n{orgName}"
-  }
+  },
+  "paymentMethods": {
+    "cash": "Espèces",
+    "card": "Carte bancaire",
+    "transfer": "Virement",
+    "check": "Chèque",
+    "other": "Autre",
+    "none": "Non renseigné"
+  },
+  "payment": {
+    "title": "Paiement",
+    "description": "Une facture émise est figée : ses montants, son numéro et sa date d'émission ne se modifient plus. Seuls la date et le moyen de paiement restent corrigeables ici.",
+    "paidAt": "Date de paiement",
+    "paidAtHint": "Laissez vide pour annuler le paiement enregistré.",
+    "method": "Moyen de paiement",
+    "submit": "Enregistrer le paiement"
+  },
+  "lockedNotice": "Facture émise : elle n'est plus modifiable. Seuls sa date et son moyen de paiement restent corrigeables ; pour toute autre correction, émettez un avoir."
 }

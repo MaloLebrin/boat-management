@@ -28,6 +28,10 @@ router
           .post('invoices/:id/convert', [controllers.Invoices, 'convert'])
           .as('invoices.convert')
         router.post('invoices/:id/pay', [controllers.Invoices, 'markPaid']).as('invoices.pay')
+        // Facture émise : seule écriture encore permise (#717).
+        router
+          .patch('invoices/:id/payment', [controllers.Invoices, 'updatePayment'])
+          .as('invoices.payment')
         router.put('invoices/:id', [controllers.Invoices, 'update']).as('invoices.update')
         router.delete('invoices/:id', [controllers.Invoices, 'destroy']).as('invoices.destroy')
       })

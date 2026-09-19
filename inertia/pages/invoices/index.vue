@@ -13,6 +13,8 @@ import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import { useNumberFormat } from '~/composables/use_number_format'
+// Une facture émise est figée (#717) : pas de raccourci « Modifier » dans la liste.
+import { canEditInvoice } from '#shared/helpers/invoice_lifecycle'
 import type {
   InvoiceListFilters,
   InvoiceRow,
@@ -108,7 +110,10 @@ function formatTotal(invoice: InvoiceRow): string {
                 {{ t('invoices.view') }}
               </BaseButton>
             </Link>
-            <Link v-if="!readOnly" :href="`/invoices/${invoice.id}/edit`">
+            <Link
+              v-if="!readOnly && canEditInvoice(invoice)"
+              :href="`/invoices/${invoice.id}/edit`"
+            >
               <BaseButton type="button" variant="secondary" size="sm">
                 {{ t('invoices.edit') }}
               </BaseButton>

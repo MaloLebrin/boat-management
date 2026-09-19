@@ -4,10 +4,11 @@ import type { InvoiceDetail } from '../../shared/types/invoice'
 
 const mockPost = vi.hoisted(() => vi.fn())
 const mockDelete = vi.hoisted(() => vi.fn())
+const mockPatch = vi.hoisted(() => vi.fn())
 
 vi.mock('@inertiajs/vue3', () => ({
   Head: { template: '<div><slot /></div>' },
-  router: { post: mockPost, delete: mockDelete },
+  router: { post: mockPost, delete: mockDelete, patch: mockPatch },
   usePage: () => ({ props: { appT: {}, locale: 'en', flash: {} } }),
 }))
 
@@ -42,6 +43,9 @@ vi.mock('~/components/invoices/InvoiceStatusBadge.vue', () => ({
 vi.mock('~/components/invoices/InvoiceLinesCard.vue', () => ({
   default: { template: '<div />', props: ['invoice'] },
 }))
+vi.mock('~/components/invoices/InvoicePaymentCard.vue', () => ({
+  default: { template: '<div class="payment-card" />', props: ['invoice'] },
+}))
 
 import InvoiceShow from '../../inertia/pages/invoices/show.vue'
 
@@ -57,6 +61,7 @@ function makeInvoice(overrides: Partial<InvoiceDetail> = {}): InvoiceDetail {
     issuedAt: '2026-07-05',
     dueAt: null,
     paidAt: null,
+    paymentMethod: null,
     sourceQuoteId: null,
     subtotal: 100,
     taxRate: 20,
@@ -145,5 +150,43 @@ describe('invoices/show.vue actions', () => {
       .findAll('button')
       .find((b) => b.text().includes('invoices.actions.markPaid'))
     expect(btn).toBeUndefined()
+  })
+})
+
+describe('invoices/show.vue — facture émise (#717)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  test('an issued invoice hides the edit link and shows the payment card', () => {
+    const wrapper = mountShow(
+      makeInvoice({ kind: 'invoice', number: 'FAC-000001', status: 'sent' })
+    )
+
+    expect(wrapper.find('a[href="/invoices/42/edit"]').exists()).toBe(false)
+    expect(wrapper.find('.payment-card').exists()).toBe(true)
+  })
+
+  test('a draft invoice keeps the edit link and shows no payment card', () => {
+    const wrapper = mountShow(
+      makeInvoice({ kind: 'invoice', number: 'FAC-000001', status: 'draft' })
+    )
+
+    expect(wrapper.find('a[href="/invoices/42/edit"]').exists()).toBe(true)
+    expect(wrapper.find('.payment-card').exists()).toBe(false)
+  })
+
+  test('a cancelled invoice is locked, and has no payment to correct either', () => {
+    const wrapper = mountShow(
+      makeInvoice({ kind: 'invoice', number: 'FAC-000001', status: 'cancelled' })
+    )
+
+    expect(wrapper.find('a[href="/invoices/42/edit"]').exists()).toBe(false)
+    expect(wrapper.find('.payment-card').exists()).toBe(false)
+  })
+
+  test('a quote stays editable, whatever its status', () => {
+    const wrapper = mountShow(makeInvoice({ kind: 'quote', status: 'sent' }))
+
+    expect(wrapper.find('a[href="/invoices/42/edit"]').exists()).toBe(true)
+    expect(wrapper.find('.payment-card').exists()).toBe(false)
   })
 })

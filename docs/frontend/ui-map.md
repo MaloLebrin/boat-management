@@ -317,6 +317,13 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
   - `ParticleNetworkCanvas.vue` — particules réactives souris : `HomeFinalCtaSection`
 - Détail des animations : `inertia/css/ANIMATIONS.md`
 
+### Factures — fiche d'un document (`/invoices/:id`, #717)
+
+- Page : `inertia/pages/invoices/show.vue` (props `invoice`, `canDelete`, `readOnly`), sous-composants `InvoiceStatusBadge`, `InvoiceLinesCard`, `InvoicePaymentCard`.
+- **Facture émise = fiche en lecture** : dès qu'une facture (`kind: 'invoice'`) quitte le brouillon, le bouton « Modifier » disparaît de la fiche **et** de la liste (`canEditInvoice`, `shared/helpers/invoice_lifecycle.ts`), remplacé par une ligne d'explication (`invoices.lockedNotice`). Les devis et les factures brouillon gardent le bouton.
+- `InvoicePaymentCard.vue` — visible sur une facture émise non annulée : date de paiement (`<input type="date">`, format machine) + moyen de paiement (`cash`/`card`/`transfer`/`check`/`other`, désactivé tant qu'aucune date n'est posée). Soumission par visite Inertia `router.patch('/invoices/:id/payment', …, { preserveScroll: true })` — jamais de `fetch` + CSRF manuel. Vider la date annule le paiement enregistré.
+- Le détail affiche « Payé le » et « Moyen de paiement » uniquement quand un paiement est enregistré — l'invariant `paid_at ⇔ status paid` (#717) garantit qu'aucun brouillon n'affiche de date de règlement.
+
 ### Settings — notifications (`/settings/notifications`, #498)
 
 - Page : `inertia/pages/settings/notifications.vue` → `components/settings/tabs/SettingsNotificationsTab.vue` (prop `pushSubscriptions`, servie par `SettingsController.notifications`), section visible pour **tous les rôles**.

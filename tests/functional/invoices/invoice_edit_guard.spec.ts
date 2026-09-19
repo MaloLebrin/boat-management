@@ -8,12 +8,16 @@ import { createEnterpriseAdminUser } from '#tests/functional/helpers'
 import { assertPageContract } from '#tests/support/inertia_page'
 
 /**
- * Ce que `GET /invoices/:id/edit` laisse passer (#694).
+ * Ce que `GET /invoices/:id/edit` et `PUT /invoices/:id` laissent passer.
  *
- * L'issue annonçait la route « jamais atteinte » : elle l'est depuis #689,
- * `invoices_pages_contract.spec.ts` épingle son composant et ses props. Restaient
- * deux faces jamais éprouvées — la facture d'une autre organisation, et la
- * facture déjà payée — et la première dément l'issue : ce n'est pas un 404.
+ * Deux faces jamais éprouvées avant #694 : la facture d'une autre organisation,
+ * et la facture déjà émise. La première dément l'issue d'origine — ce n'est pas
+ * un 404 mais une redirection.
+ *
+ * La seconde était un **constat** (#694) : une facture `paid` se réécrivait
+ * intégralement, statut et montants compris, en gardant sa date de paiement.
+ * #717 a tranché — une facture émise est figée, seuls sa date et son moyen de
+ * paiement restent corrigeables. Ces tests sont désormais des **validations**.
  */
 
 /** Payload de mise à jour valide, clés à crochets pour le tableau de lignes. */
@@ -53,42 +57,48 @@ test.group("Factures — l'édition d'une facture qui n'est pas la sienne", (gro
   })
 })
 
-test.group('Factures — une facture payée reste entièrement modifiable', (group) => {
+test.group('Factures — une facture émise est figée', (group) => {
   group.each.setup(() => truncateDb())
 
-  /**
-   * ⚠️ **Constat, pas validation.** Ni le contrôleur, ni `InvoiceService.update`,
-   * ni le validateur n'opposent de garde de statut : une facture `paid` se
-   * réécrit, montants compris, et son statut peut même redescendre à `draft`.
-   * Le seul garde-fou du domaine joue dans l'autre sens — `markAsPaid` refuse
-   * une facture déjà payée (`CannotMarkPaidError`).
-   *
-   * Figé ici pour que le durcissement soit un choix visible, et suivi par
-   * l'issue #717.
-   */
-
-  test("l'écran d'édition s'ouvre sur une facture payée", async ({ client, assert }) => {
+  test("l'écran d'édition d'une facture payée redirige vers sa fiche", async ({ client }) => {
     const user = await createEnterpriseAdminUser()
     const invoice = await InvoiceFactory.merge({ organizationId: user.organizationId! })
       .apply('invoice')
       .apply('paid')
       .create()
 
-    const response = await client.get(`/invoices/${invoice.id}/edit`).loginAs(user).withInertia()
+    const response = await client.get(`/invoices/${invoice.id}/edit`).loginAs(user).redirects(0)
 
-    assertPageContract(assert, response, 'invoices/form')
-    const props = response.inertiaProps as { invoice: { id: number; status: string } }
-    assert.equal(props.invoice.id, invoice.id)
-    assert.equal(props.invoice.status, 'paid')
+    response.assertStatus(302)
+    response.assertHeader('location', `/invoices/${invoice.id}`)
+    response.assertFlashMessage(
+      'error',
+      'This invoice has been issued: it can no longer be edited. Only its payment can be corrected.'
+    )
   })
 
-  test('… et son total se réécrit', async ({ client, assert }) => {
+  test("une facture seulement envoyée est déjà émise : elle non plus ne s'édite", async ({
+    client,
+  }) => {
+    const user = await createEnterpriseAdminUser()
+    const invoice = await InvoiceFactory.merge({ organizationId: user.organizationId! })
+      .apply('invoice')
+      .apply('sent')
+      .create()
+
+    const response = await client.get(`/invoices/${invoice.id}/edit`).loginAs(user).redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', `/invoices/${invoice.id}`)
+  })
+
+  test('… et son total ne se réécrit plus', async ({ client, assert }) => {
     const user = await createEnterpriseAdminUser()
     const invoice = await InvoiceFactory.merge({ organizationId: user.organizationId! })
       .apply('invoice')
       .apply('paid')
       .create()
-    await InvoiceLineFactory.merge({ invoiceId: invoice.id }).create()
+    await InvoiceLineFactory.merge({ invoiceId: invoice.id, label: 'Location semaine' }).create()
 
     const response = await client
       .put(`/invoices/${invoice.id}`)
@@ -102,20 +112,19 @@ test.group('Factures — une facture payée reste entièrement modifiable', (gro
       .redirects(0)
 
     response.assertStatus(302)
+    response.assertHeader('location', `/invoices/${invoice.id}`)
 
     const updated = await Invoice.findOrFail(invoice.id)
-    assert.equal(Number(updated.total), 12)
-    assert.equal(Number(updated.subtotal), 10)
+    assert.equal(Number(updated.total), 120)
+    assert.equal(Number(updated.subtotal), 100)
 
+    // Les lignes ne sont ni supprimées ni recréées.
     const lines = await InvoiceLine.query().where('invoiceId', invoice.id)
     assert.lengthOf(lines, 1)
-    assert.equal(lines[0].label, 'Location semaine (révisée)')
+    assert.equal(lines[0].label, 'Location semaine')
   })
 
-  test('… jusqu’à repasser en brouillon en gardant sa date de paiement', async ({
-    client,
-    assert,
-  }) => {
+  test('… ni son statut, qui ne redescend plus en brouillon', async ({ client, assert }) => {
     const user = await createEnterpriseAdminUser()
     const invoice = await InvoiceFactory.merge({ organizationId: user.organizationId! })
       .apply('invoice')
@@ -132,19 +141,67 @@ test.group('Factures — une facture payée reste entièrement modifiable', (gro
 
     const updated = await Invoice.findOrFail(invoice.id)
 
-    assert.equal(updated.status, 'draft')
-    // `update` ne touche jamais `paidAt` : la ligne devient incohérente — un
-    // brouillon qui porte une date de paiement. C'est le cœur de l'issue de
-    // suivi.
+    assert.equal(updated.status, 'paid')
     assert.isNotNull(updated.paidAt)
   })
 
-  test('le numéro et la nature, eux, ne bougent pas', async ({ client, assert }) => {
+  test('un devis, lui, reste librement modifiable quel que soit son statut', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createEnterpriseAdminUser()
+    const quote = await InvoiceFactory.merge({ organizationId: user.organizationId! })
+      .apply('sent')
+      .create()
+    await InvoiceLineFactory.merge({ invoiceId: quote.id }).create()
+
+    const response = await client
+      .put(`/invoices/${quote.id}`)
+      .loginAs(user)
+      .form(updateForm({ 'kind': 'quote', 'lines[0][unitPrice]': 10 }))
+      .redirects(0)
+
+    response.assertStatus(302)
+    const updated = await Invoice.findOrFail(quote.id)
+    assert.equal(Number(updated.subtotal), 10)
+  })
+
+  test("une facture encore en brouillon s'édite, et sa date de paiement suit son statut", async ({
+    client,
+    assert,
+  }) => {
     const user = await createEnterpriseAdminUser()
     const invoice = await InvoiceFactory.merge({ organizationId: user.organizationId! })
       .apply('invoice')
-      .apply('paid')
       .create()
+    await InvoiceLineFactory.merge({ invoiceId: invoice.id }).create()
+
+    // Un brouillon peut être ouvert à l'édition…
+    const editResponse = await client
+      .get(`/invoices/${invoice.id}/edit`)
+      .loginAs(user)
+      .withInertia()
+    assertPageContract(assert, editResponse, 'invoices/form')
+
+    // … et le formulaire qui le passe en `paid` horodate le paiement, au lieu de
+    // laisser une facture payée sans date (#717).
+    await client
+      .put(`/invoices/${invoice.id}`)
+      .loginAs(user)
+      .form(updateForm({ status: 'paid' }))
+      .redirects(0)
+
+    const updated = await Invoice.findOrFail(invoice.id)
+    assert.equal(updated.status, 'paid')
+    assert.isNotNull(updated.paidAt)
+  })
+
+  test('le numéro et la nature, eux, ne bougent toujours pas', async ({ client, assert }) => {
+    const user = await createEnterpriseAdminUser()
+    const invoice = await InvoiceFactory.merge({ organizationId: user.organizationId! })
+      .apply('invoice')
+      .create()
+    await InvoiceLineFactory.merge({ invoiceId: invoice.id }).create()
 
     await client
       .put(`/invoices/${invoice.id}`)
@@ -154,8 +211,7 @@ test.group('Factures — une facture payée reste entièrement modifiable', (gro
 
     const updated = await Invoice.findOrFail(invoice.id)
 
-    // Le seul invariant que le service protège vraiment : le numéro et la
-    // nature d'une pièce comptable sont figés à la création.
+    // Le numéro et la nature d'une pièce comptable sont figés à la création.
     assert.equal(updated.number, invoice.number)
     assert.equal(updated.kind, 'invoice')
   })

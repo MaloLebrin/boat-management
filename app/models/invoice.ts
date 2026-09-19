@@ -5,7 +5,7 @@ import InvoiceLine from '#models/invoice_line'
 import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
-import type { InvoiceKind, InvoiceStatus } from '#shared/types/invoice'
+import type { InvoiceKind, InvoicePaymentMethod, InvoiceStatus } from '#shared/types/invoice'
 
 export default class Invoice extends BaseModel {
   static table = 'invoices'
@@ -42,6 +42,9 @@ export default class Invoice extends BaseModel {
 
   @column.date()
   declare paidAt: DateTime | null
+
+  @column()
+  declare paymentMethod: InvoicePaymentMethod | null
 
   @column()
   declare sourceQuoteId: number | null

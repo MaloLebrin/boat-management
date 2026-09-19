@@ -1,5 +1,7 @@
 export type InvoiceKind = 'quote' | 'invoice'
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
+/** Moyen de règlement d'une facture (#717). */
+export type InvoicePaymentMethod = 'cash' | 'card' | 'transfer' | 'check' | 'other'
 export type InvoiceSortField = 'issuedAt' | 'number' | 'total' | 'status'
 export type InvoiceSortDirection = 'asc' | 'desc'
 
@@ -28,6 +30,7 @@ export interface InvoiceRow {
   issuedAt: string | null
   dueAt: string | null
   paidAt: string | null
+  paymentMethod: InvoicePaymentMethod | null
   sourceQuoteId: number | null
   subtotal: number
   taxRate: number
@@ -65,6 +68,15 @@ export interface CreateInvoicePayload {
   lines: InvoiceLineInput[]
 }
 export type UpdateInvoicePayload = CreateInvoicePayload
+
+/**
+ * Les seuls champs qu'une facture émise accepte encore (#717) : la date et le
+ * moyen de paiement. `paidAt: null` annule le paiement enregistré.
+ */
+export interface UpdateInvoicePaymentPayload {
+  paidAt: string | null
+  paymentMethod?: InvoicePaymentMethod | null
+}
 
 export interface InvoiceListFilters {
   q: string

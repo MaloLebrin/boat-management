@@ -246,7 +246,10 @@
     "alreadyConverted": "This quote has already been converted to an invoice.",
     "paid": "Invoice marked as paid.",
     "cannotMarkPaid": "This document cannot be marked as paid.",
-    "quoteFromReservation": "Quote created from the reservation."
+    "quoteFromReservation": "Quote created from the reservation.",
+    "locked": "This invoice has been issued: it can no longer be edited. Only its payment can be corrected.",
+    "paymentUpdated": "Payment updated.",
+    "cannotEditPayment": "This document's payment cannot be edited."
   },
   "rentalContracts": {
     "created": "Rental contract created.",

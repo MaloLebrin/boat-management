@@ -77,25 +77,26 @@ Deux principes structurants :
 
 Devis **et** factures partagent la même table, discriminés par `kind`.
 
-| Colonne           | Type                                                | Notes                                           |
-| ----------------- | --------------------------------------------------- | ----------------------------------------------- |
-| `organization_id` | FK organisations, `CASCADE`                         | Scope obligatoire                               |
-| `client_id`       | FK clients, **`SET NULL`**, nullable                | Le document survit à la suppression du client   |
-| `reservation_id`  | FK boat_reservations, **`SET NULL`**, nullable      | Lien vers la réservation d'origine (#288)       |
-| `source_quote_id` | FK **auto-référente** invoices, `SET NULL`, indexée | Facture ← devis converti (#287)                 |
-| `kind`            | enum `quote` / `invoice`                            | **Figé après création**                         |
-| `number`          | string                                              | `DEV-000001` / `FAC-000001` (voir §4)           |
-| `client_name`     | string, nullable                                    | **Snapshot** dénormalisé (lisible même sans FK) |
-| `status`          | enum `draft`/`sent`/`paid`/`overdue`/`cancelled`    | Défaut `draft` (voir §6)                        |
-| `issued_at`       | date                                                | Date d'émission                                 |
-| `due_at`          | date, nullable                                      | Échéance (base du calcul `overdue`)             |
-| `paid_at`         | date, nullable                                      | Date de paiement (#287)                         |
-| `subtotal`        | decimal(10,2)                                       | Recalculé serveur                               |
-| `tax_rate`        | decimal(5,2)                                        | Pourcentage TVA (0–100)                         |
-| `tax_amount`      | decimal(10,2)                                       | Recalculé serveur                               |
-| `total`           | decimal(10,2)                                       | Recalculé serveur                               |
-| `currency`        | string(3), défaut `EUR`                             | Champ libre                                     |
-| `notes`           | text, nullable                                      |                                                 |
+| Colonne           | Type                                                | Notes                                                                |
+| ----------------- | --------------------------------------------------- | -------------------------------------------------------------------- |
+| `organization_id` | FK organisations, `CASCADE`                         | Scope obligatoire                                                    |
+| `client_id`       | FK clients, **`SET NULL`**, nullable                | Le document survit à la suppression du client                        |
+| `reservation_id`  | FK boat_reservations, **`SET NULL`**, nullable      | Lien vers la réservation d'origine (#288)                            |
+| `source_quote_id` | FK **auto-référente** invoices, `SET NULL`, indexée | Facture ← devis converti (#287)                                      |
+| `kind`            | enum `quote` / `invoice`                            | **Figé après création**                                              |
+| `number`          | string                                              | `DEV-000001` / `FAC-000001` (voir §4)                                |
+| `client_name`     | string, nullable                                    | **Snapshot** dénormalisé (lisible même sans FK)                      |
+| `status`          | enum `draft`/`sent`/`paid`/`overdue`/`cancelled`    | Défaut `draft` (voir §6)                                             |
+| `issued_at`       | date                                                | Date d'émission                                                      |
+| `due_at`          | date, nullable                                      | Échéance (base du calcul `overdue`)                                  |
+| `paid_at`         | date, nullable                                      | Date de paiement (#287) — **⇔ `status = 'paid'`** (#717)             |
+| `payment_method`  | string(20), nullable                                | Moyen de règlement : `cash`/`card`/`transfer`/`check`/`other` (#717) |
+| `subtotal`        | decimal(10,2)                                       | Recalculé serveur                                                    |
+| `tax_rate`        | decimal(5,2)                                        | Pourcentage TVA (0–100)                                              |
+| `tax_amount`      | decimal(10,2)                                       | Recalculé serveur                                                    |
+| `total`           | decimal(10,2)                                       | Recalculé serveur                                                    |
+| `currency`        | string(3), défaut `EUR`                             | Champ libre                                                          |
+| `notes`           | text, nullable                                      |                                                                      |
 
 Contraintes : `UNIQUE(organization_id, kind, number)` + index
 `(organization_id, kind, status)` et `(organization_id, issued_at)`.
@@ -180,12 +181,52 @@ Statuts : `draft` → `sent` → `paid`, avec `overdue` (retard) et `cancelled`
    quote (kind=quote) ──(convert)──▶ nouvelle invoice (kind=invoice, source_quote_id)
 ```
 
-| Transition             | Déclencheur                        | Règles / gardes                                                                                                                                                                                                       |
-| ---------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Envoi** (#286)       | `POST /invoices/:id/send`          | `draft → sent` uniquement (payée/annulée non rétrogradée) ; refuse si le client n'a pas d'email                                                                                                                       |
-| **Conversion** (#287)  | `POST /invoices/:id/convert`       | Uniquement un `quote` (`NotAQuoteError`), une seule fois (`QuoteAlreadyConvertedError`). Crée une **nouvelle** facture `FAC-`, recopie client/réservation/lignes/TVA/notes, `status=draft`, `source_quote_id` = devis |
-| **Paiement** (#287)    | `POST /invoices/:id/pay`           | Uniquement une `invoice` non annulée (`CannotMarkPaidError`) → `status=paid`, `paid_at` horodaté                                                                                                                      |
-| **Retard auto** (#287) | Job planifié `MarkOverdueInvoices` | Bascule en `overdue` toute facture `sent`, non payée, `due_at` dépassée. Idempotent                                                                                                                                   |
+| Transition                  | Déclencheur                        | Règles / gardes                                                                                                                                                                                                       |
+| --------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Envoi** (#286)            | `POST /invoices/:id/send`          | `draft → sent` uniquement (payée/annulée non rétrogradée) ; refuse si le client n'a pas d'email                                                                                                                       |
+| **Conversion** (#287)       | `POST /invoices/:id/convert`       | Uniquement un `quote` (`NotAQuoteError`), une seule fois (`QuoteAlreadyConvertedError`). Crée une **nouvelle** facture `FAC-`, recopie client/réservation/lignes/TVA/notes, `status=draft`, `source_quote_id` = devis |
+| **Paiement** (#287)         | `POST /invoices/:id/pay`           | Uniquement une `invoice` non annulée (`CannotMarkPaidError`) → `status=paid`, `paid_at` horodaté                                                                                                                      |
+| **Retard auto** (#287)      | Job planifié `MarkOverdueInvoices` | Bascule en `overdue` toute facture `sent`, non payée, `due_at` dépassée. Idempotent                                                                                                                                   |
+| **Paiement corrigé** (#717) | `PATCH /invoices/:id/payment`      | Facture émise non annulée (`CannotEditPaymentError`). Écrit **uniquement** `paid_at` + `payment_method` ; une date posée règle la facture, une date effacée la remet à `sent`                                         |
+
+### Verrouillage d'une facture émise (#717)
+
+Une **facture émise** — `kind = 'invoice'` sortie du brouillon, donc `sent`,
+`paid`, `overdue` ou `cancelled` — est une **pièce comptable figée** : ni ses
+montants, ni ses lignes, ni son numéro, ni sa nature, ni sa date d'émission, ni
+son statut ne se réécrivent.
+
+| Document                                  | Édition complète | Paiement corrigeable      |
+| ----------------------------------------- | ---------------- | ------------------------- |
+| Devis (`quote`), quel que soit son statut | ✅               | ❌                        |
+| Facture `draft`                           | ✅               | ❌ (le formulaire suffit) |
+| Facture `sent` / `paid` / `overdue`       | ❌               | ✅                        |
+| Facture `cancelled`                       | ❌               | ❌ (rien à encaisser)     |
+
+- `GET /invoices/:id/edit` sur une facture émise **redirige** vers sa fiche avec
+  un flash (`flash.invoices.locked`) ; le bouton « Modifier » disparaît de la
+  fiche et de la liste (`canEditInvoice`, helper partagé).
+- `PUT /invoices/:id` sur une facture émise est **refusé** au service
+  (`InvoiceLockedError`), même avec un payload valide : la garde ne dépend pas de
+  l'UI.
+- Seul `PATCH /invoices/:id/payment` reste ouvert, avec son **validateur dédié**
+  (`updateInvoicePaymentValidator` : `paidAt`, `paymentMethod` — rien d'autre
+  n'est lu). Une correction de montant passe par un **avoir**, pas par une
+  réécriture.
+
+**Invariant `paid_at is not null ⇔ status = 'paid'`.** Avant #717, `update` ne
+touchait jamais `paid_at` : une facture repassée en brouillon gardait sa date de
+paiement. Désormais `update` (donc brouillons et devis) aligne les deux — statut
+`paid` ⇒ date horodatée si absente, tout autre statut ⇒ `paid_at` et
+`payment_method` effacés — et `updatePayment` fait dériver le statut de la date.
+La migration
+`1851000000000_alter_invoices_add_payment_method_and_clear_stale_paid_at`
+rattrape les lignes déjà incohérentes.
+
+Les règles vivent dans `shared/helpers/invoice_lifecycle.ts`
+(`isIssuedInvoice` / `canEditInvoice` / `canEditInvoicePayment`), partagées
+backend ↔ frontend : le backend les fait respecter, le frontend s'en sert pour
+masquer le bouton d'édition et afficher le bloc « Paiement ».
 
 Le passage en `overdue` est câblé via un **job de queue planifié**
 (`app/jobs/mark_overdue_invoices.ts`, cron quotidien `0 6 * * *` Europe/Paris dans
@@ -274,20 +315,21 @@ Raccourci métier : générer un devis pré-rempli depuis une réservation.
 
 Toutes sous `middleware.auth()`, préfixe `/invoices` (voir `start/routes/invoices.ts`).
 
-| Méthode & chemin                                 | Action                  | Rôle                                       |
-| ------------------------------------------------ | ----------------------- | ------------------------------------------ |
-| `GET /invoices`                                  | `index`                 | Liste filtrable/paginée                    |
-| `GET /invoices/new`                              | `create`                | Formulaire de création                     |
-| `POST /invoices`                                 | `store`                 | Créer un devis/facture                     |
-| `POST /invoices/from-reservation/:reservationId` | `createFromReservation` | Devis pré-rempli depuis réservation (#288) |
-| `GET /invoices/:id`                              | `show`                  | Fiche détail                               |
-| `GET /invoices/:id/edit`                         | `edit`                  | Formulaire d'édition                       |
-| `GET /invoices/:id/pdf`                          | `downloadPdf`           | Télécharger le PDF (#286)                  |
-| `POST /invoices/:id/send`                        | `send`                  | Envoyer par email (#286)                   |
-| `POST /invoices/:id/convert`                     | `convert`               | Convertir un devis en facture (#287)       |
-| `POST /invoices/:id/pay`                         | `markPaid`              | Marquer payée (#287)                       |
-| `PUT /invoices/:id`                              | `update`                | Modifier (jamais `number`/`kind`)          |
-| `DELETE /invoices/:id`                           | `destroy`               | Supprimer (admin uniquement)               |
+| Méthode & chemin                                 | Action                  | Rôle                                                                 |
+| ------------------------------------------------ | ----------------------- | -------------------------------------------------------------------- |
+| `GET /invoices`                                  | `index`                 | Liste filtrable/paginée                                              |
+| `GET /invoices/new`                              | `create`                | Formulaire de création                                               |
+| `POST /invoices`                                 | `store`                 | Créer un devis/facture                                               |
+| `POST /invoices/from-reservation/:reservationId` | `createFromReservation` | Devis pré-rempli depuis réservation (#288)                           |
+| `GET /invoices/:id`                              | `show`                  | Fiche détail                                                         |
+| `GET /invoices/:id/edit`                         | `edit`                  | Formulaire d'édition                                                 |
+| `GET /invoices/:id/pdf`                          | `downloadPdf`           | Télécharger le PDF (#286)                                            |
+| `POST /invoices/:id/send`                        | `send`                  | Envoyer par email (#286)                                             |
+| `POST /invoices/:id/convert`                     | `convert`               | Convertir un devis en facture (#287)                                 |
+| `POST /invoices/:id/pay`                         | `markPaid`              | Marquer payée (#287)                                                 |
+| `PATCH /invoices/:id/payment`                    | `updatePayment`         | Corriger date + moyen de paiement (#717)                             |
+| `PUT /invoices/:id`                              | `update`                | Modifier (jamais `number`/`kind`, refusé sur une facture émise #717) |
+| `DELETE /invoices/:id`                           | `destroy`               | Supprimer (admin uniquement)                                         |
 
 Toutes les mutations répondent par **redirection Inertia** (pas de JSON) et le
 frontend utilise `router.*` / `<Form>` (conventions Inertia du projet).
@@ -333,7 +375,8 @@ cannotMarkPaid,quoteFromReservation}` + `flash.quota.invoicesExceeded`.
 ## 13. Tests
 
 - **Unit** : `tests/unit/helpers/invoice_totals.spec.ts` (arrondis, TVA 0/20 %,
-  quantités fractionnaires).
+  quantités fractionnaires), `tests/unit/helpers/invoice_lifecycle.spec.ts`
+  (verrouillage d'une facture émise, #717).
 - **Fonctionnels** (`tests/functional/invoices/`) :
   - `invoices.spec.ts` — CRUD, numérotation contiguë par kind, org-scoping/IDOR,
     totaux persistés (`amount` falsifié ignoré), cascade des lignes, gating.
@@ -343,9 +386,17 @@ cannotMarkPaid,quoteFromReservation}` + `flash.quota.invoicesExceeded`.
     avec pièce jointe PDF (chemin non couvert en fonctionnel car la queue `sync`
     ne tourne pas pendant la requête HTTP).
   - `invoice_lifecycle.spec.ts` — conversion, gardes, paiement, `markOverdueInvoices`.
+  - `invoice_edit_guard.spec.ts` — verrouillage d'une facture émise (#717) :
+    édition refusée, totaux et statut intacts, devis et brouillons encore
+    modifiables, `paid_at` aligné sur le statut.
+  - `invoice_payment.spec.ts` — `PATCH /invoices/:id/payment` : correction de la
+    date/du moyen, annulation du paiement, champs hors périmètre ignorés, refus
+    sur devis/annulée, IDOR.
   - `invoice_from_reservation.spec.ts` — pré-remplissage, résolution client par
     email, lien bidirectionnel, gating.
-- **Front (Vitest)** : `tests/inertia/invoice_show_actions.spec.ts`,
+- **Front (Vitest)** : `tests/inertia/invoice_show_actions.spec.ts` (boutons
+  convertir/payer, bouton « Modifier » masqué sur une facture émise),
+  `invoice_payment_card.spec.ts` (bloc paiement → `router.patch`),
   `fleet_reservation_list.spec.ts` (boutons convertir/payer/créer-devis + liens).
 
 ---
@@ -356,5 +407,8 @@ cannotMarkPaid,quoteFromReservation}` + `flash.quota.invoicesExceeded`.
   client par email (§8) par une FK directe. Complète le CRM (épic #108).
 - Relance email automatique des factures en retard (`overdue`) — évoquée comme
   optionnelle en #287, non implémentée.
-- Statuts en machine à états stricte (actuellement `status` reste librement
-  settable via `update` en dehors des transitions dédiées).
+- **Avoir (note de crédit)** : la voie comptable pour corriger une facture émise,
+  désormais figée (#717). Aujourd'hui, une erreur de montant sur une facture
+  envoyée ne se rattrape que par une annulation suivie d'une nouvelle facture.
+- Statuts en machine à états stricte : `status` reste librement settable via
+  `update` sur les devis et les brouillons, en dehors des transitions dédiées.

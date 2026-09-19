@@ -4,6 +4,8 @@ import {
   NotAQuoteError,
   QuoteAlreadyConvertedError,
   CannotMarkPaidError,
+  InvoiceLockedError,
+  CannotEditPaymentError,
 } from '#exceptions/invoice_errors'
 import InvoicePdfService from '#services/invoice_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
@@ -11,7 +13,12 @@ import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import InvoicePolicy from '#policies/invoice_policy'
-import { createInvoiceValidator, updateInvoiceValidator } from '#validators/invoice'
+import {
+  createInvoiceValidator,
+  updateInvoiceValidator,
+  updateInvoicePaymentValidator,
+} from '#validators/invoice'
+import { canEditInvoice } from '#shared/helpers/invoice_lifecycle'
 import { toInvoiceDetail } from '#transformers/invoice_transformer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -157,6 +164,15 @@ export default class InvoicesController {
 
     try {
       const invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+
+      // Facture émise : la pièce est figée (#717). Le paiement se corrige depuis
+      // la fiche, par `PATCH /invoices/:id/payment`.
+      if (!canEditInvoice(invoice)) {
+        session.flash('error', i18n.t('flash.invoices.locked'))
+        response.redirect(`/invoices/${invoice.id}`)
+        return
+      }
+
       const clientOptions = await this.invoiceService.listClientOptions(org)
       return inertia.render('invoices/form', {
         invoice: toInvoiceDetail(invoice),
@@ -188,10 +204,48 @@ export default class InvoicesController {
         response.redirect('/invoices')
         return
       }
+      // Facture émise : aucune réécriture, même avec un payload valide (#717).
+      if (error instanceof InvoiceLockedError) {
+        session.flash('error', i18n.t('flash.invoices.locked'))
+        response.redirect(`/invoices/${params.id}`)
+        return
+      }
       throw error
     }
 
     session.flash('success', i18n.t('flash.invoices.updated'))
+    response.redirect(`/invoices/${params.id}`)
+  }
+
+  /**
+   * Seule écriture encore permise sur une facture émise (#717) : sa date et son
+   * moyen de paiement.
+   */
+  async updatePayment({ request, response, auth, bouncer, params, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrg(auth)
+
+    await bouncer.with(InvoicePolicy).authorize('update')
+
+    try {
+      const invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+      const payload = await request.validateUsing(updateInvoicePaymentValidator)
+      await this.invoiceService.updatePayment(invoice, payload)
+    } catch (error) {
+      if (error instanceof InvoiceNotFoundError) {
+        session.flash('error', i18n.t('flash.invoices.notFound'))
+        response.redirect('/invoices')
+        return
+      }
+      if (error instanceof CannotEditPaymentError) {
+        session.flash('error', i18n.t('flash.invoices.cannotEditPayment'))
+        response.redirect(`/invoices/${params.id}`)
+        return
+      }
+      throw error
+    }
+
+    session.flash('success', i18n.t('flash.invoices.paymentUpdated'))
     response.redirect(`/invoices/${params.id}`)
   }
 
