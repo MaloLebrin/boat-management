@@ -29,8 +29,15 @@ WORKDIR /app
 
 COPY --from=builder /app/build .
 
-# Ghostscript pour la compression PDF (app/services/pdf_service.ts)
-RUN apk add --no-cache ghostscript \
+# Ghostscript pour la compression PDF (app/services/pdf_service.ts).
+#
+# Plancher de version explicite (#772) : sans contrainte, la version déployée
+# est un effet de bord de la date de build. `-dSAFER` est actif par défaut
+# depuis 9.50 et le service le passe désormais explicitement, mais 10.03 fixe
+# aussi un plancher sur les CVE de l'interpréteur. Un plancher est une décision
+# vérifiable là où un numéro exact casserait le build au premier retrait du
+# paquet de l'index Alpine.
+RUN apk add --no-cache 'ghostscript>=10.03' \
  && pnpm install --prod --frozen-lockfile
 
 RUN addgroup --system --gid 1001 nodejs \
