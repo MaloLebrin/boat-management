@@ -38,14 +38,9 @@ const CONFLICT_MODAL = join(ROOT, 'inertia/components/ConflictResolutionModal.vu
  * déguisée.
  */
 const ENQUEUED_WITHOUT_SERVER_ANSWER = new Map<string, string>([
-  [
-    'update-navigation-log-entry',
-    "l'édition d'un point de journal n'envoie pas de `_expectedUpdatedAt` et le service " +
-      "n'a aucune détection de conflit : c'est la seule mutation enfilée hors-ligne sans " +
-      'verrou optimiste. Suivi par #725 — quand elle en aura un, retirer cette exemption.',
-  ],
-  // Les quatre créations du domaine terrain ont reçu leur `rejectedType` en
-  // #727 : elles ne sont plus exemptées, la garde les couvre comme les autres.
+  // Plus aucune exemption : les quatre créations du domaine terrain ont reçu
+  // leur `rejectedType` en #727, et l'édition d'un point de journal son verrou
+  // optimiste en #725. La garde couvre désormais tout le vocabulaire enfilé.
 ])
 
 /** Les trois clés de flash qui transportent un identifiant d'action. */

@@ -152,6 +152,23 @@ les événements dès que la clé API manque — et Stripe rejouerait indéfinim
 2. Résout l'**item du tier** (voir §4.5 bis) et calcule les modules désirés
 3. Dans une transaction : `upsertSubscription` + `reconcileSubscriptionModules` + `applyOrgPlan`
 
+### 4.4 bis Idempotence du webhook (#703)
+
+`POST /webhooks/stripe` ne gardait **aucune trace** des événements déjà traités : chaque livraison était rejouée intégralement. Si le rejeu était inoffensif, c'était par **effet de bord** — l'upsert de synchro, clé sur `organizationId`, réécrivait les mêmes valeurs. Personne n'avait conçu cette idempotence, et rien ne la protégeait : il suffisait d'ajouter au chemin de synchro une écriture non idempotente (compteur, ligne d'historique, notification, écriture comptable) pour que le rejeu la duplique.
+
+`StripeWebhookService.process(event)` ouvre désormais **une** transaction et y fait deux choses :
+
+1. **réserver** l'événement — `INSERT … ON CONFLICT (stripe_event_id) DO NOTHING RETURNING id` dans `processed_stripe_events`. Aucune ligne rendue ⇒ c'est un rejeu : on sort, on répond `200 { received: true }`, on n'écrit rien ;
+2. sinon, **aiguiller** vers `SubscriptionService`, qui reçoit cette même transaction (paramètre `trx` optionnel) au lieu d'en ouvrir une seconde.
+
+Les deux points comptent :
+
+- **`ON CONFLICT` plutôt qu'un `SELECT` puis un `INSERT`** : deux livraisons simultanées du même `evt_…` passeraient toutes deux la lecture, et la seconde casserait sur l'index unique — une 500, donc un rejeu de plus. PostgreSQL tranche en une instruction.
+- **Même transaction que la synchro** : une trace commitée _avant_ marquerait l'événement traité alors qu'un échec du traitement l'a annulé — Stripe ne le rejouerait jamais, l'événement serait perdu. Commitée _après_, elle laisserait une fenêtre où un rejeu concurrent rejouerait tout. Ensemble, les deux issues sont exclues.
+- Les events applicatifs (`OrganizationPlanUpgraded`…) partent via `trx.after('commit')` : leurs listeners envoient e-mails et notifications, qui ne doivent jamais s'appuyer sur une transaction encore annulable.
+
+La rétention est de **30 jours** (`PROCESSED_EVENT_RETENTION_DAYS`), purgée par le cron `daily-purge-processed-stripe-events` à 02:00 : Stripe ne rejoue pas au-delà de trois jours, le reste est de la marge de diagnostic.
+
 ### 4.5 `syncFromSubscriptionEvent(stripeSub)`
 
 1. Trouve l'organisation via `stripe_customer_id`

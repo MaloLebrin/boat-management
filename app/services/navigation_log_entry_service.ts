@@ -1,4 +1,5 @@
 import {
+  NavigationLogEntryConflictError,
   NavigationLogEntryNotEditableError,
   NavigationLogEntryNotFoundError,
   NavigationLogNotFoundError,
@@ -8,12 +9,14 @@ import NavigationLog from '#models/navigation_log'
 import NavigationLogEntry from '#models/navigation_log_entry'
 import type Boat from '#models/boat'
 import type {
+  ConflictLogEntrySnapshot,
   CreateNavigationLogEntryPayload,
   UpdateNavigationLogEntryPayload,
 } from '#shared/types/navigation_log'
 import { toUtcFromLocalInput } from '#shared/helpers/date'
 
 export {
+  NavigationLogEntryConflictError,
   NavigationLogEntryNotEditableError,
   NavigationLogEntryNotFoundError,
   NavigationLogNotFoundError,
@@ -31,6 +34,30 @@ export interface NavigationLogEntryOptions {
 
 function toDecimalString(value: number | null | undefined): string | null {
   return value !== null && value !== undefined ? String(value) : null
+}
+
+function toNumberOrNull(value: string | null): number | null {
+  return value !== null ? Number.parseFloat(value) : null
+}
+
+/**
+ * La version serveur d'un point, dans la forme que la modale de conflit compare
+ * à la saisie locale (#725). Mêmes champs que
+ * `FIELDS_BY_TYPE['update-navigation-log-entry']`, plus l'`updatedAt` qui sert
+ * de nouveau jeton au rejeu.
+ */
+function buildEntryConflictSnapshot(entry: NavigationLogEntry): ConflictLogEntrySnapshot {
+  return {
+    id: entry.id,
+    updatedAt: (entry.updatedAt ?? entry.createdAt).toISO()!,
+    recordedAt: entry.recordedAt.toISO()!,
+    latitude: toNumberOrNull(entry.latitude),
+    longitude: toNumberOrNull(entry.longitude),
+    cogDeg: entry.cogDeg,
+    sogKn: toNumberOrNull(entry.sogKn),
+    sailConfig: entry.sailConfig,
+    note: entry.note,
+  }
 }
 
 export default class NavigationLogEntryService {
@@ -74,6 +101,15 @@ export default class NavigationLogEntryService {
   ) {
     const log = await this.getEditableLog(boat, logId, options)
     const entry = await this.getEntryOrFail(log, entryId)
+
+    // Verrou optimiste (#725), avant toute écriture et sur le modèle de
+    // `NavigationLogService.updateForBoat` : un point corrigé entre-temps
+    // n'est pas écrasé, le conflit remonte pour arbitrage.
+    if (payload.expectedUpdatedAt !== undefined && entry.updatedAt) {
+      if (entry.updatedAt.toISO() !== payload.expectedUpdatedAt) {
+        throw new NavigationLogEntryConflictError(buildEntryConflictSnapshot(entry))
+      }
+    }
 
     // Champ absent (undefined) = préservé ; null explicite = vidé. Voir #180.
     const latitude = payload.latitude !== undefined ? payload.latitude : undefined

@@ -1,4 +1,4 @@
-import type { ConflictLogSnapshot } from '#shared/types/navigation_log'
+import type { ConflictLogEntrySnapshot, ConflictLogSnapshot } from '#shared/types/navigation_log'
 
 export class NavigationLogNotFoundError extends Error {
   name = 'NavigationLogNotFoundError'
@@ -21,6 +21,18 @@ export class NavigationLogEntryNotFoundError extends Error {
 
 export class NavigationLogEntryNotEditableError extends Error {
   name = 'NavigationLogEntryNotEditableError'
+}
+
+/**
+ * Un point de journal modifié entre-temps (#725). Un point se saisit **en mer**,
+ * là où il n'y a pas de réseau : deux équipiers qui corrigent le même point
+ * pendant la sortie doivent arbitrer au retour, pas s'écraser en silence.
+ */
+export class NavigationLogEntryConflictError extends Error {
+  name = 'NavigationLogEntryConflictError'
+  constructor(public readonly currentEntry: ConflictLogEntrySnapshot) {
+    super('Conflict detected')
+  }
 }
 
 export class NavigationLogValidationError extends Error {

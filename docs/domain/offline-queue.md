@@ -63,9 +63,9 @@ les 58 cas concernés entièrement verts.
 ## Le vocabulaire d'actions
 
 `shared/constants/offline_queue.ts` déclare les trois actions des états des
-lieux et, depuis #727, les quatre créations du domaine terrain — celles dont le
-backend parle. Les autres restent des **littéraux écrits à la main des deux
-côtés** : c'est la dette **#726**.
+lieux et, depuis #727 et #725, les cinq actions du domaine terrain — celles
+dont le backend parle. Les autres restent des **littéraux écrits à la main des
+deux côtés** : c'est la dette **#726**.
 
 | Type                          | Conflit détecté | `rejectedType` | Carte `FIELDS_BY_TYPE` |
 | ----------------------------- | --------------- | -------------- | ---------------------- |
@@ -75,21 +75,23 @@ côtés** : c'est la dette **#726**.
 | `update-navigation-log`       | ✅              | —              | ✅                     |
 | `close-navigation-log`        | ✅              | —              | ✅                     |
 | `update-sheet-item`           | ✅              | —              | ✅                     |
-| `update-navigation-log-entry` | ❌ **#725**     | ❌             | ❌                     |
+| `update-navigation-log-entry` | ✅              | —              | ✅                     |
 | `create-navigation-log`       | —               | ✅             | —                      |
 | `create-navigation-log-entry` | —               | ✅             | —                      |
 | `create-fuel-log`             | —               | ✅             | —                      |
 | `increment-engine-hours`      | —               | ✅             | —                      |
 
 `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` compare les deux
-moitiés en relisant les sources, et porte les cases vides ci-dessus en
-**exemptions motivées** : elles tomberont d'elles-mêmes quand les issues seront
-traitées.
+moitiés en relisant les sources. Il portait les cases vides ci-dessus en
+**exemptions motivées** ; il n'en reste aucune depuis #727 et #725 — la garde
+couvre tout le vocabulaire enfilé. Un « — » dans le tableau signale désormais
+un marqueur qui n'a pas lieu d'être, pas un marqueur qui manque.
 
 ### Ce que coûte une case vide
 
-- **pas de `conflictType`** (#725) : la mutation écrase la version du serveur,
-  dernier rejeu gagnant, sans que personne n'arbitre ;
+- **pas de `conflictType`** : la mutation écrase la version du serveur, dernier
+  rejeu gagnant, sans que personne n'arbitre. C'était le cas de l'édition d'un
+  point de journal jusqu'à #725 ;
 - **pas de `rejectedType`** : un refus métier rendu en `flash('error')` +
   redirection est **indistinguable d'un succès**. `drainQueue` supprime l'action
   de la file et affiche « synchronisation réussie » — la saisie est perdue.
@@ -99,7 +101,9 @@ traitées.
 
 ## Verrou optimiste
 
-Trois mutations envoient `_expectedUpdatedAt` avec leur payload. Le service
+Quatre mutations envoient `_expectedUpdatedAt` avec leur payload — depuis #725,
+l'édition d'un point de journal comprise. C'est l'écran où le verrou compte le
+plus : un point se saisit **en mer**, précisément là où il n'y a pas de réseau. Le service
 compare à l'`updated_at` en base et lève une erreur de conflit si l'horodatage a
 bougé — c'est ce qui distingue « ma version est périmée » de « le serveur a
 refusé ».
@@ -134,6 +138,7 @@ dépendants seront résolus au lieu de cascader en `dependencyBlocked`.
 | `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts`       | les deux moitiés du vocabulaire coïncident                 |
 | `tests/functional/navigation/offline_conflict_payload.spec.ts` | `conflictData` porte les champs de la modale               |
 | `tests/functional/boats/navigation_logs.spec.ts`               | le contrôleur pose son flash de conflit                    |
+| `tests/functional/boats/navigation_log_entry_conflict.spec.ts` | le verrou de l'édition d'un point, dans les deux sens      |
 | `tests/functional/boats/inspections.spec.ts`                   | `rejectedType`, `createdResourceType`, `createdResourceId` |
 | `tests/functional/boats/offline_replay_markers.spec.ts`        | les mêmes marqueurs sur les quatre créations du terrain    |
 | `tests/functional/boats/maintenance_sheets.spec.ts`            | le conflit de ligne de fiche                               |
@@ -174,7 +179,6 @@ Deux contraintes à connaître avant d'en écrire un autre :
 
 ## Constats ouverts
 
-| #    | Constat                                                                      |
-| ---- | ---------------------------------------------------------------------------- |
-| #725 | `update-navigation-log-entry` : seule mutation enfilée sans verrou optimiste |
-| #726 | vocabulaire d'actions écrit à la main des deux côtés                         |
+| #    | Constat                                              |
+| ---- | ---------------------------------------------------- |
+| #726 | vocabulaire d'actions écrit à la main des deux côtés |

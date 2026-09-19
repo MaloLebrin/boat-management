@@ -47,6 +47,9 @@ export const createNavigationLogEntryValidator = vine.create(
 
 export const updateNavigationLogEntryValidator = vine.create(
   vine.object({
+    // Verrou optimiste (#725) — même champ que les trois autres mutations
+    // enfilées hors-ligne.
+    _expectedUpdatedAt: vine.string().optional(),
     recordedAt: vine.date({ formats: ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss'] }).optional(),
     // browser's getTimezoneOffset() — shifts the naive local datetime to UTC (#452)
     tzOffsetMinutes: vine.number().withoutDecimals().optional(),

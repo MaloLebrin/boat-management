@@ -5,6 +5,7 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { UPDATE_NAVIGATION_LOG_ENTRY_ACTION } from '#shared/constants/offline_queue'
 import { useT } from '~/composables/use_t'
 import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
 import type { NavigationLogEntryRow } from '~/types/boat_show'
@@ -39,11 +40,16 @@ function handleSubmit() {
   const url = `/boats/${props.boatId}/navigation-logs/${props.logId}/entries/${props.entry.id}`
 
   if (!isOnline.value) {
+    // `_expectedUpdatedAt` : le rejeu refuse d'écraser un point corrigé
+    // entre-temps par un autre équipier, et ouvre la modale d'arbitrage (#725).
     enqueue({
-      type: 'update-navigation-log-entry',
+      type: UPDATE_NAVIGATION_LOG_ENTRY_ACTION,
       url,
       method: 'patch',
-      payload: form.data() as unknown as Record<string, unknown>,
+      payload: {
+        ...form.data(),
+        _expectedUpdatedAt: props.entry.updatedAt,
+      } as unknown as Record<string, unknown>,
     })
     emit('close')
     return

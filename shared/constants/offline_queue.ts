@@ -26,3 +26,10 @@ export const CREATE_NAVIGATION_LOG_ACTION = 'create-navigation-log'
 export const CREATE_NAVIGATION_LOG_ENTRY_ACTION = 'create-navigation-log-entry'
 export const CREATE_FUEL_LOG_ACTION = 'create-fuel-log'
 export const INCREMENT_ENGINE_HOURS_ACTION = 'increment-engine-hours'
+
+/**
+ * L'édition d'un point de journal (#725) : la seule mutation enfilée hors-ligne
+ * qui n'avait aucun verrou optimiste. Elle descend ici pour la même raison —
+ * le backend en parle, il renvoie son `conflictType`.
+ */
+export const UPDATE_NAVIGATION_LOG_ENTRY_ACTION = 'update-navigation-log-entry'

@@ -2424,6 +2424,19 @@ export class PricingSeasonSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class ProcessedStripeEventSchema extends BaseModel {
+  static $columns = ['id', 'processedAt', 'stripeEventId', 'type'] as const
+  $columns = ProcessedStripeEventSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column.dateTime()
+  declare processedAt: DateTime
+  @column()
+  declare stripeEventId: string
+  @column()
+  declare type: string
+}
+
 export class PushSubscriptionSchema extends BaseModel {
   static $columns = [
     'auth',
