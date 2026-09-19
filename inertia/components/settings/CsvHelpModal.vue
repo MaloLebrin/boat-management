@@ -1,11 +1,24 @@
 <script setup lang="ts">
 import BaseModal from '~/components/base/BaseModal.vue'
 import { useT } from '~/composables/use_t'
+import { CSV_IMPORT_MAX_FILE_SIZE_MB, CSV_IMPORT_MAX_ROWS } from '#shared/constants/csv_import'
 
 defineProps<{ open: boolean }>()
 defineEmits<{ (e: 'update:open', value: boolean): void }>()
 
 const { t } = useT()
+
+/**
+ * Les bornes viennent des constantes partagées (#774) : le texte annonçait
+ * 5 Mo sans plafond de lignes, alors que le validateur et le parse en
+ * imposent d'autres. Une aide qui ment sur la limite se paie en fichiers
+ * refusés sans explication. Les steps 1, 3 et 4 n'interpolent rien — les
+ * paramètres en trop sont ignorés.
+ */
+const limits = {
+  size: String(CSV_IMPORT_MAX_FILE_SIZE_MB),
+  rows: String(CSV_IMPORT_MAX_ROWS),
+}
 </script>
 
 <template>
@@ -24,7 +37,7 @@ const { t } = useT()
               class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand/10 text-xs font-bold text-brand"
               >{{ n }}</span
             >
-            {{ t(`settings.import.help.step${n}`) }}
+            {{ t(`settings.import.help.step${n}`, limits) }}
           </li>
         </ol>
       </div>

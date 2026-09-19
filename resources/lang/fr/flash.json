@@ -318,7 +318,8 @@
       "engineCaptionRequired": "Légende moteur obligatoire pour le sujet \"engine\"",
       "sailCaptionRequired": "Légende voile obligatoire pour le sujet \"sail\"",
       "costInvalid": "Coût invalide (nombre attendu)"
-    }
+    },
+    "tooManyRows": "Votre fichier contient {count} lignes, la limite est de {limit}. Découpez-le."
   },
   "genericEquipment": {
     "created": "Équipement ajouté.",
