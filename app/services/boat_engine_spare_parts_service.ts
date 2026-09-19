@@ -8,6 +8,7 @@ import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEngineRepairCartItem from '#models/boat_engine_repair_cart_item'
 import type User from '#models/user'
+import { buildCsv } from '#services/csv_export_service'
 import EngineCatalogService from '#services/engine_catalog_service'
 import EnginePartReferenceService from '#services/engine_part_reference_service'
 import {
@@ -250,7 +251,7 @@ export default class BoatEngineSparePartsService {
    * FR). Les libellés passent par `translate` (locale de la requête) ; les
    * intitulés catalogue EN sont littéraux.
    */
-  async buildCartCsv(engine: BoatEngine, translate: (key: string) => string): Promise<string> {
+  async buildCartCsv(engine: BoatEngine, translate: (key: string) => string): Promise<Buffer> {
     const items = await BoatEngineRepairCartItem.query()
       .where('boatEngineId', engine.id)
       .orderBy('createdAt', 'asc')
@@ -295,7 +296,9 @@ export default class BoatEngineSparePartsService {
       ]
     })
 
-    const escapeCell = (cell: string) => `"${cell.replaceAll('"', '""')}"`
-    return [header, ...rows].map((row) => row.map(escapeCell).join(';')).join('\r\n')
+    // Échappement délégué à `buildCsv` (#773) : cet export avait le sien, qui
+    // mettait tout entre guillemets. Ce n'était pas une protection — le
+    // tableur retire les guillemets à l'import, puis évalue le contenu.
+    return buildCsv(header, rows)
   }
 }
