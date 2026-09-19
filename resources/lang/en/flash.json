@@ -68,7 +68,11 @@
   "auth": {
     "passwordResetSent": "If this email is associated with an account, you will receive a reset link.",
     "passwordResetSuccess": "Password updated. You can now log in.",
-    "passwordResetTokenInvalid": "This reset link is invalid or has expired."
+    "passwordResetTokenInvalid": "This reset link is invalid or has expired.",
+    "emailNotVerified": "Confirm your email address before doing this — it involves someone else or a payment.",
+    "emailVerificationSent": "If that address still needs confirming, a link is on its way.",
+    "emailVerificationTokenInvalid": "This confirmation link is invalid or has expired. Sign in and request a new one.",
+    "emailVerified": "Your email address is confirmed. You can sign in."
   },
   "settings": {
     "profileUpdated": "Profile updated.",
