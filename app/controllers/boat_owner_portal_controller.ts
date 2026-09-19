@@ -2,6 +2,7 @@ import BoatOwnerService from '#services/boat_owner_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import { toBoatOwnerSummary } from '#transformers/boat_transformer'
+import { toBoatOwnerMaintenanceEvent } from '#transformers/maintenance_transformer'
 import { toBoatReservationRow } from '#transformers/boat_reservation_transformer'
 import { toInvoiceRow } from '#transformers/invoice_transformer'
 import { inject } from '@adonisjs/core'
@@ -37,14 +38,14 @@ export default class BoatOwnerPortalController {
     }
 
     const [maintenanceEvents, reservations, invoices] = await Promise.all([
-      this.maintenanceService.listForBoat(user, boat),
+      this.maintenanceService.listForBoat(boat),
       this.reservationService.listForBoat(user, boat),
       this.boatOwnerService.listInvoicesForBoat(boat),
     ])
 
     return inertia.render('owner/boats/show', {
       boat: toBoatOwnerSummary(boat),
-      maintenanceEvents,
+      maintenanceEvents: maintenanceEvents.map(toBoatOwnerMaintenanceEvent),
       reservations: reservations.map((reservation) => toBoatReservationRow(reservation, boat.name)),
       invoices: invoices.map(toInvoiceRow),
     })

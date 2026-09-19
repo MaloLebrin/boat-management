@@ -310,7 +310,7 @@ export default class BoatsController {
       // Actions équipement et Documents administratifs.
       maintenanceEvents: inertia.defer(
         deferJson(async () =>
-          toMaintenanceEventRows(await this.maintenanceService.listForBoat(user, boat))
+          toMaintenanceEventRows(await this.maintenanceService.listForBoat(boat))
         ),
         'maintenance'
       ),
