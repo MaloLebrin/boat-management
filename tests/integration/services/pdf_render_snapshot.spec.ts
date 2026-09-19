@@ -330,7 +330,7 @@ async function maintenanceLogFixture(user: { id: number; organizationId: number 
   const maintenanceService = await app.container.make(BoatMaintenanceService)
   const boat = await hullService.getFullDetailForUser(user as never, created.id)
   await boat.load('engines', (q) => q.preload('parts'))
-  const listed = await maintenanceService.listForBoat(user as never, boat)
+  const listed = await maintenanceService.listForBoat(boat)
   return { boat, events: [...listed].reverse(), eventIds: events.map((e) => e.id) }
 }
 
