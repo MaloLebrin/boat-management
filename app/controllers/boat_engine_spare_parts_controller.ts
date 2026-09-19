@@ -256,8 +256,9 @@ export default class BoatEngineSparePartsController {
 
       response.header('Content-Type', 'text/csv; charset=utf-8')
       response.header('Content-Disposition', contentDisposition(filename))
-      // BOM UTF-8 pour qu'Excel détecte l'encodage des accents.
-      return response.send('\ufeff' + csv)
+      response.header('Content-Length', String(csv.length))
+      // Le BOM UTF-8 est posé par `buildCsv`, comme pour les autres exports.
+      return response.send(csv)
     } catch (error) {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))
