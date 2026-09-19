@@ -23,7 +23,11 @@ export default class OrganizationInvitation extends BaseModel {
   @column()
   declare role: OrgRole
 
-  @column()
+  /**
+   * SHA-256 du token envoyé par e-mail, jamais le token lui-même — voir
+   * `PasswordResetToken.token` pour le raisonnement (#782).
+   */
+  @column({ serializeAs: null })
   declare token: string
 
   @column()
