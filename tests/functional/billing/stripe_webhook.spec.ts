@@ -582,6 +582,13 @@ test.group('Stripe webhook — déduplication par event.id (functional, #703)', 
  *
  * Ces tests prouvent le refus **explicite** : 200 (l'événement a été reçu et
  * compris, rien à en faire) et aucune écriture — pas « écrit la même chose ».
+ *
+ * ⚠️ Chaque livraison porte son **propre** `evt_…`. Depuis la déduplication de
+ * #703, deux POST partageant l'identifiant par défaut (`evt_test`) verraient le
+ * second écarté comme un rejeu : le chemin « sans item » ne serait jamais
+ * atteint, et les deux cas qui amorcent un état Pro passeraient au vert sans
+ * rien prouver. Vérifié : avec l'identifiant partagé, retirer le correctif ne
+ * faisait tomber qu'un test sur trois.
  */
 test.group('Stripe webhook — abonnement sans item (functional, #704)', (group) => {
   group.each.setup(() => truncateDb())
@@ -598,11 +605,11 @@ test.group('Stripe webhook — abonnement sans item (functional, #704)', (group)
     // toucher.
     await postStripeWebhook(
       client,
-      subscriptionEvent('customer.subscription.updated', {
-        id: 'sub_pro',
-        customer: CUSTOMER,
-        priceId: PRICE_IDS.proMonth,
-      })
+      subscriptionEvent(
+        'customer.subscription.updated',
+        { id: 'sub_pro', customer: CUSTOMER, priceId: PRICE_IDS.proMonth },
+        'evt_itemless_seed'
+      )
     )
     const before = await Subscription.query().where('organizationId', org.id).firstOrFail()
 
@@ -611,11 +618,11 @@ test.group('Stripe webhook — abonnement sans item (functional, #704)', (group)
 
     const response = await postStripeWebhook(
       client,
-      subscriptionEvent('customer.subscription.updated', {
-        id: 'sub_pro',
-        customer: CUSTOMER,
-        items: [],
-      })
+      subscriptionEvent(
+        'customer.subscription.updated',
+        { id: 'sub_pro', customer: CUSTOMER, items: [] },
+        'evt_itemless_updated'
+      )
     )
 
     // 200 et non 400 : un rejeu ne peut pas faire apparaître d'item, le faire
@@ -650,11 +657,11 @@ test.group('Stripe webhook — abonnement sans item (functional, #704)', (group)
 
     await postStripeWebhook(
       client,
-      subscriptionEvent('customer.subscription.updated', {
-        id: 'sub_pro',
-        customer: CUSTOMER,
-        priceId: PRICE_IDS.proMonth,
-      })
+      subscriptionEvent(
+        'customer.subscription.updated',
+        { id: 'sub_pro', customer: CUSTOMER, priceId: PRICE_IDS.proMonth },
+        'evt_itemless_deleted_seed'
+      )
     )
 
     const events = emitter.fake()
@@ -662,12 +669,11 @@ test.group('Stripe webhook — abonnement sans item (functional, #704)', (group)
 
     const response = await postStripeWebhook(
       client,
-      subscriptionEvent('customer.subscription.deleted', {
-        id: 'sub_pro',
-        customer: CUSTOMER,
-        status: 'canceled',
-        items: [],
-      })
+      subscriptionEvent(
+        'customer.subscription.deleted',
+        { id: 'sub_pro', customer: CUSTOMER, status: 'canceled', items: [] },
+        'evt_itemless_deleted'
+      )
     )
 
     // Comportement assumé, pas un oubli : un abonnement sans item ne décrit
@@ -695,7 +701,8 @@ test.group('Stripe webhook — abonnement sans item (functional, #704)', (group)
       client,
       stripeEvent(
         'checkout.session.completed',
-        stripeCheckoutSession({ customer: CUSTOMER, subscription: 'sub_empty' })
+        stripeCheckoutSession({ customer: CUSTOMER, subscription: 'sub_empty' }),
+        'evt_itemless_checkout'
       )
     )
 
