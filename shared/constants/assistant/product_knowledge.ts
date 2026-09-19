@@ -864,6 +864,32 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageClients',
   },
   {
+    id: 'data-retention',
+    title: {
+      en: 'How long we keep your data',
+      fr: 'Combien de temps vos données sont conservées',
+    },
+    body: {
+      en: 'FleetAi deletes personal data automatically, every night, once its retention period has elapsed. Messages sent through the public contact form and contact details left on the cost simulator are kept for 24 months — for the simulator, counted from your latest simulation, not your first. Estimate sharing links expire 6 months after they are created, after which the link stops working. Password reset links and invitations that were never accepted are removed a week after they expire; accepted invitations are kept, since they record who joined the organisation. Audit logs follow the retention of your plan. These periods are the ones stated in the privacy policy.',
+      fr: 'FleetAi supprime automatiquement les données personnelles, chaque nuit, au terme de leur durée de conservation. Les messages du formulaire de contact public et les coordonnées laissées sur le simulateur de coûts sont gardés 24 mois — pour le simulateur, à compter de votre dernière simulation, pas de la première. Les liens de partage d’une estimation expirent 6 mois après leur création, et cessent alors de fonctionner. Les liens de réinitialisation de mot de passe et les invitations jamais acceptées partent une semaine après leur expiration ; les invitations acceptées sont conservées, elles disent qui a rejoint l’organisation. Les journaux d’audit suivent la rétention de votre plan. Ces durées sont celles qu’annonce la politique de confidentialité.',
+    },
+    keywords: [
+      'retention',
+      'conservation',
+      'duree',
+      'suppression',
+      'deletion',
+      'purge',
+      'rgpd',
+      'gdpr',
+      'donnees',
+      'data',
+      'confidentialite',
+      'privacy',
+    ],
+    navTarget: null,
+  },
+  {
     id: 'invoices-quotes',
     title: {
       en: 'Quotes and invoices',

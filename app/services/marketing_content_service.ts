@@ -1403,7 +1403,15 @@ export default class MarketingContentService {
             body: t('s5_body'),
             bullets: [t('s5_b1'), t('s5_b2'), t('s5_b3'), t('s5_b4')],
           },
-          { title: t('s6_title'), body: t('s6_body') },
+          {
+            title: t('s6_title'),
+            // Les durées listées ici sont celles qu'appliquent les crons de
+            // `shared/constants/data_retention.ts` (#775) : une politique qui
+            // annonce un « délai raisonnable » sans purge derrière ne valait
+            // rien côté conformité. Les deux se modifient ensemble.
+            body: t('s6_body'),
+            bullets: [t('s6_b1'), t('s6_b2'), t('s6_b3'), t('s6_b4')],
+          },
           { title: t('s7_title'), body: t('s7_body') },
           {
             title: t('s8_title'),

@@ -10,7 +10,7 @@
       "titleHighlight": "policy",
       "subtitle": "We take the protection of your data seriously. This page explains what data we collect, why, and what your rights are.",
       "updatedLabel": "Last updated:",
-      "updatedDate": "July 9, 2026"
+      "updatedDate": "September 19, 2026"
     },
     "sections": [
       {
@@ -53,7 +53,13 @@
       },
       {
         "title": "Data retention",
-        "body": "Your data is kept for as long as your account is active. After your account is closed, it is deleted or anonymized within a reasonable timeframe, except where a legal retention obligation applies (billing, accounting)."
+        "body": "Your account data is kept for as long as your account is active. After it is closed, that data is deleted or anonymized within a reasonable timeframe, except where a legal retention obligation applies (billing, accounting). Data collected on our public pages is deleted automatically, every night, once the following periods have elapsed:",
+        "bullets": [
+          "Messages sent through the contact form: 24 months after we receive them.",
+          "Contact details left on the cost simulator: 24 months after your latest simulation.",
+          "Estimate sharing links: 6 months after they are created, after which the link stops working.",
+          "Password reset links and unaccepted invitations: one week after they expire."
+        ]
       },
       {
         "title": "Security",
