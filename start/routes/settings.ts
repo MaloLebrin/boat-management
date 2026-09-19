@@ -1,5 +1,6 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
+import { preferencesThrottle } from '#start/limiter'
 import { AI_PROVIDERS } from '#shared/types/ai'
 
 // Un fournisseur inconnu ne matche pas la route → 404 natif (pas de 500).
@@ -13,8 +14,8 @@ const CsvImportController = () => import('#controllers/csv_import_controller')
 // Préférences pré-auth (switchers de langue et de thème, aussi disponibles
 // sur le marketing et l'écran de login) : persistées sur le profil quand
 // l'utilisateur est connecté, en cookie sinon.
-router.post('/locale', [SettingsController, 'setLocale']).as('locale.set')
-router.post('/theme', [SettingsController, 'setTheme']).as('theme.set')
+router.post('/locale', [SettingsController, 'setLocale']).as('locale.set').use(preferencesThrottle)
+router.post('/theme', [SettingsController, 'setTheme']).as('theme.set').use(preferencesThrottle)
 
 router
   .group(() => {

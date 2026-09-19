@@ -69,3 +69,15 @@ export const simulatorLeadThrottle = limiter.define('simulator_lead', (ctx) => {
 export const pushThrottle = limiter.define('push', (ctx) => {
   return limiter.allowRequests(20).every('1 minute').usingKey(`push_${ctx.request.ip()}`)
 })
+
+// Switchers de langue et de thème (#783) : les deux dernières routes publiques
+// d'écriture du repo à n'avoir aucun limiteur. Chacune déclenche un `UPDATE`
+// sur `users` dès qu'une session existe, donc un script peut les marteler.
+//
+// Le débit est volontairement généreux : basculer plusieurs fois de thème
+// d'affilée pour comparer est un geste légitime, et ces routes sont servies
+// sur le marketing et l'écran de login, où plusieurs visiteurs peuvent
+// partager une IP.
+export const preferencesThrottle = limiter.define('preferences', (ctx) => {
+  return limiter.allowRequests(30).every('1 minute').usingKey(`preferences_${ctx.request.ip()}`)
+})
