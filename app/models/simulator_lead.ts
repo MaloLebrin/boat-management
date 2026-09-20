@@ -42,4 +42,12 @@ export default class SimulatorLead extends BaseModel {
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+
+  /**
+   * Dernière activité du prospect (#775). `create()` fait un `updateOrCreate`
+   * clé sur l'e-mail : c'est cette date, et non `createdAt`, qui datte le
+   * dernier contact — et c'est elle que regarde la rétention.
+   */
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
 }

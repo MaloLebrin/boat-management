@@ -72,7 +72,8 @@
     "emailNotVerified": "Confirmez votre adresse e-mail avant cette action : elle engage un tiers ou un paiement.",
     "emailVerificationSent": "Si cette adresse reste à confirmer, un lien est en route.",
     "emailVerificationTokenInvalid": "Ce lien de confirmation est invalide ou a expiré. Connectez-vous et demandez-en un nouveau.",
-    "emailVerified": "Votre adresse e-mail est confirmée. Vous pouvez vous connecter."
+    "emailVerified": "Votre adresse e-mail est confirmée. Vous pouvez vous connecter.",
+    "signupRateLimit": "Trop d'inscriptions depuis ce réseau. Veuillez réessayer dans une heure."
   },
   "settings": {
     "profileUpdated": "Profil mis à jour.",

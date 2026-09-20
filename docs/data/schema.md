@@ -338,6 +338,7 @@ Messages du formulaire de contact public (`POST /contact`, #450). Table autonome
 - `ipAddress` (nullable — renseigné pour tracer le throttle)
 - `createdAt`
 - index sur `email` et `created_at`
+- **rétention 24 mois** (#775) — voir « Rétention des données personnelles » plus bas
 
 ### ai_analyses
 
@@ -567,6 +568,45 @@ Ces lignes vivaient auparavant **en session**. Avec `SESSION_DRIVER=cookie`,
 quelques centaines de lignes dépassaient les ~4 Ko d'un cookie et l'import
 échouait silencieusement à la confirmation ; la session ne porte plus que
 `pendingImportId`, et la propriété se prouve en base (`where('userId')`).
+
+## Rétention des données personnelles (#775)
+
+Quatre purges tournent chaque nuit. Les deux premières sont antérieures ; les deux dernières
+existent parce que tout le reste s'accumulait sans limite, dont les tables que n'importe quel
+visiteur remplit depuis le site public et qui portent des adresses e-mail.
+
+| Heure | Job                          | Table                      | Colonne        | Durée                                     |
+| ----- | ---------------------------- | -------------------------- | -------------- | ----------------------------------------- |
+| 00:00 | `PurgeExpiredTokens`         | `password_reset_tokens`    | `expires_at`   | expiration + 7 j                          |
+| 00:00 | `PurgeExpiredTokens`         | `organization_invitations` | `expires_at`   | expiration + 7 j, **hors acceptées**      |
+| 00:30 | `PurgePublicFormData`        | `contact_messages`         | `created_at`   | 24 mois                                   |
+| 00:30 | `PurgePublicFormData`        | `simulator_leads`          | `updated_at`   | 24 mois                                   |
+| 00:30 | `PurgePublicFormData`        | `simulator_shares`         | `expires_at`   | 6 mois (échéance posée à la création)     |
+| 02:00 | `PurgeProcessedStripeEvents` | `processed_stripe_events`  | `processed_at` | 30 j (#703)                               |
+| 03:00 | `PurgeAuditLogs`             | `audit_logs`               | `created_at`   | `PLAN_LIMITS[plan].auditLogRetentionDays` |
+
+Les durées vivent dans `shared/constants/data_retention.ts` et sont celles qu'annonce la section
+« Durée de conservation » de la politique de confidentialité (`marketing.json`, clés `privacy.s6_*`) :
+les deux se modifient ensemble. Une purge non documentée ne vaut rien côté conformité.
+
+Trois points qui ne se devinent pas :
+
+- **`simulator_leads` compte depuis `updated_at`, pas `created_at`.** `SimulatorLeadService.create()`
+  est un `updateOrCreate` clé sur l'e-mail : un visiteur qui refait une simulation réécrit sa ligne.
+  Compter depuis la première visite supprimerait un prospect encore actif, et la règle de prospection
+  court depuis le **dernier** contact. La colonne a été ajoutée pour ça, et le service pousse
+  `updatedAt` explicitement — en `autoUpdate` seul, une simulation identique ne rendait la ligne
+  dirty par aucun champ et la date restait figée.
+- **Les invitations acceptées ne sont jamais supprimées.** Elles disent qui a rejoint
+  l'organisation, par qui et à quel titre : c'est la seule trace de ce rattachement en dehors des
+  journaux d'audit, qui ont une rétention plus courte.
+- **`simulator_shares.expires_at` fait foi à la lecture**, pas seulement au passage du cron : un
+  partage échu se comporte comme un jeton inconnu dès la seconde où il expire.
+
+Colonnes ajoutées pour ces purges : `simulator_shares.expires_at` (indexée, `token` élargi de 12 à
+64 caractères) et `simulator_leads.updated_at` (indexée). Index posés sur
+`password_reset_tokens.expires_at` et `organization_invitations.expires_at` — sans eux, chaque purge
+fait un balayage complet de la table qu'elle est censée borner.
 
 ## Relations (résumé)
 

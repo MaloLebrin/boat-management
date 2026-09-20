@@ -3,6 +3,7 @@ import User from '#models/user'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
+import { EXPIRED_TOKEN_GRACE_DAYS } from '#shared/constants/data_retention'
 
 function sha256(value: string): string {
   return createHash('sha256').update(value).digest('hex')
@@ -42,6 +43,28 @@ export default class PasswordResetService {
 
   async invalidateTokensForEmail(email: string): Promise<void> {
     await PasswordResetToken.query().where('email', email).delete()
+  }
+
+  /**
+   * Supprime les jetons expirés depuis assez longtemps (#775).
+   *
+   * `invalidateTokensForEmail` n'est appelée qu'à la réémission ou à la
+   * consommation : une demande de réinitialisation jamais suivie laissait sa
+   * ligne — et l'adresse e-mail qu'elle porte — en base pour toujours. Un
+   * jeton expiré n'a aucune utilité ; le délai de grâce ne sert qu'à pouvoir
+   * regarder la ligne quand un utilisateur dit « mon lien ne marche pas ».
+   *
+   * Rend le nombre de lignes supprimées.
+   */
+  async purgeExpired(graceDays = EXPIRED_TOKEN_GRACE_DAYS): Promise<number> {
+    const cutoff = DateTime.now().minus({ days: graceDays })
+
+    // `delete()` rend `[count]` sur PostgreSQL.
+    const deleted = await PasswordResetToken.query()
+      .where('expiresAt', '<', cutoff.toISO())
+      .delete()
+
+    return Number(deleted[0] ?? 0)
   }
 
   /**

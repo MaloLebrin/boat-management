@@ -2744,6 +2744,7 @@ export class SimulatorLeadSchema extends BaseModel {
     'safetyWear',
     'totalMax',
     'totalMin',
+    'updatedAt',
     'winteringZone',
   ] as const
   $columns = SimulatorLeadSchema.$columns
@@ -2771,17 +2772,29 @@ export class SimulatorLeadSchema extends BaseModel {
   declare totalMax: number
   @column()
   declare totalMin: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
   @column()
   declare winteringZone: string | null
 }
 
 export class SimulatorShareSchema extends BaseModel {
-  static $columns = ['breakdown', 'createdAt', 'id', 'input', 'locale', 'token'] as const
+  static $columns = [
+    'breakdown',
+    'createdAt',
+    'expiresAt',
+    'id',
+    'input',
+    'locale',
+    'token',
+  ] as const
   $columns = SimulatorShareSchema.$columns
   @column()
   declare breakdown: any
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column.dateTime()
+  declare expiresAt: DateTime
   @column({ isPrimary: true })
   declare id: string
   @column()

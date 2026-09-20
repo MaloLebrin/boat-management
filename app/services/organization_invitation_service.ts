@@ -15,6 +15,7 @@ import {
   InvitationNotFoundError,
 } from '#exceptions/organization_errors'
 import type { OrganizationInvitationData, OrgRole } from '#shared/types/organization'
+import { EXPIRED_TOKEN_GRACE_DAYS } from '#shared/constants/data_retention'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
@@ -263,5 +264,31 @@ export default class OrganizationInvitationService {
     await OrganizationInvitationAccepted.dispatch(organization, invitation.invitedById, memberName)
 
     return invitation
+  }
+
+  /**
+   * Supprime les invitations mortes (#775).
+   *
+   * Une invitation expire au bout de sept jours puis plus rien ne s'en
+   * occupe : celle qui n'est jamais acceptée gardait indéfiniment l'adresse
+   * e-mail de l'invité, pour un jeton qui ne sert plus.
+   *
+   * Les invitations **acceptées** ne sont jamais supprimées, quelle que soit
+   * leur date : elles disent qui a rejoint l'organisation, par qui et à quel
+   * titre, et c'est la seule trace de ce rattachement en dehors des journaux
+   * d'audit — lesquels ont leur propre rétention, plus courte.
+   *
+   * Rend le nombre de lignes supprimées.
+   */
+  async purgeExpired(graceDays = EXPIRED_TOKEN_GRACE_DAYS): Promise<number> {
+    const cutoff = DateTime.now().minus({ days: graceDays })
+
+    // `delete()` rend `[count]` sur PostgreSQL.
+    const deleted = await OrganizationInvitation.query()
+      .whereNot('status', 'accepted')
+      .where('expiresAt', '<', cutoff.toISO())
+      .delete()
+
+    return Number(deleted[0] ?? 0)
   }
 }
