@@ -70,6 +70,19 @@ export const pushThrottle = limiter.define('push', (ctx) => {
   return limiter.allowRequests(20).every('1 minute').usingKey(`push_${ctx.request.ip()}`)
 })
 
+// Renvoi du lien de vérification (#768) : chaque appel envoie un e-mail
+// sortant. Même budget que le formulaire de contact — l'autre route de l'app
+// qui met du courrier en file sur demande d'un humain.
+export const emailVerificationResendThrottle = limiter.define(
+  'email_verification_resend',
+  (ctx) => {
+    return limiter
+      .allowRequests(5)
+      .every('10 minutes')
+      .usingKey(`email_verification_${ctx.auth.user?.id ?? ctx.request.ip()}`)
+  }
+)
+
 // Switchers de langue et de thème (#783) : les deux dernières routes publiques
 // d'écriture du repo à n'avoir aucun limiteur. Chacune déclenche un `UPDATE`
 // sur `users` dès qu'une session existe, donc un script peut les marteler.

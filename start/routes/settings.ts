@@ -30,6 +30,11 @@ router
     router
       .post('settings/billing/checkout', [BillingController, 'checkout'])
       .as('settings.billing.checkout')
+      // Passer au paiement engage de l'argent sur une adresse dont rien ne
+      // prouve encore qu'elle appartient à l'inscrit (#768). Le portail
+      // Stripe, lui, reste ouvert : un client déjà payant doit pouvoir gérer
+      // son abonnement, y compris le résilier.
+      .use(middleware.requireVerifiedEmail())
     router
       .post('settings/billing/portal', [BillingController, 'portal'])
       .as('settings.billing.portal')
