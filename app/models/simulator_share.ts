@@ -28,4 +28,13 @@ export default class SimulatorShare extends BaseModel {
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+
+  /**
+   * Échéance du lien (#775). Matérialisée en base plutôt que calculée à la
+   * lecture : la purge et la page de lecture s'accordent sans se répéter, et
+   * un partage émis avant un changement de politique garde l'échéance qu'on
+   * lui avait promise.
+   */
+  @column.dateTime()
+  declare expiresAt: DateTime
 }
