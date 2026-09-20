@@ -762,7 +762,16 @@ test.group('Assistant FleetAi chat — boucle d’outils (#642)', (group) => {
     assert.isNull(calls[4].tools)
     // Rien n'est persisté en cas d'échec (invariant #602/#634).
     assert.lengthOf(await AiAssistantConversation.all(), 0)
-    assert.isNull(await AiTokenUsage.query().where('organizationId', user.organizationId!).first())
+    // Depuis #776, la réservation de tokens **crée** la ligne du mois avant
+    // l'appel : c'est elle qui rend le plafond opposable pendant l'appel.
+    // L'invariant porte donc sur les compteurs, pas sur l'absence de ligne —
+    // et les vérifier tous les deux à zéro prouve en plus que la réservation
+    // a bien été relâchée sur le chemin d'échec.
+    const usageRow = await AiTokenUsage.query()
+      .where('organizationId', user.organizationId!)
+      .first()
+    assert.equal(Number(usageRow?.tokensUsed ?? 0), 0)
+    assert.equal(Number(usageRow?.reservedTokens ?? 0), 0)
   })
 
   test('la relance corrective récupère une réponse finale hors contrat', async ({
