@@ -1,4 +1,6 @@
 import { test } from '@japa/runner'
+import { DateTime } from 'luxon'
+import { SIMULATOR_SHARE_LIFETIME_DAYS } from '#shared/constants/data_retention'
 import { truncateDb } from '#tests/utils/db'
 import SimulatorShare from '#models/simulator_share'
 import { assertFieldErrors, assertNoFieldErrors } from '#tests/support/validation'
@@ -77,9 +79,10 @@ test.group('Simulateur — la création de partage', (group) => {
     created.assertStatus(302)
     assertNoFieldErrors(assert, created)
     const location = created.header('location')
+    // 32 hexa depuis #775 (`randomBytes(16)`), contre 12 auparavant.
     assert.match(
       String(location),
-      /^\/simulateur\/r\/[\da-f]{12}$/,
+      /^\/simulateur\/r\/[\da-f]{32}$/,
       'le chemin de retour doit être la lecture localisée, jeton compris'
     )
 
@@ -87,6 +90,11 @@ test.group('Simulateur — la création de partage', (group) => {
     assert.lengthOf(rows, 1)
     assert.equal(rows[0].token, tokenOf(location))
     assert.equal(rows[0].locale, 'fr')
+
+    // Le partage porte son échéance dès la création (#775) : sans elle, le
+    // lien resterait valide pour toujours et la table ne pourrait que croître.
+    const lifetimeDays = rows[0].expiresAt.diff(DateTime.now(), 'days').days
+    assert.closeTo(lifetimeDays, SIMULATOR_SHARE_LIFETIME_DAYS, 1)
 
     // Le jeton rendu est vraiment exploitable : c'est le seul aller-retour qui
     // relie les deux moitiés de la fonctionnalité.

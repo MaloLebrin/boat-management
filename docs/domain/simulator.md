@@ -63,7 +63,8 @@ authentification. Elle crée une ligne `simulator_shares` et redirige vers sa le
 
 ```
 POST /simulator/share  { input, locale? }
-  → token = randomBytes(6).toString('hex')     // 12 hex, aucune reprise en cas de collision
+  → token = randomBytes(16).toString('hex')    // 32 hex, aucune reprise en cas de collision
+  → expires_at = now + SIMULATOR_SHARE_LIFETIME_DAYS   (6 mois, #775)
   → 302 /simulateur/r/<token>   (locale 'fr', la valeur par défaut)
      ou /simulator/r/<token>    (toute autre valeur, 'en' comprise)
 ```
@@ -74,6 +75,28 @@ mal recopié) renvoie au simulateur de la **route empruntée** (#732), via
 `marketingPath('simulator', locale)` : `/simulateur/r/:token` → `/fr/simulateur-cout-entretien`,
 `/simulator/r/:token` → `/en/maintenance-cost-simulator`. La locale se déduit du nom de route
 (`simulator.share.show.fr` / `.en`), les deux servant la même méthode.
+
+### Durée de vie d'un lien (#775)
+
+Un partage n'avait **aucune** expiration : le lien restait valide pour toujours et la table ne
+pouvait que croître, sur une route publique non authentifiée. `simulator_shares.expires_at` porte
+désormais l'échéance, fixée à la création d'après `SIMULATOR_SHARE_LIFETIME_DAYS`
+(`shared/constants/data_retention.ts`, 6 mois).
+
+L'échéance est **matérialisée en base** plutôt que recalculée à la lecture : la purge et la page de
+lecture s'accordent sans se répéter, et un partage émis avant un changement de politique garde
+l'échéance qu'on lui avait promise.
+
+Elle fait foi **à la lecture**, pas seulement au passage du cron : `SimulatorShareService
+.findByToken()` rend `null` pour un partage échu, et le contrôleur le traite exactement comme un
+jeton inconnu — la redirection décrite ci-dessus couvre déjà ce cas. Sans cela, un lien expiré
+resterait ouvert jusqu'au `PurgePublicFormData` de 00:30.
+
+Le jeton passe de `randomBytes(6)` à `randomBytes(16)` — 12 à 32 caractères hexadécimaux, colonne
+élargie à 64. 48 bits ne s'énuméraient pas en pratique et le contenu partagé ne comporte aucune
+donnée personnelle : ce n'était pas la devinabilité le défaut, mais l'absence d'échéance. Les
+anciens jetons restent lisibles tels quels — la recherche est une égalité de chaîne — et
+disparaissent d'eux-mêmes avec la purge.
 
 ### Ce que le serveur recalcule
 

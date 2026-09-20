@@ -10,7 +10,7 @@
       "titleHighlight": "confidentialité",
       "subtitle": "Nous prenons la protection de vos données au sérieux. Cette page explique quelles données nous collectons, pourquoi, et quels sont vos droits.",
       "updatedLabel": "Dernière mise à jour :",
-      "updatedDate": "9 juillet 2026"
+      "updatedDate": "19 septembre 2026"
     },
     "sections": [
       {
@@ -53,7 +53,13 @@
       },
       {
         "title": "Durée de conservation",
-        "body": "Vos données sont conservées tant que votre compte est actif. Après la fermeture de votre compte, elles sont supprimées ou anonymisées dans un délai raisonnable, sauf obligation légale de conservation (facturation, comptabilité)."
+        "body": "Vos données de compte sont conservées tant que votre compte est actif. Après sa fermeture, elles sont supprimées ou anonymisées dans un délai raisonnable, sauf obligation légale de conservation (facturation, comptabilité). Les données collectées sur nos pages publiques sont supprimées automatiquement, chaque nuit, au terme des durées suivantes :",
+        "bullets": [
+          "Messages envoyés depuis le formulaire de contact : 24 mois après leur réception.",
+          "Coordonnées laissées sur le simulateur de coûts : 24 mois après votre dernière simulation.",
+          "Liens de partage d'une estimation : 6 mois après leur création, au terme desquels le lien cesse de fonctionner.",
+          "Liens de réinitialisation de mot de passe et invitations non acceptées : une semaine après leur expiration."
+        ]
       },
       {
         "title": "Sécurité",

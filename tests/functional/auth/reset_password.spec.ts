@@ -170,7 +170,7 @@ test.group('Password reset — consuming the token (functional)', (group) => {
     )
   })
 
-  test('a signed-in visitor is turned away by the guest middleware', async ({ client }) => {
+  test('a signed-in visitor is turned away by the guest middleware', async ({ client, assert }) => {
     const user = await createAdminUser()
     const token = await requestToken(user)
 
@@ -181,9 +181,17 @@ test.group('Password reset — consuming the token (functional)', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
-    // `redirect('/dashboard', true)` conserve la query string : la redirection
-    // emporte donc le jeton. Sans conséquence — la page de destination l'ignore —
-    // mais c'est ce que fait le code, et le figer évite une fausse alerte.
-    response.assertHeader('location', `/dashboard?token=${token}`)
+    // Ce test figeait l'inverse jusqu'à #770 : `redirect('/dashboard', true)`
+    // recopiait la query string, et le commentaire concluait « sans
+    // conséquence — la page de destination l'ignore ». La page l'ignore, oui.
+    // Le navigateur, le reverse proxy et Cloudinary, non : le token, encore
+    // valide, atterrissait dans l'historique, dans les journaux d'accès et
+    // dans le `Referer` de la première image de bateau affichée.
+    response.assertHeader('location', '/dashboard')
+    assert.notInclude(
+      response.header('location') as string,
+      token,
+      'le jeton ne doit pas survivre à la redirection'
+    )
   })
 })
