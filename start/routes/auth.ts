@@ -5,6 +5,7 @@ import {
   forgotPasswordThrottle,
   loginThrottle,
   resetPasswordThrottle,
+  signupThrottle,
 } from '#start/limiter'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
@@ -12,7 +13,7 @@ import router from '@adonisjs/core/services/router'
 router
   .group(() => {
     router.get('signup', [controllers.NewAccount, 'create'])
-    router.post('signup', [controllers.NewAccount, 'store'])
+    router.post('signup', [controllers.NewAccount, 'store']).as('signup.store').use(signupThrottle)
 
     router.get('login', [controllers.Session, 'create'])
     router.post('login', [controllers.Session, 'store']).as('login.store').use(loginThrottle)

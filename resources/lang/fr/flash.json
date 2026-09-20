@@ -73,6 +73,7 @@
     "emailVerificationSent": "Si cette adresse reste à confirmer, un lien est en route.",
     "emailVerificationTokenInvalid": "Ce lien de confirmation est invalide ou a expiré. Connectez-vous et demandez-en un nouveau.",
     "emailVerified": "Votre adresse e-mail est confirmée. Vous pouvez vous connecter.",
+    "signupRateLimit": "Trop d'inscriptions depuis ce réseau. Veuillez réessayer dans une heure.",
     "loginRateLimit": "Trop de tentatives de connexion. Veuillez réessayer plus tard."
   },
   "settings": {

@@ -1,5 +1,7 @@
 import SimulatorLead from '#models/simulator_lead'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
+import { SIMULATOR_LEAD_RETENTION_DAYS } from '#shared/constants/data_retention'
+import { DateTime } from 'luxon'
 import type { SimulatorBenchmarkMap, SimulatorLeadPayload } from '#shared/types/simulator'
 import db from '@adonisjs/lucid/services/db'
 
@@ -18,12 +20,39 @@ export default class SimulatorLeadService {
         totalMin: payload.totalMin,
         totalMax: payload.totalMax,
         locale: payload.locale ?? 'fr',
+        // `updatedAt` est poussé explicitement (#775). En `autoUpdate` seul,
+        // Lucid ne sauvegarde que si un attribut a changé : un visiteur qui
+        // refait **la même** simulation ne rendait la ligne dirty par aucun
+        // champ, la date restait figée, et la rétention le supprimait alors
+        // qu'il venait de se manifester. Ce qui datte ici, c'est le contact,
+        // pas la modification.
+        updatedAt: DateTime.now(),
       }
     )
 
     await SimulatorLeadCreated.dispatch(lead)
 
     return lead
+  }
+
+  /**
+   * Supprime les leads au-delà de la rétention (#775).
+   *
+   * Le compteur part de `updatedAt`, pas de `createdAt` : `create()` fait un
+   * `updateOrCreate` clé sur l'e-mail, donc un visiteur qui refait une
+   * simulation réécrit sa ligne. Compter depuis la première visite
+   * supprimerait un prospect encore actif — c'est aussi ce que demande la
+   * règle de prospection, qui court depuis le **dernier** contact.
+   *
+   * Rend le nombre de lignes supprimées.
+   */
+  async purgeExpired(retentionDays = SIMULATOR_LEAD_RETENTION_DAYS): Promise<number> {
+    const cutoff = DateTime.now().minus({ days: retentionDays })
+
+    // `delete()` rend `[count]` sur PostgreSQL.
+    const deleted = await SimulatorLead.query().where('updatedAt', '<', cutoff.toISO()).delete()
+
+    return Number(deleted[0] ?? 0)
   }
 
   /**
