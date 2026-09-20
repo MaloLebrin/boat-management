@@ -14,6 +14,7 @@
  * Le tsconfig Inertia charge la lib DOM : `self` y est un `Window`, d'où le
  * cast local vers `ServiceWorkerGlobalScope`.
  */
+import { safeInternalPathOr } from '#shared/helpers/safe_path'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching'
@@ -96,8 +97,10 @@ self.addEventListener('push', (event) => {
 // ouverture d'une nouvelle fenêtre.
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
-  const url: string =
-    typeof event.notification.data?.url === 'string' ? event.notification.data.url : '/'
+  // La valeur vient du payload push, donc d'un aller-retour hors de l'app :
+  // c'est le chemin le plus exposé des quatre consommateurs d'`actionUrl`, et
+  // `openWindow()` accepte des URL absolues par conception (#780).
+  const url: string = safeInternalPathOr(event.notification.data?.url)
 
   event.waitUntil(
     (async () => {

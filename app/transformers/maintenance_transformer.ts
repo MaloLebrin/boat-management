@@ -1,3 +1,4 @@
+import type BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import type BoatMaintenanceSheet from '#models/boat_maintenance_sheet'
 import type BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type BoatEngine from '#models/boat_engine'
@@ -7,7 +8,12 @@ import type BoatSafetyEquipment from '#models/boat_safety_equipment'
 import type BoatSail from '#models/boat_sail'
 import type { GenericEquipmentCategory } from '#shared/types/boat'
 import type Boat from '#models/boat'
-import type { BoatTaskEquipment, SheetType, TaskEquipmentSource } from '#shared/types/maintenance'
+import type {
+  BoatOwnerMaintenanceEventRow,
+  BoatTaskEquipment,
+  SheetType,
+  TaskEquipmentSource,
+} from '#shared/types/maintenance'
 
 interface TaskEquipmentModels {
   engines?: BoatEngine[]
@@ -111,5 +117,31 @@ export function toMaintenanceSheet(s: BoatMaintenanceSheet) {
     })),
     createdAt: s.createdAt.toISO(),
     updatedAt: s.updatedAt?.toISO() ?? null,
+  }
+}
+
+/**
+ * Événement d'entretien pour le portail propriétaire (#781).
+ *
+ * Le portail est servi au rôle `boat_owner`, le moins privilégié de l'app.
+ * Trois de ses quatre props passaient par un transformer ; celle-ci partait en
+ * modèles Lucid bruts, donc **toutes** les colonnes de
+ * `boat_maintenance_events` et de `boat_maintenance_parts` — y compris le
+ * `unitPrice` des pièces, le prix d'achat côté exploitant.
+ *
+ * Ce transformer restaure la propriété qui vaut ailleurs dans l'app : ajouter
+ * une colonne à ces tables n'expose rien tant qu'on ne l'ajoute pas ici.
+ */
+export function toBoatOwnerMaintenanceEvent(
+  event: BoatMaintenanceEvent
+): BoatOwnerMaintenanceEventRow {
+  return {
+    id: event.id,
+    title: event.title,
+    subject: event.subject,
+    notes: event.notes,
+    performedAt: event.performedAt.toISODate() ?? '',
+    engineCaption: event.engineCaption,
+    sailCaption: event.sailCaption,
   }
 }

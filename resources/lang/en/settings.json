@@ -15,6 +15,7 @@
     "title": "Organisation profile",
     "nameLabel": "Organisation name",
     "namePlaceholder": "My organisation",
+    "readOnlyHint": "Only an administrator can rename the organisation.",
     "logoLabel": "Logo",
     "logoPlaceholder": "Logo",
     "changeLogo": "Change logo",

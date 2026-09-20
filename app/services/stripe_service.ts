@@ -9,7 +9,9 @@ import Stripe from 'stripe'
 @inject()
 export default class StripeService {
   private get stripe(): Stripe {
-    const key = env.get('STRIPE_SECRET_KEY')
+    // `?.release()` avant le test de présence : la variable est vide en test
+    // (`.env.test`), et un `Secret('')` serait truthy.
+    const key = env.get('STRIPE_SECRET_KEY')?.release()
     if (!key) throw new StripeNotConfiguredError()
     return new Stripe(key)
   }
@@ -119,7 +121,7 @@ export default class StripeService {
   }
 
   constructWebhookEvent(rawBody: string, signature: string): Stripe.Event {
-    const secret = env.get('STRIPE_WEBHOOK_SECRET')
+    const secret = env.get('STRIPE_WEBHOOK_SECRET')?.release()
     if (!secret) throw new StripeNotConfiguredError()
     // Vérification purement cryptographique (HMAC SHA-256 sur le corps brut) :
     // aucun appel réseau, donc aucun besoin de la clé API. Passer par

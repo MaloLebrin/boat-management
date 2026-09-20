@@ -59,9 +59,13 @@ export default class SettingsController {
     })
   }
 
-  async org({ inertia, auth }: HttpContext) {
+  async org({ inertia, auth, bouncer }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
+    // Même audience que l'annuaire (#761) : `SettingsShell` n'affiche l'onglet
+    // qu'à `members.view`, le backend le garde désormais aussi. Le formulaire
+    // de renommage, lui, est gardé par `manageOrganization` sur le PUT.
+    await bouncer.with(OrganizationPolicy).authorize('viewMembers')
 
     return inertia.render('settings/org', {
       organization: {
@@ -74,6 +78,11 @@ export default class SettingsController {
   async members({ inertia, auth, bouncer }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
+    // #761 — `allows('manageMembers')` plus bas ne sert qu'au flag d'affichage :
+    // sans cette autorisation, tout membre authentifié récupérait l'annuaire
+    // complet (e-mails, rôles, invitations en attente). Elle passe avant le
+    // `Promise.all` : on ne charge pas des données qu'on va refuser.
+    await bouncer.with(OrganizationPolicy).authorize('viewMembers')
 
     const [members, pendingInvitations, canManageMembers, canAddMember, boatOptions] =
       await Promise.all([
@@ -239,9 +248,10 @@ export default class SettingsController {
     return response.redirect().back()
   }
 
-  async updateOrganization({ request, response, session, auth, i18n }: HttpContext) {
+  async updateOrganization({ request, response, session, auth, bouncer, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
+    await bouncer.with(OrganizationPolicy).authorize('manageOrganization')
 
     const { name } = await request.validateUsing(updateOrganizationValidator)
 

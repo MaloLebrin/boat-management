@@ -33,7 +33,7 @@ export default class CsvExportController {
     if (!resolved) return
     const { boat } = resolved
 
-    const events = await this.maintenanceService.listForBoat(user, boat)
+    const events = await this.maintenanceService.listForBoat(boat)
 
     const headers = [
       'date',

@@ -31,6 +31,15 @@ testPolicyMatrix('OrganizationPolicy (unit)', () => new OrganizationPolicy(), [
     allowedRoles: ['admin'],
     deniedRoles: ['member', 'mechanic', 'boat_owner'],
   },
+  // Renommer l'organisation (#761) : aligné sur `branding.configure`, pas sur
+  // `viewMembers` qui ouvre l'écran — la raison sociale part sur les factures
+  // émises et les PDF, un member consulte sans réécrire.
+  {
+    name: 'manageOrganization',
+    capability: 'organization.manage',
+    allowedRoles: ['admin'],
+    deniedRoles: ['member', 'mechanic', 'boat_owner'],
+  },
   // Import CSV en masse (#715) : aligné sur `maintenance.delete`, pas sur
   // `maintenance.create` — un mechanic écrivait tout l'historique sans jamais
   // pouvoir le corriger.

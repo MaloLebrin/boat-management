@@ -1,6 +1,9 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
+import { DateTime } from 'luxon'
 import { BoatFactory } from '#database/factories/boat_factory'
+import BoatMaintenanceEvent from '#models/boat_maintenance_event'
+import BoatMaintenancePart from '#models/boat_maintenance_part'
 import { createAdminUser, createBoatOwnerUser } from '#tests/functional/helpers'
 import { assertPageContract } from '#tests/support/inertia_page'
 
@@ -111,5 +114,60 @@ test.group('Boat owner portal (functional)', (group) => {
 
     assertPageContract(assert, response, 'owner/boats/show')
     assert.equal((response.inertiaProps as { boat: { id: number } }).boat.id, boat.id)
+  })
+
+  // --- 3. la surface de la prop `maintenanceEvents` (#781) ---
+
+  test('the maintenance prop exposes only the fields the page consumes', async ({
+    client,
+    assert,
+  }) => {
+    // Sans ce test, la prop redevient brute à la première évolution : elle
+    // partait en modèles Lucid, donc toute colonne ajoutée à
+    // `boat_maintenance_events` ou `boat_maintenance_parts` serait repartie
+    // automatiquement chez le propriétaire.
+    const admin = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const owner = await createBoatOwnerUser(admin.organizationId!)
+    await boat.related('owners').attach([owner.id])
+
+    const event = await BoatMaintenanceEvent.create({
+      boatId: boat.id,
+      subject: 'engine',
+      title: 'Vidange',
+      notes: 'Notes internes du mécanicien',
+      performedAt: DateTime.fromISO('2026-05-04'),
+      engineCaption: 'engine_1',
+      sailCaption: null,
+    })
+    await BoatMaintenancePart.create({
+      maintenanceEventId: event.id,
+      name: 'Filtre à huile',
+      quantity: 1,
+      // Le prix d'achat côté exploitant : la colonne qui ne doit pas sortir.
+      unitPrice: '42.50',
+    })
+
+    const response = await client.get(`/owner/boats/${boat.id}`).loginAs(owner).withInertia()
+
+    assertPageContract(assert, response, 'owner/boats/show')
+    const { maintenanceEvents } = response.inertiaProps as {
+      maintenanceEvents: Record<string, unknown>[]
+    }
+
+    assert.lengthOf(maintenanceEvents, 1)
+    assert.deepEqual(Object.keys(maintenanceEvents[0]).sort(), [
+      'engineCaption',
+      'id',
+      'notes',
+      'performedAt',
+      'sailCaption',
+      'subject',
+      'title',
+    ])
+    // `parts` est la clé qui portait `unitPrice` : son absence est l'objet du
+    // correctif, pas un détail de la liste ci-dessus.
+    assert.notProperty(maintenanceEvents[0], 'parts')
+    assert.equal(maintenanceEvents[0].performedAt, '2026-05-04')
   })
 })

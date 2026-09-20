@@ -18,6 +18,14 @@ export default class AiTokenUsage extends BaseModel {
   @column()
   declare tokensUsed: number
 
+  /**
+   * Tokens réservés le temps d'un appel IA en vol, puis relâchés (#776).
+   * Distincte de `tokensUsed` : les seuils de notification et les statistiques
+   * ne lisent que la consommation réelle.
+   */
+  @column()
+  declare reservedTokens: number
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
