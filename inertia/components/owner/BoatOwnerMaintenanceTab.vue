@@ -4,19 +4,10 @@ import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import { engineCaptionLabel } from '~/utils/boat_enum_labels'
-
-interface OwnerMaintenanceEvent {
-  id: number
-  title: string
-  subject: string
-  notes: string | null
-  performedAt: string
-  engineCaption: string | null
-  sailCaption: string | null
-}
+import type { BoatOwnerMaintenanceEventRow } from '../../../shared/types/maintenance'
 
 defineProps<{
-  events: OwnerMaintenanceEvent[]
+  events: BoatOwnerMaintenanceEventRow[]
 }>()
 
 const { t } = useT()

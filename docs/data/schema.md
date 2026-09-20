@@ -344,6 +344,7 @@ Messages du formulaire de contact public (`POST /contact`, #450). Table autonome
 - `ipAddress` (nullable — renseigné pour tracer le throttle)
 - `createdAt`
 - index sur `email` et `created_at`
+- **rétention 24 mois** (#775) — voir « Rétention des données personnelles » plus bas
 
 ### ai_analyses
 
@@ -358,6 +359,27 @@ Résultats de génération de l'assistant IA : suggestions de flotte (dashboard)
 - `responseText` (JSON sérialisé : `[{ "text": "…" }]` pour les suggestions ; objet `{ summary, recommendedSheet, causes[], nextStep }` pour un `engine_diagnosis`)
 - `createdAt`
 - index sur `(organization_id, kind)`, `(organization_id, kind, locale)` et `(boat_engine_id, kind, locale)`
+
+### ai_token_usages
+
+Compteur mensuel de tokens Mistral par organisation, adossé au plafond du plan
+(`PLAN_LIMITS[plan].aiTokensPerMonth` — 1 000 000 pour `pro`, illimité pour
+`enterprise`). Une ligne par organisation et par mois, créée à la volée.
+
+- `id`
+- `organizationId` (FK `organizations` cascade)
+- `month` (`yyyy-MM`)
+- `tokensUsed` — consommation **réelle**, émargée après chaque appel par
+  `recordUsage()`. C'est la seule colonne que lisent `getUsage()`, les
+  statistiques et les seuils de notification (80 %, 100 %)
+- `reservedTokens` (#776) — tokens **réservés le temps d'un appel en vol**,
+  puis relâchés. C'est ce qui rend le plafond opposable pendant un appel
+  Mistral, et donc entre processus : la vérification est un upsert
+  conditionnel (`… WHERE tokens_used + reserved_tokens + N <= limite`) dont le
+  zéro-ligne-affectée signifie « plafond atteint ». Colonne distincte à
+  dessein, pour qu'une réservation ne déclenche pas d'alerte de seuil
+- `createdAt`, `updatedAt`
+- unique sur `(organization_id, month)` — la clé du `ON CONFLICT`
 
 ### ai_diagnosis_conversations
 
@@ -532,6 +554,45 @@ moment le moins cher pour le faire sans cron.
 antérieurs à #768 sont marqués vérifiés par la migration : pas une preuve
 rétroactive, mais le seul choix qui ne casse pas des comptes en service derrière
 une garde qu'ils n'ont jamais eu l'occasion de franchir.
+
+## Rétention des données personnelles (#775)
+
+Quatre purges tournent chaque nuit. Les deux premières sont antérieures ; les deux dernières
+existent parce que tout le reste s'accumulait sans limite, dont les tables que n'importe quel
+visiteur remplit depuis le site public et qui portent des adresses e-mail.
+
+| Heure | Job                          | Table                      | Colonne        | Durée                                     |
+| ----- | ---------------------------- | -------------------------- | -------------- | ----------------------------------------- |
+| 00:00 | `PurgeExpiredTokens`         | `password_reset_tokens`    | `expires_at`   | expiration + 7 j                          |
+| 00:00 | `PurgeExpiredTokens`         | `organization_invitations` | `expires_at`   | expiration + 7 j, **hors acceptées**      |
+| 00:30 | `PurgePublicFormData`        | `contact_messages`         | `created_at`   | 24 mois                                   |
+| 00:30 | `PurgePublicFormData`        | `simulator_leads`          | `updated_at`   | 24 mois                                   |
+| 00:30 | `PurgePublicFormData`        | `simulator_shares`         | `expires_at`   | 6 mois (échéance posée à la création)     |
+| 02:00 | `PurgeProcessedStripeEvents` | `processed_stripe_events`  | `processed_at` | 30 j (#703)                               |
+| 03:00 | `PurgeAuditLogs`             | `audit_logs`               | `created_at`   | `PLAN_LIMITS[plan].auditLogRetentionDays` |
+
+Les durées vivent dans `shared/constants/data_retention.ts` et sont celles qu'annonce la section
+« Durée de conservation » de la politique de confidentialité (`marketing.json`, clés `privacy.s6_*`) :
+les deux se modifient ensemble. Une purge non documentée ne vaut rien côté conformité.
+
+Trois points qui ne se devinent pas :
+
+- **`simulator_leads` compte depuis `updated_at`, pas `created_at`.** `SimulatorLeadService.create()`
+  est un `updateOrCreate` clé sur l'e-mail : un visiteur qui refait une simulation réécrit sa ligne.
+  Compter depuis la première visite supprimerait un prospect encore actif, et la règle de prospection
+  court depuis le **dernier** contact. La colonne a été ajoutée pour ça, et le service pousse
+  `updatedAt` explicitement — en `autoUpdate` seul, une simulation identique ne rendait la ligne
+  dirty par aucun champ et la date restait figée.
+- **Les invitations acceptées ne sont jamais supprimées.** Elles disent qui a rejoint
+  l'organisation, par qui et à quel titre : c'est la seule trace de ce rattachement en dehors des
+  journaux d'audit, qui ont une rétention plus courte.
+- **`simulator_shares.expires_at` fait foi à la lecture**, pas seulement au passage du cron : un
+  partage échu se comporte comme un jeton inconnu dès la seconde où il expire.
+
+Colonnes ajoutées pour ces purges : `simulator_shares.expires_at` (indexée, `token` élargi de 12 à
+64 caractères) et `simulator_leads.updated_at` (indexée). Index posés sur
+`password_reset_tokens.expires_at` et `organization_invitations.expires_at` — sans eux, chaque purge
+fait un balayage complet de la table qu'elle est censée borner.
 
 ## Relations (résumé)
 

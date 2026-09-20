@@ -94,6 +94,13 @@ Référence : `app/models/contact_message.ts`, migration `1824000000000_create_c
 
 Table `contact_messages` autonome (aucun lien vers `users`/`organizations` : l'expéditeur n'est pas authentifié). `ipAddress` est renseigné pour tracer les envois derrière le throttle. Index sur `email` et `created_at`. Voir `docs/data/schema.md`.
 
+**Rétention : 24 mois** (#775). `ContactMessageService.purgeExpired()`, appelée chaque nuit à 00:30
+par `PurgePublicFormData`, supprime les messages au-delà de
+`CONTACT_MESSAGE_RETENTION_DAYS` (`shared/constants/data_retention.ts`). La table est alimentée
+sans authentification : le throttle borne le débit, pas le cumul, et chaque ligne porte un nom, une
+adresse e-mail, un message libre et une IP. La durée est celle qu'annonce la section « Durée de
+conservation » de la politique de confidentialité — les deux se modifient ensemble.
+
 ---
 
 ## Emails

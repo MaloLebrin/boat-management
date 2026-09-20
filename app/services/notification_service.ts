@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import Notification from '#models/notification'
 import SendPushNotification from '#jobs/send_push_notification'
 import { isPushableNotificationType } from '#shared/constants/push'
+import { isSafeInternalPath } from '#shared/helpers/safe_path'
 import type { CreateNotificationParams, NotificationsSharedProps } from '#shared/types/notification'
 import * as NotificationTransformer from '#transformers/notification_transformer'
 import transmit from '@adonisjs/transmit/services/main'
@@ -11,6 +12,24 @@ import transmit from '@adonisjs/transmit/services/main'
 @inject()
 export default class NotificationService {
   async create(params: CreateNotificationParams): Promise<Notification> {
+    // Garde à l'écriture (#780). `actionUrl` est une colonne de texte libre
+    // dont la valeur est passée telle quelle à une navigation, côté page
+    // Inertia comme côté service worker. Les huit producteurs actuels y
+    // écrivent des chemins littéraux, mais rien ne l'impose : c'est une
+    // convention tenue à la main. Celle-ci protège les consommateurs qu'on
+    // n'a pas encore écrits.
+    //
+    // Une valeur non conforme devient `null` plutôt que de faire échouer la
+    // création : une notification sans lien reste utile, une notification
+    // perdue ne l'est pas.
+    const actionUrl = params.actionUrl ?? null
+    if (actionUrl !== null && !isSafeInternalPath(actionUrl)) {
+      logger.warn(
+        { type: params.type, userId: params.userId },
+        'notification actionUrl is not a safe internal path — stored as null'
+      )
+    }
+
     const notification = await Notification.create({
       userId: params.userId,
       organizationId: params.organizationId,
@@ -18,7 +37,7 @@ export default class NotificationService {
       severity: params.severity ?? 'info',
       title: params.title,
       body: params.body ?? null,
-      actionUrl: params.actionUrl ?? null,
+      actionUrl: isSafeInternalPath(actionUrl) ? actionUrl : null,
       metadata: params.metadata ?? null,
     })
 

@@ -18,6 +18,42 @@ Source de vérité : `shared/types/plan.ts` → `PLAN_LIMITS[plan].aiTokensPerMo
 
 ---
 
+## 1 bis. Réservation : pourquoi le plafond tient entre processus (#776)
+
+Le plafond était vérifié par un _read-modify-write_ — lire la consommation du
+mois, comparer, écrire plus tard — protégé par un **mutex en mémoire**. Ce
+mutex était mono-processus, et le repo lance déjà trois processus : le serveur
+web, `queue:work` et `queue:work:ai`. Les appels au quota partent des deux
+côtés (requêtes HTTP **et** jobs), donc chacun avait sa propre `Map` de
+verrous et le plafond se contournait par course, sur une fenêtre large comme
+un appel Mistral.
+
+Le mécanisme est désormais une **réservation** :
+
+1. `reserveTokens(org)` pose `AI_CALL_TOKEN_RESERVATION` (4 000) dans la
+   colonne `reserved_tokens`, par un `INSERT … ON CONFLICT DO UPDATE … WHERE
+tokens_used + reserved_tokens + N <= limite`. **Zéro ligne affectée =
+   plafond atteint** → `QuotaExceededError`. La base est la seule autorité.
+2. L'appel IA a lieu ; `recordUsage()` émarge la consommation réelle dans
+   `tokens_used`, inchangé.
+3. `release()` rend la réservation, dans un `finally`.
+
+`reserved_tokens` est une colonne **distincte** à dessein : les seuils de
+notification (80 %, 100 %), `getUsage()` et les statistiques ne lisent que la
+consommation réelle, donc une réservation en vol ne déclenche pas d'alerte
+prématurée ni de double notification.
+
+⚠️ Un processus tué en plein appel ne relâche pas sa réservation : elle reste
+comptée jusqu'à la remise à zéro mensuelle (`ResetAiTokenUsage`). La fuite est
+bornée à 4 000 tokens par appel interrompu, soit 0,4 % du plafond Pro ;
+`clearReservations(organizationId)` existe pour le rattrapage.
+
+`withBestEffortOrgLock` subsiste, mais **uniquement** pour le plafond de
+conversations à vie du plan starter, qui ne passe pas par le compteur de
+tokens. Il reste mono-processus et assumé comme tel : son dépassement coûte
+une conversation, pas un budget Mistral, et le corriger demanderait de tenir
+un verrou de base pendant tout un appel IA.
+
 ## 2. Architecture
 
 ```
@@ -25,13 +61,14 @@ AiAnalysisService.generateFleetAnalysis()
 AiAnalysisService.generateBoatSuggestions()
 RunAiChat.execute()
        │
-       │  assertCanUseTokens()  ← throw QuotaExceededError si dépassé
+       │  reserveTokens()  ← upsert conditionnel : 0 ligne = quota dépassé
        ▼
 AiTokenQuotaService
        │
        │  recordUsage()  ← upsert atomique PostgreSQL
+       │  release()      ← rend la réservation
        ▼
-Table ai_token_usages (organization_id, month, tokens_used)
+Table ai_token_usages (organization_id, month, tokens_used, reserved_tokens)
        │
        │  seuil 80% ou 100% franchi ?
        ▼
@@ -173,7 +210,7 @@ Le `QuotaExceededError` est intercepté et ne lève **pas** vers le framework de
 
 `app/services/assistant_chat_service.ts` — voir `docs/domain/assistant.md`.
 
-Le tour du copilote passe par `withOrgLock` + `assertCanUseTokens` (sauf BYOK), puis la **boucle d'outils** enchaîne un à quatre appels `aiService.chat` (appels d'outils, réponse finale, éventuelle relance corrective). **Coût par message** : les tokens de tous les appels du tour sont sommés et émargés en un seul `recordUsage` — une question outillée coûte typiquement deux à trois fois le prix d'une question simple (le prompt système et le fil sont repayés à chaque aller-retour, plus les schémas d'outils et leurs résultats). C'est la raison du budget par conversation à 250 000 tokens (`ASSISTANT_CONVERSATION_TOKEN_BUDGET`) et de l'affichage de la consommation en pied de panneau (`aiUsage { used, limit }` dans la prop `assistantConversation`).
+Le tour du copilote passe par `withReservedTokens` (sauf BYOK), puis la **boucle d'outils** enchaîne un à quatre appels `aiService.chat` (appels d'outils, réponse finale, éventuelle relance corrective). **Coût par message** : les tokens de tous les appels du tour sont sommés et émargés en un seul `recordUsage` — une question outillée coûte typiquement deux à trois fois le prix d'une question simple (le prompt système et le fil sont repayés à chaque aller-retour, plus les schémas d'outils et leurs résultats). C'est la raison du budget par conversation à 250 000 tokens (`ASSISTANT_CONVERSATION_TOKEN_BUDGET`) et de l'affichage de la consommation en pied de panneau (`aiUsage { used, limit }` dans la prop `assistantConversation`).
 
 ---
 

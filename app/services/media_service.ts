@@ -1,3 +1,4 @@
+import { stat } from 'node:fs/promises'
 import { MediaNotFoundError } from '#exceptions/media_errors'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import type { MediaEntityType, MediaKind } from '#shared/constants/media'
@@ -40,13 +41,22 @@ export default class MediaService {
       )
     }
 
-    // assertCanUpload uses file.size (pre-upload) as an optimistic guard; the counter is updated
+    // assertCanUpload uses the pre-upload size as an optimistic guard; the counter is updated
     // with uploaded.bytes (post-Cloudinary, after potential PDF compression). For compressed PDFs
     // the guard may be slightly conservative, but this avoids uploading a file that is certain to
-    // exceed the limit. If file.size is 0 (unknown at parse time) the guard is skipped — the
-    // post-upload increment in updateStorageUsed still runs, so the quota counter stays correct.
-    if (org && payload.entityType !== 'user' && file.size) {
-      this.quotaService.assertCanUpload(org, file.size)
+    // exceed the limit.
+    //
+    // #764 — `file.size` peut valoir 0 quand l'analyse multipart ne l'a pas
+    // renseignée. La garde était alors **sautée**, et un fichier de taille
+    // inconnue partait chez Cloudinary sans contrôle préalable. On mesure
+    // désormais le fichier temporaire plutôt que de renoncer : le repli sur 0
+    // ne vaut que si le chemin est illisible, auquel cas l'envoi échouera de
+    // toute façon juste après.
+    if (org && payload.entityType !== 'user') {
+      const size = file.size || (await measureTmpFile(file.tmpPath))
+      if (size) {
+        this.quotaService.assertCanUpload(org, size)
+      }
     }
 
     const resourceType = resourceTypeFromKind(payload.kind)
@@ -263,5 +273,19 @@ export default class MediaService {
 
     const max = result?.$extras.maxPosition as number | string | null | undefined
     return max === null || max === undefined ? 0 : Number(max) + 1
+  }
+}
+
+/**
+ * Taille réelle du fichier temporaire, quand l'analyse multipart n'a pas
+ * renseigné `file.size` (#764). Rend `0` si le chemin est absent ou illisible.
+ */
+async function measureTmpFile(tmpPath: string | undefined): Promise<number> {
+  if (!tmpPath) return 0
+  try {
+    const stats = await stat(tmpPath)
+    return stats.size
+  } catch {
+    return 0
   }
 }

@@ -1,6 +1,8 @@
 import SimulatorShare from '#models/simulator_share'
 import type { SimulatorBoatInput, SimulatorCostBreakdown } from '#shared/types/simulator'
+import { SIMULATOR_SHARE_LIFETIME_DAYS } from '#shared/constants/data_retention'
 import Factory from '@adonisjs/lucid/factories'
+import { DateTime } from 'luxon'
 import type { FactoryContextContract } from '@adonisjs/lucid/types/factory'
 
 export const SimulatorShareFactory = Factory.define(
@@ -25,10 +27,14 @@ export const SimulatorShareFactory = Factory.define(
     }
 
     return {
-      token: faker.string.alphanumeric(12),
+      token: faker.string.alphanumeric(32),
       input,
       breakdown,
       locale: faker.helpers.arrayElement(['fr', 'en']),
+      // Un partage de fabrique est **vivant** par défaut (#775) : les tests
+      // qui l'utilisent exercent la page de lecture, pas l'expiration.
+      // `.merge({ expiresAt })` sert le cas inverse.
+      expiresAt: DateTime.now().plus({ days: SIMULATOR_SHARE_LIFETIME_DAYS }),
     }
   }
 ).build()

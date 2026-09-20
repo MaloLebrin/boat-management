@@ -61,7 +61,21 @@ function normalizeIsoDate(value: unknown): string {
 
 @inject()
 export default class BoatMaintenanceService {
-  async listForBoat(_user: User, boat: Boat) {
+  /**
+   * Historique d'entretien d'un bateau, pièces préchargées.
+   *
+   * **Le cloisonnement est de la responsabilité de l'appelant** : cette
+   * méthode ne filtre que sur `boat.id`. Elle recevait auparavant un `_user`
+   * dont elle ne faisait rien — une signature qui laissait attendre une
+   * garantie qu'elle n'offrait pas (#781). Le paramètre est retiré plutôt que
+   * honoré : les deux appelants ont déjà résolu le bateau pour leur
+   * utilisateur (`getOwnedBoat` par le pivot `boat_owners` côté portail,
+   * `resolveBoat` par l'organisation côté export CSV), et un
+   * `assertBoatInUserOrg` ici casserait justement le portail — un
+   * propriétaire peut être membre d'une organisation autre que celle portée
+   * par son `user.organizationId`.
+   */
+  async listForBoat(boat: Boat) {
     return await BoatMaintenanceEvent.query()
       .where('boatId', boat.id)
       .preload('parts')

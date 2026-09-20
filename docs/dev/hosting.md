@@ -34,6 +34,24 @@ l'application de démarrer. Le point de départ est toujours `.env.example`
 | `APP_KEY`      | secret 32 octets      | `node ace generate:key`                                   |
 | `QUEUE_DRIVER` | `database`            | Les workers lisent la file en base                        |
 
+### Secrets et journaux (#769)
+
+Toute variable dont le nom contient `KEY`, `SECRET`, `PASSWORD`, `TOKEN` ou
+`CREDENTIAL` est déclarée en `Env.schema.secret` — le type qui masque la valeur
+dès qu'elle est sérialisée ou journalisée. Deux exceptions, publiques par
+conception puisqu'elles partent dans le navigateur : `STRIPE_PUBLIC_KEY` et
+`VAPID_PUBLIC_KEY`. Une valeur `Secret` se lit par `.release()`.
+
+`config/logger.ts` déclare en plus une liste `redact` (`[redacted]`). C'est un
+filet **indépendant** du typage : `Env.schema.secret` protège ce qu'on lit
+depuis `env`, `redact` protège ce qui transite par le logger quel qu'en soit
+l'émetteur — un `logger.error({ err, config })`, une erreur `pg` ou
+`nodemailer` qui embarque sa configuration de connexion, un `logger.info({ req })`
+qui traîne un en-tête `Cookie`.
+
+`tests/unit/config/secrets_and_redaction.spec.ts` tient les deux règles : c'est
+lui qui empêchera la prochaine variable d'être ajoutée sans protection.
+
 `APP_DOMAIN`, `LETSENCRYPT_EMAIL` et `IMAGE_TAG` ne sont pas lues par
 l'application : elles n'alimentent que Compose et le `Caddyfile`.
 
@@ -153,6 +171,21 @@ curl -f https://<domaine>/up
 Ghostscript est installé dans l'image (compression des PDFs uploadés, voir
 `app/services/pdf_service.ts`). Sans lui, le PDF original part sans compression
 — warning loggé, pas de crash.
+
+Le `Dockerfile` pose un **plancher de version** (`ghostscript>=10.03`) plutôt
+que de prendre ce que sert le dépôt Alpine au jour du build : la version
+déployée doit être une décision. Un numéro exact n'est volontairement pas
+épinglé — il casserait le build au premier retrait du paquet de l'index.
+
+L'appel est borné (#772) : `timeout` de 30 s avec `killSignal: 'SIGKILL'`,
+`maxBuffer` à 8 Mo, `-dSAFER` explicite et `-f` avant le chemin d'entrée.
+Ghostscript tourne sur un fichier intégralement fourni par l'utilisateur, et
+le worker de queue a une concurrence de 5 : sans limite de temps, quelques
+PDFs coûteux bloquaient toute la file (e-mails et notifications compris). Un
+dépassement lève `PdfCompressionTimeoutError`, retombe sur le PDF non
+compressé et se journalise avec `reason: 'pdf_compression_timeout'` — un pic
+de timeouts est un signal d'abus, à distinguer des échecs de compression
+ordinaires.
 
 ## Voir aussi
 

@@ -10,7 +10,13 @@ export default class PasswordResetToken extends BaseModel {
   @column()
   declare email: string
 
-  @column()
+  /**
+   * SHA-256 du token envoyé par e-mail, jamais le token lui-même. Masqué à la
+   * sérialisation (#782) : `verifyToken` cherche l'enregistrement **par hash**,
+   * donc le connaître suffit à cibler une ligne. Aucun code ne sérialise ce
+   * modèle aujourd'hui — c'est précisément pour que ça reste vrai.
+   */
+  @column({ serializeAs: null })
   declare token: string
 
   @column.dateTime()

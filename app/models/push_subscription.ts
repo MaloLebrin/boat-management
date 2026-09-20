@@ -16,17 +16,24 @@ export default class PushSubscription extends BaseModel {
   @column()
   declare organizationId: number
 
-  @column()
+  /**
+   * L'abonnement Web Push est une capacité : `endpoint` + `p256dh` + `auth`
+   * suffisent à envoyer une notification dans le navigateur de l'utilisateur,
+   * sans passer par l'app. Les quatre colonnes sont donc masquées à la
+   * sérialisation (#782) — l'écran de réglages passe de toute façon par
+   * `PushSubscriptionTransformer.toRow`, qui choisit ses champs.
+   */
+  @column({ serializeAs: null })
   declare endpoint: string
 
-  @column()
+  @column({ serializeAs: null })
   declare endpointHash: string
 
   // Le naming Lucid découperait `p256dh` en `p_256_dh`
-  @column({ columnName: 'p256dh' })
+  @column({ columnName: 'p256dh', serializeAs: null })
   declare p256dh: string
 
-  @column()
+  @column({ serializeAs: null })
   declare auth: string
 
   @column()

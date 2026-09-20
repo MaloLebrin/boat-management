@@ -35,7 +35,7 @@ export default class MaintenanceLogPdfController {
 
     await boat.load('engines', (q) => q.preload('parts'))
 
-    const events = await this.maintenanceService.listForBoat(user, boat)
+    const events = await this.maintenanceService.listForBoat(boat)
     const eventsAsc = [...events].reverse()
 
     const { buffer, filename } = await this.pdfService.generate(boat, eventsAsc, i18n)

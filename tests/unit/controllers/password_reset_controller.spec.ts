@@ -8,12 +8,23 @@ function makeI18n(key: string) {
 
 function makeSession() {
   const flashes: Record<string, string> = {}
+  const store: Record<string, unknown> = {}
   return {
     flash: (type: string, msg: string) => {
       flashes[type] = msg
     },
+    put: (key: string, value: unknown) => {
+      store[key] = value
+    },
+    get: (key: string) => store[key],
+    forget: (key: string) => {
+      delete store[key]
+    },
     get flashes() {
       return flashes
+    },
+    get store() {
+      return store
     },
   }
 }
@@ -21,6 +32,9 @@ function makeSession() {
 function makeRedirect() {
   const calls: string[] = []
   const obj = {
+    // `edit` sort le jeton de l'URL en rejouant la page sans query string
+    // (#770) : le double doit donc accepter `withQs(false)`.
+    withQs: (_forward: boolean) => obj,
     toPath: (path: string) => {
       calls.push(path)
       return obj
@@ -107,15 +121,50 @@ test.group('PasswordResetController (unit)', () => {
 
   // ── edit ─────────────────────────────────────────────────────────────────
 
-  test('edit renders the reset_password page with the token prop', async ({ assert }) => {
+  test('edit stashes a query-string token and replays the page without it', async ({ assert }) => {
+    // #770 : le jeton ne doit traverser l'URL que le temps d'une requête. Le
+    // `GET` l'échange contre une valeur de session et redirige sans query
+    // string — donc pas de rendu à ce passage.
     const rendered: Array<{ component: string; props: any }> = []
     const controller = new PasswordResetController(
       { createToken: async () => null } as any,
       { sendPasswordReset: async () => {} } as any
     )
 
+    const session = makeSession()
+    const { redirect, calls } = makeRedirect()
+
     await controller.edit({
       request: { qs: () => ({ token: 'abc123' }) },
+      response: { redirect },
+      session,
+      inertia: {
+        render: (c: string, p: any) => rendered.push({ component: c, props: p }),
+      },
+    } as any)
+
+    assert.lengthOf(rendered, 0)
+    assert.deepEqual(calls, ['/reset-password'])
+    assert.equal(session.store['passwordResetToken'], 'abc123')
+  })
+
+  test('edit renders the reset_password page with the token read back from session', async ({
+    assert,
+  }) => {
+    const rendered: Array<{ component: string; props: any }> = []
+    const controller = new PasswordResetController(
+      { createToken: async () => null } as any,
+      { sendPasswordReset: async () => {} } as any
+    )
+
+    const session = makeSession()
+    session.put('passwordResetToken', 'abc123')
+    const { redirect } = makeRedirect()
+
+    await controller.edit({
+      request: { qs: () => ({}) },
+      response: { redirect },
+      session,
       inertia: {
         render: (c: string, p: any) => rendered.push({ component: c, props: p }),
       },
@@ -136,6 +185,8 @@ test.group('PasswordResetController (unit)', () => {
 
     await controller.edit({
       request: { qs: () => ({}) },
+      response: { redirect: makeRedirect().redirect },
+      session: makeSession(),
       inertia: {
         render: (c: string, p: any) => rendered.push({ component: c, props: p }),
       },

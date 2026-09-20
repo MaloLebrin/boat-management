@@ -27,7 +27,6 @@ import hash from '@adonisjs/core/services/hash'
 import type { HttpContext } from '@adonisjs/core/http'
 import { isAiProvider, modelBelongsToProvider } from '#shared/types/ai'
 import { PLAN_LIMITS } from '#shared/types/plan'
-import { isThemePreference } from '#shared/types/theme'
 import type { ThemePreference } from '#shared/types/theme'
 import type { BooleanQuotaKey } from '#shared/types/plan'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
@@ -62,9 +61,13 @@ export default class SettingsController {
     })
   }
 
-  async org({ inertia, auth }: HttpContext) {
+  async org({ inertia, auth, bouncer }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
+    // Même audience que l'annuaire (#761) : `SettingsShell` n'affiche l'onglet
+    // qu'à `members.view`, le backend le garde désormais aussi. Le formulaire
+    // de renommage, lui, est gardé par `manageOrganization` sur le PUT.
+    await bouncer.with(OrganizationPolicy).authorize('viewMembers')
 
     return inertia.render('settings/org', {
       organization: {
@@ -77,6 +80,11 @@ export default class SettingsController {
   async members({ inertia, auth, bouncer }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
+    // #761 — `allows('manageMembers')` plus bas ne sert qu'au flag d'affichage :
+    // sans cette autorisation, tout membre authentifié récupérait l'annuaire
+    // complet (e-mails, rôles, invitations en attente). Elle passe avant le
+    // `Promise.all` : on ne charge pas des données qu'on va refuser.
+    await bouncer.with(OrganizationPolicy).authorize('viewMembers')
 
     const [members, pendingInvitations, canManageMembers, canAddMember, boatOptions] =
       await Promise.all([
@@ -225,11 +233,17 @@ export default class SettingsController {
    * est connecté, pour survivre au logout (#414 / #403).
    */
   async setLocale({ request, response, auth }: HttpContext) {
-    const locale = request.input('locale')
-    if (locale === 'en' || locale === 'fr') {
-      this.#rememberLocale(response, locale)
+    // `tryValidate` plutôt que `validateUsing` : le contrat de #414 / #403 est
+    // qu'une valeur inconnue soit **ignorée sans erreur**. Un validateur qui
+    // lève casserait le switcher sur les pages publiques, où il n'y a pas de
+    // formulaire Inertia pour afficher l'erreur de session. On garde donc la
+    // tolérance, mais le vocabulaire fermé vient désormais du validateur et
+    // non d'une comparaison à la main invisible depuis la couche route.
+    const [, payload] = await updateLocaleValidator.tryValidate(request.all())
+    if (payload) {
+      this.#rememberLocale(response, payload.locale)
       if (await auth.check()) {
-        auth.user!.locale = locale
+        auth.user!.locale = payload.locale
         await auth.user!.save()
       }
     }
@@ -238,20 +252,22 @@ export default class SettingsController {
 
   /** Route publique `POST /theme`, pendant de `setLocale` pour le thème (#416). */
   async setTheme({ request, response, auth }: HttpContext) {
-    const theme = request.input('theme')
-    if (isThemePreference(theme)) {
-      this.#rememberTheme(response, theme)
+    // Même tolérance que `setLocale` ci-dessus, et pour la même raison.
+    const [, payload] = await updateThemeValidator.tryValidate(request.all())
+    if (payload) {
+      this.#rememberTheme(response, payload.theme)
       if (await auth.check()) {
-        auth.user!.theme = theme
+        auth.user!.theme = payload.theme
         await auth.user!.save()
       }
     }
     return response.redirect().back()
   }
 
-  async updateOrganization({ request, response, session, auth, i18n }: HttpContext) {
+  async updateOrganization({ request, response, session, auth, bouncer, i18n }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
+    await bouncer.with(OrganizationPolicy).authorize('manageOrganization')
 
     const { name } = await request.validateUsing(updateOrganizationValidator)
 
