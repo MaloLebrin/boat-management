@@ -1,10 +1,12 @@
 import edge from 'edge.js'
+import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS } from '#shared/constants/email_verification'
 import env from '#start/env'
 import type { HttpContext } from '@adonisjs/core/http'
 
 const TEMPLATES = [
   { name: 'welcome', label: 'Bienvenue' },
   { name: 'password-reset', label: 'Reinitialisation mot de passe' },
+  { name: 'email-verification', label: "Verification d'adresse" },
   { name: 'invitation', label: 'Invitation organisation' },
   { name: 'simulator-report-fr', label: 'Rapport simulateur (FR)' },
   { name: 'simulator-report-en', label: 'Rapport simulateur (EN)' },
@@ -129,6 +131,13 @@ export default class MailPreviewsController {
       case 'password-reset':
         html = await edge.render('emails/password_reset', {
           resetUrl: 'https://app.fleetai.com/reset?token=preview',
+        })
+        break
+
+      case 'email-verification':
+        html = await edge.render('emails/email_verification', {
+          verificationUrl: 'https://app.fleetai.com/verify-email?token=preview',
+          ttlHours: EMAIL_VERIFICATION_TOKEN_TTL_HOURS,
         })
         break
 

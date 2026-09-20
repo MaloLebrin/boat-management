@@ -1,0 +1,35 @@
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      Confirm your email / Confirmez votre adresse e-mail
+    </h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      Welcome to FleetAi. Confirm your email address to secure your account — it is the address we use to sign you in, reset your password and send your invoices.
+    </p>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+      Bienvenue sur FleetAi. Confirmez votre adresse e-mail pour securiser votre compte : c'est elle qui sert a vous connecter, a reinitialiser votre mot de passe et a vous envoyer vos factures.
+    </p>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ verificationUrl }}"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            Confirm my email
+          </a>
+        </td>
+      </tr>
+    </table>
+    <p style="margin:25px 0 0;color:#888888;font-size:14px;line-height:1.5;">
+      This link expires in
+      {{ ttlHours }}
+      hours. If you did not create a FleetAi account, you can safely ignore this email — no account will be activated in your name.
+    </p>
+    <p style="margin:10px 0 0;color:#888888;font-size:14px;line-height:1.5;">
+      Ce lien expire dans
+      {{ ttlHours }}
+      heures. Si vous n'avez pas cree de compte FleetAi, ignorez cet e-mail : aucun compte ne sera active en votre nom.
+    </p>
+  @end
+@end

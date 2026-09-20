@@ -23,6 +23,24 @@ export const resetPasswordThrottle = limiter.define('reset_password', (ctx) => {
 })
 
 /**
+ * Consommation d'un lien de vérification d'adresse (#768).
+ *
+ * Cette route arrivait sur `authThrottle`, que #767 a éclaté en un compteur
+ * par route : elle a donc le sien, au même budget que les trois ci-dessus.
+ * Un compteur partagé ferait qu'un martèlement sur la connexion fermerait la
+ * confirmation d'adresse, et réciproquement.
+ */
+export const emailVerificationConfirmThrottle = limiter.define(
+  'email_verification_confirm',
+  (ctx) => {
+    return limiter
+      .allowRequests(10)
+      .every('1 minute')
+      .usingKey(`email_verify_confirm_${ctx.request.ip()}`)
+  }
+)
+
+/**
  * Compteur de connexion **par compte** (#767).
  *
  * Le bornage par IP ne couvre pas le credential stuffing distribué : 10
@@ -123,3 +141,16 @@ export const simulatorLeadThrottle = limiter.define('simulator_lead', (ctx) => {
 export const pushThrottle = limiter.define('push', (ctx) => {
   return limiter.allowRequests(20).every('1 minute').usingKey(`push_${ctx.request.ip()}`)
 })
+
+// Renvoi du lien de vérification (#768) : chaque appel envoie un e-mail
+// sortant. Même budget que le formulaire de contact — l'autre route de l'app
+// qui met du courrier en file sur demande d'un humain.
+export const emailVerificationResendThrottle = limiter.define(
+  'email_verification_resend',
+  (ctx) => {
+    return limiter
+      .allowRequests(5)
+      .every('10 minutes')
+      .usingKey(`email_verification_${ctx.auth.user?.id ?? ctx.request.ip()}`)
+  }
+)
