@@ -275,6 +275,9 @@
     "conversationCompleted": "Ce diagnostic est terminé. Démarrez une nouvelle conversation pour décrire une autre panne.",
     "maxMessagesReached": "Cette conversation a atteint sa taille maximale. Démarrez une nouvelle conversation."
   },
+  "publicAi": {
+    "dailyBudgetExhausted": "Nos assistants IA gratuits ont atteint leur limite d'utilisation du jour. Créez un compte pour continuer — votre offre embarque son propre budget IA."
+  },
   "publicPartSearch": {
     "quotaExhausted": "Vous avez utilisé vos recherches de pièces gratuites. Créez un compte pour continuer à entretenir votre bateau avec FleetAi.",
     "notFound": "Conversation introuvable.",

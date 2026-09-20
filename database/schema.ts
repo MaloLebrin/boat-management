@@ -2477,6 +2477,36 @@ export class ProcessedStripeEventSchema extends BaseModel {
   declare type: string
 }
 
+export class PublicAiUsageSchema extends BaseModel {
+  static $columns = [
+    'clientKey',
+    'conversations',
+    'createdAt',
+    'day',
+    'id',
+    'surface',
+    'tokensUsed',
+    'updatedAt',
+  ] as const
+  $columns = PublicAiUsageSchema.$columns
+  @column()
+  declare clientKey: string
+  @column()
+  declare conversations: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.date()
+  declare day: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare surface: string
+  @column()
+  declare tokensUsed: bigint | number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class PushSubscriptionSchema extends BaseModel {
   static $columns = [
     'auth',

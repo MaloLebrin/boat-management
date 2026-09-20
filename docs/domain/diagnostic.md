@@ -121,7 +121,7 @@ La famille cadre **trois** choses, et c'est le risque principal de #576 : un die
 
 Les garde-fous de #516 sont inchangés : gating par plan et quota de tokens, jamais de spec chiffrée inventée, l'IA recommande et ne décide pas.
 
-> `SHEET_DIGESTS` reste exporté tel quel pour le chat public de diagnostic (#602), qui n'est pas rattaché à un moteur et garde donc le socle hors-bord.
+> `SHEET_DIGESTS` reste exporté tel quel pour le chat public de diagnostic (#602), qui n'est pas rattaché à un moteur et garde donc le socle hors-bord. Les bornes de **coût** de ce chat public — plafond par IP et budget de tokens journalier, depuis #762 — sont documentées dans `docs/domain/public-ai-surface.md`.
 
 ---
 

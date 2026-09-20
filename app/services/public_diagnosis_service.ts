@@ -8,6 +8,7 @@ import AiDiagnosisConversation from '#models/ai_diagnosis_conversation'
 import type User from '#models/user'
 import AiService from '#services/ai_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
+import PublicAiBudgetService from '#services/public_ai_budget_service'
 import {
   buildFinalTurnInstruction,
   buildPublicDiagnosisFirstMessage,
@@ -31,7 +32,10 @@ import { randomBytes } from 'node:crypto'
  * Trois régimes de quota, selon qui parle :
  * - visiteur anonyme : `PUBLIC_DIAGNOSIS_LIFETIME_LIMIT` conversations,
  *   comptées par la session (liste de tokens) — qui sert aussi de preuve de
- *   propriété pour poster dans une conversation ;
+ *   propriété pour poster dans une conversation. Depuis #762, ce compteur de
+ *   session n'est plus qu'un **confort d'UX** : vider ses cookies le remet à
+ *   zéro. Le garde-fou est `PublicAiBudgetService`, qui compte par IP et par
+ *   jour en base, et borne les tokens de toute la surface publique ;
  * - plan sans IA (`starter`) : même plafond, compté en base sur
  *   `organization_id` (la ligne de conversation EST le compteur) ;
  * - plan avec IA (`pro`/`enterprise`) : aucun plafond de conversations, le
@@ -45,7 +49,8 @@ import { randomBytes } from 'node:crypto'
 export default class PublicDiagnosisService {
   constructor(
     private aiService: AiService,
-    private aiTokenQuotaService: AiTokenQuotaService
+    private aiTokenQuotaService: AiTokenQuotaService,
+    private publicAiBudgetService: PublicAiBudgetService
   ) {}
 
   async getQuota(user: User | null, sessionTokens: string[]): Promise<PublicDiagnosisQuotaProps> {
@@ -94,13 +99,23 @@ export default class PublicDiagnosisService {
     user: User | null,
     sessionTokens: string[],
     input: PublicDiagnosisStartInput,
-    locale: AiSuggestionLocale
+    locale: AiSuggestionLocale,
+    ip: string
   ): Promise<AiDiagnosisConversation> {
     if (user === null) {
+      // Budget global d'abord : un refus de budget dit autre chose qu'un
+      // refus de plafond personnel, et le visiteur mérite le bon message.
+      await this.publicAiBudgetService.assertDailyBudgetAvailable()
+
+      // Le compteur de session reste comme confort d'UX ; celui d'en dessous,
+      // persistant et par IP, est le garde-fou (#762).
       if (sessionTokens.length >= PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) {
         throw new DiagnosisQuotaExhaustedError()
       }
-      return this.#createConversation(null, input, locale)
+      if (!(await this.publicAiBudgetService.reserveConversation('diagnosis', ip))) {
+        throw new DiagnosisQuotaExhaustedError()
+      }
+      return this.#createConversation(null, input, locale, ip)
     }
 
     await this.#loadOrganization(user)
@@ -113,12 +128,12 @@ export default class PublicDiagnosisService {
         if (used >= PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) {
           throw new DiagnosisQuotaExhaustedError()
         }
-        return this.#createConversation(user, input, locale)
+        return this.#createConversation(user, input, locale, ip)
       })
     }
 
     return this.aiTokenQuotaService.withReservedTokens(user.organization, async () => {
-      return this.#createConversation(user, input, locale)
+      return this.#createConversation(user, input, locale, ip)
     })
   }
 
@@ -131,7 +146,8 @@ export default class PublicDiagnosisService {
     user: User | null,
     sessionTokens: string[],
     token: string,
-    message: string
+    message: string,
+    ip: string
   ): Promise<AiDiagnosisConversation> {
     const conversation = await this.#findOwnedOrFail(user, sessionTokens, token)
 
@@ -148,18 +164,25 @@ export default class PublicDiagnosisService {
       await this.#loadOrganization(user)
       if (this.#hasAiPlan(user)) {
         return this.aiTokenQuotaService.withReservedTokens(user.organization, async () => {
-          return this.#exchange(conversation, message, user)
+          return this.#exchange(conversation, message, user, ip)
         })
       }
+    } else {
+      // Chaque tour est un appel Mistral de plus : le budget se vérifie à
+      // chaque message, pas seulement à l'ouverture (#762). Le plafond de
+      // conversations, lui, ne compte que les ouvertures — le nombre de tours
+      // est déjà borné par `PUBLIC_DIAGNOSIS_MAX_USER_MESSAGES`.
+      await this.publicAiBudgetService.assertDailyBudgetAvailable()
     }
 
-    return this.#exchange(conversation, message, user)
+    return this.#exchange(conversation, message, user, ip)
   }
 
   async #createConversation(
     user: User | null,
     input: PublicDiagnosisStartInput,
-    locale: AiSuggestionLocale
+    locale: AiSuggestionLocale,
+    ip: string
   ): Promise<AiDiagnosisConversation> {
     const conversation = new AiDiagnosisConversation()
     conversation.token = randomBytes(6).toString('hex')
@@ -176,7 +199,7 @@ export default class PublicDiagnosisService {
     conversation.result = null
     conversation.tokensUsed = 0
 
-    return this.#exchange(conversation, input.message, user)
+    return this.#exchange(conversation, input.message, user, ip)
   }
 
   /**
@@ -187,7 +210,8 @@ export default class PublicDiagnosisService {
   async #exchange(
     conversation: AiDiagnosisConversation,
     userMessage: string,
-    user: User | null
+    user: User | null,
+    ip: string
   ): Promise<AiDiagnosisConversation> {
     const pendingMessages: AiChatMessage[] = [
       ...conversation.messages,
@@ -215,10 +239,17 @@ export default class PublicDiagnosisService {
     await conversation.save()
 
     // Suivi des coûts : les tokens des plans avec IA émargent au quota
-    // mensuel existant ; ceux des anonymes/starter restent tracés sur la
-    // conversation (`tokensUsed`) sans compteur d'org.
+    // mensuel existant ; ceux des anonymes émargent au budget public (#762) ;
+    // ceux d'un `starter` connecté restent tracés sur la conversation
+    // (`tokensUsed`) sans compteur d'org — il est identifié et son plafond de
+    // conversations est compté en base.
     if (user !== null && this.#hasAiPlan(user)) {
       await this.aiTokenQuotaService.recordUsage(user.organization, tokensUsed)
+    } else if (user === null) {
+      // Les tokens des anonymes n'apparaissaient nulle part : `ai_token_usages`
+      // ne compte que les organisations (#762). Sans mesure, on ne savait pas
+      // ce que la surface publique coûtait.
+      await this.publicAiBudgetService.recordTokens('diagnosis', ip, tokensUsed)
     }
 
     return conversation

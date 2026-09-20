@@ -5,6 +5,7 @@ import {
   PartSearchMaxMessagesReachedError,
   PartSearchQuotaExhaustedError,
 } from '#exceptions/spare_part_chat_errors'
+import { PublicAiDailyBudgetExhaustedError } from '#exceptions/public_ai_budget_errors'
 import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import PublicPartSearchService from '#services/public_part_search_service'
 import { toPublicPartSearchConversationProps } from '#transformers/spare_part_chat_transformer'
@@ -63,7 +64,8 @@ export default class PublicPartSearchController {
           brand: payload.brand ?? null,
           serialNumber: payload.serialNumber ?? null,
         },
-        toAppLocale(i18n.locale)
+        toAppLocale(i18n.locale),
+        request.ip()
       )
       if (user === null) {
         session.put(PUBLIC_PART_SEARCH_SESSION_KEY, [...sessionTokens, conversation.token])
@@ -86,7 +88,8 @@ export default class PublicPartSearchController {
         user,
         sessionTokens,
         String(params.token),
-        payload.message
+        payload.message,
+        request.ip()
       )
     } catch (error) {
       this.#flashError(error, session, i18n)
@@ -102,7 +105,12 @@ export default class PublicPartSearchController {
   }
 
   #flashError(error: unknown, session: HttpContext['session'], i18n: HttpContext['i18n']): void {
-    if (error instanceof PartSearchQuotaExhaustedError) {
+    if (error instanceof PublicAiDailyBudgetExhaustedError) {
+      // Dégradation propre (#762) : la surface publique a épuisé son budget de
+      // tokens du jour, toutes IP confondues. Message distinct du plafond
+      // personnel — le visiteur n'y est pour rien.
+      session.flash('error', i18n.t('flash.publicAi.dailyBudgetExhausted'))
+    } else if (error instanceof PartSearchQuotaExhaustedError) {
       session.flash('error', i18n.t('flash.publicPartSearch.quotaExhausted'))
     } else if (error instanceof PartSearchConversationNotFoundError) {
       session.flash('error', i18n.t('flash.publicPartSearch.notFound'))
