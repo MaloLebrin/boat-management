@@ -508,6 +508,31 @@ Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap 
 - `twdDeg`, `twaDeg`, `weatherSnapshot` (jsonb) — **réservés à l'itération météo GRIB**, jamais écrits aujourd'hui
 - `createdAt`, `updatedAt`
 
+### email_verification_tokens
+
+Jetons de vérification d'adresse (#768) — doc de domaine : `docs/domain/auth-acl.md`.
+
+Même moule que `password_reset_tokens` : jeton en clair envoyé par e-mail,
+**hash SHA-256 stocké**, expiration. `email` n'est pas une clé étrangère vers
+`users` — le lien se fait par l'adresse, et une adresse peut avoir un jeton en
+vol sans que la ligne `users` bouge.
+
+- `id`
+- `email` (indexé)
+- `token` (hash SHA-256, unique, `serializeAs: null`)
+- `expiresAt` (indexé) — 24 h, `EMAIL_VERIFICATION_TOKEN_TTL_HOURS`
+- `createdAt`
+
+Un seul jeton en vol par adresse : émettre en invalide les précédents.
+`EmailVerificationService.createToken()` balaye aussi les jetons expirés de
+toute la table — une inscription ou un renvoi, pas une lecture chaude, donc le
+moment le moins cher pour le faire sans cron.
+
+`users.email_verified_at` (nullable) porte la date de vérification. Les comptes
+antérieurs à #768 sont marqués vérifiés par la migration : pas une preuve
+rétroactive, mais le seul choix qui ne casse pas des comptes en service derrière
+une garde qu'ils n'ont jamais eu l'occasion de franchir.
+
 ## Relations (résumé)
 
 - `Organization 1..n User` via `users.organizationId`

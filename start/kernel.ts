@@ -51,4 +51,8 @@ export const middleware = router.named({
   auth: () => import('#middleware/auth_middleware'),
   requirePortsPlan: () => import('#middleware/require_ports_plan_middleware'),
   requireModulePlan: () => import('#middleware/require_module_plan_middleware'),
+  // Garde des actions qui engagent des tiers ou de l'argent (#768) : envoi
+  // d'e-mail sortant, invitation, paiement. L'app reste ouverte sans
+  // vérification — voir `require_verified_email_middleware.ts`.
+  requireVerifiedEmail: () => import('#middleware/require_verified_email_middleware'),
 })
