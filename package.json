@@ -108,7 +108,7 @@
     "@adonisjs/inertia": "^4.2.0",
     "@adonisjs/limiter": "^3.0.1",
     "@adonisjs/lucid": "^22.4.2",
-    "@adonisjs/mail": "^10.3.0",
+    "@adonisjs/mail": "^10.4.0",
     "@adonisjs/queue": "^0.6.1",
     "@adonisjs/session": "^8.1.0",
     "@adonisjs/shield": "^9.0.0",
