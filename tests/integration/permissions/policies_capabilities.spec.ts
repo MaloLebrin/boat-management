@@ -86,6 +86,26 @@ test.group('Policies — admin-only capability checks (integration)', () => {
     assert.isFalse(await policy.configureBranding(member))
   })
 
+  /**
+   * Renommer l'organisation (#761) — `viewMembers` ouvre l'écran, cette capacité
+   * garde le formulaire. Les deux sont asserties côte à côte : c'est leur écart
+   * qui est le contrat, un `member` consultant sans pouvoir réécrire.
+   */
+  test('OrganizationPolicy.manageOrganization: admin allowed, member denied', async ({
+    assert,
+  }) => {
+    const org = await OrganizationFactory.create()
+    const admin = await userWithRole(org.id, 'admin')
+    const member = await userWithRole(org.id, 'member')
+
+    const policy = new OrganizationPolicy()
+    assert.isTrue(await policy.manageOrganization(admin))
+    assert.isFalse(await policy.manageOrganization(member))
+    // Le member garde la lecture : sans cette ligne, rien ne distingue « refusé
+    // sur le renommage » de « refusé sur tout l'écran ».
+    assert.isTrue(await policy.viewMembers(member))
+  })
+
   test('SubscriptionPolicy.manage: admin allowed, member denied, cross-org denied', async ({
     assert,
   }) => {

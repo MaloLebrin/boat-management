@@ -139,9 +139,7 @@ export default class SparePartChatService {
     message: string,
     user: User
   ): Promise<AiPartSearchConversation> {
-    return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
-      const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
-      this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
+    return this.aiTokenQuotaService.withReservedTokens(user.organization, async () => {
       return this.#exchange(conversation, message, user)
     })
   }

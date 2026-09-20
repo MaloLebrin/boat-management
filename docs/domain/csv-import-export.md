@@ -145,20 +145,52 @@ valide. La session ne porte plus que `pendingImportId`.
 
 ## Fichiers clés
 
-| Fichier                                                  | Rôle                                                           |
-| -------------------------------------------------------- | -------------------------------------------------------------- |
-| `shared/types/csv.ts`                                    | Types partagés + `MAINTENANCE_CSV_HEADERS`                     |
-| `app/exceptions/csv_errors.ts`                           | `CsvImportValidationError`                                     |
-| `app/validators/csv_import.ts`                           | `csvPreviewValidator`, `csvConfirmValidator` (VineJS)          |
-| `app/services/csv_import_service.ts`                     | Parsing (BOM, guillemets, `;`), validation par colonne, import |
-| `app/services/csv_export_service.ts`                     | `buildCsv()`, `csvFilename()`                                  |
-| `app/controllers/csv_import_controller.ts`               | Attente en base + Inertia render                               |
-| `app/models/pending_import.ts`                           | `pending_imports` — une attente par utilisateur                |
-| `shared/constants/csv_import.ts`                         | Plafonds de lignes, de taille et de lot                        |
-| `app/controllers/csv_export_controller.ts`               | Streaming CSV par type                                         |
-| `inertia/pages/settings/import.vue`                      | Page shell Inertia                                             |
-| `inertia/components/settings/tabs/SettingsImportTab.vue` | Formulaire upload + aperçu + liens export                      |
-| `inertia/utils/routes.ts`                                | Helpers `routes.csv.*`                                         |
+| Fichier                                                  | Rôle                                                                         |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `shared/types/csv.ts`                                    | Types partagés + `MAINTENANCE_CSV_HEADERS`                                   |
+| `app/exceptions/csv_errors.ts`                           | `CsvImportValidationError`                                                   |
+| `app/validators/csv_import.ts`                           | `csvPreviewValidator`, `csvConfirmValidator` (VineJS)                        |
+| `app/services/csv_import_service.ts`                     | Parsing (BOM, guillemets, `;`), validation par colonne, import               |
+| `app/services/csv_export_service.ts`                     | `escapeCell()`, `buildCsv()`, `csvFilename()` — **seul** constructeur de CSV |
+| `app/controllers/csv_import_controller.ts`               | Attente en base + Inertia render                                             |
+| `app/models/pending_import.ts`                           | `pending_imports` — une attente par utilisateur                              |
+| `shared/constants/csv_import.ts`                         | Plafonds de lignes, de taille et de lot                                      |
+| `app/controllers/csv_export_controller.ts`               | Streaming CSV par type                                                       |
+| `inertia/pages/settings/import.vue`                      | Page shell Inertia                                                           |
+| `inertia/components/settings/tabs/SettingsImportTab.vue` | Formulaire upload + aperçu + liens export                                    |
+| `inertia/utils/routes.ts`                                | Helpers `routes.csv.*`                                                       |
+
+## Échappement des cellules (#773)
+
+`escapeCell()` (`app/services/csv_export_service.ts`) est le **seul**
+échappement de CSV du repo, et `buildCsv()` son seul constructeur. Il y en
+avait deux, avec deux implémentations divergentes de la même règle —
+`boat_engine_spare_parts_service.ts` avait la sienne, qui mettait tout entre
+guillemets. Ce n'était pas une protection : le tableur retire les guillemets à
+l'import, puis évalue le contenu.
+
+La règle, en deux temps :
+
+1. **RFC 4180** — une valeur contenant `;`, `"`, CR ou LF est mise entre
+   guillemets, les guillemets internes doublés.
+2. **Neutralisation des formules (CWE-1236)** — une **chaîne** commençant par
+   `=`, `+`, `-`, `@`, TAB ou CR est préfixée d'une apostrophe et mise entre
+   guillemets. Le tableur consomme l'apostrophe comme marqueur « ceci est du
+   texte » et n'évalue pas.
+
+Deux exemptions, sans lesquelles l'échappement serait une régression
+fonctionnelle :
+
+- un `number` n'est **jamais** préfixé — sinon les colonnes de coûts cessent
+  d'être sommables ;
+- une chaîne qui est un littéral numérique exact (`^-?\d+(?:[.,]\d+)?$`) non
+  plus : `-42` commence par un caractère de la liste noire et n'est pourtant
+  pas une formule. L'ancrage est ce qui rend l'exemption sûre — `-1+1` ne
+  matche pas, et se fait neutraliser.
+
+Pourquoi à l'export et non à l'écriture : `=1+1` est une saisie légitime dans
+un champ de notes. C'est la sortie vers un format évalué qui doit être
+échappée, pas la base.
 
 ## Quota et ACL
 

@@ -15,6 +15,7 @@
     "title": "Profil organisation",
     "nameLabel": "Nom de l'organisation",
     "namePlaceholder": "Mon organisation",
+    "readOnlyHint": "Seul un administrateur peut renommer l'organisation.",
     "logoLabel": "Logo",
     "logoPlaceholder": "Logo",
     "changeLogo": "Changer le logo",

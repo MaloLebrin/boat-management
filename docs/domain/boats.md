@@ -158,6 +158,39 @@ Référence: `app/controllers/boat_budget_entry_controller.ts`, `app/services/bo
 - `DELETE /boats/:id/budget/entries/:entryId` → `BoatBudgetEntryController.destroy`
   - Service: `BoatBudgetEntryService.delete`
 
+### Portail propriétaire (`boat_owner`)
+
+Référence: `app/controllers/boat_owner_portal_controller.ts`,
+`app/services/boat_owner_service.ts`.
+
+- `GET /owner/boats` → `BoatOwnerPortalController.index`
+  - Service: `BoatOwnerService.listOwnedBoats` (scoping par le pivot `boat_owners`)
+  - Transformer: `toBoatOwnerSummary`
+  - Page: `inertia/pages/owner/boats/index.vue`
+- `GET /owner/boats/:id` → `BoatOwnerPortalController.show`
+  - Services: `BoatOwnerService.getOwnedBoat`, `BoatMaintenanceService.listForBoat`,
+    `BoatReservationService.listForBoat`, `BoatOwnerService.listInvoicesForBoat`
+  - Transformers: `toBoatOwnerSummary`, `toBoatOwnerMaintenanceEvent`,
+    `toBoatReservationRow`, `toInvoiceRow`
+  - Page: `inertia/pages/owner/boats/show.vue`
+
+**Les quatre props passent par un transformer, sans exception.** C'est l'écran
+où la discipline compte le plus : `boat_owner` est le rôle le moins privilégié
+du produit, souvent externe à l'organisation qui exploite la flotte.
+`maintenanceEvents` partait en modèles Lucid bruts jusqu'à #781 — donc toute
+colonne ajoutée à `boat_maintenance_events` ou `boat_maintenance_parts`
+repartait automatiquement chez le propriétaire, `unitPrice` des pièces
+compris. `BoatOwnerMaintenanceEventRow` (`shared/types/maintenance.ts`) fixe
+désormais les sept champs que la page consomme, et
+`tests/functional/organization/boat_owner_portal.spec.ts` les fige.
+
+`BoatMaintenanceService.listForBoat(boat)` ne filtre que sur `boat.id` : **le
+cloisonnement est de la responsabilité de l'appelant**. Elle recevait un
+`_user` dont elle ne faisait rien ; le paramètre a été retiré plutôt
+qu'honoré, un `assertBoatInUserOrg` y casserait le portail (un propriétaire
+peut être membre d'une organisation autre que celle portée par son
+`user.organizationId`).
+
 ## Règles métier notables
 
 Référence: `app/services/boat_service.ts`.

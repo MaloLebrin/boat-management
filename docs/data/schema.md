@@ -353,6 +353,27 @@ Résultats de génération de l'assistant IA : suggestions de flotte (dashboard)
 - `createdAt`
 - index sur `(organization_id, kind)`, `(organization_id, kind, locale)` et `(boat_engine_id, kind, locale)`
 
+### ai_token_usages
+
+Compteur mensuel de tokens Mistral par organisation, adossé au plafond du plan
+(`PLAN_LIMITS[plan].aiTokensPerMonth` — 1 000 000 pour `pro`, illimité pour
+`enterprise`). Une ligne par organisation et par mois, créée à la volée.
+
+- `id`
+- `organizationId` (FK `organizations` cascade)
+- `month` (`yyyy-MM`)
+- `tokensUsed` — consommation **réelle**, émargée après chaque appel par
+  `recordUsage()`. C'est la seule colonne que lisent `getUsage()`, les
+  statistiques et les seuils de notification (80 %, 100 %)
+- `reservedTokens` (#776) — tokens **réservés le temps d'un appel en vol**,
+  puis relâchés. C'est ce qui rend le plafond opposable pendant un appel
+  Mistral, et donc entre processus : la vérification est un upsert
+  conditionnel (`… WHERE tokens_used + reserved_tokens + N <= limite`) dont le
+  zéro-ligne-affectée signifie « plafond atteint ». Colonne distincte à
+  dessein, pour qu'une réservation ne déclenche pas d'alerte de seuil
+- `createdAt`, `updatedAt`
+- unique sur `(organization_id, month)` — la clé du `ON CONFLICT`
+
 ### ai_diagnosis_conversations
 
 Conversations du chat IA public de diagnostic de panne (#602), le tunnel d'acquisition accessible sans compte. `userId`/`organizationId` nullables : une conversation anonyme n'a ni l'un ni l'autre (la propriété passe par la session) ; FK en `SET NULL` pour que les lignes survivent à la suppression du compte — elles portent le suivi des coûts. Le plafond « 2 conversations à vie » d'un plan `starter` est un simple `count(*)` sur `organization_id` : la ligne EST le compteur.

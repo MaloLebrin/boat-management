@@ -130,10 +130,7 @@ export default class AiAnalysisService {
     orgSystemPrompt?: string | null,
     orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
-    return this.aiTokenQuotaService.withOrgLock(org.id, async () => {
-      const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
-      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
-
+    return this.aiTokenQuotaService.withReservedTokens(org, async () => {
       const userMessage = buildFleetUserMessage(input, locale)
       const systemPrompt = buildSystemPrompt(locale)
       const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${systemPrompt}` : systemPrompt
@@ -178,10 +175,7 @@ export default class AiAnalysisService {
     orgSystemPrompt?: string | null,
     orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
-    return this.aiTokenQuotaService.withOrgLock(org.id, async () => {
-      const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
-      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
-
+    return this.aiTokenQuotaService.withReservedTokens(org, async () => {
       const userMessage = buildBoatUserMessage(input, locale)
       const systemPrompt = buildSystemPrompt(locale)
       const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${systemPrompt}` : systemPrompt
@@ -228,10 +222,7 @@ export default class AiAnalysisService {
     orgSystemPrompt?: string | null,
     orgModelOverride?: string | null
   ): Promise<AiSuggestion[]> {
-    return this.aiTokenQuotaService.withOrgLock(org.id, async () => {
-      const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
-      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
-
+    return this.aiTokenQuotaService.withReservedTokens(org, async () => {
       const userMessage = buildEngineSuggestionsUserMessage(input, locale)
       const systemPrompt = buildSystemPrompt(locale)
       const systemContent = orgSystemPrompt ? `${orgSystemPrompt}\n\n${systemPrompt}` : systemPrompt
@@ -311,10 +302,7 @@ export default class AiAnalysisService {
     orgSystemPrompt?: string | null,
     orgModelOverride?: string | null
   ): Promise<EngineDiagnosisResult> {
-    return this.aiTokenQuotaService.withOrgLock(org.id, async () => {
-      const currentUsage = await this.aiTokenQuotaService.getUsage(org.id)
-      this.aiTokenQuotaService.assertCanUseTokens(org, currentUsage)
-
+    return this.aiTokenQuotaService.withReservedTokens(org, async () => {
       // La famille du moteur cadre le prompt et restreint les fiches
       // recommandables (#576) : un diesel ne doit pas être diagnostiqué en 2T.
       const family = isEngineFamily(input.engine.family) ? input.engine.family : null

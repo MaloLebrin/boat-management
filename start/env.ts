@@ -22,7 +22,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   DB_HOST: Env.schema.string({ format: 'host' }),
   DB_PORT: Env.schema.number(),
   DB_USER: Env.schema.string(),
-  DB_PASSWORD: Env.schema.string(),
+  DB_PASSWORD: Env.schema.secret(),
   DB_DATABASE: Env.schema.string(),
 
   // App
@@ -43,12 +43,12 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Cloudinary
   CLOUDINARY_CLOUD_NAME: Env.schema.string(),
-  CLOUDINARY_API_KEY: Env.schema.string(),
+  CLOUDINARY_API_KEY: Env.schema.secret(),
   CLOUDINARY_API_SECRET: Env.schema.secret(),
 
   // Stripe
-  STRIPE_SECRET_KEY: Env.schema.string.optional(),
-  STRIPE_WEBHOOK_SECRET: Env.schema.string.optional(),
+  STRIPE_SECRET_KEY: Env.schema.secret.optional(),
+  STRIPE_WEBHOOK_SECRET: Env.schema.secret.optional(),
   STRIPE_PRO_MONTHLY_PRICE_ID: Env.schema.string.optional(),
   STRIPE_PRO_ANNUAL_PRICE_ID: Env.schema.string.optional(),
   STRIPE_ENTERPRISE_MONTHLY_PRICE_ID: Env.schema.string.optional(),
@@ -76,7 +76,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   SMTP_PORT: Env.schema.number(),
   SMTP_SECURE: Env.schema.boolean(),
   SMTP_USERNAME: Env.schema.string.optional(),
-  SMTP_PASSWORD: Env.schema.string.optional(),
+  SMTP_PASSWORD: Env.schema.secret.optional(),
   MAIL_FROM_ADDRESS: Env.schema.string(),
   MAIL_FROM_NAME: Env.schema.string(),
 
