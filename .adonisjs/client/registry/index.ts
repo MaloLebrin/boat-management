@@ -186,12 +186,6 @@ const routes = {
     tokens: [{"old":"/boats/:id/owners/:userId","type":0,"val":"boats","end":""},{"old":"/boats/:id/owners/:userId","type":1,"val":"id","end":""},{"old":"/boats/:id/owners/:userId","type":0,"val":"owners","end":""},{"old":"/boats/:id/owners/:userId","type":1,"val":"userId","end":""}],
     types: placeholder as Registry['boats.owners.destroy']['types'],
   },
-  'boats.assign': {
-    methods: ["PATCH"],
-    pattern: '/boats/:id/assignment',
-    tokens: [{"old":"/boats/:id/assignment","type":0,"val":"boats","end":""},{"old":"/boats/:id/assignment","type":1,"val":"id","end":""},{"old":"/boats/:id/assignment","type":0,"val":"assignment","end":""}],
-    types: placeholder as Registry['boats.assign']['types'],
-  },
   'boat_equipment.store_engine': {
     methods: ["POST"],
     pattern: '/boats/:boatId/engines',
@@ -948,6 +942,12 @@ const routes = {
     tokens: [{"old":"/spots/:id","type":0,"val":"spots","end":""},{"old":"/spots/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['spots.destroy']['types'],
   },
+  'boats.assign': {
+    methods: ["PATCH"],
+    pattern: '/boats/:id/assignment',
+    tokens: [{"old":"/boats/:id/assignment","type":0,"val":"boats","end":""},{"old":"/boats/:id/assignment","type":1,"val":"id","end":""},{"old":"/boats/:id/assignment","type":0,"val":"assignment","end":""}],
+    types: placeholder as Registry['boats.assign']['types'],
+  },
   'planning.index': {
     methods: ["GET","HEAD"],
     pattern: '/planning',
@@ -1386,23 +1386,11 @@ const routes = {
     tokens: [{"old":"/clients/:id","type":0,"val":"clients","end":""},{"old":"/clients/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['clients.show']['types'],
   },
-  'clients.store': {
-    methods: ["POST"],
-    pattern: '/clients',
-    tokens: [{"old":"/clients","type":0,"val":"clients","end":""}],
-    types: placeholder as Registry['clients.store']['types'],
-  },
-  'clients.update': {
-    methods: ["PUT"],
-    pattern: '/clients/:id',
-    tokens: [{"old":"/clients/:id","type":0,"val":"clients","end":""},{"old":"/clients/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['clients.update']['types'],
-  },
-  'clients.destroy': {
-    methods: ["DELETE"],
-    pattern: '/clients/:id',
-    tokens: [{"old":"/clients/:id","type":0,"val":"clients","end":""},{"old":"/clients/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['clients.destroy']['types'],
+  'clients.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/clients/:id/export',
+    tokens: [{"old":"/clients/:id/export","type":0,"val":"clients","end":""},{"old":"/clients/:id/export","type":1,"val":"id","end":""},{"old":"/clients/:id/export","type":0,"val":"export","end":""}],
+    types: placeholder as Registry['clients.export']['types'],
   },
   'clients.documents.store': {
     methods: ["POST"],
@@ -1422,17 +1410,29 @@ const routes = {
     tokens: [{"old":"/clients/:id/media/:mediaId/download","type":0,"val":"clients","end":""},{"old":"/clients/:id/media/:mediaId/download","type":1,"val":"id","end":""},{"old":"/clients/:id/media/:mediaId/download","type":0,"val":"media","end":""},{"old":"/clients/:id/media/:mediaId/download","type":1,"val":"mediaId","end":""},{"old":"/clients/:id/media/:mediaId/download","type":0,"val":"download","end":""}],
     types: placeholder as Registry['clients.media.download']['types'],
   },
+  'clients.store': {
+    methods: ["POST"],
+    pattern: '/clients',
+    tokens: [{"old":"/clients","type":0,"val":"clients","end":""}],
+    types: placeholder as Registry['clients.store']['types'],
+  },
+  'clients.update': {
+    methods: ["PUT"],
+    pattern: '/clients/:id',
+    tokens: [{"old":"/clients/:id","type":0,"val":"clients","end":""},{"old":"/clients/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['clients.update']['types'],
+  },
+  'clients.destroy': {
+    methods: ["DELETE"],
+    pattern: '/clients/:id',
+    tokens: [{"old":"/clients/:id","type":0,"val":"clients","end":""},{"old":"/clients/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['clients.destroy']['types'],
+  },
   'clients.anonymize': {
     methods: ["POST"],
     pattern: '/clients/:id/anonymize',
     tokens: [{"old":"/clients/:id/anonymize","type":0,"val":"clients","end":""},{"old":"/clients/:id/anonymize","type":1,"val":"id","end":""},{"old":"/clients/:id/anonymize","type":0,"val":"anonymize","end":""}],
     types: placeholder as Registry['clients.anonymize']['types'],
-  },
-  'clients.export': {
-    methods: ["GET","HEAD"],
-    pattern: '/clients/:id/export',
-    tokens: [{"old":"/clients/:id/export","type":0,"val":"clients","end":""},{"old":"/clients/:id/export","type":1,"val":"id","end":""},{"old":"/clients/:id/export","type":0,"val":"export","end":""}],
-    types: placeholder as Registry['clients.export']['types'],
   },
   'pricingSeasons.index': {
     methods: ["GET","HEAD"],
@@ -1464,6 +1464,18 @@ const routes = {
     tokens: [{"old":"/invoices","type":0,"val":"invoices","end":""}],
     types: placeholder as Registry['invoices.index']['types'],
   },
+  'invoices.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/invoices/:id',
+    tokens: [{"old":"/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['invoices.show']['types'],
+  },
+  'invoices.pdf': {
+    methods: ["GET","HEAD"],
+    pattern: '/invoices/:id/pdf',
+    tokens: [{"old":"/invoices/:id/pdf","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/pdf","type":1,"val":"id","end":""},{"old":"/invoices/:id/pdf","type":0,"val":"pdf","end":""}],
+    types: placeholder as Registry['invoices.pdf']['types'],
+  },
   'invoices.create': {
     methods: ["GET","HEAD"],
     pattern: '/invoices/new',
@@ -1482,23 +1494,11 @@ const routes = {
     tokens: [{"old":"/invoices/from-reservation/:reservationId","type":0,"val":"invoices","end":""},{"old":"/invoices/from-reservation/:reservationId","type":0,"val":"from-reservation","end":""},{"old":"/invoices/from-reservation/:reservationId","type":1,"val":"reservationId","end":""}],
     types: placeholder as Registry['invoices.fromReservation']['types'],
   },
-  'invoices.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/invoices/:id',
-    tokens: [{"old":"/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/invoices/:id","type":1,"val":"id","end":""}],
-    types: placeholder as Registry['invoices.show']['types'],
-  },
   'invoices.edit': {
     methods: ["GET","HEAD"],
     pattern: '/invoices/:id/edit',
     tokens: [{"old":"/invoices/:id/edit","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/edit","type":1,"val":"id","end":""},{"old":"/invoices/:id/edit","type":0,"val":"edit","end":""}],
     types: placeholder as Registry['invoices.edit']['types'],
-  },
-  'invoices.pdf': {
-    methods: ["GET","HEAD"],
-    pattern: '/invoices/:id/pdf',
-    tokens: [{"old":"/invoices/:id/pdf","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/pdf","type":1,"val":"id","end":""},{"old":"/invoices/:id/pdf","type":0,"val":"pdf","end":""}],
-    types: placeholder as Registry['invoices.pdf']['types'],
   },
   'invoices.send': {
     methods: ["POST"],
@@ -1517,6 +1517,12 @@ const routes = {
     pattern: '/invoices/:id/pay',
     tokens: [{"old":"/invoices/:id/pay","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/pay","type":1,"val":"id","end":""},{"old":"/invoices/:id/pay","type":0,"val":"pay","end":""}],
     types: placeholder as Registry['invoices.pay']['types'],
+  },
+  'invoices.payment': {
+    methods: ["PATCH"],
+    pattern: '/invoices/:id/payment',
+    tokens: [{"old":"/invoices/:id/payment","type":0,"val":"invoices","end":""},{"old":"/invoices/:id/payment","type":1,"val":"id","end":""},{"old":"/invoices/:id/payment","type":0,"val":"payment","end":""}],
+    types: placeholder as Registry['invoices.payment']['types'],
   },
   'invoices.update': {
     methods: ["PUT"],
@@ -1583,6 +1589,24 @@ const routes = {
     pattern: '/logout',
     tokens: [{"old":"/logout","type":0,"val":"logout","end":""}],
     types: placeholder as Registry['session.destroy']['types'],
+  },
+  'email_verification.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/verify-email',
+    tokens: [{"old":"/verify-email","type":0,"val":"verify-email","end":""}],
+    types: placeholder as Registry['email_verification.show']['types'],
+  },
+  'email_verification.resend': {
+    methods: ["POST"],
+    pattern: '/verify-email/resend',
+    tokens: [{"old":"/verify-email/resend","type":0,"val":"verify-email","end":""},{"old":"/verify-email/resend","type":0,"val":"resend","end":""}],
+    types: placeholder as Registry['email_verification.resend']['types'],
+  },
+  'email_verification.confirm': {
+    methods: ["GET","HEAD"],
+    pattern: '/verify-email/confirm',
+    tokens: [{"old":"/verify-email/confirm","type":0,"val":"verify-email","end":""},{"old":"/verify-email/confirm","type":0,"val":"confirm","end":""}],
+    types: placeholder as Registry['email_verification.confirm']['types'],
   },
   'ai.chat': {
     methods: ["POST"],
