@@ -1,5 +1,6 @@
 import { forgotPasswordValidator, resetPasswordValidator } from '#validators/user'
 import PasswordResetService from '#services/password_reset_service'
+import { PASSWORD_RESET_TOKEN_SESSION_KEY } from '#shared/constants/auth'
 import EmailQueueService from '#services/email_queue_service'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
@@ -30,9 +31,30 @@ export default class PasswordResetController {
     return response.redirect().toPath('/forgot-password')
   }
 
-  async edit({ request, inertia }: HttpContext) {
-    const token = request.qs().token as string
-    return inertia.render('auth/reset_password', { token: token ?? '' })
+  /**
+   * `GET /reset-password`. Deux passages (#770) :
+   *
+   * 1. avec `?token=…`, on range le token en session et on **rejoue la page
+   *    sans query string** — le token ne reste dans l'URL que le temps d'une
+   *    requête, donc pas dans l'historique, pas dans les journaux d'accès du
+   *    reverse proxy, pas dans le `Referer` des sous-requêtes de la page ;
+   * 2. sans query string, on rend le formulaire en relisant la session.
+   *
+   * Le token continue d'être posté par le formulaire : il vit alors dans le
+   * corps d'une requête, pas dans une URL.
+   */
+  async edit({ request, response, session, inertia }: HttpContext) {
+    const fromQuery = request.qs().token
+
+    if (typeof fromQuery === 'string' && fromQuery.length > 0) {
+      session.put(PASSWORD_RESET_TOKEN_SESSION_KEY, fromQuery)
+      return response.redirect().withQs(false).toPath('/reset-password')
+    }
+
+    const token = session.get(PASSWORD_RESET_TOKEN_SESSION_KEY)
+    return inertia.render('auth/reset_password', {
+      token: typeof token === 'string' ? token : '',
+    })
   }
 
   async update({ request, response, session, i18n }: HttpContext) {
@@ -52,6 +74,8 @@ export default class PasswordResetController {
     }
 
     await this.passwordResetService.invalidateTokensForEmail(record.email)
+    // Le token a servi : il n'a plus rien à faire en session (#770).
+    session.forget(PASSWORD_RESET_TOKEN_SESSION_KEY)
 
     session.flash('success', i18n.t('flash.auth.passwordResetSuccess'))
     return response.redirect().toPath('/login')

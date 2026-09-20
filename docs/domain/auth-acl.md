@@ -96,6 +96,29 @@ expiré, déjà consommé, inconnu, sans session ouverte, renvoi qui invalide le
 précédent, renvoi indiscernable sur une adresse déjà vérifiée, les deux faces de
 la garde).
 
+### Réinitialisation du mot de passe : le jeton hors de l'URL (#770)
+
+Le lien envoyé par e-mail porte le jeton en query string — c'est un lien. Ce
+qui est corrigé, c'est qu'il n'y **reste** pas :
+
+- `GET /reset-password?token=…` range le jeton en session
+  (`PASSWORD_RESET_TOKEN_SESSION_KEY`, `shared/constants/auth.ts`) et rejoue la
+  page **sans query string** ; le formulaire le reçoit en prop et le poste dans
+  le corps de la requête. `update` l'oublie de la session une fois consommé.
+- `GuestMiddleware` redirige désormais avec `.withQs(false)`. Un utilisateur
+  déjà connecté qui clique sur son lien atterrissait sur
+  `/dashboard?token=<jeton encore valide>` — donc dans l'historique, dans les
+  journaux d'accès du reverse proxy, et dans le `Referer` des sous-requêtes de
+  la page (la CSP autorise `res.cloudinary.com` en `imgSrc`).
+- `SecurityHeadersMiddleware` (`server.use`, pas Shield, que le kernel retire
+  en test) pose `Referrer-Policy: strict-origin-when-cross-origin` sur toutes
+  les réponses. Défense indépendante, qui couvre aussi les jetons
+  d'invitation — eux aussi en query string.
+
+⚠️ `config/app.ts` garde `forwardQueryString: true` en global. Toute nouvelle
+redirection depuis une route qui porte un paramètre sensible doit donc s'en
+extraire explicitement avec `.withQs(false)`.
+
 ### Login
 
 - `GET /login` (guest-only)

@@ -21,9 +21,12 @@ test.group('GuestMiddleware (unit)', () => {
     })
 
     assert.equal(nextCalled, 0, 'la page visiteur ne doit pas être rendue')
-    // Le second argument vide la query string : sans lui, un `?redirect=` collé
-    // à l'URL de login survivrait à la redirection.
-    assert.deepEqual(redirectCalls, [{ target: '/dashboard', clearQs: true }])
+    // `withQs(false)` **jette** la query string. Le commentaire précédent
+    // lisait l'API à l'envers : `redirect(target, true)` la *conservait*, et un
+    // `/reset-password?token=…` visité par un utilisateur déjà connecté
+    // repartait donc en `/dashboard?token=…`, jeton encore valide compris
+    // (#770). L'assertion figeait le bug.
+    assert.deepEqual(redirectCalls, [{ target: '/dashboard', forwardQs: false }])
     // `reflash()` reporte les messages flash en cours sur la requête suivante —
     // sans lui, un message d'erreur disparaîtrait au passage de la redirection.
     assert.equal(reflash.reflashCount, 1)
