@@ -21,8 +21,86 @@ Référence routes: `start/routes/auth.ts`.
     brute — voir l'allowlist `RATE_LIMIT_FLASH_ROUTES` d'`app/exceptions/handler.ts`.
   - Auth: `auth.use('web').login(user)`
   - Redirect: route `home`
-  - Mot de passe : `PASSWORD_MIN_LENGTH` / `PASSWORD_MAX_LENGTH` (`shared/constants/auth.ts`) — mêmes constantes côté formulaire, qui les affiche (#455). Aucune vérification d'e-mail n'existe : `store` connecte l'utilisateur immédiatement et n'envoie qu'un e-mail de bienvenue (`EmailQueueService.sendWelcome`) — ne pas promettre de lien de confirmation dans la copie
+  - Mot de passe : `PASSWORD_MIN_LENGTH` / `PASSWORD_MAX_LENGTH` (`shared/constants/auth.ts`) — mêmes constantes côté formulaire, qui les affiche (#455). `store` connecte l'utilisateur immédiatement, envoie l'e-mail de bienvenue (`EmailQueueService.sendWelcome`) **et** un lien de vérification d'adresse (#768, voir ci-dessous) : l'essai reste sans friction, le compte part simplement non vérifié
   - Promesses affichées : `tests/functional/auth/signup_claims.spec.ts` relit les chaînes servies dans `appT` pour interdire tout retour d'un quota en dur, d'un « illimité » ou d'un essai 14 jours (#455)
+
+### Vérification d'adresse (#768)
+
+L'inscription créait directement un utilisateur, une organisation et une
+session : **rien ne prouvait que l'adresse saisie appartenait à la personne qui
+s'inscrivait**. Or cette adresse est le pivot de l'app — clé de connexion,
+canal de réinitialisation, cible des invitations, destinataire des factures et
+des relances. Ce que cela permettait : s'inscrire avec l'adresse d'un tiers (qui
+reçoit alors nos e-mails transactionnels), des comptes jetables en masse, et une
+base de contacts dont les bounces dégradent la délivrabilité du domaine.
+
+Le flux reprend le moule de `password_reset_tokens` : jeton en clair envoyé par
+e-mail, **hash SHA-256 stocké**, expiration à
+`EMAIL_VERIFICATION_TOKEN_TTL_HOURS` (24 h,
+`shared/constants/email_verification.ts`).
+
+| Route                               | Accès                                                 | Rôle                                   |
+| ----------------------------------- | ----------------------------------------------------- | -------------------------------------- |
+| `GET /verify-email`                 | auth                                                  | Écran de rappel, adresse et renvoi     |
+| `POST /verify-email/resend`         | auth + `emailVerificationResendThrottle` (5 / 10 min) | Renvoie un lien, invalide le précédent |
+| `GET /verify-email/confirm?token=…` | **public** + `authThrottle`                           | Consomme le lien                       |
+
+#### Pourquoi la confirmation est publique
+
+Le lien arrive par e-mail et rien ne dit que la session est encore ouverte dans
+le navigateur qui l'ouvre. Exiger d'être connecté renverrait sur `/login` **en
+perdant le jeton** — le piège de #770. Le jeton prouve à lui seul la possession
+de l'adresse. La route est aussi hors du groupe `guest()`, pour qu'un
+utilisateur déjà connecté qui clique puisse confirmer au lieu d'être renvoyé sur
+son dashboard.
+
+La redirection vers `/login` passe par `withQs(false)` : sans lui,
+`redirect().toPath()` reporte la query string entrante et le jeton se
+retrouverait dans `/login?token=…`, donc dans l'historique du navigateur et dans
+le `Referer` envoyé aux ressources de la page de connexion. Même fuite que celle
+corrigée en #770 — un test la couvre.
+
+#### Portée du blocage
+
+C'est le choix produit de l'issue, et il est délibérément intermédiaire :
+**l'app reste accessible sans vérification**, seules les actions qui engagent un
+tiers ou de l'argent attendent. Bloquer tout casserait l'essai immédiat que
+l'inscription sans friction cherche à offrir ; ne rien bloquer rendrait la
+vérification décorative.
+
+`middleware.requireVerifiedEmail()` (`app/middleware/require_verified_email_middleware.ts`)
+garde quatre routes :
+
+| Route                                                           | Pourquoi                                              |
+| --------------------------------------------------------------- | ----------------------------------------------------- |
+| `POST /organization/invitations`                                | l'adresse d'un tiers reçoit un e-mail à notre nom     |
+| `POST /invoices/:id/send`                                       | met du courrier à notre nom dans la boîte d'un client |
+| `POST /boats/:boatId/reservations/:reservationId/contract/send` | idem                                                  |
+| `POST /settings/billing/checkout`                               | engage de l'argent                                    |
+
+`POST /settings/billing/portal` reste **ouvert** : un client déjà payant doit
+pouvoir gérer son abonnement, y compris le résilier.
+
+Le rappel passe par `EmailVerificationBanner.vue`, monté dans le layout
+applicatif et piloté par le booléen `user.emailVerified` de la prop partagée —
+un booléen, pas la date : le front n'a besoin que de savoir s'il doit afficher
+la bannière. Sans ce rappel, l'utilisateur découvrirait la garde au moment
+d'envoyer sa première facture, sans savoir quoi faire.
+
+#### Comptes antérieurs
+
+La migration les marque **vérifiés**. Ce n'est pas une preuve rétroactive :
+c'est le seul choix qui ne casse pas des comptes en service derrière une garde
+qu'ils n'ont jamais eu l'occasion de franchir. La garde ne s'applique donc
+qu'aux inscriptions postérieures. `UserFactory` fait de même — un utilisateur de
+fabrique représente un compte établi, et la garde ne doit pas surgir dans des
+tests qui n'ont rien à voir avec elle ; un compte fraîchement inscrit se
+construit en remettant `emailVerifiedAt` à `null`.
+
+Couverture : `tests/functional/auth/email_verification.spec.ts` (lien valide,
+expiré, déjà consommé, inconnu, sans session ouverte, renvoi qui invalide le
+précédent, renvoi indiscernable sur une adresse déjà vérifiée, les deux faces de
+la garde).
 
 ### Login
 
