@@ -54,6 +54,7 @@ const NOT_A_SECRET: Record<string, string> = {
   'ai_part_search_conversation.tokensUsed': 'compteur de tokens consommés',
   'ai_token_usage.tokensUsed': 'compteur de tokens consommés',
   'ai_token_usage.reservedTokens': 'compteur de tokens réservés pour un appel en vol',
+  'public_ai_usage.tokensUsed': 'compteur de tokens consommés',
 
   // Clés de catalogue et de traduction, affichées telles quelles.
   'engine_brand.plateLocationKey': 'clé i18n affichée par le front',

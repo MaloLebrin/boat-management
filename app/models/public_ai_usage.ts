@@ -20,7 +20,13 @@ export default class PublicAiUsage extends BaseModel {
   @column()
   declare surface: string
 
-  @column()
+  /**
+   * HMAC de l'IP salé par le jour — jamais sérialisé (#782/#762). Dérivé d'une
+   * donnée personnelle et strictement interne au compteur : aucun client n'a
+   * de raison de le voir, et l'exposer rendrait deux visites d'une même IP
+   * recoupables dans la journée.
+   */
+  @column({ serializeAs: null })
   declare clientKey: string
 
   @column()
