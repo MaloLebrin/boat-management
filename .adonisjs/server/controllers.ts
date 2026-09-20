@@ -48,6 +48,7 @@ export const controllers = {
     MailPreviews: () => import('#controllers/dev/mail_previews_controller'),
     PdfPreviews: () => import('#controllers/dev/pdf_previews_controller'),
   },
+  EmailVerification: () => import('#controllers/email_verification_controller'),
   Engines: () => import('#controllers/engines_controller'),
   Health: () => import('#controllers/health_controller'),
   Home: () => import('#controllers/home_controller'),

@@ -13,6 +13,7 @@ declare module '@adonisjs/inertia/types' {
     'auth/login': ExtractProps<(typeof import('../../inertia/pages/auth/login.vue'))['default']>
     'auth/reset_password': ExtractProps<(typeof import('../../inertia/pages/auth/reset_password.vue'))['default']>
     'auth/signup': ExtractProps<(typeof import('../../inertia/pages/auth/signup.vue'))['default']>
+    'auth/verify_email': ExtractProps<(typeof import('../../inertia/pages/auth/verify_email.vue'))['default']>
     'boats/budget': ExtractProps<(typeof import('../../inertia/pages/boats/budget.vue'))['default']>
     'boats/edit': ExtractProps<(typeof import('../../inertia/pages/boats/edit.vue'))['default']>
     'boats/engine_edit': ExtractProps<(typeof import('../../inertia/pages/boats/engine_edit.vue'))['default']>

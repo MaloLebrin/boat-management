@@ -1560,6 +1560,21 @@ export class CrewMemberSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class EmailVerificationTokenSchema extends BaseModel {
+  static $columns = ['createdAt', 'email', 'expiresAt', 'id', 'token'] as const
+  $columns = EmailVerificationTokenSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare token: string
+}
+
 export class EngineBrandSchema extends BaseModel {
   static $columns = [
     'aliases',
@@ -2853,6 +2868,7 @@ export class UserSchema extends BaseModel {
   static $columns = [
     'createdAt',
     'email',
+    'emailVerifiedAt',
     'fullName',
     'id',
     'lastLoginAt',
@@ -2867,6 +2883,8 @@ export class UserSchema extends BaseModel {
   declare createdAt: DateTime
   @column()
   declare email: string
+  @column.dateTime()
+  declare emailVerifiedAt: DateTime | null
   @column()
   declare fullName: string | null
   @column({ isPrimary: true })
