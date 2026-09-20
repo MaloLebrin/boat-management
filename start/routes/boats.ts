@@ -487,6 +487,9 @@ router
             'send',
           ])
           .as('boats.reservations.contract.send')
+          // Envoyer un contrat met du courrier à notre nom dans la boîte d'un
+          // client (#768).
+          .use(middleware.requireVerifiedEmail())
         router
           .post('boats/:boatId/reservations/:reservationId/contract/sign', [
             controllers.RentalContracts,
