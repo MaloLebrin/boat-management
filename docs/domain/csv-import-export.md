@@ -55,9 +55,9 @@ Routes (`start/routes/settings.ts`) → controller `app/controllers/csv_import_c
 | Route                           | Action                        | Description                                                        |
 | ------------------------------- | ----------------------------- | ------------------------------------------------------------------ |
 | `GET /settings/import`          | `CsvImportController.show`    | Page import/export, passe `boats[]`, `preview`, `hasPendingImport` |
-| `POST /settings/import/preview` | `CsvImportController.preview` | Dry-run — parse + valide, stocke en session, redirige              |
-| `POST /settings/import/confirm` | `CsvImportController.confirm` | Import effectif depuis les données en session                      |
-| `POST /settings/import/cancel`  | `CsvImportController.cancel`  | Nettoie la session, redirige                                       |
+| `POST /settings/import/preview` | `CsvImportController.preview` | Dry-run — parse + valide, écrit un `pending_imports`, redirige     |
+| `POST /settings/import/confirm` | `CsvImportController.confirm` | Import effectif depuis le `pending_imports` de l'utilisateur       |
+| `POST /settings/import/cancel`  | `CsvImportController.cancel`  | Supprime le `pending_imports` de l'utilisateur, redirige           |
 
 #### Format attendu (maintenance)
 
@@ -79,19 +79,66 @@ Colonnes optionnelles : `notes`, `engine_caption`, `sail_caption`, `cost`
 | `sail_caption`   | Obligatoire si `subject=sail`                                                                |
 | `cost`           | Décimal (`,` ou `.` acceptés), optionnel                                                     |
 
-#### Flux session (preview → confirm)
+#### Bornes du fichier (#774)
 
-1. `POST /preview` : parse le CSV, stocke les lignes valides dans `session.put('pendingImport', {...})` et le résumé d'affichage dans `session.flash('importPreview', json)`
-2. `GET /settings/import` : lit `session.flashMessages.get('importPreview')` pour afficher l'aperçu ; `hasPendingImport` reflète la présence de `pendingImport` en session
-3. `POST /confirm` : lit `session.get('pendingImport')`, crée les enregistrements en base via `importMaintenanceRows()`, puis `session.forget('pendingImport')`
+| Borne                         | Valeur               | Où                                                  |
+| ----------------------------- | -------------------- | --------------------------------------------------- |
+| `CSV_IMPORT_MAX_FILE_SIZE_MB` | `2` Mo               | `csvPreviewValidator` (VineJS, refus multipart)     |
+| `CSV_IMPORT_MAX_ROWS`         | `2 000` lignes       | `parseMaintenanceCsv()`, **avant** toute validation |
+| `CSV_IMPORT_INSERT_CHUNK`     | `200` lignes par lot | `importMaintenanceRows()`                           |
 
-> Si l'utilisateur ferme l'onglet entre preview et confirm, les données en session expirent avec la session (TTL 5 jours par défaut). Il faut alors re-uploader le fichier.
+Les trois vivent dans `shared/constants/csv_import.ts` et sont reprises telles
+quelles par l'UI (`settings.import.fileHint`, `settings.import.help.step2`) :
+l'aide annonçait 5 Mo sans plafond de lignes, c'est-à-dire une limite que le
+code n'appliquait pas.
+
+La taille de fichier est calée sur le plafond de lignes, pas l'inverse : un
+`5mb` accepté par le validateur puis systématiquement refusé au parse est un
+piège. Le refus de lignes est prioritaire sur le contrôle d'en-têtes — sur un
+fichier hors bornes, on ne parse rien de plus que le comptage.
+
+#### Flux preview → confirm
+
+L'attente vit dans la table `pending_imports`, **pas en session** (#774) :
+avec `SESSION_DRIVER=cookie` (la valeur de `.env.example`, donc de la
+production), quelques centaines de lignes dépassaient les ~4 Ko d'un cookie.
+L'aperçu s'affichait correctement, puis le `confirm` ne retrouvait rien et
+servait « votre prévisualisation a expiré » pour un fichier parfaitement
+valide. La session ne porte plus que `pendingImportId`.
+
+1. `POST /preview` : parse le CSV, supprime l'éventuelle attente précédente de
+   l'utilisateur, crée un `PendingImport` (`rows` en `jsonb`), met son `id`
+   dans `session.put('pendingImportId', …)` et le résumé d'affichage dans
+   `session.flash('importPreview', json)`
+2. `GET /settings/import` : lit `session.flashMessages.get('importPreview')`
+   pour afficher l'aperçu ; `hasPendingImport` est dérivé de la **table**, pas
+   de la session — un `confirm` joué dans un autre onglet laissait sinon
+   l'écran proposer de confirmer un import déjà consommé
+3. `POST /confirm` : charge le `PendingImport` **par `id` et par `userId`**,
+   écrit via `importMaintenanceRows()`, puis supprime la ligne et oublie la clé
+   de session
+
+> Le scope `userId` du point 3 n'est pas décoratif : sans lui, un identifiant
+> recopié suffirait à consommer la prévisualisation d'un collègue de la même
+> organisation — la vérification du bateau, elle, ne tranche pas ce cas
+> puisque les deux y ont accès.
+
+> Une seule attente par utilisateur (contrainte d'unicité sur `user_id`) : une
+> nouvelle prévisualisation remplace la précédente, et rien ne s'accumule. Pas
+> de job de purge à prévoir.
+
+> Si l'utilisateur ferme l'onglet entre preview et confirm, la ligne reste
+> jusqu'à sa prochaine prévisualisation, mais la clé de session expire avec la
+> session (TTL 5 jours par défaut). Il faut alors re-uploader le fichier.
 
 #### Comportement de l'import (maintenance)
 
 `importMaintenanceRows()` (`app/services/csv_import_service.ts`) :
 
 - Wrappé dans une transaction Lucid — rollback global si une ligne échoue
+- Insère **par lots** de `CSV_IMPORT_INSERT_CHUNK` (`createMany`), au lieu de
+  deux `INSERT` par ligne : la transaction reste unique, mais sa durée et son
+  volume de WAL sont bornés par le plafond de lignes
 - Crée un `BoatMaintenanceEvent` par ligne valide
 - Si `cost` est renseigné : crée un `BoatMaintenancePart` nommé `"Coût total"` avec `quantity=1` et `unitPrice=cost`
 - `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId` sont laissés à `null` (le CSV ne référence que des libellés)
@@ -105,7 +152,9 @@ Colonnes optionnelles : `notes`, `engine_caption`, `sail_caption`, `cost`
 | `app/validators/csv_import.ts`                           | `csvPreviewValidator`, `csvConfirmValidator` (VineJS)                        |
 | `app/services/csv_import_service.ts`                     | Parsing (BOM, guillemets, `;`), validation par colonne, import               |
 | `app/services/csv_export_service.ts`                     | `escapeCell()`, `buildCsv()`, `csvFilename()` — **seul** constructeur de CSV |
-| `app/controllers/csv_import_controller.ts`               | CRUD session + Inertia render                                                |
+| `app/controllers/csv_import_controller.ts`               | Attente en base + Inertia render                                             |
+| `app/models/pending_import.ts`                           | `pending_imports` — une attente par utilisateur                              |
+| `shared/constants/csv_import.ts`                         | Plafonds de lignes, de taille et de lot                                      |
 | `app/controllers/csv_export_controller.ts`               | Streaming CSV par type                                                       |
 | `inertia/pages/settings/import.vue`                      | Page shell Inertia                                                           |
 | `inertia/components/settings/tabs/SettingsImportTab.vue` | Formulaire upload + aperçu + liens export                                    |

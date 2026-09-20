@@ -74,6 +74,7 @@
     "emailVerificationTokenInvalid": "Ce lien de confirmation est invalide ou a expiré. Connectez-vous et demandez-en un nouveau.",
     "emailVerified": "Votre adresse e-mail est confirmée. Vous pouvez vous connecter.",
     "signupRateLimit": "Trop d'inscriptions depuis ce réseau. Veuillez réessayer dans une heure.",
+    "loginRateLimit": "Trop de tentatives de connexion. Veuillez réessayer plus tard.",
     "sessionRevoked": "Votre mot de passe a été changé. Veuillez vous reconnecter."
   },
   "settings": {
@@ -325,7 +326,8 @@
       "engineCaptionRequired": "Légende moteur obligatoire pour le sujet \"engine\"",
       "sailCaptionRequired": "Légende voile obligatoire pour le sujet \"sail\"",
       "costInvalid": "Coût invalide (nombre attendu)"
-    }
+    },
+    "tooManyRows": "Votre fichier contient {count} lignes, la limite est de {limit}. Découpez-le."
   },
   "genericEquipment": {
     "created": "Équipement ajouté.",

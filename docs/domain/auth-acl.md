@@ -137,6 +137,40 @@ extraire explicitement avec `.withQs(false)`.
   - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `home`
 
+### Bornage de la connexion (#767)
+
+Deux compteurs, complémentaires, et un par route.
+
+| Compteur                 | Clé              | Débit  | Où                                          |
+| ------------------------ | ---------------- | ------ | ------------------------------------------- |
+| `loginThrottle`          | IP               | 10/min | middleware de route `POST /login`           |
+| `loginAccountLimiter`    | e-mail normalisé | 10/h   | `SessionController.store`, via `penalize()` |
+| `forgotPasswordThrottle` | IP               | 10/min | middleware de route `POST /forgot-password` |
+| `resetPasswordThrottle`  | IP               | 10/min | middleware de route `POST /reset-password`  |
+
+Le compteur **par compte** répond au credential stuffing distribué, que le
+bornage par IP ne couvre pas : 10/min/IP, mais depuis 200 IP résidentielles
+cela fait 2 000 tentatives/minute sur la même adresse. Il n'est pas monté en
+middleware mais consommé via `penalize()`, ce qui change son comportement :
+
+- seules les tentatives **en échec** décomptent ;
+- une connexion réussie **remet le compteur à zéro** ;
+- au-delà du plafond, les identifiants ne sont même plus vérifiés.
+
+La clé est normalisée en minuscules comme le fait `User.normalizeEmail` —
+sinon changer la casse suffirait à repartir d'un compteur vierge.
+
+**Le message de refus est le même dans les deux cas**
+(`flash.auth.loginRateLimit`) : distinguer « bloqué par IP » de « bloqué par
+compte » ferait du refus un signal sur l'activité visant ce compte. Le
+compteur par compte porte sur l'adresse **tentée**, existante ou non, donc il
+n'est pas non plus un oracle d'existence.
+
+Les trois POST avaient auparavant un compteur commun (`authThrottle`, le seul
+du fichier sans `usingKey`) : se tromper plusieurs fois de mot de passe
+consommait le budget qui aurait permis de demander un lien de
+réinitialisation, c'est-à-dire de se sortir d'affaire.
+
 ### Révocation des accès au changement de mot de passe (#763)
 
 Changer son mot de passe est le seul geste de remédiation offert à quelqu'un

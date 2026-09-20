@@ -354,6 +354,8 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 - Page : `inertia/pages/settings/import.vue` → `components/settings/tabs/SettingsImportTab.vue` (props `boats`, `preview`, `hasPendingImport`, `canImport`, servies par `CsvImportController.show`).
 - **Un écran, deux fonctions aux droits différents** (#715). Les **exports** (maintenance, avitaillements, journal de bord) suivent `canExport` : plan Pro ou Entreprise, tous rôles. L'**import** exige le plan Entreprise **et** la capability `import.run` (admin seul) — c'est la prop `canImport`, vraie seulement si les deux tiennent, qui rend la section d'import ; sinon le bloc affiche `settings.import.restricted` et le formulaire disparaît, exports compris intacts.
 - La page ne redirige vers `/settings/billing` que si **ni** l'import **ni** l'export n'est accordé (plan Starter) — personne n'atteint un écran vide. L'entrée de nav « Import / Export » de `SettingsShell` reste, elle, conditionnée à `canExport`.
+- **`hasPendingImport` vient de la table `pending_imports`**, plus de la session (#774) : les lignes à confirmer y vivent désormais, et seul `pendingImportId` reste en session. Un `confirm` joué dans un autre onglet laissait sinon l'écran proposer de confirmer un import déjà consommé.
+- **Les bornes affichées viennent du code** : `settings.import.fileHint` et `settings.import.help.step2` interpolent `CSV_IMPORT_MAX_FILE_SIZE_MB` et `CSV_IMPORT_MAX_ROWS` (`shared/constants/csv_import.ts`). L'aide annonçait « max 5 Mo » sans plafond de lignes — une limite que le code n'appliquait pas.
 
 ## Pages d'erreur (403 / 404 / 500)
 

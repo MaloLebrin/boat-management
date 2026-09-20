@@ -555,6 +555,26 @@ antérieurs à #768 sont marqués vérifiés par la migration : pas une preuve
 rétroactive, mais le seul choix qui ne casse pas des comptes en service derrière
 une garde qu'ils n'ont jamais eu l'occasion de franchir.
 
+### pending_imports
+
+Une ligne = l'**import CSV en attente de confirmation** d'un utilisateur (#774)
+— doc de domaine : `docs/domain/csv-import-export.md`.
+
+- `id`, `userId` (CASCADE, **unique**), `boatId` (CASCADE)
+- `type` — varchar(32), le type d'import (`maintenance` aujourd'hui)
+- `rows` (jsonb) — les lignes validées par `parseMaintenanceCsv()`, bornées à
+  `CSV_IMPORT_MAX_ROWS`
+- `createdAt`, `updatedAt`
+
+L'unicité sur `userId` fait de cette table un **tampon**, pas un journal : une
+nouvelle prévisualisation remplace la précédente, une confirmation ou une
+annulation supprime la ligne. Rien ne s'accumule, donc aucun job de purge.
+
+Ces lignes vivaient auparavant **en session**. Avec `SESSION_DRIVER=cookie`,
+quelques centaines de lignes dépassaient les ~4 Ko d'un cookie et l'import
+échouait silencieusement à la confirmation ; la session ne porte plus que
+`pendingImportId`, et la propriété se prouve en base (`where('userId')`).
+
 ## Rétention des données personnelles (#775)
 
 Quatre purges tournent chaque nuit. Les deux premières sont antérieures ; les deux dernières
@@ -621,6 +641,7 @@ fait un balayage complet de la table qu'elle est censée borner.
 - `Boat 1..n BoatFuelLog`, `BoatEngine 0..n BoatFuelLog` via `boat_fuel_logs.boatEngineId`
 - `Boat 1..n NavigationLog` ; `NavigationLog n..n CrewMember` via `navigation_log_crew` (rôle sur le pivot)
 - `NavigationLog 1..n NavigationLogEntry` via `navigation_log_entries.navigationLogId`
+- `User 0..1 PendingImport` via `pending_imports.userId` (cascade, unique) ; `Boat 1..n PendingImport` via `boatId` (cascade)
 
 ## Catalogues bateaux et moteurs (référentiels, pas de la démo)
 
