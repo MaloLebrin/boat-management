@@ -74,7 +74,8 @@
     "emailVerificationTokenInvalid": "This confirmation link is invalid or has expired. Sign in and request a new one.",
     "emailVerified": "Your email address is confirmed. You can sign in.",
     "signupRateLimit": "Too many sign-ups from this network. Please try again in an hour.",
-    "loginRateLimit": "Too many sign-in attempts. Please try again later."
+    "loginRateLimit": "Too many sign-in attempts. Please try again later.",
+    "sessionRevoked": "Your password was changed. Please sign in again."
   },
   "settings": {
     "profileUpdated": "Profile updated.",
@@ -92,7 +93,8 @@
     "aiApiKeyRemoved": "AI API key removed.",
     "aiSettingsRequirePlan": "AI settings require a plan with AI access.",
     "aiProviderUpdated": "AI provider updated.",
-    "aiProviderKeyMissing": "Add an API key for this provider first."
+    "aiProviderKeyMissing": "Add an API key for this provider first.",
+    "passwordUpdatedOtherDevicesSignedOut": "Password updated. Your other devices have been signed out."
   },
   "enginePart": {
     "created": "Part added.",

@@ -74,7 +74,8 @@
     "emailVerificationTokenInvalid": "Ce lien de confirmation est invalide ou a expiré. Connectez-vous et demandez-en un nouveau.",
     "emailVerified": "Votre adresse e-mail est confirmée. Vous pouvez vous connecter.",
     "signupRateLimit": "Trop d'inscriptions depuis ce réseau. Veuillez réessayer dans une heure.",
-    "loginRateLimit": "Trop de tentatives de connexion. Veuillez réessayer plus tard."
+    "loginRateLimit": "Trop de tentatives de connexion. Veuillez réessayer plus tard.",
+    "sessionRevoked": "Votre mot de passe a été changé. Veuillez vous reconnecter."
   },
   "settings": {
     "profileUpdated": "Profil mis à jour.",
@@ -92,7 +93,8 @@
     "aiApiKeyRemoved": "Clé API IA retirée.",
     "aiSettingsRequirePlan": "Les réglages IA nécessitent un plan avec accès à l’IA.",
     "aiProviderUpdated": "Fournisseur IA mis à jour.",
-    "aiProviderKeyMissing": "Ajoutez d’abord une clé API pour ce fournisseur."
+    "aiProviderKeyMissing": "Ajoutez d’abord une clé API pour ce fournisseur.",
+    "passwordUpdatedOtherDevicesSignedOut": "Mot de passe mis à jour. Vos autres appareils ont été déconnectés."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",

@@ -31,6 +31,7 @@ router.use([
   ...(app.inTest ? [] : [() => import('@adonisjs/shield/shield_middleware')]),
   () => import('@adonisjs/auth/initialize_auth_middleware'),
   () => import('#middleware/silent_auth_middleware'),
+
   () => import('#middleware/initialize_bouncer_middleware'),
   () => import('#middleware/detect_user_locale_middleware'),
   // #478 — doit rester APRÈS `detect_user_locale_middleware` : la branche
@@ -39,6 +40,12 @@ router.use([
   // `TypeError: Cannot read properties of undefined (reading 't')` → page 500.
   // Il doit aussi rester APRÈS `silent_auth_middleware`, qui hydrate `ctx.auth.user`.
   () => import('#middleware/check_demo_session_middleware'),
+  // #763 — révoque les sessions ouvertes avant une réinitialisation de mot de
+  // passe. Placé ici pour les mêmes raisons que le middleware ci-dessus : il
+  // a besoin de `ctx.auth.user` (posé par `silent_auth_middleware`) et de
+  // `ctx.i18n` (posé par `detect_user_locale_middleware`) pour flasher son
+  // message avant de rediriger.
+  () => import('#middleware/revoked_session_middleware'),
 ])
 
 export const middleware = router.named({

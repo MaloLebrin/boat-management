@@ -205,6 +205,8 @@ test.group('PasswordResetController (unit)', () => {
         verifyToken: async () => ({ email: user.email }),
         updatePassword: async () => true,
         invalidateTokensForEmail: async () => {},
+        // #763 — la réinitialisation coupe aussi les accès existants.
+        revokeAllAccessForEmail: async () => null,
       } as any,
       { sendPasswordReset: async () => {} } as any
     )

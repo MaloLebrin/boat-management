@@ -37,6 +37,8 @@ export interface FakeCtxOptions {
   defaultGuard?: string
   /** Erreur levée par `auth.authenticateUsing()`. */
   authenticateError?: Error
+  /** Valeurs initiales de `ctx.session`. */
+  session?: Record<string, unknown>
 }
 
 export interface FakeCtx {
@@ -53,6 +55,10 @@ export interface FakeCtx {
   checkedGuards: Array<string | undefined>
   /** Arguments reçus par `auth.authenticateUsing()`. */
   authenticateCalls: Array<{ guards: unknown; options: unknown }>
+  /** Contenu vivant de `ctx.session`, hors flashes. */
+  sessionStore: Record<string, unknown>
+  /** Gardes passées à `auth.use(...).logout()`. */
+  logoutCalls: string[]
 }
 
 export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
@@ -62,6 +68,8 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
   const checkedGuards: Array<string | undefined> = []
   const authenticateCalls: Array<{ guards: unknown; options: unknown }> = []
   const state = { reflashCount: 0 }
+  const sessionStore: Record<string, unknown> = { ...(options.session ?? {}) }
+  const logoutCalls: string[] = []
 
   const ctx = {
     auth: {
@@ -71,7 +79,12 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
       check: async () => options.authenticated ?? false,
       use: (guard?: string) => {
         checkedGuards.push(guard)
-        return { check: async () => options.authenticated ?? false }
+        return {
+          check: async () => options.authenticated ?? false,
+          logout: async () => {
+            logoutCalls.push(guard ?? options.defaultGuard ?? 'web')
+          },
+        }
       },
       authenticateUsing: async (guards: unknown, authOptions: unknown) => {
         authenticateCalls.push({ guards, options: authOptions })
@@ -84,6 +97,13 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
       },
       reflash: () => {
         state.reflashCount++
+      },
+      get: (key: string) => sessionStore[key],
+      put: (key: string, value: unknown) => {
+        sessionStore[key] = value
+      },
+      forget: (key: string) => {
+        delete sessionStore[key]
       },
     },
     i18n: { t: (key: string) => `t:${key}` },
@@ -140,6 +160,8 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
     reflash: state,
     checkedGuards,
     authenticateCalls,
+    sessionStore,
+    logoutCalls,
   }
 }
 

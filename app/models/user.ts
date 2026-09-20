@@ -6,7 +6,8 @@ import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import Boat from '#models/boat'
-import { beforeSave, belongsTo, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import { beforeSave, belongsTo, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
+import type { DateTime } from 'luxon'
 import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import type { OrgRole } from '#shared/types/organization'
 import type { Capability } from '#shared/types/permissions'
@@ -17,6 +18,16 @@ export default class User extends compose(
   withAuthFinder(() => hash.use())
 ) {
   static rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
+
+  /**
+   * Toute session ouverte **avant** cet instant est révoquée (#763).
+   *
+   * Posé à la réinitialisation du mot de passe et au changement depuis les
+   * réglages. `null` = aucune révocation, l'état de tous les comptes avant la
+   * migration.
+   */
+  @column.dateTime({ serializeAs: null })
+  declare sessionsValidAfter: DateTime | null
 
   @beforeSave()
   static normalizeEmail(user: User) {

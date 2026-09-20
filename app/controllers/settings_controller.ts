@@ -30,6 +30,8 @@ import { PLAN_LIMITS } from '#shared/types/plan'
 import type { ThemePreference } from '#shared/types/theme'
 import type { BooleanQuotaKey } from '#shared/types/plan'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
+import { AUTH_SESSION_STARTED_AT_KEY } from '#shared/constants/auth'
+import PasswordResetService from '#services/password_reset_service'
 
 @inject()
 export default class SettingsController {
@@ -43,7 +45,8 @@ export default class SettingsController {
     private brandingService: BrandingService,
     private boatListService: BoatListService,
     private pushSubscriptionService: PushSubscriptionService,
-    private organizationAiKeyService: OrganizationAiKeyService
+    private organizationAiKeyService: OrganizationAiKeyService,
+    private passwordResetService: PasswordResetService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -169,7 +172,14 @@ export default class SettingsController {
     user.password = password
     await user.save()
 
-    session.flash('success', i18n.t('flash.settings.passwordUpdated'))
+    // Même révocation qu'à la réinitialisation (#763), à une exception près :
+    // on réestampille la session courante pour ne pas déconnecter celui qui
+    // vient d'agir. La comparaison du middleware est stricte (`<`), donc une
+    // estampille égale à `validAfter` survit.
+    const validAfter = await this.passwordResetService.revokeAllAccess(user)
+    session.put(AUTH_SESSION_STARTED_AT_KEY, validAfter.toISO() ?? '')
+
+    session.flash('success', i18n.t('flash.settings.passwordUpdatedOtherDevicesSignedOut'))
     return response.redirect().back()
   }
 
