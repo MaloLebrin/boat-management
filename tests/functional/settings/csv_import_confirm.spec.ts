@@ -2,7 +2,10 @@ import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
+import PendingImport from '#models/pending_import'
 import { BoatFactory } from '#database/factories/boat_factory'
+import { UserFactory } from '#database/factories/user_factory'
+import OrganizationMembership from '#models/organization_membership'
 import type { ApiClient } from '@japa/api-client'
 import type User from '#models/user'
 import {
@@ -50,15 +53,24 @@ const MISSING_HEADERS = `date;title
 2026-01-15;Vidange moteur
 `
 
-interface PendingImport {
-  type: string
-  boatId: number
-  validRows: unknown[]
+/** Un CSV de maintenance valide de `count` lignes. */
+function buildValidCsv(count: number): string {
+  const rows = Array.from(
+    { length: count },
+    (_, i) => `2026-01-15;Vidange ${i};engine;RAS;Moteur bâbord;;150`
+  )
+  return `${HEADERS}\n${rows.join('\n')}\n`
 }
 
-/** Prévisualisation réelle, pour disposer d'un `pendingImport` importable. */
+/**
+ * Prévisualisation réelle, pour disposer d'un import en attente importable.
+ *
+ * Depuis #774, l'attente vit en base (`pending_imports`) et non en session :
+ * avec `SESSION_DRIVER=cookie`, quelques centaines de lignes dépassaient les
+ * ~4 Ko d'un cookie. La session ne porte plus que l'identifiant.
+ */
 async function previewAs(client: ApiClient, user: User, boatId: number): Promise<PendingImport> {
-  const response = await client
+  await client
     .post('/settings/import/preview')
     .loginAs(user)
     .fields({ type: 'maintenance', boatId: String(boatId) })
@@ -68,7 +80,7 @@ async function previewAs(client: ApiClient, user: User, boatId: number): Promise
     })
     .redirects(0)
 
-  return response.session('pendingImport') as PendingImport
+  return PendingImport.findByOrFail('userId', user.id)
 }
 
 test.group('Import CSV — la confirmation écrit en base', (group) => {
@@ -92,13 +104,13 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
       .redirects(0)
 
     preview.assertStatus(302)
-    const pending = preview.session('pendingImport') as PendingImport
-    assert.lengthOf(pending.validRows, 2)
+    const pending = await PendingImport.findByOrFail('userId', user.id)
+    assert.lengthOf(pending.rows, 2)
 
     const confirm = await client
       .post('/settings/import/confirm')
       .loginAs(user)
-      .withSession({ pendingImport: pending })
+      .withSession({ pendingImportId: pending.id })
       .fields({ type: 'maintenance', boatId: String(boat.id) })
       .redirects(0)
 
@@ -128,7 +140,7 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
     const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
-    const preview = await client
+    await client
       .post('/settings/import/preview')
       .loginAs(user)
       .fields({ type: 'maintenance', boatId: String(boat.id) })
@@ -138,10 +150,12 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
       })
       .redirects(0)
 
+    const pending = await PendingImport.findByOrFail('userId', user.id)
+
     await client
       .post('/settings/import/confirm')
       .loginAs(user)
-      .withSession({ pendingImport: preview.session('pendingImport') })
+      .withSession({ pendingImportId: pending.id })
       .fields({ type: 'maintenance', boatId: String(boat.id) })
       .redirects(0)
 
@@ -160,7 +174,7 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
     const user = await createEnterpriseAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
-    const preview = await client
+    await client
       .post('/settings/import/preview')
       .loginAs(user)
       .fields({ type: 'maintenance', boatId: String(boat.id) })
@@ -170,13 +184,13 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
       })
       .redirects(0)
 
-    const pending = preview.session('pendingImport') as PendingImport
-    assert.lengthOf(pending.validRows, 2)
+    const pending = await PendingImport.findByOrFail('userId', user.id)
+    assert.lengthOf(pending.rows, 2)
 
     await client
       .post('/settings/import/confirm')
       .loginAs(user)
-      .withSession({ pendingImport: pending })
+      .withSession({ pendingImportId: pending.id })
       .fields({ type: 'maintenance', boatId: String(boat.id) })
       .redirects(0)
 
@@ -204,8 +218,100 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
     preview.assertStatus(302)
     preview.assertHeader('location', '/settings/import')
     // La prévisualisation s'arrête avant de rien préparer.
-    assert.isUndefined(preview.session('pendingImport'))
+    assert.lengthOf(await PendingImport.all(), 0)
     assert.lengthOf(await BoatMaintenanceEvent.all(), 0)
+  })
+
+  /**
+   * Plusieurs centaines de lignes (#774).
+   *
+   * C'est le cas que l'ancienne implémentation ne pouvait pas servir : les
+   * lignes validées étaient stockées telles quelles en session, et
+   * `SESSION_DRIVER=cookie` (la valeur de `.env.example`, donc de la prod) ne
+   * porte que ~4 Ko. Au-delà, l'aperçu s'affichait correctement puis le
+   * `confirm` ne trouvait plus rien — un « votre prévisualisation a expiré »
+   * pour un fichier parfaitement valide.
+   *
+   * Le test tourne ici avec `SESSION_DRIVER=memory` (`.env.test`), qui n'a pas
+   * cette borne : c'est la taille du payload de session qui fait foi, et c'est
+   * elle qui est assertée. Avec les lignes en session elle dépasse les 100 Ko.
+   */
+  test('un import de plusieurs centaines de lignes se confirme intégralement', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createEnterpriseAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const rowCount = 600
+
+    const preview = await client
+      .post('/settings/import/preview')
+      .loginAs(user)
+      .fields({ type: 'maintenance', boatId: String(boat.id) })
+      .file('file', Buffer.from(buildValidCsv(rowCount)), {
+        filename: 'import.csv',
+        contentType: 'text/csv',
+      })
+      .redirects(0)
+
+    preview.assertStatus(302)
+
+    // Ce que le store de session doit porter d'une requête à l'autre : un
+    // identifiant et un booléen. Sans plafond ici, le driver cookie casse.
+    const sessionPayload = JSON.stringify(preview.session())
+    assert.isBelow(Buffer.byteLength(sessionPayload), 1024, sessionPayload.slice(0, 200))
+
+    const pending = await PendingImport.findByOrFail('userId', user.id)
+    assert.lengthOf(pending.rows, rowCount)
+
+    const confirm = await client
+      .post('/settings/import/confirm')
+      .loginAs(user)
+      .withSession({ pendingImportId: pending.id })
+      .fields({ type: 'maintenance', boatId: String(boat.id) })
+      .redirects(0)
+
+    confirm.assertStatus(302)
+    // Les lots d'insertion (`CSV_IMPORT_INSERT_CHUNK`) restent dans la même
+    // transaction : les 600 lignes sont là, ou aucune.
+    assert.lengthOf(await BoatMaintenanceEvent.query().where('boatId', boat.id), rowCount)
+    // L'attente est purgée : pas de ligne orpheline à balayer plus tard.
+    assert.lengthOf(await PendingImport.all(), 0)
+  })
+
+  /**
+   * L'identifiant en session ne suffit pas (#774) : la propriété se prouve en
+   * base, par le `where('userId')` du contrôleur.
+   *
+   * Le cas se joue **entre deux admins de la même organisation** — sinon la
+   * vérification du bateau (`getForUserOrFail`) tranche avant et le
+   * `where('userId')` ne décide de rien. Ici les deux voient le bateau : sans
+   * ce scope, le second consomme la prévisualisation du premier, qui la perd
+   * sans avoir rien confirmé, et déclenche une écriture qu'il n'a pas préparée.
+   */
+  test("l'identifiant d'un import préparé par un autre ne confirme rien", async ({
+    client,
+    assert,
+  }) => {
+    const owner = await createEnterpriseAdminUser()
+    const organizationId = owner.organizationId!
+    const boat = await BoatFactory.merge({ organizationId }).create()
+    const pending = await previewAs(client, owner, boat.id)
+
+    const colleague = await UserFactory.merge({ organizationId }).create()
+    await OrganizationMembership.create({ userId: colleague.id, organizationId, role: 'admin' })
+
+    const response = await client
+      .post('/settings/import/confirm')
+      .loginAs(colleague)
+      .withSession({ pendingImportId: pending.id })
+      .fields({ type: 'maintenance', boatId: String(boat.id) })
+      .redirects(0)
+
+    response.assertStatus(302)
+    assert.lengthOf(await BoatMaintenanceEvent.all(), 0)
+    // L'import du premier est intact : rien n'a été consommé en son nom.
+    assert.isNotNull(await PendingImport.find(pending.id))
   })
 
   test('confirmer sans prévisualisation en cours ne crée rien', async ({ client, assert }) => {
@@ -243,7 +349,7 @@ test.group('Import CSV — la confirmation écrit en base', (group) => {
 
     response.assertStatus(302)
     response.assertHeader('location', '/settings/import')
-    assert.isUndefined(response.session('pendingImport'))
+    assert.lengthOf(await PendingImport.all(), 0)
     assert.lengthOf(await BoatMaintenanceEvent.all(), 0)
   })
 
@@ -305,7 +411,7 @@ test.group('Import CSV — la garde de rôle (#715)', (group) => {
         .redirects(0)
 
       preview.assertStatus(302)
-      assert.isUndefined(preview.session('pendingImport'), `${role} a préparé un import`)
+      assert.lengthOf(await PendingImport.all(), 0, `${role} a préparé un import`)
 
       // Le refus doit tenir même avec une prévisualisation **valide** déjà en
       // session : la confirmation ne s'appuie pas sur ce que la
@@ -313,12 +419,12 @@ test.group('Import CSV — la garde de rôle (#715)', (group) => {
       // Celle-ci est préparée par l'admin, donc parfaitement importable — sans
       // garde, la confirmation écrirait ses deux lignes.
       const pending = await previewAs(client, admin, boat.id)
-      assert.lengthOf(pending.validRows, 2)
+      assert.lengthOf(pending.rows, 2)
 
       const confirm = await client
         .post('/settings/import/confirm')
         .loginAs(user)
-        .withSession({ pendingImport: pending })
+        .withSession({ pendingImportId: pending.id })
         .fields({ type: 'maintenance', boatId: String(boat.id) })
         .redirects(0)
 
@@ -336,12 +442,12 @@ test.group('Import CSV — la garde de rôle (#715)', (group) => {
     const response = await client
       .post('/settings/import/cancel')
       .loginAs(mechanic)
-      .withSession({ pendingImport: pending, hasPendingImport: true })
+      .withSession({ pendingImportId: pending.id, hasPendingImport: true })
       .redirects(0)
 
     response.assertStatus(302)
     // La prévisualisation de l'admin survit : le mechanic n'a rien purgé.
-    assert.isDefined(response.session('pendingImport'))
+    assert.isNotNull(await PendingImport.find(pending.id))
   })
 
   test("l'écran reste ouvert au mechanic pour ses exports, section d'import fermée", async ({

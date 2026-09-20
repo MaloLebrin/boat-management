@@ -2343,6 +2343,25 @@ export class PasswordResetTokenSchema extends BaseModel {
   declare token: string
 }
 
+export class PendingImportSchema extends BaseModel {
+  static $columns = ['boatId', 'createdAt', 'id', 'rows', 'type', 'updatedAt', 'userId'] as const
+  $columns = PendingImportSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare rows: any
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
 export class PontoonSchema extends BaseModel {
   static $columns = [
     'createdAt',

@@ -2,6 +2,7 @@ import AuditLogService from '#services/audit_log_service'
 import DemoService from '#services/demo_service'
 import UserService from '#services/user_service'
 import { loginValidator } from '#validators/user'
+import { loginAccountKey, loginAccountLimiter } from '#start/limiter'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -19,9 +20,26 @@ export default class SessionController {
     return inertia.render('auth/login', {})
   }
 
-  async store({ request, auth, response, session }: HttpContext) {
+  async store({ request, auth, response, session, i18n }: HttpContext) {
     const { email, password, remember } = await request.validateUsing(loginValidator)
-    const user = await this.userService.verifyCredentials(email, password)
+
+    // Compteur **par compte**, en plus du compteur par IP monté sur la route
+    // (#767). `penalize` ne décompte que les échecs, remet le compteur à zéro
+    // sur une connexion réussie, et court-circuite la vérification des
+    // identifiants une fois le plafond atteint.
+    const attempt = await loginAccountLimiter().penalize(loginAccountKey(email), () =>
+      this.userService.verifyCredentials(email, password)
+    )
+
+    if (attempt[0] !== null) {
+      // Message volontairement identique quelle que soit l'origine du blocage
+      // — compteur par IP ou par compte. Le distinguer ferait du refus un
+      // signal sur l'activité visant ce compte.
+      session.flash('error', i18n.t('flash.auth.loginRateLimit'))
+      return response.redirect().back()
+    }
+
+    const user = attempt[1]
     await auth.use('web').login(user, remember ?? false)
     // #451 — filet de sécurité : une session navigateur qui traîne encore un
     // `demoSessionStartedAt` (session démo antérieure) ne doit pas le transmettre

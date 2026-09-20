@@ -73,7 +73,8 @@
     "emailVerificationSent": "If that address still needs confirming, a link is on its way.",
     "emailVerificationTokenInvalid": "This confirmation link is invalid or has expired. Sign in and request a new one.",
     "emailVerified": "Your email address is confirmed. You can sign in.",
-    "signupRateLimit": "Too many sign-ups from this network. Please try again in an hour."
+    "signupRateLimit": "Too many sign-ups from this network. Please try again in an hour.",
+    "loginRateLimit": "Too many sign-in attempts. Please try again later."
   },
   "settings": {
     "profileUpdated": "Profile updated.",
@@ -326,7 +327,8 @@
       "engineCaptionRequired": "Engine caption is required for subject \"engine\"",
       "sailCaptionRequired": "Sail caption is required for subject \"sail\"",
       "costInvalid": "Invalid cost (expected a number)"
-    }
+    },
+    "tooManyRows": "Your file has {count} rows; the limit is {limit}. Please split it."
   },
   "genericEquipment": {
     "created": "Equipment added.",
