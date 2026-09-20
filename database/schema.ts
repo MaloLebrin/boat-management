@@ -8,7 +8,18 @@ import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
 export class AiAnalysisSchema extends BaseModel {
-  static $columns = ['boatEngineId', 'boatId', 'contextHash', 'createdAt', 'id', 'kind', 'locale', 'organizationId', 'responseText', 'userId'] as const
+  static $columns = [
+    'boatEngineId',
+    'boatId',
+    'contextHash',
+    'createdAt',
+    'id',
+    'kind',
+    'locale',
+    'organizationId',
+    'responseText',
+    'userId',
+  ] as const
   $columns = AiAnalysisSchema.$columns
   @column()
   declare boatEngineId: number | null
@@ -33,7 +44,19 @@ export class AiAnalysisSchema extends BaseModel {
 }
 
 export class AiAssistantConversationSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'locale', 'messages', 'organizationId', 'pendingAction', 'status', 'token', 'tokensUsed', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'createdAt',
+    'id',
+    'locale',
+    'messages',
+    'organizationId',
+    'pendingAction',
+    'status',
+    'token',
+    'tokensUsed',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = AiAssistantConversationSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -60,7 +83,20 @@ export class AiAssistantConversationSchema extends BaseModel {
 }
 
 export class AiDiagnosisConversationSchema extends BaseModel {
-  static $columns = ['context', 'createdAt', 'id', 'locale', 'messages', 'organizationId', 'result', 'status', 'token', 'tokensUsed', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'context',
+    'createdAt',
+    'id',
+    'locale',
+    'messages',
+    'organizationId',
+    'result',
+    'status',
+    'token',
+    'tokensUsed',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = AiDiagnosisConversationSchema.$columns
   @column()
   declare context: any | null
@@ -89,7 +125,23 @@ export class AiDiagnosisConversationSchema extends BaseModel {
 }
 
 export class AiPartSearchConversationSchema extends BaseModel {
-  static $columns = ['boatEngineId', 'context', 'createdAt', 'id', 'identifiedEngineModelId', 'locale', 'messages', 'organizationId', 'phase', 'result', 'status', 'token', 'tokensUsed', 'updatedAt', 'userId'] as const
+  static $columns = [
+    'boatEngineId',
+    'context',
+    'createdAt',
+    'id',
+    'identifiedEngineModelId',
+    'locale',
+    'messages',
+    'organizationId',
+    'phase',
+    'result',
+    'status',
+    'token',
+    'tokensUsed',
+    'updatedAt',
+    'userId',
+  ] as const
   $columns = AiPartSearchConversationSchema.$columns
   @column()
   declare boatEngineId: number | null
@@ -124,7 +176,14 @@ export class AiPartSearchConversationSchema extends BaseModel {
 }
 
 export class AiTokenUsageSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'month', 'organizationId', 'reservedTokens', 'tokensUsed', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'id',
+    'month',
+    'organizationId',
+    'tokensUsed',
+    'updatedAt',
+  ] as const
   $columns = AiTokenUsageSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
@@ -135,15 +194,22 @@ export class AiTokenUsageSchema extends BaseModel {
   @column()
   declare organizationId: number
   @column()
-  declare reservedTokens: bigint | number
-  @column()
   declare tokensUsed: bigint | number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
 
 export class AuditLogSchema extends BaseModel {
-  static $columns = ['action', 'createdAt', 'entityId', 'entityType', 'id', 'metadata', 'organizationId', 'userId'] as const
+  static $columns = [
+    'action',
+    'createdAt',
+    'entityId',
+    'entityType',
+    'id',
+    'metadata',
+    'organizationId',
+    'userId',
+  ] as const
   $columns = AuditLogSchema.$columns
   @column()
   declare action: string
@@ -164,7 +230,19 @@ export class AuditLogSchema extends BaseModel {
 }
 
 export class BoatBrandSchema extends BaseModel {
-  static $columns = ['aliases', 'categories', 'country', 'createdAt', 'discontinuedYear', 'foundedYear', 'id', 'isActive', 'name', 'slug', 'updatedAt'] as const
+  static $columns = [
+    'aliases',
+    'categories',
+    'country',
+    'createdAt',
+    'discontinuedYear',
+    'foundedYear',
+    'id',
+    'isActive',
+    'name',
+    'slug',
+    'updatedAt',
+  ] as const
   $columns = BoatBrandSchema.$columns
   @column()
   declare aliases: any | null
@@ -191,7 +269,17 @@ export class BoatBrandSchema extends BaseModel {
 }
 
 export class BoatBudgetEntrySchema extends BaseModel {
-  static $columns = ['amount', 'boatId', 'category', 'createdAt', 'date', 'description', 'id', 'label', 'updatedAt'] as const
+  static $columns = [
+    'amount',
+    'boatId',
+    'category',
+    'createdAt',
+    'date',
+    'description',
+    'id',
+    'label',
+    'updatedAt',
+  ] as const
   $columns = BoatBudgetEntrySchema.$columns
   @column()
   declare amount: string
@@ -214,7 +302,22 @@ export class BoatBudgetEntrySchema extends BaseModel {
 }
 
 export class BoatDocumentSchema extends BaseModel {
-  static $columns = ['boatId', 'cost', 'createdAt', 'customTypeLabel', 'expiresAt', 'id', 'issuedAt', 'issuer', 'mediaId', 'notes', 'organizationId', 'referenceNumber', 'type', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'cost',
+    'createdAt',
+    'customTypeLabel',
+    'expiresAt',
+    'id',
+    'issuedAt',
+    'issuer',
+    'mediaId',
+    'notes',
+    'organizationId',
+    'referenceNumber',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = BoatDocumentSchema.$columns
   @column()
   declare boatId: number
@@ -260,7 +363,21 @@ export class BoatEngineDiagnosticCheckSchema extends BaseModel {
 }
 
 export class BoatEnginePartSchema extends BaseModel {
-  static $columns = ['boatEngineId', 'createdAt', 'designation', 'id', 'minStockAlert', 'notes', 'purchasePrice', 'purchasedAt', 'reference', 'stock', 'supplier', 'updatedAt', 'wearState'] as const
+  static $columns = [
+    'boatEngineId',
+    'createdAt',
+    'designation',
+    'id',
+    'minStockAlert',
+    'notes',
+    'purchasePrice',
+    'purchasedAt',
+    'reference',
+    'stock',
+    'supplier',
+    'updatedAt',
+    'wearState',
+  ] as const
   $columns = BoatEnginePartSchema.$columns
   @column()
   declare boatEngineId: number
@@ -291,7 +408,15 @@ export class BoatEnginePartSchema extends BaseModel {
 }
 
 export class BoatEngineRepairCartItemSchema extends BaseModel {
-  static $columns = ['boatEngineId', 'createdAt', 'id', 'partKey', 'quantity', 'reference', 'updatedAt'] as const
+  static $columns = [
+    'boatEngineId',
+    'createdAt',
+    'id',
+    'partKey',
+    'quantity',
+    'reference',
+    'updatedAt',
+  ] as const
   $columns = BoatEngineRepairCartItemSchema.$columns
   @column()
   declare boatEngineId: number
@@ -310,7 +435,27 @@ export class BoatEngineRepairCartItemSchema extends BaseModel {
 }
 
 export class BoatEngineSchema extends BaseModel {
-  static $columns = ['boatId', 'brand', 'createdAt', 'engineModelId', 'family', 'fuel', 'hours', 'id', 'installHours', 'kind', 'manufacturedAt', 'model', 'notes', 'powerHp', 'powerKw', 'serialNumber', 'status', 'strokeType', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'brand',
+    'createdAt',
+    'engineModelId',
+    'family',
+    'fuel',
+    'hours',
+    'id',
+    'installHours',
+    'kind',
+    'manufacturedAt',
+    'model',
+    'notes',
+    'powerHp',
+    'powerKw',
+    'serialNumber',
+    'status',
+    'strokeType',
+    'updatedAt',
+  ] as const
   $columns = BoatEngineSchema.$columns
   @column()
   declare boatId: number
@@ -353,7 +498,24 @@ export class BoatEngineSchema extends BaseModel {
 }
 
 export class BoatEquipmentActionSchema extends BaseModel {
-  static $columns = ['actionType', 'actualCost', 'boatId', 'createdAt', 'createdBy', 'equipmentId', 'equipmentType', 'estimatedCost', 'id', 'inspectionId', 'label', 'notes', 'organizationId', 'resolvedAt', 'status', 'updatedAt'] as const
+  static $columns = [
+    'actionType',
+    'actualCost',
+    'boatId',
+    'createdAt',
+    'createdBy',
+    'equipmentId',
+    'equipmentType',
+    'estimatedCost',
+    'id',
+    'inspectionId',
+    'label',
+    'notes',
+    'organizationId',
+    'resolvedAt',
+    'status',
+    'updatedAt',
+  ] as const
   $columns = BoatEquipmentActionSchema.$columns
   @column()
   declare actionType: string
@@ -390,7 +552,22 @@ export class BoatEquipmentActionSchema extends BaseModel {
 }
 
 export class BoatFuelLogSchema extends BaseModel {
-  static $columns = ['boatEngineId', 'boatId', 'createdAt', 'engineHoursAtFueling', 'fuelType', 'fueledAt', 'id', 'notes', 'organizationId', 'pricePerLiter', 'quantityLiters', 'supplier', 'totalCost', 'updatedAt'] as const
+  static $columns = [
+    'boatEngineId',
+    'boatId',
+    'createdAt',
+    'engineHoursAtFueling',
+    'fuelType',
+    'fueledAt',
+    'id',
+    'notes',
+    'organizationId',
+    'pricePerLiter',
+    'quantityLiters',
+    'supplier',
+    'totalCost',
+    'updatedAt',
+  ] as const
   $columns = BoatFuelLogSchema.$columns
   @column()
   declare boatEngineId: number | null
@@ -423,7 +600,22 @@ export class BoatFuelLogSchema extends BaseModel {
 }
 
 export class BoatGenericEquipmentSchema extends BaseModel {
-  static $columns = ['boatId', 'brand', 'category', 'createdAt', 'equipmentModelId', 'id', 'model', 'name', 'notes', 'purchasePrice', 'purchasedAt', 'quantity', 'status', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'brand',
+    'category',
+    'createdAt',
+    'equipmentModelId',
+    'id',
+    'model',
+    'name',
+    'notes',
+    'purchasePrice',
+    'purchasedAt',
+    'quantity',
+    'status',
+    'updatedAt',
+  ] as const
   $columns = BoatGenericEquipmentSchema.$columns
   @column()
   declare boatId: number
@@ -456,7 +648,21 @@ export class BoatGenericEquipmentSchema extends BaseModel {
 }
 
 export class BoatIncidentSchema extends BaseModel {
-  static $columns = ['boatId', 'closedAt', 'createdAt', 'description', 'id', 'insuranceClaimRef', 'insuranceClaimed', 'location', 'occurredAt', 'organizationId', 'status', 'type', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'closedAt',
+    'createdAt',
+    'description',
+    'id',
+    'insuranceClaimRef',
+    'insuranceClaimed',
+    'location',
+    'occurredAt',
+    'organizationId',
+    'status',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = BoatIncidentSchema.$columns
   @column()
   declare boatId: number
@@ -487,7 +693,15 @@ export class BoatIncidentSchema extends BaseModel {
 }
 
 export class BoatInspectionItemSchema extends BaseModel {
-  static $columns = ['boatInspectionId', 'createdAt', 'id', 'itemKey', 'note', 'state', 'updatedAt'] as const
+  static $columns = [
+    'boatInspectionId',
+    'createdAt',
+    'id',
+    'itemKey',
+    'note',
+    'state',
+    'updatedAt',
+  ] as const
   $columns = BoatInspectionItemSchema.$columns
   @column()
   declare boatInspectionId: number
@@ -506,7 +720,18 @@ export class BoatInspectionItemSchema extends BaseModel {
 }
 
 export class BoatInspectionSchema extends BaseModel {
-  static $columns = ['createdAt', 'engineHours', 'fuelLevel', 'id', 'kind', 'notes', 'organizationId', 'performedAt', 'reservationId', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'engineHours',
+    'fuelLevel',
+    'id',
+    'kind',
+    'notes',
+    'organizationId',
+    'performedAt',
+    'reservationId',
+    'updatedAt',
+  ] as const
   $columns = BoatInspectionSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -531,7 +756,23 @@ export class BoatInspectionSchema extends BaseModel {
 }
 
 export class BoatMaintenanceEventSchema extends BaseModel {
-  static $columns = ['boatEngineId', 'boatId', 'boatRigId', 'boatSafetyEquipmentId', 'boatSailId', 'createdAt', 'dueAt', 'engineCaption', 'id', 'notes', 'performedAt', 'sailCaption', 'subject', 'title', 'updatedAt'] as const
+  static $columns = [
+    'boatEngineId',
+    'boatId',
+    'boatRigId',
+    'boatSafetyEquipmentId',
+    'boatSailId',
+    'createdAt',
+    'dueAt',
+    'engineCaption',
+    'id',
+    'notes',
+    'performedAt',
+    'sailCaption',
+    'subject',
+    'title',
+    'updatedAt',
+  ] as const
   $columns = BoatMaintenanceEventSchema.$columns
   @column()
   declare boatEngineId: number | null
@@ -566,7 +807,17 @@ export class BoatMaintenanceEventSchema extends BaseModel {
 }
 
 export class BoatMaintenancePartSchema extends BaseModel {
-  static $columns = ['createdAt', 'enginePartId', 'id', 'maintenanceEventId', 'name', 'notes', 'quantity', 'unitPrice', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'enginePartId',
+    'id',
+    'maintenanceEventId',
+    'name',
+    'notes',
+    'quantity',
+    'unitPrice',
+    'updatedAt',
+  ] as const
   $columns = BoatMaintenancePartSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -589,7 +840,17 @@ export class BoatMaintenancePartSchema extends BaseModel {
 }
 
 export class BoatMaintenanceSheetItemSchema extends BaseModel {
-  static $columns = ['boatMaintenanceSheetId', 'createdAt', 'id', 'isDone', 'label', 'notes', 'position', 'templateKey', 'updatedAt'] as const
+  static $columns = [
+    'boatMaintenanceSheetId',
+    'createdAt',
+    'id',
+    'isDone',
+    'label',
+    'notes',
+    'position',
+    'templateKey',
+    'updatedAt',
+  ] as const
   $columns = BoatMaintenanceSheetItemSchema.$columns
   @column()
   declare boatMaintenanceSheetId: number
@@ -612,7 +873,17 @@ export class BoatMaintenanceSheetItemSchema extends BaseModel {
 }
 
 export class BoatMaintenanceSheetSchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'id', 'notes', 'performedAt', 'status', 'title', 'type', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'id',
+    'notes',
+    'performedAt',
+    'status',
+    'title',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = BoatMaintenanceSheetSchema.$columns
   @column()
   declare boatId: number
@@ -635,7 +906,28 @@ export class BoatMaintenanceSheetSchema extends BaseModel {
 }
 
 export class BoatMaintenanceTaskSchema extends BaseModel {
-  static $columns = ['boatEngineId', 'boatGenericEquipmentId', 'boatId', 'boatRigId', 'boatSafetyEquipmentId', 'boatSailId', 'createdAt', 'doneAt', 'doneEngineHours', 'dueAt', 'dueEngineHours', 'id', 'lastDoneEngineHours', 'notes', 'recurrenceIntervalEngineHours', 'recurrenceIntervalMonths', 'status', 'subject', 'title', 'updatedAt'] as const
+  static $columns = [
+    'boatEngineId',
+    'boatGenericEquipmentId',
+    'boatId',
+    'boatRigId',
+    'boatSafetyEquipmentId',
+    'boatSailId',
+    'createdAt',
+    'doneAt',
+    'doneEngineHours',
+    'dueAt',
+    'dueEngineHours',
+    'id',
+    'lastDoneEngineHours',
+    'notes',
+    'recurrenceIntervalEngineHours',
+    'recurrenceIntervalMonths',
+    'status',
+    'subject',
+    'title',
+    'updatedAt',
+  ] as const
   $columns = BoatMaintenanceTaskSchema.$columns
   @column()
   declare boatEngineId: number | null
@@ -680,7 +972,19 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
 }
 
 export class BoatModelSchema extends BaseModel {
-  static $columns = ['aliases', 'boatBrandId', 'category', 'createdAt', 'id', 'lengthM', 'name', 'productionEndYear', 'productionStartYear', 'slug', 'updatedAt'] as const
+  static $columns = [
+    'aliases',
+    'boatBrandId',
+    'category',
+    'createdAt',
+    'id',
+    'lengthM',
+    'name',
+    'productionEndYear',
+    'productionStartYear',
+    'slug',
+    'updatedAt',
+  ] as const
   $columns = BoatModelSchema.$columns
   @column()
   declare aliases: any | null
@@ -720,7 +1024,17 @@ export class BoatOwnerSchema extends BaseModel {
 }
 
 export class BoatPortStaySchema extends BaseModel {
-  static $columns = ['boatId', 'cost', 'createdAt', 'endedAt', 'id', 'notes', 'portName', 'startedAt', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'cost',
+    'createdAt',
+    'endedAt',
+    'id',
+    'notes',
+    'portName',
+    'startedAt',
+    'updatedAt',
+  ] as const
   $columns = BoatPortStaySchema.$columns
   @column()
   declare boatId: number
@@ -743,7 +1057,22 @@ export class BoatPortStaySchema extends BaseModel {
 }
 
 export class BoatPositionHistorySchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'endedAt', 'headingDegrees', 'id', 'kind', 'latitude', 'longitude', 'notes', 'source', 'speedKnots', 'spotId', 'startedAt', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'endedAt',
+    'headingDegrees',
+    'id',
+    'kind',
+    'latitude',
+    'longitude',
+    'notes',
+    'source',
+    'speedKnots',
+    'spotId',
+    'startedAt',
+    'updatedAt',
+  ] as const
   $columns = BoatPositionHistorySchema.$columns
   @column()
   declare boatId: number
@@ -776,7 +1105,19 @@ export class BoatPositionHistorySchema extends BaseModel {
 }
 
 export class BoatPricingSchema extends BaseModel {
-  static $columns = ['baseDailyPrice', 'baseWeeklyPrice', 'boatId', 'createdAt', 'currency', 'depositAmount', 'id', 'maxDays', 'minDays', 'organizationId', 'updatedAt'] as const
+  static $columns = [
+    'baseDailyPrice',
+    'baseWeeklyPrice',
+    'boatId',
+    'createdAt',
+    'currency',
+    'depositAmount',
+    'id',
+    'maxDays',
+    'minDays',
+    'organizationId',
+    'updatedAt',
+  ] as const
   $columns = BoatPricingSchema.$columns
   @column()
   declare baseDailyPrice: string
@@ -803,7 +1144,23 @@ export class BoatPricingSchema extends BaseModel {
 }
 
 export class BoatReservationSchema extends BaseModel {
-  static $columns = ['boatId', 'clientEmail', 'clientId', 'clientName', 'clientPhone', 'createdAt', 'endsAt', 'id', 'notes', 'organizationId', 'startsAt', 'status', 'totalPrice', 'type', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'clientEmail',
+    'clientId',
+    'clientName',
+    'clientPhone',
+    'createdAt',
+    'endsAt',
+    'id',
+    'notes',
+    'organizationId',
+    'startsAt',
+    'status',
+    'totalPrice',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = BoatReservationSchema.$columns
   @column()
   declare boatId: number
@@ -838,7 +1195,18 @@ export class BoatReservationSchema extends BaseModel {
 }
 
 export class BoatRigSchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'id', 'manufacturedAt', 'mastCount', 'notes', 'rigType', 'spreaders', 'status', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'id',
+    'manufacturedAt',
+    'mastCount',
+    'notes',
+    'rigType',
+    'spreaders',
+    'status',
+    'updatedAt',
+  ] as const
   $columns = BoatRigSchema.$columns
   @column()
   declare boatId: number
@@ -863,7 +1231,19 @@ export class BoatRigSchema extends BaseModel {
 }
 
 export class BoatSafetyEquipmentSchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'equipmentType', 'expiryDate', 'id', 'notes', 'purchasePrice', 'purchasedAt', 'quantity', 'status', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'equipmentType',
+    'expiryDate',
+    'id',
+    'notes',
+    'purchasePrice',
+    'purchasedAt',
+    'quantity',
+    'status',
+    'updatedAt',
+  ] as const
   $columns = BoatSafetyEquipmentSchema.$columns
   @column()
   declare boatId: number
@@ -890,7 +1270,23 @@ export class BoatSafetyEquipmentSchema extends BaseModel {
 }
 
 export class BoatSailSchema extends BaseModel {
-  static $columns = ['areaM2', 'boatId', 'createdAt', 'id', 'manufacturedAt', 'material', 'notes', 'purchasePrice', 'purchasedAt', 'reefPoints', 'sailLoftId', 'sailType', 'sailmaker', 'status', 'updatedAt'] as const
+  static $columns = [
+    'areaM2',
+    'boatId',
+    'createdAt',
+    'id',
+    'manufacturedAt',
+    'material',
+    'notes',
+    'purchasePrice',
+    'purchasedAt',
+    'reefPoints',
+    'sailLoftId',
+    'sailType',
+    'sailmaker',
+    'status',
+    'updatedAt',
+  ] as const
   $columns = BoatSailSchema.$columns
   @column()
   declare areaM2: number | null
@@ -925,7 +1321,36 @@ export class BoatSailSchema extends BaseModel {
 }
 
 export class BoatSchema extends BaseModel {
-  static $columns = ['armamentZone', 'beamM', 'category', 'createdAt', 'draftM', 'flagCountry', 'francisationNumber', 'homePort', 'hullIdentificationNumber', 'hullMaterial', 'id', 'imoNumber', 'lengthM', 'manufacturedAt', 'manufacturer', 'mastHeightM', 'maxPersons', 'mmsi', 'model', 'name', 'navigationCategory', 'organizationId', 'propulsionType', 'registrationNumber', 'spotId', 'type', 'updatedAt', 'yearBuilt'] as const
+  static $columns = [
+    'armamentZone',
+    'beamM',
+    'category',
+    'createdAt',
+    'draftM',
+    'flagCountry',
+    'francisationNumber',
+    'homePort',
+    'hullIdentificationNumber',
+    'hullMaterial',
+    'id',
+    'imoNumber',
+    'lengthM',
+    'manufacturedAt',
+    'manufacturer',
+    'mastHeightM',
+    'maxPersons',
+    'mmsi',
+    'model',
+    'name',
+    'navigationCategory',
+    'organizationId',
+    'propulsionType',
+    'registrationNumber',
+    'spotId',
+    'type',
+    'updatedAt',
+    'yearBuilt',
+  ] as const
   $columns = BoatSchema.$columns
   @column()
   declare armamentZone: string | null
@@ -986,7 +1411,23 @@ export class BoatSchema extends BaseModel {
 }
 
 export class ClientSchema extends BaseModel {
-  static $columns = ['address', 'anonymizedAt', 'createdAt', 'email', 'firstName', 'gdprConsentAt', 'id', 'lastName', 'navigationPermitNumber', 'navigationPermitType', 'notes', 'organizationId', 'phone', 'status', 'updatedAt'] as const
+  static $columns = [
+    'address',
+    'anonymizedAt',
+    'createdAt',
+    'email',
+    'firstName',
+    'gdprConsentAt',
+    'id',
+    'lastName',
+    'navigationPermitNumber',
+    'navigationPermitType',
+    'notes',
+    'organizationId',
+    'phone',
+    'status',
+    'updatedAt',
+  ] as const
   $columns = ClientSchema.$columns
   @column()
   declare address: string | null
@@ -1021,7 +1462,19 @@ export class ClientSchema extends BaseModel {
 }
 
 export class ContactMessageSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'firstName', 'fleetSize', 'id', 'ipAddress', 'lastName', 'locale', 'message', 'organization', 'subject'] as const
+  static $columns = [
+    'createdAt',
+    'email',
+    'firstName',
+    'fleetSize',
+    'id',
+    'ipAddress',
+    'lastName',
+    'locale',
+    'message',
+    'organization',
+    'subject',
+  ] as const
   $columns = ContactMessageSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1048,7 +1501,15 @@ export class ContactMessageSchema extends BaseModel {
 }
 
 export class CrewCertificationSchema extends BaseModel {
-  static $columns = ['createdAt', 'crewMemberId', 'expiresAt', 'id', 'referenceNumber', 'type', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'crewMemberId',
+    'expiresAt',
+    'id',
+    'referenceNumber',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = CrewCertificationSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1067,7 +1528,17 @@ export class CrewCertificationSchema extends BaseModel {
 }
 
 export class CrewMemberSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'firstName', 'id', 'lastName', 'notes', 'organizationId', 'phone', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'email',
+    'firstName',
+    'id',
+    'lastName',
+    'notes',
+    'organizationId',
+    'phone',
+    'updatedAt',
+  ] as const
   $columns = CrewMemberSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1105,7 +1576,20 @@ export class EmailVerificationTokenSchema extends BaseModel {
 }
 
 export class EngineBrandSchema extends BaseModel {
-  static $columns = ['aliases', 'country', 'createdAt', 'families', 'id', 'isActive', 'name', 'plateExampleKey', 'plateLocationKey', 'referencePattern', 'slug', 'updatedAt'] as const
+  static $columns = [
+    'aliases',
+    'country',
+    'createdAt',
+    'families',
+    'id',
+    'isActive',
+    'name',
+    'plateExampleKey',
+    'plateLocationKey',
+    'referencePattern',
+    'slug',
+    'updatedAt',
+  ] as const
   $columns = EngineBrandSchema.$columns
   @column()
   declare aliases: any | null
@@ -1134,7 +1618,24 @@ export class EngineBrandSchema extends BaseModel {
 }
 
 export class EngineModelSchema extends BaseModel {
-  static $columns = ['aliases', 'createdAt', 'cylinders', 'displacementCc', 'engineBrandId', 'family', 'fuel', 'id', 'modelCode', 'name', 'powerHp', 'productionEndYear', 'productionStartYear', 'slug', 'strokeType', 'updatedAt'] as const
+  static $columns = [
+    'aliases',
+    'createdAt',
+    'cylinders',
+    'displacementCc',
+    'engineBrandId',
+    'family',
+    'fuel',
+    'id',
+    'modelCode',
+    'name',
+    'powerHp',
+    'productionEndYear',
+    'productionStartYear',
+    'slug',
+    'strokeType',
+    'updatedAt',
+  ] as const
   $columns = EngineModelSchema.$columns
   @column()
   declare aliases: any | null
@@ -1171,7 +1672,17 @@ export class EngineModelSchema extends BaseModel {
 }
 
 export class EnginePartReferenceSchema extends BaseModel {
-  static $columns = ['createdAt', 'engineModelId', 'id', 'partKey', 'reference', 'sourceLabel', 'sourceUrl', 'updatedAt', 'verifiedAt'] as const
+  static $columns = [
+    'createdAt',
+    'engineModelId',
+    'id',
+    'partKey',
+    'reference',
+    'sourceLabel',
+    'sourceUrl',
+    'updatedAt',
+    'verifiedAt',
+  ] as const
   $columns = EnginePartReferenceSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1194,7 +1705,17 @@ export class EnginePartReferenceSchema extends BaseModel {
 }
 
 export class EquipmentBrandSchema extends BaseModel {
-  static $columns = ['aliases', 'categories', 'country', 'createdAt', 'id', 'isActive', 'name', 'slug', 'updatedAt'] as const
+  static $columns = [
+    'aliases',
+    'categories',
+    'country',
+    'createdAt',
+    'id',
+    'isActive',
+    'name',
+    'slug',
+    'updatedAt',
+  ] as const
   $columns = EquipmentBrandSchema.$columns
   @column()
   declare aliases: any | null
@@ -1217,7 +1738,18 @@ export class EquipmentBrandSchema extends BaseModel {
 }
 
 export class EquipmentModelSchema extends BaseModel {
-  static $columns = ['aliases', 'category', 'createdAt', 'equipmentBrandId', 'id', 'name', 'productionEndYear', 'productionStartYear', 'slug', 'updatedAt'] as const
+  static $columns = [
+    'aliases',
+    'category',
+    'createdAt',
+    'equipmentBrandId',
+    'id',
+    'name',
+    'productionEndYear',
+    'productionStartYear',
+    'slug',
+    'updatedAt',
+  ] as const
   $columns = EquipmentModelSchema.$columns
   @column()
   declare aliases: any | null
@@ -1242,7 +1774,14 @@ export class EquipmentModelSchema extends BaseModel {
 }
 
 export class InvoiceCounterSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'kind', 'lastNumber', 'organizationId', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'id',
+    'kind',
+    'lastNumber',
+    'organizationId',
+    'updatedAt',
+  ] as const
   $columns = InvoiceCounterSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1259,7 +1798,17 @@ export class InvoiceCounterSchema extends BaseModel {
 }
 
 export class InvoiceLineSchema extends BaseModel {
-  static $columns = ['amount', 'createdAt', 'id', 'invoiceId', 'label', 'position', 'quantity', 'unitPrice', 'updatedAt'] as const
+  static $columns = [
+    'amount',
+    'createdAt',
+    'id',
+    'invoiceId',
+    'label',
+    'position',
+    'quantity',
+    'unitPrice',
+    'updatedAt',
+  ] as const
   $columns = InvoiceLineSchema.$columns
   @column()
   declare amount: string
@@ -1282,7 +1831,29 @@ export class InvoiceLineSchema extends BaseModel {
 }
 
 export class InvoiceSchema extends BaseModel {
-  static $columns = ['clientId', 'clientName', 'createdAt', 'currency', 'dueAt', 'id', 'issuedAt', 'kind', 'notes', 'number', 'organizationId', 'paidAt', 'paymentMethod', 'reservationId', 'sourceQuoteId', 'status', 'subtotal', 'taxAmount', 'taxRate', 'total', 'updatedAt'] as const
+  static $columns = [
+    'clientId',
+    'clientName',
+    'createdAt',
+    'currency',
+    'dueAt',
+    'id',
+    'issuedAt',
+    'kind',
+    'notes',
+    'number',
+    'organizationId',
+    'paidAt',
+    'paymentMethod',
+    'reservationId',
+    'sourceQuoteId',
+    'status',
+    'subtotal',
+    'taxAmount',
+    'taxRate',
+    'total',
+    'updatedAt',
+  ] as const
   $columns = InvoiceSchema.$columns
   @column()
   declare clientId: number | null
@@ -1329,7 +1900,24 @@ export class InvoiceSchema extends BaseModel {
 }
 
 export class MediaSchema extends BaseModel {
-  static $columns = ['bytes', 'caption', 'cloudinaryPublicId', 'createdAt', 'entityId', 'entityType', 'format', 'height', 'id', 'kind', 'originalFilename', 'position', 'secureUrl', 'updatedAt', 'uploadedById', 'width'] as const
+  static $columns = [
+    'bytes',
+    'caption',
+    'cloudinaryPublicId',
+    'createdAt',
+    'entityId',
+    'entityType',
+    'format',
+    'height',
+    'id',
+    'kind',
+    'originalFilename',
+    'position',
+    'secureUrl',
+    'updatedAt',
+    'uploadedById',
+    'width',
+  ] as const
   $columns = MediaSchema.$columns
   @column()
   declare bytes: number
@@ -1366,7 +1954,16 @@ export class MediaSchema extends BaseModel {
 }
 
 export class MouillageSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'name', 'portId', 'positionX', 'positionY', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'name',
+    'portId',
+    'positionX',
+    'positionY',
+    'updatedAt',
+  ] as const
   $columns = MouillageSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1400,7 +1997,24 @@ export class NavigationLogCrewSchema extends BaseModel {
 }
 
 export class NavigationLogEntrySchema extends BaseModel {
-  static $columns = ['cogDeg', 'createdAt', 'gpsAccuracyM', 'id', 'latitude', 'longitude', 'navigationLogId', 'note', 'organizationId', 'recordedAt', 'sailConfig', 'sogKn', 'twaDeg', 'twdDeg', 'updatedAt', 'weatherSnapshot'] as const
+  static $columns = [
+    'cogDeg',
+    'createdAt',
+    'gpsAccuracyM',
+    'id',
+    'latitude',
+    'longitude',
+    'navigationLogId',
+    'note',
+    'organizationId',
+    'recordedAt',
+    'sailConfig',
+    'sogKn',
+    'twaDeg',
+    'twdDeg',
+    'updatedAt',
+    'weatherSnapshot',
+  ] as const
   $columns = NavigationLogEntrySchema.$columns
   @column()
   declare cogDeg: number | null
@@ -1437,7 +2051,28 @@ export class NavigationLogEntrySchema extends BaseModel {
 }
 
 export class NavigationLogSchema extends BaseModel {
-  static $columns = ['arrivalPortId', 'arrivalPortName', 'arrivedAt', 'boatId', 'createdAt', 'crewCount', 'departedAt', 'departurePortId', 'departurePortName', 'distanceNm', 'engineHoursEnd', 'engineHoursStart', 'fuelConsumedLiters', 'id', 'notes', 'organizationId', 'seaState', 'status', 'updatedAt', 'windForceBeaufort'] as const
+  static $columns = [
+    'arrivalPortId',
+    'arrivalPortName',
+    'arrivedAt',
+    'boatId',
+    'createdAt',
+    'crewCount',
+    'departedAt',
+    'departurePortId',
+    'departurePortName',
+    'distanceNm',
+    'engineHoursEnd',
+    'engineHoursStart',
+    'fuelConsumedLiters',
+    'id',
+    'notes',
+    'organizationId',
+    'seaState',
+    'status',
+    'updatedAt',
+    'windForceBeaufort',
+  ] as const
   $columns = NavigationLogSchema.$columns
   @column()
   declare arrivalPortId: number | null
@@ -1482,7 +2117,19 @@ export class NavigationLogSchema extends BaseModel {
 }
 
 export class NotificationSchema extends BaseModel {
-  static $columns = ['actionUrl', 'body', 'createdAt', 'id', 'metadata', 'organizationId', 'readAt', 'severity', 'title', 'type', 'userId'] as const
+  static $columns = [
+    'actionUrl',
+    'body',
+    'createdAt',
+    'id',
+    'metadata',
+    'organizationId',
+    'readAt',
+    'severity',
+    'title',
+    'type',
+    'userId',
+  ] as const
   $columns = NotificationSchema.$columns
   @column()
   declare actionUrl: string | null
@@ -1509,7 +2156,14 @@ export class NotificationSchema extends BaseModel {
 }
 
 export class OrganizationAiKeySchema extends BaseModel {
-  static $columns = ['apiKeyEncrypted', 'createdAt', 'id', 'organizationId', 'provider', 'updatedAt'] as const
+  static $columns = [
+    'apiKeyEncrypted',
+    'createdAt',
+    'id',
+    'organizationId',
+    'provider',
+    'updatedAt',
+  ] as const
   $columns = OrganizationAiKeySchema.$columns
   @column()
   declare apiKeyEncrypted: string
@@ -1526,7 +2180,20 @@ export class OrganizationAiKeySchema extends BaseModel {
 }
 
 export class OrganizationInvitationSchema extends BaseModel {
-  static $columns = ['acceptedAt', 'boatIds', 'createdAt', 'email', 'expiresAt', 'id', 'invitedById', 'organizationId', 'role', 'status', 'token', 'updatedAt'] as const
+  static $columns = [
+    'acceptedAt',
+    'boatIds',
+    'createdAt',
+    'email',
+    'expiresAt',
+    'id',
+    'invitedById',
+    'organizationId',
+    'role',
+    'status',
+    'token',
+    'updatedAt',
+  ] as const
   $columns = OrganizationInvitationSchema.$columns
   @column.dateTime()
   declare acceptedAt: DateTime | null
@@ -1572,7 +2239,16 @@ export class OrganizationMembershipSchema extends BaseModel {
 }
 
 export class OrganizationModuleSchema extends BaseModel {
-  static $columns = ['createdAt', 'id', 'module', 'organizationId', 'quantity', 'source', 'stripeSubscriptionItemId', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'id',
+    'module',
+    'organizationId',
+    'quantity',
+    'source',
+    'stripeSubscriptionItemId',
+    'updatedAt',
+  ] as const
   $columns = OrganizationModuleSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1593,7 +2269,26 @@ export class OrganizationModuleSchema extends BaseModel {
 }
 
 export class OrganizationSchema extends BaseModel {
-  static $columns = ['aiModelOverride', 'aiProvider', 'aiSystemPrompt', 'appName', 'createdAt', 'fleetSize', 'id', 'logoPublicId', 'logoUrl', 'name', 'plan', 'primaryColor', 'secondaryColor', 'slug', 'storageUsedBytes', 'stripeCustomerId', 'type', 'updatedAt'] as const
+  static $columns = [
+    'aiModelOverride',
+    'aiProvider',
+    'aiSystemPrompt',
+    'appName',
+    'createdAt',
+    'fleetSize',
+    'id',
+    'logoPublicId',
+    'logoUrl',
+    'name',
+    'plan',
+    'primaryColor',
+    'secondaryColor',
+    'slug',
+    'storageUsedBytes',
+    'stripeCustomerId',
+    'type',
+    'updatedAt',
+  ] as const
   $columns = OrganizationSchema.$columns
   @column()
   declare aiModelOverride: string | null
@@ -1649,7 +2344,16 @@ export class PasswordResetTokenSchema extends BaseModel {
 }
 
 export class PontoonSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'name', 'portId', 'positionX', 'positionY', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'name',
+    'portId',
+    'positionX',
+    'positionY',
+    'updatedAt',
+  ] as const
   $columns = PontoonSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1670,7 +2374,17 @@ export class PontoonSchema extends BaseModel {
 }
 
 export class PortSchema extends BaseModel {
-  static $columns = ['address', 'city', 'country', 'createdAt', 'id', 'name', 'notes', 'organizationId', 'updatedAt'] as const
+  static $columns = [
+    'address',
+    'city',
+    'country',
+    'createdAt',
+    'id',
+    'name',
+    'notes',
+    'organizationId',
+    'updatedAt',
+  ] as const
   $columns = PortSchema.$columns
   @column()
   declare address: string | null
@@ -1693,7 +2407,19 @@ export class PortSchema extends BaseModel {
 }
 
 export class PricingSeasonSchema extends BaseModel {
-  static $columns = ['boatId', 'createdAt', 'dailyPrice', 'endsOn', 'id', 'multiplier', 'name', 'organizationId', 'priority', 'startsOn', 'updatedAt'] as const
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'dailyPrice',
+    'endsOn',
+    'id',
+    'multiplier',
+    'name',
+    'organizationId',
+    'priority',
+    'startsOn',
+    'updatedAt',
+  ] as const
   $columns = PricingSeasonSchema.$columns
   @column()
   declare boatId: number | null
@@ -1733,7 +2459,20 @@ export class ProcessedStripeEventSchema extends BaseModel {
 }
 
 export class PushSubscriptionSchema extends BaseModel {
-  static $columns = ['auth', 'createdAt', 'endpoint', 'endpointHash', 'failureCount', 'id', 'lastUsedAt', 'organizationId', 'p256Dh', 'updatedAt', 'userAgent', 'userId'] as const
+  static $columns = [
+    'auth',
+    'createdAt',
+    'endpoint',
+    'endpointHash',
+    'failureCount',
+    'id',
+    'lastUsedAt',
+    'organizationId',
+    'p256Dh',
+    'updatedAt',
+    'userAgent',
+    'userId',
+  ] as const
   $columns = PushSubscriptionSchema.$columns
   @column()
   declare auth: string
@@ -1762,7 +2501,18 @@ export class PushSubscriptionSchema extends BaseModel {
 }
 
 export class QueueDedupKeySchema extends BaseModel {
-  static $columns = ['completedAt', 'createdAt', 'jobName', 'key', 'lastError', 'payloadHash', 'queue', 'queueJobId', 'status', 'updatedAt'] as const
+  static $columns = [
+    'completedAt',
+    'createdAt',
+    'jobName',
+    'key',
+    'lastError',
+    'payloadHash',
+    'queue',
+    'queueJobId',
+    'status',
+    'updatedAt',
+  ] as const
   $columns = QueueDedupKeySchema.$columns
   @column.dateTime()
   declare completedAt: DateTime | null
@@ -1787,7 +2537,18 @@ export class QueueDedupKeySchema extends BaseModel {
 }
 
 export class QueueJobSchema extends BaseModel {
-  static $columns = ['acquiredAt', 'data', 'error', 'executeAt', 'finishedAt', 'id', 'queue', 'score', 'status', 'workerId'] as const
+  static $columns = [
+    'acquiredAt',
+    'data',
+    'error',
+    'executeAt',
+    'finishedAt',
+    'id',
+    'queue',
+    'score',
+    'status',
+    'workerId',
+  ] as const
   $columns = QueueJobSchema.$columns
   @column()
   declare acquiredAt: bigint | number | null
@@ -1812,7 +2573,22 @@ export class QueueJobSchema extends BaseModel {
 }
 
 export class QueueScheduleSchema extends BaseModel {
-  static $columns = ['createdAt', 'cronExpression', 'everyMs', 'fromDate', 'id', 'lastRunAt', 'name', 'nextRunAt', 'payload', 'runCount', 'runLimit', 'status', 'timezone', 'toDate'] as const
+  static $columns = [
+    'createdAt',
+    'cronExpression',
+    'everyMs',
+    'fromDate',
+    'id',
+    'lastRunAt',
+    'name',
+    'nextRunAt',
+    'payload',
+    'runCount',
+    'runLimit',
+    'status',
+    'timezone',
+    'toDate',
+  ] as const
   $columns = QueueScheduleSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1873,7 +2649,17 @@ export class RememberMeTokenSchema extends BaseModel {
 }
 
 export class RentalContractSchema extends BaseModel {
-  static $columns = ['clientId', 'createdAt', 'id', 'mediaId', 'organizationId', 'reservationId', 'signedAt', 'status', 'updatedAt'] as const
+  static $columns = [
+    'clientId',
+    'createdAt',
+    'id',
+    'mediaId',
+    'organizationId',
+    'reservationId',
+    'signedAt',
+    'status',
+    'updatedAt',
+  ] as const
   $columns = RentalContractSchema.$columns
   @column()
   declare clientId: number | null
@@ -1896,7 +2682,16 @@ export class RentalContractSchema extends BaseModel {
 }
 
 export class SailLoftSchema extends BaseModel {
-  static $columns = ['aliases', 'country', 'createdAt', 'id', 'isActive', 'name', 'slug', 'updatedAt'] as const
+  static $columns = [
+    'aliases',
+    'country',
+    'createdAt',
+    'id',
+    'isActive',
+    'name',
+    'slug',
+    'updatedAt',
+  ] as const
   $columns = SailLoftSchema.$columns
   @column()
   declare aliases: any | null
@@ -1917,7 +2712,22 @@ export class SailLoftSchema extends BaseModel {
 }
 
 export class SimulatorLeadSchema extends BaseModel {
-  static $columns = ['boatType', 'createdAt', 'email', 'engineWear', 'hullWear', 'id', 'lengthM', 'locale', 'riggingWear', 'safetyWear', 'totalMax', 'totalMin', 'updatedAt', 'winteringZone'] as const
+  static $columns = [
+    'boatType',
+    'createdAt',
+    'email',
+    'engineWear',
+    'hullWear',
+    'id',
+    'lengthM',
+    'locale',
+    'riggingWear',
+    'safetyWear',
+    'totalMax',
+    'totalMin',
+    'updatedAt',
+    'winteringZone',
+  ] as const
   $columns = SimulatorLeadSchema.$columns
   @column()
   declare boatType: string
@@ -1950,7 +2760,15 @@ export class SimulatorLeadSchema extends BaseModel {
 }
 
 export class SimulatorShareSchema extends BaseModel {
-  static $columns = ['breakdown', 'createdAt', 'expiresAt', 'id', 'input', 'locale', 'token'] as const
+  static $columns = [
+    'breakdown',
+    'createdAt',
+    'expiresAt',
+    'id',
+    'input',
+    'locale',
+    'token',
+  ] as const
   $columns = SimulatorShareSchema.$columns
   @column()
   declare breakdown: any
@@ -1969,7 +2787,16 @@ export class SimulatorShareSchema extends BaseModel {
 }
 
 export class SpotSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'mouillageId', 'name', 'organizationId', 'pontoonId', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'description',
+    'id',
+    'mouillageId',
+    'name',
+    'organizationId',
+    'pontoonId',
+    'updatedAt',
+  ] as const
   $columns = SpotSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1990,7 +2817,20 @@ export class SpotSchema extends BaseModel {
 }
 
 export class SubscriptionSchema extends BaseModel {
-  static $columns = ['billingInterval', 'cancelAtPeriodEnd', 'createdAt', 'currentPeriodEnd', 'currentPeriodStart', 'id', 'organizationId', 'planTier', 'status', 'stripePriceId', 'stripeSubscriptionId', 'updatedAt'] as const
+  static $columns = [
+    'billingInterval',
+    'cancelAtPeriodEnd',
+    'createdAt',
+    'currentPeriodEnd',
+    'currentPeriodStart',
+    'id',
+    'organizationId',
+    'planTier',
+    'status',
+    'stripePriceId',
+    'stripeSubscriptionId',
+    'updatedAt',
+  ] as const
   $columns = SubscriptionSchema.$columns
   @column()
   declare billingInterval: string
@@ -2019,7 +2859,19 @@ export class SubscriptionSchema extends BaseModel {
 }
 
 export class UserSchema extends BaseModel {
-  static $columns = ['createdAt', 'email', 'emailVerifiedAt', 'fullName', 'id', 'lastLoginAt', 'locale', 'organizationId', 'password', 'sessionsValidAfter', 'theme', 'updatedAt'] as const
+  static $columns = [
+    'createdAt',
+    'email',
+    'emailVerifiedAt',
+    'fullName',
+    'id',
+    'lastLoginAt',
+    'locale',
+    'organizationId',
+    'password',
+    'theme',
+    'updatedAt',
+  ] as const
   $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -2039,8 +2891,6 @@ export class UserSchema extends BaseModel {
   declare organizationId: number | null
   @column({ serializeAs: null })
   declare password: string
-  @column.dateTime()
-  declare sessionsValidAfter: DateTime | null
   @column()
   declare theme: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
