@@ -49,6 +49,44 @@ générique/sécurité → `/boats/:id?tab=equipment`.
 Couverture : `tests/functional/boats/boat_equipment_photos.spec.ts` (upload, suppression, IDOR par
 entité, non authentifié).
 
+## Envois groupés : ce qui est refusé, et quand (#764)
+
+Les douze routes de `LARGE_UPLOAD_ROUTES` (`config/bodyparser.ts`) sortent du
+traitement automatique du bodyparser (`processManually`) et sont reprises par
+`LargeMultipartUploadMiddleware`, qui les rejoue avec un plafond relevé.
+
+Ce middleware écrivait chaque partie **en entier sur le disque** avant qu'aucun
+validateur ne s'exécute, avec un plafond unique de 400 Mo pour les douze
+routes. Il applique désormais trois gardes, par coût croissant :
+
+| Garde                   | Source                             | Effet                                                                                   |
+| ----------------------- | ---------------------------------- | --------------------------------------------------------------------------------------- |
+| Plafond de charge utile | `largeUploadLimitFor(pattern)`     | 200 Mo pour un lot de photos (20 × 10 Mo), 400 Mo pour un lot de documents (20 × 20 Mo) |
+| Extension               | `MEDIA_BATCH_RULES[kind].extnames` | la partie est **drainée sans être écrite**                                              |
+| Nombre de parties       | `MAX_FILES_PER_BATCH`              | idem au-delà de 20                                                                      |
+
+Les trois valeurs viennent de `shared/constants/media.ts`, que lit aussi
+`app/validators/media.ts` : le middleware ne peut pas diverger du validateur
+sans casser la compilation. La nature du lot est déduite du **motif de route**
+(`/photos` ou `/documents`) — `tests/unit/hygiene/large_upload_routes.spec.ts`
+fige ce couplage, pour qu'une treizième route ne se retrouve pas sans plafond
+adapté ni allowlist.
+
+Une partie refusée est drainée et non écrite : il faut consommer le flux pour
+que l'analyse multipart continue, mais aucun octet ne touche le disque. Le
+validateur rend ensuite l'erreur habituelle — **le refus précoce ne change pas
+ce que voit l'utilisateur, seulement ce que ça coûte**.
+
+Les fichiers temporaires acceptés sont supprimés en fin de requête (`finally`
+du middleware). Le `unlink` précédent ne couvrait que l'échec du `pipeline` :
+un lot rejeté par le validateur en aval laissait tout dans `tmpdir()`, et on
+dépendait du ménage de l'OS. C'est sûr parce que les envois vers Cloudinary
+ont lieu **dans la requête**, pas dans un job différé.
+
+Enfin, `MediaService.upload` ne saute plus sa garde de quota quand
+`file.size` vaut 0 : il mesure le fichier temporaire (`stat`) au lieu de
+renoncer au contrôle pré-upload.
+
 ## Nettoyage Cloudinary
 
 `deleteAllForEntity(entityType, entityId, folder, org)` supprime les lignes `media`, purge le dossier
