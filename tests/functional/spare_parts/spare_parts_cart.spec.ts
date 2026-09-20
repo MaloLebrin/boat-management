@@ -185,7 +185,12 @@ test.group('Spare parts repair cart (functional)', (group) => {
     const body = response.text()
     assert.include(body, 'GASKET, FLOAT CHAMBER')
     assert.include(body, '6E0-14384-00')
-    assert.include(body, '"2"')
+    // La quantité n'est plus mise entre guillemets depuis #773 : l'escaper
+    // propre à cet export mettait **tout** entre guillemets, ce qui n'était
+    // pas une protection (le tableur les retire à l'import, puis évalue le
+    // contenu). Il partage désormais `buildCsv`, qui ne cite que ce qui
+    // l'exige — et laisse donc un nombre exploitable comme un nombre.
+    assert.match(body, /;2(\r\n|$)/m)
     assert.include(body, 'Shear pin')
   })
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+import { isSafeInternalPath } from '#shared/helpers/safe_path'
 import DefaultLayout from '~/layouts/default.vue'
 export default { layout: DefaultLayout }
 </script>
@@ -43,6 +44,12 @@ function deleteNotification(notif: NotificationForFront) {
 }
 
 function handleItemClick(notif: NotificationForFront) {
+  // `actionUrl` est une colonne de texte libre : on ne navigue que si la
+  // valeur est un chemin interne (#780). Ne rien faire vaut mieux qu'ouvrir
+  // une redirection ouverte — la notification est marquée lue dans les deux
+  // cas.
+  const target = isSafeInternalPath(notif.actionUrl) ? notif.actionUrl : null
+
   if (!notif.isRead) {
     router.patch(
       `/notifications/${notif.id}/read`,
@@ -50,12 +57,12 @@ function handleItemClick(notif: NotificationForFront) {
       {
         preserveScroll: true,
         onSuccess: () => {
-          if (notif.actionUrl) router.visit(notif.actionUrl)
+          if (target) router.visit(target)
         },
       }
     )
-  } else if (notif.actionUrl) {
-    router.visit(notif.actionUrl)
+  } else if (target) {
+    router.visit(target)
   }
 }
 </script>

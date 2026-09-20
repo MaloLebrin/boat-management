@@ -3,7 +3,7 @@ import { defineConfig, transports } from '@adonisjs/mail'
 import type { InferMailers } from '@adonisjs/mail/types'
 
 const smtpUsername = env.get('SMTP_USERNAME')
-const smtpPassword = env.get('SMTP_PASSWORD')
+const smtpPassword = env.get('SMTP_PASSWORD')?.release()
 
 const mailConfig = defineConfig({
   default: 'smtp',

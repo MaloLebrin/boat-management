@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { isSafeInternalPath } from '#shared/helpers/safe_path'
 import { Link } from '@adonisjs/inertia/vue'
 import type { Data } from '@generated/data'
 import { router, usePage } from '@inertiajs/vue3'
@@ -75,7 +76,9 @@ watch(
 // à la fenêtre focusée — navigation Inertia, pas de rechargement complet (#498)
 function onSwMessage(event: MessageEvent) {
   const data = event.data as { type?: string; url?: string } | null
-  if (data?.type === 'push:navigate' && typeof data.url === 'string') {
+  // `typeof === 'string'` ne dit rien de la forme : on ne navigue que vers un
+  // chemin interne (#780).
+  if (data?.type === 'push:navigate' && isSafeInternalPath(data.url)) {
     router.visit(data.url)
   }
 }

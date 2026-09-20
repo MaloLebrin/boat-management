@@ -20,6 +20,18 @@ export default class OrganizationPolicy extends OrgScopedPolicy {
   }
 
   /**
+   * Renommer l'organisation (`PUT /settings/org`, #761) — admin seul.
+   *
+   * Distinct de `viewMembers`, qui ouvre l'écran : un member consulte
+   * `/settings/org` sans pouvoir réécrire la raison sociale qui figure sur les
+   * factures émises et les PDF. Distinct aussi de `manageMembers` — gérer un
+   * annuaire et changer l'identité contractuelle ne sont pas le même geste.
+   */
+  async manageOrganization(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'organization.manage')
+  }
+
+  /**
    * Import CSV (`/settings/import`) — admin seul (#715). L'import écrit en
    * masse dans l'historique d'entretien, que seul `maintenance.delete` permet
    * ensuite de corriger : ouvrir l'écriture plus largement que la correction

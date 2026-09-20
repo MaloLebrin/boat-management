@@ -85,18 +85,85 @@ test.group('OrgScopedPolicy.before — via un vrai Bouncer (integration)', () =>
     assert.isFalse(await bouncerFor(outsiderAdmin).with(MouillagePolicy).allows('edit', mouillage))
   })
 
-  test('an admin keeps access when the resource carries no readable organization', async ({
+  // --- #771 : « je n'ai pas pu vérifier » n'est plus « autorisé » ---
+
+  test('an admin on an unreadable resource falls through to the policy method', async ({
     assert,
   }) => {
     const org = await OrganizationFactory.create()
     const admin = await userWithRole(org.id, 'admin')
-    // Relation `port` non préchargée : impossible de trancher. Le hook ne doit
-    // pas refuser sur un doute — sinon tout appel qui ne précharge pas le port
-    // se met à renvoyer 403 pour les admins, une régression silencieuse sur un
-    // chemin aujourd'hui autorisé.
+    // Relation `port` non préchargée : le hook ne peut pas lire l'organisation.
+    //
+    // ⚠️ Ce test assertait l'inverse jusqu'à #771 : le hook traitait une
+    // ressource illisible comme « non étrangère », donc l'autorisait, et ne
+    // distinguait pas « rien à vérifier » de « je n'ai pas pu vérifier ».
+    // Il ne tranche plus : c'est `MouillagePolicy.edit` qui décide, et
+    // `sameOrgViaPort` refuse faute de relation.
     const mouillage = { portId: 12 } as never
 
+    assert.isFalse(await bouncerFor(admin).with(MouillagePolicy).allows('edit', mouillage))
+  })
+
+  test('an admin on a preloaded resource of their own organization is still granted', async ({
+    assert,
+  }) => {
+    // Le témoin de la régression que le refus-sur-le-doute pourrait causer :
+    // précharger la relation suffit à retrouver le laissez-passer admin.
+    const org = await OrganizationFactory.create()
+    const admin = await userWithRole(org.id, 'admin')
+    const mouillage = { port: { organizationId: org.id } } as never
+
     assert.isTrue(await bouncerFor(admin).with(MouillagePolicy).allows('edit', mouillage))
+  })
+
+  test('an action with no resource at all still grants the admin', async ({ assert }) => {
+    // « Rien à vérifier » reste distinct de « je n'ai pas pu vérifier » : les
+    // actions sans cible (`create`, `viewMembers`…) doivent continuer à
+    // passer, sans quoi #771 casserait la moitié des écrans d'administration.
+    const org = await OrganizationFactory.create()
+    const admin = await userWithRole(org.id, 'admin')
+
+    assert.isTrue(await bouncerFor(admin).with(PortPolicy).allows('create'))
+  })
+
+  test('one unreadable resource among several is enough to stop deciding', async ({ assert }) => {
+    const org = await OrganizationFactory.create()
+    const admin = await userWithRole(org.id, 'admin')
+
+    // Un argument illisible à côté d'un argument parfaitement légitime : le
+    // hook ne doit pas conclure sur la seule foi du second. L'ancienne
+    // version répondait `true` — `every(non étrangère)` — et la méthode de
+    // policy n'était jamais atteinte.
+    const unreadable = { portId: 12 } as never
+    const readable = { port: { organizationId: org.id } } as never
+
+    assert.isFalse(
+      await bouncerFor(admin).with(MouillagePolicy).allows('edit', unreadable, readable)
+    )
+  })
+
+  test('a foreign resource still wins over an unreadable one', async ({ assert }) => {
+    const org = await OrganizationFactory.create()
+    const otherOrg = await OrganizationFactory.create()
+    const outsiderAdmin = await userWithRole(otherOrg.id, 'admin')
+
+    const foreign = { port: { organizationId: org.id } } as never
+    const unreadable = { portId: 12 } as never
+
+    assert.isFalse(
+      await bouncerFor(outsiderAdmin).with(MouillagePolicy).allows('edit', foreign, unreadable)
+    )
+  })
+
+  test('the boat relation is a readable form too', async ({ assert }) => {
+    // Troisième forme reconnue par `organizationIdOf` : les ressources
+    // rattachées à un bateau n'ont pas de colonne `organization_id`.
+    const org = await OrganizationFactory.create()
+    const otherOrg = await OrganizationFactory.create()
+    const outsiderAdmin = await userWithRole(otherOrg.id, 'admin')
+    const resource = { boat: { organizationId: org.id } } as never
+
+    assert.isFalse(await bouncerFor(outsiderAdmin).with(PortPolicy).allows('edit', resource))
   })
 
   test('a member falls through to the policy method', async ({ assert }) => {

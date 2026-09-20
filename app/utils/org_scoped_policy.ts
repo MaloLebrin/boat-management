@@ -25,7 +25,27 @@ export default abstract class OrgScopedPolicy extends BasePolicy {
     // Non-admin : le hook ne tranche pas, la méthode de policy décide.
     if (!(await user.isAdminOf(user.organizationId))) return
 
-    return resources.every((resource) => !this.isForeignResource(user, resource))
+    // Aucune ressource : action sans cible (`create`, `viewMembers`…). Il n'y
+    // a rien à vérifier, et le laissez-passer admin s'applique — c'est un cas
+    // légitime, distinct de « je n'ai pas pu vérifier » ci-dessous (#771).
+    if (resources.length === 0) return true
+
+    const scopes = resources.map((resource) => this.scopeOf(user, resource))
+
+    // Une seule ressource étrangère suffit à refuser.
+    if (scopes.includes('foreign')) return false
+
+    // Au moins une ressource dont l'organisation n'est pas lisible : le hook
+    // **ne tranche pas** et laisse la méthode de policy décider (#771).
+    //
+    // La version précédente les traitait comme « non étrangères », donc les
+    // autorisait. L'asymétrie était assumée et documentée, mais elle voulait
+    // dire que le hook ne distinguait pas « rien à vérifier » de « je n'ai
+    // pas pu vérifier » — et que sur ce second cas la défense en profondeur
+    // n'avait, de nouveau, qu'une profondeur.
+    if (scopes.includes('unreadable')) return
+
+    return true
   }
 
   protected async can(user: User, capability: Capability): Promise<boolean> {
@@ -38,39 +58,51 @@ export default abstract class OrgScopedPolicy extends BasePolicy {
   }
 
   /**
-   * Une ressource n'est « étrangère » que si son organisation est **lisible et
-   * différente**. L'asymétrie est délibérée : sur une ressource dont on ne sait
-   * rien — argument absent, payload de validation, relation non préchargée — le
-   * hook laisse passer l'admin comme avant.
+   * Position d'une ressource vis-à-vis de l'organisation de l'utilisateur.
    *
-   * Refuser sur le doute reviendrait à faire retomber l'admin sur la méthode de
-   * policy, qui refuserait par exemple un `Mouillage` dont le `port` n'est pas
-   * préchargé (`MouillagePolicy.sameOrgViaPort`) : un 403 tout neuf sur un
-   * chemin aujourd'hui autorisé, pour un durcissement que personne n'a demandé.
+   * Les trois cas sont distincts, et c'est tout le propos de #771 :
+   *
+   * - `same` — organisation lisible et identique : le hook peut autoriser ;
+   * - `foreign` — lisible et différente : le hook refuse ;
+   * - `unreadable` — non lisible : le hook **ne tranche pas**.
    */
-  private isForeignResource(user: User, resource: unknown): boolean {
+  private scopeOf(user: User, resource: unknown): 'same' | 'foreign' | 'unreadable' {
     const organizationId = this.organizationIdOf(resource)
-    return organizationId !== null && organizationId !== user.organizationId
+    if (organizationId === null) return 'unreadable'
+    return organizationId === user.organizationId ? 'same' : 'foreign'
   }
 
   /**
    * L'organisation d'une ressource, ou `null` si elle n'est pas lisible.
    *
-   * Deux formes couvrent le modèle de données : la colonne directe, et la
-   * relation `port` chargée — `Mouillage` et `Pontoon` n'ont pas de colonne
-   * `organization_id`, ils héritent celle de leur port. `Spot`, lui, en porte
-   * une (`NOT NULL`) et passe donc par la première forme.
+   * **Liste close des formes reconnues** — tout le reste est `unreadable`, et
+   * le hook laisse alors la méthode de policy décider :
+   *
+   * 1. la colonne directe `organizationId` (`Boat`, `Port`, `Spot`,
+   *    `BoatReservation`, `Invoice`… — c'est la forme de **tous** les sites
+   *    d'appel actuels) ;
+   * 2. la relation `port` **préchargée** — `Mouillage` et `Pontoon` n'ont pas
+   *    de colonne `organization_id`, ils héritent celle de leur port ;
+   * 3. la relation `boat` **préchargée** — même raisonnement pour les
+   *    ressources rattachées à un bateau (`BoatEngine` et consorts, qui ne
+   *    portent pas d'`organization_id` non plus).
+   *
+   * Étendre cette liste est préférable à laisser une forme retomber sur
+   * `null` : depuis #771, `null` ne signifie plus « autorisé », il signifie
+   * « c'est à la policy de voir ».
    */
   private organizationIdOf(resource: unknown): number | null {
     if (typeof resource !== 'object' || resource === null) return null
 
-    const { organizationId, port } = resource as {
+    const { organizationId, port, boat } = resource as {
       organizationId?: unknown
       port?: { organizationId?: unknown }
+      boat?: { organizationId?: unknown }
     }
 
     if (typeof organizationId === 'number') return organizationId
     if (port && typeof port.organizationId === 'number') return port.organizationId
+    if (boat && typeof boat.organizationId === 'number') return boat.organizationId
 
     return null
   }

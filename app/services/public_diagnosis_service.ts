@@ -123,7 +123,7 @@ export default class PublicDiagnosisService {
     if (!this.#hasAiPlan(user)) {
       // Plafond starter : sérialisé par le verrou d'org pour éviter deux
       // créations simultanées qui passeraient toutes deux le count.
-      return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
+      return this.aiTokenQuotaService.withBestEffortOrgLock(user.organization.id, async () => {
         const used = await this.#countForOrganization(user.organization.id)
         if (used >= PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) {
           throw new DiagnosisQuotaExhaustedError()
@@ -132,9 +132,7 @@ export default class PublicDiagnosisService {
       })
     }
 
-    return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
-      const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
-      this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
+    return this.aiTokenQuotaService.withReservedTokens(user.organization, async () => {
       return this.#createConversation(user, input, locale, ip)
     })
   }
@@ -165,9 +163,7 @@ export default class PublicDiagnosisService {
     if (user !== null) {
       await this.#loadOrganization(user)
       if (this.#hasAiPlan(user)) {
-        return this.aiTokenQuotaService.withOrgLock(user.organization.id, async () => {
-          const currentUsage = await this.aiTokenQuotaService.getUsage(user.organization.id)
-          this.aiTokenQuotaService.assertCanUseTokens(user.organization, currentUsage)
+        return this.aiTokenQuotaService.withReservedTokens(user.organization, async () => {
           return this.#exchange(conversation, message, user, ip)
         })
       }

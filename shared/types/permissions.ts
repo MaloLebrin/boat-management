@@ -7,6 +7,7 @@ export type Capability =
   | 'invitations.manage'
   | 'ai.configure'
   | 'branding.configure'
+  | 'organization.manage'
   | 'audit_log.view'
   | 'boats.view'
   | 'boats.create'
@@ -75,6 +76,11 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'invitations.manage',
   'ai.configure',
   'branding.configure',
+  // Renommer l'organisation (#761) : aligné sur `branding.configure`, pas sur
+  // `members.view` qui ouvre l'écran. La raison sociale est reprise sur les
+  // factures émises, les PDF (contrats, carnets d'entretien) et le branding —
+  // c'est une identité contractuelle, pas une préférence d'affichage.
+  'organization.manage',
   // Import CSV en masse (#715) : réservé à l'admin, comme `maintenance.delete`.
   // Écrire un historique d'entretien que seul un admin peut ensuite corriger
   // n'est pas du même ordre qu'une saisie unitaire.
