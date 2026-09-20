@@ -385,6 +385,12 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
   un cookie signé 365j (`SettingsController.updateTheme`, route publique `POST /theme` pour le marketing et
   le login). Cascade profil > cookie > `system` dans `resolveSharedTheme` (`inertia_middleware.ts`),
   exposée en prop partagée `theme`.
+- **Routes publiques `POST /locale` et `POST /theme`** : validées par `updateLocaleValidator` /
+  `updateThemeValidator` en mode **tolérant** (`tryValidate`, pas `validateUsing`) — une valeur
+  inconnue est ignorée sans erreur, contrat de #414 / #403 : ces switchers vivent sur des pages
+  publiques où aucun formulaire Inertia ne porterait l'erreur de session. Bornées par
+  `preferencesThrottle` (30/min/IP, compteur **partagé** entre les deux), parce qu'elles
+  déclenchent chacune un `UPDATE` sur `users` dès qu'une session existe (#783).
 - **Composable** : `inertia/composables/use_theme.ts` → `useTheme()` (`preference`, `resolved`, `setTheme`).
   Applique le thème immédiatement sur `<html>` puis persiste via `router.put`/`router.post` ; suit un
   changement d'OS à chaud tant que la préférence vaut `system`.
