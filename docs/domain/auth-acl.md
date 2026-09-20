@@ -13,6 +13,12 @@ Référence routes: `start/routes/auth.ts`.
   - Controller: `NewAccountController.store`
   - Validation: `signupValidator` (`app/validators/user.ts`) — `firstName`, `lastName`, `email`, `password`, `organizationName`, `organizationType?`, `fleetSize?`, `acceptTerms`. Le schéma doit rester le miroir exact des champs rendus par la page, sinon l'inscription échoue en silence (#448) ; `tests/inertia/signup_form_validator_sync.spec.ts` le vérifie.
   - Service: `UserService.signupWithOrganization`
+  - Limiteur: `signupThrottle` (`start/limiter.ts`) — 5/h/IP, route nommée `signup.store`.
+    Fenêtre à l'heure et non à la minute : une inscription légitime est rare, et les 10/min
+    d'`authThrottle` ne bornent rien sur la durée. 5 plutôt que 3 pour laisser passer une
+    marina qui ouvre les comptes de son équipe derrière une IP partagée (#766). Le
+    dépassement rend un flash `flash.auth.signupRateLimit` et une redirection, pas une 429
+    brute — voir l'allowlist `RATE_LIMIT_FLASH_ROUTES` d'`app/exceptions/handler.ts`.
   - Auth: `auth.use('web').login(user)`
   - Redirect: route `home`
   - Mot de passe : `PASSWORD_MIN_LENGTH` / `PASSWORD_MAX_LENGTH` (`shared/constants/auth.ts`) — mêmes constantes côté formulaire, qui les affiche (#455). `store` connecte l'utilisateur immédiatement, envoie l'e-mail de bienvenue (`EmailQueueService.sendWelcome`) **et** un lien de vérification d'adresse (#768, voir ci-dessous) : l'essai reste sans friction, le compte part simplement non vérifié

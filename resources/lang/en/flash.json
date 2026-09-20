@@ -72,7 +72,8 @@
     "emailNotVerified": "Confirm your email address before doing this — it involves someone else or a payment.",
     "emailVerificationSent": "If that address still needs confirming, a link is on its way.",
     "emailVerificationTokenInvalid": "This confirmation link is invalid or has expired. Sign in and request a new one.",
-    "emailVerified": "Your email address is confirmed. You can sign in."
+    "emailVerified": "Your email address is confirmed. You can sign in.",
+    "signupRateLimit": "Too many sign-ups from this network. Please try again in an hour."
   },
   "settings": {
     "profileUpdated": "Profile updated.",
