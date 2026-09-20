@@ -5,6 +5,7 @@ import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shar
 import type { ReminderDocumentItem } from '#shared/types/boat_document'
 import type { PlanModule, PlanTier } from '#shared/types/plan'
 import type { BrandingEmailParams } from '#shared/types/branding'
+import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS } from '#shared/constants/email_verification'
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
@@ -68,6 +69,31 @@ export default class EmailQueueService {
       text,
       html,
       correlationId: `password-reset:${params.to}:${Date.now()}`,
+    })
+  }
+
+  /**
+   * Lien de vérification d'adresse (#768).
+   *
+   * `correlationId` horodaté, comme la réinitialisation de mot de passe : un
+   * renvoi demandé par l'utilisateur doit repartir, pas être avalé par la
+   * déduplication de la file.
+   */
+  async sendEmailVerification(params: { to: string; verificationUrl: string }) {
+    const subject = 'Confirm your email / Confirmez votre adresse e-mail'
+    const text = `Confirm your email address: ${params.verificationUrl}\n\nConfirmez votre adresse e-mail : ${params.verificationUrl}`
+
+    const html = await edge.render('emails/email_verification', {
+      verificationUrl: params.verificationUrl,
+      ttlHours: EMAIL_VERIFICATION_TOKEN_TTL_HOURS,
+    })
+
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `email-verification:${params.to}:${Date.now()}`,
     })
   }
 

@@ -48,7 +48,6 @@ export interface ApiDefinition {
       store: typeof routes['boats.owners.store']
       destroy: typeof routes['boats.owners.destroy']
     }
-    assign: typeof routes['boats.assign']
     engines: {
       show: typeof routes['boats.engines.show']
       photos: {
@@ -180,6 +179,7 @@ export interface ApiDefinition {
         destroy: typeof routes['boats.reservations.contract.destroy']
       }
     }
+    assign: typeof routes['boats.assign']
   }
   boatEquipment: {
     storeEngine: typeof routes['boat_equipment.store_engine']
@@ -406,9 +406,7 @@ export interface ApiDefinition {
   clients: {
     index: typeof routes['clients.index']
     show: typeof routes['clients.show']
-    store: typeof routes['clients.store']
-    update: typeof routes['clients.update']
-    destroy: typeof routes['clients.destroy']
+    export: typeof routes['clients.export']
     documents: {
       store: typeof routes['clients.documents.store']
     }
@@ -416,8 +414,10 @@ export interface ApiDefinition {
       destroy: typeof routes['clients.media.destroy']
       download: typeof routes['clients.media.download']
     }
+    store: typeof routes['clients.store']
+    update: typeof routes['clients.update']
+    destroy: typeof routes['clients.destroy']
     anonymize: typeof routes['clients.anonymize']
-    export: typeof routes['clients.export']
   }
   pricingSeasons: {
     index: typeof routes['pricingSeasons.index']
@@ -427,15 +427,16 @@ export interface ApiDefinition {
   }
   invoices: {
     index: typeof routes['invoices.index']
+    show: typeof routes['invoices.show']
+    pdf: typeof routes['invoices.pdf']
     create: typeof routes['invoices.create']
     store: typeof routes['invoices.store']
     fromReservation: typeof routes['invoices.fromReservation']
-    show: typeof routes['invoices.show']
     edit: typeof routes['invoices.edit']
-    pdf: typeof routes['invoices.pdf']
     send: typeof routes['invoices.send']
     convert: typeof routes['invoices.convert']
     pay: typeof routes['invoices.pay']
+    payment: typeof routes['invoices.payment']
     update: typeof routes['invoices.update']
     destroy: typeof routes['invoices.destroy']
   }
@@ -455,6 +456,11 @@ export interface ApiDefinition {
   passwordReset: {
     store: typeof routes['password_reset.store']
     update: typeof routes['password_reset.update']
+  }
+  emailVerification: {
+    show: typeof routes['email_verification.show']
+    resend: typeof routes['email_verification.resend']
+    confirm: typeof routes['email_verification.confirm']
   }
   ai: {
     chat: typeof routes['ai.chat']

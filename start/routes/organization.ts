@@ -24,6 +24,9 @@ router
     router
       .post('organization/invitations', [controllers.OrganizationInvitations, 'store'])
       .as('organization.invitations.store')
+      // Inviter engage un tiers : son adresse reçoit un e-mail à notre nom
+      // (#768).
+      .use(middleware.requireVerifiedEmail())
     router
       .delete('organization/invitations/:id', [controllers.OrganizationInvitations, 'destroy'])
       .as('organization.invitations.destroy')
