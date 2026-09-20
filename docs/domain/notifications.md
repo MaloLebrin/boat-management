@@ -202,6 +202,30 @@ Références : `resources/lang/{en,fr}/notifications.json`. Le namespace `notifi
 - **Broadcast best-effort** : un échec SSE n'échoue jamais la création (loggé en warning).
 - **Isolation** : toute mutation/lecture est scopée par `user_id` ; le canal SSE est autorisé au seul propriétaire.
 
+## `actionUrl` : un chemin interne, et rien d'autre (#780)
+
+`notifications.action_url` est une colonne de texte libre dont la valeur est
+passée telle quelle à une navigation — `router.visit()` côté page Inertia,
+`clients.openWindow()` côté service worker. `router.visit` ne filtre pas le
+schéma, et `openWindow()` accepte des URL absolues par conception.
+
+`isSafeInternalPath()` (`shared/helpers/safe_path.ts`) est l'unique garde, et
+elle est posée **aux deux bouts** :
+
+- **à l'écriture**, dans `NotificationService.create` : une valeur non conforme
+  est stockée à `null` (et journalisée en warning) plutôt que de faire échouer
+  la création — une notification sans lien reste utile. C'est la garde qui
+  protège les consommateurs qu'on n'a pas encore écrits ;
+- **à la lecture**, dans les quatre consommateurs (`NotificationPanel.vue`,
+  `pages/notifications/index.vue`, `sw.ts`, `layouts/default.vue`). Le chemin
+  du service worker est le plus exposé : la valeur y arrive par le payload
+  push, donc après un aller-retour hors de l'app.
+
+La règle est une **allowlist de forme** : une seule barre oblique en tête, pas
+de `//` ni de `/\` (URL protocol-relative, que le navigateur lit comme un
+hôte — le cas qu'on oublie systématiquement), pas de caractère de contrôle.
+Pas une liste noire de schémas, qui est toujours en retard d'un schéma.
+
 ## Étendre : ajouter un nouveau type de notification
 
 1. Ajouter le `type` à l'union `NotificationType` (`shared/types/notification.ts`) — facultatif grâce à `(string & {})`, mais recommandé pour l'autocomplétion.
