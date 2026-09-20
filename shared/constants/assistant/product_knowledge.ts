@@ -969,6 +969,31 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageInvoices',
   },
   {
+    id: 'email-verification',
+    title: {
+      en: 'Confirming your email address',
+      fr: 'Confirmer votre adresse e-mail',
+    },
+    body: {
+      en: 'FleetAi sends a confirmation link when you create your account, and again whenever you ask for one from the Confirm your email screen. The link is valid for 24 hours; asking for a new one cancels the previous link. The app stays fully open while your address is unconfirmed — you can add boats, log maintenance and use the AI. Only what involves someone else or a payment waits: sending an invoice or a rental contract, inviting a member, and subscribing to a paid plan. A banner at the top of the app reminds you until it is done.',
+      fr: 'FleetAi envoie un lien de confirmation à la création du compte, puis à chaque demande depuis l’écran Confirmez votre adresse. Le lien reste valable 24 heures ; en demander un nouveau annule le précédent. L’app reste entièrement ouverte tant que l’adresse n’est pas confirmée — vous pouvez ajouter des bateaux, consigner l’entretien et utiliser l’IA. Seul ce qui engage un tiers ou un paiement attend : envoyer une facture ou un contrat de location, inviter un membre, et souscrire à une offre payante. Une bannière en haut de l’app vous le rappelle jusqu’à ce que ce soit fait.',
+    },
+    keywords: [
+      'verification',
+      'confirmation',
+      'email',
+      'adresse',
+      'address',
+      'lien',
+      'link',
+      'confirmer',
+      'confirm',
+      'banniere',
+      'banner',
+    ],
+    navTarget: null,
+  },
+  {
     id: 'members-roles',
     title: {
       en: 'Members, roles and invitations',

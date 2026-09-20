@@ -23,7 +23,12 @@ router
           ])
           .as('invoices.fromReservation')
         router.get('invoices/:id/edit', [controllers.Invoices, 'edit']).as('invoices.edit')
-        router.post('invoices/:id/send', [controllers.Invoices, 'send']).as('invoices.send')
+        // Envoyer une facture met du courrier à notre nom dans la boîte d'un
+        // client (#768).
+        router
+          .post('invoices/:id/send', [controllers.Invoices, 'send'])
+          .as('invoices.send')
+          .use(middleware.requireVerifiedEmail())
         router
           .post('invoices/:id/convert', [controllers.Invoices, 'convert'])
           .as('invoices.convert')
