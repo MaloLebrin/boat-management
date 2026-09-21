@@ -69,6 +69,7 @@ vi.mock('~/components/boats/show/modals/BoatEquipmentAddModal.vue', () => ({
 import BoatMaintenanceTasksPanel from '../../inertia/components/boats/maintenance/BoatMaintenanceTasksPanel.vue'
 import BoatShowTabContent from '../../inertia/components/boats/show/BoatShowTabContent.vue'
 import BoatShowTabEquipment from '../../inertia/components/boats/show/tabs/BoatShowTabEquipment.vue'
+import BoatShowTabIncidents from '../../inertia/components/boats/show/tabs/BoatShowTabIncidents.vue'
 import BoatShowTabHistory from '../../inertia/components/boats/show/tabs/BoatShowTabHistory.vue'
 import BoatShowTabNavigationLogs from '../../inertia/components/boats/show/tabs/BoatShowTabNavigationLogs.vue'
 
@@ -281,6 +282,41 @@ describe('BoatShowTabEquipment — createIntent (#365)', () => {
     await nextTick()
 
     expect(wrapper.findComponent({ name: 'BoatEquipmentAddModal' }).props('open')).toBe(false)
+    expect(wrapper.emitted('createIntentConsumed')).toBeUndefined()
+  })
+})
+
+describe('BoatShowTabIncidents — createIntent (#813)', () => {
+  test("opens the incident modal when mounted with the 'incident' intent", async () => {
+    const wrapper = mount(BoatShowTabIncidents, {
+      props: { boat, incidents: [], canManage: true, canDelete: true, createIntent: 'incident' },
+      ...globalStubs,
+    })
+    await nextTick()
+
+    expect(wrapper.findComponent({ name: 'BoatIncidentModal' }).props('open')).toBe(true)
+    expect(wrapper.emitted('createIntentConsumed')).toHaveLength(1)
+  })
+
+  test('consumes the intent without opening when the user cannot report incidents', async () => {
+    const wrapper = mount(BoatShowTabIncidents, {
+      props: { boat, incidents: [], canManage: false, canDelete: false, createIntent: 'incident' },
+      ...globalStubs,
+    })
+    await nextTick()
+
+    expect(wrapper.findComponent({ name: 'BoatIncidentModal' }).exists()).toBe(false)
+    expect(wrapper.emitted('createIntentConsumed')).toHaveLength(1)
+  })
+
+  test("ignores the 'task' intent, which belongs to another tab", async () => {
+    const wrapper = mount(BoatShowTabIncidents, {
+      props: { boat, incidents: [], canManage: true, canDelete: true, createIntent: 'task' },
+      ...globalStubs,
+    })
+    await nextTick()
+
+    expect(wrapper.findComponent({ name: 'BoatIncidentModal' }).props('open')).toBe(false)
     expect(wrapper.emitted('createIntentConsumed')).toBeUndefined()
   })
 })

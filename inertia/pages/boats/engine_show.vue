@@ -7,6 +7,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import EquipmentIncidentAction from '~/components/boats/incidents/EquipmentIncidentAction.vue'
 import EngineMaintenanceEventModal from '~/components/engine/show/EngineMaintenanceEventModal.vue'
 import EngineShowTabDiagnostic from '~/components/engine/show/tabs/EngineShowTabDiagnostic.vue'
 import EngineShowTabDocuments from '~/components/engine/show/tabs/EngineShowTabDocuments.vue'
@@ -38,6 +39,8 @@ const props = defineProps<{
   taskPermissions: MaintenanceTaskPermissions
   diagnosticCheckedStepKeys: string[] | null
   canManage: boolean
+  /** Droit `incidents.create` : bouton « Incident » de l'en-tête (#813). */
+  canReportIncident: boolean
   /** Prop différée (deferJson) — `undefined` tant qu'Inertia ne l'a pas résolue. */
   aiSuggestions?: AiSuggestion[] | null
   /** `?tab=` vu par le serveur : le rendu SSR part du bon onglet (#463). */
@@ -268,15 +271,22 @@ function formatYear(iso: string): string {
           </div>
         </div>
 
-        <div v-if="canManage" class="flex flex-wrap items-center gap-2 justify-end">
+        <div class="flex flex-wrap items-center gap-2 justify-end">
+          <EquipmentIncidentAction
+            :boat-id="boat.id"
+            :target="{ type: 'engine', id: engine.id }"
+            :equipment="taskEquipment"
+            :can-report="canReportIncident"
+          />
           <BaseButton
+            v-if="canManage"
             variant="secondary"
             size="sm"
             :href="`/boats/${boat.id}/engines/${engine.id}/edit`"
           >
             {{ t('boats.engineShow.actions.edit') }}
           </BaseButton>
-          <BaseButton size="sm" @click="addEventOpen = true">
+          <BaseButton v-if="canManage" size="sm" @click="addEventOpen = true">
             {{ t('boats.engineShow.actions.addEvent') }}
           </BaseButton>
         </div>

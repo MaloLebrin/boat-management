@@ -26,7 +26,8 @@
     "description": "Description",
     "insuranceClaimed": "Insurance claim submitted",
     "insuranceClaimRef": "Claim reference (optional)",
-    "status": "Status"
+    "status": "Status",
+    "target": "Equipment concerned"
   },
   "form": {
     "createTitle": "Report an incident",
@@ -36,5 +37,17 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "confirmDelete": "Delete this incident?"
-  }
+  },
+  "target": {
+    "wholeBoat": "Whole boat",
+    "engine": "Engine",
+    "sail": "Sail",
+    "rig": "Rig",
+    "safety": "Safety",
+    "generic": "Equipment",
+    "engine_part": "Part"
+  },
+  "reportShort": "Incident",
+  "reportForEquipment": "Report an incident on this equipment",
+  "modalTitle": "Report an incident"
 }

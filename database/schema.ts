@@ -652,7 +652,13 @@ export class BoatGenericEquipmentSchema extends BaseModel {
 
 export class BoatIncidentSchema extends BaseModel {
   static $columns = [
+    'boatEngineId',
+    'boatEnginePartId',
+    'boatGenericEquipmentId',
     'boatId',
+    'boatRigId',
+    'boatSafetyEquipmentId',
+    'boatSailId',
     'closedAt',
     'createdAt',
     'description',
@@ -668,7 +674,19 @@ export class BoatIncidentSchema extends BaseModel {
   ] as const
   $columns = BoatIncidentSchema.$columns
   @column()
+  declare boatEngineId: number | null
+  @column()
+  declare boatEnginePartId: number | null
+  @column()
+  declare boatGenericEquipmentId: number | null
+  @column()
   declare boatId: number
+  @column()
+  declare boatRigId: number | null
+  @column()
+  declare boatSafetyEquipmentId: number | null
+  @column()
+  declare boatSailId: number | null
   @column.dateTime()
   declare closedAt: DateTime | null
   @column.dateTime({ autoCreate: true })

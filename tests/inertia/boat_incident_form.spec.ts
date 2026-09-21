@@ -94,6 +94,7 @@ vi.mock('~/components/base/BaseTextarea.vue', () => ({
 
 const sampleIncident: BoatIncidentRow = {
   id: 42,
+  boatId: 7,
   type: 'grounding',
   status: 'open',
   occurredAt: '2026-06-25T10:00:00.000Z',
@@ -101,6 +102,15 @@ const sampleIncident: BoatIncidentRow = {
   description: 'Test incident',
   insuranceClaimed: false,
   insuranceClaimRef: null,
+  closedAt: null,
+  createdAt: '2026-06-25T10:00:00.000Z',
+  boatEngineId: null,
+  boatSailId: null,
+  boatRigId: null,
+  boatSafetyEquipmentId: null,
+  boatGenericEquipmentId: null,
+  boatEnginePartId: null,
+  target: null,
 }
 
 describe('BoatIncidentForm', () => {
@@ -204,6 +214,47 @@ describe('BoatIncidentForm', () => {
     await wrapper.find('form').trigger('submit')
     const secondPayload = mockEnqueue.mock.calls[1][0].payload as Record<string, unknown>
     expect(secondPayload.tzOffsetMinutes).toBe(120)
+  })
+
+  test('a locked target travels in the queued payload as its FK column (#813)', async () => {
+    mockIsOnline.value = false
+    const wrapper = mount(BoatIncidentForm, {
+      props: {
+        boatId: 7,
+        editingIncident: null,
+        prefill: { target: { type: 'engine', id: 12 } },
+        lockTarget: true,
+      },
+    })
+
+    expect(wrapper.find('[data-testid="incident-locked-target"]').exists()).toBe(true)
+    await wrapper.find('form').trigger('submit')
+
+    const payload = mockEnqueue.mock.calls[0][0].payload as Record<string, unknown>
+    expect(payload.boatEngineId).toBe(12)
+    expect(payload.boatSailId).toBeNull()
+    expect(payload.boatEnginePartId).toBeNull()
+  })
+
+  test('editing sends every target column so the server can change or clear the target', async () => {
+    mockIsOnline.value = false
+    const wrapper = mount(BoatIncidentForm, {
+      props: { boatId: 7, editingIncident: { ...sampleIncident, boatSailId: 3 } },
+    })
+
+    await wrapper.find('form').trigger('submit')
+
+    const payload = mockEnqueue.mock.calls[0][0].payload as Record<string, unknown>
+    expect(payload).toEqual(
+      expect.objectContaining({
+        boatEngineId: null,
+        boatSailId: 3,
+        boatRigId: null,
+        boatSafetyEquipmentId: null,
+        boatGenericEquipmentId: null,
+        boatEnginePartId: null,
+      })
+    )
   })
 
   test('cancel button emits close', async () => {

@@ -8,6 +8,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import GenericShowTabInfo from '~/components/boats/equipment/show/tabs/GenericShowTabInfo.vue'
 import GenericShowTabPhotos from '~/components/boats/equipment/show/tabs/GenericShowTabPhotos.vue'
+import EquipmentIncidentAction from '~/components/boats/incidents/EquipmentIncidentAction.vue'
 import EquipmentTasksSection from '~/components/boats/maintenance/EquipmentTasksSection.vue'
 import { useTabDeepLink } from '~/composables/use_tab_deep_link'
 import { useT } from '~/composables/use_t'
@@ -25,6 +26,8 @@ const props = defineProps<{
   boat: { id: number; name: string }
   item: BoatGenericEquipmentDetail
   canManage: boolean
+  /** Droit `incidents.create` : bouton « Incident » de l'en-tête (#813). */
+  canReportIncident: boolean
   maintenanceTasks: MaintenanceTaskRow[]
   taskEquipment: TaskEquipmentSource
   taskPermissions: MaintenanceTaskPermissions
@@ -77,6 +80,12 @@ const tab = useTabDeepLink<TabKey>({
           <BaseButton variant="secondary" size="sm" :href="`/boats/${boat.id}?tab=equipment`">
             ← {{ t('boats.genericEquipmentShow.back') }}
           </BaseButton>
+          <EquipmentIncidentAction
+            :boat-id="boat.id"
+            :target="taskRef"
+            :equipment="taskEquipment"
+            :can-report="canReportIncident"
+          />
         </div>
       </div>
 

@@ -4,13 +4,14 @@ import { ref, watch } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import BaseModal from '~/components/base/BaseModal.vue'
-import BoatSafetyEquipmentFields from './BoatSafetyEquipmentFields.vue'
+import BoatSafetyEquipmentModals from './BoatSafetyEquipmentModals.vue'
 import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
+import EquipmentReportIncidentButton from '~/components/boats/incidents/EquipmentReportIncidentButton.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
 import type { BoatShowSafetyEquipment, EquipmentActionPrefill } from '~/types/boat_show'
+import type { IncidentTargetRef } from '#shared/types/incident'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
 import { safetyStatusVariant } from '~/utils/status_variants'
 
@@ -21,19 +22,21 @@ const props = withDefaults(
     canManage: boolean
     canManageActions: boolean
     canAddTask?: boolean
+    canReportIncident?: boolean
     /**
      * Type demandé par le panneau de conformité (#582) : ouvre la modale de
      * création pré-remplie sur ce type d'équipement.
      */
     prefillEquipmentType?: string | null
   }>(),
-  { prefillEquipmentType: null, canAddTask: false }
+  { prefillEquipmentType: null, canAddTask: false, canReportIncident: false }
 )
 
 const emit = defineEmits<{
   (e: 'addToActions', payload: EquipmentActionPrefill): void
   (e: 'prefillConsumed'): void
   (e: 'addTask', equipment: TaskEquipmentRef): void
+  (e: 'reportIncident', target: IncidentTargetRef): void
 }>()
 
 const { t } = useT()
@@ -70,9 +73,7 @@ function openCreate() {
   isCreateOpen.value = true
 }
 
-const toDateInputValue = (iso: string | null) => (iso ? iso.slice(0, 10) : null)
 const openEdit = (item: BoatShowSafetyEquipment) => (editingItem.value = item)
-const closeEdit = () => (editingItem.value = null)
 </script>
 
 <template>
@@ -146,6 +147,11 @@ const closeEdit = () => (editingItem.value = null)
               :equipment="{ type: 'safety', id: item.id }"
               @add-task="emit('addTask', $event)"
             />
+            <EquipmentReportIncidentButton
+              v-if="canReportIncident"
+              :target="{ type: 'safety', id: item.id }"
+              @report-incident="emit('reportIncident', $event)"
+            />
             <BaseButton
               v-if="canManageActions && item.status !== 'ok'"
               variant="secondary"
@@ -186,60 +192,11 @@ const closeEdit = () => (editingItem.value = null)
       </li>
     </ul>
 
-    <!-- Create Modal -->
-    <BaseModal
-      v-model:open="isCreateOpen"
-      :title="t('boats.safetyEquipment.modal.title')"
-      :close-label="t('common.close')"
-    >
-      <Form
-        :key="`create-${createEquipmentType}`"
-        :action="{ url: `/boats/${boatId}/safety-equipment`, method: 'post' }"
-        @success="isCreateOpen = false"
-        #default="{ processing, errors }"
-      >
-        <BoatSafetyEquipmentFields :errors="errors" :equipment-type="createEquipmentType" />
-        <div class="flex items-center justify-end gap-2 pt-4">
-          <BaseButton variant="ghost" type="button" @click="isCreateOpen = false">
-            {{ t('boats.safetyEquipment.modal.cancel') }}
-          </BaseButton>
-          <BaseButton type="submit" :disabled="processing">
-            {{ t('boats.safetyEquipment.modal.submit') }}
-          </BaseButton>
-        </div>
-      </Form>
-    </BaseModal>
-
-    <!-- Edit Modal -->
-    <BaseModal
-      :open="!!editingItem"
-      @update:open="(v) => !v && closeEdit()"
-      :title="t('boats.safetyEquipment.modal.editTitle')"
-      :close-label="t('common.close')"
-    >
-      <Form
-        v-if="editingItem"
-        :action="{ url: `/boats/${boatId}/safety-equipment/${editingItem.id}`, method: 'put' }"
-        @success="closeEdit()"
-        #default="{ processing, errors }"
-      >
-        <BoatSafetyEquipmentFields
-          :errors="errors"
-          :equipment-type="editingItem.equipmentType"
-          :quantity="editingItem.quantity !== null ? String(editingItem.quantity) : ''"
-          :expiry-date="toDateInputValue(editingItem.expiryDate) ?? ''"
-          :status="editingItem.status"
-          :notes="editingItem.notes ?? ''"
-        />
-        <div class="flex items-center justify-end gap-2 pt-4">
-          <BaseButton variant="ghost" type="button" @click="closeEdit()">
-            {{ t('boats.safetyEquipment.modal.cancel') }}
-          </BaseButton>
-          <BaseButton type="submit" :disabled="processing">
-            {{ t('boats.safetyEquipment.modal.submit') }}
-          </BaseButton>
-        </div>
-      </Form>
-    </BaseModal>
+    <BoatSafetyEquipmentModals
+      v-model:create-open="isCreateOpen"
+      v-model:editing-item="editingItem"
+      :boat-id="boatId"
+      :create-equipment-type="createEquipmentType"
+    />
   </BaseCard>
 </template>

@@ -61,6 +61,7 @@ const props = defineProps<{
   canManageDocuments: boolean
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
+  canCreateIncidents: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
@@ -158,6 +159,7 @@ const showSkeleton = computed(
         :can-manage-equipment="canManageEquipment"
         :can-manage-actions="canManageEquipmentActions"
         :can-manage-maintenance="canManageMaintenance"
+        :can-report-incident="canCreateIncidents"
         :create-intent="createIntent"
         @create-intent-consumed="$emit('createIntentConsumed')"
       />
@@ -236,6 +238,8 @@ const showSkeleton = computed(
         :incidents="incidents ?? []"
         :can-manage="canManageMaintenance"
         :can-delete="canDeleteIncidents"
+        :create-intent="createIntent"
+        @create-intent-consumed="$emit('createIntentConsumed')"
       />
 
       <BoatShowTabPosition

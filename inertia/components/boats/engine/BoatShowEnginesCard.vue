@@ -9,11 +9,13 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
+import EquipmentReportIncidentButton from '~/components/boats/incidents/EquipmentReportIncidentButton.vue'
 import { computed, ref } from 'vue'
 import { shouldReopenEngineForm } from '~/composables/use_engine_form_draft'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { engineFuelLabel, engineStrokeShortLabel } from '~/utils/boat_enum_labels'
+import type { IncidentTargetRef } from '#shared/types/incident'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
 import { equipmentStatusVariant } from '~/utils/status_variants'
 
@@ -23,11 +25,15 @@ const props = withDefaults(
     engines: BoatShowEngine[]
     canManage: boolean
     canAddTask?: boolean
+    canReportIncident?: boolean
   }>(),
-  { canAddTask: false }
+  { canAddTask: false, canReportIncident: false }
 )
 
-defineEmits<{ (e: 'addTask', equipment: TaskEquipmentRef): void }>()
+defineEmits<{
+  (e: 'addTask', equipment: TaskEquipmentRef): void
+  (e: 'reportIncident', target: IncidentTargetRef): void
+}>()
 
 /** Identifie cette modale dans l'URL de l'aller-retour catalogue. */
 const ENGINE_FORM_SURFACE = 'engines-card'
@@ -130,6 +136,11 @@ const totalEngineHours = computed(() => {
               v-if="canAddTask"
               :equipment="{ type: 'engine', id: e.id }"
               @add-task="$emit('addTask', $event)"
+            />
+            <EquipmentReportIncidentButton
+              v-if="canReportIncident"
+              :target="{ type: 'engine', id: e.id }"
+              @report-incident="$emit('reportIncident', $event)"
             />
             <Link :href="`/boats/${boatId}/engines/${e.id}`">
               <BaseButton variant="secondary" size="sm" type="button">

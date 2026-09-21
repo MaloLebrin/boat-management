@@ -6,6 +6,7 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import EquipmentIncidentAction from '~/components/boats/incidents/EquipmentIncidentAction.vue'
 import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
 import EnginePartShowTabDocuments from '~/components/engine/parts/show/tabs/EnginePartShowTabDocuments.vue'
 import EnginePartShowTabInfo from '~/components/engine/parts/show/tabs/EnginePartShowTabInfo.vue'
@@ -32,6 +33,8 @@ const props = defineProps<{
   }
   part: BoatShowEnginePart
   canManage: boolean
+  /** Droit `incidents.create` : seul point d'entrée d'un incident sur une pièce (#813). */
+  canReportIncident: boolean
   /** `?tab=` vu par le serveur : le rendu SSR part du bon onglet (#463). */
   initialTab?: string | null
 }>()
@@ -90,6 +93,12 @@ function engineTitle(): string {
           >
             ← {{ t('boats.engineShow.parts.title') }}
           </BaseButton>
+          <EquipmentIncidentAction
+            :boat-id="boat.id"
+            :target="{ type: 'engine_part', id: part.id }"
+            :target-label="part.designation"
+            :can-report="canReportIncident"
+          />
           <BaseButton v-if="canManage" size="sm" @click="isEditOpen = true">
             {{ t('boats.engineShow.parts.edit') }}
           </BaseButton>

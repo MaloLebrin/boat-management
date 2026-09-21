@@ -119,8 +119,8 @@ const ACTION_LINES: Record<AssistantActionKind, Record<AiSuggestionLocale, strin
     en: `  - {"kind":"log_fuel","boatId":0,"fueledAt":"...","quantityLiters":0,"pricePerLiter":null,"totalCost":null,"boatEngineId":null,"fuelType":null,"supplier":null,"notes":null} — record a refueling. "fuelType" is one of: ${ENGINE_FUELS.join(', ')} — or null.`,
   },
   report_incident: {
-    fr: `  - {"kind":"report_incident","boatId":0,"occurredAt":"...","incidentType":"...","location":null,"description":"..."} — déclarer un incident. "incidentType" est l'une de : ${INCIDENT_TYPES.join(', ')}.`,
-    en: `  - {"kind":"report_incident","boatId":0,"occurredAt":"...","incidentType":"...","location":null,"description":"..."} — report an incident. "incidentType" is one of: ${INCIDENT_TYPES.join(', ')}.`,
+    fr: `  - {"kind":"report_incident","boatId":0,"occurredAt":"...","incidentType":"...","location":null,"description":"...","boatEngineId":null} — déclarer un incident. "incidentType" est l'une de : ${INCIDENT_TYPES.join(', ')}. "boatEngineId" désigne le moteur en cause quand l'utilisateur en nomme un (vérifie-le avec get_engine) — null sinon.`,
+    en: `  - {"kind":"report_incident","boatId":0,"occurredAt":"...","incidentType":"...","location":null,"description":"...","boatEngineId":null} — report an incident. "incidentType" is one of: ${INCIDENT_TYPES.join(', ')}. "boatEngineId" names the engine at fault when the user points at one (check it with get_engine) — null otherwise.`,
   },
   create_reservation: {
     fr: `  - {"kind":"create_reservation","boatId":0,"startsAt":"...","endsAt":"...","clientId":null,"clientName":"...","clientEmail":null,"clientPhone":null,"reservationType":null,"notes":null} — proposer une réservation ("clientId" seulement pour un client existant trouvé via list_commercial). "reservationType" est l'une de : ${RESERVATION_TYPES.join(', ')} — ou null.`,
@@ -495,6 +495,7 @@ function parseProposedAction(a: Record<string, unknown>): AssistantProposedActio
       incidentType: incidentType as (typeof INCIDENT_TYPES)[number],
       location: toNullableString(a.location),
       description: toRequiredString(a.description, 'description'),
+      boatEngineId: toNullablePositiveInt(a.boatEngineId),
     }
   }
 

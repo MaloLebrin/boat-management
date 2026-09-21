@@ -1,4 +1,5 @@
 import BoatPolicy from '#policies/boat_policy'
+import IncidentPolicy from '#policies/incident_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
@@ -38,8 +39,11 @@ export default class BoatEnginePartsController {
     const part = await this.equipmentService.findEnginePart(engineId, partId)
     if (!part) return response.redirect(`/boats/${boat.id}/engines/${engineId}?tab=parts`)
 
-    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
-    const media = await this.mediaService.listForEntity('boat_engine_part', partId)
+    const [canManage, canReportIncident, media] = await Promise.all([
+      bouncer.with(BoatPolicy).allows('edit', boat),
+      bouncer.with(IncidentPolicy).allows('create', boat),
+      this.mediaService.listForEntity('boat_engine_part', partId),
+    ])
 
     return inertia.render('boats/engine_part_show', {
       boat: { id: boat.id, name: boat.name },
@@ -68,6 +72,7 @@ export default class BoatEnginePartsController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      canReportIncident,
     })
   }
 

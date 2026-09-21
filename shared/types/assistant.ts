@@ -305,6 +305,8 @@ export type AssistantProposedAction =
       incidentType: IncidentType
       location: string | null
       description: string
+      /** Moteur visé (#813) — `null` pour le bateau entier ; les autres cibles passent par l'UI. */
+      boatEngineId: number | null
     }
   | {
       kind: 'create_reservation'
@@ -456,6 +458,9 @@ export interface AssistantIncidentAction {
   incidentType: IncidentType
   location: string | null
   description: string
+  /** Moteur visé (#813), `null` pour le bateau entier. */
+  boatEngineId: number | null
+  engineLabel: string | null
 }
 
 export interface AssistantReservationAction {

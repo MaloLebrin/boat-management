@@ -5,6 +5,9 @@ import NavigationLog from '#models/navigation_log'
 import type User from '#models/user'
 import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { IncidentStatus, IncidentType } from '#shared/types/incident'
+import { INCIDENT_TARGET_FIELDS } from '#shared/helpers/incident_target'
+import { preloadIncidentTargets } from '#services/boat_incident_service'
+import { toIncidentTarget } from '#transformers/boat_transformer'
 import type {
   FleetBoatOption,
   FleetFuelLogRow,
@@ -116,7 +119,8 @@ export default class NavigationService {
         'status',
         'location',
         'description',
-        'insuranceClaimed'
+        'insuranceClaimed',
+        ...INCIDENT_TARGET_FIELDS
       )
       .preload('boat', (q) => q.select('id', 'name'))
       .where('organizationId', user.organizationId)
@@ -125,7 +129,7 @@ export default class NavigationService {
 
     if (boatId) query.where('boatId', boatId)
 
-    const incidents = await query
+    const incidents = await preloadIncidentTargets(query)
 
     return incidents.map((incident) => ({
       id: incident.id,
@@ -137,6 +141,7 @@ export default class NavigationService {
       location: incident.location,
       description: incident.description,
       insuranceClaimed: incident.insuranceClaimed,
+      target: toIncidentTarget(incident),
     }))
   }
 }

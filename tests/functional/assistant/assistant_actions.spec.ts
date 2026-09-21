@@ -309,6 +309,8 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
       incidentType: 'grounding',
       location: 'Chenal du Fromveur',
       description: 'Talonnage léger à marée basse, coque à inspecter.',
+      boatEngineId: null,
+      engineLabel: null,
     })
 
     const response = await confirm(client, conversation.token, user)
@@ -318,7 +320,34 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
     assert.lengthOf(incidents, 1)
     assert.equal(incidents[0].type, 'grounding')
     assert.equal(incidents[0].status, 'open')
+    assert.isNull(incidents[0].boatEngineId)
     assert.lengthOf(await AuditLog.query().where('action', 'incident.create'), 1)
+  })
+
+  test('report_incident : un moteur du bateau devient la cible de l’incident (#813)', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const { boat, engine } = await makeBoat(user.organizationId!)
+    const conversation = await makeConversationWithPending(user, {
+      kind: 'report_incident',
+      boatId: boat.id,
+      boatName: 'Mistral II',
+      occurredAt: '2026-09-06T16:30',
+      tzOffsetMinutes: null,
+      incidentType: 'engine_failure',
+      location: null,
+      description: 'Le moteur ne démarre plus.',
+      boatEngineId: engine.id,
+      engineLabel: 'Yamaha 4AS',
+    })
+
+    await confirm(client, conversation.token, user)
+
+    const incident = await BoatIncident.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(incident.boatEngineId, engine.id)
+    assert.isNull(incident.boatSailId)
   })
 
   test('start_trip : sortie ouverte ; refusée si une sortie est déjà en cours', async ({

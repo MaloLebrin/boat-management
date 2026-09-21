@@ -1,5 +1,5 @@
 import type { EngineFuel } from '../constants/boats/boat_form_options.js'
-import type { IncidentStatus, IncidentType } from './incident.js'
+import type { IncidentStatus, IncidentTargetSummary, IncidentType } from './incident.js'
 import type { NavigationLogStatus, SeaState } from './navigation_log.js'
 
 export interface FleetLogbookRow {
@@ -41,6 +41,8 @@ export interface FleetIncidentRow {
   location: string | null
   description: string
   insuranceClaimed: boolean
+  /** Équipement ou pièce visé (#813), `null` pour le bateau entier. */
+  target: IncidentTargetSummary | null
 }
 
 export interface FleetBoatOption {

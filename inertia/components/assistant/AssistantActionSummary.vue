@@ -159,6 +159,7 @@ const taskRecurrenceLabel = computed(() => {
         :label="t('assistant.proposal.type')"
         :value="t(`assistant.proposal.incidentTypes.${action.incidentType}`)"
       />
+      <AssistantActionRow :label="t('assistant.proposal.engine')" :value="action.engineLabel" />
       <AssistantActionRow :label="t('assistant.proposal.location')" :value="action.location" />
       <AssistantActionRow
         :label="t('assistant.proposal.description')"

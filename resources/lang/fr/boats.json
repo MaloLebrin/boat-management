@@ -463,7 +463,8 @@
       "event": "Un événement de maintenance",
       "task": "Une tâche",
       "navigationLog": "Une sortie",
-      "equipment": "Un équipement"
+      "equipment": "Un équipement",
+      "incident": "Un incident"
     },
     "moreMenu": {
       "label": "⋯",

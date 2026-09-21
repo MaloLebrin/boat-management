@@ -2,7 +2,10 @@ import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import BoatIncident from '#models/boat_incident'
 import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { BoatEnginePartFactory } from '#database/factories/boat_engine_part_factory'
 import { BoatIncidentFactory } from '#database/factories/boat_incident_factory'
+import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import {
   createAdminUser,
   createBoatOwnerUser,
@@ -242,3 +245,144 @@ test.group(
     })
   }
 )
+
+test.group('Incidents — cible équipement ou pièce (#813)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  test('un incident déclaré sur un moteur du bateau porte sa FK', async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+
+    await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(admin)
+      .form({ ...VALID_INCIDENT, boatEngineId: String(engine.id) })
+
+    const incident = await BoatIncident.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(incident.boatEngineId, engine.id)
+    assert.isNull(incident.boatSailId)
+    assert.isNull(incident.boatEnginePartId)
+  })
+
+  test("le moteur d'un autre bateau est refusé, rien n'est créé", async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+    const otherBoat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const foreignEngine = await BoatEngineFactory.merge({ boatId: otherBoat.id }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(admin)
+      .form({ ...VALID_INCIDENT, boatEngineId: String(foreignEngine.id) })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', `/boats/${boat.id}?tab=incidents`)
+    response.assertFlashMessage('error', 'This equipment does not belong to this boat.')
+    assert.lengthOf(await BoatIncident.query().where('boatId', boat.id), 0)
+  })
+
+  test('deux cibles à la fois sont refusées', async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const sail = await BoatSailFactory.merge({ boatId: boat.id }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(admin)
+      .form({ ...VALID_INCIDENT, boatEngineId: String(engine.id), boatSailId: String(sail.id) })
+      .redirects(0)
+
+    response.assertFlashMessage('error', 'An incident can target only one piece of equipment.')
+    assert.lengthOf(await BoatIncident.query().where('boatId', boat.id), 0)
+  })
+
+  test("une pièce est bornée par son moteur : celle d'un autre bateau est refusée", async ({
+    client,
+    assert,
+  }) => {
+    const { admin, boat } = await adminWithBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const part = await BoatEnginePartFactory.merge({ boatEngineId: engine.id }).create()
+    const otherBoat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const foreignEngine = await BoatEngineFactory.merge({ boatId: otherBoat.id }).create()
+    const foreignPart = await BoatEnginePartFactory.merge({
+      boatEngineId: foreignEngine.id,
+    }).create()
+
+    const refused = await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(admin)
+      .form({ ...VALID_INCIDENT, boatEnginePartId: String(foreignPart.id) })
+      .redirects(0)
+    refused.assertFlashMessage('error', 'This equipment does not belong to this boat.')
+    assert.lengthOf(await BoatIncident.query().where('boatId', boat.id), 0)
+
+    await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(admin)
+      .form({ ...VALID_INCIDENT, boatEnginePartId: String(part.id) })
+
+    const incident = await BoatIncident.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(incident.boatEnginePartId, part.id)
+    assert.isNull(incident.boatEngineId)
+  })
+
+  test('la mise à jour change la cible, puis la retire quand toutes les clés sont à null', async ({
+    client,
+    assert,
+  }) => {
+    const { admin, boat } = await adminWithBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const sail = await BoatSailFactory.merge({ boatId: boat.id }).create()
+    const incident = await BoatIncidentFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      boatEngineId: engine.id,
+    }).create()
+
+    await client
+      .put(`/boats/${boat.id}/incidents/${incident.id}`)
+      .loginAs(admin)
+      .form({ boatSailId: String(sail.id) })
+    await incident.refresh()
+    assert.equal(incident.boatSailId, sail.id)
+    assert.isNull(incident.boatEngineId)
+
+    // Une mise à jour sans clé de cible ne touche pas à la cible
+    await client
+      .put(`/boats/${boat.id}/incidents/${incident.id}`)
+      .loginAs(admin)
+      .form({ status: 'in_progress' })
+    await incident.refresh()
+    assert.equal(incident.boatSailId, sail.id)
+
+    await client.put(`/boats/${boat.id}/incidents/${incident.id}`).loginAs(admin).json({
+      boatEngineId: null,
+      boatSailId: null,
+      boatRigId: null,
+      boatSafetyEquipmentId: null,
+      boatGenericEquipmentId: null,
+      boatEnginePartId: null,
+    })
+    await incident.refresh()
+    assert.isNull(incident.boatSailId)
+    assert.isNull(incident.boatEngineId)
+  })
+
+  test("supprimer l'équipement visé conserve l'incident, rattaché au bateau entier", async ({
+    assert,
+  }) => {
+    const { boat } = await adminWithBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const incident = await BoatIncidentFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+      boatEngineId: engine.id,
+    }).create()
+
+    await engine.delete()
+
+    await incident.refresh()
+    assert.isNull(incident.boatEngineId)
+  })
+})
