@@ -1,3 +1,11 @@
+## Issue
+
+Closes #<numéro>
+
+> **Le mot-clé doit être en anglais** — `Closes`, `Fixes` ou `Resolves`, suivi de `#<numéro>`.
+> GitHub n'interprète pas « Ferme #123 » ni « Corrige #123 » : l'issue reste ouverte après le merge.
+> PR sans issue rattachée (rapport d'audit, convention) : remplacer cette ligne par `Pas d'issue —` + la raison.
+
 ## Summary
 
 -
