@@ -30,6 +30,11 @@ const props = defineProps<{
   demoLoginPath?: string
   /** Cible du CTA secondaire ; à défaut, ancre historique #demo (même page). */
   secondaryHref?: string
+  /**
+   * Badge cliquable au-dessus du H1 (lead magnet du moment : le diagnostic de
+   * panne IA gratuit). Lien interne depuis l'emplacement le plus fort de la home.
+   */
+  announcement?: { label: string; href: string }
 }>()
 
 // Session de démo autonome : POST Inertia (CSRF automatique), comme HomeDemoSection.
@@ -57,6 +62,15 @@ const { transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6, refName: '
         class="mx-auto mb-12 max-w-2xl space-y-6 text-center"
         style="animation: fadeUp 700ms var(--ease-premium) both"
       >
+        <!-- Bandeau navy permanent : encre claire assumée (comme l'eyebrow du simulateur). -->
+        <Link
+          v-if="announcement"
+          :href="announcement.href"
+          class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+        >
+          {{ announcement.label }}
+          <span aria-hidden="true">→</span>
+        </Link>
         <h1
           class="font-display text-5xl leading-tight tracking-tight text-white lg:text-6xl xl:text-7xl"
         >

@@ -5,10 +5,12 @@ import { TuyauProvider } from '@adonisjs/inertia/vue'
 import { renderToString } from '@vue/server-renderer'
 import { createSSRApp, h, type DefineComponent } from 'vue'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
+import { pageTitle } from '~/utils/page_title'
 
 export default function render(page: any) {
   return createInertiaApp({
     page,
+    title: pageTitle,
     render: renderToString,
     resolve: (name) => {
       return resolvePageComponent(

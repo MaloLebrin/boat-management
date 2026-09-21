@@ -10,13 +10,16 @@
     "dashboard": "Dashboard"
   },
   "home": {
+    "meta_title": "Boat fleet management & maintenance software",
+    "meta_description": "Digital maintenance log, fleet planning, AI assistant and free engine breakdown diagnosis. For rental operators, sailing schools and marinas. Free Starter plan.",
     "hero": {
       "cta_primary": "Start for free",
       "cta_secondary": "Try the demo",
       "caption": "Free Starter plan forever - no credit card - setup in 5 min",
+      "announcement_label": "New · Free AI engine breakdown diagnosis, no account needed",
       "loueurs_title": "You manage your fleet in Excel.",
       "loueurs_highlight": "You can do better.",
-      "loueurs_subtitle": "FleetAi replaces your shared spreadsheet with a tool that knows your boats, anticipates maintenance, and alerts you before delays.",
+      "loueurs_subtitle": "FleetAi is boat fleet management and maintenance software: maintenance log, planning, AI assistant and breakdown diagnosis. It knows your boats and alerts you before delays.",
       "ecoles_title": "Your instructors waste time.",
       "ecoles_highlight": "Your boats too.",
       "ecoles_subtitle": "Centralize your fleet status, share it with instructors, and never miss a safety deadline again.",
@@ -294,7 +297,9 @@
       "item7_q": "Does the AI see other customers' data?",
       "item7_a": "No. Each organization is isolated. The AI only sees your data.",
       "item8_q": "How many users can I add?",
-      "item8_a": "Starter: 1 user. Pro: up to 5 users. Enterprise: unlimited. You pay per organization, not per seat."
+      "item8_a": "Starter: 1 user. Pro: up to 5 users. Enterprise: unlimited. You pay per organization, not per seat.",
+      "item9_q": "Can I try the AI breakdown diagnosis without creating an account?",
+      "item9_a": "Yes. The AI engine breakdown diagnosis is free on the site, no sign-up needed: {count} diagnoses included. After that, the free Starter plan gives you the full troubleshooting checklists."
     },
     "final_cta": {
       "title": "Start for free, upgrade when you need to.",

@@ -1,4 +1,5 @@
 import type { AiChatMessage } from '#shared/types/ai'
+import type { FeatureCrossLink, FeatureCta, FeatureFaqItem } from '#shared/types/marketing'
 
 /**
  * Chat IA public de diagnostic de panne moteur (#602) — tunnel d'acquisition.
@@ -67,4 +68,52 @@ export interface PublicDiagnosisConversationProps {
 export interface PublicDiagnosisQuotaProps {
   used: number
   limit: number | null
+}
+
+/** Carte « panne fréquente » de la page publique : un symptôme, ce que l'assistant vérifie. */
+export interface PublicDiagnosisSymptom {
+  title: string
+  description: string
+}
+
+/**
+ * Contenu éditorial de la page publique de diagnostic — construit côté serveur
+ * (`PublicDiagnosisContentService`), comme les pages fonctionnalité. Le chat
+ * seul n'offre rien à indexer : ces sections portent les mots-clés (symptômes,
+ * étapes, FAQ) et le maillage interne vers les autres pages marketing.
+ */
+export interface PublicDiagnosisContentProps {
+  meta: { title: string; description: string }
+  steps: {
+    eyebrow: string
+    title: string
+    subtitle: string
+    items: Array<{ step: string; title: string; description: string }>
+  }
+  symptoms: {
+    eyebrow: string
+    title: string
+    titleHighlight: string
+    subtitle: string
+    items: PublicDiagnosisSymptom[]
+  }
+  crossLinks: {
+    eyebrow: string
+    title: string
+    linkLabel: string
+    items: FeatureCrossLink[]
+  }
+  faq: {
+    eyebrow: string
+    title: string
+    titleHighlight: string
+    items: FeatureFaqItem[]
+  }
+  finalCta: {
+    title: string
+    titleHighlight: string
+    subtitle: string
+    primaryCta: FeatureCta
+    secondaryCta: FeatureCta
+  }
 }

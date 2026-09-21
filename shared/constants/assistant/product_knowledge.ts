@@ -405,6 +405,30 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canUseAI',
   },
   {
+    id: 'public-diagnosis-chat',
+    title: {
+      en: 'Free public AI breakdown diagnosis (no account)',
+      fr: 'Diagnostic de panne IA public et gratuit (sans compte)',
+    },
+    body: {
+      en: 'The public FleetAi site offers a free AI engine breakdown diagnosis at /en/engine-diagnosis-ai (French: /fr/diagnostic-panne-ia), usable without an account. The visitor describes the breakdown (optionally engine type, brand and hours), the assistant asks a few clarifying questions, then returns a structured diagnosis: likely failure family, 2 to 3 causes ordered from the cheapest to the most expensive to check, and one concrete next step. Anonymous visitors and Starter organizations get a limited number of free conversations; Pro and Enterprise plans have no conversation cap, bounded by the monthly AI token quota. It never replaces the workshop manual or a professional.',
+      fr: 'Le site public de FleetAi propose un diagnostic de panne moteur par IA, gratuit et sans compte, sur /fr/diagnostic-panne-ia (anglais : /en/engine-diagnosis-ai). Le visiteur décrit sa panne (avec, s’il le souhaite, le type de moteur, la marque et les heures), l’assistant pose quelques questions de clarification puis rend un diagnostic structuré : famille de panne probable, 2 à 3 causes ordonnées de la moins chère à la plus chère à vérifier, et une prochaine étape concrète. Les visiteurs anonymes et les organisations Starter disposent d’un nombre limité de conversations gratuites ; les plans Pro et Entreprise n’ont pas de plafond de conversations, dans la limite du quota mensuel de tokens IA. Il ne remplace ni le manuel d’atelier ni un professionnel.',
+    },
+    keywords: [
+      'diagnostic gratuit',
+      'free diagnosis',
+      'sans compte',
+      'no account',
+      'panne moteur',
+      'engine breakdown',
+      'diagnostic panne ia',
+      'site public',
+      'essai gratuit',
+      'chat public',
+    ],
+    navTarget: null,
+  },
+  {
     id: 'spare-parts-identify',
     title: {
       en: 'Spare parts identification and repair list',

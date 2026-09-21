@@ -8,7 +8,7 @@ export default {
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
-import JsonLd from '~/components/json_ld'
+import { jsonLd } from '~/utils/json_ld'
 import FeatureHeroSection from '~/components/marketing/features/FeatureHeroSection.vue'
 import FeatureStepsSection from '~/components/marketing/features/FeatureStepsSection.vue'
 import FeatureProofSection from '~/components/marketing/features/FeatureProofSection.vue'
@@ -33,7 +33,7 @@ const hreflangEn = marketingPath(props.featureKey, 'en')
 const hreflangFr = marketingPath(props.featureKey, 'fr')
 
 const faqSchema = computed(() =>
-  JSON.stringify({
+  jsonLd({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     'mainEntity': t.faq.items.map((item) => ({
@@ -57,7 +57,7 @@ const faqSchema = computed(() =>
     <link rel="alternate" hreflang="en" :href="hreflangEn" />
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
     <link rel="alternate" hreflang="x-default" :href="hreflangEn" />
-    <JsonLd :schema="faqSchema" />
+    <component :is="'script'" type="application/ld+json">{{ faqSchema }}</component>
   </Head>
 
   <!-- Hero : promesse + mock produit -->

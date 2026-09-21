@@ -41,9 +41,13 @@ export default class MarketingContentService {
         name: i18n.t('marketing.brand.name'),
         tagline: i18n.t('marketing.brand.tagline'),
       },
+      // Titre et description SEO dédiés (mots-clés + proposition de valeur), et
+      // non plus l'accroche du hero : « Tu gères ta flotte dans Excel. » ne dit
+      // rien à un moteur de recherche. La marque est ajoutée par le template de
+      // titre (`inertia/utils/page_title.ts`).
       meta: {
-        title: i18n.t('marketing.home.hero.loueurs_title'),
-        description: i18n.t('marketing.home.hero.loueurs_subtitle'),
+        title: i18n.t('marketing.home.meta_title'),
+        description: i18n.t('marketing.home.meta_description'),
       },
       home: {
         hero: {
@@ -52,6 +56,12 @@ export default class MarketingContentService {
             secondary: i18n.t('marketing.home.hero.cta_secondary'),
           },
           caption: i18n.t('marketing.home.hero.caption'),
+          // Badge au-dessus du H1 : lien interne vers le chat public de
+          // diagnostic depuis l'emplacement le plus fort de la home.
+          announcement: {
+            label: i18n.t('marketing.home.hero.announcement_label'),
+            href: marketingPath('diagnosisAi', locale),
+          },
           content: {
             loueurs: {
               title: i18n.t('marketing.home.hero.loueurs_title'),
@@ -452,6 +462,12 @@ export default class MarketingContentService {
             { q: i18n.t('marketing.home.faq.item6_q'), a: i18n.t('marketing.home.faq.item6_a') },
             { q: i18n.t('marketing.home.faq.item7_q'), a: i18n.t('marketing.home.faq.item7_a') },
             { q: i18n.t('marketing.home.faq.item8_q'), a: i18n.t('marketing.home.faq.item8_a') },
+            {
+              q: i18n.t('marketing.home.faq.item9_q'),
+              a: i18n.t('marketing.home.faq.item9_a', {
+                count: String(PUBLIC_DIAGNOSIS_LIFETIME_LIMIT),
+              }),
+            },
           ],
         },
         diagnosis: {
