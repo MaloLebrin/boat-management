@@ -271,71 +271,6 @@ export interface ApiDefinition {
   planning: {
     index: typeof routes['planning.index']
   }
-  locale: {
-    set: typeof routes['locale.set']
-  }
-  theme: {
-    set: typeof routes['theme.set']
-  }
-  settings: {
-    index: typeof routes['settings.index']
-    me: typeof routes['settings.me']
-    notifications: typeof routes['settings.notifications']
-    org: typeof routes['settings.org'] & {
-      update: typeof routes['settings.org.update']
-    }
-    members: typeof routes['settings.members']
-    billing: typeof routes['settings.billing'] & {
-      checkout: typeof routes['settings.billing.checkout']
-      portal: typeof routes['settings.billing.portal']
-      module: {
-        add: typeof routes['settings.billing.module.add']
-        remove: typeof routes['settings.billing.module.remove']
-        enterprise: {
-          activate: typeof routes['settings.billing.module.enterprise.activate']
-          deactivate: typeof routes['settings.billing.module.enterprise.deactivate']
-        }
-      }
-      addon: {
-        set: typeof routes['settings.billing.addon.set']
-      }
-    }
-    profile: {
-      update: typeof routes['settings.profile.update']
-    }
-    password: {
-      update: typeof routes['settings.password.update']
-    }
-    locale: {
-      update: typeof routes['settings.locale.update']
-    }
-    theme: {
-      update: typeof routes['settings.theme.update']
-    }
-    ai: typeof routes['settings.ai'] & {
-      update: typeof routes['settings.ai.update']
-      provider: {
-        update: typeof routes['settings.ai.provider.update']
-      }
-      apiKey: {
-        update: typeof routes['settings.ai.apiKey.update']
-        remove: typeof routes['settings.ai.apiKey.remove']
-      }
-    }
-    auditLog: typeof routes['settings.auditLog']
-    branding: typeof routes['settings.branding'] & {
-      update: typeof routes['settings.branding.update']
-      logo: {
-        upload: typeof routes['settings.branding.logo.upload']
-        delete: typeof routes['settings.branding.logo.delete']
-      }
-    }
-    import: typeof routes['settings.import'] & {
-      preview: typeof routes['settings.import.preview']
-      confirm: typeof routes['settings.import.confirm']
-      cancel: typeof routes['settings.import.cancel']
-    }
-  }
   maintenance: {
     history: typeof routes['maintenance.history'] & {
       pdf: typeof routes['maintenance.history.pdf']
@@ -442,12 +377,16 @@ export interface ApiDefinition {
   }
   newAccount: {
     create: typeof routes['new_account.create']
-    store: typeof routes['new_account.store']
+  }
+  signup: {
+    store: typeof routes['signup.store']
   }
   session: {
     create: typeof routes['session.create']
-    store: typeof routes['session.store']
     destroy: typeof routes['session.destroy']
+  }
+  login: {
+    store: typeof routes['login.store']
   }
   password: {
     forgot: typeof routes['password.forgot']
@@ -540,6 +479,71 @@ export interface ApiDefinition {
   publicPartSearch: {
     start: typeof routes['public_part_search.start']
     message: typeof routes['public_part_search.message']
+  }
+  locale: {
+    set: typeof routes['locale.set']
+  }
+  theme: {
+    set: typeof routes['theme.set']
+  }
+  settings: {
+    index: typeof routes['settings.index']
+    me: typeof routes['settings.me']
+    notifications: typeof routes['settings.notifications']
+    org: typeof routes['settings.org'] & {
+      update: typeof routes['settings.org.update']
+    }
+    members: typeof routes['settings.members']
+    billing: typeof routes['settings.billing'] & {
+      checkout: typeof routes['settings.billing.checkout']
+      portal: typeof routes['settings.billing.portal']
+      module: {
+        add: typeof routes['settings.billing.module.add']
+        remove: typeof routes['settings.billing.module.remove']
+        enterprise: {
+          activate: typeof routes['settings.billing.module.enterprise.activate']
+          deactivate: typeof routes['settings.billing.module.enterprise.deactivate']
+        }
+      }
+      addon: {
+        set: typeof routes['settings.billing.addon.set']
+      }
+    }
+    profile: {
+      update: typeof routes['settings.profile.update']
+    }
+    password: {
+      update: typeof routes['settings.password.update']
+    }
+    locale: {
+      update: typeof routes['settings.locale.update']
+    }
+    theme: {
+      update: typeof routes['settings.theme.update']
+    }
+    ai: typeof routes['settings.ai'] & {
+      update: typeof routes['settings.ai.update']
+      provider: {
+        update: typeof routes['settings.ai.provider.update']
+      }
+      apiKey: {
+        update: typeof routes['settings.ai.apiKey.update']
+        remove: typeof routes['settings.ai.apiKey.remove']
+      }
+    }
+    auditLog: typeof routes['settings.auditLog']
+    branding: typeof routes['settings.branding'] & {
+      update: typeof routes['settings.branding.update']
+      logo: {
+        upload: typeof routes['settings.branding.logo.upload']
+        delete: typeof routes['settings.branding.logo.delete']
+      }
+    }
+    import: typeof routes['settings.import'] & {
+      preview: typeof routes['settings.import.preview']
+      confirm: typeof routes['settings.import.confirm']
+      cancel: typeof routes['settings.import.cancel']
+    }
   }
   spareParts: {
     index: typeof routes['spareParts.index']

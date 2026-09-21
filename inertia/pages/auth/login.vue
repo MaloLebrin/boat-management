@@ -55,7 +55,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
             {{ t('auth.login.subtitleNew') }}
           </p>
 
-          <Form route="session.store" class="mt-7" #default="{ processing, errors }">
+          <Form route="login.store" class="mt-7" #default="{ processing, errors }">
             <div class="flex flex-col gap-3.5">
               <BaseInput
                 id="email"

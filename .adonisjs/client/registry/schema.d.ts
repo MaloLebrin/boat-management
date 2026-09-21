@@ -1903,414 +1903,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/planning_controller').default['index']>>>
     }
   }
-  'locale.set': {
-    methods: ["POST"]
-    pattern: '/locale'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['setLocale']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['setLocale']>>>
-    }
-  }
-  'theme.set': {
-    methods: ["POST"]
-    pattern: '/theme'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['setTheme']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['setTheme']>>>
-    }
-  }
-  'settings.index': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: unknown
-      errorResponse: unknown
-    }
-  }
-  'settings.me': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/me'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['me']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['me']>>>
-    }
-  }
-  'settings.notifications': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/notifications'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['notifications']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['notifications']>>>
-    }
-  }
-  'settings.org': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/org'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['org']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['org']>>>
-    }
-  }
-  'settings.members': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/members'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['members']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['members']>>>
-    }
-  }
-  'settings.billing': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/billing'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['billing']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['billing']>>>
-    }
-  }
-  'settings.billing.checkout': {
-    methods: ["POST"]
-    pattern: '/settings/billing/checkout'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/billing').checkoutValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/billing').checkoutValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['checkout']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['checkout']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.billing.portal': {
-    methods: ["POST"]
-    pattern: '/settings/billing/portal'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['portal']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['portal']>>>
-    }
-  }
-  'settings.billing.module.add': {
-    methods: ["POST"]
-    pattern: '/settings/billing/module'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['addModule']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['addModule']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.billing.module.remove': {
-    methods: ["DELETE"]
-    pattern: '/settings/billing/module'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['removeModule']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['removeModule']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.billing.module.enterprise.activate': {
-    methods: ["POST"]
-    pattern: '/settings/billing/module/enterprise'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['activateEnterpriseModule']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['activateEnterpriseModule']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.billing.module.enterprise.deactivate': {
-    methods: ["DELETE"]
-    pattern: '/settings/billing/module/enterprise'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['deactivateEnterpriseModule']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['deactivateEnterpriseModule']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.billing.addon.set': {
-    methods: ["POST"]
-    pattern: '/settings/billing/addon'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/billing').addonActionValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/billing').addonActionValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['setAddon']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['setAddon']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.profile.update': {
-    methods: ["PUT"]
-    pattern: '/settings/profile'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.password.update': {
-    methods: ["PUT"]
-    pattern: '/settings/password'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').changePasswordValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').changePasswordValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['changePassword']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['changePassword']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.locale.update': {
-    methods: ["PUT"]
-    pattern: '/settings/locale'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateLocaleValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateLocaleValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateLocale']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateLocale']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.theme.update': {
-    methods: ["PUT"]
-    pattern: '/settings/theme'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateThemeValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateThemeValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateTheme']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateTheme']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.org.update': {
-    methods: ["PUT"]
-    pattern: '/settings/org'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.ai': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/ai'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['ai']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['ai']>>>
-    }
-  }
-  'settings.ai.update': {
-    methods: ["PUT"]
-    pattern: '/settings/ai'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiSettingsValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiSettingsValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.ai.provider.update': {
-    methods: ["PUT"]
-    pattern: '/settings/ai/provider'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiProviderValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiProviderValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiProvider']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiProvider']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.ai.apiKey.update': {
-    methods: ["PUT"]
-    pattern: '/settings/ai/api-key/:provider'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
-      paramsTuple: [ParamValue]
-      params: { provider: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiApiKey']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiApiKey']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.ai.apiKey.remove': {
-    methods: ["DELETE"]
-    pattern: '/settings/ai/api-key/:provider'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { provider: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['removeAiApiKey']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['removeAiApiKey']>>>
-    }
-  }
-  'settings.auditLog': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/audit-log'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: ExtractQueryForGet<InferInput<(typeof import('#validators/audit_log').auditLogFiltersValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/audit_logs_controller').default['index']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/audit_logs_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.branding': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/branding'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['branding']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['branding']>>>
-    }
-  }
-  'settings.branding.update': {
-    methods: ["PUT"]
-    pattern: '/settings/branding'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/branding').updateBrandingValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/branding').updateBrandingValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateBranding']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateBranding']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.branding.logo.upload': {
-    methods: ["POST"]
-    pattern: '/settings/branding/logo'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/branding').uploadLogoValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/branding').uploadLogoValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['uploadLogo']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['uploadLogo']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.branding.logo.delete': {
-    methods: ["DELETE"]
-    pattern: '/settings/branding/logo'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['deleteLogo']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['deleteLogo']>>>
-    }
-  }
-  'settings.import': {
-    methods: ["GET","HEAD"]
-    pattern: '/settings/import'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['show']>>>
-    }
-  }
-  'settings.import.preview': {
-    methods: ["POST"]
-    pattern: '/settings/import/preview'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/csv_import').csvPreviewValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/csv_import').csvPreviewValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['preview']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['preview']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.import.confirm': {
-    methods: ["POST"]
-    pattern: '/settings/import/confirm'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/csv_import').csvConfirmValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/csv_import').csvConfirmValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['confirm']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['confirm']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'settings.import.cancel': {
-    methods: ["POST"]
-    pattern: '/settings/import/cancel'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['cancel']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['cancel']>>>
-    }
-  }
   'maintenance.history': {
     methods: ["GET","HEAD"]
     pattern: '/maintenance/history'
@@ -3079,7 +2671,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/new_account_controller').default['create']>>>
     }
   }
-  'new_account.store': {
+  'signup.store': {
     methods: ["POST"]
     pattern: '/signup'
     types: {
@@ -3103,7 +2695,7 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['create']>>>
     }
   }
-  'session.store': {
+  'login.store': {
     methods: ["POST"]
     pattern: '/login'
     types: {
@@ -3881,6 +3473,414 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/simulator_share_controller').default['show']>>>
+    }
+  }
+  'locale.set': {
+    methods: ["POST"]
+    pattern: '/locale'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['setLocale']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['setLocale']>>>
+    }
+  }
+  'theme.set': {
+    methods: ["POST"]
+    pattern: '/theme'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['setTheme']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['setTheme']>>>
+    }
+  }
+  'settings.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: unknown
+      errorResponse: unknown
+    }
+  }
+  'settings.me': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/me'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['me']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['me']>>>
+    }
+  }
+  'settings.notifications': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/notifications'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['notifications']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['notifications']>>>
+    }
+  }
+  'settings.org': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/org'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['org']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['org']>>>
+    }
+  }
+  'settings.members': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/members'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['members']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['members']>>>
+    }
+  }
+  'settings.billing': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/billing'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['billing']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['billing']>>>
+    }
+  }
+  'settings.billing.checkout': {
+    methods: ["POST"]
+    pattern: '/settings/billing/checkout'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').checkoutValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').checkoutValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['checkout']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['checkout']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.billing.portal': {
+    methods: ["POST"]
+    pattern: '/settings/billing/portal'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['portal']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['portal']>>>
+    }
+  }
+  'settings.billing.module.add': {
+    methods: ["POST"]
+    pattern: '/settings/billing/module'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['addModule']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['addModule']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.billing.module.remove': {
+    methods: ["DELETE"]
+    pattern: '/settings/billing/module'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['removeModule']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['removeModule']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.billing.module.enterprise.activate': {
+    methods: ["POST"]
+    pattern: '/settings/billing/module/enterprise'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['activateEnterpriseModule']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['activateEnterpriseModule']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.billing.module.enterprise.deactivate': {
+    methods: ["DELETE"]
+    pattern: '/settings/billing/module/enterprise'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').moduleActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['deactivateEnterpriseModule']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['deactivateEnterpriseModule']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.billing.addon.set': {
+    methods: ["POST"]
+    pattern: '/settings/billing/addon'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/billing').addonActionValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/billing').addonActionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['setAddon']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/billing_controller').default['setAddon']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.profile.update': {
+    methods: ["PUT"]
+    pattern: '/settings/profile'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateProfileValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateProfile']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.password.update': {
+    methods: ["PUT"]
+    pattern: '/settings/password'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').changePasswordValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').changePasswordValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['changePassword']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['changePassword']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.locale.update': {
+    methods: ["PUT"]
+    pattern: '/settings/locale'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateLocaleValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateLocaleValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateLocale']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateLocale']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.theme.update': {
+    methods: ["PUT"]
+    pattern: '/settings/theme'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateThemeValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateThemeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateTheme']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateTheme']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.org.update': {
+    methods: ["PUT"]
+    pattern: '/settings/org'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateOrganizationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateOrganization']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.ai': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/ai'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['ai']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['ai']>>>
+    }
+  }
+  'settings.ai.update': {
+    methods: ["PUT"]
+    pattern: '/settings/ai'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiSettingsValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiSettingsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiSettings']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.ai.provider.update': {
+    methods: ["PUT"]
+    pattern: '/settings/ai/provider'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiProviderValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiProviderValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiProvider']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiProvider']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.ai.apiKey.update': {
+    methods: ["PUT"]
+    pattern: '/settings/ai/api-key/:provider'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
+      paramsTuple: [ParamValue]
+      params: { provider: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/user').updateAiApiKeyValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiApiKey']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateAiApiKey']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.ai.apiKey.remove': {
+    methods: ["DELETE"]
+    pattern: '/settings/ai/api-key/:provider'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { provider: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['removeAiApiKey']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['removeAiApiKey']>>>
+    }
+  }
+  'settings.auditLog': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/audit-log'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/audit_log').auditLogFiltersValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/audit_logs_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/audit_logs_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.branding': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/branding'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['branding']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['branding']>>>
+    }
+  }
+  'settings.branding.update': {
+    methods: ["PUT"]
+    pattern: '/settings/branding'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/branding').updateBrandingValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/branding').updateBrandingValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateBranding']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['updateBranding']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.branding.logo.upload': {
+    methods: ["POST"]
+    pattern: '/settings/branding/logo'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/branding').uploadLogoValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/branding').uploadLogoValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['uploadLogo']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['uploadLogo']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.branding.logo.delete': {
+    methods: ["DELETE"]
+    pattern: '/settings/branding/logo'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['deleteLogo']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['deleteLogo']>>>
+    }
+  }
+  'settings.import': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/import'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['show']>>>
+    }
+  }
+  'settings.import.preview': {
+    methods: ["POST"]
+    pattern: '/settings/import/preview'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/csv_import').csvPreviewValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/csv_import').csvPreviewValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['preview']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['preview']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.import.confirm': {
+    methods: ["POST"]
+    pattern: '/settings/import/confirm'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/csv_import').csvConfirmValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/csv_import').csvConfirmValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['confirm']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['confirm']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.import.cancel': {
+    methods: ["POST"]
+    pattern: '/settings/import/cancel'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['cancel']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/csv_import_controller').default['cancel']>>>
     }
   }
   'spareParts.index': {

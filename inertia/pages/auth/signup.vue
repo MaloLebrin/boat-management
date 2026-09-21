@@ -115,7 +115,7 @@ const STARTER_FEATURES = [
             {{ t('auth.signup.fromPartsAiNotice') }}
           </div>
 
-          <Form route="new_account.store" class="mt-6" #default="{ processing, errors }">
+          <Form route="signup.store" class="mt-6" #default="{ processing, errors }">
             <div class="flex flex-col gap-3.5">
               <BaseFormErrorSummary
                 :errors="errors"

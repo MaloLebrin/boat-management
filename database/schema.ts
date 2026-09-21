@@ -181,6 +181,7 @@ export class AiTokenUsageSchema extends BaseModel {
     'id',
     'month',
     'organizationId',
+    'reservedTokens',
     'tokensUsed',
     'updatedAt',
   ] as const
@@ -193,6 +194,8 @@ export class AiTokenUsageSchema extends BaseModel {
   declare month: string
   @column()
   declare organizationId: number
+  @column()
+  declare reservedTokens: bigint | number
   @column()
   declare tokensUsed: bigint | number
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -2918,6 +2921,7 @@ export class UserSchema extends BaseModel {
     'locale',
     'organizationId',
     'password',
+    'sessionsValidAfter',
     'theme',
     'updatedAt',
   ] as const
@@ -2940,6 +2944,8 @@ export class UserSchema extends BaseModel {
   declare organizationId: number | null
   @column({ serializeAs: null })
   declare password: string
+  @column.dateTime()
+  declare sessionsValidAfter: DateTime | null
   @column()
   declare theme: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
