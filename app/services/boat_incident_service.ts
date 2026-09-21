@@ -3,10 +3,12 @@ import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
 import BoatGenericEquipment from '#models/boat_generic_equipment'
 import BoatIncident from '#models/boat_incident'
+import Media from '#models/media'
 import BoatRig from '#models/boat_rig'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
 import type Boat from '#models/boat'
+import type Organization from '#models/organization'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
@@ -24,6 +26,8 @@ import {
 } from '#shared/helpers/incident_target'
 import { toUtcFromLocalInput } from '#shared/helpers/date'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
+import MediaService from '#services/media_service'
+import { CloudinaryFolders } from '#services/cloudinary_service'
 
 const EQUIPMENT_MODELS = {
   engine: BoatEngine,
@@ -91,6 +95,42 @@ export function preloadIncidentTargets(query: ModelQueryBuilderContract<typeof B
 
 @inject()
 export default class BoatIncidentService {
+  constructor(private mediaService: MediaService) {}
+
+  /**
+   * Un incident du bateau, cibles préchargées — lève « introuvable » pour un id
+   * d'un autre bateau. C'est la garde IDOR de la page de détail et des photos (#814).
+   */
+  async findForBoat(user: User, boat: Boat, incidentId: number) {
+    assertBoatInUserOrg(user, boat, () => new BoatIncidentNotFoundError())
+
+    const incident = await preloadIncidentTargets(
+      BoatIncident.query().where('id', incidentId).where('boatId', boat.id)
+    ).first()
+
+    if (!incident) throw new BoatIncidentNotFoundError()
+    return incident
+  }
+
+  /** Nombre de photos par incident, en une requête — pour le badge des cartes (#814). */
+  private async attachPhotosCount(incidents: BoatIncident[]): Promise<void> {
+    if (incidents.length === 0) return
+    const rows = await Media.query()
+      .where('entityType', 'boat_incident')
+      .where('kind', 'photo')
+      .whereIn(
+        'entityId',
+        incidents.map((i) => i.id)
+      )
+      .groupBy('entityId')
+      .select('entityId')
+      .count('* as total')
+    const counts = new Map(rows.map((r) => [r.entityId, Number(r.$extras.total)]))
+    for (const incident of incidents) {
+      incident.$extras.photosCount = counts.get(incident.id) ?? 0
+    }
+  }
+
   async listForBoat(user: User, boat: Boat) {
     assertBoatInUserOrg(user, boat, () => new BoatIncidentNotFoundError())
 
@@ -115,7 +155,9 @@ export default class BoatIncidentService {
       .orderBy('occurredAt', 'desc')
       .orderBy('id', 'desc')
 
-    return await preloadIncidentTargets(query)
+    const incidents = await preloadIncidentTargets(query)
+    await this.attachPhotosCount(incidents)
+    return incidents
   }
 
   async createForBoat(user: User, boat: Boat, payload: CreateIncidentPayload) {
@@ -189,7 +231,11 @@ export default class BoatIncidentService {
     return incident
   }
 
-  async deleteForBoat(user: User, boat: Boat, incidentId: number) {
+  /**
+   * `org` sert à purger les photos Cloudinary et à décrémenter le quota (#814) ;
+   * sans elle, les lignes `media` orphelines resteraient derrière l'incident.
+   */
+  async deleteForBoat(user: User, boat: Boat, incidentId: number, org?: Organization) {
     assertBoatInUserOrg(user, boat, () => new BoatIncidentNotFoundError())
 
     const incident = await BoatIncident.query()
@@ -198,6 +244,15 @@ export default class BoatIncidentService {
       .first()
 
     if (!incident) throw new BoatIncidentNotFoundError()
+
+    if (org) {
+      await this.mediaService.deleteAllForEntity(
+        'boat_incident',
+        incident.id,
+        CloudinaryFolders.boatIncident(org.slug, boat.id, incident.id),
+        org
+      )
+    }
     await incident.delete()
   }
 }

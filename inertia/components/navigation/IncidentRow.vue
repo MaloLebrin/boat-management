@@ -30,7 +30,9 @@ defineProps<{ row: FleetIncidentRow }>()
     </td>
     <td class="px-4 py-3 text-sm text-fg">
       <span class="inline-flex flex-wrap items-center gap-2">
-        {{ t(`incidents.type.${row.type}`) }}
+        <Link :href="`/boats/${row.boatId}/incidents/${row.id}`" class="hover:underline">
+          {{ t(`incidents.type.${row.type}`) }}
+        </Link>
         <IncidentTargetBadge v-if="row.target" :target="row.target" :boat-id="row.boatId" />
       </span>
     </td>

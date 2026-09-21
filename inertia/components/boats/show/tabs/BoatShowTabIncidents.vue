@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { onMounted, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BoatIncidentModal from '~/components/boats/incidents/BoatIncidentModal.vue'
@@ -113,9 +114,13 @@ function deleteIncident(incidentId: number) {
           <div class="min-w-0 flex-1">
             <!-- Type + status badge + target -->
             <div class="flex flex-wrap items-center gap-2 mb-1">
-              <span class="font-semibold text-fg">
+              <Link
+                :href="`/boats/${boat.id}/incidents/${incident.id}`"
+                class="font-semibold text-fg hover:underline"
+                data-testid="incident-detail-link"
+              >
                 {{ t(`incidents.type.${incident.type}`) }}
-              </span>
+              </Link>
               <span
                 :class="[
                   'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium',
@@ -133,6 +138,9 @@ function deleteIncident(incidentId: number) {
               <span v-if="incident.insuranceClaimed" class="text-xs text-fg-muted">
                 {{ t('incidents.insuranceDeclared') }}
                 <span v-if="incident.insuranceClaimRef">#{{ incident.insuranceClaimRef }}</span>
+              </span>
+              <span v-if="incident.photosCount > 0" class="text-xs text-fg-muted">
+                · {{ t('incidents.photosCount', { count: String(incident.photosCount) }) }}
               </span>
             </div>
 

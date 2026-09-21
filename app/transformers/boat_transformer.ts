@@ -470,7 +470,7 @@ export function toIncidentTarget(i: BoatIncident): IncidentTargetSummary | null 
   }
 }
 
-function toIncident(i: BoatIncident): BoatIncidentRow {
+export function toIncident(i: BoatIncident): BoatIncidentRow {
   return {
     id: i.id,
     boatId: i.boatId,
@@ -490,6 +490,9 @@ function toIncident(i: BoatIncident): BoatIncidentRow {
     boatGenericEquipmentId: i.boatGenericEquipmentId,
     boatEnginePartId: i.boatEnginePartId,
     target: toIncidentTarget(i),
+    // Posé par `BoatIncidentService.attachPhotosCount` (#814) ; absent sur les
+    // autres chemins (assistant, tests), d'où le repli à 0.
+    photosCount: Number(i.$extras?.photosCount ?? 0),
   }
 }
 

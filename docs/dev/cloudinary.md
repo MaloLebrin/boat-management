@@ -44,6 +44,8 @@ CLOUDINARY_API_SECRET=
     maintenance/{event-id}/
       photos/
       documents/
+    incidents/{incident-id}/
+      photos/
   users/{user-id}/
     avatar/
 ```

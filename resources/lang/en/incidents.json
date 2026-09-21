@@ -49,5 +49,17 @@
   },
   "reportShort": "Incident",
   "reportForEquipment": "Report an incident on this equipment",
-  "modalTitle": "Report an incident"
+  "modalTitle": "Report an incident",
+  "photosCount": "{count, plural, one {# photo} other {# photos}}",
+  "show": {
+    "breadcrumb": "Incidents",
+    "back": "← Back to incidents",
+    "edit": "Edit",
+    "delete": "Delete",
+    "photosTitle": "Photos",
+    "photosHint": "Useful for the insurance file. Uploading photos requires a connection.",
+    "detail": "Detail",
+    "reportedOn": "Reported on {date}",
+    "closedOn": "Closed on {date}"
+  }
 }

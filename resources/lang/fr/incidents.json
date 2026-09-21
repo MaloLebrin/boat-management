@@ -49,5 +49,17 @@
   },
   "reportShort": "Incident",
   "reportForEquipment": "Signaler un incident sur cet équipement",
-  "modalTitle": "Déclarer un incident"
+  "modalTitle": "Déclarer un incident",
+  "photosCount": "{count, plural, one {# photo} other {# photos}}",
+  "show": {
+    "breadcrumb": "Incidents",
+    "back": "← Retour aux incidents",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "photosTitle": "Photos",
+    "photosHint": "Utiles pour le dossier assurance. L'envoi de photos nécessite une connexion.",
+    "detail": "Détail",
+    "reportedOn": "Déclaré le {date}",
+    "closedOn": "Clôturé le {date}"
+  }
 }

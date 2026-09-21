@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import app from '@adonisjs/core/services/app'
 import BoatIncidentService from '#services/boat_incident_service'
 import { BoatIncidentValidationError } from '#exceptions/incident_errors'
 import { toIncidentTarget } from '#transformers/boat_transformer'
@@ -10,6 +11,7 @@ import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 import { BoatSafetyEquipmentFactory } from '#database/factories/boat_safety_equipment_factory'
 import { BoatGenericEquipmentFactory } from '#database/factories/boat_generic_equipment_factory'
+import { MediaFactory } from '#database/factories/media_factory'
 import { incidentTargetFieldName } from '#shared/helpers/incident_target'
 import type { IncidentTargetType } from '#shared/types/incident'
 import type Boat from '#models/boat'
@@ -65,7 +67,8 @@ test.group('BoatIncidentService — cible (#813)', () => {
       const id = await makeTarget(type, boat)
       const field = incidentTargetFieldName(type)
 
-      const incident = await new BoatIncidentService().createForBoat(user, boat, {
+      const service = await app.container.make(BoatIncidentService)
+      const incident = await service.createForBoat(user, boat, {
         ...BASE_PAYLOAD,
         [field]: id,
       })
@@ -78,9 +81,10 @@ test.group('BoatIncidentService — cible (#813)', () => {
       const otherBoat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
       const foreignId = await makeTarget(type, otherBoat)
 
+      const service = await app.container.make(BoatIncidentService)
       await assert.rejects(
         () =>
-          new BoatIncidentService().createForBoat(user, boat, {
+          service.createForBoat(user, boat, {
             ...BASE_PAYLOAD,
             [incidentTargetFieldName(type)]: foreignId,
           }),
@@ -95,7 +99,8 @@ test.group('BoatIncidentService — cible (#813)', () => {
     const sailId = await makeTarget('sail', boat)
 
     try {
-      await new BoatIncidentService().createForBoat(user, boat, {
+      const service = await app.container.make(BoatIncidentService)
+      await service.createForBoat(user, boat, {
         ...BASE_PAYLOAD,
         boatEngineId: engineId,
         boatSailId: sailId,
@@ -112,7 +117,7 @@ test.group('BoatIncidentService — cible (#813)', () => {
   }) => {
     const { user, boat } = await makeUserBoat()
     const engineId = await makeTarget('engine', boat)
-    const service = new BoatIncidentService()
+    const service = await app.container.make(BoatIncidentService)
     const incident = await service.createForBoat(user, boat, {
       ...BASE_PAYLOAD,
       boatEngineId: engineId,
@@ -137,7 +142,7 @@ test.group('BoatIncidentService — cible (#813)', () => {
       boatEngineId: engine.id,
       designation: 'Bougie NGK',
     }).create()
-    const service = new BoatIncidentService()
+    const service = await app.container.make(BoatIncidentService)
     await service.createForBoat(user, boat, { ...BASE_PAYLOAD, boatEngineId: engine.id })
     await service.createForBoat(user, boat, { ...BASE_PAYLOAD, boatEnginePartId: part.id })
     await service.createForBoat(user, boat, BASE_PAYLOAD)
@@ -153,5 +158,25 @@ test.group('BoatIncidentService — cible (#813)', () => {
       engineId: engine.id,
     })
     assert.include(rows, null)
+  })
+
+  test('listForBoat compte les photos de chaque incident en une requête (#814)', async ({
+    assert,
+  }) => {
+    const { user, boat } = await makeUserBoat()
+    const service = await app.container.make(BoatIncidentService)
+    const withPhotos = await service.createForBoat(user, boat, BASE_PAYLOAD)
+    await service.createForBoat(user, boat, BASE_PAYLOAD)
+    await MediaFactory.merge({
+      entityType: 'boat_incident',
+      entityId: withPhotos.id,
+      kind: 'photo',
+    }).createMany(2)
+
+    const incidents = await service.listForBoat(user, boat)
+
+    const counts = new Map(incidents.map((i) => [i.id, i.$extras.photosCount]))
+    assert.equal(counts.get(withPhotos.id), 2)
+    assert.equal([...counts.values()].filter((c) => c === 0).length, 1)
   })
 })

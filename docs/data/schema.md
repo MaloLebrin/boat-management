@@ -301,6 +301,7 @@ plomberie).
 - `insuranceClaimed` (bool), `insuranceClaimRef` (nullable)
 - `status` (CHECK : `open | in_progress | closed`, indexé), `closedAt` (nullable)
 - cible optionnelle (#813), **au plus une** des six FK nullables `SET NULL` : `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId`, `boatGenericEquipmentId`, `boatEnginePartId` — supprimer l'équipement conserve l'incident, rattaché au bateau entier
+- photos (#814) : lignes `media` avec `entity_type = 'boat_incident'`, purgées avec l'incident et avec le bateau
 
 ### boat_port_stays
 

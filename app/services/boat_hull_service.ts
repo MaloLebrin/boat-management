@@ -8,6 +8,7 @@ import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
 import BoatGenericEquipment from '#models/boat_generic_equipment'
+import BoatIncident from '#models/boat_incident'
 import BoatRig from '#models/boat_rig'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
@@ -330,6 +331,17 @@ export default class BoatHullService {
           'boat_safety_equipment',
           item.id,
           CloudinaryFolders.boatSafetyEquipment(org.slug, boat.id, item.id),
+          org
+        )
+      }
+
+      // Photos d'incident (#814) — l'incident lui-même part en CASCADE avec le bateau.
+      const incidents = await BoatIncident.query().where('boatId', boat.id).select('id')
+      for (const incident of incidents) {
+        await this.mediaService.deleteAllForEntity(
+          'boat_incident',
+          incident.id,
+          CloudinaryFolders.boatIncident(org.slug, boat.id, incident.id),
           org
         )
       }
