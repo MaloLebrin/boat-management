@@ -69,7 +69,7 @@ function handleAssignConfirm({ spotId, boatId }: { spotId: number; boatId: numbe
   const currentBoat = assigningSpot.value?.boat ?? null
   assigningSpot.value = null
 
-  const patchOpts = { preserveScroll: true, only: ['port'] as const }
+  const patchOpts = { preserveScroll: true, only: ['port'] }
 
   if (boatId === null) {
     if (currentBoat) {

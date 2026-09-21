@@ -22,6 +22,20 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
 
+  # Sans ce job, `pnpm typecheck` n'était vérifié nulle part : le programme
+  # client avait accumulé 198 erreurs sans jamais rougir une PR.
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+
   build:
     runs-on: ubuntu-latest
     steps:

@@ -11,8 +11,6 @@ import { Head } from '@inertiajs/vue3'
 import { Link } from '@adonisjs/inertia/vue'
 import { computed, ref } from 'vue'
 
-const props = defineProps<{ meta?: { title: string; description: string } }>()
-
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -35,6 +33,8 @@ import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import BaseToggle from '~/components/base/BaseToggle.vue'
 
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg?url'
+
+const props = defineProps<{ meta?: { title: string; description: string } }>()
 
 const tab = ref<'overview' | 'components' | 'patterns'>('overview')
 const page = ref(1)

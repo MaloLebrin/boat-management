@@ -13,7 +13,8 @@ export type BoatEquipmentRigFieldsModel = {
   mastCount: number | null
   spreaders: number | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
-  notes: string | null
+  /** Optionnel : la fiche bateau (`BoatShowRig`) ne transporte pas les notes. */
+  notes?: string | null
 }
 
 const props = defineProps<{

@@ -44,13 +44,15 @@ function applyFilters() {
   router.get('/settings/audit-log', query, { preserveScroll: true })
 }
 
-function onUserChange(value: string) {
-  selectedUserId.value = value
+// `BaseSelect` émet `string | number` : les deux listes n'exposent que des
+// chaînes, on normalise avant de reconstruire la query.
+function onUserChange(value: string | number) {
+  selectedUserId.value = String(value)
   applyFilters()
 }
 
-function onActionChange(value: string) {
-  selectedAction.value = value
+function onActionChange(value: string | number) {
+  selectedAction.value = String(value)
   applyFilters()
 }
 

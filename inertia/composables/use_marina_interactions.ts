@@ -68,7 +68,7 @@ export function useMarinaInteractions(
     const currentBoat = selectedSpot.value?.boat ?? null
     selectedSpot.value = null
 
-    const patchOpts = { preserveScroll: true, only: ['port'] as const }
+    const patchOpts = { preserveScroll: true, only: ['port'] }
 
     if (boatId === null) {
       if (currentBoat) {

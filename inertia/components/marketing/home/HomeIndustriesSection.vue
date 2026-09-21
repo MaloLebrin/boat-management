@@ -31,12 +31,12 @@ defineProps<{
 }>()
 
 const activePanel = ref(0)
-const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
+const { isVisible: sectionVisible } = useScrollReveal('sectionEl')
 </script>
 
 <template>
   <section
-    :ref="sectionEl"
+    ref="sectionEl"
     class="reveal mt-14 bg-surface-elevated rounded-2xl py-14 px-8"
     :class="{ visible: sectionVisible }"
   >

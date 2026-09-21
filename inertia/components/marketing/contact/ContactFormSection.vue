@@ -55,7 +55,7 @@ const page = usePage<{ locale?: 'en' | 'fr' }>()
 const locale = computed<'en' | 'fr'>(() => (page.props.locale ?? 'en') as 'en' | 'fr')
 const privacyHref = computed(() => marketingPath('privacy', locale.value))
 
-const { el, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal()
 
 const isSent = ref(props.sent)
 
@@ -103,7 +103,7 @@ function writeAnother() {
 <template>
   <section
     :id="anchorId"
-    :ref="el"
+    ref="el"
     class="reveal scroll-mt-24 bg-paper px-6 py-20 lg:px-8"
     :class="{ visible: isVisible }"
   >

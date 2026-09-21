@@ -27,8 +27,8 @@ interface FeatureData {
 
 const props = defineProps<FeatureData>()
 
-const { el: sectionEl, isVisible } = useScrollReveal()
-const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 7 })
+const { isVisible } = useScrollReveal('sectionEl')
+const { transform: tiltTransform } = useTilt({ max: 7, refName: 'tiltEl' })
 
 const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
   boatDetail: HomeMockBoatDetail,
@@ -42,7 +42,7 @@ const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
 <template>
   <section
     :id="anchorId"
-    :ref="sectionEl"
+    ref="sectionEl"
     class="reveal scroll-mt-24 px-6 py-20 lg:px-8 lg:py-24"
     :class="[bgClass || 'bg-cream', { visible: isVisible }]"
   >
@@ -102,7 +102,7 @@ const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
 
         <!-- Mock — carte 3D inclinable au survol -->
         <div
-          :ref="tiltEl"
+          ref="tiltEl"
           class="will-change-transform"
           :class="{ 'lg:col-start-1': reversed }"
           :style="{ transform: tiltTransform }"

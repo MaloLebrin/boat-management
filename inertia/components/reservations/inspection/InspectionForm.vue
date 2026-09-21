@@ -43,7 +43,7 @@ const form = useForm({
  * Les champs optionnels vides sont omis — un `''` échouerait la validation
  * numérique, là où l'envoi `<Form>` natif les strippait.
  */
-function cleanPayload(): Record<string, unknown> {
+function cleanPayload() {
   return {
     ...(props.inspection ? {} : { kind: props.kind }),
     performedAt: form.performedAt,

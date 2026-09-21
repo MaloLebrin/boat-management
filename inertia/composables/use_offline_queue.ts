@@ -5,6 +5,16 @@ import { toast } from 'vue-sonner'
 import { useT } from '~/composables/use_t'
 import type { OfflineActionType } from '#shared/constants/offline_queue'
 
+/**
+ * Charge utile acceptée par une visite Inertia (`Record<string, FormDataConvertible>`).
+ * `@inertiajs/core` n'est pas une dépendance directe du projet : on dérive le
+ * type de la signature de `router.post` plutôt que d'importer le paquet.
+ */
+type InertiaPayload = Extract<
+  NonNullable<Parameters<typeof router.post>[1]>,
+  Record<string, unknown>
+>
+
 const DB_NAME = 'fleetide-offline-queue'
 const STORE_NAME = 'actions'
 const FAILED_STORE_NAME = 'failed'
@@ -31,7 +41,13 @@ export interface QueuedAction {
   type: OfflineActionType
   url: string
   method: 'post' | 'patch' | 'put'
-  payload: Record<string, unknown>
+  /**
+   * Charge utile telle qu'elle repartira dans `router.post/patch/put` : les
+   * valeurs doivent rester des données sérialisables par Inertia
+   * (`FormDataConvertible`), sinon la file rejoue une visite que le client
+   * Inertia ne sait pas encoder.
+   */
+  payload: InertiaPayload
   createdAt: string
   /**
    * Clé de déduplication (#490) : deux enqueue successifs portant la même clé

@@ -28,14 +28,14 @@ defineProps<{
 }>()
 
 const activeTab = ref(0)
-const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
+const { isVisible: sectionVisible } = useScrollReveal('sectionEl')
 
 const tabIcons = [ComputerDesktopIcon, DocumentTextIcon, ClipboardDocumentCheckIcon, SparklesIcon]
 </script>
 
 <template>
   <section
-    :ref="sectionEl"
+    ref="sectionEl"
     class="reveal bg-paper rounded-2xl py-14 px-8"
     :class="{ visible: sectionVisible }"
   >

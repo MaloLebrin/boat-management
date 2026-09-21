@@ -91,7 +91,7 @@ function handleSubmit() {
       type: props.editingIncident ? UPDATE_INCIDENT_ACTION : CREATE_INCIDENT_ACTION,
       url: actionUrl.value,
       method: props.editingIncident ? 'put' : 'post',
-      payload: form.data() as unknown as Record<string, unknown>,
+      payload: form.data(),
     })
     emit('close')
     return

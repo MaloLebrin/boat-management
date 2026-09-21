@@ -7,6 +7,7 @@ import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
 import { PLAN_LIMITS } from '../../../shared/types/plan'
 import type { PlanTier } from '../../../shared/types/plan'
+import type { InferRoutes, UserRegistry } from '@tuyau/core/types'
 
 const { t } = useT()
 const page = usePage()
@@ -23,11 +24,22 @@ type SettingsSection =
   | 'branding'
   | 'import'
 
+/**
+ * `route` porte un nom de route généré (`.adonisjs/server/routes.d.ts`) et non
+ * une chaîne libre : `<Link :route>` refuse tout nom inconnu, une section
+ * renommée côté serveur casse donc à la compilation et pas en navigation.
+ */
+interface SettingsLink {
+  key: SettingsSection
+  route: keyof InferRoutes<UserRegistry>
+  label: () => string
+}
+
 // `org`/`members` partagent la même audience que la capability `members.view`
 // (member + admin) — mechanic/boat_owner n'ont accès à aucune section
 // administrative de l'organisation. Cf. #397.
 const baseSections = computed(() => {
-  const result: { key: SettingsSection; route: string; label: () => string }[] = [
+  const result: SettingsLink[] = [
     { key: 'me', route: 'settings.me', label: () => t('settings.sections.me') },
     // Notifications push (#498) — chaque utilisateur a ses propres appareils
     {

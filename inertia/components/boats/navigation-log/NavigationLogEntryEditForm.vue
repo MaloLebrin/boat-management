@@ -49,7 +49,7 @@ function handleSubmit() {
       payload: {
         ...form.data(),
         _expectedUpdatedAt: props.entry.updatedAt,
-      } as unknown as Record<string, unknown>,
+      },
     })
     emit('close')
     return

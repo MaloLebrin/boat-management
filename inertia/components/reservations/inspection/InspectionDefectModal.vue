@@ -86,7 +86,7 @@ const equipmentTypeOptions = computed(() =>
 )
 
 /** Les champs optionnels vides sont omis, comme les strippait l'envoi `<Form>`. */
-function cleanPayload(): Record<string, unknown> {
+function cleanPayload() {
   return {
     label: form.label,
     actionType: form.actionType,

@@ -24,7 +24,7 @@ defineProps<{
   rows: ComparisonRow[]
 }>()
 
-const { el: sectionEl, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal('sectionEl')
 
 function getCellClass(value: string): string {
   if (value.includes('auto') || value.includes('EU')) return 'text-mint-300 font-semibold'
@@ -35,7 +35,7 @@ function getCellClass(value: string): string {
 
 <template>
   <section
-    :ref="sectionEl"
+    ref="sectionEl"
     class="reveal bg-navy-900 px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >

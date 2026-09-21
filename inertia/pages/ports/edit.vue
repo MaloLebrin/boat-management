@@ -8,13 +8,13 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
-import type { PortEditPayload } from '~/types/port'
+import type { PortShowDetail } from '~/types/port'
 
 const { t } = useT()
 const { countryOptions } = useCountries()
 
 const props = defineProps<{
-  port: PortEditPayload
+  port: PortShowDetail
 }>()
 
 const form = useForm({

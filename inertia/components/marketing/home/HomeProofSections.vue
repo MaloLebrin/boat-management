@@ -37,12 +37,12 @@ const props = defineProps<{
   }
 }>()
 
-const { el: statsEl, isVisible: statsVisible } = useScrollReveal()
-const { el: useCasesEl, isVisible: useCasesVisible } = useScrollReveal()
-const { el: testimonialsEl, isVisible: testimonialsVisible } = useScrollReveal()
-const { el: comparisonEl, isVisible: comparisonVisible } = useScrollReveal()
-const { el: securityEl, isVisible: securityVisible } = useScrollReveal()
-const { el: blogEl, isVisible: blogVisible } = useScrollReveal()
+const { isVisible: statsVisible } = useScrollReveal('statsEl')
+const { isVisible: useCasesVisible } = useScrollReveal('useCasesEl')
+const { isVisible: testimonialsVisible } = useScrollReveal('testimonialsEl')
+const { isVisible: comparisonVisible } = useScrollReveal('comparisonEl')
+const { isVisible: securityVisible } = useScrollReveal('securityEl')
+const { isVisible: blogVisible } = useScrollReveal('blogEl')
 
 function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): string {
   const v = props.comparisonTable.vals
@@ -64,7 +64,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
 <template>
   <!-- Section 7: Stats KPIs -->
   <section
-    :ref="statsEl"
+    ref="statsEl"
     class="mt-14 reveal rounded-2xl bg-navy-900 px-8 py-12"
     :class="{ visible: statsVisible }"
   >
@@ -81,7 +81,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
   </section>
 
   <!-- Section 8: Use cases -->
-  <section :ref="useCasesEl" class="mt-14 reveal" :class="{ visible: useCasesVisible }">
+  <section ref="useCasesEl" class="mt-14 reveal" :class="{ visible: useCasesVisible }">
     <BaseCard padded>
       <template #header>
         <p class="font-display text-sm font-semibold text-fg">{{ useCases.title }}</p>
@@ -100,7 +100,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
   </section>
 
   <!-- Section 9: Testimonials -->
-  <section :ref="testimonialsEl" class="mt-14 reveal" :class="{ visible: testimonialsVisible }">
+  <section ref="testimonialsEl" class="mt-14 reveal" :class="{ visible: testimonialsVisible }">
     <div class="text-center mb-8">
       <BaseHeading level="2">{{ testimonials.title }}</BaseHeading>
     </div>
@@ -130,7 +130,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
 
   <!-- Section: Comparison table -->
   <section
-    :ref="comparisonEl"
+    ref="comparisonEl"
     class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
     :class="{ visible: comparisonVisible }"
   >
@@ -179,7 +179,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
   </section>
 
   <!-- Section 10: Security -->
-  <section :ref="securityEl" class="mt-14 reveal" :class="{ visible: securityVisible }">
+  <section ref="securityEl" class="mt-14 reveal" :class="{ visible: securityVisible }">
     <BaseCard padded>
       <template #header>
         <p class="font-display text-sm font-semibold text-fg">{{ security.title }}</p>
@@ -204,7 +204,7 @@ function getComparisonVal(row: string, col: 'excel' | 'paper' | 'fleetai'): stri
 
   <!-- Section: Blog -->
   <section
-    :ref="blogEl"
+    ref="blogEl"
     class="mt-14 reveal rounded-2xl bg-paper py-14 px-8"
     :class="{ visible: blogVisible }"
   >

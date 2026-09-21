@@ -21,15 +21,15 @@ defineProps<{
 
 const { t: tApp } = useT()
 
-const { el: howItWorksEl, isVisible: howItWorksVisible } = useScrollReveal()
-const { el: timelineEl, isVisible: timelineVisible } = useScrollReveal()
-const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
+const { isVisible: howItWorksVisible } = useScrollReveal('howItWorksEl')
+const { isVisible: timelineVisible } = useScrollReveal('timelineEl')
+const { isVisible: previewVisible } = useScrollReveal('previewEl')
 </script>
 
 <template>
   <!-- Section 5: How it works -->
   <section
-    :ref="howItWorksEl"
+    ref="howItWorksEl"
     class="mt-14 reveal px-6 lg:px-8"
     :class="{ visible: howItWorksVisible }"
   >
@@ -61,11 +61,7 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
   </section>
 
   <!-- Timeline J1/J7/J30 -->
-  <section
-    :ref="timelineEl"
-    class="mt-10 reveal px-6 lg:px-8"
-    :class="{ visible: timelineVisible }"
-  >
+  <section ref="timelineEl" class="mt-10 reveal px-6 lg:px-8" :class="{ visible: timelineVisible }">
     <div class="mx-auto max-w-4xl rounded-2xl bg-navy-900 px-6 py-10 shadow-xl sm:px-12">
       <p class="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-white/50">
         {{ howItWorks.timeline.title }}
@@ -107,7 +103,7 @@ const { el: previewEl, isVisible: previewVisible } = useScrollReveal()
 
   <!-- Section 6: Preview dashboard mockup -->
   <section
-    :ref="previewEl"
+    ref="previewEl"
     class="mt-14 pb-14 reveal px-6 lg:px-8 lg:pb-20"
     :class="{ visible: previewVisible }"
   >

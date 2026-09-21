@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, ref, type Ref } from 'vue'
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 import { resolveLocaleTag } from '../../shared/helpers/date_format'
 
 interface CountUpOptions {
@@ -14,6 +14,8 @@ interface CountUpOptions {
   threshold?: number
   /** Locale de rendu du nombre (séparateur de milliers, séparateur décimal). */
   locale?: string
+  /** Nom du `ref="…"` posé sur l'élément à observer dans le template. */
+  refName?: string
 }
 
 /**
@@ -30,9 +32,10 @@ export function useCountUp(target: number, options: CountUpOptions = {}) {
     suffix = '',
     threshold = 0.4,
     locale,
+    refName = 'el',
   } = options
 
-  const el: Ref<HTMLElement | null> = ref(null)
+  const el = useTemplateRef<HTMLElement>(refName)
   const current = ref(0)
   let observer: IntersectionObserver | null = null
   let rafId: number | null = null

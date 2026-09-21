@@ -11,7 +11,7 @@ import BoatMaintenanceSubjectFields from './BoatMaintenanceSubjectFields.vue'
 import { useMaintenanceOperations } from '~/composables/use_maintenance_operations'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail } from '~/types/boat_show'
-import type { MaintenanceTaskSubject } from '../../../../shared/types/maintenance'
+import type { MaintenanceTaskSubject } from '#shared/types/maintenance'
 
 const props = defineProps<{
   boat: BoatShowDetail

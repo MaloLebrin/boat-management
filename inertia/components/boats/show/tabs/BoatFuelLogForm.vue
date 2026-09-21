@@ -72,7 +72,7 @@ function handleSubmit() {
       type: CREATE_FUEL_LOG_ACTION,
       url: `/boats/${props.boat.id}/fuel-logs`,
       method: 'post',
-      payload: form.data() as Record<string, unknown>,
+      payload: form.data(),
     })
     emit('close')
     return

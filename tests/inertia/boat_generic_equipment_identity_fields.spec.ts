@@ -106,7 +106,6 @@ test('choisir une marque recharge les modèles par visite Inertia partielle', as
   expect(reload).toHaveBeenCalledWith({
     only: ['equipmentCatalogModels', 'equipmentCatalogBrandId'],
     data: { equipmentBrandId: 2 },
-    preserveScroll: true,
   })
 })
 
@@ -119,7 +118,6 @@ test('la surface d’origine voyage dans l’URL pour rouvrir la modale', async 
   expect(reload).toHaveBeenCalledWith({
     only: ['equipmentCatalogModels', 'equipmentCatalogBrandId'],
     data: { equipmentBrandId: 2, equipmentForm: 'generic-card' },
-    preserveScroll: true,
   })
 })
 

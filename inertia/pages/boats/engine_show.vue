@@ -78,10 +78,12 @@ const statusOptions = computed(() => [
   { value: 'retired', label: t('equipment.status.retired') },
 ])
 
-function changeStatus(newStatus: string) {
+// `BaseSelect` émet `string | number` : les statuts sont des chaînes, on
+// normalise avant l'envoi.
+function changeStatus(newStatus: string | number) {
   router.patch(
     `/boats/${props.boat.id}/engines/${props.engine.id}/status`,
-    { status: newStatus },
+    { status: String(newStatus) },
     { preserveScroll: true }
   )
 }

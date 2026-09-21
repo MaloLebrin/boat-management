@@ -107,15 +107,16 @@ function onBrandSelected(option: ComboboxOption) {
   selectedBrandId.value = brandId
   model.value = ''
   selectedModelId.value = null
-  // Visite Inertia partielle, pas un `fetch`. `equipmentCatalogBrandId` fait
-  // partie du rechargement : la visite remonte l'arbre, et c'est le serveur qui
-  // réapprend au formulaire quelle marque est retenue.
+  // Visite Inertia partielle, pas un `fetch`. `equipmentCatalogBrandId` fait partie du
+  // rechargement : la visite remonte l'arbre, et c'est le serveur qui réapprend
+  // au formulaire quelle marque est retenue. Pas de `preserveScroll` ici :
+  // `reload()` préserve toujours scroll et état, l'option ne fait pas partie
+  // de ses types.
   router.reload({
     only: ['equipmentCatalogModels', 'equipmentCatalogBrandId'],
     data: props.surface
       ? { equipmentBrandId: brandId, equipmentForm: props.surface }
       : { equipmentBrandId: brandId },
-    preserveScroll: true,
   })
 }
 

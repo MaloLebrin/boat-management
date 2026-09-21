@@ -49,8 +49,6 @@ function handleSubmit() {
     form.post(`/ports/${props.portId}/mouillages/${props.mouillageId}/spots`, { onSuccess })
   }
 }
-
-const modalTitle = props.spot ? t('ports.spots.edit') : t('ports.spots.add')
 </script>
 
 <template>
@@ -70,7 +68,7 @@ const modalTitle = props.spot ? t('ports.spots.edit') : t('ports.spots.add')
         v-model="form.description"
         :label="t('ports.spots.fields.description')"
         :error="form.errors.description"
-        rows="3"
+        :rows="3"
       />
       <div class="flex justify-end gap-2 pt-2">
         <BaseButton variant="secondary" type="button" @click="emit('update:open', false)">

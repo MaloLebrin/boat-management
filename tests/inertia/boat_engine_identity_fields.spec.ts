@@ -107,7 +107,6 @@ test('choisir une marque recharge les modèles par visite Inertia partielle', as
   expect(reload).toHaveBeenCalledWith({
     only: ['engineCatalogModels', 'engineCatalogBrandId'],
     data: { engineBrandId: 1 },
-    preserveScroll: true,
   })
 })
 
