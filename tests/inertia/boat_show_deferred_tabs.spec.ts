@@ -184,6 +184,8 @@ describe('boat_show_tab_data', () => {
     const nothingLoaded = { maintenance: false, navigation: false }
 
     expect(isTabDataReady('specs', nothingLoaded)).toBe(true)
+    // Les photos arrivent avec la prop `boat`, non différée (#811)
+    expect(isTabDataReady('photos', nothingLoaded)).toBe(true)
     expect(isTabDataReady('history', nothingLoaded)).toBe(false)
     expect(isTabDataReady('history', { maintenance: true, navigation: false })).toBe(true)
   })

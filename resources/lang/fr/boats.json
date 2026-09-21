@@ -335,6 +335,7 @@
     "tabs": {
       "maintenance": "Maintenance",
       "overview": "Aperçu",
+      "photos": "Photos",
       "equipment": "Équipement",
       "equipmentActions": "Achats/réparations",
       "specs": "Spécifications",
@@ -388,6 +389,7 @@
       "draft": "Tirant d'eau",
       "mastHeight": "Hauteur de mât",
       "viewSpecs": "Voir les spécifications →",
+      "viewAllPhotos": "Voir les {count} photos →",
       "recentActivityTitle": "Activité récente",
       "recentActivityEmpty": "Aucune activité récente.",
       "viewHistory": "Voir tout l'historique →",

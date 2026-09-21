@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import { usePhotoUpload } from '~/composables/use_photo_upload'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MediaRow } from '~/types/boat_show'
+import { sortedBoatPhotos } from '~/utils/boat_photos'
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -17,9 +18,7 @@ const { form, fileInput, cameraInput, isOnline, onFileChange } = usePhotoUpload(
   () => `/boats/${props.boat.id}/photos`
 )
 
-const photos = computed<MediaRow[]>(() =>
-  props.boat.media.filter((m) => m.kind === 'photo').sort((a, b) => a.position - b.position)
-)
+const photos = computed<MediaRow[]>(() => sortedBoatPhotos(props.boat.media))
 </script>
 
 <template>

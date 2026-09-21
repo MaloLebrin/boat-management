@@ -97,6 +97,19 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'boats.index',
   },
   {
+    id: 'boats-photos',
+    title: {
+      en: 'Boat photos',
+      fr: 'Photos du bateau',
+    },
+    body: {
+      en: 'Each boat page has a Photos tab, right after Overview, that holds the full gallery. From there you can add several photos at once (JPEG, PNG, WebP, GIF or HEIC), take a picture directly with the phone camera, and delete a photo by hovering it. Uploads need a connection: offline, the buttons are disabled. The Overview tab no longer lists every picture: it shows the first four in a single row, with a “See all photos” link that opens the Photos tab.',
+      fr: 'Chaque fiche bateau a un onglet Photos, juste après Aperçu, qui porte la galerie complète. Vous pouvez y ajouter plusieurs photos à la fois (JPEG, PNG, WebP, GIF ou HEIC), prendre une photo directement avec l’appareil du téléphone, et supprimer une photo en la survolant. L’envoi demande une connexion : hors ligne, les boutons sont désactivés. L’onglet Aperçu ne liste plus toutes les images : il montre les quatre premières sur une seule rangée, avec un lien « Voir les photos » qui ouvre l’onglet Photos.',
+    },
+    keywords: ['photos', 'photo', 'galerie', 'gallery', 'photo bateau', 'boat photo', 'camera'],
+    navTarget: 'boats.index',
+  },
+  {
     id: 'boats-equipment',
     title: {
       en: 'Boat equipment: engines, sails, rig, generic and safety gear',

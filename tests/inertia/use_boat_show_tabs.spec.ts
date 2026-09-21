@@ -61,10 +61,11 @@ describe('useBoatShowTabs — grouping (#365)', () => {
     expect(activeGroupKey.value).toBe('overview')
   })
 
-  test('exposes exactly the 5 groups required by #365', () => {
+  test('exposes the 5 groups of #365 plus the photos group right after overview (#811)', () => {
     const { groupTabs } = mountComposable({})
     expect(groupTabs.value.map((g) => g.key)).toEqual([
       'overview',
+      'photos',
       'equipment',
       'maintenance',
       'navigation',
@@ -130,6 +131,14 @@ describe('useBoatShowTabs — grouping (#365)', () => {
     const { tab, activeGroupKey } = mountComposable({})
     expect(tab.value).toBe('incidents')
     expect(activeGroupKey.value).toBe('navigation')
+  })
+
+  test('?tab=photos opens the photos tab without badge (#811)', () => {
+    window.history.replaceState({}, '', '/boats/13?tab=photos')
+    const { tab, activeGroupKey, groupTabs } = mountComposable({})
+    expect(tab.value).toBe('photos')
+    expect(activeGroupKey.value).toBe('photos')
+    expect(groupTabs.value.find((g) => g.key === 'photos')?.badge).toBeUndefined()
   })
 
   test('an unknown ?tab= value falls back to overview', () => {

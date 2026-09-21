@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
+import BoatPhotoGallery from '~/components/boats/show/BoatPhotoGallery.vue'
 import BoatShowTabAdminDocs from '~/components/boats/show/tabs/BoatShowTabAdminDocs.vue'
 import BoatShowTabDocuments from '~/components/boats/show/tabs/BoatShowTabDocuments.vue'
 import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipment.vue'
@@ -133,6 +134,12 @@ const showSkeleton = computed(
         :can-manage="canManageEquipment"
         :ai-suggestions="aiSuggestions ?? null"
         @go-to-tab="$emit('goToTab', $event)"
+      />
+
+      <BoatPhotoGallery
+        v-else-if="tab === 'photos'"
+        :boat="boat"
+        :can-manage="canManageEquipment"
       />
 
       <BoatShowTabSpecs v-else-if="tab === 'specs'" :boat="boat" :home-port-id="homePortId" />

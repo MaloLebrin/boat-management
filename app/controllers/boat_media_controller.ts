@@ -12,6 +12,7 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
 import { contentDisposition } from '#shared/helpers/content_disposition'
+import type { MediaKind } from '#shared/constants/media'
 
 @inject()
 export default class BoatMediaController {
@@ -64,7 +65,7 @@ export default class BoatMediaController {
     } else {
       session.flash('error', i18n.t('flash.media.photosAddFailed'))
     }
-    response.redirect(`/boats/${boat.id}?tab=overview`)
+    response.redirect(`/boats/${boat.id}?tab=photos`)
   }
 
   async storeDocument({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
@@ -120,8 +121,9 @@ export default class BoatMediaController {
 
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
+    let kind: MediaKind
     try {
-      await this.mediaService.deleteForEntity(Number(params.mediaId), 'boat', boat.id, org)
+      kind = await this.mediaService.deleteForEntity(Number(params.mediaId), 'boat', boat.id, org)
     } catch (error) {
       if (error instanceof MediaNotFoundError) {
         response.redirect(`/boats/${boat.id}`)
@@ -131,7 +133,8 @@ export default class BoatMediaController {
     }
 
     session.flash('success', i18n.t('flash.media.deleted'))
-    response.redirect(`/boats/${boat.id}`)
+    // On revient sur l'onglet qui porte le média supprimé (#811)
+    response.redirect(`/boats/${boat.id}?tab=${kind === 'photo' ? 'photos' : 'documents'}`)
   }
 
   async storeEngineDocument({

@@ -14,6 +14,7 @@ export interface BoatShowDeferredGroupsLoaded {
 
 const TAB_DEFERRED_GROUP: Record<BoatShowTabKey, BoatShowDeferredGroup | null> = {
   'overview': 'maintenance',
+  'photos': null,
   'specs': null,
   'pricing': null,
   'equipment': null,

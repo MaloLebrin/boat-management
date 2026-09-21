@@ -4,6 +4,7 @@ import type { BoatDocumentRow, BoatIncidentRow, MaintenanceTaskRow } from '~/typ
 
 export type BoatShowTabKey =
   | 'overview'
+  | 'photos'
   | 'specs'
   | 'pricing'
   | 'equipment'
@@ -18,7 +19,13 @@ export type BoatShowTabKey =
   | 'incidents'
   | 'position'
 
-export type BoatShowGroupKey = 'overview' | 'equipment' | 'maintenance' | 'navigation' | 'documents'
+export type BoatShowGroupKey =
+  | 'overview'
+  | 'photos'
+  | 'equipment'
+  | 'maintenance'
+  | 'navigation'
+  | 'documents'
 
 type TabItem = { key: BoatShowTabKey; label: string; badge?: string }
 type Group = { key: BoatShowGroupKey; label: string; tabs: TabItem[] }
@@ -65,6 +72,12 @@ export function useBoatShowTabs(input: {
       key: 'overview',
       label: t('boats.show.tabs.overview'),
       tabs: [{ key: 'overview', label: t('boats.show.tabs.overview') }],
+    },
+    // Galerie complète sortie de l'Aperçu, qui n'en garde qu'une rangée (#811)
+    {
+      key: 'photos',
+      label: t('boats.show.tabs.photos'),
+      tabs: [{ key: 'photos', label: t('boats.show.tabs.photos') }],
     },
     {
       key: 'equipment',

@@ -149,7 +149,7 @@ export default class MediaService {
     entityType: MediaEntityType,
     entityId: number,
     org: Organization | null
-  ): Promise<void> {
+  ): Promise<MediaKind> {
     const media = await Media.query()
       .where('id', mediaId)
       .where('entityType', entityType)
@@ -175,6 +175,7 @@ export default class MediaService {
     if (org !== null) {
       await this.quotaService.updateStorageUsed(org, -bytes)
     }
+    return media.kind
   }
 
   async deleteAllForEntity(

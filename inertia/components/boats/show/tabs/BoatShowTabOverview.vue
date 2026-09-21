@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import BoatPhotoGallery from '~/components/boats/show/BoatPhotoGallery.vue'
 import BoatSimulatorCard from '~/components/boats/show/BoatSimulatorCard.vue'
 import BoatOverdueAlert from './overview/BoatOverdueAlert.vue'
 import BoatOverviewAiPanel from './overview/BoatOverviewAiPanel.vue'
 import BoatOverviewKpiRow from './overview/BoatOverviewKpiRow.vue'
+import BoatOverviewPhotoStrip from './overview/BoatOverviewPhotoStrip.vue'
 import BoatOverviewPositionCard from './overview/BoatOverviewPositionCard.vue'
 import BoatOverviewRecentActivity from './overview/BoatOverviewRecentActivity.vue'
 import BoatOverviewSpecsCard from './overview/BoatOverviewSpecsCard.vue'
@@ -84,7 +84,11 @@ const latestGpsPosition = computed(() => {
 <template>
   <div class="flex flex-col gap-6 lg:flex-row">
     <div class="flex-1 space-y-6">
-      <BoatPhotoGallery :boat="boat" :can-manage="canManage" />
+      <BoatOverviewPhotoStrip
+        :boat="boat"
+        :can-manage="canManage"
+        @go-to-tab="emit('go-to-tab', $event)"
+      />
       <BoatOverdueAlert :overdue-tasks="overdueTasks" @go-to-tab="emit('go-to-tab', $event)" />
       <BoatOverviewKpiRow
         :total-engine-hours="totalEngineHours"

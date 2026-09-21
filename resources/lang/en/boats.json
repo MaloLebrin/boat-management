@@ -335,6 +335,7 @@
     "tabs": {
       "maintenance": "Maintenance",
       "overview": "Overview",
+      "photos": "Photos",
       "equipment": "Equipment",
       "equipmentActions": "Purchases/repairs",
       "specs": "Specifications",
@@ -388,6 +389,7 @@
       "draft": "Draft",
       "mastHeight": "Mast height",
       "viewSpecs": "View specifications →",
+      "viewAllPhotos": "See all {count} photos →",
       "recentActivityTitle": "Recent activity",
       "recentActivityEmpty": "No recent activity.",
       "viewHistory": "View full history →",

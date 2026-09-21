@@ -23,6 +23,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
         entityType: 'boat',
         entityId: boat.id,
         uploadedById: user.id,
+        kind: 'photo',
       }).create()
 
       const response = await client
@@ -31,7 +32,8 @@ test.group('Boat Media — DELETE (functional)', (group) => {
         .redirects(0)
 
       response.assertStatus(302)
-      response.assertHeader('location', `/boats/${boat.id}`)
+      // On reste sur l'onglet Photos après la suppression (#811)
+      response.assertHeader('location', `/boats/${boat.id}?tab=photos`)
 
       const found = await Media.find(media.id)
       assert.isNull(found)
@@ -122,6 +124,7 @@ test.group('Boat Media — DELETE (functional)', (group) => {
         .redirects(0)
 
       response.assertStatus(302)
+      response.assertHeader('location', `/boats/${boat.id}?tab=documents`)
 
       const found = await Media.find(media.id)
       assert.isNull(found)
@@ -175,7 +178,7 @@ test.group('Boat Media — POST photos (functional)', (group) => {
         .redirects(0)
 
       response.assertStatus(302)
-      response.assertHeader('location', `/boats/${boat.id}?tab=overview`)
+      response.assertHeader('location', `/boats/${boat.id}?tab=photos`)
 
       const medias = await Media.query().where('entityType', 'boat').where('entityId', boat.id)
       assert.lengthOf(medias, 1)
@@ -209,7 +212,7 @@ test.group('Boat Media — POST photos (functional)', (group) => {
         .redirects(0)
 
       response.assertStatus(302)
-      response.assertHeader('location', `/boats/${boat.id}?tab=overview`)
+      response.assertHeader('location', `/boats/${boat.id}?tab=photos`)
 
       const medias = await Media.query().where('entityType', 'boat').where('entityId', boat.id)
       assert.lengthOf(medias, 2)
