@@ -7,6 +7,7 @@ export const MEDIA_ENTITY_TYPES = [
   'boat_generic_equipment',
   'boat_safety_equipment',
   'boat_maintenance_event',
+  'boat_incident',
   'boat_document',
   'inspection',
   'rentalContract',
@@ -52,9 +53,9 @@ export const MEDIA_BATCH_RULES: Record<
 /**
  * Nature d'une route d'envoi groupé, déduite de son motif.
  *
- * Les douze routes de `LARGE_UPLOAD_ROUTES` se terminent toutes par `/photos`
+ * Les treize routes de `LARGE_UPLOAD_ROUTES` se terminent toutes par `/photos`
  * ou `/documents` — `tests/unit/hygiene/large_upload_routes.spec.ts` le fige,
- * pour qu'une treizième route n'arrive pas sans plafond adapté.
+ * pour qu'une quatorzième route n'arrive pas sans plafond adapté.
  */
 export function mediaBatchKindFor(routePattern: string): MediaBatchKind | null {
   if (routePattern.endsWith('/photos')) return 'photos'
@@ -66,7 +67,7 @@ export function mediaBatchKindFor(routePattern: string): MediaBatchKind | null {
  * Plafond de charge utile d'une route d'envoi groupé : ce que le validateur
  * laissera passer au mieux, et rien de plus.
  *
- * Une seule valeur de 400 Mo couvrait les douze routes, soit **le double** de
+ * Une seule valeur de 400 Mo couvrait les douze routes d'alors, soit **le double** de
  * ce qu'un lot de photos peut atteindre (20 × 10 Mo).
  */
 export function largeUploadLimitFor(routePattern: string): string {

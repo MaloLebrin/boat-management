@@ -11,6 +11,7 @@ const BoatBudgetEntryController = () => import('#controllers/boat_budget_entry_c
 const BoatReservationsController = () => import('#controllers/boat_reservations_controller')
 const BoatPricingController = () => import('#controllers/boat_pricing_controller')
 const BoatEquipmentMediaController = () => import('#controllers/boat_equipment_media_controller')
+const BoatIncidentMediaController = () => import('#controllers/boat_incident_media_controller')
 const BoatOwnersController = () => import('#controllers/boat_owners_controller')
 
 router
@@ -290,6 +291,19 @@ router
     router
       .delete('boats/:boatId/incidents/:incidentId', [controllers.BoatIncidents, 'destroy'])
       .as('boats.incidents.destroy')
+    // Page de détail et photos d'un incident (#814)
+    router
+      .get('boats/:boatId/incidents/:incidentId', [controllers.BoatIncidents, 'show'])
+      .as('boats.incidents.show')
+    router
+      .post('boats/:boatId/incidents/:incidentId/photos', [BoatIncidentMediaController, 'store'])
+      .as('boats.incidents.photos.store')
+    router
+      .delete('boats/:boatId/incidents/:incidentId/photos/:mediaId', [
+        BoatIncidentMediaController,
+        'destroy',
+      ])
+      .as('boats.incidents.photos.destroy')
 
     router
       .post('boats/:boatId/equipment-actions', [BoatEquipmentActionsController, 'store'])

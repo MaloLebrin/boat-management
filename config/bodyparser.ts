@@ -35,6 +35,7 @@ export const LARGE_UPLOAD_ROUTES: string[] = [
   '/boats/:boatId/rig/photos',
   '/boats/:boatId/safety-equipment/:safetyId/photos',
   '/boats/:boatId/generic-equipment/:genericId/photos',
+  '/boats/:boatId/incidents/:incidentId/photos',
   '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos',
   '/clients/:id/documents',
 ]

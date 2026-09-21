@@ -42,12 +42,19 @@ Capacités `incidents.view | create | edit | delete` (`shared/types/permissions.
 - `IncidentTargetBadge` : puce « Moteur · Yamaha F100 » avec lien vers la page de l'équipement ou de la pièce, sur l'onglet, `IncidentRow` et `IncidentCard`.
 - Ajout rapide : `QuickAddIncidentModal` (page flotte, dashboard) — sans sélecteur de cible, faute de données équipement dans `FleetBoatOption`.
 
+## Photos et page de détail (#814)
+
+- `GET /boats/:boatId/incidents/:incidentId` (`boats.incidents.show`) → `BoatIncidentsController.show` (`IncidentPolicy.view`) → page `boats/incident_show` : en-tête (`IncidentShowHeader`), description, galerie (`IncidentShowTabPhotos` → `MediaPhotoGallery`). Les cartes de l'onglet et les lignes de la page flotte y mènent.
+- `POST …/incidents/:incidentId/photos` et `DELETE …/photos/:mediaId` → `BoatIncidentMediaController` (autorisé par **`IncidentPolicy.edit`**, pas `BoatPolicy.edit` comme les équipements). Deux gardes IDOR : `BoatIncidentService.findForBoat` (l'incident est du bateau, lui-même scopé à l'organisation) puis `mediaService.getForEntity(mediaId, 'boat_incident', incidentId)`. Redirection vers la page de détail ; incident étranger → `/boats/:id?tab=incidents`.
+- Médias : `entity_type = 'boat_incident'` (`MEDIA_ENTITY_TYPES`), dossier `CloudinaryFolders.boatIncidentPhotos` (`…/boats/{id}/incidents/{id}/photos`), route dans `LARGE_UPLOAD_ROUTES`. Purge à la suppression de l'incident (`deleteForBoat(…, org)`) et du bateau (`BoatHullService.deleteForUser`).
+- `BoatIncidentRow.photosCount` (compteur seul, une requête groupée dans `listForBoat`) : les médias ne voyagent jamais dans la prop différée `incidents`.
+- Hors-ligne : la déclaration d'un incident est enfilée, **pas** les photos — `usePhotoUpload` refuse l'envoi sans réseau (#621), le bouton est désactivé avec un message.
+
 ## Copilote
 
 Action confirmable `report_incident` (`incidents.create`), avec `boatEngineId` facultatif (#813) — un moteur hors du bateau est une réponse invalide, comme pour `log_fuel`. Les autres cibles passent par l'UI. Fiche produit `incidents` dans `shared/constants/assistant/product_knowledge.ts`.
 
 ## Chantiers suivants
 
-- #814 — photos et page de détail d'un incident.
 - #815 — créer une tâche ou une action « à réparer » depuis un incident (`boat_incident_id` sur tâches et actions).
 - #816 — `created_by`, `rejectedType` hors-ligne, droits `incidents.*` sur l'onglet, audit `incident.update/delete`.

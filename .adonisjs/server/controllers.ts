@@ -18,6 +18,7 @@ export const controllers = {
   BoatEquipmentMedia: () => import('#controllers/boat_equipment_media_controller'),
   BoatFuelLogs: () => import('#controllers/boat_fuel_logs_controller'),
   BoatGenericEquipment: () => import('#controllers/boat_generic_equipment_controller'),
+  BoatIncidentMedia: () => import('#controllers/boat_incident_media_controller'),
   BoatIncidents: () => import('#controllers/boat_incidents_controller'),
   BoatInspections: () => import('#controllers/boat_inspections_controller'),
   BoatMaintenanceSheetItems: () => import('#controllers/boat_maintenance_sheet_items_controller'),

@@ -111,6 +111,7 @@ const sampleIncident: BoatIncidentRow = {
   boatGenericEquipmentId: null,
   boatEnginePartId: null,
   target: null,
+  photosCount: 0,
 }
 
 describe('BoatIncidentForm', () => {

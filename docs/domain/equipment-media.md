@@ -1,7 +1,9 @@
 # Photos des équipements
 
 Les six types d'équipement (moteur, pièce moteur, voile, gréement, équipement générique,
-équipement de sécurité) peuvent porter des photos.
+équipement de sécurité) peuvent porter des photos. Les **incidents** aussi depuis #814, par un
+contrôleur dédié (`BoatIncidentMediaController`, autorisé par `IncidentPolicy.edit`) — voir
+`docs/domain/incidents.md`.
 
 ## Modèle de données
 
@@ -51,7 +53,7 @@ entité, non authentifié).
 
 ## Envois groupés : ce qui est refusé, et quand (#764)
 
-Les douze routes de `LARGE_UPLOAD_ROUTES` (`config/bodyparser.ts`) sortent du
+Les treize routes de `LARGE_UPLOAD_ROUTES` (`config/bodyparser.ts`) sortent du
 traitement automatique du bodyparser (`processManually`) et sont reprises par
 `LargeMultipartUploadMiddleware`, qui les rejoue avec un plafond relevé.
 

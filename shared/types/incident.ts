@@ -101,4 +101,6 @@ export type BoatIncidentRow = Record<IncidentTargetField, number | null> & {
   closedAt: string | null
   createdAt: string
   target: IncidentTargetSummary | null
+  /** Photos jointes (#814) — compteur seul, les médias vivent sur la page de détail. */
+  photosCount: number
 }
