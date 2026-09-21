@@ -33,7 +33,7 @@ defineProps<{
   freeLabel: string
 }>()
 
-const { el, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal()
 const { formatPrice } = useNumberFormat()
 
 /**
@@ -53,7 +53,7 @@ function isFree(tier: Tier, billing: 'monthly' | 'annual'): boolean {
 
 <template>
   <section
-    :ref="el"
+    ref="el"
     class="reveal bg-cream px-6 pb-16 pt-20 lg:px-8 lg:pt-28"
     :class="{ visible: isVisible }"
   >

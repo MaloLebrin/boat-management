@@ -16,12 +16,12 @@ defineProps<{
   items: ProblemItem[]
 }>()
 
-const { el: sectionEl, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal('sectionEl')
 </script>
 
 <template>
   <section
-    :ref="sectionEl"
+    ref="sectionEl"
     class="reveal bg-cream px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >

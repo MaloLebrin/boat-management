@@ -87,7 +87,7 @@ function handleSubmit() {
       type: CREATE_NAVIGATION_LOG_ENTRY_ACTION,
       url,
       method: 'post',
-      payload: form.data() as unknown as Record<string, unknown>,
+      payload: form.data(),
     })
     closeForm()
     return

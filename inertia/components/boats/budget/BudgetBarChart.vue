@@ -10,6 +10,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
+import type { ChartOptions, TooltipItem } from 'chart.js'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import type { BudgetMonthlyData } from '~/types/budget'
@@ -84,15 +85,17 @@ const chartData = computed(() => ({
   ],
 }))
 
-const chartOptions = computed(() => ({
+const chartOptions = computed<ChartOptions<'bar'>>(() => ({
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: { position: 'top' as const },
     tooltip: {
       callbacks: {
-        label: (ctx: { dataset: { label?: string }; parsed: { y: number } }) =>
-          `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`,
+        // `parsed.y` est typé `number | null` par chart.js (barre sans valeur) :
+        // une barre vide s'affiche à 0 plutôt que « null € ».
+        label: (ctx: TooltipItem<'bar'>) =>
+          `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y ?? 0)}`,
       },
     },
   },

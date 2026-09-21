@@ -18,11 +18,11 @@ defineProps<{
   items: TestimonialItem[]
 }>()
 
-const { el, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal()
 </script>
 
 <template>
-  <section :ref="el" class="reveal bg-cream px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
+  <section ref="el" class="reveal bg-cream px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
     <div class="mx-auto max-w-7xl">
       <!-- Header -->
       <div class="mb-12 text-center">

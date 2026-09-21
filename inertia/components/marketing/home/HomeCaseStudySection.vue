@@ -31,11 +31,11 @@ defineProps<{
   }
 }>()
 
-const { el: sectionEl, isVisible: sectionVisible } = useScrollReveal()
+const { isVisible: sectionVisible } = useScrollReveal('sectionEl')
 </script>
 
 <template>
-  <section :ref="sectionEl" class="reveal mt-14 px-6 lg:px-8" :class="{ visible: sectionVisible }">
+  <section ref="sectionEl" class="reveal mt-14 px-6 lg:px-8" :class="{ visible: sectionVisible }">
     <div
       class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-bone bg-paper shadow-sm"
     >

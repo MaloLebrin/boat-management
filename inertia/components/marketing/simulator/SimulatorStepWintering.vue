@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
 import BaseOptionCard from '~/components/base/BaseOptionCard.vue'
 import type { SimulatorBoatInput, SimulatorWinteringZone } from '../../../../shared/types/simulator'
-import { SIMULATOR_WINTERING_ZONES } from '../../../../shared/types/simulator'
 
 interface Props {
   modelValue: Partial<SimulatorBoatInput>

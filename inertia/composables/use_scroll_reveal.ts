@@ -1,7 +1,16 @@
-import { onMounted, onUnmounted, ref, type Ref } from 'vue'
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 
-export function useScrollReveal(threshold = 0.1) {
-  const el: Ref<HTMLElement | null> = ref(null)
+/**
+ * Révèle un bloc quand il entre dans le viewport.
+ *
+ * `refName` doit être l'attribut `ref="…"` posé sur l'élément à observer :
+ * c'est `useTemplateRef` qui le résout. Le composant n'a donc plus à ré-exposer
+ * le ref dans son template — un `:ref="el"` liait la valeur déréférencée
+ * (`null` au premier rendu), l'observer n'observait rien et la section
+ * apparaissait sans animation.
+ */
+export function useScrollReveal(refName = 'el', threshold = 0.1) {
+  const el = useTemplateRef<HTMLElement>(refName)
   const isVisible = ref(false)
   let observer: IntersectionObserver | null = null
 

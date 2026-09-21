@@ -15,7 +15,7 @@ defineProps<{
   items: FaqItem[]
 }>()
 
-const { el, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal()
 const openIndex = ref<number | null>(null)
 
 function toggle(idx: number) {
@@ -24,7 +24,7 @@ function toggle(idx: number) {
 </script>
 
 <template>
-  <section :ref="el" class="reveal bg-paper px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
+  <section ref="el" class="reveal bg-paper px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
     <div class="mx-auto max-w-7xl">
       <div class="grid gap-12 lg:grid-cols-[1fr_2fr]">
         <!-- Left -->

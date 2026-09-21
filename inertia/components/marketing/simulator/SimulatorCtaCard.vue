@@ -54,10 +54,13 @@ function submit() {
     showUpgradeModal.value = true
     return
   }
+  // Copie à plat : une visite Inertia attend un objet de données indexable,
+  // qu'une interface (`SimulatorBoatInput`) ne satisfait pas telle quelle.
+  const payload = { ...props.input }
   if (props.isAuthenticated) {
-    router.post('/boats/from-simulator', props.input, { preserveScroll: false })
+    router.post('/boats/from-simulator', payload, { preserveScroll: false })
   } else {
-    router.post('/simulator/session', props.input, { preserveScroll: false })
+    router.post('/simulator/session', payload, { preserveScroll: false })
   }
 }
 

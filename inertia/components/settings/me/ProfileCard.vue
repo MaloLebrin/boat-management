@@ -22,13 +22,13 @@ const user = page.props.user
           <BaseInput
             name="fullName"
             :label="t('settings.me.fullNameLabel')"
-            :model-value="user.fullName ?? ''"
+            :model-value="user?.fullName ?? ''"
             :placeholder="t('settings.me.fullNamePlaceholder')"
             :errors="errors"
           />
           <BaseInput
             :label="t('settings.me.emailLabel')"
-            :model-value="user.email"
+            :model-value="user?.email ?? ''"
             disabled
             readonly
           />

@@ -23,12 +23,12 @@ const props = defineProps<{
 
 const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
-const { el: faqEl, isVisible: faqVisible } = useScrollReveal()
+const { isVisible: faqVisible } = useScrollReveal('faqEl')
 </script>
 
 <template>
   <!-- Section 11: FAQ accordion -->
-  <section :ref="faqEl" class="mt-14 reveal" :class="{ visible: faqVisible }">
+  <section ref="faqEl" class="mt-14 reveal" :class="{ visible: faqVisible }">
     <div class="mb-6">
       <BaseHeading level="2">{{ faq.title }}</BaseHeading>
     </div>

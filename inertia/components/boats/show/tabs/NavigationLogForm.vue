@@ -62,7 +62,7 @@ function handleSubmit() {
       type: CREATE_NAVIGATION_LOG_ACTION,
       url: `/boats/${props.boatId}/navigation-logs`,
       method: 'post',
-      payload: form.data() as Record<string, unknown>,
+      payload: form.data(),
     })
     emit('close')
     return

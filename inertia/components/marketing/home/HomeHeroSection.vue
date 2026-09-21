@@ -42,7 +42,7 @@ const currentHero = computed(
 )
 const duplicatedLogos = computed(() => [...props.socialProof.logos, ...props.socialProof.logos])
 
-const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6 })
+const { transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6, refName: 'tiltEl' })
 </script>
 
 <template>
@@ -121,7 +121,7 @@ const { el: tiltEl, transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6
            Divs séparés pour que l'animation d'entrée n'écrase pas le transform du tilt. -->
       <div style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 300ms">
         <div class="float-slow">
-          <div :ref="tiltEl" class="will-change-transform" :style="{ transform: tiltTransform }">
+          <div ref="tiltEl" class="will-change-transform" :style="{ transform: tiltTransform }">
             <HomeBrowserFrame>
               <HomeMockDashboard />
             </HomeBrowserFrame>

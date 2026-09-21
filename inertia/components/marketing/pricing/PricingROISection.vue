@@ -32,7 +32,7 @@ const props = defineProps<{
   profiles: Record<ProfileKey, ProfileItem>
 }>()
 
-const { el, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal()
 const { formatPrice } = useNumberFormat()
 
 // Local state
@@ -99,7 +99,7 @@ const profileKeys: ProfileKey[] = ['loueurs', 'ecoles', 'marinas', 'armateurs']
 </script>
 
 <template>
-  <section :ref="el" class="reveal bg-paper px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
+  <section ref="el" class="reveal bg-paper px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
     <div class="mx-auto max-w-7xl">
       <!-- Header -->
       <div class="mb-12 text-center">

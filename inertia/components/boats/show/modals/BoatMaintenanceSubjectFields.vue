@@ -11,7 +11,7 @@ import {
   sailTypeLabel,
 } from '~/utils/boat_enum_labels'
 import type { BoatShowDetail } from '~/types/boat_show'
-import type { MaintenanceTaskSubject } from '../../../../shared/types/maintenance'
+import type { MaintenanceTaskSubject } from '#shared/types/maintenance'
 
 const props = defineProps<{
   boat: BoatShowDetail

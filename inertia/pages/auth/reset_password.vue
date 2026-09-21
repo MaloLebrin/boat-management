@@ -71,7 +71,15 @@ const confirmType = computed(() => (showConfirm.value ? 'text' : 'password'))
           </p>
 
           <div class="mt-7">
-            <Form method="POST" action="/reset-password" #default="{ processing, errors }">
+            <!--
+              `action` prend un objet `{ url, method }` (la route POST
+              `/reset-password` n'est pas nommée côté serveur, contrairement aux
+              autres écrans d'auth qui passent par `route="…"`).
+            -->
+            <Form
+              :action="{ url: '/reset-password', method: 'post' }"
+              #default="{ processing, errors }"
+            >
               <input type="hidden" name="token" :value="token" />
               <div class="flex flex-col gap-3.5">
                 <div>

@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, ref, type Ref } from 'vue'
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
 
 interface TiltOptions {
   /** Amplitude maximale de rotation en degrés. */
@@ -7,6 +7,8 @@ interface TiltOptions {
   lift?: number
   /** Facteur de parallaxe au scroll (0 = désactivé). */
   parallax?: number
+  /** Nom du `ref="…"` posé sur l'élément incliné dans le template. */
+  refName?: string
 }
 
 /**
@@ -15,9 +17,9 @@ interface TiltOptions {
  * inline via une variable réactive. No-op en SSR et sous `prefers-reduced-motion`.
  */
 export function useTilt(options: TiltOptions = {}) {
-  const { max = 8, lift = 0, parallax = 0 } = options
+  const { max = 8, lift = 0, parallax = 0, refName = 'el' } = options
 
-  const el: Ref<HTMLElement | null> = ref(null)
+  const el = useTemplateRef<HTMLElement>(refName)
   const transform = ref('')
   let scrollHandler: (() => void) | null = null
   let scrollOffset = 0

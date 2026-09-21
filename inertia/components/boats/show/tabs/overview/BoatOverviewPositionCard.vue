@@ -127,7 +127,7 @@ function savePosition() {
     <div class="space-y-3">
       <div class="flex items-center justify-between">
         <p class="text-sm font-semibold text-fg">{{ t('boats.show.overview.positionTitle') }}</p>
-        <BaseButton v-if="canManage" size="xs" variant="ghost" @click="showForm = !showForm">
+        <BaseButton v-if="canManage" size="sm" variant="ghost" @click="showForm = !showForm">
           {{ showForm ? t('common.cancel') : t('boats.show.position.setGps') }}
         </BaseButton>
       </div>

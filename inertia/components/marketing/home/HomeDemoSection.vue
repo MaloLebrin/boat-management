@@ -41,13 +41,13 @@ const { errorMessage: flashError } = useFlash()
 
 const pricingHref = computed(() => marketingPath('pricing', props.locale))
 
-const { el, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal()
 </script>
 
 <template>
   <section
     id="demo"
-    :ref="el"
+    ref="el"
     class="reveal bg-paper px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >

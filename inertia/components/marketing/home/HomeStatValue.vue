@@ -26,7 +26,7 @@ const parsed = computed(() => {
   return { prefix, suffix, target, decimals }
 })
 
-const { el, display } = useCountUp(parsed.value?.target ?? 0, {
+const { display } = useCountUp(parsed.value?.target ?? 0, {
   prefix: parsed.value?.prefix ?? '',
   suffix: parsed.value?.suffix ?? '',
   decimals: parsed.value?.decimals ?? 0,

@@ -42,7 +42,7 @@ defineProps<{
   billedAnnuallyNote: string
 }>()
 
-const { el, isVisible } = useScrollReveal()
+const { isVisible } = useScrollReveal()
 const { formatPrice } = useNumberFormat()
 
 // First 3 groups open by default
@@ -68,7 +68,7 @@ function collapseAllGroups() {
 </script>
 
 <template>
-  <section :ref="el" class="reveal bg-paper px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
+  <section ref="el" class="reveal bg-paper px-6 py-20 lg:px-8" :class="{ visible: isVisible }">
     <div class="mx-auto max-w-7xl">
       <!-- Header -->
       <div class="mb-8 text-center">

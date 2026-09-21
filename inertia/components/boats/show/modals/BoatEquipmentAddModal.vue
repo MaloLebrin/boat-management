@@ -15,7 +15,7 @@ import {
   Square3Stack3DIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/outline'
-import { computed, ref, watch, type Component } from 'vue'
+import { computed, ref, watch, type Component, type Ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BoatEquipmentEngineFields from '~/components/boats/engine/BoatEquipmentEngineFields.vue'
@@ -52,10 +52,12 @@ const { t } = useT()
 // Au retour d'un aller-retour catalogue, la modale se remonte : la catégorie
 // choisie est restaurée depuis l'historique Inertia (#577) — pour le moteur
 // elle est déjà la valeur par défaut.
+// `useRemember` se déclare `T | Ref<T>` (son repli SSR) mais rend toujours un
+// `Ref` — même cast explicite que `use_catalog_form_draft`.
 const rememberedCategory = useRemember(
   { category: 'engine' as Category },
   'boat-equipment-add-modal'
-)
+) as Ref<{ category: Category }>
 const selectedCategory = ref<Category>(
   shouldReopenGenericEquipmentForm(ENGINE_FORM_SURFACE)
     ? rememberedCategory.value.category
