@@ -7,6 +7,7 @@ import {
 } from '#exceptions/public_diagnosis_errors'
 import { PublicAiDailyBudgetExhaustedError } from '#exceptions/public_ai_budget_errors'
 import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
+import PublicDiagnosisContentService from '#services/public_diagnosis_content_service'
 import PublicDiagnosisService from '#services/public_diagnosis_service'
 import { toPublicDiagnosisConversationProps } from '#transformers/public_diagnosis_transformer'
 import {
@@ -28,7 +29,10 @@ import type { HttpContext } from '@adonisjs/core/http'
  */
 @inject()
 export default class PublicDiagnosisController {
-  constructor(private publicDiagnosisService: PublicDiagnosisService) {}
+  constructor(
+    private publicDiagnosisService: PublicDiagnosisService,
+    private publicDiagnosisContentService: PublicDiagnosisContentService
+  ) {}
 
   async show({ inertia, auth, session, i18n }: HttpContext) {
     const isAuthenticated = await auth.check()
@@ -45,6 +49,9 @@ export default class PublicDiagnosisController {
       locale: toAppLocale(i18n.locale),
       quota,
       conversation: conversation ? toPublicDiagnosisConversationProps(conversation) : null,
+      // Sections indexables (étapes, symptômes, FAQ, maillage) : le chat seul
+      // n'offre rien aux moteurs de recherche.
+      content: this.publicDiagnosisContentService.build(i18n),
     })
   }
 

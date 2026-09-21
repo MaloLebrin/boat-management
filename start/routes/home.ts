@@ -1,6 +1,6 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
-import { marketingPath, type MarketingPage } from '#shared/helpers/locale_path'
+import { marketingPath, SITE_URL, type MarketingPage } from '#shared/helpers/locale_path'
 
 const HomeController = () => import('#controllers/home_controller')
 
@@ -17,8 +17,6 @@ router
   })
   .as('design_system')
 
-const SITE_URL = 'https://fleetai.app'
-
 /**
  * Pages marketing localisées (en/fr) : chaque entrée génère une URL par locale,
  * annotée avec les alternates hreflang (+ x-default → en) pour l'indexation
@@ -33,7 +31,8 @@ const LOCALIZED_PAGES = [
   { page: 'aiAssistant', priority: '0.8', changefreq: 'monthly' },
   { page: 'simulator', priority: '0.8', changefreq: 'monthly' },
   { page: 'guide', priority: '0.7', changefreq: 'monthly' },
-  { page: 'diagnosisAi', priority: '0.8', changefreq: 'monthly' },
+  // Entrée n°1 du tunnel d'acquisition, page enrichie en contenu indexable : priorité relevée.
+  { page: 'diagnosisAi', priority: '0.9', changefreq: 'weekly' },
   { page: 'partsAi', priority: '0.8', changefreq: 'monthly' },
   { page: 'help', priority: '0.5', changefreq: 'monthly' },
   { page: 'about', priority: '0.5', changefreq: 'monthly' },

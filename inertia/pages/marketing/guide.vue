@@ -11,7 +11,7 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import GuideCostTable from '~/components/marketing/guide/GuideCostTable.vue'
 import GuideFaqSection from '~/components/marketing/guide/GuideFaqSection.vue'
-import JsonLd from '~/components/json_ld'
+import { jsonLd } from '~/utils/json_ld'
 import { marketingPath } from '#shared/helpers/locale_path'
 
 interface FaqItem {
@@ -81,7 +81,7 @@ const guideEn = marketingPath('guide', 'en')
 const guideFr = marketingPath('guide', 'fr')
 
 const faqSchema = computed(() =>
-  JSON.stringify({
+  jsonLd({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     'mainEntity': props.guide.faq.items.map((item) => ({
@@ -101,7 +101,7 @@ const faqSchema = computed(() =>
     <link rel="canonical" :href="canonicalHref" />
     <link rel="alternate" hreflang="fr" :href="guideFr" />
     <link rel="alternate" hreflang="en" :href="guideEn" />
-    <JsonLd :schema="faqSchema" />
+    <component :is="'script'" type="application/ld+json">{{ faqSchema }}</component>
   </Head>
 
   <!-- Hero -->

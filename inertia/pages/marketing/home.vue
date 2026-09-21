@@ -8,7 +8,7 @@ export default {
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
-import JsonLd from '~/components/json_ld'
+import { jsonLd } from '~/utils/json_ld'
 import HomeHeroSection from '~/components/marketing/home/HomeHeroSection.vue'
 import HomeProblemSection from '~/components/marketing/home/HomeProblemSection.vue'
 import HomeFeatureSection from '~/components/marketing/home/HomeFeatureSection.vue'
@@ -31,7 +31,7 @@ import HomeFinalCtaSection from '~/components/marketing/home/HomeFinalCtaSection
 // import HomeSecuritySection from '~/components/marketing/home/HomeSecuritySection.vue'
 // import HomeDemoSection from '~/components/marketing/home/HomeDemoSection.vue'
 import { useT } from '~/composables/use_t'
-import { marketingPath } from '#shared/helpers/locale_path'
+import { marketingPath, marketingUrl, SITE_URL } from '#shared/helpers/locale_path'
 
 type Persona = 'loueurs' | 'ecoles' | 'marinas' | 'armateurs'
 
@@ -153,6 +153,7 @@ interface PageProps {
       hero: {
         cta: { primary: string; secondary: string }
         caption: string
+        announcement: { label: string; href: string }
         content: Record<Persona, HeroContent>
       }
       socialProof: { eyebrow: string; logos: string[] }
@@ -246,19 +247,59 @@ const featureCtas = computed(() =>
 // session de démo autonome (POST /demo) — on ne « réserve » pas de démo, on
 // l'essaie soi-même ou on passe par le formulaire de contact.
 
-const hreflangEn = marketingPath('home', 'en')
-const hreflangFr = marketingPath('home', 'fr')
-const canonicalHref = computed(() => marketingPath('home', locale.value))
+// URLs absolues (reco #7 de l'audit SEO) : canonical/hreflang pleinement
+// qualifiés, `x-default` sur l'anglais comme le sitemap.
+const hreflangEn = marketingUrl('home', 'en')
+const hreflangFr = marketingUrl('home', 'fr')
+const canonicalHref = computed(() => marketingUrl('home', locale.value))
+const ogLocale = computed(() => (locale.value === 'fr' ? 'fr_FR' : 'en_US'))
+const ogLocaleAlternate = computed(() => (locale.value === 'fr' ? 'en_US' : 'fr_FR'))
+const inLanguage = computed(() => (locale.value === 'fr' ? 'fr-FR' : 'en-US'))
 
-// Schéma JSON-LD WebSite rendu dans <Head> (donc présent dans le HTML SSR lu
-// par les crawlers), au lieu d'une injection client-side via onMounted.
+// Schémas JSON-LD rendus dans <Head> (donc présents dans le HTML SSR lu par
+// les crawlers), au lieu d'une injection client-side via onMounted.
 const websiteSchema = computed(() =>
-  JSON.stringify({
+  jsonLd({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     'name': 'FleetAi',
-    'url': 'https://fleetai.app',
+    'url': SITE_URL,
+    'inLanguage': inLanguage.value,
     'description': t.meta.description,
+  })
+)
+
+const faqSchema = computed(() =>
+  jsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    'mainEntity': t.home.faq.items.map((item) => ({
+      '@type': 'Question',
+      'name': item.q,
+      'acceptedAnswer': { '@type': 'Answer', 'text': item.a },
+    })),
+  })
+)
+
+// Le produit : plan Starter gratuit, liste des fonctionnalités reprise des
+// libellés de la nav publique (pas de chaîne recopiée).
+const featureList = computed(() =>
+  (['maintenance', 'fleet', 'aiAssistant', 'diagnosisAi'] as const).map((key) =>
+    appT(`public.footer.${key}`)
+  )
+)
+const softwareSchema = computed(() =>
+  jsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    'name': 'FleetAi',
+    'url': SITE_URL,
+    'description': t.meta.description,
+    'applicationCategory': 'BusinessApplication',
+    'operatingSystem': 'Web',
+    'inLanguage': inLanguage.value,
+    'offers': { '@type': 'Offer', 'price': '0', 'priceCurrency': 'EUR' },
+    'featureList': featureList.value,
   })
 )
 </script>
@@ -268,7 +309,10 @@ const websiteSchema = computed(() =>
     <meta name="description" :content="t.meta.description" />
     <meta property="og:title" :content="t.meta.title" />
     <meta property="og:description" :content="t.meta.description" />
-    <meta property="og:image" content="https://fleetai.app/og-image.png" />
+    <meta property="og:url" :content="canonicalHref" />
+    <meta property="og:locale" :content="ogLocale" />
+    <meta property="og:locale:alternate" :content="ogLocaleAlternate" />
+    <meta property="og:image" :content="`${SITE_URL}/og-image.png`" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" :content="t.meta.title" />
     <meta name="twitter:description" :content="t.meta.description" />
@@ -276,7 +320,9 @@ const websiteSchema = computed(() =>
     <link rel="alternate" hreflang="en" :href="hreflangEn" />
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
     <link rel="alternate" hreflang="x-default" :href="hreflangEn" />
-    <JsonLd :schema="websiteSchema" />
+    <component :is="'script'" type="application/ld+json">{{ websiteSchema }}</component>
+    <component :is="'script'" type="application/ld+json">{{ faqSchema }}</component>
+    <component :is="'script'" type="application/ld+json">{{ softwareSchema }}</component>
   </Head>
 
   <!-- 1. Hero -->
@@ -285,6 +331,7 @@ const websiteSchema = computed(() =>
     :hero-content="t.home.hero.content"
     :cta="t.home.hero.cta"
     :caption="t.home.hero.caption"
+    :announcement="t.home.hero.announcement"
     :social-proof="t.home.socialProof"
     :locale="locale"
     :demo-login-path="t.home.demo.demoLoginPath"
@@ -311,7 +358,13 @@ const websiteSchema = computed(() =>
   <HomeModularOfferSection v-bind="t.home.modularOffer" />
   -->
 
-  <!-- 3-5. Feature deep-dives, chacun relié à sa page dédiée -->
+  <!-- 3. Diagnostic de panne IA — essai gratuit sans compte (#609), lead magnet.
+       Remonté avant l'argumentaire produit : l'outil gratuit se tente avant de
+       lire les fonctionnalités (promotion SEO/conversion, 2026-09). -->
+  <HomeDiagnosisSection v-bind="t.home.diagnosis" />
+
+  <!-- 4-6. Feature deep-dives, chacun relié à sa page dédiée. Fonds paper/cream/paper :
+       la section diagnostic (surface-elevated) précède, « Comment ça marche » (cream) suit. -->
   <HomeFeatureSection
     anchor-id="features"
     :eyebrow="t.home.features[0].eyebrow"
@@ -321,7 +374,7 @@ const websiteSchema = computed(() =>
     :bullets="t.home.features[0].bullets"
     :cta="featureCtas[0]"
     mock-type="boatDetail"
-    bg-class="bg-cream"
+    bg-class="bg-paper"
   />
   <HomeFeatureSection
     :eyebrow="t.home.features[1].eyebrow"
@@ -331,7 +384,7 @@ const websiteSchema = computed(() =>
     :bullets="t.home.features[1].bullets"
     :cta="featureCtas[1]"
     mock-type="planning"
-    bg-class="bg-paper"
+    bg-class="bg-cream"
     reversed
   />
   <HomeFeatureSection
@@ -342,12 +395,9 @@ const websiteSchema = computed(() =>
     :bullets="t.home.features[2].bullets"
     :cta="featureCtas[2]"
     mock-type="fleetide"
-    bg-class="bg-cream"
+    bg-class="bg-paper"
     is-ai
   />
-
-  <!-- 6. Diagnostic de panne IA — essai gratuit sans compte (#609), lead magnet -->
-  <HomeDiagnosisSection v-bind="t.home.diagnosis" />
 
   <!-- 7. How it works — lève l'objection migration / temps de mise en route -->
   <HomeHowItWorksSection

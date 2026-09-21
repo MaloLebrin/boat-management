@@ -5,8 +5,8 @@
       "tagline": "Fleet intelligence"
     },
     "meta": {
-      "title": "You manage your fleet in Excel.",
-      "description": "FleetAi replaces your shared spreadsheet with a tool that knows your boats, anticipates maintenance, and alerts you before delays."
+      "title": "Boat fleet management & maintenance software",
+      "description": "Digital maintenance log, fleet planning, AI assistant and free engine breakdown diagnosis. For rental operators, sailing schools and marinas. Free Starter plan."
     },
     "home": {
       "hero": {
@@ -15,11 +15,15 @@
           "secondary": "Try the demo"
         },
         "caption": "Free Starter plan forever - no credit card - setup in 5 min",
+        "announcement": {
+          "label": "New · Free AI engine breakdown diagnosis, no account needed",
+          "href": "/en/engine-diagnosis-ai"
+        },
         "content": {
           "loueurs": {
             "title": "You manage your fleet in Excel.",
             "titleHighlight": "You can do better.",
-            "subtitle": "FleetAi replaces your shared spreadsheet with a tool that knows your boats, anticipates maintenance, and alerts you before delays."
+            "subtitle": "FleetAi is boat fleet management and maintenance software: maintenance log, planning, AI assistant and breakdown diagnosis. It knows your boats and alerts you before delays."
           },
           "ecoles": {
             "title": "Your instructors waste time.",
@@ -435,6 +439,10 @@
           {
             "q": "How many users can I add?",
             "a": "Starter: 1 user. Pro: up to 5 users. Enterprise: unlimited. You pay per organization, not per seat."
+          },
+          {
+            "q": "Can I try the AI breakdown diagnosis without creating an account?",
+            "a": "Yes. The AI engine breakdown diagnosis is free on the site, no sign-up needed: 2 diagnoses included. After that, the free Starter plan gives you the full troubleshooting checklists."
           }
         ]
       },

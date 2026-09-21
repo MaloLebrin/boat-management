@@ -49,6 +49,18 @@ export function marketingPath(page: MarketingPage, locale: AppLocale): string {
 }
 
 /**
+ * Origine publique du site, sans slash final. Source unique pour le sitemap,
+ * les `canonical`/`hreflang`, l'`og:url` et les URLs des JSON-LD : Google
+ * recommande des URLs **absolues** pour ces balises (audit SEO, reco #7).
+ */
+export const SITE_URL = 'https://fleetai.app'
+
+/** URL absolue d'une page marketing : `marketingUrl('pricing', 'en')` → `https://fleetai.app/en/pricing`. */
+export function marketingUrl(page: MarketingPage, locale: AppLocale): string {
+  return `${SITE_URL}${marketingPath(page, locale)}`
+}
+
+/**
  * Index bidirectionnel slug → paire de slugs : `/tarifs` comme `/pricing`
  * désignent la page tarifs, quelle que soit la locale du chemin d'origine.
  * L'ancien slug EN `/en/tarifs` (redirigé en 301, #475) reste ainsi traduisible.

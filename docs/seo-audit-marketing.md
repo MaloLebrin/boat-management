@@ -2,6 +2,13 @@
 
 _Date : 2026-07-12_
 
+> **Mise à jour 2026-09-21** — home et page « Diagnostic de panne IA » (voir
+> `docs/changelog/2026-09-21-1220-seo-home-et-page-diagnostic-panne-ia.md`) :
+> reco #7 (URLs absolues + `x-default`) et reco #6 (`og:locale`) appliquées sur
+> ces deux pages via `SITE_URL` / `marketingUrl()` (`shared/helpers/locale_path.ts`) ;
+> template de `<title>` désormais partagé client/SSR (`inertia/utils/page_title.ts`).
+> Les autres pages marketing restent en URLs relatives.
+
 Périmètre : pages publiques `inertia/pages/marketing/**` (home, tarifs, about, contact,
 guide, simulateur, privacy) et l'infrastructure SEO associée (shell SSR, sitemap,
 robots, i18n). Le site est bilingue **en/fr**, rendu en **SSR** (Inertia

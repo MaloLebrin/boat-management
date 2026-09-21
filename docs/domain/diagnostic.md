@@ -125,6 +125,16 @@ Les garde-fous de #516 sont inchangés : gating par plan et quota de tokens, jam
 
 ---
 
+## Page publique (chat sans compte, #602)
+
+Le chat public `/fr/diagnostic-panne-ia` • `/en/engine-diagnosis-ai` est servi
+par `PublicDiagnosisController` (bornes de coût : `docs/domain/public-ai-surface.md`).
+Depuis le 2026-09-21 il sert aussi une prop `content` (`PublicDiagnosisContentProps`)
+construite par `PublicDiagnosisContentService` : étapes, huit pannes fréquentes,
+maillage interne, FAQ et CTA final — le contenu indexable de la page, lu depuis
+`publicDiagnosis.*` et `marketing.features.shared.*`, quota interpolé depuis
+`PUBLIC_DIAGNOSIS_LIFETIME_LIMIT`. Tests : `tests/functional/marketing/diagnosis_seo.spec.ts`.
+
 ## Liens croisés avec les pièces détachées
 
 `DIAGNOSTIC_SHEET_TO_ASSEMBLY` (fiche → ensemble) et `SparePartAssembly.diagnosticSheet` (ensemble → fiche) sont **réciproques**, et trois tests le vérifient :

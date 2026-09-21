@@ -8,7 +8,7 @@ export default {
 <script setup lang="ts">
 import { Head, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
-import JsonLd from '~/components/json_ld'
+import { jsonLd } from '~/utils/json_ld'
 import HelpChannelsSection from '~/components/marketing/help/HelpChannelsSection.vue'
 import HelpFaqGroupsSection from '~/components/marketing/help/HelpFaqGroupsSection.vue'
 import HelpResourcesSection from '~/components/marketing/help/HelpResourcesSection.vue'
@@ -29,7 +29,7 @@ const hreflangEn = marketingPath('help', 'en')
 const hreflangFr = marketingPath('help', 'fr')
 
 const faqSchema = computed(() =>
-  JSON.stringify({
+  jsonLd({
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
     'mainEntity': t.faq.groups.flatMap((group) =>
@@ -52,7 +52,7 @@ const faqSchema = computed(() =>
     <link rel="alternate" hreflang="en" :href="hreflangEn" />
     <link rel="alternate" hreflang="fr" :href="hreflangFr" />
     <link rel="alternate" hreflang="x-default" :href="hreflangEn" />
-    <JsonLd :schema="faqSchema" />
+    <component :is="'script'" type="application/ld+json">{{ faqSchema }}</component>
   </Head>
 
   <!-- Hero -->

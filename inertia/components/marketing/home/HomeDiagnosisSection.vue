@@ -4,6 +4,10 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import { useScrollReveal } from '~/composables/use_scroll_reveal'
 
 /**
+ * Fond `bg-surface-elevated` : la section vit en 3ᵉ position entre « Problème »
+ * (cream) et le premier bloc fonctionnalité (paper) — un ton à part pour le
+ * lead magnet, sans casser l'alternance cream/paper de la home.
+ *
  * Diagnostic de panne IA en essai gratuit (#609) : le CTA vise le chat public
  * (`/fr/diagnostic-panne-ia`), jamais `/signup` — c'est l'entrée sans friction
  * du tunnel d'acquisition, l'inscription est proposée après le diagnostic.
@@ -27,7 +31,7 @@ const { isVisible } = useScrollReveal()
   <section
     id="diagnosis"
     ref="el"
-    class="reveal bg-paper px-6 py-20 lg:px-8 lg:py-24"
+    class="reveal bg-surface-elevated px-6 py-20 lg:px-8 lg:py-24"
     :class="{ visible: isVisible }"
   >
     <div class="mx-auto max-w-7xl">
@@ -51,7 +55,7 @@ const { isVisible } = useScrollReveal()
         </div>
 
         <!-- Colonne preuve : ce que rend le diagnostic, étape par étape -->
-        <div class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated shadow-sm">
+        <div class="overflow-hidden rounded-2xl border border-bone bg-surface shadow-sm">
           <div class="h-1.5 bg-gradient-to-r from-coral-500 to-coral-400" aria-hidden="true" />
           <ol class="space-y-5 p-8 lg:p-10">
             <li v-for="(item, idx) in items" :key="idx" class="flex items-start gap-4">

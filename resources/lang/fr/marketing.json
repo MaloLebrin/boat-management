@@ -10,13 +10,16 @@
     "dashboard": "Dashboard"
   },
   "home": {
+    "meta_title": "Logiciel de gestion et maintenance de flotte de bateaux",
+    "meta_description": "Carnet d'entretien numérique, planning de flotte, assistant IA et diagnostic de panne moteur gratuit. Pour loueurs, écoles de voile et marinas. Plan Starter gratuit.",
     "hero": {
       "cta_primary": "Commencer gratuitement",
       "cta_secondary": "Essayer la démo",
       "caption": "Plan Starter gratuit à vie - sans carte bleue - setup en 5 min",
+      "announcement_label": "Nouveau · Diagnostic de panne moteur IA, gratuit et sans compte",
       "loueurs_title": "Tu gères ta flotte dans Excel.",
       "loueurs_highlight": "Tu peux faire mieux.",
-      "loueurs_subtitle": "FleetAi remplace ton tableur partagé par un outil qui connaît tes bateaux, anticipe les maintenances et te prévient avant le retard.",
+      "loueurs_subtitle": "FleetAi, le logiciel de gestion de flotte et de maintenance de bateaux : carnet d'entretien, planning, assistant IA et diagnostic de panne. Il connaît tes bateaux et te prévient avant le retard.",
       "ecoles_title": "Tes moniteurs perdent du temps.",
       "ecoles_highlight": "Tes bateaux aussi.",
       "ecoles_subtitle": "Centralise l'état de ta flotte, partage le avec tes moniteurs, et ne rate plus jamais une échéance de sécurité.",
@@ -294,7 +297,9 @@
       "item7_q": "L'IA voit-elle les données des autres clients ?",
       "item7_a": "Non. Chaque organisation est cloisonnée. L'IA ne voit que tes données.",
       "item8_q": "Combien d'utilisateurs puis-je ajouter ?",
-      "item8_a": "Starter : 1 utilisateur. Pro : jusqu'à 5 utilisateurs. Entreprise : illimité. Tu paies par organisation, pas par siège."
+      "item8_a": "Starter : 1 utilisateur. Pro : jusqu'à 5 utilisateurs. Entreprise : illimité. Tu paies par organisation, pas par siège.",
+      "item9_q": "Puis-je tester le diagnostic de panne IA sans créer de compte ?",
+      "item9_a": "Oui. Le diagnostic de panne moteur par IA est accessible gratuitement depuis le site, sans inscription : {count} diagnostics offerts. Ensuite, le plan Starter gratuit te donne accès aux checklists de diagnostic complètes."
     },
     "final_cta": {
       "title": "Commence gratuitement, monte en plan quand tu veux.",
