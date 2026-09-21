@@ -233,12 +233,22 @@ export default class AssistantActionsService {
       }
 
       case 'report_incident': {
+        // Même garde que log_fuel : un moteur hors du bateau est une réponse invalide (#813).
+        let engineLabel: string | null = null
+        if (action.boatEngineId !== null) {
+          const engine = boat.engines.find((e) => e.id === action.boatEngineId)
+          if (engine === undefined) {
+            throw new AiInvalidResponseError('Assistant action names an engine outside the boat')
+          }
+          engineLabel = engine.label
+        }
         const { kind, boatId, ...rest } = action
         return {
           kind,
           boatId,
           boatName: boat.name,
           tzOffsetMinutes: context.tzOffsetMinutes,
+          engineLabel,
           ...rest,
         }
       }
@@ -514,6 +524,7 @@ export default class AssistantActionsService {
           type: pending.incidentType,
           location: pending.location,
           description: pending.description,
+          boatEngineId: pending.boatEngineId,
         })
         return {
           card: {

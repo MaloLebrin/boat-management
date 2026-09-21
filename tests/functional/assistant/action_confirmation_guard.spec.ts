@@ -164,6 +164,8 @@ function pendingFor(kind: AssistantActionKind, d: Decor): AssistantPendingAction
         incidentType: 'collision',
         location: null,
         description: 'Coque rayée au ponton',
+        boatEngineId: null,
+        engineLabel: null,
       }
     case 'create_reservation':
       return {

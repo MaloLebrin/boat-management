@@ -170,7 +170,9 @@
     "updated": "Incident updated.",
     "deleted": "Incident deleted.",
     "notFound": "Incident not found.",
-    "descriptionRequired": "A description is required."
+    "descriptionRequired": "A description is required.",
+    "equipmentNotFound": "This equipment does not belong to this boat.",
+    "multipleEquipment": "An incident can target only one piece of equipment."
   },
   "inspections": {
     "created": "Inspection saved.",

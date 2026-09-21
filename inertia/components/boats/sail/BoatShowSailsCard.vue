@@ -8,11 +8,13 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
+import EquipmentReportIncidentButton from '~/components/boats/incidents/EquipmentReportIncidentButton.vue'
 import type { BoatShowSail } from '~/types/boat_show'
 import BoatEquipmentSailFields from './BoatEquipmentSailFields.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { sailMaterialLabel, sailTypeLabel } from '~/utils/boat_enum_labels'
+import type { IncidentTargetRef } from '#shared/types/incident'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
 import { equipmentStatusVariant } from '~/utils/status_variants'
 
@@ -22,11 +24,15 @@ withDefaults(
     sails: BoatShowSail[]
     canManage: boolean
     canAddTask?: boolean
+    canReportIncident?: boolean
   }>(),
-  { canAddTask: false }
+  { canAddTask: false, canReportIncident: false }
 )
 
-defineEmits<{ (e: 'addTask', equipment: TaskEquipmentRef): void }>()
+defineEmits<{
+  (e: 'addTask', equipment: TaskEquipmentRef): void
+  (e: 'reportIncident', target: IncidentTargetRef): void
+}>()
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
@@ -100,6 +106,11 @@ const isCreateOpen = ref(false)
               v-if="canAddTask"
               :equipment="{ type: 'sail', id: s.id }"
               @add-task="$emit('addTask', $event)"
+            />
+            <EquipmentReportIncidentButton
+              v-if="canReportIncident"
+              :target="{ type: 'sail', id: s.id }"
+              @report-incident="$emit('reportIncident', $event)"
             />
             <BaseButton
               variant="ghost"

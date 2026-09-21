@@ -6,10 +6,12 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
+import EquipmentReportIncidentButton from '~/components/boats/incidents/EquipmentReportIncidentButton.vue'
 import type { BoatShowRig } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { rigTypeLabel } from '~/utils/boat_enum_labels'
+import type { IncidentTargetRef } from '#shared/types/incident'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
 import { equipmentStatusVariant } from '~/utils/status_variants'
 
@@ -19,11 +21,15 @@ withDefaults(
     rig: BoatShowRig | null
     canManage: boolean
     canAddTask?: boolean
+    canReportIncident?: boolean
   }>(),
-  { canAddTask: false }
+  { canAddTask: false, canReportIncident: false }
 )
 
-defineEmits<{ (e: 'addTask', equipment: TaskEquipmentRef): void }>()
+defineEmits<{
+  (e: 'addTask', equipment: TaskEquipmentRef): void
+  (e: 'reportIncident', target: IncidentTargetRef): void
+}>()
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
@@ -69,6 +75,11 @@ const { formatDate } = useDateFormat()
             v-if="canAddTask"
             :equipment="{ type: 'rig', id: rig.id }"
             @add-task="$emit('addTask', $event)"
+          />
+          <EquipmentReportIncidentButton
+            v-if="canReportIncident"
+            :target="{ type: 'rig', id: rig.id }"
+            @report-incident="$emit('reportIncident', $event)"
           />
           <BaseButton variant="ghost" size="sm" route="boats.rig.show" :params="{ boatId }">
             {{ t('boats.rig.viewDetail') }}

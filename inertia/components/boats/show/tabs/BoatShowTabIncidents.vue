@@ -1,24 +1,47 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
-import BoatIncidentForm from '~/components/boats/show/tabs/BoatIncidentForm.vue'
+import BoatIncidentModal from '~/components/boats/incidents/BoatIncidentModal.vue'
+import IncidentTargetBadge from '~/components/boats/incidents/IncidentTargetBadge.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
-import type { BoatIncidentRow, BoatShowDetail, IncidentStatus } from '~/types/boat_show'
+import type {
+  BoatCreateIntent,
+  BoatIncidentRow,
+  BoatShowDetail,
+  IncidentStatus,
+} from '~/types/boat_show'
 import { confirmDelete } from '~/utils/native_dialog'
 
-const props = defineProps<{
-  boat: BoatShowDetail
-  incidents: BoatIncidentRow[]
-  canManage: boolean
-  canDelete: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    boat: BoatShowDetail
+    incidents: BoatIncidentRow[]
+    canManage: boolean
+    canDelete: boolean
+    createIntent?: BoatCreateIntent
+  }>(),
+  { createIntent: null }
+)
+
+const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
 const { formatDate } = useDateFormat()
 
-const showForm = ref(false)
+const isModalOpen = ref(false)
 const editingIncident = ref<BoatIncidentRow | null>(null)
+
+// L'onglet est monté après la demande d'ouverture (prop différée) : on consomme
+// l'intention au montage, et si elle change alors que l'onglet est affiché (#365).
+function consumeCreateIntent() {
+  if (props.createIntent !== 'incident') return
+  if (props.canManage) openCreate()
+  emit('createIntentConsumed')
+}
+
+onMounted(consumeCreateIntent)
+watch(() => props.createIntent, consumeCreateIntent)
 
 const STATUS_COLORS: Record<IncidentStatus, string> = {
   open: 'bg-coral-50 text-coral-700 border-coral-200',
@@ -34,17 +57,12 @@ const STATUS_DOT: Record<IncidentStatus, string> = {
 
 function openCreate() {
   editingIncident.value = null
-  showForm.value = true
+  isModalOpen.value = true
 }
 
 function openEdit(incident: BoatIncidentRow) {
   editingIncident.value = incident
-  showForm.value = true
-}
-
-function closeForm() {
-  showForm.value = false
-  editingIncident.value = null
+  isModalOpen.value = true
 }
 
 function deleteIncident(incidentId: number) {
@@ -68,12 +86,13 @@ function deleteIncident(incidentId: number) {
       </BaseButton>
     </div>
 
-    <!-- Create / Edit form -->
-    <BoatIncidentForm
-      v-if="showForm"
+    <!-- Create / Edit modal — `boat` est structurellement une TaskEquipmentSource -->
+    <BoatIncidentModal
+      v-if="canManage"
+      v-model:open="isModalOpen"
       :boat-id="boat.id"
+      :equipment="boat"
       :editing-incident="editingIncident"
-      @close="closeForm"
     />
 
     <!-- Incidents list -->
@@ -92,7 +111,7 @@ function deleteIncident(incidentId: number) {
       >
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div class="min-w-0 flex-1">
-            <!-- Type + status badge -->
+            <!-- Type + status badge + target -->
             <div class="flex flex-wrap items-center gap-2 mb-1">
               <span class="font-semibold text-fg">
                 {{ t(`incidents.type.${incident.type}`) }}
@@ -106,6 +125,11 @@ function deleteIncident(incidentId: number) {
                 <span :class="['h-1.5 w-1.5 rounded-full', STATUS_DOT[incident.status]]" />
                 {{ t(`incidents.status.${incident.status}`) }}
               </span>
+              <IncidentTargetBadge
+                v-if="incident.target"
+                :target="incident.target"
+                :boat-id="boat.id"
+              />
               <span v-if="incident.insuranceClaimed" class="text-xs text-fg-muted">
                 {{ t('incidents.insuranceDeclared') }}
                 <span v-if="incident.insuranceClaimRef">#{{ incident.insuranceClaimRef }}</span>
@@ -143,7 +167,7 @@ function deleteIncident(incidentId: number) {
 
     <!-- Empty state -->
     <div
-      v-else-if="!showForm"
+      v-else
       class="rounded-lg border border-dashed border-border bg-surface-muted/30 p-8 text-center"
     >
       <p class="text-fg-muted">{{ t('incidents.empty') }}</p>

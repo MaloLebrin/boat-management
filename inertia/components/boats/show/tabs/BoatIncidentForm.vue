@@ -5,17 +5,40 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import IncidentInsuranceFields from '~/components/boats/incidents/IncidentInsuranceFields.vue'
+import IncidentTargetSelect from '~/components/boats/incidents/IncidentTargetSelect.vue'
 import { useNetworkStatus } from '~/composables/use_network_status'
 import { useOfflineQueue } from '~/composables/use_offline_queue'
 import { CREATE_INCIDENT_ACTION, UPDATE_INCIDENT_ACTION } from '#shared/constants/offline_queue'
+import { incidentTargetColumns, incidentTargetRefOf } from '#shared/helpers/incident_target'
+import { INCIDENT_TYPES } from '#shared/types/incident'
 import { useT } from '~/composables/use_t'
 import { isoToDatetimeLocalValue, tzOffsetMinutes } from '~/utils/local_datetime'
-import type { BoatIncidentRow, IncidentStatus, IncidentType } from '~/types/boat_show'
+import type { TaskEquipmentSource } from '#shared/types/maintenance'
+import type {
+  BoatIncidentRow,
+  IncidentFormPrefill,
+  IncidentStatus,
+  IncidentTargetRef,
+  IncidentType,
+} from '~/types/boat_show'
 
-const props = defineProps<{
-  boatId: number
-  editingIncident: BoatIncidentRow | null
-}>()
+/**
+ * Formulaire d'incident, réutilisé par tous les points d'entrée. `equipment`
+ * alimente le sélecteur de cible ; `prefill` + `lockTarget` la figent (carte ou
+ * page équipement/pièce, #813). Les six colonnes de cible voyagent dans le
+ * formulaire lui-même : le payload enfilé hors-ligne les porte tel quel.
+ */
+const props = withDefaults(
+  defineProps<{
+    boatId: number
+    editingIncident: BoatIncidentRow | null
+    equipment?: TaskEquipmentSource | null
+    prefill?: IncidentFormPrefill | null
+    lockTarget?: boolean
+  }>(),
+  { equipment: null, prefill: null, lockTarget: false }
+)
 
 const emit = defineEmits<{
   close: []
@@ -24,6 +47,9 @@ const emit = defineEmits<{
 const { t } = useT()
 const { isOnline } = useNetworkStatus()
 const { enqueue } = useOfflineQueue()
+
+const initialTarget = props.prefill?.target ?? incidentTargetRefOf(props.editingIncident ?? {})
+const lockedTarget = props.lockTarget ? (props.prefill?.target ?? null) : null
 
 const form = useForm({
   occurredAt: props.editingIncident
@@ -38,6 +64,14 @@ const form = useForm({
   description: props.editingIncident?.description ?? '',
   insuranceClaimed: props.editingIncident?.insuranceClaimed ?? false,
   insuranceClaimRef: props.editingIncident?.insuranceClaimRef ?? '',
+  ...incidentTargetColumns(initialTarget),
+})
+
+// La cible n'est qu'une vue sur les six colonnes : la changer réécrit toutes
+// les FK, ce qui permet aussi de la retirer en édition.
+const target = computed<IncidentTargetRef | null>({
+  get: () => incidentTargetRefOf(form),
+  set: (ref) => Object.assign(form, incidentTargetColumns(ref)),
 })
 
 watch(
@@ -50,19 +84,9 @@ watch(
     form.description = incident?.description ?? ''
     form.insuranceClaimed = incident?.insuranceClaimed ?? false
     form.insuranceClaimRef = incident?.insuranceClaimRef ?? ''
+    target.value = incidentTargetRefOf(incident ?? {})
   }
 )
-
-const INCIDENT_TYPES: IncidentType[] = [
-  'grounding',
-  'flooding',
-  'rigging_failure',
-  'engine_failure',
-  'collision',
-  'fire',
-  'theft_vandalism',
-  'other',
-]
 
 const INCIDENT_STATUSES: IncidentStatus[] = ['open', 'in_progress', 'closed']
 
@@ -110,11 +134,8 @@ function handleSubmit() {
 </script>
 
 <template>
-  <div class="rounded-lg border border-border bg-surface-elevated p-6 space-y-4">
-    <h3 class="font-semibold text-fg">
-      {{ editingIncident ? t('incidents.form.editTitle') : t('incidents.form.createTitle') }}
-    </h3>
-
+  <!-- Toujours rendu dans une modale (onglet, cartes, pages, ajout rapide) qui porte le titre -->
+  <div class="space-y-4">
     <form @submit.prevent="handleSubmit">
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <BaseInput
@@ -147,12 +168,22 @@ function handleSubmit() {
           :error="form.errors.status"
         />
 
+        <!-- Target: equipment or part (#813) -->
+        <IncidentTargetSelect
+          v-model:target="target"
+          :class="editingIncident ? 'sm:col-span-2' : ''"
+          :equipment="equipment"
+          :locked-target="lockedTarget"
+          :locked-label="prefill?.targetLabel ?? null"
+          :error="form.errors.boatEngineId"
+        />
+
         <BaseInput
           v-model="form.location"
           type="text"
           id="location"
           name="location"
-          :class="editingIncident ? '' : 'sm:col-span-2'"
+          class="sm:col-span-2"
           :label="t('incidents.fields.location')"
           :error="form.errors.location"
         />
@@ -167,27 +198,9 @@ function handleSubmit() {
           class="sm:col-span-2"
         />
 
-        <!-- Insurance -->
-        <div class="sm:col-span-2 flex items-center gap-3">
-          <input
-            id="insuranceClaimed"
-            v-model="form.insuranceClaimed"
-            type="checkbox"
-            name="insuranceClaimed"
-            class="h-4 w-4 rounded border-border text-brand focus:ring-brand"
-          />
-          <label for="insuranceClaimed" class="text-sm text-fg">
-            {{ t('incidents.fields.insuranceClaimed') }}
-          </label>
-        </div>
-
-        <BaseInput
-          v-model="form.insuranceClaimRef"
-          type="text"
-          id="insuranceClaimRef"
-          name="insuranceClaimRef"
-          class="sm:col-span-2"
-          :label="t('incidents.fields.insuranceClaimRef')"
+        <IncidentInsuranceFields
+          v-model:insurance-claimed="form.insuranceClaimed"
+          v-model:insurance-claim-ref="form.insuranceClaimRef"
           :error="form.errors.insuranceClaimRef"
         />
       </div>

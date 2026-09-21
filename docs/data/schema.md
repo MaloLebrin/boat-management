@@ -294,6 +294,14 @@ plomberie).
 - `createdBy` (FK users)
 - `resolvedAt` (timestamp nullable, auto-positionné au passage à `done`)
 
+### boat_incidents
+
+- `id`, `boatId`, `organizationId`
+- `occurredAt` (timestamp, indexé), `type` (CHECK : `grounding | flooding | rigging_failure | engine_failure | collision | fire | theft_vandalism | other`), `location` (nullable), `description`
+- `insuranceClaimed` (bool), `insuranceClaimRef` (nullable)
+- `status` (CHECK : `open | in_progress | closed`, indexé), `closedAt` (nullable)
+- cible optionnelle (#813), **au plus une** des six FK nullables `SET NULL` : `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId`, `boatGenericEquipmentId`, `boatEnginePartId` — supprimer l'équipement conserve l'incident, rattaché au bateau entier
+
 ### boat_port_stays
 
 - `id`, `boatId`

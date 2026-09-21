@@ -708,8 +708,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Suivi des incidents',
     },
     body: {
-      en: 'Incidents record what went wrong at sea or in port: grounding, flooding, rigging failure, engine failure, collision, fire, theft or vandalism, or other. Each incident carries a date, a location, a description, a status (open, in progress, closed) and insurance claim tracking (claimed flag and claim reference). The fleet incidents page (/navigation/incidents) lists incidents across all boats, and each boat page has its own incidents view. Deleting an incident is reserved to admins.',
-      fr: 'Les incidents consignent ce qui a mal tourné en mer ou au port : échouement, voie d’eau, avarie de gréement, panne moteur, collision, incendie, vol ou vandalisme, ou autre. Chaque incident porte une date, un lieu, une description, un statut (ouvert, en cours, clos) et le suivi assurance (déclaration et référence de dossier). La page incidents flotte (/navigation/incidents) liste les incidents de tous les bateaux, et chaque fiche bateau a sa propre vue. La suppression d’un incident est réservée aux admins.',
+      en: 'Incidents record what went wrong at sea or in port: grounding, flooding, rigging failure, engine failure, collision, fire, theft or vandalism, or other. Each incident carries a date, a location, a description, a status (open, in progress, closed) and insurance claim tracking. An incident can target the whole boat or one piece of equipment — an engine, a sail, the rig, a safety item, a generic item — or an engine part, so "engine won\'t start" points at that engine. Report one from the "Incident" button on an equipment card or page (parts included), from the "+ Add" menu of the boat page, from the fleet incidents page (/navigation/incidents) or the dashboard. Deleting an incident is reserved to admins.',
+      fr: 'Les incidents consignent ce qui a mal tourné en mer ou au port : échouement, voie d’eau, avarie de gréement, panne moteur, collision, incendie, vol ou vandalisme, ou autre. Chaque incident porte une date, un lieu, une description, un statut (ouvert, en cours, clos) et le suivi assurance. Un incident vise le bateau entier ou un équipement précis — un moteur, une voile, le gréement, un équipement de sécurité ou générique — ou une pièce moteur : « moteur qui ne démarre plus » désigne ce moteur-là. On le déclare depuis le bouton « Incident » d’une carte ou d’une page équipement (pièces comprises), le menu « + Ajouter » de la fiche bateau, la page incidents flotte (/navigation/incidents) ou le dashboard. La suppression est réservée aux admins.',
     },
     keywords: [
       'incident',
@@ -722,6 +722,11 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'assurance',
       'insurance',
       'sinistre',
+      'moteur',
+      'equipement',
+      'equipment',
+      'piece',
+      'part',
     ],
     navTarget: 'navigation.incidents',
   },

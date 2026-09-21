@@ -56,6 +56,7 @@ const props = defineProps<{
   canManageDocuments: boolean
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
+  canCreateIncidents: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
@@ -130,6 +131,11 @@ function openEquipmentTab() {
   createIntent.value = 'equipment'
 }
 
+function openIncidentsTab() {
+  goToTab('incidents')
+  createIntent.value = 'incident'
+}
+
 function onCreateIntentConsumed() {
   createIntent.value = null
 }
@@ -184,11 +190,13 @@ const tabContentProps = computed(() => {
             :can-manage-maintenance="canManageMaintenance"
             :can-manage-equipment="canManageEquipment"
             :can-create-navigation-logs="canCreateNavigationLogs"
+            :can-create-incidents="canCreateIncidents"
             :can-export="canExport"
             @add-event="openHistoryTab"
             @add-task="openTasksTab"
             @add-equipment="openEquipmentTab"
             @add-navigation-log="openNavigationLogTab"
+            @add-incident="openIncidentsTab"
           />
         </div>
       </div>

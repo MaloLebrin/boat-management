@@ -170,7 +170,9 @@
     "updated": "Incident mis à jour.",
     "deleted": "Incident supprimé.",
     "notFound": "Incident introuvable.",
-    "descriptionRequired": "Une description est requise."
+    "descriptionRequired": "Une description est requise.",
+    "equipmentNotFound": "Cet équipement n'appartient pas à ce bateau.",
+    "multipleEquipment": "Un incident ne peut viser qu'un seul équipement."
   },
   "inspections": {
     "created": "État des lieux enregistré.",

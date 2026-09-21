@@ -85,6 +85,39 @@ describe('BoatShowHeaderActions — regroupement des actions d’en-tête (#365)
     expect(wrapper.emitted('addNavigationLog')).toHaveLength(1)
   })
 
+  test('emits addIncident from a fifth item shown only with canCreateIncidents (#813)', async () => {
+    const without = mount(BoatShowHeaderActions, { props: baseProps })
+    await openAddMenu(without)
+    expect(without.findAll('button[role="menuitem"]').map((el) => el.text())).not.toContain(
+      'boats.show.addMenu.incident'
+    )
+
+    const wrapper = mount(BoatShowHeaderActions, {
+      props: { ...baseProps, canCreateIncidents: true },
+    })
+    await openAddMenu(wrapper)
+    const items = wrapper.findAll('button[role="menuitem"]')
+    expect(items).toHaveLength(5)
+    expect(items[4]!.text()).toBe('boats.show.addMenu.incident')
+
+    await items[4]!.trigger('click')
+    expect(wrapper.emitted('addIncident')).toHaveLength(1)
+  })
+
+  test('the "+ Ajouter" menu shows for a user who can only report incidents', async () => {
+    const wrapper = mount(BoatShowHeaderActions, {
+      props: {
+        ...baseProps,
+        canManageMaintenance: false,
+        canManageEquipment: false,
+        canCreateNavigationLogs: false,
+        canCreateIncidents: true,
+      },
+    })
+
+    expect(wrapper.text()).toContain('boats.show.addMenu.label')
+  })
+
   test('the "⋯" menu links to budget/edit and hides the PDF export when canExport is false', async () => {
     const wrapper = mount(BoatShowHeaderActions, { props: { ...baseProps, canExport: false } })
 

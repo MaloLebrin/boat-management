@@ -1,4 +1,5 @@
 import BoatPolicy from '#policies/boat_policy'
+import IncidentPolicy from '#policies/incident_policy'
 import BoatGenericEquipmentService from '#services/boat_generic_equipment_service'
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
@@ -41,12 +42,14 @@ export default class BoatGenericEquipmentController {
       return
     }
 
-    const [canManage, media, maintenanceTasks, taskPermissions] = await Promise.all([
-      bouncer.with(BoatPolicy).allows('edit', boat),
-      this.mediaService.listForEntity('boat_generic_equipment', item.id),
-      this.taskService.listForEquipment(boat.id, { type: 'generic', id: item.id }),
-      maintenanceTaskPermissions(bouncer, boat),
-    ])
+    const [canManage, canReportIncident, media, maintenanceTasks, taskPermissions] =
+      await Promise.all([
+        bouncer.with(BoatPolicy).allows('edit', boat),
+        bouncer.with(IncidentPolicy).allows('create', boat),
+        this.mediaService.listForEntity('boat_generic_equipment', item.id),
+        this.taskService.listForEquipment(boat.id, { type: 'generic', id: item.id }),
+        maintenanceTaskPermissions(bouncer, boat),
+      ])
 
     return inertia.render('boats/generic_equipment_show', {
       boat: { id: boat.id, name: boat.name },
@@ -66,6 +69,7 @@ export default class BoatGenericEquipmentController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      canReportIncident,
       maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
       taskEquipment: toTaskEquipmentSource({ genericEquipment: [item] }),
       taskPermissions,

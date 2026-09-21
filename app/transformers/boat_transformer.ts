@@ -9,7 +9,13 @@ import type BoatPositionHistory from '#models/boat_position_history'
 import type NavigationLog from '#models/navigation_log'
 import type NavigationLogEntry from '#models/navigation_log_entry'
 import type Media from '#models/media'
-import type { IncidentType, IncidentStatus } from '#shared/types/incident'
+import type {
+  BoatIncidentRow,
+  IncidentTargetSummary,
+  IncidentType,
+  IncidentStatus,
+} from '#shared/types/incident'
+import { incidentTargetRefOf } from '#shared/helpers/incident_target'
 import type { SheetType } from '#shared/types/maintenance'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
@@ -46,6 +52,8 @@ export interface BoatShowShellContext {
   canManagePricing: boolean
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
+  /** Droit `incidents.create` : entrée « Incident » du menu Ajouter et boutons des cartes (#813). */
+  canCreateIncidents: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
@@ -128,6 +136,7 @@ export function toShowShellProps(boat: Boat, ctx: BoatShowShellContext) {
     canDeleteEquipmentActions: ctx.canDeleteEquipmentActions,
     positionHistory,
     latestGpsPosition,
+    canCreateIncidents: ctx.canCreateIncidents,
     canDeleteIncidents: ctx.canDeleteIncidents,
     canCreateFuelLogs: ctx.canCreateFuelLogs,
     canDeleteFuelLogs: ctx.canDeleteFuelLogs,
@@ -431,7 +440,37 @@ function toMaintenanceTask(t: BoatMaintenanceTask) {
   }
 }
 
-function toIncident(i: BoatIncident) {
+/**
+ * Cible d'un incident (#813) pour le front : type, id et libellé brut, lus sur
+ * les relations préchargées par `preloadIncidentTargets`. Sans preload, seul le
+ * type et l'id sont connus — le front affiche alors la famille seule.
+ */
+export function toIncidentTarget(i: BoatIncident): IncidentTargetSummary | null {
+  const ref = incidentTargetRefOf(i)
+  if (!ref) return null
+
+  switch (ref.type) {
+    case 'engine': {
+      const engine = i.$preloaded.engine ? i.engine : null
+      const name = engine ? `${engine.brand ?? ''} ${engine.model ?? ''}`.trim() : ''
+      return { ...ref, name: name || engine?.serialNumber || null }
+    }
+    case 'sail':
+      return { ...ref, name: i.$preloaded.sail ? i.sail.sailType : null }
+    case 'rig':
+      return { ...ref, name: null }
+    case 'safety':
+      return { ...ref, name: i.$preloaded.safetyEquipment ? i.safetyEquipment.equipmentType : null }
+    case 'generic':
+      return { ...ref, name: i.$preloaded.genericEquipment ? i.genericEquipment.name : null }
+    case 'engine_part': {
+      const part = i.$preloaded.enginePart ? i.enginePart : null
+      return { ...ref, name: part?.designation ?? null, engineId: part?.boatEngineId }
+    }
+  }
+}
+
+function toIncident(i: BoatIncident): BoatIncidentRow {
   return {
     id: i.id,
     boatId: i.boatId,
@@ -444,6 +483,13 @@ function toIncident(i: BoatIncident) {
     status: i.status as IncidentStatus,
     closedAt: i.closedAt ? i.closedAt.toISO() : null,
     createdAt: i.createdAt.toISO()!,
+    boatEngineId: i.boatEngineId,
+    boatSailId: i.boatSailId,
+    boatRigId: i.boatRigId,
+    boatSafetyEquipmentId: i.boatSafetyEquipmentId,
+    boatGenericEquipmentId: i.boatGenericEquipmentId,
+    boatEnginePartId: i.boatEnginePartId,
+    target: toIncidentTarget(i),
   }
 }
 

@@ -26,7 +26,8 @@
     "description": "Description",
     "insuranceClaimed": "Déclaration assurance transmise",
     "insuranceClaimRef": "N° de sinistre (optionnel)",
-    "status": "Statut"
+    "status": "Statut",
+    "target": "Équipement concerné"
   },
   "form": {
     "createTitle": "Déclarer un incident",
@@ -36,5 +37,17 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "confirmDelete": "Supprimer cet incident ?"
-  }
+  },
+  "target": {
+    "wholeBoat": "Tout le bateau",
+    "engine": "Moteur",
+    "sail": "Voile",
+    "rig": "Gréement",
+    "safety": "Sécurité",
+    "generic": "Équipement",
+    "engine_part": "Pièce"
+  },
+  "reportShort": "Incident",
+  "reportForEquipment": "Signaler un incident sur cet équipement",
+  "modalTitle": "Déclarer un incident"
 }

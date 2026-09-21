@@ -152,7 +152,7 @@ Les types sont définis dans `shared/types/equipment_action.ts` et importables c
 
 - `EquipmentActionType` : `'to_buy' | 'to_replace' | 'to_repair'`
 - `EquipmentActionStatus` : `'pending' | 'ordered' | 'done' | 'cancelled'`
-- `EquipmentReferenceType` : `'generic' | 'safety' | 'engine' | 'sail' | 'rig'`
+- `EquipmentReferenceType` : `'generic' | 'safety' | 'engine' | 'sail' | 'rig'` — **sans** `engine_part` : il sert de clé de `Record` dans les helpers de tâches et de `CHECK` SQL sur `equipment_type`. Un incident, qui peut viser une pièce, a son propre `IncidentTargetType = EquipmentReferenceType | 'engine_part'` (#813, `shared/types/incident.ts`)
 - `CreateEquipmentActionPayload` : payload de création
 - `UpdateEquipmentActionPayload` : payload de mise à jour
 - `BoatEquipmentActionRow` : représentation sérialisée pour le frontend

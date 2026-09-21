@@ -1,4 +1,5 @@
 import BoatPolicy from '#policies/boat_policy'
+import IncidentPolicy from '#policies/incident_policy'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
@@ -40,12 +41,14 @@ export default class BoatSafetyEquipmentController {
       return
     }
 
-    const [canManage, media, maintenanceTasks, taskPermissions] = await Promise.all([
-      bouncer.with(BoatPolicy).allows('edit', boat),
-      this.mediaService.listForEntity('boat_safety_equipment', item.id),
-      this.taskService.listForEquipment(boat.id, { type: 'safety', id: item.id }),
-      maintenanceTaskPermissions(bouncer, boat),
-    ])
+    const [canManage, canReportIncident, media, maintenanceTasks, taskPermissions] =
+      await Promise.all([
+        bouncer.with(BoatPolicy).allows('edit', boat),
+        bouncer.with(IncidentPolicy).allows('create', boat),
+        this.mediaService.listForEntity('boat_safety_equipment', item.id),
+        this.taskService.listForEquipment(boat.id, { type: 'safety', id: item.id }),
+        maintenanceTaskPermissions(bouncer, boat),
+      ])
 
     return inertia.render('boats/safety_equipment_show', {
       boat: { id: boat.id, name: boat.name },
@@ -62,6 +65,7 @@ export default class BoatSafetyEquipmentController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      canReportIncident,
       maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
       taskEquipment: toTaskEquipmentSource({ safetyEquipment: [item] }),
       taskPermissions,

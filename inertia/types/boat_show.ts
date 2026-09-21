@@ -24,7 +24,7 @@ import type { SheetType } from '../../shared/types/maintenance'
  * Intention de création demandée depuis l'en-tête de la fiche bateau (#358, #365).
  * Consommée au montage de l'onglet cible, puis remise à `null`.
  */
-export type BoatCreateIntent = 'event' | 'task' | 'navigationLog' | 'equipment' | null
+export type BoatCreateIntent = 'event' | 'task' | 'navigationLog' | 'equipment' | 'incident' | null
 
 /** Seed data to open the equipment-action modal pre-filled from a card (#313). */
 export type EquipmentActionPrefill = {
@@ -267,7 +267,15 @@ export type MaintenanceSheetRow = {
 }
 
 export type { SheetType } from '../../shared/types/maintenance'
-export type { IncidentType, IncidentStatus, BoatIncidentRow } from '../../shared/types/incident'
+export type {
+  IncidentType,
+  IncidentStatus,
+  BoatIncidentRow,
+  IncidentFormPrefill,
+  IncidentTargetRef,
+  IncidentTargetSummary,
+  IncidentTargetType,
+} from '../../shared/types/incident'
 export type { FuelLogRow } from '../../shared/types/fuel_log'
 export type {
   NavigationLogRow,

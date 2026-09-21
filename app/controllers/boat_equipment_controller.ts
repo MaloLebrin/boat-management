@@ -1,4 +1,5 @@
 import BoatPolicy from '#policies/boat_policy'
+import IncidentPolicy from '#policies/incident_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
 import { toMaintenanceTaskRows } from '#transformers/boat_transformer'
 import { toTaskEquipmentSource } from '#transformers/maintenance_transformer'
@@ -247,12 +248,14 @@ export default class BoatEquipmentController {
       return
     }
 
-    const [canManage, media, maintenanceTasks, taskPermissions] = await Promise.all([
-      bouncer.with(BoatPolicy).allows('edit', boat),
-      this.mediaService.listForEntity('boat_sail', sail.id),
-      this.taskService.listForEquipment(boat.id, { type: 'sail', id: sail.id }),
-      maintenanceTaskPermissions(bouncer, boat),
-    ])
+    const [canManage, canReportIncident, media, maintenanceTasks, taskPermissions] =
+      await Promise.all([
+        bouncer.with(BoatPolicy).allows('edit', boat),
+        bouncer.with(IncidentPolicy).allows('create', boat),
+        this.mediaService.listForEntity('boat_sail', sail.id),
+        this.taskService.listForEquipment(boat.id, { type: 'sail', id: sail.id }),
+        maintenanceTaskPermissions(bouncer, boat),
+      ])
 
     return inertia.render('boats/sail_show', {
       boat: { id: boat.id, name: boat.name },
@@ -271,6 +274,7 @@ export default class BoatEquipmentController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      canReportIncident,
       maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
       taskEquipment: toTaskEquipmentSource({ sails: [sail] }),
       taskPermissions,
@@ -290,12 +294,14 @@ export default class BoatEquipmentController {
       return
     }
 
-    const [canManage, media, maintenanceTasks, taskPermissions] = await Promise.all([
-      bouncer.with(BoatPolicy).allows('edit', boat),
-      this.mediaService.listForEntity('boat_rig', rig.id),
-      this.taskService.listForEquipment(boat.id, { type: 'rig', id: rig.id }),
-      maintenanceTaskPermissions(bouncer, boat),
-    ])
+    const [canManage, canReportIncident, media, maintenanceTasks, taskPermissions] =
+      await Promise.all([
+        bouncer.with(BoatPolicy).allows('edit', boat),
+        bouncer.with(IncidentPolicy).allows('create', boat),
+        this.mediaService.listForEntity('boat_rig', rig.id),
+        this.taskService.listForEquipment(boat.id, { type: 'rig', id: rig.id }),
+        maintenanceTaskPermissions(bouncer, boat),
+      ])
 
     return inertia.render('boats/rig_show', {
       boat: { id: boat.id, name: boat.name },
@@ -311,6 +317,7 @@ export default class BoatEquipmentController {
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
       canManage,
+      canReportIncident,
       maintenanceTasks: toMaintenanceTaskRows(maintenanceTasks),
       taskEquipment: toTaskEquipmentSource({ rig }),
       taskPermissions,
@@ -439,7 +446,10 @@ export default class BoatEquipmentController {
       return response.redirect(`/boats/${boat.id}`)
     }
 
-    const canManage = await bouncer.with(BoatPolicy).allows('edit', boat)
+    const [canManage, canReportIncident] = await Promise.all([
+      bouncer.with(BoatPolicy).allows('edit', boat),
+      bouncer.with(IncidentPolicy).allows('create', boat),
+    ])
 
     const [
       maintenanceEvents,
@@ -510,6 +520,7 @@ export default class BoatEquipmentController {
       taskPermissions,
       diagnosticCheckedStepKeys,
       canManage,
+      canReportIncident,
       // Jamais `null` ici : le serializer d'Inertia jette « Cannot serialize
       // an item with null value » quand un callback différé résout `null`
       // (#478) — l'absence d'analyse est donc portée par la liste vide.

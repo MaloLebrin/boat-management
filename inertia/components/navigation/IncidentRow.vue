@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import IncidentTargetBadge from '~/components/boats/incidents/IncidentTargetBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { FleetIncidentRow } from '../../../shared/types/navigation'
@@ -27,7 +28,12 @@ defineProps<{ row: FleetIncidentRow }>()
         {{ row.boatName }}
       </Link>
     </td>
-    <td class="px-4 py-3 text-sm text-fg">{{ t(`incidents.type.${row.type}`) }}</td>
+    <td class="px-4 py-3 text-sm text-fg">
+      <span class="inline-flex flex-wrap items-center gap-2">
+        {{ t(`incidents.type.${row.type}`) }}
+        <IncidentTargetBadge v-if="row.target" :target="row.target" :boat-id="row.boatId" />
+      </span>
+    </td>
     <td class="px-4 py-3 text-sm text-fg-muted">{{ formatDate(row.occurredAt) }}</td>
     <td class="px-4 py-3 text-sm text-fg-muted">{{ row.location ?? '—' }}</td>
   </tr>

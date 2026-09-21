@@ -14,6 +14,7 @@ import { useT } from '~/composables/use_t'
 import { suggestEquipmentActionType } from '#shared/helpers/equipment_action'
 import { GENERIC_EQUIPMENT_CATEGORIES, type GenericEquipmentCategory } from '#shared/types/boat'
 import type { BoatShowGenericEquipment, EquipmentActionPrefill } from '~/types/boat_show'
+import type { IncidentTargetRef } from '#shared/types/incident'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
 
 const props = defineProps<{
@@ -22,11 +23,13 @@ const props = defineProps<{
   canManage: boolean
   canManageActions: boolean
   canAddTask?: boolean
+  canReportIncident?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'addToActions', payload: EquipmentActionPrefill): void
   (e: 'addTask', equipment: TaskEquipmentRef): void
+  (e: 'reportIncident', target: IncidentTargetRef): void
 }>()
 
 /** Identifient ces modales dans l'URL de l'aller-retour catalogue (#577). */
@@ -117,8 +120,10 @@ function closeEdit() {
             :can-manage-actions="canManageActions"
             @edit="openEdit"
             :can-add-task="canAddTask"
+            :can-report-incident="canReportIncident"
             @add-to-actions="emitAddToActions"
             @add-task="emit('addTask', $event)"
+            @report-incident="emit('reportIncident', $event)"
           />
         </ul>
       </div>

@@ -3,8 +3,10 @@ import { Form } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import EquipmentAddTaskButton from '~/components/boats/maintenance/EquipmentAddTaskButton.vue'
+import EquipmentReportIncidentButton from '~/components/boats/incidents/EquipmentReportIncidentButton.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowGenericEquipment } from '~/types/boat_show'
+import type { IncidentTargetRef } from '#shared/types/incident'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
 import { safetyStatusVariant } from '~/utils/status_variants'
 
@@ -14,12 +16,14 @@ defineProps<{
   canManage: boolean
   canManageActions: boolean
   canAddTask?: boolean
+  canReportIncident?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'edit', item: BoatShowGenericEquipment): void
   (e: 'addToActions', item: BoatShowGenericEquipment): void
   (e: 'addTask', equipment: TaskEquipmentRef): void
+  (e: 'reportIncident', target: IncidentTargetRef): void
 }>()
 
 const { t } = useT()
@@ -73,6 +77,11 @@ const { t } = useT()
           v-if="canAddTask"
           :equipment="{ type: 'generic', id: item.id }"
           @add-task="emit('addTask', $event)"
+        />
+        <EquipmentReportIncidentButton
+          v-if="canReportIncident"
+          :target="{ type: 'generic', id: item.id }"
+          @report-incident="emit('reportIncident', $event)"
         />
         <BaseButton
           v-if="canManageActions && item.status !== 'ok'"

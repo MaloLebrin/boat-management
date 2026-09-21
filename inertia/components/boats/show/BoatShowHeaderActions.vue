@@ -9,6 +9,8 @@ const props = defineProps<{
   canManageMaintenance: boolean
   canManageEquipment: boolean
   canCreateNavigationLogs: boolean
+  /** Droit `incidents.create` : entrée « Un incident » (#813). */
+  canCreateIncidents?: boolean
   canExport: boolean
 }>()
 
@@ -17,12 +19,17 @@ const emit = defineEmits<{
   addTask: []
   addEquipment: []
   addNavigationLog: []
+  addIncident: []
 }>()
 
 const { t } = useT()
 
 const hasAddMenuItems = computed(
-  () => props.canManageMaintenance || props.canCreateNavigationLogs || props.canManageEquipment
+  () =>
+    props.canManageMaintenance ||
+    props.canCreateNavigationLogs ||
+    props.canManageEquipment ||
+    props.canCreateIncidents
 )
 
 const menuItemClass =
@@ -68,6 +75,15 @@ const menuItemClass =
         @click="(emit('addNavigationLog'), close())"
       >
         {{ t('boats.show.addMenu.navigationLog') }}
+      </button>
+      <button
+        v-if="canCreateIncidents"
+        type="button"
+        role="menuitem"
+        :class="menuItemClass"
+        @click="(emit('addIncident'), close())"
+      >
+        {{ t('boats.show.addMenu.incident') }}
       </button>
     </template>
   </BaseDropdown>

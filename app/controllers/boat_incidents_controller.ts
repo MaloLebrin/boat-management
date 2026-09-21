@@ -42,6 +42,12 @@ export default class BoatIncidentsController {
         description: payload.description,
         insuranceClaimed: payload.insuranceClaimed ?? false,
         insuranceClaimRef: payload.insuranceClaimRef ?? null,
+        boatEngineId: payload.boatEngineId,
+        boatSailId: payload.boatSailId,
+        boatRigId: payload.boatRigId,
+        boatSafetyEquipmentId: payload.boatSafetyEquipmentId,
+        boatGenericEquipmentId: payload.boatGenericEquipmentId,
+        boatEnginePartId: payload.boatEnginePartId,
       })
     } catch (error) {
       if (error instanceof BoatIncidentValidationError) {
@@ -85,6 +91,13 @@ export default class BoatIncidentsController {
         insuranceClaimed: payload.insuranceClaimed ?? false,
         insuranceClaimRef: payload.insuranceClaimRef ?? null,
         status: payload.status,
+        // `undefined` = cible inchangée ; `null` sur toutes = retour au bateau entier
+        boatEngineId: payload.boatEngineId,
+        boatSailId: payload.boatSailId,
+        boatRigId: payload.boatRigId,
+        boatSafetyEquipmentId: payload.boatSafetyEquipmentId,
+        boatGenericEquipmentId: payload.boatGenericEquipmentId,
+        boatEnginePartId: payload.boatEnginePartId,
       })
     } catch (error) {
       if (error instanceof BoatIncidentNotFoundError) {

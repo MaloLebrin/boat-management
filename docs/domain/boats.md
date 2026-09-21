@@ -72,6 +72,7 @@ C'est le même contrat que pour les contrôleurs « sous » un bateau
     - `inertia/components/boats/rig/BoatShowRigCard.vue`
     - `inertia/components/boats/show/tabs/BoatShowTabTasks.vue`
     - `inertia/components/boats/show/tabs/BoatShowTabHistory.vue`
+    - `inertia/components/boats/show/tabs/BoatShowTabIncidents.vue` — voir `docs/domain/incidents.md`
 - `GET /boats/:id/edit` (`boats.edit`)
   - Controller: `BoatsController.edit`
   - Page: `inertia/pages/boats/edit.vue`
