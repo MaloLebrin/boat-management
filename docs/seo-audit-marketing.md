@@ -7,7 +7,9 @@ _Date : 2026-07-12_
 > reco #7 (URLs absolues + `x-default`) et reco #6 (`og:locale`) appliquées sur
 > ces deux pages via `SITE_URL` / `marketingUrl()` (`shared/helpers/locale_path.ts`) ;
 > template de `<title>` désormais partagé client/SSR (`inertia/utils/page_title.ts`).
-> Les autres pages marketing restent en URLs relatives.
+> Les autres pages marketing restent en URLs relatives. Le 2026-09-22, la page
+> pièces IA reçoit le même traitement et le shell perd ses `<title>` / description
+> de repli, qui doublaient ceux de chaque page.
 
 Périmètre : pages publiques `inertia/pages/marketing/**` (home, tarifs, about, contact,
 guide, simulateur, privacy) et l'infrastructure SEO associée (shell SSR, sitemap,

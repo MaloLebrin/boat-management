@@ -7,6 +7,7 @@ import {
 } from '#exceptions/spare_part_chat_errors'
 import { PublicAiDailyBudgetExhaustedError } from '#exceptions/public_ai_budget_errors'
 import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
+import PublicPartSearchContentService from '#services/public_part_search_content_service'
 import PublicPartSearchService from '#services/public_part_search_service'
 import { toPublicPartSearchConversationProps } from '#transformers/spare_part_chat_transformer'
 import {
@@ -29,7 +30,10 @@ import type { HttpContext } from '@adonisjs/core/http'
  */
 @inject()
 export default class PublicPartSearchController {
-  constructor(private publicPartSearchService: PublicPartSearchService) {}
+  constructor(
+    private publicPartSearchService: PublicPartSearchService,
+    private publicPartSearchContentService: PublicPartSearchContentService
+  ) {}
 
   async show({ inertia, auth, session, i18n }: HttpContext) {
     const isAuthenticated = await auth.check()
@@ -46,6 +50,9 @@ export default class PublicPartSearchController {
       locale: toAppLocale(i18n.locale),
       quota,
       conversation: conversation ? toPublicPartSearchConversationProps(conversation) : null,
+      // Sections indexables (étapes, pièces fréquentes, FAQ, maillage) : le
+      // chat seul n'offre rien aux moteurs de recherche.
+      content: this.publicPartSearchContentService.build(i18n),
     })
   }
 
