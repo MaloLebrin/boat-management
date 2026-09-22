@@ -10,14 +10,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title inertia>
-      FleetAi
-    </title>
-
-    <meta
-      name="description"
-      content="FleetAi helps organizations track boats, equipment, and maintenance with intelligent signals."
-    />
+    {{--
+      Pas de <title> ni de <meta description> de repli ici : chaque page les
+      pose via <Head> et @inertiaHead() les rend en SSR. Un repli dans le shell
+      venait AVANT ceux de la page — deux <title> et deux descriptions par page,
+      et Google retient volontiers le premier (« FleetAi »). Sans SSR, le
+      gestionnaire de head d'Inertia ajoute lui-même le <title> côté client.
+    --}}
     {{--
       Résout `system` vers un thème concret avant le premier paint, pour éviter
       un flash clair sur un OS en sombre (#416). Doit rester en tête de <head>,

@@ -31,9 +31,9 @@ const LOCALIZED_PAGES = [
   { page: 'aiAssistant', priority: '0.8', changefreq: 'monthly' },
   { page: 'simulator', priority: '0.8', changefreq: 'monthly' },
   { page: 'guide', priority: '0.7', changefreq: 'monthly' },
-  // Entrée n°1 du tunnel d'acquisition, page enrichie en contenu indexable : priorité relevée.
+  // Tunnels d'acquisition (diagnostic, pièces), pages enrichies en contenu indexable : priorité relevée.
   { page: 'diagnosisAi', priority: '0.9', changefreq: 'weekly' },
-  { page: 'partsAi', priority: '0.8', changefreq: 'monthly' },
+  { page: 'partsAi', priority: '0.9', changefreq: 'weekly' },
   { page: 'help', priority: '0.5', changefreq: 'monthly' },
   { page: 'about', priority: '0.5', changefreq: 'monthly' },
   { page: 'contact', priority: '0.5', changefreq: 'monthly' },

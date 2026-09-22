@@ -1,4 +1,5 @@
 import type { AiChatMessage } from '#shared/types/ai'
+import type { FeatureCrossLink, FeatureCta, FeatureFaqItem } from '#shared/types/marketing'
 import type { EngineFamily } from '#shared/types/engine_catalog'
 import type { SparePartReferenceRow } from '#shared/types/spare_parts'
 
@@ -127,5 +128,53 @@ export interface PublicPartSearchConversationProps extends PartSearchConversatio
     brand: string | null
     model: string | null
     catalogBrandSlug: string | null
+  }
+}
+
+/** Carte « pièce fréquente » de la page publique : la pièce, ce que l'assistant en retrouve. */
+export interface PublicPartSearchPartCard {
+  title: string
+  description: string
+}
+
+/**
+ * Contenu éditorial de la page publique de recherche de pièces — construit
+ * côté serveur (`PublicPartSearchContentService`), jumeau de
+ * `PublicDiagnosisContentProps`. Le chat seul n'offre rien à indexer : ces
+ * sections portent les mots-clés (pièces, étapes, FAQ) et le maillage interne.
+ */
+export interface PublicPartSearchContentProps {
+  meta: { title: string; description: string }
+  steps: {
+    eyebrow: string
+    title: string
+    subtitle: string
+    items: Array<{ step: string; title: string; description: string }>
+  }
+  parts: {
+    eyebrow: string
+    title: string
+    titleHighlight: string
+    subtitle: string
+    items: PublicPartSearchPartCard[]
+  }
+  crossLinks: {
+    eyebrow: string
+    title: string
+    linkLabel: string
+    items: FeatureCrossLink[]
+  }
+  faq: {
+    eyebrow: string
+    title: string
+    titleHighlight: string
+    items: FeatureFaqItem[]
+  }
+  finalCta: {
+    title: string
+    titleHighlight: string
+    subtitle: string
+    primaryCta: FeatureCta
+    secondaryCta: FeatureCta
   }
 }

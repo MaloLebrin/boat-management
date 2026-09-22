@@ -429,6 +429,30 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: null,
   },
   {
+    id: 'public-part-search-chat',
+    title: {
+      en: 'Free public AI part number finder (no account)',
+      fr: 'Recherche de référence de pièce IA publique et gratuite (sans compte)',
+    },
+    body: {
+      en: 'The public FleetAi site offers a free AI engine part number finder at /en/engine-part-finder-ai (French: /fr/reference-piece-moteur-ia), usable without an account. The visitor gives the engine brand and serial number, then describes the part; the assistant first identifies the exact engine model from the brand plate pattern, then maps the part onto the catalog filtered by motorization family. A displayed part number comes exclusively from the sourced reference database, with its source and verification date — the AI never invents one; otherwise it links to the retailer catalogs and exploded views. Anonymous visitors and Starter organizations get a limited number of free searches; Pro and Enterprise plans have no conversation cap.',
+      fr: 'Le site public de FleetAi propose une recherche de référence de pièce moteur par IA, gratuite et sans compte, sur /fr/reference-piece-moteur-ia (anglais : /en/engine-part-finder-ai). Le visiteur donne la marque et le numéro de série du moteur puis décrit la pièce ; l’assistant identifie d’abord le modèle exact via le motif de plaque de la marque, puis rapproche la pièce du catalogue filtré par famille de motorisation. Une référence affichée provient exclusivement de la base sourcée, avec sa source et sa date de vérification — l’IA n’en invente jamais ; sinon elle renvoie vers les catalogues revendeurs et leurs vues éclatées. Anonymes et organisations Starter ont un nombre limité de recherches gratuites ; les plans Pro et Entreprise n’ont pas de plafond de conversations.',
+    },
+    keywords: [
+      'reference piece',
+      'part number',
+      'numero de serie',
+      'serial number',
+      'recherche gratuite',
+      'free search',
+      'sans compte',
+      'no account',
+      'pieces ia',
+      'site public',
+    ],
+    navTarget: null,
+  },
+  {
     id: 'spare-parts-identify',
     title: {
       en: 'Spare parts identification and repair list',
