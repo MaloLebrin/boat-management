@@ -65,6 +65,7 @@ Référence: `inertia/app.ts`.
 
 - Page: `inertia/pages/boats/show.vue`
 - Composants:
+  - photos (#811) : onglet principal « Photos » (`?tab=photos`, groupe `photos` juste après Aperçu dans `inertia/composables/use_boat_show_tabs.ts`) rendu par `BoatShowTabContent.vue` → `inertia/components/boats/show/BoatPhotoGallery.vue` (galerie complète : ajout multiple, caméra, suppression). L'Aperçu n'en garde qu'une rangée : `inertia/components/boats/show/tabs/overview/BoatOverviewPhotoStrip.vue` (4 vignettes max triées par `position`, lien « Voir les N photos → » et tuile « Ajouter des photos » pour les gestionnaires, tous émettant `go-to-tab: 'photos'`). Tri partagé `inertia/utils/boat_photos.ts`. Après upload (`POST /boats/:boatId/photos`) ou suppression (`DELETE /boats/:boatId/media/:mediaId`), `BoatMediaController` redirige vers `?tab=photos` pour une photo et `?tab=documents` pour un document : on reste sur l'onglet courant
   - specs: `inertia/components/boats/hull/BoatShowSpecsCard.vue`
   - engines: `inertia/components/boats/engine/BoatShowEnginesCard.vue`
   - sails: `inertia/components/boats/sail/BoatShowSailsCard.vue`
@@ -438,9 +439,10 @@ sélecteur depuis ses propres zones (état vide, tuile d'ajout, zone de dépôt)
 Deux boutons d'upload (#485) : « Ajouter » ouvre le sélecteur (input `multiple`) et
 « Prendre une photo » ouvre l'appareil photo via un **second input** `capture="environment"`
 sans `multiple` — `capture` sur l'input principal supprimerait la sélection multiple sur
-iOS/Android. Même montage dans `BoatPhotoGallery.vue` (fiche bateau), qui partage le
-composable mais garde son propre rendu : i18n `boats.show.mediaUpload.*`, légendes des
-photos, tuile d'ajout en fin de grille, grille à quatre colonnes, suppression par `<Form>`.
+iOS/Android. Même montage dans `BoatPhotoGallery.vue` (fiche bateau, onglet « Photos »
+depuis #811), qui partage le composable mais garde son propre rendu : i18n
+`boats.show.mediaUpload.*`, légendes des photos, tuile d'ajout en fin de grille, grille à
+quatre colonnes, suppression par `<Form>`.
 
 Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos » des six équipements —
 `EngineShowTabPhotos`, `EnginePartShowTabPhotos`, `SailShowTabPhotos`, `RigShowTabPhotos`,
