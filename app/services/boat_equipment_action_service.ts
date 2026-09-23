@@ -4,6 +4,7 @@ import {
 } from '#exceptions/equipment_action_errors'
 import BoatEquipmentAction from '#models/boat_equipment_action'
 import type Boat from '#models/boat'
+import type BoatIncident from '#models/boat_incident'
 import type BoatInspection from '#models/boat_inspection'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
@@ -13,6 +14,7 @@ import type {
   UpdateEquipmentActionPayload,
 } from '#shared/types/equipment_action'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
+import { incidentBelongsToBoat } from '#utils/incident_utils'
 
 const ACTION_COLUMNS: string[] = [
   'id',
@@ -27,6 +29,7 @@ const ACTION_COLUMNS: string[] = [
   'equipmentType',
   'equipmentId',
   'inspectionId',
+  'boatIncidentId',
   'createdBy',
   'resolvedAt',
   'createdAt',
@@ -60,12 +63,36 @@ export default class BoatEquipmentActionService {
       .orderBy('id', 'desc')
   }
 
+  /**
+   * Actions levées depuis un incident du bateau (#815). Scopées au bateau
+   * comme `listForInspection`.
+   */
+  async listForIncident(user: User, boat: Boat, incident: BoatIncident) {
+    assertBoatInUserOrg(user, boat, () => new BoatEquipmentActionNotFoundError())
+
+    return await BoatEquipmentAction.query()
+      .select(ACTION_COLUMNS)
+      .where('boatId', boat.id)
+      .where('boatIncidentId', incident.id)
+      .orderBy('createdAt', 'desc')
+      .orderBy('id', 'desc')
+  }
+
   async createForBoat(user: User, boat: Boat, payload: CreateEquipmentActionPayload) {
     assertBoatInUserOrg(user, boat, () => new BoatEquipmentActionNotFoundError())
 
     const label = payload.label.trim()
     if (!label) {
       throw new BoatEquipmentActionValidationError('label is required', 'labelRequired')
+    }
+
+    // Suite d'un incident (#815) : l'incident tracé doit être du bateau.
+    const boatIncidentId = payload.boatIncidentId ?? null
+    if (boatIncidentId !== null && !(await incidentBelongsToBoat(boat.id, boatIncidentId))) {
+      throw new BoatEquipmentActionValidationError(
+        'Incident does not belong to this boat',
+        'incidentNotFound'
+      )
     }
 
     return await BoatEquipmentAction.create({
@@ -79,6 +106,7 @@ export default class BoatEquipmentActionService {
       actualCost: null,
       equipmentType: payload.equipmentType ?? null,
       equipmentId: payload.equipmentId ?? null,
+      boatIncidentId,
       createdBy: user.id,
     })
   }

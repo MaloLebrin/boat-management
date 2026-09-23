@@ -92,6 +92,7 @@ export function toMaintenanceTask(t: BoatMaintenanceTask) {
     boatGenericEquipmentId: t.boatGenericEquipmentId,
     recurrenceIntervalMonths: t.recurrenceIntervalMonths,
     recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
+    boatIncidentId: t.boatIncidentId,
     createdAt: t.createdAt.toISO(),
     updatedAt: t.updatedAt?.toISO() ?? null,
   }

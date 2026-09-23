@@ -61,5 +61,20 @@
     "detail": "Detail",
     "reportedOn": "Reported on {date}",
     "closedOn": "Closed on {date}"
+  },
+  "followUps": {
+    "createTask": "Create a task",
+    "createAction": "Repair action",
+    "count": "{count, plural, one {# follow-up} other {# follow-ups}}",
+    "title": "Incident follow-ups",
+    "hint": "Create a maintenance task or a repair action: it will stay linked to this incident.",
+    "tasksTitle": "Linked tasks",
+    "actionsTitle": "Linked actions",
+    "tasksEmpty": "No task created from this incident.",
+    "actionsEmpty": "No action created from this incident.",
+    "seeTasks": "See tasks",
+    "seeActions": "See actions",
+    "taskDone": "Done",
+    "taskOpen": "Open"
   }
 }

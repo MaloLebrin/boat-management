@@ -16,6 +16,8 @@ import type { TaskEquipmentSource, TaskFormPrefill } from '#shared/types/mainten
  * Réutilisable depuis tout point d'entrée : fiche bateau, page équipement,
  * carte de l'onglet Équipements ou dashboard. `prefill` + `lockEquipment` figent
  * l'équipement visé ; le retour se fait sur la page d'origine (redirect back).
+ * Depuis une carte d'incident (#815), `prefill.boatIncidentId` trace l'origine
+ * en champ caché.
  */
 const props = withDefaults(
   defineProps<{
@@ -63,6 +65,13 @@ const lockedEquipment = props.lockEquipment ? (props.prefill?.equipment ?? null)
     class="space-y-4"
     #default="{ processing, errors }"
   >
+    <input
+      v-if="prefill?.boatIncidentId"
+      type="hidden"
+      name="boatIncidentId"
+      :value="prefill.boatIncidentId"
+    />
+
     <MaintenanceTaskSubjectFields
       :equipment="equipment"
       :errors="errors"

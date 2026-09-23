@@ -4,24 +4,38 @@ import { ref } from 'vue'
 import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BoatIncidentModal from '~/components/boats/incidents/BoatIncidentModal.vue'
+import IncidentShowFollowUps from '~/components/boats/incidents/show/IncidentShowFollowUps.vue'
 import IncidentShowHeader from '~/components/boats/incidents/show/IncidentShowHeader.vue'
 import IncidentShowTabPhotos from '~/components/boats/incidents/show/IncidentShowTabPhotos.vue'
 import { useT } from '~/composables/use_t'
-import type { BoatIncidentRow, MediaRow } from '~/types/boat_show'
+import type {
+  BoatEquipmentActionRow,
+  BoatIncidentRow,
+  MaintenanceTaskRow,
+  MediaRow,
+} from '~/types/boat_show'
+import type { TaskEquipmentSource } from '#shared/types/maintenance'
 import { confirmDelete } from '~/utils/native_dialog'
 
 /**
  * Page de détail d'un incident (#814) : support des photos (le pipeline média
- * redirige toujours vers une page) et, à venir, des suites tâche/action (#815).
- * L'édition rouvre la modale sans données équipement : la cible se change
- * depuis l'onglet Incidents de la fiche bateau.
+ * redirige toujours vers une page) et suites tâche/action (#815). L'édition
+ * rouvre la modale sans données équipement : la cible se change depuis
+ * l'onglet Incidents de la fiche bateau.
  */
 const props = defineProps<{
   boat: { id: number; name: string }
   incident: BoatIncidentRow
   photos: MediaRow[]
+  /** Tâches et actions tracées par l'incident (#815). */
+  tasks: MaintenanceTaskRow[]
+  actions: BoatEquipmentActionRow[]
+  /** Équipements du bateau, pour la modale de tâche. */
+  equipment: TaskEquipmentSource
   canManage: boolean
   canDelete: boolean
+  canCreateTask: boolean
+  canCreateAction: boolean
 }>()
 
 const { t } = useT()
@@ -65,6 +79,16 @@ function deleteIncident() {
         </p>
         <p class="text-sm text-fg whitespace-pre-wrap">{{ incident.description }}</p>
       </BaseCard>
+
+      <IncidentShowFollowUps
+        :boat="boat"
+        :incident="incident"
+        :tasks="tasks"
+        :actions="actions"
+        :equipment="equipment"
+        :can-create-task="canCreateTask"
+        :can-create-action="canCreateAction"
+      />
 
       <IncidentShowTabPhotos
         :boat-id="boat.id"

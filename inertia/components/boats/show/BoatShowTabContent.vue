@@ -237,9 +237,13 @@ const showSkeleton = computed(
         v-else-if="tab === 'incidents'"
         :boat="boat"
         :incidents="incidents ?? []"
+        :maintenance-tasks="maintenanceTasks"
+        :equipment-actions="equipmentActions"
         :can-create="canCreateIncidents"
         :can-edit="canEditIncidents"
         :can-delete="canDeleteIncidents"
+        :can-create-task="canManageMaintenance"
+        :can-create-action="canManageEquipmentActions"
         :create-intent="createIntent"
         @create-intent-consumed="$emit('createIntentConsumed')"
       />

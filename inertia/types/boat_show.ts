@@ -30,8 +30,11 @@ export type BoatCreateIntent = 'event' | 'task' | 'navigationLog' | 'equipment' 
 export type EquipmentActionPrefill = {
   label: string
   actionType: EquipmentActionTypeValue
-  equipmentType: EquipmentReferenceTypeValue
-  equipmentId: number
+  /** Absents pour une action levée depuis un incident sans équipement (#815). */
+  equipmentType?: EquipmentReferenceTypeValue
+  equipmentId?: number
+  /** Incident d'origine (#815), envoyé en champ caché par la modale. */
+  boatIncidentId?: number
 }
 
 export type BoatShowSafetyEquipment = {
@@ -244,6 +247,8 @@ export type MaintenanceTaskRow = {
   boatGenericEquipmentId: number | null
   recurrenceIntervalMonths: number | null
   recurrenceIntervalEngineHours: number | null
+  /** Incident à l'origine de la tâche (#815), `null` sinon. */
+  boatIncidentId: number | null
 }
 
 export type MaintenanceSheetItemRow = {

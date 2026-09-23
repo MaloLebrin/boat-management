@@ -27,6 +27,7 @@ import type {
   TaskEquipmentRef,
 } from '#shared/types/maintenance'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
+import { incidentBelongsToBoat } from '#utils/incident_utils'
 
 export type { CreateMaintenanceTaskPayload, MaintenanceTaskSubject, MarkTaskDonePayload }
 
@@ -164,6 +165,15 @@ export default class BoatMaintenanceTaskService {
 
     const notes = payload.notes?.trim() ? payload.notes.trim() : null
 
+    // Suite d'un incident (#815) : l'incident tracé doit être du bateau.
+    const boatIncidentId = payload.boatIncidentId ?? null
+    if (boatIncidentId !== null && !(await incidentBelongsToBoat(boat.id, boatIncidentId))) {
+      throw new BoatMaintenanceTaskValidationError(
+        'Incident does not belong to this boat',
+        'incidentNotFound'
+      )
+    }
+
     const equipmentColumns = {
       boatEngineId: null,
       boatSailId: null,
@@ -177,6 +187,7 @@ export default class BoatMaintenanceTaskService {
       boatId: boat.id,
       subject,
       ...equipmentColumns,
+      boatIncidentId,
       title,
       notes,
       status: 'open',
@@ -258,6 +269,9 @@ export default class BoatMaintenanceTaskService {
         boatRigId: task.boatRigId,
         boatSafetyEquipmentId: task.boatSafetyEquipmentId,
         boatGenericEquipmentId: task.boatGenericEquipmentId,
+        // Seule la première occurrence trace l'incident (#815) : la
+        // récurrence est un entretien courant, plus une suite d'incident.
+        boatIncidentId: null,
         title: task.title,
         notes: task.notes,
         status: 'open',
@@ -320,5 +334,16 @@ export default class BoatMaintenanceTaskService {
 
   async listForEngine(boatId: number, engineId: number) {
     return await this.listForEquipment(boatId, { type: 'engine', id: engineId })
+  }
+
+  /**
+   * Tâches créées depuis un incident du bateau (#815). Bornées au bateau : un
+   * id d'incident d'un autre bateau ne remonte rien. Le bateau doit déjà être
+   * autorisé par l'appelant.
+   */
+  async listForIncident(boatId: number, incidentId: number) {
+    return await orderTasks(
+      BoatMaintenanceTask.query().where('boatId', boatId).where('boatIncidentId', incidentId)
+    )
   }
 }

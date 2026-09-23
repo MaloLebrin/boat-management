@@ -119,6 +119,8 @@ export type CreateMaintenanceTaskPayload = {
   recurrenceIntervalMonths?: number | null
   dueEngineHours?: number | null
   recurrenceIntervalEngineHours?: number | null
+  /** Incident à l'origine de la tâche (#815) — doit appartenir au bateau. */
+  boatIncidentId?: number | null
 }
 
 /** Équipement visé par une tâche — au plus un par tâche. */
@@ -173,6 +175,8 @@ export interface TaskFormPrefill {
   subject?: MaintenanceTaskSubject
   equipment?: TaskEquipmentRef
   title?: string
+  /** Incident d'origine (#815), envoyé en champ caché par le formulaire. */
+  boatIncidentId?: number
 }
 
 export type MarkTaskDonePayload = {

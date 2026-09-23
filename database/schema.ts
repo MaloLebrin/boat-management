@@ -505,6 +505,7 @@ export class BoatEquipmentActionSchema extends BaseModel {
     'actionType',
     'actualCost',
     'boatId',
+    'boatIncidentId',
     'createdAt',
     'createdBy',
     'equipmentId',
@@ -526,6 +527,8 @@ export class BoatEquipmentActionSchema extends BaseModel {
   declare actualCost: string | null
   @column()
   declare boatId: number
+  @column()
+  declare boatIncidentId: number | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -934,6 +937,7 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
     'boatEngineId',
     'boatGenericEquipmentId',
     'boatId',
+    'boatIncidentId',
     'boatRigId',
     'boatSafetyEquipmentId',
     'boatSailId',
@@ -959,6 +963,8 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare boatGenericEquipmentId: number | null
   @column()
   declare boatId: number
+  @column()
+  declare boatIncidentId: number | null
   @column()
   declare boatRigId: number | null
   @column()

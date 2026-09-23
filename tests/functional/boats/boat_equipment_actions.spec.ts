@@ -25,9 +25,11 @@ test.group('Boat Equipment Actions (functional)', (group) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
+    // Retour sur la page d'origine (#815) : ici l'onglet Actions équipement.
     const response = await client
       .post(`/boats/${boat.id}/equipment-actions`)
       .loginAs(user)
+      .header('referer', `/boats/${boat.id}?tab=equipmentActions`)
       .form(VALID_ACTION)
       .redirects(0)
 

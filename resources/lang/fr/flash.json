@@ -48,7 +48,8 @@
     "engineSubjectRequired": "Les tâches basées sur les heures moteur doivent avoir le sujet défini sur moteur.",
     "engineIdRequired": "Un moteur est requis pour les tâches basées sur les heures moteur.",
     "doneEngineHoursRequired": "Les heures moteur à l'achèvement sont requises.",
-    "doneEngineHoursInvalid": "Les heures moteur à l'achèvement doivent être supérieures ou égales à 0."
+    "doneEngineHoursInvalid": "Les heures moteur à l'achèvement doivent être supérieures ou égales à 0.",
+    "incidentNotFound": "Cet incident n'appartient pas à ce bateau."
   },
   "ai": {
     "messagesRequired": "Le champ messages est obligatoire.",
@@ -163,7 +164,8 @@
     "deleted": "Action supprimée.",
     "notFound": "Action introuvable.",
     "labelRequired": "Un libellé est requis.",
-    "actualCostRequired": "Le coût réel est requis pour marquer comme terminé."
+    "actualCostRequired": "Le coût réel est requis pour marquer comme terminé.",
+    "incidentNotFound": "Cet incident n'appartient pas à ce bateau."
   },
   "incidents": {
     "created": "Incident déclaré.",

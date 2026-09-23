@@ -110,3 +110,108 @@ describe('IncidentShowHeader (#814)', () => {
     expect(w.text()).not.toContain('incidents.show.edit')
   })
 })
+
+vi.mock('~/components/boats/maintenance/BoatMaintenanceTaskModal.vue', () => ({
+  default: {
+    name: 'BoatMaintenanceTaskModal',
+    props: ['open', 'prefill', 'lockEquipment', 'equipment'],
+    template: '<div data-testid="task-modal" :data-open="String(open)" />',
+  },
+}))
+vi.mock('~/components/boats/equipment-actions/BoatEquipmentActionModal.vue', () => ({
+  default: {
+    name: 'BoatEquipmentActionModal',
+    props: ['open', 'prefill'],
+    template: '<div data-testid="action-modal" :data-open="String(open)" />',
+  },
+}))
+vi.mock('~/components/base/BaseBadge.vue', () => ({
+  default: { template: '<span><slot /></span>' },
+}))
+
+import IncidentShowFollowUps from '../../inertia/components/boats/incidents/show/IncidentShowFollowUps.vue'
+
+const equipment = { engines: [], sails: [], rig: null, safetyEquipment: [], genericEquipment: [] }
+
+function mountFollowUps(extra: Record<string, unknown> = {}) {
+  return mount(IncidentShowFollowUps, {
+    props: {
+      boat: { id: 7, name: 'Aventura' },
+      incident,
+      tasks: [],
+      actions: [],
+      equipment,
+      canCreateTask: true,
+      canCreateAction: true,
+      ...extra,
+    },
+  })
+}
+
+describe('IncidentShowFollowUps (#815)', () => {
+  test('affiche les états vides et les liens vers les onglets', () => {
+    const w = mountFollowUps()
+
+    expect(w.text()).toContain('incidents.followUps.tasksEmpty')
+    expect(w.text()).toContain('incidents.followUps.actionsEmpty')
+    const links = w.findAll('a').map((a) => a.attributes('href'))
+    expect(links).toContain('/boats/7?tab=tasks')
+    expect(links).toContain('/boats/7?tab=equipmentActions')
+  })
+
+  test('liste les tâches et actions liées', () => {
+    const w = mountFollowUps({
+      tasks: [
+        {
+          id: 1,
+          title: 'Changer la turbine',
+          status: 'open',
+          dueAt: '2026-07-01',
+          boatIncidentId: 42,
+        },
+        { id: 2, title: 'Vidange', status: 'done', dueAt: null, boatIncidentId: 42 },
+      ],
+      actions: [
+        {
+          id: 3,
+          label: 'Réparer la pompe',
+          actionType: 'to_repair',
+          status: 'pending',
+          boatIncidentId: 42,
+        },
+      ],
+    })
+
+    const tasks = w.find('[data-testid="incident-linked-tasks"]')
+    expect(tasks.text()).toContain('Changer la turbine')
+    expect(tasks.text()).toContain('incidents.followUps.taskDone')
+    expect(tasks.text()).toContain('boats.maintenance.tasks.dueAt')
+    const actions = w.find('[data-testid="incident-linked-actions"]')
+    expect(actions.text()).toContain('Réparer la pompe')
+    expect(actions.text()).toContain('equipmentActions.actionType.to_repair')
+  })
+
+  test('« Créer une tâche » ouvre la modale verrouillée sur le moteur de l’incident', async () => {
+    const w = mountFollowUps()
+
+    await w.find('[data-testid="incident-create-task"]').trigger('click')
+
+    const modal = w.findComponent({ name: 'BoatMaintenanceTaskModal' })
+    expect(modal.props('open')).toBe(true)
+    expect(modal.props('lockEquipment')).toBe(true)
+    expect(modal.props('prefill')).toEqual({
+      title: 'incidents.type.engine_failure',
+      boatIncidentId: 42,
+      equipment: { type: 'engine', id: 12 },
+    })
+  })
+
+  test('sans les droits : ni boutons, ni indication, ni modales', () => {
+    const w = mountFollowUps({ canCreateTask: false, canCreateAction: false })
+
+    expect(w.findAll('button')).toHaveLength(0)
+    expect(w.text()).not.toContain('incidents.followUps.hint')
+    expect(w.find('[data-testid="task-modal"]').exists()).toBe(false)
+    expect(w.find('[data-testid="action-modal"]').exists()).toBe(false)
+  })
+})

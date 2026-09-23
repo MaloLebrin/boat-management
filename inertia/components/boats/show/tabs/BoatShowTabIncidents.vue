@@ -1,18 +1,22 @@
 <script setup lang="ts">
-import { Link } from '@adonisjs/inertia/vue'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BoatEquipmentActionModal from '~/components/boats/equipment-actions/BoatEquipmentActionModal.vue'
+import BoatIncidentCard from '~/components/boats/incidents/BoatIncidentCard.vue'
 import BoatIncidentModal from '~/components/boats/incidents/BoatIncidentModal.vue'
-import IncidentTargetBadge from '~/components/boats/incidents/IncidentTargetBadge.vue'
+import BoatMaintenanceTaskModal from '~/components/boats/maintenance/BoatMaintenanceTaskModal.vue'
 import { useT } from '~/composables/use_t'
-import { useDateFormat } from '~/composables/use_date_format'
 import type {
   BoatCreateIntent,
+  BoatEquipmentActionRow,
   BoatIncidentRow,
   BoatShowDetail,
-  IncidentStatus,
+  EquipmentActionPrefill,
+  MaintenanceTaskRow,
 } from '~/types/boat_show'
+import type { TaskFormPrefill } from '#shared/types/maintenance'
 import { confirmDelete } from '~/utils/native_dialog'
+import { countFollowUps, type IncidentTaskPrefill } from '~/utils/incident_follow_ups'
 
 const props = withDefaults(
   defineProps<{
@@ -24,15 +28,31 @@ const props = withDefaults(
     canEdit: boolean
     /** `incidents.delete` — réservé aux admins. */
     canDelete: boolean
+    /** `maintenance.create` — « Créer une tâche » depuis une carte (#815). */
+    canCreateTask?: boolean
+    /** `equipmentActions.create` — « Action à réparer » depuis une carte (#815). */
+    canCreateAction?: boolean
+    /**
+     * Tâches et actions du bateau (groupe différé `maintenance`, distinct du
+     * groupe `navigation` des incidents) : `undefined` tant qu'elles ne sont
+     * pas arrivées, et le badge « n suites » attend plutôt que d'afficher 0.
+     */
+    maintenanceTasks?: MaintenanceTaskRow[]
+    equipmentActions?: BoatEquipmentActionRow[]
     createIntent?: BoatCreateIntent
   }>(),
-  { createIntent: null }
+  {
+    createIntent: null,
+    canCreateTask: false,
+    canCreateAction: false,
+    maintenanceTasks: undefined,
+    equipmentActions: undefined,
+  }
 )
 
 const emit = defineEmits<{ createIntentConsumed: [] }>()
 
 const { t } = useT()
-const { formatDate } = useDateFormat()
 
 const isModalOpen = ref(false)
 const editingIncident = ref<BoatIncidentRow | null>(null)
@@ -47,18 +67,6 @@ function consumeCreateIntent() {
 
 onMounted(consumeCreateIntent)
 watch(() => props.createIntent, consumeCreateIntent)
-
-const STATUS_COLORS: Record<IncidentStatus, string> = {
-  open: 'bg-coral-50 text-coral-700 border-coral-200',
-  in_progress: 'bg-amber-50 text-amber-700 border-amber-200',
-  closed: 'bg-surface-muted text-fg-muted border-border',
-}
-
-const STATUS_DOT: Record<IncidentStatus, string> = {
-  open: 'bg-coral-500',
-  in_progress: 'bg-amber-600',
-  closed: 'bg-fg-subtle',
-}
 
 function openCreate() {
   editingIncident.value = null
@@ -77,6 +85,33 @@ function deleteIncident(incidentId: number) {
     { preserveScroll: true }
   )
 }
+
+// Suites d'un incident (#815) : une seule modale de tâche et une seule modale
+// d'action pour toutes les cartes, semées par la carte qui les ouvre.
+const isTaskModalOpen = ref(false)
+const taskPrefill = ref<TaskFormPrefill | null>(null)
+const taskLockEquipment = ref(false)
+
+function openTaskModal(payload: IncidentTaskPrefill) {
+  taskPrefill.value = payload.prefill
+  taskLockEquipment.value = payload.lockEquipment
+  isTaskModalOpen.value = true
+}
+
+const isActionModalOpen = ref(false)
+const actionPrefill = ref<EquipmentActionPrefill | null>(null)
+
+function openActionModal(payload: EquipmentActionPrefill) {
+  actionPrefill.value = payload
+  isActionModalOpen.value = true
+}
+
+const followUpCounts = computed(() => {
+  const tasks = props.maintenanceTasks
+  const actions = props.equipmentActions
+  if (tasks === undefined || actions === undefined) return null
+  return new Map(props.incidents.map((i) => [i.id, countFollowUps(i.id, tasks, actions)]))
+})
 </script>
 
 <template>
@@ -100,87 +135,40 @@ function deleteIncident(incidentId: number) {
       :editing-incident="editingIncident"
     />
 
+    <!-- Suites (#815) : tâche ou action pré-remplies depuis une carte -->
+    <BoatMaintenanceTaskModal
+      v-if="canCreateTask"
+      v-model:open="isTaskModalOpen"
+      :boat-id="boat.id"
+      :equipment="boat"
+      :prefill="taskPrefill"
+      :lock-equipment="taskLockEquipment"
+    />
+    <BoatEquipmentActionModal
+      v-if="canCreateAction"
+      v-model:open="isActionModalOpen"
+      :boat="boat"
+      :editing-action="null"
+      :prefill="actionPrefill"
+    />
+
     <!-- Incidents list -->
     <div v-if="incidents.length > 0" class="space-y-3">
-      <div
+      <BoatIncidentCard
         v-for="incident in incidents"
         :key="incident.id"
-        :class="[
-          'rounded-lg border p-4',
-          incident.status === 'open'
-            ? 'border-coral-200 bg-coral-50'
-            : incident.status === 'in_progress'
-              ? 'border-amber-200 bg-amber-50'
-              : 'border-border bg-surface-elevated',
-        ]"
-      >
-        <div class="flex flex-wrap items-start justify-between gap-3">
-          <div class="min-w-0 flex-1">
-            <!-- Type + status badge + target -->
-            <div class="flex flex-wrap items-center gap-2 mb-1">
-              <Link
-                :href="`/boats/${boat.id}/incidents/${incident.id}`"
-                class="font-semibold text-fg hover:underline"
-                data-testid="incident-detail-link"
-              >
-                {{ t(`incidents.type.${incident.type}`) }}
-              </Link>
-              <span
-                :class="[
-                  'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium',
-                  STATUS_COLORS[incident.status],
-                ]"
-              >
-                <span :class="['h-1.5 w-1.5 rounded-full', STATUS_DOT[incident.status]]" />
-                {{ t(`incidents.status.${incident.status}`) }}
-              </span>
-              <IncidentTargetBadge
-                v-if="incident.target"
-                :target="incident.target"
-                :boat-id="boat.id"
-              />
-              <span v-if="incident.insuranceClaimed" class="text-xs text-fg-muted">
-                {{ t('incidents.insuranceDeclared') }}
-                <span v-if="incident.insuranceClaimRef">#{{ incident.insuranceClaimRef }}</span>
-              </span>
-              <span v-if="incident.photosCount > 0" class="text-xs text-fg-muted">
-                · {{ t('incidents.photosCount', { count: String(incident.photosCount) }) }}
-              </span>
-            </div>
-
-            <!-- Date + location -->
-            <p class="text-xs text-fg-muted mb-2">
-              {{ formatDate(incident.occurredAt) }}
-              <span v-if="incident.location"> · {{ incident.location }}</span>
-            </p>
-
-            <!-- Description -->
-            <p class="text-sm text-fg whitespace-pre-wrap">{{ incident.description }}</p>
-          </div>
-
-          <!-- Actions -->
-          <div v-if="canEdit || canDelete" class="flex items-center gap-2 shrink-0">
-            <BaseButton
-              v-if="canEdit"
-              type="button"
-              variant="ghost"
-              size="sm"
-              @click="openEdit(incident)"
-            >
-              {{ t('incidents.form.edit') }}
-            </BaseButton>
-            <BaseButton
-              v-if="canDelete"
-              type="button"
-              variant="ghost"
-              size="sm"
-              @click="deleteIncident(incident.id)"
-            >
-              {{ t('incidents.form.delete') }}
-            </BaseButton>
-          </div>
-        </div>
-      </div>
+        :boat-id="boat.id"
+        :incident="incident"
+        :can-edit="canEdit"
+        :can-delete="canDelete"
+        :can-create-task="canCreateTask"
+        :can-create-action="canCreateAction"
+        :follow-up-count="followUpCounts?.get(incident.id) ?? null"
+        @edit="openEdit"
+        @delete="deleteIncident"
+        @create-task="openTaskModal"
+        @create-action="openActionModal"
+      />
     </div>
 
     <!-- Empty state -->

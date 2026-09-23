@@ -56,6 +56,7 @@ export default class BoatMaintenanceTasksController {
         recurrenceIntervalMonths: payload.recurrenceIntervalMonths ?? null,
         dueEngineHours: payload.dueEngineHours ?? null,
         recurrenceIntervalEngineHours: payload.recurrenceIntervalEngineHours ?? null,
+        boatIncidentId: payload.boatIncidentId ?? null,
       })
 
       const equipment = equipmentRefOf(task)
@@ -69,6 +70,7 @@ export default class BoatMaintenanceTasksController {
           name: task.title,
           boatName: boat.name,
           ...(equipment ? { equipmentType: equipment.type } : {}),
+          ...(task.boatIncidentId ? { incidentId: task.boatIncidentId } : {}),
         },
       })
     } catch (error) {

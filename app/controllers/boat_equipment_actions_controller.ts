@@ -47,18 +47,21 @@ export default class BoatEquipmentActionsController {
         estimatedCost: payload.estimatedCost ?? null,
         equipmentType: payload.equipmentType ?? null,
         equipmentId: payload.equipmentId ?? null,
+        boatIncidentId: payload.boatIncidentId ?? null,
       })
     } catch (error) {
       if (error instanceof BoatEquipmentActionValidationError) {
         session.flash('error', i18n.t(`flash.equipmentActions.${error.errorCode}`))
-        response.redirect(`/boats/${boat.id}?tab=equipmentActions`)
+        response.redirect().back()
         return
       }
       throw error
     }
 
+    // Retour sur la page d'origine (#815) : onglet Actions, onglet Incidents ou
+    // page de détail d'un incident — comme la création d'une tâche.
     session.flash('success', i18n.t('flash.equipmentActions.created'))
-    response.redirect(`/boats/${boat.id}?tab=equipmentActions`)
+    response.redirect().back()
   }
 
   async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
