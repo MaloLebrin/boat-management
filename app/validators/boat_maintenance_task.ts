@@ -35,6 +35,7 @@ export const createBoatMaintenanceTaskValidator = vine.create(
     boatRigId: optionalIdFromForm(),
     boatSafetyEquipmentId: optionalIdFromForm(),
     boatGenericEquipmentId: optionalIdFromForm(),
+    boatIncidentId: optionalIdFromForm(),
     title: vine.string().trim().minLength(1).maxLength(200),
     notes: vine.string().trim().optional(),
 

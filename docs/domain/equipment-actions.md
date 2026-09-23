@@ -22,24 +22,25 @@ Références : `app/models/boat_equipment_action.ts`, `database/schema.ts`.
 
 ### `boat_equipment_actions`
 
-| Colonne           | Type           | Description                                                         |
-| ----------------- | -------------- | ------------------------------------------------------------------- |
-| `id`              | INTEGER PK     | Identifiant unique                                                  |
-| `boat_id`         | FK             | Bateau propriétaire (CASCADE DELETE)                                |
-| `organization_id` | FK             | Organisation (CASCADE DELETE, dénormalisé pour scope org)           |
-| `action_type`     | VARCHAR        | `to_buy \| to_replace \| to_repair`                                 |
-| `status`          | VARCHAR        | `pending` (défaut) \| `ordered` \| `done` \| `cancelled`            |
-| `label`           | VARCHAR        | Libellé de l'action (requis)                                        |
-| `notes`           | TEXT NULL      | Remarques libres                                                    |
-| `estimated_cost`  | DECIMAL(10,2)  | Coût estimé (nullable)                                              |
-| `actual_cost`     | DECIMAL(10,2)  | Coût réel (nullable, requis pour statut `done`)                     |
-| `equipment_type`  | VARCHAR NULL   | `generic \| safety \| engine \| sail \| rig` (référence polymorphe) |
-| `equipment_id`    | INTEGER NULL   | ID de l'équipement lié (référence polymorphe)                       |
-| `inspection_id`   | FK NULL        | Référence future vers `boat_inspections` (SET NULL on delete)       |
-| `created_by`      | FK             | Utilisateur créateur (CASCADE DELETE)                               |
-| `resolved_at`     | TIMESTAMP NULL | Date de résolution (auto-positionné au passage à `done`)            |
-| `created_at`      | TIMESTAMP      | Date de création                                                    |
-| `updated_at`      | TIMESTAMP NULL | Date de modification                                                |
+| Colonne            | Type           | Description                                                         |
+| ------------------ | -------------- | ------------------------------------------------------------------- |
+| `id`               | INTEGER PK     | Identifiant unique                                                  |
+| `boat_id`          | FK             | Bateau propriétaire (CASCADE DELETE)                                |
+| `organization_id`  | FK             | Organisation (CASCADE DELETE, dénormalisé pour scope org)           |
+| `action_type`      | VARCHAR        | `to_buy \| to_replace \| to_repair`                                 |
+| `status`           | VARCHAR        | `pending` (défaut) \| `ordered` \| `done` \| `cancelled`            |
+| `label`            | VARCHAR        | Libellé de l'action (requis)                                        |
+| `notes`            | TEXT NULL      | Remarques libres                                                    |
+| `estimated_cost`   | DECIMAL(10,2)  | Coût estimé (nullable)                                              |
+| `actual_cost`      | DECIMAL(10,2)  | Coût réel (nullable, requis pour statut `done`)                     |
+| `equipment_type`   | VARCHAR NULL   | `generic \| safety \| engine \| sail \| rig` (référence polymorphe) |
+| `equipment_id`     | INTEGER NULL   | ID de l'équipement lié (référence polymorphe)                       |
+| `inspection_id`    | FK NULL        | Référence future vers `boat_inspections` (SET NULL on delete)       |
+| `boat_incident_id` | FK NULL        | Incident d'origine (#815), `boat_incidents` (SET NULL on delete)    |
+| `created_by`       | FK             | Utilisateur créateur (CASCADE DELETE)                               |
+| `resolved_at`      | TIMESTAMP NULL | Date de résolution (auto-positionné au passage à `done`)            |
+| `created_at`       | TIMESTAMP      | Date de création                                                    |
+| `updated_at`       | TIMESTAMP NULL | Date de modification                                                |
 
 ## Règles métier
 
@@ -62,10 +63,10 @@ Références :
 
 - `POST /boats/:boatId/equipment-actions` (`boats.equipmentActions.store`)
   - Controller : `BoatEquipmentActionsController.store`
-  - Validation : `createBoatEquipmentActionValidator` — label (requis), actionType (enum), notes/estimatedCost/equipmentType/equipmentId (opt.)
+  - Validation : `createBoatEquipmentActionValidator` — label (requis), actionType (enum), notes/estimatedCost/equipmentType/equipmentId/boatIncidentId (opt.)
   - ACL : `bouncer.with(EquipmentActionPolicy).authorize('create', boat)`
-  - Service : `BoatEquipmentActionService.createForBoat`
-  - Effet : crée l'action avec statut `pending`
+  - Service : `BoatEquipmentActionService.createForBoat` — un `boatIncidentId` doit être un incident du bateau (`incidentNotFound` sinon)
+  - Effet : crée l'action avec statut `pending`, puis `redirect().back()` (onglet Actions, onglet Incidents ou page de détail d'un incident — #815)
 
 ### Modifier une action
 
@@ -136,6 +137,15 @@ label, actionType })` → `BoatShowTabEquipment.vue` (hôte) ouvre un unique `Bo
   `BoatShowTabEquipment.vue` (hôte du modal), `BoatEquipmentActionModal.vue` (prop `prefill`),
   `BoatShowTabContent.vue` (passe `canManageEquipmentActions`). Gating : bouton visible si
   `equipmentActions.create` (membre). i18n `equipmentActions.prefill.addButton`.
+
+## Origine incident (#815)
+
+Depuis une carte de l'onglet Incidents ou la page de détail d'un incident, « Action à réparer »
+ouvre le même `BoatEquipmentActionModal` pré-rempli (`actionType: 'to_repair'`, libellé = type
+d'incident, même équipement quand l'incident en vise un, jamais une pièce moteur) avec
+`prefill.boatIncidentId` envoyé en champ caché. La colonne `boat_incident_id` (FK nullable,
+`SET NULL`) trace l'origine ; `BoatEquipmentActionService.listForIncident` alimente la section
+« Actions liées » de la page de détail. Voir `docs/domain/incidents.md`.
 
 ## Capacités Bouncer
 

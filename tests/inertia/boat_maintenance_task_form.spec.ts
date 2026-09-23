@@ -268,3 +268,14 @@ test("l'échéance en heures se remplit avec le minimum au premier contact", asy
   await dueHours().trigger('focus')
   expect(dueHours().element.value).toBe('1500')
 })
+
+test('l’incident d’origine est envoyé en champ caché, jamais sans pré-remplissage (#815)', () => {
+  const linked = mountForm([], {
+    prefill: { title: 'Avarie moteur', boatIncidentId: 42, equipment: { type: 'safety', id: 30 } },
+    lockEquipment: true,
+  })
+  expect(linked.find('input[type="hidden"][name="boatIncidentId"]').attributes('value')).toBe('42')
+  expect(linked.find('input[name="boatSafetyEquipmentId"]').attributes('value')).toBe('30')
+
+  expect(mountForm().find('input[name="boatIncidentId"]').exists()).toBe(false)
+})

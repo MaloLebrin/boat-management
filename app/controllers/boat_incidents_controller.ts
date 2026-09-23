@@ -1,13 +1,19 @@
 import { BoatIncidentNotFoundError, BoatIncidentValidationError } from '#exceptions/incident_errors'
 import AuditLogService from '#services/audit_log_service'
+import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatIncidentService from '#services/boat_incident_service'
 import BoatHullService from '#services/boat_hull_service'
+import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
-import { toIncident } from '#transformers/boat_transformer'
+import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
+import { toIncident, toMaintenanceTaskRows } from '#transformers/boat_transformer'
+import { toBoatTaskEquipment } from '#transformers/maintenance_transformer'
 import { toMediaRow } from '#transformers/media_row_transformer'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
+import EquipmentActionPolicy from '#policies/equipment_action_policy'
 import IncidentPolicy from '#policies/incident_policy'
+import MaintenancePolicy from '#policies/maintenance_policy'
 import { createBoatIncidentValidator, updateBoatIncidentValidator } from '#validators/boat_incident'
 import { CREATE_INCIDENT_ACTION, UPDATE_INCIDENT_ACTION } from '#shared/constants/offline_queue'
 import { inject } from '@adonisjs/core'
@@ -20,10 +26,15 @@ export default class BoatIncidentsController {
     private boatIncidentService: BoatIncidentService,
     private mediaService: MediaService,
     private organizationService: OrganizationService,
-    private auditLogService: AuditLogService
+    private auditLogService: AuditLogService,
+    private taskService: BoatMaintenanceTaskService,
+    private equipmentActionService: BoatEquipmentActionService
   ) {}
 
-  /** Page de détail d'un incident : en-tête, description, assurance et photos (#814). */
+  /**
+   * Page de détail d'un incident : en-tête, description, assurance, photos
+   * (#814) et suites — tâches et actions créées depuis l'incident (#815).
+   */
   async show({ inertia, response, auth, params, bouncer }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
@@ -52,18 +63,32 @@ export default class BoatIncidentsController {
       throw error
     }
 
-    const [media, canManage, canDelete] = await Promise.all([
-      this.mediaService.listForEntity('boat_incident', incident.id),
-      bouncer.with(IncidentPolicy).allows('edit', boat),
-      bouncer.with(IncidentPolicy).allows('delete', boat),
-    ])
+    // `getForUserOrFail` ne précharge que moteurs, voiles et gréement : la
+    // modale de tâche a aussi besoin de la sécurité et du générique.
+    const [media, tasks, actions, canManage, canDelete, canCreateTask, canCreateAction] =
+      await Promise.all([
+        this.mediaService.listForEntity('boat_incident', incident.id),
+        this.taskService.listForIncident(boat.id, incident.id),
+        this.equipmentActionService.listForIncident(user, boat, incident),
+        bouncer.with(IncidentPolicy).allows('edit', boat),
+        bouncer.with(IncidentPolicy).allows('delete', boat),
+        bouncer.with(MaintenancePolicy).allows('create', boat),
+        bouncer.with(EquipmentActionPolicy).allows('create', boat),
+        boat.load('safetyEquipment'),
+        boat.load('genericEquipment'),
+      ])
 
     return inertia.render('boats/incident_show', {
       boat: { id: boat.id, name: boat.name },
       incident: toIncident(incident),
       photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
+      tasks: toMaintenanceTaskRows(tasks),
+      actions: actions.map(toBoatEquipmentActionRow),
+      equipment: toBoatTaskEquipment(boat).equipment,
       canManage,
       canDelete,
+      canCreateTask,
+      canCreateAction,
     })
   }
 

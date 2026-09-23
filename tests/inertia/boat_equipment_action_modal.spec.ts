@@ -206,3 +206,25 @@ test('does not render equipment hidden inputs without a prefill', () => {
   expect(inputs.find((i) => i.attributes('name') === 'equipmentType')).toBeFalsy()
   expect(inputs.find((i) => i.attributes('name') === 'equipmentId')).toBeFalsy()
 })
+
+test('a prefill raised from an incident sends boatIncidentId without equipment inputs (#815)', () => {
+  const w = mount(BoatEquipmentActionModal, {
+    props: {
+      boat: minimalBoat,
+      open: true,
+      editingAction: null,
+      prefill: { label: 'Avarie moteur', actionType: 'to_repair' as const, boatIncidentId: 42 },
+    },
+  })
+  const inputs = w.findAll('input')
+  expect(inputs.find((i) => i.attributes('name') === 'boatIncidentId')?.attributes('value')).toBe(
+    '42'
+  )
+  expect(inputs.find((i) => i.attributes('name') === 'equipmentType')).toBeFalsy()
+  expect((w.find('select[name="actionType"]').element as HTMLSelectElement).value).toBe('to_repair')
+})
+
+test('does not render the boatIncidentId input without an incident prefill', () => {
+  const inputs = mountModal(null).findAll('input')
+  expect(inputs.find((i) => i.attributes('name') === 'boatIncidentId')).toBeFalsy()
+})

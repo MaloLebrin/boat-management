@@ -14,18 +14,15 @@ import {
   type EquipmentActionType,
   type EquipmentReferenceType,
 } from '#shared/constants/equipment_action'
-import type {
-  BoatEquipmentActionRow,
-  BoatShowDetail,
-  EquipmentActionPrefill,
-} from '~/types/boat_show'
+import type { BoatEquipmentActionRow, EquipmentActionPrefill } from '~/types/boat_show'
 
 const props = withDefaults(
   defineProps<{
-    boat: BoatShowDetail
+    /** Only `id` and `name` are read — the boat page passes its full detail. */
+    boat: { id: number; name: string }
     open: boolean
     editingAction: BoatEquipmentActionRow | null
-    /** Seed for a new action raised from an equipment card (#313). */
+    /** Seed for a new action raised from an equipment card (#313) or an incident (#815). */
     prefill?: EquipmentActionPrefill | null
   }>(),
   { prefill: null }
@@ -48,6 +45,7 @@ const actualCost = ref<string>('')
 const status = ref<EquipmentActionStatus>('pending')
 const equipmentType = ref<EquipmentReferenceType | null>(null)
 const equipmentId = ref<number | null>(null)
+const boatIncidentId = ref<number | null>(null)
 
 function resetForm(action: BoatEquipmentActionRow | null) {
   if (action) {
@@ -59,6 +57,7 @@ function resetForm(action: BoatEquipmentActionRow | null) {
     status.value = action.status
     equipmentType.value = action.equipmentType
     equipmentId.value = action.equipmentId
+    boatIncidentId.value = null
   } else {
     // Create: seed from the prefill (#313) when present, otherwise blank defaults.
     label.value = props.prefill?.label ?? ''
@@ -69,6 +68,7 @@ function resetForm(action: BoatEquipmentActionRow | null) {
     status.value = 'pending'
     equipmentType.value = props.prefill?.equipmentType ?? null
     equipmentId.value = props.prefill?.equipmentId ?? null
+    boatIncidentId.value = props.prefill?.boatIncidentId ?? null
   }
 }
 
@@ -122,6 +122,13 @@ function close() {
         <input type="hidden" name="equipmentType" :value="equipmentType" />
         <input type="hidden" name="equipmentId" :value="equipmentId" />
       </template>
+      <!-- Origin incident when raised from an incident card (#815) -->
+      <input
+        v-if="!editingAction && boatIncidentId !== null"
+        type="hidden"
+        name="boatIncidentId"
+        :value="boatIncidentId"
+      />
 
       <BaseInput
         id="action-label"

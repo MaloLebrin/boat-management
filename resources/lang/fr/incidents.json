@@ -61,5 +61,20 @@
     "detail": "Détail",
     "reportedOn": "Déclaré le {date}",
     "closedOn": "Clôturé le {date}"
+  },
+  "followUps": {
+    "createTask": "Créer une tâche",
+    "createAction": "Action à réparer",
+    "count": "{count, plural, one {# suite} other {# suites}}",
+    "title": "Suites de l'incident",
+    "hint": "Créez une tâche de maintenance ou une action à réparer : elle restera rattachée à cet incident.",
+    "tasksTitle": "Tâches liées",
+    "actionsTitle": "Actions liées",
+    "tasksEmpty": "Aucune tâche créée depuis cet incident.",
+    "actionsEmpty": "Aucune action créée depuis cet incident.",
+    "seeTasks": "Voir les tâches",
+    "seeActions": "Voir les actions",
+    "taskDone": "Terminée",
+    "taskOpen": "Ouverte"
   }
 }

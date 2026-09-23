@@ -13,6 +13,8 @@ export type CreateEquipmentActionPayload = {
   estimatedCost?: number | null
   equipmentType?: EquipmentReferenceType | null
   equipmentId?: number | null
+  /** Incident à l'origine de l'action (#815) — doit appartenir au bateau. */
+  boatIncidentId?: number | null
 }
 
 export type UpdateEquipmentActionPayload = {
@@ -39,6 +41,8 @@ export type BoatEquipmentActionRow = {
   equipmentId: number | null
   /** Set when the action was raised from a rental inspection (#311). */
   inspectionId: number | null
+  /** Set when the action was raised from an incident (#815). */
+  boatIncidentId: number | null
   resolvedAt: string | null
   createdAt: string
   createdBy: number

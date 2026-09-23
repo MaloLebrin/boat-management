@@ -61,6 +61,7 @@ function toPendingDefectRows(actions: QueuedAction[], tempId: string): BoatEquip
         null) as BoatEquipmentActionRow['equipmentType'],
       equipmentId: asNumberOrNull(action.payload.equipmentId),
       inspectionId: null,
+      boatIncidentId: null,
       resolvedAt: null,
       createdAt: action.createdAt,
       createdBy: 0,

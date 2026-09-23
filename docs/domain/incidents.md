@@ -55,11 +55,18 @@ La fiche bateau expose trois props lues sur cette policy — `canCreateIncidents
 - `BoatIncidentRow.photosCount` (compteur seul, une requête groupée dans `listForBoat`) : les médias ne voyagent jamais dans la prop différée `incidents`.
 - Hors-ligne : la déclaration d'un incident est enfilée, **pas** les photos — `usePhotoUpload` refuse l'envoi sans réseau (#621), le bouton est désactivé avec un message.
 
+## Suites : tâche et action à réparer (#815)
+
+- `boat_incident_id` (FK nullable `SET NULL`, indexée) sur **`boat_maintenance_tasks`** et **`boat_equipment_actions`** — même motif qu'`inspection_id` (#311). Supprimer l'incident conserve la suite, qui perd son origine. `BoatEquipmentActionRow.boatIncidentId` et `MaintenanceTaskRow.boatIncidentId` l'exposent au front.
+- **Services** : `boatIncidentId` sur `CreateMaintenanceTaskPayload` / `CreateEquipmentActionPayload`, borné au bateau par `incidentBelongsToBoat` (`app/utils/incident_utils.ts`) → `incidentNotFound` dans le domaine appelant (`flash.maintenanceTasks.incidentNotFound`, `flash.equipmentActions.incidentNotFound`). `BoatMaintenanceTaskService.listForIncident(boatId, incidentId)` et `BoatEquipmentActionService.listForIncident(user, boat, incident)`. Le clone récurrent de `markDone` ne reporte pas l'incident.
+- **Routes** : aucune nouvelle — `boats.maintenanceTasks.store` et `boats.equipmentActions.store` acceptent `boatIncidentId` (champ caché) ; la seconde répond désormais `redirect().back()` pour revenir sur l'onglet ou la page d'origine. `boats.incidents.show` sert en plus `tasks`, `actions`, `equipment` (`TaskEquipmentSource`), `canCreateTask` (`MaintenancePolicy.create`), `canCreateAction` (`EquipmentActionPolicy.create`).
+- **UI** : `IncidentFollowUpButtons` (« Créer une tâche » / « Action à réparer ») émet un pré-remplissage calculé par `inertia/utils/incident_follow_ups.ts` — titre depuis le type d'incident, même équipement verrouillé, action `to_repair`, `boatIncidentId` caché. Une **pièce moteur** n'est pas rabattue sur son moteur : ni tâche ni action ne savent la viser, elle reste tracée par l'incident seul. L'onglet (`BoatIncidentCard`, extraite de `BoatShowTabIncidents`) et la page de détail (`IncidentShowFollowUps`) hébergent chacun une modale de tâche et une modale d'action. Badge « n suites » compté côté client depuis `maintenanceTasks` / `equipmentActions` (groupe différé `maintenance`, distinct du groupe `navigation` des incidents : rien tant qu'ils ne sont pas chargés) ; sections « Tâches liées » / « Actions liées » en lecture seule sur la page de détail.
+- **Audit** : `maintenance_task.create` porte `incidentId` quand la tâche vient d'un incident.
+
 ## Copilote
 
 Action confirmable `report_incident` (`incidents.create`), avec `boatEngineId` facultatif (#813) — un moteur hors du bateau est une réponse invalide, comme pour `log_fuel`. Les autres cibles passent par l'UI. Fiche produit `incidents` dans `shared/constants/assistant/product_knowledge.ts`.
 
 ## Chantiers suivants
 
-- #815 — créer une tâche ou une action « à réparer » depuis un incident (`boat_incident_id` sur tâches et actions).
 - Verrou optimiste sur l'édition d'un incident (`conflictType` + `_expectedUpdatedAt`) — seule case encore vide du protocole hors-ligne pour ce domaine.

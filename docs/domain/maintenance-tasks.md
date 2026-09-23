@@ -18,7 +18,8 @@ Champs clés:
 - `done_at` (date), `done_engine_hours` (int) pour les tasks engine-hours
 - `recurrence_interval_months` (int)
 - `recurrence_interval_engine_hours` (int)
-- cibles optionnelles: `boat_engine_id`, `boat_sail_id`, `boat_rig_id`
+- cibles optionnelles: `boat_engine_id`, `boat_sail_id`, `boat_rig_id`, `boat_safety_equipment_id`, `boat_generic_equipment_id`
+- `boat_incident_id` (FK nullable, `SET NULL`) — incident à l'origine de la tâche (#815), voir `docs/domain/incidents.md`
 
 ## Routes → controllers → services → UI
 
@@ -40,6 +41,7 @@ Références:
 Règles (source: `createForBoat`):
 
 - `title` obligatoire (trim), 200 caractères max — aligné sur les événements (#581)
+- `boatIncidentId` facultatif : doit être un incident **du bateau** (`incidentNotFound` sinon) ; posé en champ caché par « Créer une tâche » depuis un incident (#815) et repris dans les métadonnées d'audit (`incidentId`). Le clone récurrent créé par `markDone` ne le reporte pas.
 - `subject` : les 10 valeurs de `MAINTENANCE_SUBJECTS` (`shared/constants/maintenance/maintenance_subjects.ts`), source unique partagée avec les événements et l'historique
 - au moins un des deux:
   - `dueAt`

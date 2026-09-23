@@ -13,6 +13,7 @@ export const createBoatEquipmentActionValidator = vine.create(
     estimatedCost: vine.number().positive().optional(),
     equipmentType: vine.enum(equipmentTypeChoices).optional(),
     equipmentId: vine.number().withoutDecimals().positive().optional(),
+    boatIncidentId: vine.number().withoutDecimals().positive().optional(),
   })
 )
 

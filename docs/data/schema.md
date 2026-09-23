@@ -252,7 +252,8 @@ plomberie).
 - `subject`: `boat | engine | sail | rig`
 - `status`: `open | done`
 - cibles optionnelles:
-  - `boatEngineId`, `boatSailId`, `boatRigId`
+  - `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId`, `boatGenericEquipmentId`
+- `boatIncidentId` (FK `boat_incidents` nullable, SET NULL, indexé) — incident à l'origine de la tâche (#815) ; supprimer l'incident conserve la tâche
 - contenu: `title`, `notes`
 - planification:
   - `dueAt` (date)
@@ -291,6 +292,7 @@ plomberie).
 - `estimatedCost`, `actualCost` (decimal 10,2, nullable)
 - référence polymorphe: `equipmentType` (`generic | safety | engine | sail | rig`), `equipmentId`
 - `inspectionId` (FK `boat_inspections` nullable, SET NULL) — renseigné quand l'action a été levée depuis un état des lieux (#311) ; supprimer l'inspection ne détruit pas l'action
+- `boatIncidentId` (FK `boat_incidents` nullable, SET NULL, indexé) — renseigné quand l'action a été levée depuis un incident (#815) ; supprimer l'incident ne détruit pas l'action
 - `createdBy` (FK users)
 - `resolvedAt` (timestamp nullable, auto-positionné au passage à `done`)
 
@@ -303,6 +305,7 @@ plomberie).
 - `createdBy` (FK `users` nullable, SET NULL, indexé) — qui a déclaré l'incident (#816), posé par `BoatIncidentService.createForBoat` sur la déclaration manuelle comme sur celle du copilote ; `null` pour les lignes antérieures ou un compte supprimé
 - cible optionnelle (#813), **au plus une** des six FK nullables `SET NULL` : `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId`, `boatGenericEquipmentId`, `boatEnginePartId` — supprimer l'équipement conserve l'incident, rattaché au bateau entier
 - photos (#814) : lignes `media` avec `entity_type = 'boat_incident'`, purgées avec l'incident et avec le bateau
+- suites (#815) : référencé par `boat_maintenance_tasks.boat_incident_id` et `boat_equipment_actions.boat_incident_id` (SET NULL)
 
 ### boat_port_stays
 

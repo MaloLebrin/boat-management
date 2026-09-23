@@ -48,7 +48,8 @@
     "engineSubjectRequired": "Engine-hour tasks must have the subject set to engine.",
     "engineIdRequired": "An engine is required for engine-hour tasks.",
     "doneEngineHoursRequired": "Engine hours at completion is required.",
-    "doneEngineHoursInvalid": "Engine hours at completion must be 0 or more."
+    "doneEngineHoursInvalid": "Engine hours at completion must be 0 or more.",
+    "incidentNotFound": "This incident does not belong to this boat."
   },
   "ai": {
     "messagesRequired": "The messages field is required.",
@@ -163,7 +164,8 @@
     "deleted": "Action deleted.",
     "notFound": "Action not found.",
     "labelRequired": "A label is required.",
-    "actualCostRequired": "Actual cost is required when marking as done."
+    "actualCostRequired": "Actual cost is required when marking as done.",
+    "incidentNotFound": "This incident does not belong to this boat."
   },
   "incidents": {
     "created": "Incident reported.",

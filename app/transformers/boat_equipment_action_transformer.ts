@@ -19,6 +19,7 @@ export function toBoatEquipmentActionRow(action: BoatEquipmentAction): BoatEquip
     equipmentType: action.equipmentType as EquipmentReferenceType | null,
     equipmentId: action.equipmentId,
     inspectionId: action.inspectionId,
+    boatIncidentId: action.boatIncidentId,
     resolvedAt: action.resolvedAt ? action.resolvedAt.toISO()! : null,
     createdAt: action.createdAt.toISO()!,
     createdBy: action.createdBy,
