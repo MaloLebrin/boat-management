@@ -82,8 +82,8 @@ un renommage casse désormais à la compilation plutôt qu'en mer.
 | `create-navigation-log-entry` | `CREATE_NAVIGATION_LOG_ENTRY_ACTION` | —               | ✅             | —                      |
 | `create-fuel-log`             | `CREATE_FUEL_LOG_ACTION`             | —               | ✅             | —                      |
 | `increment-engine-hours`      | `INCREMENT_ENGINE_HOURS_ACTION`      | —               | ✅             | —                      |
-| `create-incident`             | `CREATE_INCIDENT_ACTION`             | —               | ❌             | —                      |
-| `update-incident`             | `UPDATE_INCIDENT_ACTION`             | ❌              | ❌             | —                      |
+| `create-incident`             | `CREATE_INCIDENT_ACTION`             | —               | ✅             | —                      |
+| `update-incident`             | `UPDATE_INCIDENT_ACTION`             | ❌              | ✅             | —                      |
 
 `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` relit les sources — il
 n'importe pas les constantes, une garde qui partagerait sa source avec sa cible
@@ -91,12 +91,13 @@ hériterait de ses angles morts. Il tient trois choses : **aucun littéral** ne
 réapparaît (le contournement qui rouvrirait #726), les deux moitiés se
 **répondent**, et aucune constante déclarée n'est **morte**.
 
-Les deux ❌ du tableau sont les incidents, seul trou restant : ils sont enfilés
-hors-ligne mais `BoatIncidentsController` rend ses refus métier en
-`flash('error')` + redirection, sans `rejectedType` — exactement le défaut que
-#727 a corrigé pour les quatre créations du domaine terrain. La garde les porte
-en **exemptions motivées** plutôt que de les ignorer. Un « — » signale au
-contraire un marqueur qui n'a pas lieu d'être.
+Le seul ❌ restant est le verrou optimiste de `update-incident` : l'édition
+d'un incident rejouée écrase la version du serveur, sans `conflictType`. Les
+deux `rejectedType` des incidents, longtemps le dernier trou du protocole, sont
+renvoyés par `BoatIncidentsController` depuis #816 — la liste d'exemptions de
+la garde (`ENQUEUED_WITHOUT_SERVER_ANSWER`) est vide, mais reste en place :
+c'est là qu'un prochain trou devra s'écrire, avec sa raison. Un « — » signale
+au contraire un marqueur qui n'a pas lieu d'être.
 
 ### Ce que coûte une case vide
 
@@ -190,6 +191,6 @@ Deux contraintes à connaître avant d'en écrire un autre :
 
 ## Constats ouverts
 
-| #   | Constat                                                                          |
-| --- | -------------------------------------------------------------------------------- |
-| —   | les incidents s'enfilent sans `rejectedType` ni verrou optimiste (cf. ci-dessus) |
+| #   | Constat                                                                |
+| --- | ---------------------------------------------------------------------- |
+| —   | l'édition d'un incident s'enfile sans verrou optimiste (cf. ci-dessus) |

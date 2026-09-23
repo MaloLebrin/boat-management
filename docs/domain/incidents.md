@@ -12,6 +12,7 @@ Déclarer et suivre les événements imprévus d'un bateau (#106) : échouage, v
 - `occurredAt` (timestamp, indexé), `type` (CHECK : les 8 types de `INCIDENT_TYPES`), `location` (nullable), `description`
 - `insuranceClaimed` (bool), `insuranceClaimRef` (nullable)
 - `status` (CHECK : `open | in_progress | closed`), `closedAt` — posé au passage à `closed`, remis à `null` à la réouverture
+- `createdBy` (FK `users` nullable, `SET NULL`) — le déclarant (#816), posé par `createForBoat` : la déclaration manuelle et celle du copilote passent par le même chemin. Relation `creator` sur le modèle.
 - **cible (#813)**, six FK nullables `SET NULL`, **au plus une posée** : `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId`, `boatGenericEquipmentId`, `boatEnginePartId`. Supprimer l'équipement conserve l'incident, qui vise alors le bateau entier.
 
 Types partagés : `shared/types/incident.ts` — `IncidentTargetType = EquipmentReferenceType | 'engine_part'`, `IncidentTargetRef { type, id }`, `IncidentTargetSummary { type, id, name, engineId? }`, `BoatIncidentRow`. Helper : `shared/helpers/incident_target.ts` (`incidentTargetFieldName`, `incidentTargetRefOf`, `incidentTargetColumns`, `hasIncidentTargetInput`).
@@ -22,9 +23,13 @@ Types partagés : `shared/types/incident.ts` — `IncidentTargetType = Equipment
 
 Capacités `incidents.view | create | edit | delete` (`shared/types/permissions.ts`), policy `app/policies/incident_policy.ts` (`OrgScopedPolicy`). `delete` est réservé aux admins.
 
+La fiche bateau expose trois props lues sur cette policy — `canCreateIncidents`, `canEditIncidents`, `canDeleteIncidents` — et l'onglet Incidents reçoit `canCreate` / `canEdit` / `canDelete` (#816). Il recevait auparavant `canManageMaintenance` (`boats.edit`) : un membre autorisé par `IncidentPolicy` mais sans `boats.edit` ne voyait pas les boutons que le contrôleur lui accordait.
+
 ## Routes → controllers → services
 
 - `POST /boats/:boatId/incidents` (`boats.incidents.store`), `PUT …/:incidentId` (`update`), `DELETE …/:incidentId` (`destroy`) → `BoatIncidentsController` → `BoatIncidentService`. Redirection vers `/boats/:id?tab=incidents` avec flash `flash.incidents.*`.
+- **Audit (#816)** : le contrôleur journalise `incident.create`, `incident.update` (métadonnées `boatName`, `type`, `status` atteint) et `incident.delete` via `AuditLogService` — un refus métier ou un incident introuvable ne journalise rien. `incident.create` est aussi posé par le copilote (`report_incident`).
+- **Hors-ligne (#816)** : un refus métier de `store` (`descriptionRequired`, `multipleEquipment`, `equipmentNotFound`) flashe `rejectedType = create-incident`, un refus ou un incident introuvable en `update` flashe `update-incident` — sans quoi `drainQueue` lirait la redirection comme un succès et détruirait la saisie (cf. `docs/domain/offline-queue.md`). L'édition reste sans verrou optimiste (`conflictType`).
 - `GET /navigation/incidents` (`navigation.incidents`) → `NavigationController.incidents` → `NavigationService.getFleetIncidents`.
 - Lecture sur la fiche bateau : prop **différée** `incidents` du groupe `navigation` (`BoatsController.show`).
 
@@ -57,4 +62,4 @@ Action confirmable `report_incident` (`incidents.create`), avec `boatEngineId` f
 ## Chantiers suivants
 
 - #815 — créer une tâche ou une action « à réparer » depuis un incident (`boat_incident_id` sur tâches et actions).
-- #816 — `created_by`, `rejectedType` hors-ligne, droits `incidents.*` sur l'onglet, audit `incident.update/delete`.
+- Verrou optimiste sur l'édition d'un incident (`conflictType` + `_expectedUpdatedAt`) — seule case encore vide du protocole hors-ligne pour ce domaine.

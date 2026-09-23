@@ -57,6 +57,7 @@ const props = defineProps<{
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
   canCreateIncidents: boolean
+  canEditIncidents: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean

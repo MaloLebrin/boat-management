@@ -49,12 +49,12 @@ export const CLOSE_NAVIGATION_LOG_ACTION = 'close-navigation-log'
 export const UPDATE_SHEET_ITEM_ACTION = 'update-sheet-item'
 
 /**
- * Les incidents. Ils sont enfilés hors-ligne mais **aucun contrôleur ne renvoie
- * encore leur marqueur** : un refus métier de `BoatIncidentsController` part en
- * `flash('error')` + redirection, que `drainQueue` lit comme un succès (le
- * défaut que #727 a corrigé pour les quatre créations du domaine terrain). Ils
- * vivent ici quand même — le vocabulaire enfilé est clos, et l'exemption
- * correspondante de la garde d'hygiène nomme le trou au lieu de le cacher.
+ * Les incidents. Enfilés hors-ligne depuis #106, ils ont longtemps été le
+ * dernier trou du protocole : `BoatIncidentsController` rendait ses refus
+ * métier en `flash('error')` + redirection, que `drainQueue` lisait comme un
+ * succès. Depuis #816 le contrôleur renvoie leur `rejectedType` comme les
+ * quatre créations du domaine terrain (#727). Il reste sans verrou optimiste :
+ * une édition rejouée écrase la version du serveur, sans `conflictType`.
  */
 export const CREATE_INCIDENT_ACTION = 'create-incident'
 export const UPDATE_INCIDENT_ACTION = 'update-incident'

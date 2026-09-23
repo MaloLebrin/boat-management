@@ -321,6 +321,8 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
     assert.equal(incidents[0].type, 'grounding')
     assert.equal(incidents[0].status, 'open')
     assert.isNull(incidents[0].boatEngineId)
+    // Le déclarant est posé par le service, le chemin copilote en hérite (#816).
+    assert.equal(incidents[0].createdBy, user.id)
     assert.lengthOf(await AuditLog.query().where('action', 'incident.create'), 1)
   })
 

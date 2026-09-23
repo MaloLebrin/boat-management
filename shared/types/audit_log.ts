@@ -23,6 +23,10 @@ export const AUDIT_ACTIONS = [
   'reservation.create',
   'client.create',
   'engine_part.set_stock',
+  // Cycle de vie complet d'un incident depuis l'onglet (#816) — `incident.create`
+  // ci-dessus est partagé avec le copilote.
+  'incident.update',
+  'incident.delete',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]

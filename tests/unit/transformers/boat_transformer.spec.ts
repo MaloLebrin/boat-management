@@ -295,6 +295,7 @@ function makeShellContext(overrides: Partial<BoatShowShellContext> = {}): BoatSh
     canManageEquipmentActions: false,
     canDeleteEquipmentActions: false,
     canCreateIncidents: true,
+    canEditIncidents: true,
     canDeleteIncidents: false,
     canCreateFuelLogs: true,
     canDeleteFuelLogs: false,

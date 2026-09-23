@@ -353,7 +353,9 @@
       "incident_create": "Incident déclaré",
       "reservation_create": "Réservation créée",
       "client_create": "Client créé",
-      "engine_part_set_stock": "Stock de pièce mis à jour"
+      "engine_part_set_stock": "Stock de pièce mis à jour",
+      "incident_update": "Incident modifié",
+      "incident_delete": "Incident supprimé"
     },
     "empty": {
       "title": "Aucune activité",

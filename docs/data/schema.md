@@ -300,6 +300,7 @@ plomberie).
 - `occurredAt` (timestamp, indexé), `type` (CHECK : `grounding | flooding | rigging_failure | engine_failure | collision | fire | theft_vandalism | other`), `location` (nullable), `description`
 - `insuranceClaimed` (bool), `insuranceClaimRef` (nullable)
 - `status` (CHECK : `open | in_progress | closed`, indexé), `closedAt` (nullable)
+- `createdBy` (FK `users` nullable, SET NULL, indexé) — qui a déclaré l'incident (#816), posé par `BoatIncidentService.createForBoat` sur la déclaration manuelle comme sur celle du copilote ; `null` pour les lignes antérieures ou un compte supprimé
 - cible optionnelle (#813), **au plus une** des six FK nullables `SET NULL` : `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId`, `boatGenericEquipmentId`, `boatEnginePartId` — supprimer l'équipement conserve l'incident, rattaché au bateau entier
 - photos (#814) : lignes `media` avec `entity_type = 'boat_incident'`, purgées avec l'incident et avec le bateau
 

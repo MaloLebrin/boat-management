@@ -353,7 +353,9 @@
       "incident_create": "Incident reported",
       "reservation_create": "Reservation created",
       "client_create": "Client created",
-      "engine_part_set_stock": "Part stock updated"
+      "engine_part_set_stock": "Part stock updated",
+      "incident_update": "Incident updated",
+      "incident_delete": "Incident deleted"
     },
     "empty": {
       "title": "No activity yet",
