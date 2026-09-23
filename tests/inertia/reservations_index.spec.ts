@@ -122,6 +122,19 @@ test('changing the filter navigates with the boat id', async () => {
   )
 })
 
+test('single-boat fleet: no boat filter, the charter type filter still works alone (#823)', async () => {
+  const w = mount(ReservationsIndex, { props: { ...baseProps, boats: [boats[0]] } })
+  expect(w.find('#fleet-boat-filter').exists()).toBe(false)
+  expect(w.find('#fleet-type-filter').exists()).toBe(true)
+
+  await w.get('#fleet-type-filter').setValue('cabin')
+  expect(routerGet).toHaveBeenCalledWith(
+    '/reservations',
+    { type: 'cabin' },
+    expect.objectContaining({ preserveScroll: true })
+  )
+})
+
 test('renders a create-reservation button fed with the fleet boats', () => {
   const w = mount(ReservationsIndex, { props: baseProps })
   const btn = w.get('[data-testid="create-button"]')

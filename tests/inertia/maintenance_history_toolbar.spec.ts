@@ -48,3 +48,30 @@ test('search field and subject select do not share the same label', () => {
   expect(selectLabels).toContain('maintenance.history.filterBar.subjectLabel')
   expect(inputLabel).not.toBe('maintenance.history.filterBar.subjectLabel')
 })
+
+const selectLabels = (w: ReturnType<typeof mount>) =>
+  w.findAll('.base-select').map((s) => s.attributes('data-label'))
+
+test('offers the boat filter when the org has several boats', () => {
+  const w = mount(MaintenanceHistoryToolbar, {
+    props: {
+      filters: baseFilters,
+      boatOptions: [
+        { id: 1, name: 'Mistral' },
+        { id: 2, name: 'Zephyr' },
+      ],
+      total: 0,
+    },
+  })
+  expect(selectLabels(w)).toContain('maintenance.history.filterBar.boatLabel')
+})
+
+test('hides the boat filter for a single-boat fleet, keeping the other filters (#823)', () => {
+  const w = mount(MaintenanceHistoryToolbar, {
+    props: { filters: baseFilters, boatOptions: [{ id: 1, name: 'Mistral' }], total: 0 },
+  })
+  const labels = selectLabels(w)
+  expect(labels).not.toContain('maintenance.history.filterBar.boatLabel')
+  expect(labels).toContain('maintenance.history.filterBar.subjectLabel')
+  expect(labels).toContain('maintenance.history.filterBar.sortLabel')
+})

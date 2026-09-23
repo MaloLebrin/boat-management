@@ -29,6 +29,7 @@
       "emailPlaceholder": "collègue@exemple.com",
       "role": "Rôle",
       "boats": "Bateaux concernés",
+      "singleBoat": "Accès à {boat}, le seul bateau de la flotte",
       "submit": "Envoyer l'invitation",
       "cancel": "Annuler"
     },

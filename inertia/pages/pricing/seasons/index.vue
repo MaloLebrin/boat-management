@@ -8,6 +8,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import PricingSeasonForm from '~/components/pricing/PricingSeasonForm.vue'
 import PricingSeasonList from '~/components/pricing/PricingSeasonList.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import { useRowDeleteConfirmation } from '~/composables/use_row_delete_confirmation'
 import type {
@@ -35,6 +36,9 @@ const seasonDeletion = useRowDeleteConfirmation<PricingSeasonRow>({
 const boatFilterOptions = computed(() =>
   props.boatOptions.map((b) => ({ label: b.name, value: String(b.id) }))
 )
+
+/** Flotte mono-bateau (#823) : la liste est déjà celle du seul bateau, pas de filtre. */
+const { hasSingleBoat } = useSingleBoat(() => props.boatOptions)
 
 function onBoatFilterChange(value: string | number) {
   const boatId = value === '' ? undefined : value
@@ -81,7 +85,7 @@ function handleEdit(season: PricingSeasonRow) {
       @close="editingSeason = null"
     />
 
-    <div class="mt-6 grid gap-3 md:grid-cols-12 md:items-end">
+    <div v-if="!hasSingleBoat" class="mt-6 grid gap-3 md:grid-cols-12 md:items-end">
       <div class="md:col-span-4">
         <BaseSelect
           :label="t('pricingSeasons.filter.boat')"

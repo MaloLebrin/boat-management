@@ -49,6 +49,39 @@ test('choosing a boat reloads only its equipment, then shows the form', async ()
   expect(w.find('[data-testid="task-form"]').attributes('data-boat')).toBe('2')
 })
 
+test('opening the modal with several boats does not reload anything', async () => {
+  const w = mount(QuickAddMaintenanceTaskModal, { props: { boats } })
+  ;(w.vm as unknown as { openModal: () => void }).openModal()
+  await w.vm.$nextTick()
+
+  expect(w.find('select[name="taskBoatId"]').exists()).toBe(true)
+  expect(mockReload).not.toHaveBeenCalled()
+})
+
+test('single boat fleet: the boat is picked at opening, its equipment reloaded, no selector (#823)', async () => {
+  const w = mount(QuickAddMaintenanceTaskModal, { props: { boats: [boats[0]] } })
+  ;(w.vm as unknown as { openModal: () => void }).openModal()
+  await w.vm.$nextTick()
+
+  expect(w.find('select[name="taskBoatId"]').exists()).toBe(false)
+  expect(mockReload).toHaveBeenCalledTimes(1)
+  expect(mockReload).toHaveBeenCalledWith({ only: ['taskEquipment'], data: { taskBoatId: '1' } })
+
+  await w.setProps({ taskEquipment: { boatId: 1, equipment: emptyEquipment } })
+  expect(w.find('[data-testid="task-form"]').attributes('data-boat')).toBe('1')
+})
+
+test('single boat fleet: each opening reloads the equipment again', async () => {
+  const w = mount(QuickAddMaintenanceTaskModal, { props: { boats: [boats[0]] } })
+  const vm = w.vm as unknown as { openModal: () => void }
+  vm.openModal()
+  await w.vm.$nextTick()
+  vm.openModal()
+  await w.vm.$nextTick()
+
+  expect(mockReload).toHaveBeenCalledTimes(2)
+})
+
 test('equipment loaded for another boat is never used', async () => {
   const w = mount(QuickAddMaintenanceTaskModal, {
     props: { boats, taskEquipment: { boatId: 1, equipment: emptyEquipment } },

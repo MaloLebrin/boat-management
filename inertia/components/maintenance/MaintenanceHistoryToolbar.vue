@@ -11,6 +11,7 @@ import type {
 } from '#shared/types/maintenance'
 import { useT } from '~/composables/use_t'
 import { useListFilters } from '~/composables/use_list_filters'
+import { useSingleBoat } from '~/composables/use_single_boat'
 
 const { t } = useT()
 
@@ -47,6 +48,9 @@ const boatSelectOptions = computed(() =>
   props.boatOptions.map((b) => ({ value: String(b.id), label: b.name }))
 )
 
+/** Flotte mono-bateau (#823) : la liste est déjà celle du seul bateau, pas de filtre. */
+const { hasSingleBoat } = useSingleBoat(() => props.boatOptions)
+
 const sortOptions = computed<Array<{ label: string; value: MaintenanceHistorySort }>>(() => [
   { label: t('maintenance.history.filterBar.sortRecent'), value: 'recent' },
   { label: t('maintenance.history.filterBar.sortOldest'), value: 'oldest' },
@@ -71,7 +75,7 @@ const hasActiveFilters = computed(
 <template>
   <div class="mt-8 space-y-4">
     <div class="grid gap-3 md:grid-cols-12 md:items-end">
-      <div class="md:col-span-4">
+      <div :class="hasSingleBoat ? 'md:col-span-6' : 'md:col-span-4'">
         <BaseInput
           :model-value="qDraft"
           :label="t('maintenance.history.filterBar.searchLabel')"
@@ -80,7 +84,7 @@ const hasActiveFilters = computed(
           @update:model-value="onSearchInput"
         />
       </div>
-      <div class="md:col-span-4">
+      <div v-if="!hasSingleBoat" class="md:col-span-4">
         <BaseSelect
           :label="t('maintenance.history.filterBar.boatLabel')"
           allow-empty
@@ -92,7 +96,7 @@ const hasActiveFilters = computed(
           "
         />
       </div>
-      <div class="md:col-span-4">
+      <div :class="hasSingleBoat ? 'md:col-span-6' : 'md:col-span-4'">
         <BaseSelect
           :label="t('maintenance.history.filterBar.subjectLabel')"
           allow-empty

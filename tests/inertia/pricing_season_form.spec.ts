@@ -5,6 +5,7 @@ import type { PricingSeasonRow } from '../../shared/types/pricing_season'
 const mockPost = vi.hoisted(() => vi.fn())
 const mockPut = vi.hoisted(() => vi.fn())
 const mockReset = vi.hoisted(() => vi.fn())
+const mockTransform = vi.hoisted(() => vi.fn())
 
 vi.mock('@inertiajs/vue3', () => ({
   useForm: (initial: Record<string, unknown>) => ({
@@ -13,7 +14,10 @@ vi.mock('@inertiajs/vue3', () => ({
     processing: false,
     data: () => ({ ...initial }),
     reset: mockReset,
-    transform: () => ({ post: mockPost, put: mockPut }),
+    transform: (fn: () => unknown) => {
+      mockTransform(fn())
+      return { post: mockPost, put: mockPut }
+    },
   }),
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
 }))
@@ -98,5 +102,36 @@ describe('PricingSeasonForm', () => {
   test('displays edit title when a season is provided', () => {
     const wrapper = mount(PricingSeasonForm, { props: { season, boatOptions: [] } })
     expect(wrapper.text()).toContain('pricingSeasons.form.editTitle')
+  })
+
+  describe('single boat fleet (#823)', () => {
+    const fleet = [
+      { id: 7, name: 'Mistral' },
+      { id: 8, name: 'Zephyr' },
+    ]
+
+    test('hides the scope selector and creates the season on the only boat', async () => {
+      const wrapper = mount(PricingSeasonForm, { props: { boatOptions: [fleet[0]] } })
+      expect(wrapper.find('select[name="boatId"]').exists()).toBe(false)
+
+      await wrapper.find('form').trigger('submit')
+      expect(mockTransform).toHaveBeenCalledWith(expect.objectContaining({ boatId: 7 }))
+    })
+
+    test('keeps the scope of an existing global season untouched', async () => {
+      const wrapper = mount(PricingSeasonForm, { props: { season, boatOptions: [fleet[0]] } })
+      expect(wrapper.find('select[name="boatId"]').exists()).toBe(false)
+
+      await wrapper.find('form').trigger('submit')
+      expect(mockTransform).toHaveBeenCalledWith(expect.objectContaining({ boatId: null }))
+    })
+
+    test('still offers the scope selector with several boats, global by default', async () => {
+      const wrapper = mount(PricingSeasonForm, { props: { boatOptions: fleet } })
+      expect(wrapper.find('select[name="boatId"]').exists()).toBe(true)
+
+      await wrapper.find('form').trigger('submit')
+      expect(mockTransform).toHaveBeenCalledWith(expect.objectContaining({ boatId: null }))
+    })
   })
 })

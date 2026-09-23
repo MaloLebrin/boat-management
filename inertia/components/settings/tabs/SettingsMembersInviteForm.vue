@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseCheckbox from '~/components/base/BaseCheckbox.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import type { OrgRole } from '../../../../shared/types/organization'
 
-defineProps<{
+const props = defineProps<{
   boatOptions: { id: number; name: string }[]
 }>()
 
@@ -31,6 +32,20 @@ const roleOptions = computed(() => [
   { label: t('settings.members.roles.mechanic'), value: 'mechanic' },
   { label: t('settings.members.roles.boat_owner'), value: 'boat_owner' },
 ])
+
+/**
+ * Flotte mono-bateau (#823) : un propriétaire invité reçoit d'office l'accès
+ * au seul bateau, sans cases à cocher.
+ */
+const { singleBoat } = useSingleBoat(() => props.boatOptions)
+
+watch(
+  () => [form.role, singleBoat.value] as const,
+  ([role, boat]) => {
+    if (role === 'boat_owner' && boat) form.boatIds = [boat.id]
+  },
+  { immediate: true }
+)
 
 function toggleBoat(boatId: number, checked: boolean) {
   form.boatIds = checked ? [...form.boatIds, boatId] : form.boatIds.filter((id) => id !== boatId)
@@ -81,7 +96,14 @@ function submitInvite() {
         </div>
       </div>
 
-      <div v-if="form.role === 'boat_owner'" class="border-t border-border pt-4">
+      <p
+        v-if="form.role === 'boat_owner' && singleBoat"
+        class="border-t border-border pt-4 text-sm text-fg-muted"
+        data-testid="invite-single-boat"
+      >
+        {{ t('settings.members.inviteForm.singleBoat', { boat: singleBoat.name }) }}
+      </p>
+      <div v-else-if="form.role === 'boat_owner'" class="border-t border-border pt-4">
         <p class="mb-2 text-sm font-medium text-fg">
           {{ t('settings.members.inviteForm.boats') }}
         </p>

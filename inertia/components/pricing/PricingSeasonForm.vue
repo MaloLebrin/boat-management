@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseSegmentedControl from '~/components/base/BaseSegmentedControl.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import type { PricingSeasonRow, BoatOption } from '../../../shared/types/pricing_season'
 
@@ -21,11 +22,17 @@ const { t } = useT()
 
 const isEdit = computed(() => Boolean(props.season))
 
+/**
+ * Flotte mono-bateau (#823) : pas de choix de portée, une nouvelle saison est
+ * rattachée au seul bateau ; en édition la portée existante est conservée.
+ */
+const { singleBoat, singleBoatId } = useSingleBoat(() => props.boatOptions)
+
 type PricingType = 'fixed' | 'multiplier'
 const pricingType = ref<PricingType>(props.season?.dailyPrice != null ? 'fixed' : 'multiplier')
 
 const form = useForm({
-  boatId: props.season?.boatId ?? null,
+  boatId: props.season ? props.season.boatId : (singleBoat.value?.id ?? null),
   name: props.season?.name ?? '',
   startsOn: props.season?.startsOn ?? '',
   endsOn: props.season?.endsOn ?? '',
@@ -91,6 +98,7 @@ function submit() {
     </p>
 
     <BaseSelect
+      v-if="!singleBoatId"
       :model-value="form.boatId ? String(form.boatId) : ''"
       :label="t('pricingSeasons.fields.boatId')"
       :options="boatSelectOptions"

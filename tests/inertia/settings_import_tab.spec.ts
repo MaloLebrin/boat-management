@@ -11,10 +11,15 @@ vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({ props: { appT: {}, locale: 'en' } }),
 }))
 
-function mountTab(canImport: boolean) {
+const fleet = [
+  { id: 1, name: 'Ariane' },
+  { id: 2, name: 'Pen Duick' },
+]
+
+function mountTab(canImport: boolean, boats = [fleet[0]]) {
   return mount(SettingsImportTab, {
     props: {
-      boats: [{ id: 1, name: 'Ariane' }],
+      boats,
       preview: null,
       hasPendingImport: false,
       canImport,
@@ -50,5 +55,46 @@ describe('SettingsImportTab — section d’import gardée (#715)', () => {
     expect(w.find('input[type="file"]').exists()).toBe(true)
     expect(w.text()).toContain('settings.import.previewButton')
     expect(w.text()).not.toContain('settings.import.restricted')
+  })
+})
+
+/**
+ * Flotte mono-bateau (#823) : le bateau est retenu d'office, les deux
+ * sélecteurs (export et import) disparaissent et les exports sont actifs.
+ */
+describe('SettingsImportTab — flotte mono-bateau (#823)', () => {
+  const exportLinks = (w: ReturnType<typeof mountTab>) =>
+    w.findAll('a').filter((a) => a.text().startsWith('settings.import.export'))
+
+  test('un seul bateau : aucun sélecteur de bateau, exports actifs d’emblée', () => {
+    const w = mountTab(true)
+
+    const selects = w.findAll('select')
+    expect(selects).toHaveLength(1)
+    expect(w.text()).not.toContain('settings.import.exportBoatLabel')
+    expect(w.text()).not.toContain('settings.import.boatLabel')
+
+    const links = exportLinks(w)
+    expect(links).toHaveLength(3)
+    for (const link of links) {
+      expect(link.attributes('href')).toContain('/1/')
+      expect(link.classes()).not.toContain('pointer-events-none')
+    }
+  })
+
+  test('plusieurs bateaux : les deux sélecteurs sont là, exports inactifs sans choix', () => {
+    const w = mountTab(true, fleet)
+
+    expect(w.text()).toContain('settings.import.exportBoatLabel')
+    expect(w.text()).toContain('settings.import.boatLabel')
+    for (const link of exportLinks(w)) {
+      expect(link.attributes('href')).toBeUndefined()
+      expect(link.classes()).toContain('pointer-events-none')
+    }
+  })
+
+  test('aucun bateau : le message reste affiché', () => {
+    const w = mountTab(true, [])
+    expect(w.text()).toContain('settings.import.noBoats')
   })
 })

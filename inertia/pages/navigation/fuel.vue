@@ -7,6 +7,7 @@ import FuelLogCard from '~/components/navigation/FuelLogCard.vue'
 import FuelLogRow from '~/components/navigation/FuelLogRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
 import { useNumberFormat } from '~/composables/use_number_format'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import type { FleetBoatOption, FleetFuelLogRow } from '../../../shared/types/navigation'
 
@@ -19,12 +20,19 @@ const props = defineProps<{
   selectedBoatId: number | null
 }>()
 
+/**
+ * Flotte mono-bateau (#823) : l'état vide mène directement au seul bateau,
+ * comme sur le journal de bord (#603).
+ */
+const { singleBoat } = useSingleBoat(() => props.boats)
+const targetBoatId = computed(() => props.selectedBoatId ?? singleBoat.value?.id ?? null)
+
 const emptyActionLabel = computed(() =>
-  props.selectedBoatId ? t('navigation.fuel.empty.actionBoat') : t('navigation.fuel.empty.action')
+  targetBoatId.value ? t('navigation.fuel.empty.actionBoat') : t('navigation.fuel.empty.action')
 )
 
 function onEmptyAction() {
-  router.visit(props.selectedBoatId ? `/boats/${props.selectedBoatId}/navigation` : '/boats')
+  router.visit(targetBoatId.value ? `/boats/${targetBoatId.value}/navigation` : '/boats')
 }
 
 const totalLiters = computed(() =>

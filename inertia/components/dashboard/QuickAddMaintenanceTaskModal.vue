@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { router, useRemember } from '@inertiajs/vue3'
-import { computed, type Ref } from 'vue'
+import { computed, type Ref, watch } from 'vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BoatMaintenanceTaskForm from '~/components/boats/maintenance/BoatMaintenanceTaskForm.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import type { BoatTaskEquipment } from '#shared/types/maintenance'
 import type { FleetBoatOption } from '#shared/types/navigation'
@@ -57,9 +58,21 @@ const loadedEquipment = computed(() => {
   return String(loaded.boatId) === state.value.boatId ? loaded.equipment : null
 })
 
+/**
+ * Flotte mono-bateau (#823) : le bateau est retenu d'office à l'ouverture, en
+ * passant par le setter de `selectedBoatId` — seul point qui déclenche le
+ * rechargement partiel des équipements.
+ */
+const { singleBoatId } = useSingleBoat(() => props.boats)
+
 function openModal() {
   state.value = { open: true, boatId: '' }
+  if (singleBoatId.value) selectedBoatId.value = singleBoatId.value
 }
+
+watch(singleBoatId, (boatId) => {
+  if (boatId && state.value.open && state.value.boatId !== boatId) selectedBoatId.value = boatId
+})
 
 defineExpose({ openModal })
 </script>
@@ -71,6 +84,7 @@ defineExpose({ openModal })
     :close-label="t('common.close')"
   >
     <BaseSelect
+      v-if="!singleBoatId"
       id="quick-add-task-boat"
       v-model="selectedBoatId"
       name="taskBoatId"
@@ -82,7 +96,7 @@ defineExpose({ openModal })
     <BoatMaintenanceTaskForm
       v-if="loadedEquipment"
       :key="selectedBoatId"
-      class="mt-4"
+      :class="singleBoatId ? '' : 'mt-4'"
       :boat-id="Number(selectedBoatId)"
       :equipment="loadedEquipment"
       @submitted="open = false"

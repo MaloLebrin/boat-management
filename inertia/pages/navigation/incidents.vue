@@ -8,6 +8,7 @@ import IncidentCard from '~/components/navigation/IncidentCard.vue'
 import IncidentRow from '~/components/navigation/IncidentRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
 import QuickAddIncidentModal from '~/components/navigation/QuickAddIncidentModal.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import type { FleetBoatOption, FleetIncidentRow } from '../../../shared/types/navigation'
 
@@ -25,14 +26,21 @@ const showQuickAdd = ref(false)
 const openCount = computed(() => props.incidents.filter((i) => i.status === 'open').length)
 const closedCount = computed(() => props.incidents.filter((i) => i.status === 'closed').length)
 
+/**
+ * Flotte mono-bateau (#823) : l'état vide mène directement au seul bateau,
+ * comme sur le journal de bord (#603).
+ */
+const { singleBoat } = useSingleBoat(() => props.boats)
+const targetBoatId = computed(() => props.selectedBoatId ?? singleBoat.value?.id ?? null)
+
 const emptyActionLabel = computed(() =>
-  props.selectedBoatId
+  targetBoatId.value
     ? t('navigation.incidents.empty.actionBoat')
     : t('navigation.incidents.empty.action')
 )
 
 function onEmptyAction() {
-  router.visit(props.selectedBoatId ? `/boats/${props.selectedBoatId}/navigation` : '/boats')
+  router.visit(targetBoatId.value ? `/boats/${targetBoatId.value}/navigation` : '/boats')
 }
 </script>
 
