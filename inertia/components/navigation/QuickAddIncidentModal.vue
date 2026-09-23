@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BoatIncidentForm from '~/components/boats/show/tabs/BoatIncidentForm.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import type { FleetBoatOption } from '../../../shared/types/navigation'
 
@@ -18,26 +19,31 @@ const emit = defineEmits<{
 
 const { t } = useT()
 
-const selectedBoatId = ref<string>(props.defaultBoatId ? String(props.defaultBoatId) : '')
+const boatOptions = computed(() => props.boats.map((b) => ({ label: b.name, value: String(b.id) })))
 
-const boatOptions = ref<Array<{ label: string; value: string }>>([])
-watch(
-  () => props.boats,
-  (boats) => {
-    boatOptions.value = boats.map((b) => ({ label: b.name, value: String(b.id) }))
-  },
-  { immediate: true }
-)
+/** Flotte mono-bateau (#823) : le choix est déjà fait, on saute le sélecteur. */
+const { singleBoatId } = useSingleBoat(() => props.boats)
+
+function initialBoatId(): string {
+  if (singleBoatId.value) return singleBoatId.value
+  return props.defaultBoatId ? String(props.defaultBoatId) : ''
+}
+
+const selectedBoatId = ref<string>(initialBoatId())
 
 watch(
   () => props.open,
   (isOpen) => {
-    if (isOpen) selectedBoatId.value = props.defaultBoatId ? String(props.defaultBoatId) : ''
+    if (isOpen) selectedBoatId.value = initialBoatId()
   }
 )
 
+watch(singleBoatId, (boatId) => {
+  if (boatId) selectedBoatId.value = boatId
+})
+
 function close() {
-  selectedBoatId.value = ''
+  selectedBoatId.value = initialBoatId()
   emit('update:open', false)
 }
 </script>
@@ -51,6 +57,7 @@ function close() {
     @update:open="close"
   >
     <BaseSelect
+      v-if="!singleBoatId"
       v-model="selectedBoatId"
       name="boatId"
       :label="t('navigation.incidents.quickAddModal.selectBoat')"
@@ -60,7 +67,7 @@ function close() {
 
     <BoatIncidentForm
       v-if="selectedBoatId"
-      class="mt-4"
+      :class="singleBoatId ? '' : 'mt-4'"
       :boat-id="Number(selectedBoatId)"
       :editing-incident="null"
       @close="close"

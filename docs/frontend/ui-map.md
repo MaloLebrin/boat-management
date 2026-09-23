@@ -362,6 +362,15 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 - **`hasPendingImport` vient de la table `pending_imports`**, plus de la session (#774) : les lignes à confirmer y vivent désormais, et seul `pendingImportId` reste en session. Un `confirm` joué dans un autre onglet laissait sinon l'écran proposer de confirmer un import déjà consommé.
 - **Les bornes affichées viennent du code** : `settings.import.fileHint` et `settings.import.help.step2` interpolent `CSV_IMPORT_MAX_FILE_SIZE_MB` et `CSV_IMPORT_MAX_ROWS` (`shared/constants/csv_import.ts`). L'aide annonçait « max 5 Mo » sans plafond de lignes — une limite que le code n'appliquait pas.
 
+## Flotte mono-bateau (#603, #823)
+
+**Un seul bateau ⇒ aucun sélecteur de bateau, ce bateau est retenu d'office.** La règle passe par `inertia/composables/use_single_boat.ts` (`useSingleBoat(() => props.boats)` → `singleBoat`, `singleBoatId` au format `BaseSelect`, `hasSingleBoat`) — ne pas réécrire un `boats.length === 1` local.
+
+- **Créations (masquer + présélectionner)** : modales « Nouvelle sortie » (`QuickAddNavigationLogModal`) et « Nouvel incident » (`QuickAddIncidentModal`), modale « Nouvelle tâche » du tableau de bord (`QuickAddMaintenanceTaskModal` : la présélection passe par le setter de `selectedBoatId`, seul point qui déclenche le rechargement partiel `taskEquipment`), import/export CSV (`SettingsImportTab`, deux sélecteurs), invitation d'un `boat_owner` (`SettingsMembersInviteForm` : mention `settings.members.inviteForm.singleBoat` à la place des cases, `boatIds` rempli d'office), formulaire de période tarifaire (`PricingSeasonForm` : nouvelle saison rattachée au bateau, portée d'une saison éditée conservée). `ReservationCreateButton` saute son menu depuis #585.
+- **Filtres de liste (masquer seulement, la liste est déjà celle du bateau)** : `NavigationBoatFilter` (journal de bord, carburant, incidents), filtre bateau de `/reservations`, de `/pricing/seasons`, `MaintenanceHistoryToolbar`, `EngineListToolbar`.
+- **États vides** de `navigation/logbook.vue`, `fuel.vue`, `incidents.vue` : sans filtre, l'action mène à `/boats/:id/navigation` du bateau unique (libellé `*.empty.actionBoat`) au lieu de `/boats`.
+- **Hors règle** : `BoatAssignModal` (affectation d'une place de port, « aucun bateau » reste choisissable) et les listes de bateaux.
+
 ## Pages d'erreur (403 / 404 / 500)
 
 - Pages : `inertia/pages/errors/{forbidden,not_found,server_error}.vue`, layout `inertia/layouts/error.vue`.

@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseSelect from '~/components/base/BaseSelect.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
@@ -13,6 +14,9 @@ const props = defineProps<{
 }>()
 
 const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id), label: b.name })))
+
+/** Flotte mono-bateau (#823) : la liste est déjà celle du seul bateau, pas de filtre. */
+const { hasSingleBoat } = useSingleBoat(() => props.boats)
 
 const currentBoatId = ref(props.selectedBoatId ? String(props.selectedBoatId) : '')
 
@@ -30,7 +34,7 @@ function onSelectChange(val: string | number | '') {
 </script>
 
 <template>
-  <div class="flex items-center gap-3">
+  <div v-if="!hasSingleBoat" class="flex items-center gap-3">
     <label for="boat-filter" class="text-sm text-fg-muted shrink-0">
       {{ t('navigation.filter.filterByBoat') }}
     </label>

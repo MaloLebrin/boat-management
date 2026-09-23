@@ -6,6 +6,7 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import FleetReservationList from '~/components/reservations/FleetReservationList.vue'
 import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
 import ReservationTimeline from '~/components/reservations/ReservationTimeline.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import { RESERVATION_TYPES } from '#shared/types/reservation'
 import type {
@@ -34,6 +35,9 @@ onMounted(() => {
 })
 
 const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id), label: b.name })))
+
+/** Flotte mono-bateau (#823) : la liste est déjà celle du seul bateau, pas de filtre. */
+const { hasSingleBoat } = useSingleBoat(() => props.boats)
 
 const typeOptions = computed(() =>
   RESERVATION_TYPES.map((value) => ({ value, label: t(`reservations.types.${value}`) }))
@@ -106,7 +110,7 @@ function applyFilters(next: { boatId?: string | number; type?: string | number }
 
     <!-- Boat + charter type filters -->
     <div class="mt-6 flex flex-wrap gap-4">
-      <div class="w-56">
+      <div v-if="!hasSingleBoat" class="w-56">
         <BaseSelect
           id="fleet-boat-filter"
           :label="t('reservations.fleet.filterLabel')"

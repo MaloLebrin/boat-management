@@ -8,6 +8,7 @@ import LogbookCard from '~/components/navigation/LogbookCard.vue'
 import LogbookRow from '~/components/navigation/LogbookRow.vue'
 import NavigationBoatFilter from '~/components/navigation/NavigationBoatFilter.vue'
 import QuickAddNavigationLogModal from '~/components/navigation/QuickAddNavigationLogModal.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogPortOption } from '~/types/boat_show'
 import type { FleetBoatOption, FleetLogbookRow } from '../../../shared/types/navigation'
@@ -31,9 +32,8 @@ const totalDistanceNm = computed(() => props.logs.reduce((acc, l) => acc + (l.di
  * Flotte mono-bateau (#603) : inutile de renvoyer vers la liste des bateaux
  * pour choisir, on emmène directement sur le seul bateau de la flotte.
  */
-const targetBoatId = computed(
-  () => props.selectedBoatId ?? (props.boats.length === 1 ? props.boats[0].id : null)
-)
+const { singleBoat } = useSingleBoat(() => props.boats)
+const targetBoatId = computed(() => props.selectedBoatId ?? singleBoat.value?.id ?? null)
 
 const emptyActionLabel = computed(() =>
   targetBoatId.value

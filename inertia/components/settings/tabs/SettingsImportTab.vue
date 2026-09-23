@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import CsvHelpModal from '~/components/settings/CsvHelpModal.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import { CSV_IMPORT_MAX_FILE_SIZE_MB, CSV_IMPORT_MAX_ROWS } from '#shared/constants/csv_import'
 import { routes } from '~/utils/routes'
@@ -36,7 +37,12 @@ const props = defineProps<{
   canImport: boolean
 }>()
 
-const selectedBoatId = ref<string | ''>('')
+/** Flotte mono-bateau (#823) : le bateau est retenu d'office, sans sélecteur. */
+const { singleBoatId } = useSingleBoat(() => props.boats)
+const selectedBoatId = ref<string | ''>(singleBoatId.value ?? '')
+watch(singleBoatId, (boatId) => {
+  if (boatId) selectedBoatId.value = boatId
+})
 const selectedType = ref<'maintenance'>('maintenance')
 const fileInput = ref<HTMLInputElement | null>(null)
 const isSubmitting = ref(false)
@@ -108,7 +114,7 @@ function handleCancel() {
     <!-- Export section -->
     <BaseCard>
       <BaseHeading level="3" class="mb-4">{{ t('settings.import.exportSection') }}</BaseHeading>
-      <div class="mb-4">
+      <div v-if="!singleBoatId" class="mb-4">
         <BaseSelect
           v-model="selectedBoatId"
           :label="t('settings.import.exportBoatLabel')"
@@ -149,6 +155,7 @@ function handleCancel() {
 
       <div v-else-if="!preview" class="space-y-4">
         <BaseSelect
+          v-if="!singleBoatId"
           v-model="selectedBoatId"
           :label="t('settings.import.boatLabel')"
           :options="boatOptions"

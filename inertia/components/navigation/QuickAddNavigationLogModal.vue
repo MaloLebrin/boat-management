@@ -3,6 +3,7 @@ import { computed, ref, watch } from 'vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import NavigationLogForm from '~/components/boats/show/tabs/NavigationLogForm.vue'
+import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import type { NavigationLogPortOption } from '~/types/boat_show'
 import type { FleetBoatOption } from '../../../shared/types/navigation'
@@ -22,10 +23,8 @@ const { t } = useT()
 
 const boatOptions = computed(() => props.boats.map((b) => ({ label: b.name, value: String(b.id) })))
 
-/**
- * Flotte mono-bateau (#603) : le choix est déjà fait, on saute le sélecteur.
- */
-const singleBoatId = computed(() => (props.boats.length === 1 ? String(props.boats[0].id) : null))
+/** Flotte mono-bateau (#603) : le choix est déjà fait, on saute le sélecteur. */
+const { singleBoatId } = useSingleBoat(() => props.boats)
 
 function initialBoatId(): string {
   if (singleBoatId.value) return singleBoatId.value

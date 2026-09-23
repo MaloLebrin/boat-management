@@ -55,4 +55,29 @@ describe('SettingsMembersInviteForm', () => {
     await checkboxes[0]!.setValue(false)
     expect(mockForm.boatIds).toEqual([])
   })
+
+  describe('single boat fleet (#823)', () => {
+    const singleBoat = [{ id: 1, name: 'Bora Bora' }]
+
+    test('boat_owner gets the only boat without any checkbox', () => {
+      mockForm.role = 'boat_owner'
+      mockForm.boatIds = []
+      const wrapper = mount(SettingsMembersInviteForm, { props: { boatOptions: singleBoat } })
+
+      expect(wrapper.findAll('input[type="checkbox"]')).toHaveLength(0)
+      expect(mockForm.boatIds).toEqual([1])
+      expect(wrapper.find('[data-testid="invite-single-boat"]').text()).toBe(
+        'settings.members.inviteForm.singleBoat'
+      )
+    })
+
+    test('other roles leave boatIds untouched', () => {
+      mockForm.role = 'member'
+      mockForm.boatIds = []
+      const wrapper = mount(SettingsMembersInviteForm, { props: { boatOptions: singleBoat } })
+
+      expect(mockForm.boatIds).toEqual([])
+      expect(wrapper.find('[data-testid="invite-single-boat"]').exists()).toBe(false)
+    })
+  })
 })

@@ -65,4 +65,44 @@ describe('QuickAddIncidentModal', () => {
     await wrapper.find('.incident-form').trigger('click')
     expect(wrapper.emitted('update:open')).toEqual([[false]])
   })
+
+  describe('single boat fleet (#823)', () => {
+    const singleBoat: FleetBoatOption[] = [{ id: 7, name: 'Mistral' }]
+
+    test('skips the selector and opens the form on the only boat', () => {
+      const wrapper = mount(QuickAddIncidentModal, {
+        props: { open: true, boats: singleBoat, defaultBoatId: null },
+      })
+      expect(wrapper.find('select').exists()).toBe(false)
+      expect(wrapper.find('.incident-form').text()).toBe('7')
+    })
+
+    test('keeps the only boat selected after a close/reopen cycle', async () => {
+      const wrapper = mount(QuickAddIncidentModal, {
+        props: { open: true, boats: singleBoat, defaultBoatId: null },
+      })
+      await wrapper.find('.incident-form').trigger('click')
+      await wrapper.setProps({ open: false })
+      await wrapper.setProps({ open: true })
+      expect(wrapper.find('select').exists()).toBe(false)
+      expect(wrapper.find('.incident-form').text()).toBe('7')
+    })
+
+    test('still shows the selector when the fleet has several boats', () => {
+      const wrapper = mount(QuickAddIncidentModal, {
+        props: { open: true, boats, defaultBoatId: null },
+      })
+      expect(wrapper.find('select').exists()).toBe(true)
+      expect(wrapper.find('.incident-form').exists()).toBe(false)
+    })
+
+    test('selects the boat when the fleet narrows down to one', async () => {
+      const wrapper = mount(QuickAddIncidentModal, {
+        props: { open: true, boats, defaultBoatId: null },
+      })
+      await wrapper.setProps({ boats: singleBoat })
+      expect(wrapper.find('select').exists()).toBe(false)
+      expect(wrapper.find('.incident-form').text()).toBe('7')
+    })
+  })
 })
