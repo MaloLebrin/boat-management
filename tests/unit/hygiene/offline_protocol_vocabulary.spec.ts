@@ -39,21 +39,11 @@ const CONFLICT_MODAL = join(ROOT, 'inertia/components/ConflictResolutionModal.vu
 /**
  * Types enfilés par le front que le serveur ne renvoie jamais. Toute entrée
  * porte son motif : une exemption sans raison écrite est une régression
- * déguisée.
+ * déguisée. Vide depuis #816 — les incidents, derniers exemptés, renvoient
+ * désormais leur `rejectedType` — mais la garde reste : c'est ici qu'un
+ * prochain trou devra s'écrire, avec sa raison.
  */
-const ENQUEUED_WITHOUT_SERVER_ANSWER = new Map<string, string>([
-  [
-    'create-incident',
-    "BoatIncidentsController.store rend ses refus métier en flash('error') + " +
-      'redirection, sans `rejectedType` — le défaut que #727 a corrigé pour les ' +
-      'quatre créations du domaine terrain, pas encore pour les incidents',
-  ],
-  [
-    'update-incident',
-    'BoatIncidentsController.update : même trou que la création ci-dessus, et ' +
-      'aucun verrou optimiste non plus (pas de `conflictType`)',
-  ],
-])
+const ENQUEUED_WITHOUT_SERVER_ANSWER = new Map<string, string>([])
 
 /** Les trois clés de flash qui transportent un identifiant d'action. */
 const ACTION_FLASH_KEYS = ['conflictType', 'rejectedType', 'createdResourceType']

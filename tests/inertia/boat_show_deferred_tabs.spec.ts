@@ -29,6 +29,7 @@ const shellProps = {
   canManageDocuments: true,
   canManageEquipmentActions: true,
   canDeleteEquipmentActions: true,
+  canEditIncidents: true,
   canDeleteIncidents: true,
   canCreateFuelLogs: true,
   canDeleteFuelLogs: true,

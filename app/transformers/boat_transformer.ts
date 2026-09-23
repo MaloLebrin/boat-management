@@ -54,6 +54,8 @@ export interface BoatShowShellContext {
   canDeleteEquipmentActions: boolean
   /** Droit `incidents.create` : entrée « Incident » du menu Ajouter et boutons des cartes (#813). */
   canCreateIncidents: boolean
+  /** Droit `incidents.edit` : bouton « Modifier » de l'onglet Incidents (#816). */
+  canEditIncidents: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
@@ -137,6 +139,7 @@ export function toShowShellProps(boat: Boat, ctx: BoatShowShellContext) {
     positionHistory,
     latestGpsPosition,
     canCreateIncidents: ctx.canCreateIncidents,
+    canEditIncidents: ctx.canEditIncidents,
     canDeleteIncidents: ctx.canDeleteIncidents,
     canCreateFuelLogs: ctx.canCreateFuelLogs,
     canDeleteFuelLogs: ctx.canDeleteFuelLogs,

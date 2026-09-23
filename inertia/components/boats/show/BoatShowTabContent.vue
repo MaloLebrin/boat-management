@@ -62,6 +62,7 @@ const props = defineProps<{
   canManageEquipmentActions: boolean
   canDeleteEquipmentActions: boolean
   canCreateIncidents: boolean
+  canEditIncidents: boolean
   canDeleteIncidents: boolean
   canCreateFuelLogs: boolean
   canDeleteFuelLogs: boolean
@@ -236,7 +237,8 @@ const showSkeleton = computed(
         v-else-if="tab === 'incidents'"
         :boat="boat"
         :incidents="incidents ?? []"
-        :can-manage="canManageMaintenance"
+        :can-create="canCreateIncidents"
+        :can-edit="canEditIncidents"
         :can-delete="canDeleteIncidents"
         :create-intent="createIntent"
         @create-intent-consumed="$emit('createIntentConsumed')"

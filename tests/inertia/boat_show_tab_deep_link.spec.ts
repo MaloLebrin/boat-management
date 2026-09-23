@@ -41,6 +41,7 @@ const baseProps = {
   crewMemberOptions: [],
   positionHistory: [],
   latestGpsPosition: null,
+  canEditIncidents: true,
   canDeleteIncidents: true,
   canCreateFuelLogs: true,
   canDeleteFuelLogs: true,

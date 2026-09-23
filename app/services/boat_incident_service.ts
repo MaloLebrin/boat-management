@@ -147,6 +147,7 @@ export default class BoatIncidentService {
         'insuranceClaimRef',
         'status',
         'closedAt',
+        'createdBy',
         'createdAt',
         'updatedAt',
         ...INCIDENT_TARGET_FIELDS,
@@ -173,6 +174,9 @@ export default class BoatIncidentService {
     return await BoatIncident.create({
       boatId: boat.id,
       organizationId: boat.organizationId,
+      // Déclarant (#816) : le même chemin sert la déclaration manuelle et celle
+      // du copilote, l'auteur est donc posé ici et non dans le contrôleur.
+      createdBy: user.id,
       occurredAt: toUtcFromLocalInput(payload.occurredAt, payload.tzOffsetMinutes),
       type: payload.type,
       location: payload.location?.trim() || null,
@@ -234,6 +238,7 @@ export default class BoatIncidentService {
   /**
    * `org` sert à purger les photos Cloudinary et à décrémenter le quota (#814) ;
    * sans elle, les lignes `media` orphelines resteraient derrière l'incident.
+   * Renvoie l'incident supprimé, pour l'entrée d'audit (#816).
    */
   async deleteForBoat(user: User, boat: Boat, incidentId: number, org?: Organization) {
     assertBoatInUserOrg(user, boat, () => new BoatIncidentNotFoundError())
@@ -254,5 +259,6 @@ export default class BoatIncidentService {
       )
     }
     await incident.delete()
+    return incident
   }
 }

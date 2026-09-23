@@ -289,7 +289,14 @@ describe('BoatShowTabEquipment — createIntent (#365)', () => {
 describe('BoatShowTabIncidents — createIntent (#813)', () => {
   test("opens the incident modal when mounted with the 'incident' intent", async () => {
     const wrapper = mount(BoatShowTabIncidents, {
-      props: { boat, incidents: [], canManage: true, canDelete: true, createIntent: 'incident' },
+      props: {
+        boat,
+        incidents: [],
+        canCreate: true,
+        canEdit: true,
+        canDelete: true,
+        createIntent: 'incident',
+      },
       ...globalStubs,
     })
     await nextTick()
@@ -300,7 +307,14 @@ describe('BoatShowTabIncidents — createIntent (#813)', () => {
 
   test('consumes the intent without opening when the user cannot report incidents', async () => {
     const wrapper = mount(BoatShowTabIncidents, {
-      props: { boat, incidents: [], canManage: false, canDelete: false, createIntent: 'incident' },
+      props: {
+        boat,
+        incidents: [],
+        canCreate: false,
+        canEdit: false,
+        canDelete: false,
+        createIntent: 'incident',
+      },
       ...globalStubs,
     })
     await nextTick()
@@ -311,7 +325,14 @@ describe('BoatShowTabIncidents — createIntent (#813)', () => {
 
   test("ignores the 'task' intent, which belongs to another tab", async () => {
     const wrapper = mount(BoatShowTabIncidents, {
-      props: { boat, incidents: [], canManage: true, canDelete: true, createIntent: 'task' },
+      props: {
+        boat,
+        incidents: [],
+        canCreate: true,
+        canEdit: true,
+        canDelete: true,
+        createIntent: 'task',
+      },
       ...globalStubs,
     })
     await nextTick()

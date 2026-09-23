@@ -3,15 +3,20 @@ import { truncateDb } from '#tests/utils/db'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
+import { BoatIncidentFactory } from '#database/factories/boat_incident_factory'
+import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import BoatFuelLog from '#models/boat_fuel_log'
+import BoatIncident from '#models/boat_incident'
 import NavigationLog from '#models/navigation_log'
 import NavigationLogEntry from '#models/navigation_log_entry'
 import { createAdminUser, createMemberUser } from '#tests/functional/helpers'
 import {
   CREATE_FUEL_LOG_ACTION,
+  CREATE_INCIDENT_ACTION,
   CREATE_NAVIGATION_LOG_ACTION,
   CREATE_NAVIGATION_LOG_ENTRY_ACTION,
   INCREMENT_ENGINE_HOURS_ACTION,
+  UPDATE_INCIDENT_ACTION,
 } from '#shared/constants/offline_queue'
 
 /**
@@ -174,5 +179,100 @@ test.group('File hors-ligne — le chemin passant porte son createdResourceId', 
     const fuelLog = await BoatFuelLog.query().where('boatId', boat.id).firstOrFail()
     response.assertFlashMessage('createdResourceType', CREATE_FUEL_LOG_ACTION)
     response.assertFlashMessage('createdResourceId', String(fuelLog.id))
+  })
+})
+
+/**
+ * Les incidents (#816) : dernier trou du protocole, enfilés hors-ligne depuis
+ * #106 sans que `BoatIncidentsController` renvoie jamais leur marqueur. Un
+ * incident refusé au rejeu — cible d'un autre bateau, deux cibles à la fois,
+ * incident supprimé entre-temps — était détruit sous un toast de succès.
+ */
+test.group('File hors-ligne — le refus des incidents porte son rejectedType (#816)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  const VALID_INCIDENT = {
+    occurredAt: '2026-06-01 10:00:00',
+    tzOffsetMinutes: 0,
+    type: 'engine_failure',
+    description: 'Surchauffe moteur',
+  }
+
+  test('une déclaration sur deux cibles est refusée avec son marqueur', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const sail = await BoatSailFactory.merge({ boatId: boat.id }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(user)
+      .form({ ...VALID_INCIDENT, boatEngineId: engine.id, boatSailId: sail.id })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('rejectedType', CREATE_INCIDENT_ACTION)
+    response.assertFlashMessage('error')
+    assert.isNull(await BoatIncident.query().where('boatId', boat.id).first())
+  })
+
+  test("une édition visant l'équipement d'un autre bateau est refusée avec son marqueur", async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const otherBoat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const foreignEngine = await BoatEngineFactory.merge({ boatId: otherBoat.id }).create()
+    const incident = await BoatIncidentFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    const response = await client
+      .put(`/boats/${boat.id}/incidents/${incident.id}`)
+      .loginAs(user)
+      .form({ boatEngineId: foreignEngine.id })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('rejectedType', UPDATE_INCIDENT_ACTION)
+    await incident.refresh()
+    assert.isNull(incident.boatEngineId)
+  })
+
+  test("l'édition d'un incident supprimé entre-temps est refusée avec son marqueur", async ({
+    client,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .put(`/boats/${boat.id}/incidents/999999`)
+      .loginAs(user)
+      .form({ status: 'closed' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('rejectedType', UPDATE_INCIDENT_ACTION)
+    response.assertFlashMessage('error', 'Incident not found.')
+  })
+
+  test('une déclaration acceptée ne porte aucun marqueur de refus', async ({ client, assert }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(user)
+      .form(VALID_INCIDENT)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMissing('rejectedType')
+    assert.isNotNull(await BoatIncident.query().where('boatId', boat.id).first())
   })
 })

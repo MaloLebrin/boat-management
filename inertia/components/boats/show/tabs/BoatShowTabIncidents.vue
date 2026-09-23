@@ -18,7 +18,11 @@ const props = withDefaults(
   defineProps<{
     boat: BoatShowDetail
     incidents: BoatIncidentRow[]
-    canManage: boolean
+    /** `incidents.create` — bouton « Déclarer » et intention d'ouverture (#816). */
+    canCreate: boolean
+    /** `incidents.edit` — bouton « Modifier » de chaque carte (#816). */
+    canEdit: boolean
+    /** `incidents.delete` — réservé aux admins. */
     canDelete: boolean
     createIntent?: BoatCreateIntent
   }>(),
@@ -37,7 +41,7 @@ const editingIncident = ref<BoatIncidentRow | null>(null)
 // l'intention au montage, et si elle change alors que l'onglet est affiché (#365).
 function consumeCreateIntent() {
   if (props.createIntent !== 'incident') return
-  if (props.canManage) openCreate()
+  if (props.canCreate) openCreate()
   emit('createIntentConsumed')
 }
 
@@ -82,14 +86,14 @@ function deleteIncident(incidentId: number) {
       <p class="text-sm text-fg-muted">
         {{ t('incidents.count', { count: String(incidents.length) }) }}
       </p>
-      <BaseButton v-if="canManage" variant="primary" size="sm" type="button" @click="openCreate">
+      <BaseButton v-if="canCreate" variant="primary" size="sm" type="button" @click="openCreate">
         {{ t('incidents.addIncident') }}
       </BaseButton>
     </div>
 
     <!-- Create / Edit modal — `boat` est structurellement une TaskEquipmentSource -->
     <BoatIncidentModal
-      v-if="canManage"
+      v-if="canCreate || canEdit"
       v-model:open="isModalOpen"
       :boat-id="boat.id"
       :equipment="boat"
@@ -155,8 +159,14 @@ function deleteIncident(incidentId: number) {
           </div>
 
           <!-- Actions -->
-          <div v-if="canManage" class="flex items-center gap-2 shrink-0">
-            <BaseButton type="button" variant="ghost" size="sm" @click="openEdit(incident)">
+          <div v-if="canEdit || canDelete" class="flex items-center gap-2 shrink-0">
+            <BaseButton
+              v-if="canEdit"
+              type="button"
+              variant="ghost"
+              size="sm"
+              @click="openEdit(incident)"
+            >
               {{ t('incidents.form.edit') }}
             </BaseButton>
             <BaseButton
@@ -180,7 +190,7 @@ function deleteIncident(incidentId: number) {
     >
       <p class="text-fg-muted">{{ t('incidents.empty') }}</p>
       <BaseButton
-        v-if="canManage"
+        v-if="canCreate"
         variant="secondary"
         size="sm"
         type="button"

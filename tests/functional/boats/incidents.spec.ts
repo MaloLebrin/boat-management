@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
+import AuditLog from '#models/audit_log'
 import BoatIncident from '#models/boat_incident'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
@@ -12,6 +13,7 @@ import {
   createMechanicUser,
   createMemberUser,
 } from '#tests/functional/helpers'
+import type { AuditAction } from '#shared/types/audit_log'
 
 /**
  * Tests de caractérisation de `BoatIncidentsController` (vague 0.4 du plan de
@@ -384,5 +386,133 @@ test.group('Incidents — cible équipement ou pièce (#813)', (group) => {
 
     await incident.refresh()
     assert.isNull(incident.boatEngineId)
+  })
+})
+
+async function findLog(organizationId: number, action: AuditAction) {
+  return await AuditLog.query()
+    .where('organizationId', organizationId)
+    .where('action', action)
+    .first()
+}
+
+test.group('Incidents — déclarant, audit et droits de l’onglet (#816)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  test("l'incident retient qui l'a déclaré", async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+    const member = await createMemberUser(admin.organizationId!)
+
+    await client.post(`/boats/${boat.id}/incidents`).loginAs(member).form(VALID_INCIDENT)
+
+    const incident = await BoatIncident.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(incident.createdBy, member.id)
+  })
+
+  test('la déclaration est journalisée en incident.create', async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+
+    await client.post(`/boats/${boat.id}/incidents`).loginAs(admin).form(VALID_INCIDENT)
+
+    const incident = await BoatIncident.query().where('boatId', boat.id).firstOrFail()
+    const log = await findLog(admin.organizationId!, 'incident.create')
+    assert.isNotNull(log)
+    assert.equal(log!.userId, admin.id)
+    assert.equal(log!.entityType, 'incident')
+    assert.equal(log!.entityId, incident.id)
+    assert.deepEqual(log!.metadata, { boatName: boat.name, type: 'engine_failure' })
+  })
+
+  test('une déclaration refusée ne journalise rien', async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+    const sail = await BoatSailFactory.merge({ boatId: boat.id }).create()
+
+    await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(admin)
+      .form({ ...VALID_INCIDENT, boatEngineId: engine.id, boatSailId: sail.id })
+
+    assert.isNull(await findLog(admin.organizationId!, 'incident.create'))
+  })
+
+  test('la mise à jour est journalisée en incident.update avec le statut atteint', async ({
+    client,
+    assert,
+  }) => {
+    const { admin, boat } = await adminWithBoat()
+    const incident = await BoatIncidentFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    await client
+      .put(`/boats/${boat.id}/incidents/${incident.id}`)
+      .loginAs(admin)
+      .form({ status: 'closed' })
+
+    const log = await findLog(admin.organizationId!, 'incident.update')
+    assert.isNotNull(log)
+    assert.equal(log!.userId, admin.id)
+    assert.equal(log!.entityType, 'incident')
+    assert.equal(log!.entityId, incident.id)
+    assert.deepEqual(log!.metadata, {
+      boatName: boat.name,
+      type: incident.type,
+      status: 'closed',
+    })
+  })
+
+  test('un incident introuvable en mise à jour ne journalise rien', async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+
+    await client.put(`/boats/${boat.id}/incidents/999999`).loginAs(admin).form({ status: 'closed' })
+
+    assert.isNull(await findLog(admin.organizationId!, 'incident.update'))
+  })
+
+  test('la suppression est journalisée en incident.delete', async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+    const incident = await BoatIncidentFactory.merge({
+      boatId: boat.id,
+      organizationId: boat.organizationId,
+    }).create()
+
+    await client.delete(`/boats/${boat.id}/incidents/${incident.id}`).loginAs(admin)
+
+    const log = await findLog(admin.organizationId!, 'incident.delete')
+    assert.isNotNull(log)
+    assert.equal(log!.userId, admin.id)
+    assert.equal(log!.entityType, 'incident')
+    assert.equal(log!.entityId, incident.id)
+    assert.deepEqual(log!.metadata, { boatName: boat.name, type: incident.type })
+  })
+
+  test('la fiche bateau expose les trois droits incidents, lus sur IncidentPolicy', async ({
+    client,
+    assert,
+  }) => {
+    const { admin, boat } = await adminWithBoat()
+    const member = await createMemberUser(admin.organizationId!)
+
+    // `incidents.delete` est réservé aux admins ; un membre déclare et modifie.
+    // (Le propriétaire passe par son portail `/owner/boats`, pas par cette page.)
+    const expectations = [
+      { user: admin, create: true, edit: true, remove: true },
+      { user: member, create: true, edit: true, remove: false },
+    ]
+
+    for (const { user, create, edit, remove } of expectations) {
+      const response = await client.get(`/boats/${boat.id}`).loginAs(user).withInertia()
+      response.assertStatus(200)
+      const props = response.inertiaProps as {
+        canCreateIncidents: boolean
+        canEditIncidents: boolean
+        canDeleteIncidents: boolean
+      }
+      assert.equal(props.canCreateIncidents, create)
+      assert.equal(props.canEditIncidents, edit)
+      assert.equal(props.canDeleteIncidents, remove)
+    }
   })
 })

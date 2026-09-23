@@ -661,6 +661,7 @@ export class BoatIncidentSchema extends BaseModel {
     'boatSailId',
     'closedAt',
     'createdAt',
+    'createdBy',
     'description',
     'id',
     'insuranceClaimRef',
@@ -691,6 +692,8 @@ export class BoatIncidentSchema extends BaseModel {
   declare closedAt: DateTime | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare createdBy: number | null
   @column()
   declare description: string
   @column({ isPrimary: true })
