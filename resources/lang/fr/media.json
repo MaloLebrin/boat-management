@@ -6,6 +6,14 @@
     "uploading": "Envoi en cours…",
     "empty": "Aucune photo.",
     "delete": "Supprimer",
-    "confirmDelete": "Supprimer cette photo ?"
+    "confirmDelete": "Supprimer cette photo ?",
+    "selected": "Photos sélectionnées",
+    "remove": "Retirer",
+    "browse": "Choisir des photos",
+    "dropzone": "Déposez vos photos ici",
+    "formats": "JPG, PNG, HEIC, WEBP, GIF · {max} Mo max par photo",
+    "rejectedExtension": "{name} : format non pris en charge.",
+    "rejectedSize": "{name} : fichier trop volumineux.",
+    "rejectedCount": "{max} photos maximum."
   }
 }

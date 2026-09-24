@@ -180,6 +180,31 @@ test.group('File hors-ligne — le chemin passant porte son createdResourceId', 
     response.assertFlashMessage('createdResourceType', CREATE_FUEL_LOG_ACTION)
     response.assertFlashMessage('createdResourceId', String(fuelLog.id))
   })
+
+  /**
+   * L'incident a rejoint les créations qui rendent leur identifiant, non pour
+   * la file — il n'a pas de `tempId` — mais parce que le formulaire enchaîne
+   * l'envoi des photos, désormais obligatoires, sur `…/incidents/:id/photos`.
+   */
+  test('un incident créé rend son identifiant réel', async ({ client }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(user)
+      .form({
+        occurredAt: '2026-06-01 10:00:00',
+        tzOffsetMinutes: 0,
+        type: 'engine_failure',
+        description: 'Surchauffe moteur',
+      })
+      .redirects(0)
+
+    const incident = await BoatIncident.query().where('boatId', boat.id).firstOrFail()
+    response.assertFlashMessage('createdResourceType', CREATE_INCIDENT_ACTION)
+    response.assertFlashMessage('createdResourceId', String(incident.id))
+  })
 })
 
 /**

@@ -174,7 +174,8 @@
     "notFound": "Incident introuvable.",
     "descriptionRequired": "Une description est requise.",
     "equipmentNotFound": "Cet équipement n'appartient pas à ce bateau.",
-    "multipleEquipment": "Un incident ne peut viser qu'un seul équipement."
+    "multipleEquipment": "Un incident ne peut viser qu'un seul équipement.",
+    "photoRequiredToClose": "Un incident ne peut pas être clôturé sans photo."
   },
   "inspections": {
     "created": "État des lieux enregistré.",
@@ -412,7 +413,7 @@
       "start_trip": "Sortie ouverte au journal de bord.",
       "close_trip": "Sortie clôturée.",
       "log_fuel": "Plein de carburant enregistré.",
-      "report_incident": "Incident déclaré.",
+      "report_incident": "Incident déclaré. Ajoutez-lui une photo : un incident ne peut pas être clôturé sans.",
       "create_reservation": "Réservation créée.",
       "create_client": "Fiche client créée.",
       "set_part_stock": "Stock de la pièce mis à jour."

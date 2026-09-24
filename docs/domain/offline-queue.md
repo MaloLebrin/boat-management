@@ -142,6 +142,18 @@ une ressource (`create-navigation-log`, `create-navigation-log-entry`,
 dépendants seront résolus au lieu de cascader en `dependencyBlocked`.
 `increment-engine-hours` n'ouvre aucune ressource et n'en renvoie pas.
 
+`create-incident` les renvoie lui aussi, mais pour une autre raison : la photo
+étant devenue obligatoire à la déclaration, le formulaire enchaîne un POST
+multipart sur `…/incidents/:id/photos` et a besoin de l'id rendu par le flash
+(cf. `docs/domain/incidents.md`). Pour la file, c'est **neutre** : sans `tempId`,
+`drainQueue` ne lit jamais ces deux clés. Le bénéfice de #727 s'applique de la
+même façon si un `tempId` venait un jour s'y poser.
+
+La photo, elle, reste **exemptée hors-ligne** : la file ne transporte que du
+`FormDataConvertible`, et mieux vaut un incident déclaré sans photo sur un ponton
+qu'une saisie perdue. C'est le refus de clôture côté serveur
+(`photoRequiredToClose`) qui la réclame au retour du réseau.
+
 ## Où c'est testé
 
 | Fichier                                                        | Maillon                                                    |

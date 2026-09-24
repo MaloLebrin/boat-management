@@ -43,6 +43,8 @@ export interface FleetIncidentRow {
   insuranceClaimed: boolean
   /** Équipement ou pièce visé (#813), `null` pour le bateau entier. */
   target: IncidentTargetSummary | null
+  /** Photos attachées — à zéro, la ligne porte le badge « photo manquante ». */
+  photosCount: number
 }
 
 export interface FleetBoatOption {

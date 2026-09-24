@@ -78,10 +78,13 @@ export default class BoatIncidentsController {
         boat.load('genericEquipment'),
       ])
 
+    const photos = media.filter((m) => m.kind === 'photo').map(toMediaRow)
+
     return inertia.render('boats/incident_show', {
       boat: { id: boat.id, name: boat.name },
-      incident: toIncident(incident),
-      photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
+      // Les photos sont déjà en main : pas de requête de comptage à ajouter.
+      incident: toIncident(incident, photos.length),
+      photos,
       tasks: toMaintenanceTaskRows(tasks),
       actions: actions.map(toBoatEquipmentActionRow),
       equipment: toBoatTaskEquipment(boat).equipment,
@@ -149,6 +152,12 @@ export default class BoatIncidentsController {
       metadata: { boatName: boat.name, type: incident.type },
     })
 
+    // Le formulaire enchaîne l'envoi des photos, désormais obligatoires, sur
+    // `…/incidents/:id/photos` : il lui faut l'id de la ligne créée. Même canal
+    // que les inspections et les journaux de navigation — inerte au rejeu
+    // hors-ligne, où l'action incident n'a ni `tempId` ni dépendant.
+    session.flash('createdResourceType', CREATE_INCIDENT_ACTION)
+    session.flash('createdResourceId', String(incident.id))
     session.flash('success', i18n.t('flash.incidents.created'))
     response.redirect(`/boats/${boat.id}?tab=incidents`)
   }

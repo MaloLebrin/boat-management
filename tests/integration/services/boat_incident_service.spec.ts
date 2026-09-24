@@ -180,3 +180,79 @@ test.group('BoatIncidentService — cible (#813)', () => {
     assert.equal([...counts.values()].filter((c) => c === 0).length, 1)
   })
 })
+
+/**
+ * Photo obligatoire : la garantie serveur tient au point de **clôture**, parce
+ * que la création est un POST JSON rejouable hors-ligne et que le copilote
+ * n'a aucun fichier à fournir. C'est donc là que se referme le filet.
+ */
+test.group('BoatIncidentService — clôture sans photo', () => {
+  test('clôturer un incident sans photo est refusé', async ({ assert }) => {
+    const { user, boat } = await makeUserBoat()
+    const service = await app.container.make(BoatIncidentService)
+    const incident = await service.createForBoat(user, boat, BASE_PAYLOAD)
+
+    try {
+      await service.updateForBoat(user, boat, incident.id, { status: 'closed' })
+      assert.fail('la clôture aurait dû être refusée')
+    } catch (error) {
+      assert.instanceOf(error, BoatIncidentValidationError)
+      assert.equal((error as BoatIncidentValidationError).errorCode, 'photoRequiredToClose')
+    }
+
+    await incident.refresh()
+    assert.equal(incident.status, 'open')
+  })
+
+  test('une photo attachée débloque la clôture', async ({ assert }) => {
+    const { user, boat } = await makeUserBoat()
+    const service = await app.container.make(BoatIncidentService)
+    const incident = await service.createForBoat(user, boat, BASE_PAYLOAD)
+    await MediaFactory.merge({
+      entityType: 'boat_incident',
+      entityId: incident.id,
+      kind: 'photo',
+    }).create()
+
+    const closed = await service.updateForBoat(user, boat, incident.id, { status: 'closed' })
+
+    assert.equal(closed.status, 'closed')
+    assert.isNotNull(closed.closedAt)
+  })
+
+  test('un document ne tient pas lieu de photo', async ({ assert }) => {
+    const { user, boat } = await makeUserBoat()
+    const service = await app.container.make(BoatIncidentService)
+    const incident = await service.createForBoat(user, boat, BASE_PAYLOAD)
+    await MediaFactory.merge({
+      entityType: 'boat_incident',
+      entityId: incident.id,
+      kind: 'document',
+    }).create()
+
+    await assert.rejects(
+      () => service.updateForBoat(user, boat, incident.id, { status: 'closed' }),
+      BoatIncidentValidationError
+    )
+  })
+
+  test('la règle ne porte que sur la transition, pas sur un incident déjà clos', async ({
+    assert,
+  }) => {
+    const { user, boat } = await makeUserBoat()
+    const service = await app.container.make(BoatIncidentService)
+    const incident = await service.createForBoat(user, boat, BASE_PAYLOAD)
+    // Clôturé avant l'obligation de preuve : il doit rester éditable, sinon
+    // tout l'historique antérieur devient ingérable.
+    incident.status = 'closed'
+    await incident.save()
+
+    const updated = await service.updateForBoat(user, boat, incident.id, {
+      status: 'closed',
+      location: 'Quai Nord',
+    })
+
+    assert.equal(updated.location, 'Quai Nord')
+    assert.equal(updated.status, 'closed')
+  })
+})

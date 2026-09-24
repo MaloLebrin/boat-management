@@ -314,7 +314,12 @@ test.group('Assistant FleetAi actions — kinds de l’agent actionnable', (grou
     })
 
     const response = await confirm(client, conversation.token, user)
-    response.assertFlashMessage('success', 'Incident reported.')
+    // Le copilote ne peut joindre aucun fichier : sa confirmation réclame la
+    // photo, sans laquelle l'incident ne pourra pas être clôturé.
+    response.assertFlashMessage(
+      'success',
+      'Incident reported. Add a photo to it: an incident cannot be closed without one.'
+    )
 
     const incidents = await BoatIncident.query().where('boatId', boat.id)
     assert.lengthOf(incidents, 1)

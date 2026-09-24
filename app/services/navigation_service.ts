@@ -6,7 +6,7 @@ import type User from '#models/user'
 import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { IncidentStatus, IncidentType } from '#shared/types/incident'
 import { INCIDENT_TARGET_FIELDS } from '#shared/helpers/incident_target'
-import { preloadIncidentTargets } from '#services/boat_incident_service'
+import { attachIncidentPhotosCount, preloadIncidentTargets } from '#services/boat_incident_service'
 import { toIncidentTarget } from '#transformers/boat_transformer'
 import type {
   FleetBoatOption,
@@ -130,6 +130,9 @@ export default class NavigationService {
     if (boatId) query.where('boatId', boatId)
 
     const incidents = await preloadIncidentTargets(query)
+    // Une requête groupée, comme `listForBoat` : la page flotte signale les
+    // incidents sans photo, que la file hors-ligne et le copilote produisent.
+    await attachIncidentPhotosCount(incidents)
 
     return incidents.map((incident) => ({
       id: incident.id,
@@ -142,6 +145,7 @@ export default class NavigationService {
       description: incident.description,
       insuranceClaimed: incident.insuranceClaimed,
       target: toIncidentTarget(incident),
+      photosCount: Number(incident.$extras.photosCount ?? 0),
     }))
   }
 }

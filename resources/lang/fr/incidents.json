@@ -36,7 +36,15 @@
     "submit": "Enregistrer",
     "cancel": "Annuler",
     "delete": "Supprimer",
-    "confirmDelete": "Supprimer cet incident ?"
+    "confirmDelete": "Supprimer cet incident ?",
+    "photos": "Photos (obligatoire)",
+    "photoHint": "Au moins une photo est requise : c'est elle qui constitue le dossier assurance.",
+    "photoRequired": "Ajoutez au moins une photo avant d'enregistrer.",
+    "photoOfflineNotice": "Hors connexion : l'incident part en file d'attente sans photo. Ajoutez-la depuis la page de l'incident au retour du réseau.",
+    "photoUploading": "Envoi des photos…",
+    "photoUploadFailed": "L'incident a bien été créé, mais les photos n'ont pas pu être envoyées. Ajoutez-les depuis la page de l'incident.",
+    "closedNeedsPhoto": "Ajoutez une photo à cet incident avant de le clôturer.",
+    "goToIncident": "Ouvrir la page de l'incident"
   },
   "target": {
     "wholeBoat": "Tout le bateau",
@@ -60,7 +68,8 @@
     "photosHint": "Utiles pour le dossier assurance. L'envoi de photos nécessite une connexion.",
     "detail": "Détail",
     "reportedOn": "Déclaré le {date}",
-    "closedOn": "Clôturé le {date}"
+    "closedOn": "Clôturé le {date}",
+    "missingPhotoHint": "Cet incident n'a aucune photo. Ajoutez-en une : elle est requise pour le clôturer."
   },
   "followUps": {
     "createTask": "Créer une tâche",
@@ -76,5 +85,6 @@
     "seeActions": "Voir les actions",
     "taskDone": "Terminée",
     "taskOpen": "Ouverte"
-  }
+  },
+  "missingPhoto": "Photo manquante"
 }

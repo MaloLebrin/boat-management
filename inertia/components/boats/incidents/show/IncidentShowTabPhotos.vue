@@ -23,6 +23,9 @@ function deleteUrlFor(mediaId: number): string {
 
 <template>
   <BaseCard padded>
+    <p v-if="canManage && photos.length === 0" class="mb-3 text-xs text-warning">
+      {{ t('incidents.show.missingPhotoHint') }}
+    </p>
     <p v-if="canManage" class="mb-3 text-xs text-fg-muted">{{ t('incidents.show.photosHint') }}</p>
     <MediaPhotoGallery
       :upload-url="uploadUrl"

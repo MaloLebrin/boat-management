@@ -6,6 +6,14 @@
     "uploading": "Uploading…",
     "empty": "No photos.",
     "delete": "Delete",
-    "confirmDelete": "Delete this photo?"
+    "confirmDelete": "Delete this photo?",
+    "selected": "Selected photos",
+    "remove": "Remove",
+    "browse": "Choose photos",
+    "dropzone": "Drop your photos here",
+    "formats": "JPG, PNG, HEIC, WEBP, GIF · {max} MB max per photo",
+    "rejectedExtension": "{name}: unsupported format.",
+    "rejectedSize": "{name}: file too large.",
+    "rejectedCount": "{max} photos maximum."
   }
 }

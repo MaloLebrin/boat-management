@@ -47,13 +47,38 @@ La fiche bateau expose trois props lues sur cette policy — `canCreateIncidents
 - `IncidentTargetBadge` : puce « Moteur · Yamaha F100 » avec lien vers la page de l'équipement ou de la pièce, sur l'onglet, `IncidentRow` et `IncidentCard`.
 - Ajout rapide : `QuickAddIncidentModal` (page flotte, dashboard) — sans sélecteur de cible, faute de données équipement dans `FleetBoatOption`.
 
+## Photo obligatoire
+
+Un incident sans photo est inexploitable pour un dossier assurance — la raison d'être de #814, qui les avait pourtant laissées facultatives. Depuis, **au moins une photo est requise**, mais pas au même endroit selon le chemin :
+
+| Chemin                       | Photo à la déclaration       | Ce qui tient la règle                            |
+| ---------------------------- | ---------------------------- | ------------------------------------------------ |
+| Formulaire, en ligne         | **exigée** par le formulaire | envoi en deux temps (ci-dessous)                 |
+| Formulaire, hors-ligne       | **exemptée**                 | verrou de clôture au retour du réseau            |
+| Copilote (`report_incident`) | impossible (aucun fichier)   | verrou de clôture + relance dans la confirmation |
+| Clôture (`status: 'closed'`) | —                            | **refus serveur** `photoRequiredToClose`         |
+
+### Pourquoi deux temps, et pas un POST multipart
+
+`POST /boats/:boatId/incidents` reste un POST **JSON**. Le basculer en multipart coûterait trois choses : les six FK de cible repartiraient en chaînes vides au lieu de `number | null` ; la route devrait entrer dans `LARGE_UPLOAD_ROUTES`, dont la garde `mediaBatchKindFor` impose un suffixe `/photos` ou `/documents` ; et la branche hors-ligne enfilerait des `File`, que `QueuedAction.payload` (`FormDataConvertible`) ne transporte pas (#621).
+
+Le formulaire crée donc l'incident, puis envoie les photos sur `POST …/incidents/:incidentId/photos` — route déjà validée par `storeBoatPhotosValidator`, déjà plafonnée pour les lots. Pour connaître l'id, `BoatIncidentsController.store` flashe `createdResourceType = create-incident` et `createdResourceId`, le canal déjà relayé par `InertiaMiddleware.share()` et déjà utilisé par les inspections, les journaux et les pleins. **Neutre pour `drainQueue`** : ces clés ne sont lues que si l'action porte un `tempId`, ce que les incidents ne font pas.
+
+Tout tient dans `inertia/composables/use_incident_photo_flow.ts` (exemption hors-ligne, enchaînement, `createdIncidentId` mémorisé pour qu'une resoumission après un envoi raté ne crée pas un second incident) et `inertia/components/media/MediaPendingPhotoPicker.vue` — sélecteur de fichiers **en attente**, qui ne poste rien et remonte des `File` à son parent, contrairement à `usePhotoUpload` et `MediaPhotoGallery`. Les bornes viennent de `shared/constants/media.ts` et sont appliquées dès la sélection, pour qu'un fichier refusé ne le soit pas après la création.
+
+### Le verrou de clôture
+
+`BoatIncidentService.updateForBoat` refuse `status: 'closed'` quand l'incident n'a aucune photo (`countIncidentPhotos`), avec `BoatIncidentValidationError('photoRequiredToClose')` → `flash.incidents.photoRequiredToClose` + `rejectedType`. La règle ne porte que sur la **transition** (`incident.status !== 'closed'`) : un incident clôturé avant l'obligation reste éditable, sinon tout l'historique deviendrait ingérable. Côté UI, le formulaire d'édition retire l'option « clôturé » quand `photosCount === 0` et renvoie vers la page de détail — `BaseSelect` n'ayant pas de `disabled` par option.
+
+Un incident sans photo est signalé partout : `BoatIncidentCard`, `IncidentRow` et `IncidentCard` (d'où `photosCount` sur `FleetIncidentRow`, posé par `getFleetIncidents` avec le même helper groupé que `listForBoat`), et une incitation sur `IncidentShowTabPhotos`. `toIncident(i, photosCount?)` prend le compteur en second argument : la page de détail a déjà ses photos en main, sans quoi elle rendrait `photosCount: 0` et masquerait à tort l'option de clôture.
+
 ## Photos et page de détail (#814)
 
 - `GET /boats/:boatId/incidents/:incidentId` (`boats.incidents.show`) → `BoatIncidentsController.show` (`IncidentPolicy.view`) → page `boats/incident_show` : en-tête (`IncidentShowHeader`), description, galerie (`IncidentShowTabPhotos` → `MediaPhotoGallery`). Les cartes de l'onglet et les lignes de la page flotte y mènent.
 - `POST …/incidents/:incidentId/photos` et `DELETE …/photos/:mediaId` → `BoatIncidentMediaController` (autorisé par **`IncidentPolicy.edit`**, pas `BoatPolicy.edit` comme les équipements). Deux gardes IDOR : `BoatIncidentService.findForBoat` (l'incident est du bateau, lui-même scopé à l'organisation) puis `mediaService.getForEntity(mediaId, 'boat_incident', incidentId)`. Redirection vers la page de détail ; incident étranger → `/boats/:id?tab=incidents`.
 - Médias : `entity_type = 'boat_incident'` (`MEDIA_ENTITY_TYPES`), dossier `CloudinaryFolders.boatIncidentPhotos` (`…/boats/{id}/incidents/{id}/photos`), route dans `LARGE_UPLOAD_ROUTES`. Purge à la suppression de l'incident (`deleteForBoat(…, org)`) et du bateau (`BoatHullService.deleteForUser`).
 - `BoatIncidentRow.photosCount` (compteur seul, une requête groupée dans `listForBoat`) : les médias ne voyagent jamais dans la prop différée `incidents`.
-- Hors-ligne : la déclaration d'un incident est enfilée, **pas** les photos — `usePhotoUpload` refuse l'envoi sans réseau (#621), le bouton est désactivé avec un message.
+- Hors-ligne : la déclaration d'un incident est enfilée, **pas** les photos — `usePhotoUpload` refuse l'envoi sans réseau (#621), le bouton est désactivé avec un message. C'est ce qui motive l'exemption de la section précédente.
 
 ## Suites : tâche et action à réparer (#815)
 
@@ -65,7 +90,7 @@ La fiche bateau expose trois props lues sur cette policy — `canCreateIncidents
 
 ## Copilote
 
-Action confirmable `report_incident` (`incidents.create`), avec `boatEngineId` facultatif (#813) — un moteur hors du bateau est une réponse invalide, comme pour `log_fuel`. Les autres cibles passent par l'UI. Fiche produit `incidents` dans `shared/constants/assistant/product_knowledge.ts`.
+Action confirmable `report_incident` (`incidents.create`), avec `boatEngineId` facultatif (#813). Le copilote ne peut joindre aucun fichier : sa confirmation (`flash.assistant.actions.report_incident`) réclame explicitement la photo, et le verrou de clôture la rend obligatoire avant de refermer le dossier — un moteur hors du bateau est une réponse invalide, comme pour `log_fuel`. Les autres cibles passent par l'UI. Fiche produit `incidents` dans `shared/constants/assistant/product_knowledge.ts`.
 
 ## Chantiers suivants
 

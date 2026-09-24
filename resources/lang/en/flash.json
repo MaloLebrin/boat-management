@@ -174,7 +174,8 @@
     "notFound": "Incident not found.",
     "descriptionRequired": "A description is required.",
     "equipmentNotFound": "This equipment does not belong to this boat.",
-    "multipleEquipment": "An incident can target only one piece of equipment."
+    "multipleEquipment": "An incident can target only one piece of equipment.",
+    "photoRequiredToClose": "An incident cannot be closed without a photo."
   },
   "inspections": {
     "created": "Inspection saved.",
@@ -412,7 +413,7 @@
       "start_trip": "Trip opened in the logbook.",
       "close_trip": "Trip closed.",
       "log_fuel": "Refueling recorded.",
-      "report_incident": "Incident reported.",
+      "report_incident": "Incident reported. Add a photo to it: an incident cannot be closed without one.",
       "create_reservation": "Reservation created.",
       "create_client": "Client record created.",
       "set_part_stock": "Part stock updated."

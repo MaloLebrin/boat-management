@@ -473,7 +473,13 @@ export function toIncidentTarget(i: BoatIncident): IncidentTargetSummary | null 
   }
 }
 
-export function toIncident(i: BoatIncident): BoatIncidentRow {
+/**
+ * `photosCount` sert au badge « photo manquante » et au verrou de clôture du
+ * formulaire d'édition. La page de détail a déjà ses photos en main : elle
+ * passe `photosCount` explicitement, sinon le compteur vaudrait 0 et l'option
+ * « clôturé » disparaîtrait d'un incident qui en a pourtant.
+ */
+export function toIncident(i: BoatIncident, photosCount?: number): BoatIncidentRow {
   return {
     id: i.id,
     boatId: i.boatId,
@@ -493,9 +499,9 @@ export function toIncident(i: BoatIncident): BoatIncidentRow {
     boatGenericEquipmentId: i.boatGenericEquipmentId,
     boatEnginePartId: i.boatEnginePartId,
     target: toIncidentTarget(i),
-    // Posé par `BoatIncidentService.attachPhotosCount` (#814) ; absent sur les
-    // autres chemins (assistant, tests), d'où le repli à 0.
-    photosCount: Number(i.$extras?.photosCount ?? 0),
+    // Posé par `attachIncidentPhotosCount` (#814) ; absent sur les autres
+    // chemins (assistant, tests), d'où le repli à 0.
+    photosCount: photosCount ?? Number(i.$extras?.photosCount ?? 0),
   }
 }
 
