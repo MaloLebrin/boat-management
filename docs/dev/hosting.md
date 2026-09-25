@@ -25,14 +25,15 @@ l'application de démarrer. Le point de départ est toujours `.env.example`
 
 À régler spécifiquement en production :
 
-| Variable       | Valeur                | Pourquoi                                                  |
-| -------------- | --------------------- | --------------------------------------------------------- |
-| `NODE_ENV`     | `production`          | Active les optimisations et désactive les routes `/dev/*` |
-| `HOST`         | `0.0.0.0`             | Écoute sur toutes les interfaces (forcé par le compose)   |
-| `APP_URL`      | `https://<domaine>`   | URLs absolues des mails, PDFs, SEO/JSON-LD                |
-| `DB_HOST`      | `postgres` en compose | Nom du service Postgres (forcé par le compose)            |
-| `APP_KEY`      | secret 32 octets      | `node ace generate:key`                                   |
-| `QUEUE_DRIVER` | `database`            | Les workers lisent la file en base                        |
+| Variable         | Valeur                        | Pourquoi                                                                                                   |
+| ---------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`       | `production`                  | Active les optimisations et désactive les routes `/dev/*`                                                  |
+| `HOST`           | `0.0.0.0`                     | Écoute sur toutes les interfaces (forcé par le compose)                                                    |
+| `APP_URL`        | `https://<domaine>`           | URLs absolues des mails, PDFs, SEO/JSON-LD                                                                 |
+| `DB_HOST`        | `postgres` en compose         | Nom du service Postgres (forcé par le compose)                                                             |
+| `APP_KEY`        | secret 32 octets              | `node ace generate:key`                                                                                    |
+| `ENCRYPTION_KEY` | secret 32 octets, ≠ `APP_KEY` | Chiffrement au repos des clés BYOK (#786) : `openssl rand -base64 32` — voir `docs/dev/encryption-keys.md` |
+| `QUEUE_DRIVER`   | `database`                    | Les workers lisent la file en base                                                                         |
 
 ### Secrets et journaux (#769)
 
@@ -86,7 +87,7 @@ Sur une machine vierge, avec Docker installé :
 ```bash
 git clone https://github.com/MaloLebrin/boat-management.git
 cd boat-management
-cp .env.example .env      # puis remplir APP_KEY, DB_*, APP_DOMAIN, LETSENCRYPT_EMAIL…
+cp .env.example .env      # puis remplir APP_KEY, ENCRYPTION_KEY, DB_*, APP_DOMAIN, LETSENCRYPT_EMAIL…
 docker compose -f docker-compose.prod.yml up -d
 ```
 

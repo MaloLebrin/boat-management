@@ -29,6 +29,12 @@ export default await Env.create(new URL('../', import.meta.url), {
   APP_NAME: Env.schema.string(),
   APP_KEY: Env.schema.secret(),
   APP_URL: Env.schema.string(),
+  // Chiffrement au repos (#786) — distinct d'APP_KEY (cookies, sessions) pour
+  // que l'une puisse tourner sans casser l'autre. `_PREVIOUS` n'est posée que
+  // le temps d'une rotation (`node ace encryption:rotate`) — voir
+  // docs/dev/encryption-keys.md.
+  ENCRYPTION_KEY: Env.schema.secret(),
+  ENCRYPTION_KEY_PREVIOUS: Env.schema.secret.optional(),
 
   // Session
   SESSION_DRIVER: Env.schema.enum(['cookie', 'memory', 'database'] as const),

@@ -12,9 +12,9 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 export default class OrganizationAiKey extends OrganizationAiKeySchema {
   declare provider: AiProvider
 
-  // Chiffrée au repos (APP_KEY), jamais sérialisée : seuls les booléens
-  // `configuredProviders` construits dans OrganizationAiKeyService sortent
-  // du backend.
+  // Chiffrée au repos via DataEncryptionService (ENCRYPTION_KEY, #786 — plus
+  // APP_KEY), jamais sérialisée : seuls les booléens `configuredProviders`
+  // construits dans OrganizationAiKeyService sortent du backend.
   @column({ serializeAs: null })
   declare apiKeyEncrypted: string
 

@@ -10,6 +10,7 @@ import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
 import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
+import AiKeyUndecryptable from '#events/ai_key_undecryptable'
 
 emitter.listen(SimulatorLeadCreated, [() => import('#listeners/on_simulator_lead_created')])
 emitter.listen(ContactMessageReceived, [() => import('#listeners/on_contact_message_received')])
@@ -36,3 +37,4 @@ emitter.listen(StorageThresholdCrossed, [
 emitter.listen(AiTokenThresholdCrossed, [
   () => import('#listeners/send_ai_token_quota_notification'),
 ])
+emitter.listen(AiKeyUndecryptable, [() => import('#listeners/log_ai_key_undecryptable')])

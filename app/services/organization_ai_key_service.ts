@@ -1,8 +1,13 @@
+import AiKeyUndecryptable from '#events/ai_key_undecryptable'
 import { AiProviderKeyMissingError } from '#exceptions/ai_errors'
 import type Organization from '#models/organization'
 import OrganizationAiKey from '#models/organization_ai_key'
+import DataEncryptionService from '#services/data_encryption_service'
 import { AI_PROVIDERS, modelBelongsToProvider, type AiProvider } from '#shared/types/ai'
-import encryption from '@adonisjs/core/services/encryption'
+import type { AiKeyRotationOptions, AiKeyRotationReport } from '#shared/types/encryption'
+import { inject } from '@adonisjs/core'
+import emitter from '@adonisjs/core/services/emitter'
+import logger from '@adonisjs/core/services/logger'
 
 /**
  * Clés API IA par fournisseur (BYOK multi-fournisseurs, table
@@ -16,9 +21,14 @@ import encryption from '@adonisjs/core/services/encryption'
  *   fournisseur sans clé, et supprimer la clé du fournisseur actif ramène
  *   l'org au défaut de l'app (`ai_provider = null`, quota de tokens) ;
  * - `aiModelOverride` suit le fournisseur actif : un modèle étranger au
- *   nouveau fournisseur est remis à null plutôt que laissé incohérent.
+ *   nouveau fournisseur est remis à null plutôt que laissé incohérent ;
+ * - le chiffrement au repos passe par `DataEncryptionService` (`ENCRYPTION_KEY`,
+ *   #786), jamais par l'encrypteur par défaut lié à `APP_KEY`.
  */
+@inject()
 export default class OrganizationAiKeyService {
+  constructor(private dataEncryption: DataEncryptionService) {}
+
   /** Booléens par fournisseur — seule forme qui sort du backend. */
   async listConfigured(organizationId: number): Promise<Record<AiProvider, boolean>> {
     const keys = await OrganizationAiKey.query()
@@ -35,7 +45,7 @@ export default class OrganizationAiKeyService {
   async setKey(org: Organization, provider: AiProvider, apiKey: string): Promise<void> {
     await OrganizationAiKey.updateOrCreate(
       { organizationId: org.id, provider },
-      { apiKeyEncrypted: encryption.encrypt(apiKey) }
+      { apiKeyEncrypted: this.dataEncryption.encrypt(apiKey) }
     )
   }
 
@@ -81,6 +91,10 @@ export default class OrganizationAiKeyService {
    * Résolution pour l'assistant : `null` = défaut app (clé Mistral de l'app,
    * quota applicable) ; sinon la clé déchiffrée du fournisseur actif. Une
    * ligne manquante (état incohérent) ramène au défaut plutôt que d'échouer.
+   *
+   * Une clé indéchiffrable ramène aussi au défaut — mais jamais en silence
+   * (#786) : `AiKeyUndecryptable` est émis, le repli sur la clé de l'app
+   * transformerait sinon un incident de configuration en dérive de facturation.
    */
   async resolveActiveKey(
     org: Organization
@@ -93,10 +107,63 @@ export default class OrganizationAiKeyService {
       .first()
     if (key === null) return null
 
-    // Une clé indéchiffrable (APP_KEY changée) ramène aussi au défaut app.
-    const apiKey = encryption.decrypt<string>(key.apiKeyEncrypted)
-    if (apiKey === null) return null
+    const decrypted = this.dataEncryption.decrypt(key.apiKeyEncrypted)
+    if (decrypted === null) {
+      await emitter.emit(AiKeyUndecryptable, new AiKeyUndecryptable(org, org.aiProvider))
+      return null
+    }
 
-    return { provider: org.aiProvider, apiKey }
+    if (decrypted.keyring === 'app_key') {
+      logger.warn(
+        { organizationId: org.id, provider: org.aiProvider },
+        'OrganizationAiKeyService: clé BYOK encore chiffrée avec APP_KEY — lancer `node ace encryption:rotate` pour terminer la migration vers ENCRYPTION_KEY'
+      )
+    }
+
+    return { provider: org.aiProvider, apiKey: decrypted.plainText }
+  }
+
+  /**
+   * Rechiffre toutes les clés BYOK avec la clé courante d'`ENCRYPTION_KEY`
+   * (#786) — c'est l'étape « rechiffrer » d'une rotation, et la migration
+   * initiale depuis `APP_KEY`. Idempotent : une ligne déjà à jour est
+   * rechiffrée à l'identique (nouvel IV), sans effet. Une ligne qu'aucune clé
+   * ne déchiffre est comptée et laissée telle quelle : la commande la signale,
+   * l'admin de l'org devra ressaisir la clé.
+   */
+  async reencryptAll(options: AiKeyRotationOptions = {}): Promise<AiKeyRotationReport> {
+    const dryRun = options.dryRun ?? false
+    const keys = await OrganizationAiKey.query()
+      .select('id', 'organizationId', 'provider', 'apiKeyEncrypted')
+      .orderBy('id')
+
+    const report: AiKeyRotationReport = {
+      dryRun,
+      total: keys.length,
+      reencrypted: 0,
+      fromAppKey: 0,
+      undecryptable: 0,
+    }
+
+    for (const key of keys) {
+      const decrypted = this.dataEncryption.decrypt(key.apiKeyEncrypted)
+      if (decrypted === null) {
+        report.undecryptable++
+        logger.error(
+          { organizationId: key.organizationId, provider: key.provider, aiKeyId: key.id },
+          'encryption:rotate — clé BYOK indéchiffrable, laissée telle quelle'
+        )
+        continue
+      }
+
+      report.reencrypted++
+      if (decrypted.keyring === 'app_key') report.fromAppKey++
+      if (dryRun) continue
+
+      key.apiKeyEncrypted = this.dataEncryption.encrypt(decrypted.plainText)
+      await key.save()
+    }
+
+    return report
   }
 }

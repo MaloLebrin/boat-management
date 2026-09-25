@@ -207,6 +207,8 @@ Le select de la page settings ne propose que les modèles du **fournisseur actif
 
 Les fournisseurs non-Mistral n'existent qu'en **BYOK** : la clé API de l'org (table `organization_ai_keys`, une ligne par couple org/fournisseur, chiffrée) est consommée **uniquement par le copilote FleetAi** — cf. changelog `2026-09-06-0110-byok-multi-fournisseurs-ia.md`.
 
+La clé est chiffrée au repos avec `ENCRYPTION_KEY` (encrypteur `data`, via `DataEncryptionService`), **pas** avec `APP_KEY` — les deux tournent indépendamment, procédure dans `docs/dev/encryption-keys.md` (#786). Une clé indéchiffrable ramène l'org au défaut de l'app (clé Mistral + quota) mais émet `AiKeyUndecryptable`, journalisé en `error` avec `event: "ai_key_undecryptable"`.
+
 ---
 
 ## 8. Frontend

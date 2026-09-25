@@ -29,6 +29,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/frontend/i18n.md` — internationalisation, `useT()`, ajouter une langue
 - **Tests**: `docs/dev/testing.md`
 - **Hébergement & déploiement**: `docs/dev/hosting.md` — image GHCR, migrations au déploiement, docker-compose.prod.yml, healthcheck `/up`
+- **Clés de chiffrement**: `docs/dev/encryption-keys.md` — `ENCRYPTION_KEY` vs `APP_KEY`, migration initiale, procédure de rotation (`node ace encryption:rotate`)
 - **Seeders**: `docs/dev/seeders.md`
 - **Contribution**: `docs/dev/contributing.md`
 - **Process “doc à jour”**: `docs/process/keeping-docs-up-to-date.md`
