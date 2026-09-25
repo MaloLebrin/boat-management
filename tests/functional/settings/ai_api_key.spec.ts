@@ -1,11 +1,18 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
+import app from '@adonisjs/core/services/app'
+import emitter from '@adonisjs/core/services/emitter'
 import encryption from '@adonisjs/core/services/encryption'
+import AiKeyUndecryptable from '#events/ai_key_undecryptable'
+import DataEncryptionService from '#services/data_encryption_service'
+import OrganizationAiKeyService from '#services/organization_ai_key_service'
 import Organization from '#models/organization'
 import OrganizationAiKey from '#models/organization_ai_key'
 import OrganizationMembership from '#models/organization_membership'
 import { UserFactory } from '#database/factories/user_factory'
 import { createAdminUser } from '#tests/functional/helpers'
+
+const dataEncryption = new DataEncryptionService()
 
 test.group('AI API keys settings (BYOK multi-provider)', (group) => {
   group.each.setup(() => truncateDb())
@@ -30,7 +37,10 @@ test.group('AI API keys settings (BYOK multi-provider)', (group) => {
       .where('provider', 'anthropic')
       .firstOrFail()
     assert.notInclude(key.apiKeyEncrypted, 'sk-ant-secret-key')
-    assert.equal(encryption.decrypt<string>(key.apiKeyEncrypted), 'sk-ant-secret-key')
+    assert.isTrue(dataEncryption.isCurrent(key.apiKeyEncrypted))
+    assert.equal(dataEncryption.decrypt(key.apiKeyEncrypted)?.plainText, 'sk-ant-secret-key')
+    // Chiffrée avec ENCRYPTION_KEY, pas avec APP_KEY (#786).
+    assert.isNull(encryption.decrypt(key.apiKeyEncrypted))
   })
 
   test('saving a key again replaces it (one row per org/provider)', async ({ assert, client }) => {
@@ -51,7 +61,7 @@ test.group('AI API keys settings (BYOK multi-provider)', (group) => {
       .where('organizationId', user.organizationId!)
       .where('provider', 'openai')
     assert.lengthOf(keys, 1)
-    assert.equal(encryption.decrypt<string>(keys[0].apiKeyEncrypted), 'sk-openai-second')
+    assert.equal(dataEncryption.decrypt(keys[0].apiKeyEncrypted)?.plainText, 'sk-openai-second')
   })
 
   test('an unknown provider does not match the route (404)', async ({ client }) => {
@@ -71,7 +81,7 @@ test.group('AI API keys settings (BYOK multi-provider)', (group) => {
     const key = await OrganizationAiKey.create({
       organizationId: user.organizationId!,
       provider: 'google',
-      apiKeyEncrypted: encryption.encrypt('sk-gemini-secret-key'),
+      apiKeyEncrypted: dataEncryption.encrypt('sk-gemini-secret-key'),
     })
 
     const page = await client.get('/settings/ai').loginAs(user).withInertia()
@@ -109,7 +119,7 @@ test.group('AI API keys settings (BYOK multi-provider)', (group) => {
     await OrganizationAiKey.create({
       organizationId: user.organizationId!,
       provider: 'anthropic',
-      apiKeyEncrypted: encryption.encrypt('sk-ant-secret-key'),
+      apiKeyEncrypted: dataEncryption.encrypt('sk-ant-secret-key'),
     })
 
     const response = await client
@@ -136,7 +146,7 @@ test.group('AI API keys settings (BYOK multi-provider)', (group) => {
     await OrganizationAiKey.create({
       organizationId: org.id,
       provider: 'anthropic',
-      apiKeyEncrypted: encryption.encrypt('sk-ant-secret-key'),
+      apiKeyEncrypted: dataEncryption.encrypt('sk-ant-secret-key'),
     })
 
     // Retour au défaut app (mistral) : le modèle Claude ne s'applique plus.
@@ -161,7 +171,7 @@ test.group('AI API keys settings (BYOK multi-provider)', (group) => {
     await OrganizationAiKey.create({
       organizationId: org.id,
       provider: 'mistral',
-      apiKeyEncrypted: encryption.encrypt('sk-mistral-secret-key'),
+      apiKeyEncrypted: dataEncryption.encrypt('sk-mistral-secret-key'),
     })
     org.aiProvider = 'mistral'
     await org.save()
@@ -186,7 +196,7 @@ test.group('AI API keys settings (BYOK multi-provider)', (group) => {
       await OrganizationAiKey.create({
         organizationId: org.id,
         provider,
-        apiKeyEncrypted: encryption.encrypt(`sk-${provider}-secret-key`),
+        apiKeyEncrypted: dataEncryption.encrypt(`sk-${provider}-secret-key`),
       })
     }
     org.aiProvider = 'google'
@@ -249,5 +259,74 @@ test.group('AI API keys settings (BYOK multi-provider)', (group) => {
     response.assertStatus(302)
     const keys = await OrganizationAiKey.query().where('organizationId', admin.organizationId!)
     assert.lengthOf(keys, 0)
+  })
+
+  // --- résolution au moment de l'appel IA (#786) ---
+
+  test('resolveActiveKey returns the decrypted key of the active provider', async ({ assert }) => {
+    const user = await createAdminUser()
+    const org = await Organization.findOrFail(user.organizationId!)
+    await OrganizationAiKey.create({
+      organizationId: org.id,
+      provider: 'anthropic',
+      apiKeyEncrypted: dataEncryption.encrypt('sk-ant-secret-key'),
+    })
+    org.aiProvider = 'anthropic'
+    await org.save()
+    const service = await app.container.make(OrganizationAiKeyService)
+
+    assert.deepEqual(await service.resolveActiveKey(org), {
+      provider: 'anthropic',
+      apiKey: 'sk-ant-secret-key',
+    })
+  })
+
+  test('a key still encrypted with APP_KEY is resolved until the rotation is run', async ({
+    assert,
+    cleanup,
+  }) => {
+    const user = await createAdminUser()
+    const org = await Organization.findOrFail(user.organizationId!)
+    await OrganizationAiKey.create({
+      organizationId: org.id,
+      provider: 'mistral',
+      apiKeyEncrypted: encryption.encrypt('sk-mistral-legacy-key'),
+    })
+    org.aiProvider = 'mistral'
+    await org.save()
+    const service = await app.container.make(OrganizationAiKeyService)
+    const events = emitter.fake()
+    cleanup(() => emitter.restore())
+
+    const active = await service.resolveActiveKey(org)
+
+    assert.equal(active?.apiKey, 'sk-mistral-legacy-key')
+    events.assertNotEmitted(AiKeyUndecryptable)
+  })
+
+  test('an undecryptable key falls back to the app default and emits AiKeyUndecryptable', async ({
+    assert,
+    cleanup,
+  }) => {
+    const user = await createAdminUser()
+    const org = await Organization.findOrFail(user.organizationId!)
+    await OrganizationAiKey.create({
+      organizationId: org.id,
+      provider: 'google',
+      apiKeyEncrypted: 'data.encrypted-with-a-key-nobody-has.iv.tag',
+    })
+    org.aiProvider = 'google'
+    await org.save()
+    const service = await app.container.make(OrganizationAiKeyService)
+    const events = emitter.fake()
+    cleanup(() => emitter.restore())
+
+    const active = await service.resolveActiveKey(org)
+
+    assert.isNull(active)
+    events.assertEmitted(AiKeyUndecryptable)
+    const emitted = events.find(AiKeyUndecryptable)
+    assert.equal(emitted?.data.organization.id, org.id)
+    assert.equal(emitted?.data.provider, 'google')
   })
 })

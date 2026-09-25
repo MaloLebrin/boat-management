@@ -1,6 +1,5 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import encryption from '@adonisjs/core/services/encryption'
 import { DateTime } from 'luxon'
 import AiAssistantConversation from '#models/ai_assistant_conversation'
 import AiTokenUsage from '#models/ai_token_usage'
@@ -13,6 +12,9 @@ import { createAdminUser, createMechanicUser } from '#tests/functional/helpers'
 import OrganizationAiKey from '#models/organization_ai_key'
 import { ASSISTANT_CONVERSATION_TOKEN_BUDGET, type AssistantMessage } from '#shared/types/assistant'
 import { restoreAiService, swapAiService } from '#tests/support/fakes'
+import DataEncryptionService from '#services/data_encryption_service'
+
+const dataEncryption = new DataEncryptionService()
 
 const ANSWER_RESPONSE = JSON.stringify({
   type: 'answer',
@@ -570,7 +572,7 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     await OrganizationAiKey.create({
       organizationId: org.id,
       provider: 'mistral',
-      apiKeyEncrypted: encryption.encrypt('sk-org-own-key'),
+      apiKeyEncrypted: dataEncryption.encrypt('sk-org-own-key'),
     })
     org.aiProvider = 'mistral'
     await org.save()
@@ -609,7 +611,7 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     await OrganizationAiKey.create({
       organizationId: org.id,
       provider: 'anthropic',
-      apiKeyEncrypted: encryption.encrypt('sk-ant-org-key'),
+      apiKeyEncrypted: dataEncryption.encrypt('sk-ant-org-key'),
     })
     org.aiProvider = 'anthropic'
     await org.save()
@@ -640,7 +642,7 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     await OrganizationAiKey.create({
       organizationId: org.id,
       provider: 'anthropic',
-      apiKeyEncrypted: encryption.encrypt('sk-ant-org-key'),
+      apiKeyEncrypted: dataEncryption.encrypt('sk-ant-org-key'),
     })
     await AiTokenUsage.create({
       organizationId: user.organizationId!,

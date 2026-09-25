@@ -13,6 +13,7 @@ Références: `start/env.ts` et `.env.example`.
 Le projet attend (entre autres):
 
 - `APP_KEY`, `APP_URL`
+- `ENCRYPTION_KEY` (chiffrement au repos, distincte d'`APP_KEY` — `openssl rand -base64 32`, voir `docs/dev/encryption-keys.md`)
 - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_DATABASE`
 - `SESSION_DRIVER`
 - `QUEUE_DRIVER`

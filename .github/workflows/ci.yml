@@ -121,6 +121,7 @@ jobs:
           HOST: localhost
           APP_NAME: fleetai
           APP_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          ENCRYPTION_KEY: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=
           APP_URL: http://localhost:3333
           LOG_LEVEL: error
           QUEUE_DRIVER: sync
@@ -225,6 +226,7 @@ jobs:
           HOST: localhost
           APP_NAME: fleetai
           APP_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          ENCRYPTION_KEY: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=
           APP_URL: http://localhost:3333
           LOG_LEVEL: error
           QUEUE_DRIVER: sync

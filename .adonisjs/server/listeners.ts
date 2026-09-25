@@ -4,6 +4,7 @@
  */
 
 export const listeners = {
+  LogAiKeyUndecryptable: () => import('#listeners/log_ai_key_undecryptable'),
   OnContactMessageReceived: () => import('#listeners/on_contact_message_received'),
   OnOrganizationInvitationAccepted: () => import('#listeners/on_organization_invitation_accepted'),
   OnOrganizationMemberJoined: () => import('#listeners/on_organization_member_joined'),
