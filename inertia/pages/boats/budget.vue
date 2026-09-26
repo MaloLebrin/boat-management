@@ -13,6 +13,7 @@ import BudgetEntryForm from '~/components/boats/budget/BudgetEntryForm.vue'
 import BudgetEntryList from '~/components/boats/budget/BudgetEntryList.vue'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
+import { routes } from '~/utils/routes'
 import type { BudgetData, BoatPortStayItem, BoatBudgetEntryItem } from '~/types/budget'
 import type { PortNameOption } from '../../../shared/types/port'
 
@@ -23,6 +24,8 @@ const props = defineProps<{
   portStays: BoatPortStayItem[]
   entries: BoatBudgetEntryItem[]
   canManage: boolean
+  /** Plan Entreprise + admin (`import.run`) : affiche le raccourci vers l'import de dépenses. */
+  canImport: boolean
   portOptions: PortNameOption[]
 }>()
 
@@ -119,6 +122,15 @@ const categories = computed(() => [
           external-href
         >
           {{ t('budget.exportCsv') }}
+        </BaseButton>
+        <BaseButton
+          v-if="canImport"
+          variant="secondary"
+          size="sm"
+          :href="routes.csv.importExpenses(boat.id)"
+          data-testid="budget-import-button"
+        >
+          {{ t('budget.importButton') }}
         </BaseButton>
         <BaseButton variant="secondary" size="sm" route="boats.show" :params="{ id: boat.id }">
           ← {{ boat.name }}

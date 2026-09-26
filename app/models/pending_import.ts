@@ -3,7 +3,7 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import Boat from '#models/boat'
 import User from '#models/user'
-import type { CsvImportType, MaintenanceImportRow } from '#shared/types/csv'
+import type { CsvImportRows, CsvImportType } from '#shared/types/csv'
 
 /**
  * Import CSV en attente de confirmation (#774).
@@ -26,10 +26,14 @@ export default class PendingImport extends BaseModel {
   @column()
   declare type: CsvImportType
 
+  /**
+   * Lignes validées, de la forme que `type` annonce (`MaintenanceImportRow[]`
+   * ou `ExpenseImportRow[]`) — voir `runImport`.
+   */
   @column({
-    prepare: (value: MaintenanceImportRow[]) => JSON.stringify(value),
+    prepare: (value: CsvImportRows) => JSON.stringify(value),
   })
-  declare rows: MaintenanceImportRow[]
+  declare rows: CsvImportRows
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

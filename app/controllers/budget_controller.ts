@@ -3,9 +3,11 @@ import { BoatNotFoundError } from '#exceptions/boat_errors'
 import BudgetService from '#services/budget_service'
 import BoatPortStayService from '#services/boat_port_stay_service'
 import BoatBudgetEntryService from '#services/boat_budget_entry_service'
+import QuotaService from '#services/quota_service'
 import { toBudgetEntryItem, toPortStayItem } from '#transformers/budget_transformer'
 import PortService from '#services/port_service'
 import BoatPolicy from '#policies/boat_policy'
+import OrganizationPolicy from '#policies/organization_policy'
 import { budgetYearValidator } from '#validators/budget_validator'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -17,7 +19,8 @@ export default class BudgetController {
     private budgetService: BudgetService,
     private portStayService: BoatPortStayService,
     private entryService: BoatBudgetEntryService,
-    private portService: PortService
+    private portService: PortService,
+    private quotaService: QuotaService
   ) {}
 
   async show({ params, inertia, auth, bouncer, response, request }: HttpContext) {
@@ -37,15 +40,25 @@ export default class BudgetController {
     const { year: rawYear } = await request.validateUsing(budgetYearValidator)
     const year = rawYear ?? new Date().getFullYear()
 
-    const [budget, portStays, entries, canManage, portOptions] = await Promise.all([
-      this.budgetService.getForBoat(boat, year),
-      this.portStayService.listForBoat(boat, year),
-      this.entryService.listForBoat(boat, year),
-      bouncer.with(BoatPolicy).allows('manage', boat),
-      // Assistance à la saisie du nom d'escale (#579) : la colonne reste du
-      // texte libre, la liste ne fait que proposer les ports de l'organisation.
-      this.portService.listNamesForOrg(user),
-    ])
+    await user.load('organization')
+
+    const [budget, portStays, entries, canManage, portOptions, allowsRunImport] = await Promise.all(
+      [
+        this.budgetService.getForBoat(boat, year),
+        this.portStayService.listForBoat(boat, year),
+        this.entryService.listForBoat(boat, year),
+        bouncer.with(BoatPolicy).allows('manage', boat),
+        // Assistance à la saisie du nom d'escale (#579) : la colonne reste du
+        // texte libre, la liste ne fait que proposer les ports de l'organisation.
+        this.portService.listNamesForOrg(user),
+        bouncer.with(OrganizationPolicy).allows('runImport'),
+      ]
+    )
+
+    // Raccourci « Importer des dépenses » vers `/settings/import` : même
+    // garde que l'import lui-même (plan Entreprise + capability `import.run`),
+    // sinon le bouton mènerait à un écran qui refuse.
+    const canImport = this.quotaService.canImport(user.organization) && allowsRunImport
 
     const portStaysFormatted = portStays.map(toPortStayItem)
     const entriesFormatted = entries.map(toBudgetEntryItem)
@@ -57,6 +70,7 @@ export default class BudgetController {
       portStays: portStaysFormatted,
       entries: entriesFormatted,
       canManage,
+      canImport,
       portOptions,
     })
   }

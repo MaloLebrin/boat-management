@@ -1,101 +1,53 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { router } from '@inertiajs/vue3'
 import BaseCard from '~/components/base/BaseCard.vue'
-import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
-import BaseSelect from '~/components/base/BaseSelect.vue'
 import CsvHelpModal from '~/components/settings/CsvHelpModal.vue'
+import ImportExportCard from '~/components/settings/import/ImportExportCard.vue'
+import ImportPreviewPanel from '~/components/settings/import/ImportPreviewPanel.vue'
+import ImportUploadForm from '~/components/settings/import/ImportUploadForm.vue'
 import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
-import { CSV_IMPORT_MAX_FILE_SIZE_MB, CSV_IMPORT_MAX_ROWS } from '#shared/constants/csv_import'
-import { routes } from '~/utils/routes'
-import { MAINTENANCE_CSV_HEADERS } from '../../../../shared/types/csv'
-import type { CsvBoatOption, CsvImportPreviewData } from '../../../../shared/types/csv'
+import type { CsvBoatOption, CsvImportPreviewData, CsvImportType } from '#shared/types/csv'
 
 const { t } = useT()
 
-/**
- * Bornes du fichier, reprises des constantes partagées (#774) : l'aide
- * annonçait « max 5 Mo » sans plafond de lignes, c'est-à-dire une limite que
- * le code n'appliquait pas.
- */
-const csvLimits = {
-  size: String(CSV_IMPORT_MAX_FILE_SIZE_MB),
-  rows: String(CSV_IMPORT_MAX_ROWS),
-}
-
-const props = defineProps<{
-  boats: CsvBoatOption[]
-  preview: CsvImportPreviewData | null
-  hasPendingImport: boolean
-  /**
-   * Plan Entreprise **et** capability `import.run` (admin seul) — #715. Faux,
-   * la page garde ses exports : ils s'arrêtent à `canExport`, ouvert dès le
-   * plan Pro et à tous les rôles.
-   */
-  canImport: boolean
-}>()
+const props = withDefaults(
+  defineProps<{
+    boats: CsvBoatOption[]
+    preview: CsvImportPreviewData | null
+    hasPendingImport: boolean
+    /**
+     * Plan Entreprise **et** capability `import.run` (admin seul) — #715. Faux,
+     * la page garde ses exports : ils s'arrêtent à `canExport`, ouvert dès le
+     * plan Pro et à tous les rôles.
+     */
+    canImport: boolean
+    /**
+     * Présélection par `?type=…&boatId=…` — le raccourci « Importer des
+     * dépenses » de la page budget arrive ici. Déjà filtrés par le contrôleur.
+     */
+    initialType?: CsvImportType | null
+    initialBoatId?: number | null
+  }>(),
+  { initialType: null, initialBoatId: null }
+)
 
 /** Flotte mono-bateau (#823) : le bateau est retenu d'office, sans sélecteur. */
 const { singleBoatId } = useSingleBoat(() => props.boats)
-const selectedBoatId = ref<string | ''>(singleBoatId.value ?? '')
+const selectedBoatId = ref<string>(
+  props.initialBoatId !== null && props.boats.some((b) => b.id === props.initialBoatId)
+    ? String(props.initialBoatId)
+    : (singleBoatId.value ?? '')
+)
 watch(singleBoatId, (boatId) => {
   if (boatId) selectedBoatId.value = boatId
 })
-const selectedType = ref<'maintenance'>('maintenance')
-const fileInput = ref<HTMLInputElement | null>(null)
-const isSubmitting = ref(false)
+
+const selectedType = ref<CsvImportType>(props.initialType ?? 'maintenance')
 const showHelpModal = ref(false)
 
-function getExportHref(key: string) {
-  if (!selectedBoatId.value) return undefined
-  const id = Number(selectedBoatId.value)
-  return key === 'maintenance'
-    ? routes.csv.exportMaintenance(id)
-    : key === 'fuelLogs'
-      ? routes.csv.exportFuelLogs(id)
-      : routes.csv.exportNavigationLogs(id)
-}
-
-const templateHeaders = MAINTENANCE_CSV_HEADERS.join(';')
-
 const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id), label: b.name })))
-
-const typeOptions = computed(() => [
-  { value: 'maintenance', label: t('settings.import.types.maintenance') },
-])
-
-function handlePreview() {
-  if (!selectedBoatId.value || !fileInput.value?.files?.[0]) return
-  const form = new FormData()
-  form.append('type', selectedType.value)
-  form.append('boatId', String(selectedBoatId.value))
-  form.append('file', fileInput.value.files[0])
-  isSubmitting.value = true
-  router.post(routes.csv.importPreview(), form, {
-    onFinish: () => {
-      isSubmitting.value = false
-    },
-  })
-}
-
-function handleConfirm() {
-  if (!props.preview) return
-  const form = new FormData()
-  form.append('type', props.preview.type)
-  form.append('boatId', String(props.preview.boatId))
-  isSubmitting.value = true
-  router.post(routes.csv.importConfirm(), form, {
-    onFinish: () => {
-      isSubmitting.value = false
-    },
-  })
-}
-
-function handleCancel() {
-  router.post(routes.csv.importCancel(), {})
-}
 </script>
 
 <template>
@@ -111,173 +63,29 @@ function handleCancel() {
       </button>
     </div>
 
-    <!-- Export section -->
-    <BaseCard>
-      <BaseHeading level="3" class="mb-4">{{ t('settings.import.exportSection') }}</BaseHeading>
-      <div v-if="!singleBoatId" class="mb-4">
-        <BaseSelect
-          v-model="selectedBoatId"
-          :label="t('settings.import.exportBoatLabel')"
-          :options="boatOptions"
-          allow-empty
-          :placeholder="t('settings.import.boatPlaceholder')"
-        />
-        <p v-if="boats.length === 0" class="mt-2 text-sm text-fg-muted">
-          {{ t('settings.import.noBoats') }}
-        </p>
-      </div>
-      <div class="flex flex-wrap gap-3">
-        <!-- eslint-disable vue/no-restricted-v-bind -- export CSV : pas une navigation -->
-        <a
-          v-for="{ key, label } in [
-            { key: 'maintenance', label: t('settings.import.exportMaintenance') },
-            { key: 'fuelLogs', label: t('settings.import.exportFuelLogs') },
-            { key: 'navigationLogs', label: t('settings.import.exportNavigationLogs') },
-          ]"
-          :key="key"
-          :href="getExportHref(key)"
-          :class="[
-            'inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors',
-            selectedBoatId ? 'text-fg hover:bg-surface-muted' : 'pointer-events-none opacity-40',
-          ]"
-        >
-          {{ label }}
-        </a>
-        <!-- eslint-enable vue/no-restricted-v-bind -->
-      </div>
-    </BaseCard>
+    <ImportExportCard
+      v-model="selectedBoatId"
+      :boats="boats"
+      :boat-options="boatOptions"
+      :single-boat-id="singleBoatId"
+    />
 
-    <!-- Import section -->
     <BaseCard>
       <BaseHeading level="3" class="mb-4">{{ t('settings.import.importSection') }}</BaseHeading>
 
       <p v-if="!canImport" class="text-sm text-fg-muted">{{ t('settings.import.restricted') }}</p>
 
-      <div v-else-if="!preview" class="space-y-4">
-        <BaseSelect
-          v-if="!singleBoatId"
-          v-model="selectedBoatId"
-          :label="t('settings.import.boatLabel')"
-          :options="boatOptions"
-          allow-empty
-          :placeholder="t('settings.import.boatPlaceholder')"
-        />
+      <ImportUploadForm
+        v-else-if="!preview"
+        v-model:boat-id="selectedBoatId"
+        v-model:type="selectedType"
+        :boat-options="boatOptions"
+        :single-boat-id="singleBoatId"
+      />
 
-        <BaseSelect
-          v-model="selectedType"
-          :label="t('settings.import.typeLabel')"
-          :options="typeOptions"
-        />
-
-        <div>
-          <label class="mb-1 block text-sm font-medium text-fg">
-            {{ t('settings.import.fileLabel') }}
-          </label>
-          <input
-            ref="fileInput"
-            type="file"
-            accept=".csv"
-            class="block w-full text-sm text-fg-muted file:mr-4 file:rounded-lg file:border-0 file:bg-brand/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-brand hover:file:bg-brand/20"
-          />
-          <p class="mt-1 text-xs text-fg-muted">
-            {{ t('settings.import.fileHint', csvLimits) }}
-          </p>
-          <p class="mt-1 text-xs text-fg-muted">
-            {{ t('settings.import.templateHint', { headers: templateHeaders }) }}
-          </p>
-        </div>
-
-        <div class="flex justify-end">
-          <BaseButton
-            type="button"
-            variant="primary"
-            :disabled="!selectedBoatId || isSubmitting"
-            @click="handlePreview"
-          >
-            {{ t('settings.import.previewButton') }}
-          </BaseButton>
-        </div>
-      </div>
-
-      <!-- Preview result -->
-      <div v-else class="space-y-4">
-        <div class="flex items-center justify-between">
-          <p class="text-sm text-fg-muted">
-            {{
-              t('settings.import.previewSummary', {
-                valid: String(preview.validRows),
-                total: String(preview.totalRows),
-              })
-            }}
-            — <strong>{{ preview.boatName }}</strong>
-          </p>
-          <span class="text-xs text-fg-muted">
-            {{ t('settings.import.previewErrors', { count: String(preview.invalidRows) }) }}
-          </span>
-        </div>
-
-        <div class="overflow-x-auto rounded-lg border border-border">
-          <table class="w-full text-sm">
-            <thead class="bg-surface-muted text-left text-xs font-medium text-fg-muted">
-              <tr>
-                <th class="px-3 py-2">{{ t('settings.import.previewColumns.line') }}</th>
-                <th class="px-3 py-2">{{ t('settings.import.previewColumns.date') }}</th>
-                <th class="px-3 py-2">{{ t('settings.import.previewColumns.title') }}</th>
-                <th class="px-3 py-2">{{ t('settings.import.previewColumns.subject') }}</th>
-                <th class="px-3 py-2">{{ t('settings.import.previewColumns.status') }}</th>
-                <th class="px-3 py-2">{{ t('settings.import.previewColumns.errors') }}</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-border">
-              <tr
-                v-for="row in preview.rows"
-                :key="row.line"
-                :class="row.errors.length === 0 ? 'bg-surface' : 'bg-danger-soft'"
-              >
-                <td class="px-3 py-2 text-fg-muted">{{ row.line }}</td>
-                <td class="px-3 py-2">{{ row.raw['date'] ?? '' }}</td>
-                <td class="max-w-[200px] truncate px-3 py-2">{{ row.raw['title'] ?? '' }}</td>
-                <td class="px-3 py-2">{{ row.raw['subject'] ?? '' }}</td>
-                <td class="px-3 py-2">
-                  <span
-                    :class="[
-                      'rounded-full px-2 py-0.5 text-xs font-medium',
-                      row.errors.length === 0
-                        ? 'bg-mint-100 text-mint-700'
-                        : 'bg-coral-100 text-coral-700',
-                    ]"
-                  >
-                    {{
-                      row.errors.length === 0
-                        ? t('settings.import.rowValid')
-                        : t('settings.import.rowInvalid')
-                    }}
-                  </span>
-                </td>
-                <td class="px-3 py-2 text-xs text-danger">
-                  {{ row.errors.map((e) => e.message).join(', ') }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="flex items-center justify-between">
-          <BaseButton type="button" variant="secondary" @click="handleCancel">
-            {{ t('settings.import.cancelButton') }}
-          </BaseButton>
-          <BaseButton
-            type="button"
-            variant="primary"
-            :disabled="preview.validRows === 0 || isSubmitting"
-            @click="handleConfirm"
-          >
-            {{ t('settings.import.confirmButton', { count: String(preview.validRows) }) }}
-          </BaseButton>
-        </div>
-      </div>
+      <ImportPreviewPanel v-else :preview="preview" />
     </BaseCard>
 
-    <CsvHelpModal v-model:open="showHelpModal" />
+    <CsvHelpModal v-model:open="showHelpModal" :type="preview?.type ?? selectedType" />
   </div>
 </template>

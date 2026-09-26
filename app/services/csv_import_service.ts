@@ -1,13 +1,24 @@
 import { CSV_IMPORT_INSERT_CHUNK, CSV_IMPORT_MAX_ROWS } from '#shared/constants/csv_import'
 import type {
+  CsvImportPreviewResult,
+  CsvImportRows,
   CsvImportType,
+  CsvParseResult,
   CsvPreviewRowKeys,
   CsvRowErrorKey,
+  ExpenseImportRow,
   MaintenanceImportRow,
+  ParsedTable,
 } from '#shared/types/csv'
 import { MAINTENANCE_CSV_HEADERS } from '#shared/types/csv'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
+import {
+  importExpenseRows,
+  markExpenseDuplicates,
+  parseExpenseTable,
+} from '#services/expense_import_service'
+import { parseCsvContent } from '#services/table_file_parser_service'
 import db from '@adonisjs/lucid/services/db'
 import type { I18n } from '@adonisjs/i18n'
 import { DateTime } from 'luxon'
@@ -25,41 +36,8 @@ const VALID_SUBJECTS = [
   'other',
 ] as const
 
-export { MAINTENANCE_CSV_HEADERS }
-
-function splitCsvLine(line: string): string[] {
-  const result: string[] = []
-  let current = ''
-  let inQuotes = false
-
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i]
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"'
-        i++
-      } else {
-        inQuotes = !inQuotes
-      }
-    } else if (ch === ';' && !inQuotes) {
-      result.push(current.trim())
-      current = ''
-    } else {
-      current += ch
-    }
-  }
-  result.push(current.trim())
-  return result
-}
-
-function parseCsvContent(content: string): { headers: string[]; rows: string[][] } {
-  const cleaned = content.startsWith('﻿') ? content.slice(1) : content
-  const lines = cleaned.split(/\r?\n/).filter((l) => l.trim())
-  if (lines.length === 0) return { headers: [], rows: [] }
-  const headers = splitCsvLine(lines[0]).map((h) => h.toLowerCase())
-  const rows = lines.slice(1).map((l) => splitCsvLine(l))
-  return { headers, rows }
-}
+export { MAINTENANCE_CSV_HEADERS, parseCsvContent }
+export type { CsvParseResult }
 
 function validateMaintenanceRow(raw: Record<string, string>): CsvRowErrorKey[] {
   const errors: CsvRowErrorKey[] = []
@@ -101,21 +79,13 @@ function validateMaintenanceRow(raw: Record<string, string>): CsvRowErrorKey[] {
   return errors
 }
 
-export interface CsvParseResult {
-  previewRows: CsvPreviewRowKeys[]
-  validRows: MaintenanceImportRow[]
-  totalRows: number
-  missingHeaders: string[]
-  /**
-   * Le fichier dépasse `CSV_IMPORT_MAX_ROWS` (#774). Le parse s'arrête là :
-   * inutile de valider des lignes qu'on refusera, et surtout inutile de les
-   * garder en mémoire.
-   */
-  tooManyRows: boolean
-}
-
-export function parseMaintenanceCsv(content: string, _type: CsvImportType): CsvParseResult {
-  const { headers, rows } = parseCsvContent(content)
+/**
+ * Valide une table de maintenance (CSV ou xlsx déjà lu). Les en-têtes sont
+ * **strictes** (`MAINTENANCE_CSV_HEADERS`), contrairement au type `expenses`
+ * qui tolère des alias.
+ */
+export function parseMaintenanceTable(table: ParsedTable): CsvParseResult<MaintenanceImportRow> {
+  const { headers, rows } = table
 
   // Refus avant validation (#774) : le parse ne bornait rien, et un fichier de
   // 5 Mo — ce que le validateur laissait passer — fait plusieurs dizaines de
@@ -145,7 +115,12 @@ export function parseMaintenanceCsv(content: string, _type: CsvImportType): CsvP
     }
 
     const errors = missingHeaders.length === 0 ? validateMaintenanceRow(raw) : []
-    previewRows.push({ line: i + 2, raw, errors })
+    previewRows.push({
+      line: i + 2,
+      raw,
+      errors,
+      status: errors.length === 0 ? 'valid' : 'invalid',
+    })
 
     if (errors.length === 0 && missingHeaders.length === 0) {
       const cost = raw['cost']?.trim() ? Number.parseFloat(raw['cost'].replace(',', '.')) : null
@@ -162,6 +137,47 @@ export function parseMaintenanceCsv(content: string, _type: CsvImportType): CsvP
   }
 
   return { previewRows, validRows, totalRows: rows.length, missingHeaders, tooManyRows: false }
+}
+
+/** Raccourci historique : contenu CSV brut → table de maintenance validée. */
+export function parseMaintenanceCsv(
+  content: string,
+  _type: CsvImportType
+): CsvParseResult<MaintenanceImportRow> {
+  return parseMaintenanceTable(parseCsvContent(content))
+}
+
+/**
+ * Aiguillage du `preview` par type. Seul le type `expenses` connaît les
+ * doublons ; la maintenance en compte toujours zéro.
+ */
+export async function prepareImportPreview(
+  type: CsvImportType,
+  table: ParsedTable,
+  boatId: number
+): Promise<CsvImportPreviewResult> {
+  if (type === 'expenses') {
+    return markExpenseDuplicates(boatId, parseExpenseTable(table))
+  }
+  return { ...parseMaintenanceTable(table), duplicateRows: 0 }
+}
+
+/**
+ * Aiguillage du `confirm`. Les `rows` d'un `PendingImport` sont typées en
+ * union : c'est la colonne `type`, écrite par le même `preview`, qui dit
+ * laquelle des deux formes elles ont — d'où les casts.
+ */
+export async function runImport(
+  type: CsvImportType,
+  boatId: number,
+  rows: CsvImportRows,
+  i18n: I18n
+): Promise<void> {
+  if (type === 'expenses') {
+    await importExpenseRows(boatId, rows as ExpenseImportRow[])
+    return
+  }
+  await importMaintenanceRows(boatId, rows as MaintenanceImportRow[], i18n)
 }
 
 /**

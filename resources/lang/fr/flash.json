@@ -325,7 +325,8 @@
     "imported": "{count, plural, one {# ligne importée avec succès.} other {# lignes importées avec succès.}}",
     "boatNotFound": "Bateau introuvable.",
     "previewExpired": "La prévisualisation a expiré. Veuillez réimporter le fichier.",
-    "missingHeaders": "En-têtes manquantes dans le fichier CSV : {headers}.",
+    "missingHeaders": "En-têtes manquantes dans le fichier : {headers}.",
+    "fileUnreadable": "Le fichier n'a pas pu être lu. Vérifiez qu'il s'agit d'un CSV ou d'un classeur .xlsx valide.",
     "rowErrors": {
       "dateInvalidFormat": "Date invalide (format attendu : YYYY-MM-DD)",
       "dateInvalid": "Date invalide",
@@ -333,7 +334,13 @@
       "subjectInvalid": "Sujet invalide. Valeurs acceptées : {values}",
       "engineCaptionRequired": "Légende moteur obligatoire pour le sujet \"engine\"",
       "sailCaptionRequired": "Légende voile obligatoire pour le sujet \"sail\"",
-      "costInvalid": "Coût invalide (nombre attendu)"
+      "costInvalid": "Coût invalide (nombre attendu)",
+      "dateInvalidFormatFlexible": "Date invalide (formats attendus : {formats})",
+      "labelRequired": "Le libellé est obligatoire",
+      "labelTooLong": "Libellé trop long (max {max} caractères)",
+      "amountRequired": "Le montant est obligatoire",
+      "amountInvalid": "Montant invalide (nombre attendu)",
+      "categoryInvalid": "Catégorie invalide. Valeurs acceptées : {values}"
     },
     "tooManyRows": "Votre fichier contient {count} lignes, la limite est de {limit}. Découpez-le."
   },

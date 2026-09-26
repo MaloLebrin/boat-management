@@ -5,7 +5,7 @@
 Permettre aux gestionnaires de flotte d'importer et d'exporter des données tabulaires au format CSV.
 
 - **Export** : téléchargement direct (streaming) depuis le controller, pour les maintenance, avitaillements et journal de bord d'un bateau
-- **Import** : upload d'un fichier CSV, dry-run avec rapport d'erreurs ligne par ligne, puis confirmation pour persister les données
+- **Import** : upload d'un fichier CSV **ou d'un classeur Excel (`.xlsx`)**, dry-run avec rapport d'erreurs ligne par ligne, puis confirmation pour persister les données — deux types : l'historique de maintenance et les dépenses du budget
 - **Quota** : fonctionnalité réservée aux plans Pro et Enterprise (`canExport`)
 
 ## Routes → controllers → services → UI
@@ -143,22 +143,95 @@ valide. La session ne porte plus que `pendingImportId`.
 - Si `cost` est renseigné : crée un `BoatMaintenancePart` nommé `"Coût total"` avec `quantity=1` et `unitPrice=cost`
 - `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId` sont laissés à `null` (le CSV ne référence que des libellés)
 
+#### Import — dépenses (`type=expenses`)
+
+Écrit dans `boat_budget_entries` (les dépenses libres de la page budget d'un
+bateau). Le formulaire de `/settings/import` propose le type « Dépenses
+(budget) », et la page budget porte un bouton « Importer des dépenses » qui y
+mène présélectionné : `GET /settings/import?type=expenses&boatId=N` →
+props `initialType` / `initialBoatId` (un type inconnu ou un bateau hors de la
+flotte de l'utilisateur sont ignorés). Même garde que la maintenance : plan
+Entreprise + capability `import.run`.
+
+```
+date;label;amount;category;description
+2024-01-15;Antifouling;350.00;maintenance;Carénage annuel
+15/02/2024;Plein gasoil;120,50;carburant;
+```
+
+Colonnes requises : `date`, `label`, `amount`  
+Colonnes optionnelles : `category`, `description`
+
+Contrairement à la maintenance, les **en-têtes sont tolérantes** : la
+comparaison passe par `normalizeImportToken()` (minuscules, sans accent) et
+`EXPENSE_HEADER_ALIASES` (`shared/constants/csv_import.ts`) — « Libellé »,
+« Montant », « Coût », « Catégorie », « Commentaire »… sont reconnus, la
+première colonne qui correspond à une clé la prend, les colonnes inconnues
+sont ignorées.
+
+| Colonne       | Règle                                                                                                                                                                    |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `date`        | `YYYY-MM-DD`, `DD/MM/YYYY` ou `DD-MM-YYYY`, date valide (`31/02/2024` refusé). Une cellule date Excel arrive déjà en ISO                                                 |
+| `label`       | Non vide, 255 caractères max                                                                                                                                             |
+| `amount`      | `1 234,56`, `1234.56`, `1.234,56`, `1 234,56 €` acceptés ; quand `,` et `.` coexistent, le dernier est le décimal ; arrondi au centime ; négatif accepté (remboursement) |
+| `category`    | Slug (`fuel`…) ou alias FR/EN (`EXPENSE_CATEGORY_ALIASES` : carburant, entretien, escale, équipement, autre…) ; vide → `other` ; inconnu → erreur                        |
+| `description` | Texte libre, optionnel                                                                                                                                                   |
+
+**Doublons.** Une ligne dont la clé `date | libellé (casse ignorée) | montant`
+existe déjà sur le bateau prend le statut `duplicate` : l'aperçu la signale
+(« Déjà présente », badge `amber`), elle n'est ni comptée en erreur ni
+importée. La seconde occurrence d'une même ligne dans le fichier est traitée
+pareil. La détection tient en **une requête** (`markExpenseDuplicates`) : les
+dépenses du bateau aux dates concernées (au plus 2 000 dates distinctes), puis
+comparaison en mémoire.
+
+`importExpenseRows()` (`app/services/expense_import_service.ts`) insère par
+lots de `CSV_IMPORT_INSERT_CHUNK` dans une transaction unique, montant stocké
+en chaîne comme le fait `BoatBudgetEntryService.create`.
+
+#### Fichiers Excel
+
+`parseUploadedTable()` (`app/services/table_file_parser_service.ts`) est le
+point d'entrée du `preview` : `.csv` → `parseCsvContent()` (BOM, guillemets,
+`;`), `.xlsx` → `parseXlsxBuffer()` via `exceljs`. Les deux produisent la même
+`ParsedTable` (`{ headers, rows }` en texte), et tout ce qui suit — validation,
+aperçu, doublons — ignore le format d'origine. La maintenance accepte donc
+aussi l'xlsx.
+
+- Première feuille seulement, ligne 1 = en-têtes, lignes entièrement vides
+  ignorées.
+- `cellToString()` : `Date` → `YYYY-MM-DD` **en UTC** (exceljs construit ses
+  dates en UTC ; sans `zone: 'utc'`, un serveur à l'ouest de Greenwich
+  reculerait chaque date d'un jour) ; nombre → chaîne ; texte riche →
+  concaténation ; formule → son `result` ; lien → son texte.
+- Un classeur illisible (zip corrompu) lève `TableFileUnreadableError` →
+  flash `flash.csv.fileUnreadable`. Un fichier texte simplement renommé en
+  `.xlsx` est refusé plus tôt par le validateur d'extension (détection par
+  en-tête binaire).
+- `exceljs` n'est importé **que** depuis ce service : `shared/` et `inertia/`
+  ne doivent jamais le faire, sinon Vite l'embarque dans le bundle client.
+- Les plafonds (2 Mo, 2 000 lignes) s'appliquent à l'identique ; le classeur
+  est lu en entier en mémoire, la taille du fichier borne le coût.
+
 ## Fichiers clés
 
-| Fichier                                                  | Rôle                                                                         |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `shared/types/csv.ts`                                    | Types partagés + `MAINTENANCE_CSV_HEADERS`                                   |
-| `app/exceptions/csv_errors.ts`                           | `CsvImportValidationError`                                                   |
-| `app/validators/csv_import.ts`                           | `csvPreviewValidator`, `csvConfirmValidator` (VineJS)                        |
-| `app/services/csv_import_service.ts`                     | Parsing (BOM, guillemets, `;`), validation par colonne, import               |
-| `app/services/csv_export_service.ts`                     | `escapeCell()`, `buildCsv()`, `csvFilename()` — **seul** constructeur de CSV |
-| `app/controllers/csv_import_controller.ts`               | Attente en base + Inertia render                                             |
-| `app/models/pending_import.ts`                           | `pending_imports` — une attente par utilisateur                              |
-| `shared/constants/csv_import.ts`                         | Plafonds de lignes, de taille et de lot                                      |
-| `app/controllers/csv_export_controller.ts`               | Streaming CSV par type                                                       |
-| `inertia/pages/settings/import.vue`                      | Page shell Inertia                                                           |
-| `inertia/components/settings/tabs/SettingsImportTab.vue` | Formulaire upload + aperçu + liens export                                    |
-| `inertia/utils/routes.ts`                                | Helpers `routes.csv.*`                                                       |
+| Fichier                                                  | Rôle                                                                                 |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `shared/types/csv.ts`                                    | Types partagés, `CSV_IMPORT_TYPES`, `MAINTENANCE_CSV_HEADERS`, `EXPENSE_CSV_HEADERS` |
+| `app/exceptions/csv_errors.ts`                           | `CsvImportValidationError`, `TableFileUnreadableError`                               |
+| `app/validators/csv_import.ts`                           | `csvPreviewValidator`, `csvConfirmValidator` (VineJS)                                |
+| `app/services/table_file_parser_service.ts`              | Lecture CSV / xlsx (`exceljs`) → `ParsedTable`, `normalizeImportToken()`             |
+| `app/services/csv_import_service.ts`                     | Validation maintenance, aiguillage `prepareImportPreview()` / `runImport()`          |
+| `app/services/expense_import_service.ts`                 | Validation dépenses (alias, dates, montants, catégories), doublons, import           |
+| `app/services/csv_export_service.ts`                     | `escapeCell()`, `buildCsv()`, `csvFilename()` — **seul** constructeur de CSV         |
+| `app/controllers/csv_import_controller.ts`               | Attente en base + Inertia render                                                     |
+| `app/models/pending_import.ts`                           | `pending_imports` — une attente par utilisateur                                      |
+| `shared/constants/csv_import.ts`                         | Plafonds, extensions, alias d'en-têtes et de catégories des dépenses                 |
+| `app/controllers/csv_export_controller.ts`               | Streaming CSV par type                                                               |
+| `inertia/pages/settings/import.vue`                      | Page shell Inertia                                                                   |
+| `inertia/components/settings/tabs/SettingsImportTab.vue` | Composition : exports, formulaire, aperçu, aide                                      |
+| `inertia/components/settings/import/*.vue`               | `ImportExportCard`, `ImportUploadForm`, `ImportPreviewPanel`                         |
+| `inertia/utils/routes.ts`                                | Helpers `routes.csv.*`                                                               |
 
 ## Échappement des cellules (#773)
 
@@ -200,6 +273,6 @@ un champ de notes. C'est la sortie vers un format évalué qui doit être
 
 ## Extension future
 
-- Ajouter les types `fuel_logs` et `navigation_logs` à l'import (enum `CsvImportType`, nouveau validator, nouvelle branche dans le controller)
+- Ajouter les types `fuel_logs` et `navigation_logs` à l'import (`CSV_IMPORT_TYPES`, un service de validation dédié, une branche dans `prepareImportPreview()` / `runImport()`, les colonnes d'aperçu dans `ImportPreviewPanel`)
 - Brancher le job `ProcessBoatMaintenanceImport` pour les imports volumineux (> 500 lignes) : stocker le fichier CSV sur Cloudinary, passer son URL dans le payload du job, implémenter `execute()` qui parse + persiste en background
 - Ajouter un filtre de période (date de début / fin) sur les exports

@@ -3,6 +3,7 @@
   "subtitle": "Annual expenses by category",
   "yearSelector": "Year",
   "exportCsv": "Export CSV",
+  "importButton": "Import expenses",
   "categories": {
     "maintenance": "Maintenance",
     "fuel": "Fuel",

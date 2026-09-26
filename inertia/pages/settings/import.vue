@@ -8,13 +8,15 @@ import { Head } from '@inertiajs/vue3'
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsImportTab from '~/components/settings/tabs/SettingsImportTab.vue'
 import { useT } from '~/composables/use_t'
-import type { CsvBoatOption, CsvImportPreviewData } from '../../../shared/types/csv'
+import type { CsvBoatOption, CsvImportPreviewData, CsvImportType } from '#shared/types/csv'
 
 defineProps<{
   boats: CsvBoatOption[]
   preview: CsvImportPreviewData | null
   hasPendingImport: boolean
   canImport: boolean
+  initialType: CsvImportType | null
+  initialBoatId: number | null
 }>()
 
 const { t } = useT()
@@ -28,6 +30,8 @@ const { t } = useT()
       :preview="preview"
       :has-pending-import="hasPendingImport"
       :can-import="canImport"
+      :initial-type="initialType"
+      :initial-boat-id="initialBoatId"
     />
   </SettingsShell>
 </template>

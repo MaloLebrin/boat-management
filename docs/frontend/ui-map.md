@@ -211,7 +211,8 @@ la nav est masquée via `effectiveQuotas.canManagePorts` ; la carte ports du das
   - `inertia/components/boats/budget/BudgetPortStayList.vue` — liste séjours port avec suppression
   - `inertia/components/boats/budget/BudgetEntryForm.vue` — formulaire dépense libre (catégorie, montant, date)
   - `inertia/components/boats/budget/BudgetEntryList.vue` — liste dépenses libres avec badges catégorie
-- Props: `boat`, `budget`, `year`, `portStays`, `entries`, `canManage`
+- En-tête : export CSV (`external-href`) et, si `canImport` (plan Entreprise + `import.run`), bouton « Importer des dépenses » → `<Link>` vers `/settings/import?type=expenses&boatId=:id`
+- Props: `boat`, `budget`, `year`, `portStays`, `entries`, `canManage`, `canImport`, `portOptions`
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
@@ -371,7 +372,9 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 
 ### Settings — import / export CSV (`/settings/import`)
 
-- Page : `inertia/pages/settings/import.vue` → `components/settings/tabs/SettingsImportTab.vue` (props `boats`, `preview`, `hasPendingImport`, `canImport`, servies par `CsvImportController.show`).
+- Page : `inertia/pages/settings/import.vue` → `components/settings/tabs/SettingsImportTab.vue` (props `boats`, `preview`, `hasPendingImport`, `canImport`, `initialType`, `initialBoatId`, servies par `CsvImportController.show`), qui compose `components/settings/import/ImportExportCard.vue` (liens export), `ImportUploadForm.vue` (bateau, type, fichier `.csv,.xlsx`) et `ImportPreviewPanel.vue` (table d'aperçu dont les colonnes suivent `preview.type`, trois statuts : `valid` mint, `invalid` coral, `duplicate` amber « Déjà présente »).
+- **Deux types d'import** : `maintenance` et `expenses` (dépenses du budget, `boat_budget_entries`). `CsvHelpModal` prend le `type` courant et affiche le format attendu correspondant (alias d'en-têtes FR/EN, formats de date et de montant, catégories, règle des doublons).
+- **Présélection** : `?type=expenses&boatId=N` — c'est le lien du bouton « Importer des dépenses » de la page budget (`routes.csv.importExpenses`).
 - **Un écran, deux fonctions aux droits différents** (#715). Les **exports** (maintenance, avitaillements, journal de bord) suivent `canExport` : plan Pro ou Entreprise, tous rôles. L'**import** exige le plan Entreprise **et** la capability `import.run` (admin seul) — c'est la prop `canImport`, vraie seulement si les deux tiennent, qui rend la section d'import ; sinon le bloc affiche `settings.import.restricted` et le formulaire disparaît, exports compris intacts.
 - La page ne redirige vers `/settings/billing` que si **ni** l'import **ni** l'export n'est accordé (plan Starter) — personne n'atteint un écran vide. L'entrée de nav « Import / Export » de `SettingsShell` reste, elle, conditionnée à `canExport`.
 - **`hasPendingImport` vient de la table `pending_imports`**, plus de la session (#774) : les lignes à confirmer y vivent désormais, et seul `pendingImportId` reste en session. Un `confirm` joué dans un autre onglet laissait sinon l'écran proposer de confirmer un import déjà consommé.
