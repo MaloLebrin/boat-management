@@ -1,7 +1,12 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
 import type { MouillageRow, PontoonRow, SpotRow } from '../../inertia/types/port'
-import type { DashboardStats } from '../../shared/types/dashboard'
+import type {
+  DashboardAttentionCounts,
+  DashboardFleetStatus,
+  DashboardPulseStats,
+  DashboardStats,
+} from '../../shared/types/dashboard'
 
 /**
  * CSP et attributs `style` (#831) : en production, `style-src` (nonce) bloque
@@ -20,6 +25,11 @@ vi.mock('~/composables/use_theme', () => ({
 
 vi.mock('@inertiajs/vue3', () => ({
   useForm: () => ({ processing: false, post: vi.fn() }),
+  usePage: () => ({ props: { appT: {}, locale: 'en' } }),
+}))
+
+vi.mock('~/composables/use_number_format', () => ({
+  useNumberFormat: () => ({ formatNumber: (v: number) => String(v) }),
 }))
 
 vi.mock('@adonisjs/inertia/vue', () => ({
@@ -310,41 +320,46 @@ describe('MarinaCanvas — curseur et touch-action en classes', () => {
 
 describe('DashboardStatsGrid — cascade fadeUp en classes', () => {
   const stats: DashboardStats = {
-    boats: 3,
-    engines: 2,
-    sails: 1,
-    rigs: 1,
+    boats: 5,
+    engines: 5,
+    sails: 6,
+    rigs: 3,
     urgentMaintenance: 0,
-    deltas: {
-      boatsInAlert: 0,
-      boatsWithEngine: 2,
-      boatsWithSail: 1,
-      boatsWithRig: 1,
-      overdueCount: 0,
-    },
+    deltas: { boatsInAlert: 0, overdueCount: 0 },
+  }
+  const pulse: DashboardPulseStats = {
+    windowDays: 30,
+    tripsCompleted: 0,
+    distanceNm: 0,
+    tasksDone: 0,
+  }
+  const fleetStatus: DashboardFleetStatus = {
+    total: 5,
+    atSea: 2,
+    inPort: 3,
+    enginesInMaintenance: 1,
+  }
+  const counts: DashboardAttentionCounts = {
+    maintenanceOverdue: 0,
+    maintenanceSoon: 0,
+    incidentsOpen: 0,
+    incidentsInProgress: 0,
+    documentsExpired: 0,
+    documentsExpiring: 0,
+    invoicesOverdue: 0,
+    total: 0,
   }
 
-  test('les quatre cartes portent animate-fade-up et des délais croissants', () => {
-    const w = mount(DashboardStatsGrid, { props: { stats } })
+  test('les quatre cartes portent animate-fade-up et des délais croissants, sans attribut style', () => {
+    const w = mount(DashboardStatsGrid, { props: { stats, pulse, fleetStatus, counts } })
 
     expect(w.findAll('[style]')).toHaveLength(0)
     const cards = w.findAll('a')
     expect(cards).toHaveLength(4)
     cards.forEach((card) => expect(card.classes()).toContain('animate-fade-up'))
+    expect(cards[0].classes().some((c) => c.startsWith('[animation-delay'))).toBe(false)
     expect(cards[1].classes()).toContain('[animation-delay:60ms]')
     expect(cards[2].classes()).toContain('[animation-delay:120ms]')
     expect(cards[3].classes()).toContain('[animation-delay:180ms]')
-  })
-
-  test('la carte « équipements vides » entre avec le même délai que la 2e carte', () => {
-    const w = mount(DashboardStatsGrid, {
-      props: { stats: { ...stats, engines: 0, sails: 0, rigs: 0 } },
-    })
-
-    expect(w.findAll('[style]')).toHaveLength(0)
-    const card = w.get('[data-testid="equipment-empty-card"]')
-    expect(card.classes()).toEqual(
-      expect.arrayContaining(['animate-fade-up', '[animation-delay:60ms]'])
-    )
   })
 })

@@ -18,6 +18,8 @@ import type {
   UpdateReservationPayload,
 } from '#shared/types/reservation'
 import { toUtcFromLocalInput } from '#shared/helpers/date'
+import { UPCOMING_RESERVATIONS_CAP, UPCOMING_RESERVATIONS_DAYS } from '#shared/constants/dashboard'
+import type { DashboardUpcomingReservation } from '#shared/types/dashboard'
 import { countBilledNights } from '#shared/helpers/reservation_quote'
 import BoatPricingService from '#services/boat_pricing_service'
 import ReservationQuoteService from '#services/reservation_quote_service'
@@ -82,6 +84,53 @@ export default class BoatReservationService {
     }
 
     return query
+  }
+
+  /**
+   * Départs et retours des prochains jours pour le tableau de bord (#832) :
+   * réservations `option` ou `confirmed` qui commencent dans la fenêtre
+   * (départ) ou déjà en cours qui s'y terminent (retour), triées par instant.
+   */
+  async listUpcomingForOrg(
+    user: User,
+    now: DateTime = DateTime.now(),
+    days: number = UPCOMING_RESERVATIONS_DAYS,
+    limit: number = UPCOMING_RESERVATIONS_CAP
+  ): Promise<DashboardUpcomingReservation[]> {
+    if (user.organizationId === null) return []
+    const horizon = now.plus({ days })
+
+    const rows = await BoatReservation.query()
+      .where('organizationId', user.organizationId)
+      .whereIn('status', ['option', 'confirmed'])
+      .where((q) => {
+        q.whereBetween('startsAt', [now.toISO()!, horizon.toISO()!]).orWhere((ongoing) =>
+          ongoing
+            .where('startsAt', '<', now.toISO()!)
+            .whereBetween('endsAt', [now.toISO()!, horizon.toISO()!])
+        )
+      })
+      .preload('boat', (q) => q.select(['id', 'name']))
+      .orderBy('starts_at', 'asc')
+
+    return rows
+      .map((r): DashboardUpcomingReservation => {
+        const event = r.startsAt >= now ? 'departure' : 'return'
+        return {
+          id: r.id,
+          boatId: r.boatId,
+          boatName: r.boat?.name ?? `#${r.boatId}`,
+          clientName: r.clientName,
+          status: r.status,
+          type: r.type,
+          event,
+          at: (event === 'departure' ? r.startsAt : r.endsAt).toISO()!,
+          startsAt: r.startsAt.toISO()!,
+          endsAt: r.endsAt.toISO()!,
+        }
+      })
+      .sort((a, b) => a.at.localeCompare(b.at))
+      .slice(0, limit)
   }
 
   async create(

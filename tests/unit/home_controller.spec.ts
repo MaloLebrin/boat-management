@@ -23,6 +23,10 @@ test.group('HomeController (unit)', () => {
       {
         getBoatUsage: async () => ({ used: 0, limit: 2 }),
       } as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
       {} as any
     )
 
@@ -67,8 +71,42 @@ test.group('HomeController (unit)', () => {
       } as any,
       {
         getBoatUsage: async () => ({ used: 1, limit: 2 }),
+        canManageInvoices: async () => false,
+        canManageReservations: async () => false,
       } as any,
-      {} as any
+      {} as any,
+      {
+        getForUser: async () => ({
+          items: [],
+          counts: {
+            maintenanceOverdue: 0,
+            maintenanceSoon: 0,
+            incidentsOpen: 0,
+            incidentsInProgress: 0,
+            documentsExpired: 0,
+            documentsExpiring: 0,
+            invoicesOverdue: 0,
+            total: 0,
+          },
+          canViewInvoices: false,
+        }),
+      } as any,
+      {
+        getActiveTrips: async () => ({ items: [], total: 0 }),
+        getFleetStatus: async () => ({ total: 0, atSea: 0, inPort: 0, enginesInMaintenance: 0 }),
+        getPulse: async () => ({ windowDays: 30, tripsCompleted: 0, distanceNm: 0, tasksDone: 0 }),
+        getRecentActivity: async () => [],
+      } as any,
+      {
+        listUpcomingForOrg: async () => {
+          throw new Error('should not be called without the charter module')
+        },
+      } as any,
+      {
+        getOrgSpendSummary: async () => {
+          throw new Error('should not be called for a member')
+        },
+      } as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []
@@ -80,6 +118,7 @@ test.group('HomeController (unit)', () => {
           return { component, props }
         },
         optional: (fn: unknown) => fn,
+        defer: (fn: unknown, group: string) => ({ deferred: group, fn }),
       },
       request: { qs: () => ({}) },
       auth: {
@@ -100,6 +139,16 @@ test.group('HomeController (unit)', () => {
     assert.equal(rendered[0]!.component, 'dashboard')
     assert.equal(rendered[0]!.props.canAddBoat, true)
     assert.deepEqual(rendered[0]!.props.boatQuota, { used: 1, limit: 2 })
+    // Les lignes urgentes brutes ne sont plus une prop de page : « À traiter » les porte (#832)
+    assert.notProperty(rendered[0]!.props, 'urgentMaintenance')
+    assert.equal(rendered[0]!.props.attention.counts.total, 0)
+    assert.equal(rendered[0]!.props.fleetStatus.total, 0)
+    assert.notProperty(rendered[0]!.props, 'upcomingReservations')
+    // Membre : pas de groupe différé « spend » ; l'activité est différée pour tous
+    assert.isFalse(rendered[0]!.props.canViewSpend)
+    assert.notProperty(rendered[0]!.props, 'spend')
+    assert.equal(rendered[0]!.props.activity.deferred, 'activity')
+    assert.isNull(rendered[0]!.props.aiFleetAnalysisAt)
   })
 
   test('renders the dedicated mechanic dashboard for a mechanic', async ({ assert }) => {
@@ -126,6 +175,10 @@ test.group('HomeController (unit)', () => {
           throw new Error('should not be called')
         },
       } as any,
+      {} as any,
+      {} as any,
+      {} as any,
+      {} as any,
       {} as any
     )
 

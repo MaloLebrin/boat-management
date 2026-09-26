@@ -24,12 +24,12 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
   {
     id: 'dashboard-overview',
     title: {
-      en: 'Dashboard: fleet overview and urgent maintenance',
-      fr: 'Tableau de bord : vue flotte et maintenance urgente',
+      en: 'Dashboard: what is happening and what to handle today',
+      fr: 'Tableau de bord : ce qui se passe et ce qu’il faut traiter',
     },
     body: {
-      en: 'The dashboard is the landing page after login. It shows four fleet counters (boats, engines, sails, rigs), then the urgent maintenance card: the number of overdue tasks, a link to the planning and the five most pressing tasks (each row opens the planning on that task; a link shows the others). Below it, your boats as a table on desktop or as cards on a phone. The AI assistant and, on plans with ports, the ports card sit in the side column. A task is urgent when its due date falls within the next 14 days, or, for engine-hour tasks, when fewer than 10 engine hours remain before the threshold. From the dashboard you can also launch the AI fleet analysis when your plan includes AI features.',
-      fr: 'Le tableau de bord est la page d’accueil une fois connecté. Il affiche quatre compteurs de flotte (bateaux, moteurs, voiles, gréements), puis la carte de maintenance urgente : le nombre de tâches en retard, un lien vers le planning et les cinq tâches les plus pressantes (chaque ligne ouvre le planning sur la tâche ; un lien mène aux autres). En dessous, vos bateaux en tableau sur ordinateur ou en cartes sur téléphone. L’assistant IA et, sur les plans avec ports, la carte des ports occupent la colonne latérale. Une tâche est urgente quand son échéance tombe dans les 14 prochains jours ou, pour une tâche en heures moteur, quand il reste moins de 10 heures avant le seuil. Depuis le tableau de bord, vous pouvez aussi lancer l’analyse IA de flotte si votre plan inclut l’IA.',
+      en: 'The dashboard is the landing page after login. Four counters open it: boats (at sea, in alert), trips completed over 30 days, tasks done over 30 days and open incidents. Then comes what to handle today: a single list mixing overdue or due-soon maintenance, open incidents, expiring or expired documents and unpaid invoices, sorted by severity, each row opening the right screen. Below: the boats currently at sea with a fleet status line, upcoming departures and returns with the Charter module, recent fleet activity, and your boats. On the side: the AI assistant, the organisation spend since 1 January compared with last year (admins only) and the ports.',
+      fr: 'Le tableau de bord est la page d’accueil une fois connecté. Quatre compteurs l’ouvrent : bateaux (en mer, en alerte), sorties terminées sur 30 jours, tâches réalisées sur 30 jours et incidents ouverts. Vient ensuite ce qu’il faut traiter aujourd’hui : une seule liste qui mêle maintenance en retard ou bientôt due, incidents ouverts, documents expirés ou à échéance et factures impayées, triée par gravité, chaque ligne ouvrant le bon écran. En dessous : les bateaux en mer avec l’état de la flotte, les prochains départs et retours avec le module Location, l’activité récente et vos bateaux. Sur le côté : l’assistant IA, les dépenses de l’organisation depuis le 1er janvier comparées à l’an dernier (admins) et les ports.',
     },
     keywords: [
       'dashboard',
@@ -38,6 +38,7 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'vue d ensemble',
       'overview',
       'urgent',
+      'a traiter',
       'stats',
       'compteurs',
       'flotte',
@@ -46,6 +47,12 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'planning',
       'en retard',
       'overdue',
+      'en mer',
+      'sorties',
+      'departs',
+      'activite recente',
+      'depenses',
+      'incidents ouverts',
     ],
     navTarget: 'dashboard',
   },

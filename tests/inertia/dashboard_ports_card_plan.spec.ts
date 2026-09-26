@@ -20,6 +20,22 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 
 import { usePage } from '@inertiajs/vue3'
 import Dashboard from '../../inertia/pages/dashboard.vue'
+import type { DashboardAttention } from '../../shared/types/dashboard'
+
+const EMPTY_ATTENTION: DashboardAttention = {
+  items: [],
+  counts: {
+    maintenanceOverdue: 3,
+    maintenanceSoon: 4,
+    incidentsOpen: 0,
+    incidentsInProgress: 0,
+    documentsExpired: 0,
+    documentsExpiring: 0,
+    invoicesOverdue: 0,
+    total: 7,
+  },
+  canViewInvoices: false,
+}
 import type { DashboardPortItem } from '../../shared/types/dashboard'
 
 const PORT: DashboardPortItem = {
@@ -37,10 +53,14 @@ const stubs = {
   Link: { template: '<a><slot /></a>' },
   DashboardAiPanel: { template: '<div />' },
   DashboardBoatsCard: { template: '<div />' },
+  DashboardAtSeaCard: { template: '<div />' },
+  DashboardActivityCard: { template: '<div />' },
+  DashboardSpendCard: { template: '<div />' },
+  DashboardUpcomingReservationsCard: { template: '<div />' },
   DashboardHeader: { template: '<div><slot name="actions" /></div>' },
   DashboardQuickAddActions: { template: '<div />' },
   DashboardStatsGrid: { template: '<div />' },
-  DashboardUrgentMaintenanceCard: { template: '<div />' },
+  DashboardAttentionCard: { template: '<div />' },
   PortDashboardCard: { template: '<div class="port-dashboard-card" />' },
 }
 
@@ -56,20 +76,19 @@ function mountDashboard(
   return mount(Dashboard, {
     props: {
       boats: [],
-      urgentMaintenance: [],
+      attention: EMPTY_ATTENTION,
+      pulse: { windowDays: 30, tripsCompleted: 0, distanceNm: 0, tasksDone: 0 },
+      activeTrips: { items: [], total: 0 },
+      fleetStatus: { total: 0, atSea: 0, inPort: 0, enginesInMaintenance: 0 },
+      canViewSpend: true,
+      aiFleetAnalysisAt: null,
       stats: {
         boats: 0,
         engines: 0,
         sails: 0,
         rigs: 0,
         urgentMaintenance: 0,
-        deltas: {
-          boatsInAlert: 0,
-          boatsWithEngine: 0,
-          boatsWithSail: 0,
-          boatsWithRig: 0,
-          overdueCount: 0,
-        },
+        deltas: { boatsInAlert: 0, overdueCount: 0 },
       },
       aiFleetAnalysis: null,
       ports,

@@ -4,13 +4,22 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import UpgradePlanModal from '~/components/base/UpgradePlanModal.vue'
 import { useT } from '~/composables/use_t'
+import { useDateFormat } from '~/composables/use_date_format'
 import type { AiSuggestion } from '~/types/boat_show'
 import { PLAN_LIMITS } from '../../../shared/types/plan'
 import type { PlanTier } from '../../../shared/types/plan'
 
-defineProps<{ aiFleetAnalysis: AiSuggestion[] | null }>()
+withDefaults(
+  defineProps<{
+    aiFleetAnalysis: AiSuggestion[] | null
+    /** Date ISO de la dernière analyse de flotte, si une existe (#832). */
+    aiFleetAnalysisAt?: string | null
+  }>(),
+  { aiFleetAnalysisAt: null }
+)
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 const page = usePage()
 
 const canUseAI = computed(() => {
@@ -55,7 +64,12 @@ function analyzeFleet() {
       <span class="text-navy-300">&#10022;</span>
       <h3 class="text-base font-semibold">{{ t('dashboard.aiPanel.title') }}</h3>
     </div>
-    <p class="mb-4 text-xs text-navy-300">{{ t('dashboard.aiPanel.suggestions') }}</p>
+    <p class="mb-4 text-xs text-navy-300">
+      {{ t('dashboard.aiPanel.suggestions') }}
+      <span v-if="aiFleetAnalysisAt" data-testid="ai-panel-analysed-at">
+        · {{ t('dashboard.aiPanel.lastAnalysedAt', { date: formatDate(aiFleetAnalysisAt) }) }}
+      </span>
+    </p>
 
     <!-- Placeholders translucides plutôt que `BaseSkeleton` : celui-ci est bâti
          sur `bg-surface-muted`, invisible sur un aplat navy en thème sombre. -->

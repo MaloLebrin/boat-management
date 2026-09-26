@@ -174,8 +174,13 @@ export default class EngineListService {
   /**
    * Compteurs par statut sur l'ensemble des moteurs du périmètre — indépendants
    * de la recherche et de la page en cours, pour rester un indicateur de flotte.
+   * Public depuis #832 : le tableau de bord s'en sert pour « N moteurs en
+   * maintenance » dans l'état de flotte.
    */
-  private async summaryForBoats(boatIds: number[]): Promise<EngineListSummary> {
+  async summaryForBoats(boatIds: number[]): Promise<EngineListSummary> {
+    if (boatIds.length === 0) {
+      return { total: 0, operational: 0, inMaintenance: 0, outOfService: 0 }
+    }
     const rows = await BoatEngine.query()
       .whereIn('boatId', boatIds)
       .select('status')
