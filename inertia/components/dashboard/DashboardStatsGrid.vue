@@ -55,12 +55,8 @@ const boatsTone = computed<'warning' | 'neutral'>(() =>
   props.stats.deltas.boatsInAlert > 0 ? 'warning' : 'neutral'
 )
 
-function fadeUp(delayMs: number) {
-  return {
-    animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
-    animationDelay: `${delayMs}ms`,
-  }
-}
+// Entrée en cascade posée en classes (`animate-fade-up` + délai) et non en
+// `:style` : la CSP de production ne couvre pas les attributs `style` (#831).
 </script>
 
 <template>
@@ -74,7 +70,7 @@ function fadeUp(delayMs: number) {
       :delta="statDeltas.boats"
       :tone="boatsTone"
       href="/boats"
-      :style="fadeUp(0)"
+      class="animate-fade-up"
     >
       <template #icon>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,7 +91,7 @@ function fadeUp(delayMs: number) {
         :delta="statDeltas.engines"
         :tone="statTones.engines"
         href="/boats?hasEngine=true"
-        :style="fadeUp(60)"
+        class="animate-fade-up [animation-delay:60ms]"
       >
         <template #icon>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +111,7 @@ function fadeUp(delayMs: number) {
         :delta="statDeltas.sails"
         :tone="statTones.sails"
         href="/boats?hasSails=true"
-        :style="fadeUp(120)"
+        class="animate-fade-up [animation-delay:120ms]"
       >
         <template #icon>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +130,7 @@ function fadeUp(delayMs: number) {
         :delta="statDeltas.rigs"
         :tone="statTones.rigs"
         href="/boats?hasRig=true"
-        :style="fadeUp(180)"
+        class="animate-fade-up [animation-delay:180ms]"
       >
         <template #icon>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,8 +148,7 @@ function fadeUp(delayMs: number) {
     <div
       v-else
       data-testid="equipment-empty-card"
-      class="col-span-2 flex flex-col justify-between rounded-(--radius-card) border border-dashed border-border bg-surface-elevated p-4 shadow-(--shadow-xs) sm:p-5 lg:col-span-3"
-      :style="fadeUp(60)"
+      class="col-span-2 flex animate-fade-up flex-col justify-between rounded-(--radius-card) border border-dashed border-border bg-surface-elevated p-4 shadow-(--shadow-xs) [animation-delay:60ms] sm:p-5 lg:col-span-3"
     >
       <div class="flex items-center gap-1.5">
         <span class="shrink-0 text-fg-muted">

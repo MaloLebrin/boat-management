@@ -14,6 +14,17 @@ const shieldConfig = defineConfig({
       // nonce géré automatiquement par Shield pour @vite et @inertiaHead
       scriptSrc: ["'self'", "'nonce-{{nonce}}'"],
       styleSrc: ["'self'", "'nonce-{{nonce}}'"],
+      // Attributs `style="…"` (#831) : Chromium les évalue via `style-src-attr`,
+      // qui retombe sur `style-src` — et un nonce ne s'applique jamais à un
+      // attribut. Or le SSR d'Inertia sérialise chaque `:style` de Vue (jauges,
+      // barres de progression, positions de carte, couleurs de marque choisies
+      // par l'utilisateur, `wrapperStyle` de BaseInput) en attribut `style` :
+      // sans cette directive, le HTML arrive sans ces styles jusqu'au rendu
+      // client. `'unsafe-inline'` est cantonné aux attributs — les balises
+      // `<style>` et les feuilles restent sous `style-src` ('self' + nonce).
+      // `'unsafe-hashes'` est écarté : il faudrait un hash par valeur, ce que
+      // des largeurs ou des positions calculées rendent impossible.
+      styleSrcAttr: ["'unsafe-inline'"],
       // Cloudinary CDN pour les images uploadées
       imgSrc: ["'self'", 'data:', 'res.cloudinary.com'],
       // Polices bundlées localement via Fontsource, pas de CDN externe

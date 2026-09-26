@@ -58,10 +58,7 @@ const { transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6, refName: '
 
     <div class="relative mx-auto max-w-5xl">
       <!-- Copy: centré -->
-      <div
-        class="mx-auto mb-12 max-w-2xl space-y-6 text-center"
-        style="animation: fadeUp 700ms var(--ease-premium) both"
-      >
+      <div class="mx-auto mb-12 max-w-2xl animate-fade-up-slow space-y-6 text-center">
         <!-- Bandeau navy permanent : encre claire assumée (comme l'eyebrow du simulateur). -->
         <Link
           v-if="announcement"
@@ -77,15 +74,11 @@ const { transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6, refName: '
           {{ currentHero.title }}
           <em class="text-gradient-animated not-italic">{{ currentHero.titleHighlight }}</em>
         </h1>
-        <p
-          class="text-pretty text-lg text-white/70"
-          style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 100ms"
-        >
+        <p class="animate-fade-up-slow text-pretty text-lg text-white/70 [animation-delay:100ms]">
           {{ currentHero.subtitle }}
         </p>
         <div
-          class="flex flex-wrap items-center justify-center gap-3 pt-2"
-          style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 200ms"
+          class="flex animate-fade-up-slow flex-wrap items-center justify-center gap-3 pt-2 [animation-delay:200ms]"
         >
           <Link href="/signup">
             <BaseButton size="lg" class="shadow-lg">
@@ -123,17 +116,14 @@ const { transform: tiltTransform } = useTilt({ max: 6, parallax: 0.6, refName: '
             </BaseButton>
           </a>
         </div>
-        <p
-          class="text-sm text-white/50"
-          style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 300ms"
-        >
+        <p class="animate-fade-up-slow text-sm text-white/50 [animation-delay:300ms]">
           {{ caption }}
         </p>
       </div>
 
       <!-- Browser mock : entrée (fadeUp) → flottement (float-slow) → tilt 3D.
            Divs séparés pour que l'animation d'entrée n'écrase pas le transform du tilt. -->
-      <div style="animation: fadeUp 700ms var(--ease-premium) both; animation-delay: 300ms">
+      <div class="animate-fade-up-slow [animation-delay:300ms]">
         <div class="float-slow">
           <div ref="tiltEl" class="will-change-transform" :style="{ transform: tiltTransform }">
             <HomeBrowserFrame>

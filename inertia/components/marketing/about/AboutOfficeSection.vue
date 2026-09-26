@@ -69,8 +69,8 @@ const { isVisible } = useScrollReveal()
             class="overflow-hidden rounded-2xl border border-bone bg-surface-elevated"
           >
             <div
-              class="relative flex items-end px-6 py-8"
-              :style="{ height: '140px', background: office.gradient }"
+              class="relative flex h-[140px] items-end px-6 py-8"
+              :style="{ background: office.gradient }"
             >
               <svg
                 viewBox="0 0 400 200"

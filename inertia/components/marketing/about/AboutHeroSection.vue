@@ -18,16 +18,14 @@ defineProps<{
         À PROPOS · NOTRE MISSION
       </p>
       <h1
-        class="mt-6 font-display text-5xl leading-none tracking-tight text-fg lg:text-6xl xl:text-7xl"
-        style="animation: fadeUp 700ms var(--ease-premium) both"
+        class="mt-6 animate-fade-up-slow font-display text-5xl leading-none tracking-tight text-fg lg:text-6xl xl:text-7xl"
       >
         {{ line1 }} <em class="text-coral-500">{{ line1Highlight }}</em
         ><br />
         {{ line2 }} <em class="text-coral-500">{{ line2Highlight }}</em>
       </h1>
       <p
-        class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-fg-muted"
-        style="animation: fadeUp 700ms var(--ease-premium) 100ms both"
+        class="mx-auto mt-6 max-w-2xl animate-fade-up-slow text-lg leading-relaxed text-fg-muted [animation-delay:100ms]"
       >
         {{ subtitle }}
       </p>

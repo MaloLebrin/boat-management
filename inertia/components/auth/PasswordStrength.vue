@@ -18,13 +18,9 @@ const score = computed(() => {
 })
 
 // Tokens sémantiques plutôt qu'hex : les segments suivent le thème (#416).
-const segmentColors = [
-  'var(--color-bone)',
-  'var(--color-danger)',
-  'var(--color-warning)',
-  'var(--color-success)',
-  'var(--color-success)',
-]
+// En classes et non en `:style` : la CSP ne couvre pas les attributs (#831).
+const segmentClasses = ['bg-bone', 'bg-danger', 'bg-warning', 'bg-success', 'bg-success']
+const labelClasses = ['text-bone', 'text-danger', 'text-warning', 'text-success', 'text-success']
 const labels = computed(() => [
   t('auth.passwordStrength.tooShort'),
   t('auth.passwordStrength.weak'),
@@ -33,7 +29,8 @@ const labels = computed(() => [
   t('auth.passwordStrength.excellent'),
 ])
 
-const activeColor = computed(() => segmentColors[score.value])
+const activeSegmentClass = computed(() => segmentClasses[score.value])
+const activeLabelClass = computed(() => labelClasses[score.value])
 const label = computed(() => (props.value ? labels.value[score.value] : ''))
 </script>
 
@@ -44,13 +41,13 @@ const label = computed(() => (props.value ? labels.value[score.value] : ''))
         v-for="i in 4"
         :key="i"
         class="h-0.5 flex-1 rounded-full transition-colors duration-150"
-        :style="{ background: i - 1 < score ? activeColor : 'var(--color-bone)' }"
+        :class="i - 1 < score ? activeSegmentClass : 'bg-bone'"
       />
     </div>
     <span
       v-if="value"
       class="min-w-[54px] text-right text-[11px] font-semibold transition-colors duration-150"
-      :style="{ color: activeColor }"
+      :class="activeLabelClass"
     >
       {{ label }}
     </span>

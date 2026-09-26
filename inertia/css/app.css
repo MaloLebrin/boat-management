@@ -180,6 +180,11 @@
   --motion-normal: 220ms;
   --motion-slow: 320ms;
   --ease-premium: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Entrées `fadeUp` en classes (`animate-fade-up`, `animate-fade-up-slow`)
+     plutôt qu'en attribut `style` : la CSP ne couvre pas les attributs (#831).
+     Le décalage se pose à côté, ex. `[animation-delay:60ms]`. */
+  --animate-fade-up: fadeUp var(--motion-normal) var(--ease-premium) both;
+  --animate-fade-up-slow: fadeUp 700ms var(--ease-premium) both;
 
   /* ============================================================
      FOCUS RINGS

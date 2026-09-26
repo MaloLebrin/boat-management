@@ -50,7 +50,7 @@ function handleSpotClick(spot: SpotRow) {
   <g
     :data-testid="`marina-pontoon-${pontoon.id}`"
     :transform="`translate(${x}, ${y})`"
-    :style="{ cursor: editMode ? 'grab' : 'pointer' }"
+    :class="editMode ? 'cursor-grab' : 'cursor-pointer'"
     @pointerdown="$emit('pointerdown', $event)"
   >
     <!-- Pontoon body -->
@@ -71,7 +71,7 @@ function handleSpotClick(spot: SpotRow) {
       :key="spot.id"
       :data-testid="`marina-spot-${spot.id}`"
       :transform="`translate(${SLOT_GAP + i * (SLOT_W + SLOT_GAP)}, ${PIER_H + 5})`"
-      style="cursor: pointer"
+      class="cursor-pointer"
       @click.stop="handleSpotClick(spot)"
     >
       <!-- Occupied: filled rect + badge + boat icon + name -->
