@@ -77,12 +77,15 @@ const cards = computed(() => [
   },
 ])
 
-function fadeUp(delayMs: number) {
-  return {
-    animation: 'fadeUp var(--motion-normal) var(--ease-premium) both',
-    animationDelay: `${delayMs}ms`,
-  }
-}
+// Entrée en cascade posée en classes (`animate-fade-up` + délai) et non en
+// `:style` : la CSP de production ne couvre pas les attributs `style` (#831).
+// Liste figée : Tailwind ne génère que les classes présentes dans les sources.
+const fadeUpDelayClasses = [
+  '',
+  '[animation-delay:60ms]',
+  '[animation-delay:120ms]',
+  '[animation-delay:180ms]',
+]
 </script>
 
 <template>
@@ -99,7 +102,7 @@ function fadeUp(delayMs: number) {
       :delta="card.delta"
       :tone="card.tone"
       :href="card.href"
-      :style="fadeUp(index * 60)"
+      :class="['animate-fade-up', fadeUpDelayClasses[index]]"
     />
   </div>
 </template>

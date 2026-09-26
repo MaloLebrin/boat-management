@@ -59,7 +59,7 @@ function handleSpotClick(spot: SpotRow) {
   <g
     :data-testid="`marina-mouillage-${mouillage.id}`"
     :transform="`translate(${x + RX}, ${y + RY})`"
-    :style="{ cursor: editMode ? 'grab' : 'pointer' }"
+    :class="editMode ? 'cursor-grab' : 'cursor-pointer'"
     @pointerdown="handlePointerDown"
   >
     <!-- Zone ellipse -->
@@ -95,7 +95,7 @@ function handleSpotClick(spot: SpotRow) {
       :key="spot.id"
       :data-testid="`marina-spot-${spot.id}`"
       :transform="`translate(${spot.sx - (spot.boat ? SPOT_OCCUPIED_SIZE : SPOT_SIZE) / 2}, ${spot.sy - (spot.boat ? SPOT_OCCUPIED_SIZE : SPOT_SIZE) / 2})`"
-      style="cursor: pointer"
+      class="cursor-pointer"
       @click.stop="handleSpotClick(spot)"
     >
       <!-- Occupied: large circle + boat icon + name -->

@@ -72,10 +72,7 @@ const { isVisible } = useScrollReveal('sectionEl')
             </button>
             <div
               class="overflow-hidden transition-all duration-300"
-              :style="{
-                maxHeight: openIndex === idx ? '200px' : '0',
-                opacity: openIndex === idx ? 1 : 0,
-              }"
+              :class="openIndex === idx ? 'max-h-[200px] opacity-100' : 'max-h-0 opacity-0'"
             >
               <p class="px-5 pb-4 text-sm text-fg-muted">{{ item.a }}</p>
             </div>

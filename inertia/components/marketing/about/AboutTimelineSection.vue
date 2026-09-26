@@ -18,16 +18,12 @@ defineProps<{
 
 const { isVisible } = useScrollReveal()
 
-function dotBg(tone?: string) {
-  if (tone === 'coral') return '#e2674f'
-  if (tone === 'mint') return '#1f6b54'
-  return '#fff'
-}
-
-function dotBorder(tone?: string) {
-  if (tone === 'coral') return '#fadcd2'
-  if (tone === 'mint') return '#cfe8de'
-  return '#dde7f0'
+// Pastilles en classes de palette et non en hex dans `:style` (#831) : la CSP
+// ne couvre pas les attributs `style`, et les tokens suivent le thème sombre.
+function dotClass(tone?: string) {
+  if (tone === 'coral') return 'border-coral-100 bg-coral-500'
+  if (tone === 'mint') return 'border-mint-100 bg-mint-700'
+  return 'border-bone bg-surface-elevated'
 }
 </script>
 
@@ -52,11 +48,8 @@ function dotBorder(tone?: string) {
           <div v-for="(item, idx) in items" :key="idx" class="relative pb-8 pl-12">
             <!-- Dot -->
             <div
-              class="absolute left-[9px] top-1 h-[15px] w-[15px] rounded-full ring-1 ring-bone"
-              :style="{
-                background: dotBg(item.tone),
-                border: `3px solid ${dotBorder(item.tone)}`,
-              }"
+              class="absolute left-[9px] top-1 h-[15px] w-[15px] rounded-full border-[3px] ring-1 ring-bone"
+              :class="dotClass(item.tone)"
             />
             <p class="font-mono text-[11px] font-semibold uppercase tracking-wider text-fg-subtle">
               {{ item.d }}
