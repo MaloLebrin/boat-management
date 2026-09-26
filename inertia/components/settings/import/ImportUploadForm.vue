@@ -9,21 +9,32 @@ import {
   CSV_IMPORT_MAX_FILE_SIZE_MB,
   CSV_IMPORT_MAX_ROWS,
 } from '#shared/constants/csv_import'
-import { EXPENSE_CSV_HEADERS, MAINTENANCE_CSV_HEADERS, type CsvImportType } from '#shared/types/csv'
+import {
+  CSV_IMPORT_TYPES,
+  EXPENSE_CSV_HEADERS,
+  MAINTENANCE_CSV_HEADERS,
+  type CsvImportType,
+} from '#shared/types/csv'
 import { routes } from '~/utils/routes'
 
 const { t } = useT()
 
-const props = defineProps<{
-  boatOptions: { value: string; label: string }[]
-  /** Flotte mono-bateau (#823) : le bateau est retenu d'office, sans sélecteur. */
-  singleBoatId: string | null
-  /** Bateau sélectionné, au format `BaseSelect` (chaîne vide = aucun). */
-  boatId: string
-  type: CsvImportType
-  /** Types ouverts par le plan (dépenses dès Pro, historique en Entreprise). */
-  types: readonly CsvImportType[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    boatOptions: { value: string; label: string }[]
+    /** Flotte mono-bateau (#823) : le bateau est retenu d'office, sans sélecteur. */
+    singleBoatId: string | null
+    /** Bateau sélectionné, au format `BaseSelect` (chaîne vide = aucun). */
+    boatId: string
+    type: CsvImportType
+    /**
+     * Types ouverts par le plan (dépenses dès Pro, historique en Entreprise).
+     * Tous par défaut : le parent restreint, le formulaire seul ne sait rien du plan.
+     */
+    types?: readonly CsvImportType[]
+  }>(),
+  { types: () => CSV_IMPORT_TYPES }
+)
 
 const emit = defineEmits<{
   (e: 'update:boatId', value: string): void
