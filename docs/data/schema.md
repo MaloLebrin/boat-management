@@ -260,6 +260,7 @@ plomberie).
   - `dueEngineHours` (int)
 - complétion:
   - `doneAt`
+- index `(boat_id, status)` (`boat_maintenance_tasks_boat_status_idx`, #832) — comptage exact des tâches urgentes et « tâches réalisées 30 j » du tableau de bord
   - `doneEngineHours`
   - `lastDoneEngineHours`
 - récurrence:
@@ -301,11 +302,24 @@ plomberie).
 - `id`, `boatId`, `organizationId`
 - `occurredAt` (timestamp, indexé), `type` (CHECK : `grounding | flooding | rigging_failure | engine_failure | collision | fire | theft_vandalism | other`), `location` (nullable), `description`
 - `insuranceClaimed` (bool), `insuranceClaimRef` (nullable)
-- `status` (CHECK : `open | in_progress | closed`, indexé), `closedAt` (nullable)
+- `status` (CHECK : `open | in_progress | closed`, indexé), `closedAt` (nullable) ; index composite `(organization_id, status)` (`boat_incidents_org_status_idx`, #832) pour la liste « À traiter » du tableau de bord
 - `createdBy` (FK `users` nullable, SET NULL, indexé) — qui a déclaré l'incident (#816), posé par `BoatIncidentService.createForBoat` sur la déclaration manuelle comme sur celle du copilote ; `null` pour les lignes antérieures ou un compte supprimé
 - cible optionnelle (#813), **au plus une** des six FK nullables `SET NULL` : `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId`, `boatGenericEquipmentId`, `boatEnginePartId` — supprimer l'équipement conserve l'incident, rattaché au bateau entier
 - photos (#814) : lignes `media` avec `entity_type = 'boat_incident'`, purgées avec l'incident et avec le bateau
 - suites (#815) : référencé par `boat_maintenance_tasks.boat_incident_id` et `boat_equipment_actions.boat_incident_id` (SET NULL)
+
+### boat_documents
+
+Papiers d'un bateau (assurance, francisation, permis…) — onglet « Documents » de la fiche bateau, ligne « À traiter » du tableau de bord quand l'échéance approche.
+
+- `id`, `boatId` (CASCADE), `organizationId` (CASCADE)
+- `type` (enum : `francisation | insurance | navigation_permit | radio_license | safety_inspection | tonnage | ce_certificate | crew_role | other`), `customTypeLabel` (nullable, pour `other`)
+- `referenceNumber`, `issuer`, `notes` (nullables)
+- `issuedAt` (date, nullable), `expiresAt` (date, nullable, indexée) — statut `valid | expiring_soon | expired` dérivé par `shared/helpers/boat_document.ts` (`documentStatusFor`, fenêtre `BOAT_DOCUMENT_EXPIRY_WARNING_DAYS` = 30 j)
+- `cost` (decimal 10,2, nullable) — poste « documents » du budget
+- `mediaId` (FK `media` nullable, SET NULL) — le PDF joint
+- index composite `(organization_id, expires_at)` (`boat_documents_org_expires_idx`, #832) pour les documents à échéance du tableau de bord
+- `createdAt`, `updatedAt`
 
 ### boat_port_stays
 
@@ -517,7 +531,7 @@ Constats structurés de la checklist d'état des lieux (#584). Le contenu des po
 Une ligne = une **sortie** (trip) du journal de bord — doc de domaine : `docs/domain/navigation-logs.md`.
 
 - `id`, `boatId` (CASCADE), `organizationId` (CASCADE)
-- `status` — `in_progress` | `completed` ; **index partiel `one_in_progress_per_boat`** (#182) : une seule sortie en cours par bateau, garanti côté base
+- `status` — `in_progress` | `completed` ; **index partiel `one_in_progress_per_boat`** (#182) : une seule sortie en cours par bateau, garanti côté base ; index composite `(organization_id, status)` (`navigation_logs_org_status_idx`, #832) pour « En mer maintenant » et les KPI 30 j du tableau de bord
 - `departedAt` (indexé), `arrivedAt` (nullable)
 - `departurePortId` / `arrivalPortId` (FK → ports, SET NULL) + `departurePortName` / `arrivalPortName` (nom libre)
 - `distanceNm`, `engineHoursStart`, `engineHoursEnd`, `fuelConsumedLiters`

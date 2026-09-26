@@ -1,9 +1,15 @@
 import Boat from '#models/boat'
+import BoatDocument from '#models/boat_document'
+import BoatFuelLog from '#models/boat_fuel_log'
+import BoatIncident from '#models/boat_incident'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import BoatReservation from '#models/boat_reservation'
+import NavigationLog from '#models/navigation_log'
 import Mouillage from '#models/mouillage'
 import Notification from '#models/notification'
 import Organization from '#models/organization'
+import OrganizationMembership from '#models/organization_membership'
 import Pontoon from '#models/pontoon'
 import Port from '#models/port'
 import Spot from '#models/spot'
@@ -13,6 +19,7 @@ import BoatEquipmentService from '#services/boat_equipment_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatService from '#services/boat_hull_service'
 import MouillageService from '#services/mouillage_service'
+import OrganizationModuleService from '#services/organization_module_service'
 import PontoonService from '#services/pontoon_service'
 import PortService from '#services/port_service'
 import SpotService from '#services/spot_service'
@@ -111,6 +118,14 @@ export async function seedDemoData() {
       organizationId: org.id,
     })
   }
+
+  // Sans ligne de membership, le rôle effectif retombe sur « member » : la
+  // carte Dépenses du tableau de bord (admin) et la page Équipiers ne
+  // s'afficheraient qu'après le self-heal d'OrganizationMemberService (#832).
+  await OrganizationMembership.firstOrCreate(
+    { userId: user.id, organizationId: org.id },
+    { userId: user.id, organizationId: org.id, role: 'admin' }
+  )
 
   const boatService = await app.container.make(BoatService)
   const equipmentService = await app.container.make(BoatEquipmentService)
@@ -365,6 +380,155 @@ export async function seedDemoData() {
 
   await seedDemoPort(user, org)
   await seedDemoNotifications(user, org)
+  await seedDemoFleetActivity(org)
+}
+
+/**
+ * Ce qui fait vivre le tableau de bord (#832) : une sortie en cours, des
+ * sorties terminées, des incidents, des documents à échéance, des pleins et,
+ * si le plan le permet, des réservations à venir. Idempotent : chaque bloc
+ * est posé une seule fois par bateau (recherche par nom / libellé).
+ */
+async function seedDemoFleetActivity(org: Organization) {
+  const boats = await Boat.query().where('organizationId', org.id).orderBy('id', 'asc')
+  const byName = new Map(boats.map((b) => [b.name, b]))
+  const albatros = byName.get('Albatros')
+  const marin = byName.get('Marin du Vent')
+  const mistral = byName.get('Cap Mistral')
+  const etoile = byName.get('Étoile du Port')
+  const tempete = byName.get('Tempête Douce')
+  if (!albatros || !marin || !mistral || !etoile || !tempete) return
+
+  const now = DateTime.now()
+
+  // Sorties : une en cours (« En mer maintenant »), trois terminées sur 30 jours (KPI, activité)
+  const hasTrips = await NavigationLog.query().where('organizationId', org.id).first()
+  if (!hasTrips) {
+    await NavigationLog.create({
+      boatId: albatros.id,
+      organizationId: org.id,
+      status: 'in_progress',
+      departedAt: now.minus({ hours: 5 }),
+      departurePortName: 'Port de la Grande Rade',
+      crewCount: 4,
+      windForceBeaufort: 3,
+    })
+    const completed: Array<[Boat, number, string, string, string]> = [
+      [marin, 2, 'Port de la Grande Rade', 'Saint-Malo', '18.5'],
+      [mistral, 9, 'Port de la Grande Rade', 'Dinard', '7.2'],
+      [tempete, 20, 'Saint-Malo', 'Port de la Grande Rade', '11.0'],
+    ]
+    for (const [boat, daysAgo, from, to, nm] of completed) {
+      await NavigationLog.create({
+        boatId: boat.id,
+        organizationId: org.id,
+        status: 'completed',
+        departedAt: now.minus({ days: daysAgo, hours: 6 }),
+        arrivedAt: now.minus({ days: daysAgo }),
+        departurePortName: from,
+        arrivalPortName: to,
+        distanceNm: nm,
+        crewCount: 2,
+      })
+    }
+  }
+
+  // Incidents : un ouvert, un en cours (« À traiter », KPI)
+  const hasIncidents = await BoatIncident.query().where('organizationId', org.id).first()
+  if (!hasIncidents) {
+    await BoatIncident.create({
+      boatId: mistral.id,
+      organizationId: org.id,
+      type: 'engine_failure',
+      status: 'in_progress',
+      occurredAt: now.minus({ days: 6 }),
+      location: 'Baie de Saint-Malo',
+      description: 'Surchauffe moteur au retour, remorquage jusqu’au ponton.',
+      insuranceClaimed: false,
+    })
+    await BoatIncident.create({
+      boatId: etoile.id,
+      organizationId: org.id,
+      type: 'rigging_failure',
+      status: 'open',
+      occurredAt: now.minus({ days: 2 }),
+      location: 'Ponton B',
+      description: 'Ridoir de bas-hauban fissuré constaté à l’amarrage.',
+      insuranceClaimed: false,
+    })
+  }
+
+  // Documents : une assurance expirée, un permis à 12 jours (« À traiter »)
+  const hasDocuments = await BoatDocument.query().where('organizationId', org.id).first()
+  if (!hasDocuments) {
+    await BoatDocument.create({
+      boatId: mistral.id,
+      organizationId: org.id,
+      type: 'insurance',
+      issuedAt: now.minus({ years: 1, days: 20 }),
+      expiresAt: now.minus({ days: 20 }),
+      issuer: 'Assurance Maritime Démo',
+      cost: '640.00',
+    })
+    await BoatDocument.create({
+      boatId: marin.id,
+      organizationId: org.id,
+      type: 'navigation_permit',
+      issuedAt: now.minus({ years: 1 }).plus({ days: 12 }),
+      expiresAt: now.plus({ days: 12 }),
+      issuer: 'Affaires maritimes',
+    })
+  }
+
+  // Pleins : alimentent « Dépenses » (carburant) et l'activité
+  const hasFuel = await BoatFuelLog.query().where('organizationId', org.id).first()
+  if (!hasFuel) {
+    const refuels: Array<[Boat, number, string, string]> = [
+      [mistral, 10, '48.500', '96.50'],
+      [tempete, 21, '32.000', '64.90'],
+      [marin, 3, '20.000', '41.20'],
+    ]
+    for (const [boat, daysAgo, liters, cost] of refuels) {
+      await BoatFuelLog.create({
+        boatId: boat.id,
+        organizationId: org.id,
+        fueledAt: now.minus({ days: daysAgo }),
+        quantityLiters: liters,
+        pricePerLiter: '1.9900',
+        totalCost: cost,
+        fuelType: 'diesel',
+        supplier: 'Station du port',
+      })
+    }
+  }
+
+  // Réservations : seulement si le plan / module Location les autorise
+  const quotas = await new OrganizationModuleService().getEffectiveQuotas(org)
+  if (quotas.canManageReservations) {
+    const hasReservations = await BoatReservation.query().where('organizationId', org.id).first()
+    if (!hasReservations) {
+      await BoatReservation.create({
+        boatId: marin.id,
+        organizationId: org.id,
+        status: 'confirmed',
+        type: 'bareboat',
+        startsAt: now.plus({ days: 2 }).set({ hour: 9, minute: 0 }),
+        endsAt: now.plus({ days: 9 }).set({ hour: 17, minute: 0 }),
+        clientName: 'Claire Morvan',
+        clientEmail: 'claire.morvan@example.com',
+      })
+      await BoatReservation.create({
+        boatId: tempete.id,
+        organizationId: org.id,
+        status: 'option',
+        type: 'day_charter',
+        startsAt: now.minus({ days: 1 }).set({ hour: 10, minute: 0 }),
+        endsAt: now.plus({ days: 1 }).set({ hour: 18, minute: 0 }),
+        clientName: 'Yann Le Goff',
+        clientEmail: 'yann.legoff@example.com',
+      })
+    }
+  }
 }
 
 /**
