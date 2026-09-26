@@ -28,6 +28,7 @@ const EMPTY_ATTENTION: DashboardAttention = {
     maintenanceOverdue: 3,
     maintenanceSoon: 4,
     incidentsOpen: 0,
+    incidentsInProgress: 0,
     documentsExpired: 0,
     documentsExpiring: 0,
     invoicesOverdue: 0,
@@ -53,11 +54,13 @@ const stubs = {
     template: '<div data-testid="attention" :data-total="attention.counts.total" />',
   },
   DashboardBoatsCard: { template: '<div data-testid="boats" />' },
+  DashboardAtSeaCard: { template: '<div data-testid="at-sea" />' },
+  DashboardUpcomingReservationsCard: { template: '<div data-testid="upcoming" />' },
   DashboardAiPanel: { template: '<div data-testid="ai-panel" />' },
   PortDashboardCard: { template: '<div data-testid="ports" />' },
 }
 
-function mountDashboard(currentPlan = 'enterprise') {
+function mountDashboard(currentPlan = 'enterprise', extraProps: Record<string, unknown> = {}) {
   vi.mocked(usePage).mockReturnValue({
     props: { currentPlan, activeModules: [], activeAddons: [] },
   } as unknown as ReturnType<typeof usePage>)
@@ -66,19 +69,16 @@ function mountDashboard(currentPlan = 'enterprise') {
     props: {
       boats: [],
       attention: EMPTY_ATTENTION,
+      pulse: { windowDays: 30, tripsCompleted: 0, distanceNm: 0, tasksDone: 0 },
+      activeTrips: { items: [], total: 0 },
+      fleetStatus: { total: 0, atSea: 0, inPort: 0, enginesInMaintenance: 0 },
       stats: {
         boats: 0,
         engines: 0,
         sails: 0,
         rigs: 0,
         urgentMaintenance: 7,
-        deltas: {
-          boatsInAlert: 0,
-          boatsWithEngine: 0,
-          boatsWithSail: 0,
-          boatsWithRig: 0,
-          overdueCount: 3,
-        },
+        deltas: { boatsInAlert: 0, overdueCount: 3 },
       },
       aiFleetAnalysis: null,
       ports: [],
@@ -89,6 +89,7 @@ function mountDashboard(currentPlan = 'enterprise') {
       canCreateMaintenanceTasks: false,
       canAddBoat: true,
       boatQuota: { used: 0, limit: 2 },
+      ...extraProps,
     },
     global: { stubs },
   })
@@ -106,13 +107,30 @@ describe('Dashboard — structure de page (#828)', () => {
     expect(positions).toEqual([...positions].sort((a, b) => a - b))
   })
 
-  test('puts the attention list before the boats in the main column', () => {
+  test('orders the main column: attention, today grid (at sea), boats', () => {
     const wrapper = mountDashboard()
     const main = wrapper.get('[data-testid="dashboard-main-column"]')
     expect(main.find('[data-testid="attention"]').exists()).toBe(true)
+    expect(main.find('[data-testid="at-sea"]').exists()).toBe(true)
     expect(main.find('[data-testid="boats"]').exists()).toBe(true)
-    const [attention, boats] = order(wrapper, ['attention', 'boats'])
-    expect(attention).toBeLessThan(boats)
+    const positions = order(wrapper, ['attention', 'at-sea', 'boats'])
+    expect(positions).toEqual([...positions].sort((a, b) => a - b))
+  })
+
+  test('the today grid is single-column without the charter module and two-column with it', () => {
+    const without = mountDashboard()
+    expect(without.find('[data-testid="upcoming"]').exists()).toBe(false)
+    expect(without.get('[data-testid="dashboard-today-grid"]').classes()).not.toContain(
+      'md:grid-cols-2'
+    )
+
+    const withModule = mountDashboard('enterprise', { upcomingReservations: [] })
+    expect(withModule.find('[data-testid="upcoming"]').exists()).toBe(true)
+    expect(withModule.get('[data-testid="dashboard-today-grid"]').classes()).toContain(
+      'md:grid-cols-2'
+    )
+    const [atSea, upcoming] = order(withModule, ['at-sea', 'upcoming'])
+    expect(atSea).toBeLessThan(upcoming)
   })
 
   test('puts the AI panel then the ports card in the side column, after the main column', () => {

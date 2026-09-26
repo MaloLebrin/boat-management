@@ -32,6 +32,7 @@ const counts = (over: Partial<DashboardAttentionCounts> = {}): DashboardAttentio
   maintenanceOverdue: 0,
   maintenanceSoon: 0,
   incidentsOpen: 0,
+  incidentsInProgress: 0,
   documentsExpired: 0,
   documentsExpiring: 0,
   invoicesOverdue: 0,

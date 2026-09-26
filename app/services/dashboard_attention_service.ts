@@ -51,6 +51,7 @@ export default class DashboardAttentionService {
           maintenanceOverdue,
           maintenanceSoon,
           incidentsOpen: 0,
+          incidentsInProgress: 0,
           documentsExpired: 0,
           documentsExpiring: 0,
           invoicesOverdue: 0,
@@ -72,6 +73,7 @@ export default class DashboardAttentionService {
       maintenanceOverdue,
       maintenanceSoon,
       incidentsOpen: incidents.total,
+      incidentsInProgress: incidents.inProgress,
       documentsExpired: documents.expired,
       documentsExpiring: documents.expiring,
       invoicesOverdue: invoices.total,
@@ -135,19 +137,25 @@ export default class DashboardAttentionService {
   /** Incidents ouverts ou en cours, le plus ancien d'abord ; total par fonction fenêtre (une requête). */
   private async fetchIncidents(
     orgId: number
-  ): Promise<{ items: DashboardAttentionIncident[]; total: number }> {
+  ): Promise<{ items: DashboardAttentionIncident[]; total: number; inProgress: number }> {
     const rows = await BoatIncident.query()
       .where('organizationId', orgId)
       .whereIn('status', ['open', 'in_progress'])
       .preload('boat', (q) => q.select(['id', 'name']))
       .select('*')
       .select(db.raw('count(*) over() as window_total'))
+      .select(
+        db.raw(
+          "sum(case when status = 'in_progress' then 1 else 0 end) over() as window_in_progress"
+        )
+      )
       .orderBy('occurredAt', 'asc')
       .orderBy('id', 'asc')
       .limit(ATTENTION_FETCH_PER_KIND)
 
     return {
       total: Number(rows[0]?.$extras.window_total ?? 0),
+      inProgress: Number(rows[0]?.$extras.window_in_progress ?? 0),
       items: rows.map((incident) => ({
         kind: 'incident',
         key: `incident:${incident.id}`,

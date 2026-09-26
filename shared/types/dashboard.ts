@@ -1,5 +1,6 @@
 import type { BoatDocumentType } from '#shared/types/boat_document'
 import type { IncidentType } from '#shared/types/incident'
+import type { ReservationStatus, ReservationType } from '#shared/types/reservation'
 
 export type DashboardPortItem = {
   id: number
@@ -39,10 +40,9 @@ export type DashboardUrgentMaintenanceRow = {
 }
 
 export type DashboardStatDeltas = {
+  /** Bateaux ayant au moins une tâche urgente. */
   boatsInAlert: number
-  boatsWithEngine: number
-  boatsWithSail: number
-  boatsWithRig: number
+  /** Tâches datées dont l'échéance est dépassée (comptage exact, #832). */
   overdueCount: number
 }
 
@@ -116,7 +116,10 @@ export type DashboardAttentionItem =
 export interface DashboardAttentionCounts {
   maintenanceOverdue: number
   maintenanceSoon: number
+  /** Incidents `open` + `in_progress`. */
   incidentsOpen: number
+  /** Sous-ensemble de `incidentsOpen` au statut `in_progress`. */
+  incidentsInProgress: number
   documentsExpired: number
   documentsExpiring: number
   invoicesOverdue: number
@@ -129,4 +132,53 @@ export interface DashboardAttention {
   counts: DashboardAttentionCounts
   /** Module CRM actif et capability `invoices.view` : sinon les factures n'apparaissent nulle part. */
   canViewInvoices: boolean
+}
+
+// --- État de flotte, KPI « pulse », départs (#832) -------------------------
+
+export interface DashboardPulseStats {
+  /** Fenêtre glissante des compteurs sorties / tâches (`PULSE_WINDOW_DAYS`). */
+  windowDays: number
+  tripsCompleted: number
+  /** Milles parcourus sur la fenêtre (somme des `distance_nm` renseignées). */
+  distanceNm: number
+  tasksDone: number
+}
+
+export interface DashboardActiveTrip {
+  id: number
+  boatId: number
+  boatName: string
+  departedAt: string
+  departurePortName: string | null
+  crewCount: number | null
+}
+
+export interface DashboardActiveTrips {
+  /** Plafonnées à `ACTIVE_TRIPS_DISPLAY_CAP`, la plus ancienne d'abord. */
+  items: DashboardActiveTrip[]
+  /** Toutes les sorties en cours de l'organisation (= bateaux en mer, une sortie par bateau). */
+  total: number
+}
+
+export interface DashboardFleetStatus {
+  total: number
+  atSea: number
+  inPort: number
+  enginesInMaintenance: number
+}
+
+export interface DashboardUpcomingReservation {
+  id: number
+  boatId: number
+  boatName: string
+  clientName: string
+  status: ReservationStatus
+  type: ReservationType | null
+  /** Départ (début dans la fenêtre) ou retour (réservation en cours qui finit dans la fenêtre). */
+  event: 'departure' | 'return'
+  /** Instant de l'événement (`startsAt` ou `endsAt`), ISO. */
+  at: string
+  startsAt: string
+  endsAt: string
 }

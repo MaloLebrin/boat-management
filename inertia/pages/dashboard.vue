@@ -2,18 +2,24 @@
 import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import DashboardAiPanel from '~/components/dashboard/DashboardAiPanel.vue'
+import DashboardAtSeaCard from '~/components/dashboard/DashboardAtSeaCard.vue'
 import DashboardAttentionCard from '~/components/dashboard/DashboardAttentionCard.vue'
 import DashboardBoatsCard from '~/components/dashboard/DashboardBoatsCard.vue'
 import DashboardHeader from '~/components/dashboard/DashboardHeader.vue'
 import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
 import DashboardStatsGrid from '~/components/dashboard/DashboardStatsGrid.vue'
+import DashboardUpcomingReservationsCard from '~/components/dashboard/DashboardUpcomingReservationsCard.vue'
 import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
 import type {
+  DashboardActiveTrips,
   DashboardAttention,
   DashboardBoatSummary,
+  DashboardFleetStatus,
   DashboardPortItem,
   DashboardPortStats,
+  DashboardPulseStats,
   DashboardStats,
+  DashboardUpcomingReservation,
 } from '#shared/types/dashboard'
 import type { BoatTaskEquipment } from '#shared/types/maintenance'
 import { useT } from '~/composables/use_t'
@@ -31,6 +37,11 @@ defineProps<{
   stats: DashboardStats
   /** Liste mixte « À traiter » (#832) : maintenance, incidents, documents, factures. */
   attention: DashboardAttention
+  pulse: DashboardPulseStats
+  activeTrips: DashboardActiveTrips
+  fleetStatus: DashboardFleetStatus
+  /** Absent (pas `null`) quand le module Location n'est pas actif. */
+  upcomingReservations?: DashboardUpcomingReservation[]
   aiFleetAnalysis: AiSuggestion[] | null
   ports: DashboardPortItem[]
   portStats: DashboardPortStats
@@ -68,7 +79,13 @@ defineProps<{
       </template>
     </DashboardHeader>
 
-    <DashboardStatsGrid class="mt-6 sm:mt-8" :stats="stats" />
+    <DashboardStatsGrid
+      class="mt-6 sm:mt-8"
+      :stats="stats"
+      :pulse="pulse"
+      :fleet-status="fleetStatus"
+      :counts="attention.counts"
+    />
 
     <!-- Deux colonnes à partir de `xl` seulement : entre 1024 et 1279 px la
          colonne 2fr (~450 px) tronquait la table bateaux et les noms de port.
@@ -79,6 +96,26 @@ defineProps<{
     >
       <div class="space-y-6" data-testid="dashboard-main-column">
         <DashboardAttentionCard :attention="attention" />
+        <!-- Les deux cartes « aujourd'hui » côte à côte dès md quand le module
+             Location est actif ; en colonne principale pour garder l'ordre
+             mobile (« En mer » puis départs) sans dupliquer le DOM. -->
+        <div
+          class="grid grid-cols-1 gap-6"
+          :class="{ 'md:grid-cols-2': upcomingReservations }"
+          data-testid="dashboard-today-grid"
+        >
+          <DashboardAtSeaCard
+            :active-trips="activeTrips"
+            :fleet-status="fleetStatus"
+            :boats="boats"
+            :port-options="portOptions"
+            :can-create-navigation-logs="canCreateNavigationLogs"
+          />
+          <DashboardUpcomingReservationsCard
+            v-if="upcomingReservations"
+            :items="upcomingReservations"
+          />
+        </div>
         <DashboardBoatsCard :boats="boats" />
       </div>
 

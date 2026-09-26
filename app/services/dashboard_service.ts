@@ -39,13 +39,7 @@ export default class DashboardService {
     portStats: DashboardPortStats
   }> {
     if (!user.organizationId) {
-      const emptyDeltas: DashboardStatDeltas = {
-        boatsInAlert: 0,
-        boatsWithEngine: 0,
-        boatsWithSail: 0,
-        boatsWithRig: 0,
-        overdueCount: 0,
-      }
+      const emptyDeltas: DashboardStatDeltas = { boatsInAlert: 0, overdueCount: 0 }
       return {
         boats: [],
         boatIds: [],
@@ -89,13 +83,7 @@ export default class DashboardService {
       sails: boats.reduce((acc, b) => acc + b.sails.length, 0),
       rigs: boats.reduce((acc, b) => acc + (b.rig ? 1 : 0), 0),
       urgentMaintenance: 0,
-      deltas: {
-        boatsInAlert: 0,
-        boatsWithEngine: 0,
-        boatsWithSail: 0,
-        boatsWithRig: 0,
-        overdueCount: 0,
-      },
+      deltas: { boatsInAlert: 0, overdueCount: 0 },
     }
 
     const thresholdDate = DateTime.now().startOf('day').plus({ days: urgentWithinDays })
@@ -205,9 +193,6 @@ export default class DashboardService {
     const alertBoatIds = new Set(allUrgent.map((t) => t.boatId))
     stats.deltas = {
       boatsInAlert: alertBoatIds.size,
-      boatsWithEngine: boats.filter((b) => b.engines.length > 0).length,
-      boatsWithSail: boats.filter((b) => b.sails.length > 0).length,
-      boatsWithRig: boats.filter((b) => b.rig !== null).length,
       overdueCount: allUrgent.filter(
         (t) => t.kind === 'date' && t.dueAt !== null && isDueDateOverdue(t.dueAt, today)
       ).length,

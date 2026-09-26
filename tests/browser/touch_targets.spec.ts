@@ -3,6 +3,7 @@ import type { Assert } from '@japa/assert'
 import type { Browser, BrowserContext } from 'playwright'
 import { truncateDb } from '#tests/utils/db'
 import { BoatMaintenanceTaskFactory } from '#database/factories/boat_maintenance_task_factory'
+import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
 import { createAdminUser, createBoatForUser } from '#tests/browser/helpers'
 
 /**
@@ -258,6 +259,10 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
     const user = await createAdminUser()
     const boat = await createBoatForUser(user, { name: 'Touch Dashboard Boat' })
     await BoatMaintenanceTaskFactory.merge({ boatId: boat.id }).apply('overdue').createMany(2)
+    await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+    }).create()
 
     const context = await newTouchContext(browser)
     try {
@@ -269,6 +274,7 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
       // aussi l'entrée « Planning » de la sidebar, masquée (0 px) en mobile.
       const selector = [
         '[data-testid="dashboard-attention-row"]',
+        '[data-testid="dashboard-active-trip-row"]',
         '[data-testid="dashboard-view-all"]',
         '[data-testid="dashboard-main-column"] a[href="/planning"]',
       ].join(', ')

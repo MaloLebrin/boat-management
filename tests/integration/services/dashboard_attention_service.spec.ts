@@ -18,13 +18,7 @@ function stats(urgent: number, overdue: number): DashboardStats {
     sails: 0,
     rigs: 0,
     urgentMaintenance: urgent,
-    deltas: {
-      boatsInAlert: 1,
-      boatsWithEngine: 0,
-      boatsWithSail: 0,
-      boatsWithRig: 0,
-      overdueCount: overdue,
-    },
+    deltas: { boatsInAlert: 1, overdueCount: overdue },
   }
 }
 
@@ -98,6 +92,7 @@ test.group('DashboardAttentionService (#832)', () => {
       maintenanceOverdue: 1,
       maintenanceSoon: 4,
       incidentsOpen: 1,
+      incidentsInProgress: 0,
       documentsExpired: 1,
       documentsExpiring: 1,
       invoicesOverdue: 0,
@@ -112,7 +107,12 @@ test.group('DashboardAttentionService (#832)', () => {
     const user = await UserFactory.with('organization').create()
     const orgId = user.organizationId!
     const boat = await BoatFactory.merge({ organizationId: orgId }).create()
-    await BoatIncidentFactory.merge({ boatId: boat.id, organizationId: orgId }).createMany(8)
+    await BoatIncidentFactory.merge({ boatId: boat.id, organizationId: orgId }).createMany(6)
+    await BoatIncidentFactory.merge({
+      boatId: boat.id,
+      organizationId: orgId,
+      status: 'in_progress',
+    }).createMany(2)
     await BoatIncidentFactory.merge({ boatId: boat.id, organizationId: orgId })
       .apply('closed')
       .create()
@@ -130,6 +130,7 @@ test.group('DashboardAttentionService (#832)', () => {
     })
 
     assert.equal(result.counts.incidentsOpen, 8)
+    assert.equal(result.counts.incidentsInProgress, 2)
     assert.equal(result.counts.documentsExpired, 7)
     assert.equal(result.counts.documentsExpiring, 0)
     assert.equal(result.items.length, 6)

@@ -52,6 +52,7 @@ function chipClass(chip: Chip): string {
 }
 </script>
 
+<!-- Puces de 28 px : la pseudo-zone `pointer-coarse:` (#494) porte la cible à 44 px sous le doigt. -->
 <template>
   <div v-if="chips.length" class="flex flex-wrap gap-1.5">
     <component
@@ -60,7 +61,7 @@ function chipClass(chip: Chip): string {
       :key="chip.key"
       :href="chip.href ?? undefined"
       :data-testid="`dashboard-attention-chip-${chip.key}`"
-      class="inline-flex min-h-7 items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+      class="relative inline-flex min-h-7 items-center rounded-full px-2.5 py-0.5 text-xs font-semibold pointer-coarse:before:absolute pointer-coarse:before:inset-x-0 pointer-coarse:before:-inset-y-2 pointer-coarse:before:content-['']"
       :class="[chipClass(chip), chip.href ? 'hover:underline' : '']"
     >
       {{ t(`dashboard.attention.chips.${chip.key}`, { count: String(chip.count) }) }}

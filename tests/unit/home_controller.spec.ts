@@ -24,6 +24,8 @@ test.group('HomeController (unit)', () => {
         getBoatUsage: async () => ({ used: 0, limit: 2 }),
       } as any,
       {} as any,
+      {} as any,
+      {} as any,
       {} as any
     )
 
@@ -69,6 +71,7 @@ test.group('HomeController (unit)', () => {
       {
         getBoatUsage: async () => ({ used: 1, limit: 2 }),
         canManageInvoices: async () => false,
+        canManageReservations: async () => false,
       } as any,
       {} as any,
       {
@@ -78,6 +81,7 @@ test.group('HomeController (unit)', () => {
             maintenanceOverdue: 0,
             maintenanceSoon: 0,
             incidentsOpen: 0,
+            incidentsInProgress: 0,
             documentsExpired: 0,
             documentsExpiring: 0,
             invoicesOverdue: 0,
@@ -85,6 +89,16 @@ test.group('HomeController (unit)', () => {
           },
           canViewInvoices: false,
         }),
+      } as any,
+      {
+        getActiveTrips: async () => ({ items: [], total: 0 }),
+        getFleetStatus: async () => ({ total: 0, atSea: 0, inPort: 0, enginesInMaintenance: 0 }),
+        getPulse: async () => ({ windowDays: 30, tripsCompleted: 0, distanceNm: 0, tasksDone: 0 }),
+      } as any,
+      {
+        listUpcomingForOrg: async () => {
+          throw new Error('should not be called without the charter module')
+        },
       } as any
     )
 
@@ -120,6 +134,8 @@ test.group('HomeController (unit)', () => {
     // Les lignes urgentes brutes ne sont plus une prop de page : « À traiter » les porte (#832)
     assert.notProperty(rendered[0]!.props, 'urgentMaintenance')
     assert.equal(rendered[0]!.props.attention.counts.total, 0)
+    assert.equal(rendered[0]!.props.fleetStatus.total, 0)
+    assert.notProperty(rendered[0]!.props, 'upcomingReservations')
   })
 
   test('renders the dedicated mechanic dashboard for a mechanic', async ({ assert }) => {
@@ -146,6 +162,8 @@ test.group('HomeController (unit)', () => {
           throw new Error('should not be called')
         },
       } as any,
+      {} as any,
+      {} as any,
       {} as any,
       {} as any
     )

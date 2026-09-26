@@ -24,23 +24,18 @@
   },
   "stats": {
     "boats": "Boats",
-    "engines": "Engines",
-    "sails": "Sails",
-    "rigs": "Rigs",
-    "equipmentEmpty": {
-      "title": "Equipment",
-      "description": "No engines, sails or rigs recorded for your fleet yet.",
-      "cta": "Add your equipment"
-    },
+    "tripsWindow": "Trips {days} d",
+    "tasksDoneWindow": "Tasks done {days} d",
+    "incidentsOpen": "Open incidents",
     "delta": {
-      "boatsInAlert": "{count} in alert",
-      "boatsOk": "Fleet up to date",
-      "boatsWithEngine": "{count} motorised",
-      "boatsAllMotorless": "No engines",
-      "boatsWithSail": "{count} with sails",
-      "boatsAllSailless": "No sails",
-      "boatsWithRig": "{count} rigged",
-      "noRig": "No rigs"
+      "atSeaAndAlert": "{atSea} at sea · {alert} in alert",
+      "distance": "{nm} nm sailed",
+      "noTrips": "No trip over the period",
+      "tasksOverdue": "{count, plural, one {# overdue} other {# overdue}}",
+      "tasksUpToDate": "Nothing overdue",
+      "incidentsInProgress": "{count, plural, one {# in progress} other {# in progress}}",
+      "incidentsAllOpen": "None being handled yet",
+      "noIncidents": "No open incident"
     }
   },
   "yourBoats": {
@@ -123,5 +118,26 @@
       "invoice": "Invoice {number} · {total}",
       "invoiceDue": "Due on {date}"
     }
+  },
+  "atSea": {
+    "title": "At sea now",
+    "status": "{atSea} at sea · {inPort} in port · {engines, plural, one {# engine in maintenance} other {# engines in maintenance}}",
+    "pill": "At sea",
+    "departedFrom": "Departed from {port}",
+    "departed": "Trip in progress",
+    "crew": "{count, plural, one {# crew member} other {# crew members}}",
+    "open": "Open the navigation of {boat}",
+    "empty": "No trip in progress.",
+    "emptyCta": "Log a trip",
+    "viewAll": "Logbook",
+    "viewMore": "{count, plural, one {View the other trip} other {View the # other trips}}"
+  },
+  "upcoming": {
+    "title": "Upcoming departures and returns",
+    "period": "Next {days} days",
+    "departure": "Departure at {time}",
+    "return": "Return at {time}",
+    "empty": "No departure or return scheduled.",
+    "viewAll": "Reservations"
   }
 }

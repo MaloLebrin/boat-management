@@ -1,6 +1,8 @@
 import AiAnalysisService from '#services/ai_analysis_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import BoatReservationService from '#services/boat_reservation_service'
 import DashboardAttentionService from '#services/dashboard_attention_service'
+import DashboardFleetActivityService from '#services/dashboard_fleet_activity_service'
 import DashboardService from '#services/dashboard_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
@@ -21,7 +23,9 @@ export default class HomeController {
     private planningService: PlanningService,
     private quotaService: QuotaService,
     private taskService: BoatMaintenanceTaskService,
-    private attentionService: DashboardAttentionService
+    private attentionService: DashboardAttentionService,
+    private fleetService: DashboardFleetActivityService,
+    private reservationService: BoatReservationService
   ) {}
 
   async index({ inertia, auth, request, response, i18n }: HttpContext) {
@@ -89,6 +93,22 @@ export default class HomeController {
       { canViewInvoices }
     )
 
+    // Ce qui se passe dans la flotte : sorties en cours, état de flotte, KPI
+    // glissants ; départs et retours si le module Location est actif (#832).
+    const activeTrips = await this.fleetService.getActiveTrips(user)
+    const [fleetStatus, pulse] = await Promise.all([
+      this.fleetService.getFleetStatus(data.boatIds, activeTrips.total),
+      this.fleetService.getPulse(user, data.boatIds),
+    ])
+    const canViewReservations =
+      user.organizationId && user.organization
+        ? (await this.quotaService.canManageReservations(user.organization)) &&
+          (await user.hasPermission(user.organizationId, 'boats.view'))
+        : false
+    const upcomingReservations = canViewReservations
+      ? await this.reservationService.listUpcomingForOrg(user)
+      : undefined
+
     // Quota bateaux pour l'upsell du bouton « Nouveau bateau » (issue #418).
     const boatQuota = user.organization
       ? await this.quotaService.getBoatUsage(user.organization)
@@ -101,6 +121,12 @@ export default class HomeController {
       ports: data.ports,
       portStats: data.portStats,
       attention,
+      pulse,
+      activeTrips,
+      fleetStatus,
+      // Omis (et non `null`) hors module Location : le front distingue « pas
+      // de module » d'une liste vide.
+      ...(upcomingReservations ? { upcomingReservations } : {}),
       aiFleetAnalysis,
       portOptions,
       canCreateNavigationLogs,
