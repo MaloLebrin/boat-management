@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useMounted } from '@vueuse/core'
 import { onBeforeUnmount, onMounted, useId, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 
@@ -33,6 +34,14 @@ const emit = defineEmits<{
 // l'identifiant qui porte le nom accessible du dialogue.
 const titleId = useId()
 
+// Le SSR d'Inertia n'injecte que le HTML de `#app` : ce qu'un `<Teleport
+// to="body">` rend côté serveur est perdu, et à l'hydratation Vue cherchait
+// la modale directement dans `<body>` → « Hydration node mismatch » sur chaque
+// page portant une modale (#835). Le Teleport reste désactivé (contenu rendu
+// en place, identique serveur/client) jusqu'au montage, puis déplace la modale
+// dans `<body>`.
+const isMounted = useMounted()
+
 function close() {
   if (!props.dismissible) return
   emit('update:open', false)
@@ -65,7 +74,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport to="body" :disabled="!isMounted">
     <Transition name="modal-overlay">
       <div
         v-if="open"

@@ -7,6 +7,8 @@ Référence: `inertia/app.ts`.
 - résout les pages via `./pages/${name}.vue` et `import.meta.glob('./pages/**/*.vue')`
 - applique le layout par défaut `inertia/layouts/default.vue`
 - SSR activé (`config/inertia.ts` : `ssr.enabled: true`, entrypoint `inertia/ssr.ts`)
+- hydratation (#835) : `pickVueAppFactory(el)` (`inertia/utils/vue_app_factory.ts`) choisit `createSSRApp` quand le conteneur contient déjà le HTML serveur, `createApp` sinon — `createApp` seul remontait tout l'arbre au lieu de l'hydrater. Tout composant dont le rendu diffère entre serveur et client (`window`, dates locales, `Math.random`…) lève un « Hydration mismatch » en dev : le corriger (`onMounted`, `useMounted()`…), ne pas l'ignorer
+- `<Teleport to="body">` : le SSR d'Inertia n'injecte que `#app`, le contenu téléporté côté serveur est perdu — le désactiver jusqu'au montage (`:disabled="!isMounted"`, cf. `BaseModal`)
 
 ## Pages principales
 
