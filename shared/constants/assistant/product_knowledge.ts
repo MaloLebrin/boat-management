@@ -65,8 +65,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Personnaliser le tableau de bord : choisir et réordonner ses widgets',
     },
     body: {
-      en: 'The dashboard layout is personal to each user account. Open the Customize button in the dashboard header: a dialog lists every widget available to you, grouped into three zones (key figures at the top, the main column, the side column). Switch a widget off to hide it and use the up and down arrows to reorder it inside its column, then save. Reset restores the default layout. Widgets tied to a plan, a module or a role, such as ports, spend for admins or upcoming departures with the Charter module, only appear when you have access to them. A widget shipped later shows up at its default position even if you already customised. Hidden widgets are not computed at all, which makes the page lighter.',
-      fr: 'La disposition du tableau de bord est propre à chaque compte utilisateur. Ouvrez le bouton Personnaliser dans l’en-tête du tableau de bord : une fenêtre liste tous les widgets qui vous sont accessibles, regroupés en trois zones (indicateurs en haut, colonne principale, colonne latérale). Désactivez un widget pour le masquer, utilisez les flèches haut et bas pour le déplacer dans sa colonne, puis enregistrez. Réinitialiser rétablit la disposition par défaut. Les widgets liés à un plan, un module ou un rôle (ports, dépenses pour les admins, prochains départs avec le module Location) n’apparaissent que si vous y avez accès. Un widget livré plus tard apparaît à sa position par défaut même si vous aviez déjà personnalisé. Les widgets masqués ne sont pas calculés, la page est plus légère.',
+      en: 'The dashboard layout is personal to each user account. Press Customize in the dashboard header to enter edit mode, like the iOS home screen: every widget gets a frame, its content is no longer clickable, a minus badge removes it and the arrows move it up or down inside its column. Add a widget opens a gallery of the widgets you removed, grouped by zone, and puts one back in its column. Done saves everything in one go, Cancel (or Escape) drops your changes, Reset restores the default layout. Widgets tied to a plan, a module or a role, such as ports, spend for admins or upcoming departures with the Charter module, only appear when you have access to them. Hidden widgets are not computed at all, which keeps the page light.',
+      fr: 'La disposition du tableau de bord est propre à chaque compte utilisateur. Appuyez sur Personnaliser dans l’en-tête pour passer en mode édition, comme l’écran d’accueil d’iOS : chaque widget est encadré, son contenu n’est plus cliquable, un badge moins le retire et les flèches le montent ou le descendent dans sa colonne. Ajouter un widget ouvre une galerie des widgets retirés, groupés par zone, et en remet un dans sa colonne. Terminé enregistre tout en une fois, Annuler (ou Échap) abandonne vos changements, Réinitialiser rétablit la disposition par défaut. Les widgets liés à un plan, un module ou un rôle (ports, dépenses pour les admins, prochains départs avec le module Location) n’apparaissent que si vous y avez accès. Les widgets masqués ne sont pas calculés, la page reste légère.',
     },
     keywords: [
       'personnaliser',
@@ -85,6 +85,11 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'layout',
       'reinitialiser',
       'reset',
+      'ajouter',
+      'retirer',
+      'editer',
+      'edition',
+      'mode edition',
       'tableau de bord',
       'dashboard',
     ],

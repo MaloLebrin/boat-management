@@ -166,13 +166,19 @@
   "customize": {
     "button": "Personnaliser",
     "hiddenCount": "{count, plural, one {# masqué} other {# masqués}}",
-    "title": "Personnaliser le tableau de bord",
-    "subtitle": "Choisissez les widgets à afficher et leur ordre dans chaque colonne. La disposition est propre à votre compte.",
-    "hint": "Les widgets réservés à un plan, un module ou un rôle n’apparaissent que s’ils vous sont accessibles.",
-    "toggle": "Afficher le widget {widget}",
+    "editingHint": "Mode édition : les widgets ne sont pas cliquables. Retirez-les avec « − », déplacez-les avec les flèches, puis validez avec « Terminé ».",
+    "frameLabel": "Widget {widget} en édition",
+    "remove": "Retirer le widget {widget}",
     "moveUp": "Monter le widget {widget}",
     "moveDown": "Descendre le widget {widget}",
+    "addWidget": "Ajouter un widget",
+    "addTitle": "Ajouter un widget",
+    "addEmpty": "Tous les widgets disponibles sont déjà affichés.",
+    "add": "Ajouter",
     "reset": "Réinitialiser",
+    "done": "Terminé",
+    "saving": "Enregistrement…",
+    "placeholder": "Les données de ce widget se chargeront à l’enregistrement.",
     "zone": {
       "top": "Indicateurs",
       "main": "Colonne principale",
@@ -191,6 +197,19 @@
     "ports": "Ports",
     "planned_tasks": "Tâches planifiées",
     "notifications": "Notifications"
+  },
+  "widgetDescriptions": {
+    "kpis": "Bateaux, sorties et tâches sur 30 jours, incidents ouverts.",
+    "attention": "Maintenance urgente, incidents, documents à échéance et factures impayées.",
+    "at_sea": "Sorties en cours et état de la flotte.",
+    "upcoming_reservations": "Départs et retours des 7 prochains jours (module Location).",
+    "activity": "Les derniers événements de la flotte.",
+    "boats": "La liste de vos bateaux et leur équipement.",
+    "ai_panel": "Suggestions de l’assistant IA sur la flotte.",
+    "spend": "Dépenses de l’organisation depuis le 1er janvier, par poste.",
+    "ports": "Ports et taux d’occupation des places.",
+    "planned_tasks": "Tâches de maintenance prévues sur 30 jours.",
+    "notifications": "Vos dernières notifications non lues."
   },
   "plannedTasks": {
     "title": "Tâches planifiées",

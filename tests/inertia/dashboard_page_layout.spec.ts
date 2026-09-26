@@ -77,7 +77,10 @@ const stubs = {
   PortDashboardCard: { template: '<div data-testid="ports" />' },
   DashboardPlannedTasksCard: { template: '<div data-testid="planned-tasks" />' },
   DashboardNotificationsCard: { template: '<div data-testid="notifications" />' },
-  DashboardCustomizeModal: { template: '<div data-testid="customize-modal" />' },
+  DashboardAddWidgetModal: {
+    props: ['open', 'addable'],
+    template: '<div data-testid="add-modal" :data-open="String(open)" />',
+  },
 }
 
 function mountDashboard(currentPlan = 'enterprise', extraProps: Record<string, unknown> = {}) {
@@ -241,13 +244,15 @@ describe('Dashboard — structure de page (#828)', () => {
     )
   })
 
-  test('offers the customize button in the header and mounts the modal', () => {
+  test('offers the customize button in the header and no frame outside edit mode', () => {
     const wrapper = mountDashboard()
     expect(
       wrapper.get('[data-testid="header"]').find('[data-testid="dashboard-customize"]').exists()
     ).toBe(true)
     expect(wrapper.find('[data-testid="dashboard-hidden-count"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="customize-modal"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="dashboard-widget-frame"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dashboard-edit-toolbar"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="quick-add"]').exists()).toBe(true)
   })
 
   test('hands the whole attention payload to the card', () => {
@@ -263,5 +268,122 @@ describe('Dashboard — structure de page (#828)', () => {
     expect(wrapper.get('[data-testid="header"]').find('[data-testid="quick-add"]').exists()).toBe(
       true
     )
+  })
+})
+
+/**
+ * Mode édition en place (façon iOS) : chaque widget est encadré, son contenu
+ * devient inerte, la toolbar remplace « Personnaliser » et « + Créer ».
+ */
+describe('Dashboard — mode édition', () => {
+  async function enterEdit(extraProps: Record<string, unknown> = {}) {
+    const wrapper = mountDashboard('enterprise', extraProps)
+    await wrapper.get('[data-testid="dashboard-customize"]').trigger('click')
+    return wrapper
+  }
+
+  test('frames every visible widget with inert content and swaps the header actions', async () => {
+    const wrapper = await enterEdit()
+    const frames = wrapper.findAll('[data-testid="dashboard-widget-frame"]')
+    // 1 KPI + 4 principaux (sans réservations) + 5 latéraux
+    expect(frames.length).toBe(10)
+    for (const frame of frames) {
+      expect(
+        frame.get('[data-testid="dashboard-widget-content"]').attributes('inert')
+      ).toBeDefined()
+      expect(frame.find('[data-testid="dashboard-widget-remove"]').exists()).toBe(true)
+    }
+    const kpis = wrapper.get('[data-testid="dashboard-widget-frame"][data-widget="kpis"]')
+    expect(kpis.find('[data-testid="dashboard-widget-up"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dashboard-edit-toolbar"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="dashboard-customize"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="quick-add"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="dashboard-editing-hint"]').exists()).toBe(true)
+  })
+
+  test('removing and moving widgets applies immediately, Done saves once with PUT', async () => {
+    const wrapper = await enterEdit()
+    await wrapper
+      .get('[data-testid="dashboard-widget-frame"][data-widget="activity"]')
+      .get('[data-testid="dashboard-widget-remove"]')
+      .trigger('click')
+    expect(wrapper.find('[data-testid="activity"]').exists()).toBe(false)
+
+    await wrapper
+      .get('[data-testid="dashboard-widget-frame"][data-widget="boats"]')
+      .get('[data-testid="dashboard-widget-up"]')
+      .trigger('click')
+    const main = order(wrapper, ['attention', 'boats', 'at-sea'])
+    expect(main).toEqual([...main].sort((a, b) => a - b))
+
+    const { router } = await import('@inertiajs/vue3')
+    await wrapper.get('[data-testid="dashboard-edit-done"]').trigger('click')
+    expect(router.put).toHaveBeenCalledTimes(1)
+    const [path, payload, options] = vi.mocked(router.put).mock.calls[0] as unknown as [
+      string,
+      { order: { main: string[]; side: string[] }; hidden: string[] },
+      { preserveScroll: boolean },
+    ]
+    expect(path).toBe('/dashboard/layout')
+    // Le widget retiré (`activity`) garde sa place dans l'ordre stocké : seuls les visibles permutent.
+    expect(payload.order.main).toEqual(['attention', 'boats', 'activity', 'at_sea'])
+    expect(payload.hidden).toEqual(['activity'])
+    expect(options.preserveScroll).toBe(true)
+  })
+
+  test('Cancel and Escape drop the draft and leave edit mode without a request', async () => {
+    const { router } = await import('@inertiajs/vue3')
+    vi.mocked(router.put).mockClear()
+
+    const wrapper = await enterEdit()
+    await wrapper
+      .get('[data-testid="dashboard-widget-frame"][data-widget="ports"]')
+      .get('[data-testid="dashboard-widget-remove"]')
+      .trigger('click')
+    expect(wrapper.find('[data-testid="ports"]').exists()).toBe(false)
+    await wrapper.get('[data-testid="dashboard-edit-cancel"]').trigger('click')
+    expect(wrapper.find('[data-testid="ports"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="dashboard-widget-frame"]').exists()).toBe(false)
+
+    await wrapper.get('[data-testid="dashboard-customize"]').trigger('click')
+    expect(wrapper.find('[data-testid="dashboard-edit-toolbar"]').exists()).toBe(true)
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-testid="dashboard-edit-toolbar"]').exists()).toBe(false)
+    expect(router.put).not.toHaveBeenCalled()
+  })
+
+  test('Done without any change leaves edit mode without a request', async () => {
+    const { router } = await import('@inertiajs/vue3')
+    vi.mocked(router.put).mockClear()
+    const wrapper = await enterEdit()
+    await wrapper.get('[data-testid="dashboard-edit-done"]').trigger('click')
+    expect(wrapper.find('[data-testid="dashboard-edit-toolbar"]').exists()).toBe(false)
+    expect(router.put).not.toHaveBeenCalled()
+  })
+
+  test('the add button opens the gallery with the removed widgets', async () => {
+    const wrapper = await enterEdit({
+      layout: defaultLayout({ hidden: ['spend'], isCustomized: true }),
+    })
+    expect(wrapper.get('[data-testid="add-modal"]').attributes('data-open')).toBe('false')
+    await wrapper.get('[data-testid="dashboard-edit-add"]').trigger('click')
+    expect(wrapper.get('[data-testid="add-modal"]').attributes('data-open')).toBe('true')
+    const addable = wrapper.getComponent('[data-testid="add-modal"]').props('addable') as {
+      side: string[]
+    }
+    expect(addable.side).toEqual(['spend'])
+  })
+
+  test('a re-added widget whose data is missing shows a placeholder until saved', async () => {
+    const wrapper = await enterEdit({
+      layout: defaultLayout({ hidden: ['activity'], isCustomized: true }),
+      activity: undefined,
+    })
+    expect(wrapper.find('[data-testid="activity"]').exists()).toBe(false)
+    wrapper.getComponent('[data-testid="add-modal"]').vm.$emit('add', 'activity')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-testid="dashboard-widget-placeholder"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="activity"]').exists()).toBe(false)
   })
 })

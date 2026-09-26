@@ -63,7 +63,7 @@ const stubs = {
   DashboardUpcomingReservationsCard: { template: '<div />' },
   DashboardPlannedTasksCard: { template: '<div />' },
   DashboardNotificationsCard: { template: '<div />' },
-  DashboardCustomizeModal: { template: '<div />' },
+  DashboardAddWidgetModal: { template: '<div />' },
   DashboardHeader: { template: '<div><slot name="actions" /></div>' },
   DashboardQuickAddActions: { template: '<div />' },
   DashboardStatsGrid: { template: '<div />' },

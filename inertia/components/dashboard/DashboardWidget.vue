@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import DashboardActivityCard from '~/components/dashboard/DashboardActivityCard.vue'
 import DashboardAiPanel from '~/components/dashboard/DashboardAiPanel.vue'
 import DashboardAtSeaCard from '~/components/dashboard/DashboardAtSeaCard.vue'
@@ -8,6 +9,7 @@ import DashboardNotificationsCard from '~/components/dashboard/DashboardNotifica
 import DashboardPlannedTasksCard from '~/components/dashboard/DashboardPlannedTasksCard.vue'
 import DashboardSpendCard from '~/components/dashboard/DashboardSpendCard.vue'
 import DashboardUpcomingReservationsCard from '~/components/dashboard/DashboardUpcomingReservationsCard.vue'
+import DashboardWidgetPlaceholder from '~/components/dashboard/DashboardWidgetPlaceholder.vue'
 import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
 import type { DashboardWidgetId } from '#shared/constants/dashboard_widgets'
 import type { DashboardWidgetData } from '~/types/dashboard_widgets'
@@ -17,14 +19,38 @@ import type { DashboardWidgetData } from '~/types/dashboard_widgets'
  * chaque carte garde ses props typées, et un id sans branche est une erreur
  * visible à la relecture. Les KPI (zone `top`) sont rendus par la page.
  */
-defineProps<{
+const props = defineProps<{
   id: DashboardWidgetId
   data: DashboardWidgetData
+  /** Mode édition : un widget réajouté dont la donnée est absente montre un tenant-lieu. */
+  editing?: boolean
 }>()
+
+// Les props gardées ou différées d'un widget masqué sont **omises** par le
+// serveur ; réajouté pendant l'édition, il n'a rien à montrer avant
+// l'enregistrement (rechargement complet). Les cartes à squelette (`activity`,
+// `spend`, `plannedTasks`) sauraient afficher `undefined`, mais un squelette
+// qui ne se résout jamais tromperait l'utilisateur : tenant-lieu explicite.
+const awaitingData = computed(() => {
+  if (!props.editing) return false
+  switch (props.id) {
+    case 'upcoming_reservations':
+      return props.data.upcomingReservations === undefined
+    case 'activity':
+      return props.data.activity === undefined
+    case 'spend':
+      return props.data.spend === undefined
+    case 'planned_tasks':
+      return props.data.plannedTasks === undefined
+    default:
+      return false
+  }
+})
 </script>
 
 <template>
-  <DashboardAttentionCard v-if="id === 'attention'" :attention="data.attention" />
+  <DashboardWidgetPlaceholder v-if="awaitingData" :id="id" />
+  <DashboardAttentionCard v-else-if="id === 'attention'" :attention="data.attention" />
   <DashboardAtSeaCard
     v-else-if="id === 'at_sea'"
     :active-trips="data.activeTrips"

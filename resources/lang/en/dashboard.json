@@ -166,13 +166,19 @@
   "customize": {
     "button": "Customize",
     "hiddenCount": "{count, plural, one {# hidden} other {# hidden}}",
-    "title": "Customize the dashboard",
-    "subtitle": "Choose which widgets to show and their order in each column. The layout is specific to your account.",
-    "hint": "Widgets tied to a plan, a module or a role only appear when you have access to them.",
-    "toggle": "Show the {widget} widget",
+    "editingHint": "Edit mode: widgets are not clickable. Remove them with “−”, move them with the arrows, then confirm with “Done”.",
+    "frameLabel": "{widget} widget, editing",
+    "remove": "Remove the {widget} widget",
     "moveUp": "Move the {widget} widget up",
     "moveDown": "Move the {widget} widget down",
+    "addWidget": "Add a widget",
+    "addTitle": "Add a widget",
+    "addEmpty": "Every available widget is already shown.",
+    "add": "Add",
     "reset": "Reset to default",
+    "done": "Done",
+    "saving": "Saving…",
+    "placeholder": "This widget’s data will load once you save.",
     "zone": {
       "top": "Indicators",
       "main": "Main column",
@@ -191,6 +197,19 @@
     "ports": "Ports",
     "planned_tasks": "Planned tasks",
     "notifications": "Notifications"
+  },
+  "widgetDescriptions": {
+    "kpis": "Boats, trips and tasks over 30 days, open incidents.",
+    "attention": "Urgent maintenance, incidents, expiring documents and unpaid invoices.",
+    "at_sea": "Trips in progress and fleet status.",
+    "upcoming_reservations": "Departures and returns over the next 7 days (Charter module).",
+    "activity": "The latest fleet events.",
+    "boats": "Your boats and their equipment.",
+    "ai_panel": "AI assistant suggestions about the fleet.",
+    "spend": "Organisation spend since 1 January, by category.",
+    "ports": "Ports and berth occupancy.",
+    "planned_tasks": "Maintenance tasks planned over 30 days.",
+    "notifications": "Your latest unread notifications."
   },
   "plannedTasks": {
     "title": "Planned tasks",

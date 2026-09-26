@@ -624,6 +624,7 @@ body {
   .text-gradient-animated,
   .glow-border::after,
   .task-scroll,
+  .dashboard-editing,
   .stagger.visible > * {
     animation: none !important;
   }
@@ -636,6 +637,21 @@ body {
 }
 
 /* ── App-wide motion primitives ───────────────────────────────── */
+/* Mode édition du tableau de bord : oscillation discrète des widgets (façon
+   iOS), coupée sous reduced-motion ci-dessous. */
+@keyframes dashboardWiggle {
+  from {
+    transform: rotate(-0.35deg);
+  }
+  to {
+    transform: rotate(0.35deg);
+  }
+}
+.dashboard-editing {
+  transform-origin: center;
+  animation: dashboardWiggle 0.9s ease-in-out infinite alternate;
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;
