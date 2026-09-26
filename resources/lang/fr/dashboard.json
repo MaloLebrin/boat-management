@@ -1,6 +1,6 @@
 {
   "title": "Tableau de bord",
-  "subtitle": "Vue d'ensemble de votre flotte et de la maintenance à venir.",
+  "greeting": "Voici l'état de votre flotte au {date}",
   "newBoat": "Nouveau bateau",
   "quickAdd": {
     "menuLabel": "Créer",
@@ -13,7 +13,6 @@
     "selectBoat": "Bateau",
     "selectBoatPlaceholder": "— Choisir un bateau —"
   },
-  "overdueAlert": "{count, plural, one {# tâche en retard} other {# tâches en retard}}",
   "viewPlanning": "Voir le planning",
   "analyzeFleet": "Analyser la flotte",
   "aiPanel": {
@@ -21,40 +20,24 @@
     "suggestions": "Suggestions",
     "empty": "Cliquez sur 'Analyser la flotte' pour des suggestions personnalisées.",
     "analyzing": "Analyse en cours...",
-    "noSuggestions": "Aucune suggestion pour le moment."
+    "noSuggestions": "Aucune suggestion pour le moment.",
+    "lastAnalysedAt": "Dernière analyse le {date}"
   },
   "stats": {
     "boats": "Bateaux",
-    "engines": "Moteurs",
-    "sails": "Voiles",
-    "rigs": "Gréements",
-    "equipmentEmpty": {
-      "title": "Équipements",
-      "description": "Aucun moteur, voile ou gréement saisi pour votre flotte pour l'instant.",
-      "cta": "Saisir vos équipements"
-    },
+    "tripsWindow": "Sorties {days} j",
+    "tasksDoneWindow": "Tâches réalisées {days} j",
+    "incidentsOpen": "Incidents ouverts",
     "delta": {
-      "boatsInAlert": "dont {count} en alerte",
-      "boatsOk": "Flotte à jour",
-      "boatsWithEngine": "{count, plural, one {# motorisé} other {# motorisés}}",
-      "boatsAllMotorless": "Aucun moteur",
-      "boatsWithSail": "{count} à voile",
-      "boatsAllSailless": "Aucune voile",
-      "boatsWithRig": "{count, plural, one {# équipé} other {# équipés}}",
-      "noRig": "Aucun gréement"
+      "atSeaAndAlert": "{atSea} en mer · {alert} en alerte",
+      "distance": "{nm} nm parcourus",
+      "noTrips": "Aucune sortie sur la période",
+      "tasksOverdue": "{count, plural, one {# en retard} other {# en retard}}",
+      "tasksUpToDate": "Aucun retard",
+      "incidentsInProgress": "{count, plural, one {# en cours} other {# en cours}}",
+      "incidentsAllOpen": "Aucun pris en charge",
+      "noIncidents": "Aucun incident ouvert"
     }
-  },
-  "urgentMaintenance": {
-    "title": "Maintenance urgente",
-    "period": "14 prochains jours",
-    "empty": "Aucune maintenance urgente à venir.",
-    "overdue": "En retard",
-    "dueSoon": "Bientôt dû",
-    "hours": "Heures",
-    "dueAt": "Dû le {date}",
-    "dueAtHours": "Dû à {hours}h · actuel {current}h",
-    "viewMore": "Voir {count, plural, one {l'autre tâche} other {les # autres}} dans le planning",
-    "openTask": "Ouvrir la tâche {title} sur {boat}"
   },
   "yourBoats": {
     "title": "Vos bateaux",
@@ -99,5 +82,85 @@
     "openTask": "Ouvrir l'intervention {title} sur {boat}",
     "dueAt": "Dû le {date}",
     "dueAtHours": "Dû à {hours}h · actuel {current}h"
+  },
+  "attention": {
+    "title": "À traiter",
+    "empty": "Rien à traiter aujourd'hui.",
+    "more": "{count, plural, one {# autre élément compté ci-dessus} other {# autres éléments comptés ci-dessus}}",
+    "open": "Ouvrir {title} ({boat})",
+    "type": {
+      "maintenance": "Maintenance",
+      "incident": "Incident",
+      "document": "Document",
+      "invoice": "Facture"
+    },
+    "chips": {
+      "maintenance": "{count, plural, one {# tâche} other {# tâches}}",
+      "incidents": "{count, plural, one {# incident} other {# incidents}}",
+      "documents": "{count, plural, one {# document} other {# documents}}",
+      "invoices": "{count, plural, one {# facture impayée} other {# factures impayées}}"
+    },
+    "kind": {
+      "overdue": "En retard",
+      "dueSoon": "Bientôt dû",
+      "hours": "Heures",
+      "incidentOpen": "Ouvert",
+      "incidentInProgress": "En cours",
+      "documentExpired": "Expiré",
+      "documentExpiring": "Expire bientôt",
+      "invoiceOverdue": "Impayée"
+    },
+    "detail": {
+      "dueAt": "Dû le {date}",
+      "dueAtHours": "Dû à {hours}h · actuel {current}h",
+      "reportedOn": "Déclaré le {date}",
+      "expiresAt": "Expire le {date}",
+      "expiredOn": "Expiré le {date}",
+      "invoice": "Facture {number} · {total}",
+      "invoiceDue": "Échéance le {date}"
+    }
+  },
+  "atSea": {
+    "title": "En mer maintenant",
+    "status": "{atSea} en mer · {inPort} au port · {engines, plural, one {# moteur en maintenance} other {# moteurs en maintenance}}",
+    "pill": "En mer",
+    "departedFrom": "Parti de {port}",
+    "departed": "Sortie en cours",
+    "crew": "{count, plural, one {# équipier} other {# équipiers}}",
+    "open": "Ouvrir la navigation de {boat}",
+    "empty": "Aucune sortie en cours.",
+    "emptyCta": "Enregistrer une sortie",
+    "viewAll": "Journal de bord",
+    "viewMore": "{count, plural, one {Voir l'autre sortie} other {Voir les # autres sorties}}"
+  },
+  "upcoming": {
+    "title": "Prochains départs et retours",
+    "period": "{days} prochains jours",
+    "departure": "Départ à {time}",
+    "return": "Retour à {time}",
+    "empty": "Aucun départ ni retour prévu.",
+    "viewAll": "Réservations"
+  },
+  "activity": {
+    "title": "Activité récente",
+    "empty": "Aucune activité récente.",
+    "distance": "{nm} nm",
+    "kind": {
+      "tripCompleted": "Sortie terminée · {from} → {to}",
+      "taskDone": "Tâche réalisée · {title} ({subject})",
+      "incidentReported": "Incident déclaré · {type}",
+      "fuelLogged": "Plein · {liters} L · {cost}",
+      "documentAdded": "Document ajouté · {type}"
+    }
+  },
+  "spend": {
+    "title": "Dépenses {year}",
+    "ytd": "Depuis le 1er janvier",
+    "vsSamePeriod": "vs même période {year}",
+    "increase": "+{pct} %",
+    "decrease": "-{pct} %",
+    "noComparison": "Pas de comparaison N-1",
+    "empty": "Aucune dépense enregistrée cette année.",
+    "viewBoatBudget": "Voir le budget du bateau"
   }
 }

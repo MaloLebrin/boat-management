@@ -1,110 +1,67 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
-import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { DateTime } from 'luxon'
 import { BoatMaintenanceTaskFactory } from '#database/factories/boat_maintenance_task_factory'
-import { BoatRigFactory } from '#database/factories/boat_rig_factory'
-import { BoatSailFactory } from '#database/factories/boat_sail_factory'
+import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
 import { createAdminUser, createBoatForUser } from '#tests/browser/helpers'
 
-test.group('E2E · Dashboard stat card links', (group) => {
+test.group('E2E · Dashboard card links', (group) => {
   group.each.setup(() => truncateDb())
 
-  test('the Moteurs card leads to the engine-filtered fleet list', async ({
+  test('the KPI cards lead to the fleet, the logbook, the planning and the incidents (#832)', async ({
     browserContext,
     visit,
     assert,
   }) => {
     const user = await createAdminUser()
-    // One boat with an engine, one purely sailed (no engine) so the filter is
-    // observable end-to-end, not just a matching URL.
-    const motorBoat = await createBoatForUser(user, { name: 'Motor Yacht' })
-    await BoatEngineFactory.merge({ boatId: motorBoat.id }).create()
-    const sailBoat = await createBoatForUser(user, { name: 'Pure Sailer' })
-    await BoatSailFactory.merge({ boatId: sailBoat.id }).create()
+    const boat = await createBoatForUser(user, { name: 'Pulse Boat' })
+    await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+      status: 'completed',
+      arrivedAt: DateTime.now().minus({ days: 1 }),
+      distanceNm: '18',
+    }).create()
 
     await browserContext.loginAs(user)
 
     const page = await visit('/dashboard')
     await page.waitForLoadState('networkidle')
 
-    // Click the actual card link rather than navigating by URL.
-    await page.locator('a[href="/boats?hasEngine=true"]').click()
-
-    await page.waitForURL(/\/boats\?hasEngine=true/)
-    await page.waitForLoadState('networkidle')
-    const content = await page.content()
-    assert.include(content, 'Motor Yacht')
-    assert.notInclude(content, 'Pure Sailer')
-  })
-
-  test('each equipment card points to its own filtered destination', async ({
-    browserContext,
-    visit,
-  }) => {
-    const user = await createAdminUser()
-    // The per-equipment cards only render once the fleet has equipment: an
-    // empty fleet shows the combined empty-state card instead (#419).
-    const boat = await createBoatForUser(user, { name: 'Fully Equipped' })
-    await BoatEngineFactory.merge({ boatId: boat.id }).create()
-    await BoatSailFactory.merge({ boatId: boat.id }).create()
-    await BoatRigFactory.merge({ boatId: boat.id }).create()
-
-    await browserContext.loginAs(user)
-
-    const page = await visit('/dashboard')
-    await page.waitForLoadState('networkidle')
-
-    // The four equipment cards must resolve to distinct, content-matching URLs
-    // (regression guard for #354, where all of them pointed to /boats).
-    await page.assertExists('a[href="/boats"]')
-    await page.assertExists('a[href="/boats?hasEngine=true"]')
-    await page.assertExists('a[href="/boats?hasSails=true"]')
-    await page.assertExists('a[href="/boats?hasRig=true"]')
-  })
-
-  test('a fleet without equipment shows the combined empty-state card (#419)', async ({
-    browserContext,
-    visit,
-  }) => {
-    const user = await createAdminUser()
-    await createBoatForUser(user, { name: 'Bare Hull' })
-    await browserContext.loginAs(user)
-
-    const page = await visit('/dashboard')
-    await page.waitForLoadState('networkidle')
-
-    // The three grey per-equipment cards are replaced by one combined card…
-    await page.assertExists('[data-testid="equipment-empty-card"]')
+    await page.assertExists('[data-testid="dashboard-kpi-boats"][href="/boats"]')
+    await page.assertExists('[data-testid="dashboard-kpi-tasks"][href="/planning"]')
+    await page.assertExists('[data-testid="dashboard-kpi-incidents"][href="/navigation/incidents"]')
+    // Plus de cartes équipement ni de carte « équipement vide » (#419 remplacée)
     await page.assertNotExists('a[href="/boats?hasEngine=true"]')
-    await page.assertNotExists('a[href="/boats?hasSails=true"]')
-    await page.assertNotExists('a[href="/boats?hasRig=true"]')
+    await page.assertNotExists('[data-testid="equipment-empty-card"]')
 
-    // …whose CTA leads to the fleet list.
-    await page.locator('[data-testid="equipment-empty-card"] a[href="/boats"]').click()
-    await page.waitForURL(/\/boats$/)
+    const trips = page.locator('[data-testid="dashboard-kpi-trips"]')
+    assert.include(await trips.textContent(), '1')
+    await trips.click()
+    await page.waitForURL(/\/navigation\/logbook$/)
   })
 
-  test('the urgent list shows five rows, links to the rest and opens the planning on a task (#828)', async ({
+  test('the attention list is capped, counts every task and opens the planning on a row (#832)', async ({
     browserContext,
     visit,
     assert,
   }) => {
     const user = await createAdminUser()
     const boat = await createBoatForUser(user, { name: 'Busy Boat' })
-    // 6 tâches en retard : 5 affichées, la 6ᵉ derrière « Voir les autres »
-    await BoatMaintenanceTaskFactory.merge({ boatId: boat.id }).apply('overdue').createMany(6)
+    // 8 tâches en retard : 6 affichées (ATTENTION_DISPLAY_CAP), toutes comptées
+    await BoatMaintenanceTaskFactory.merge({ boatId: boat.id }).apply('overdue').createMany(8)
 
     await browserContext.loginAs(user)
 
     const page = await visit('/dashboard')
     await page.waitForLoadState('networkidle')
 
-    const rows = page.locator('[data-testid="dashboard-urgent-row"]')
-    assert.equal(await rows.count(), 5, 'la liste urgente doit être plafonnée à 5 lignes')
-    await page.assertExists('[data-testid="dashboard-overdue-badge"]')
-    await page.assertExists('[data-testid="dashboard-urgent-view-more"][href="/planning"]')
-    // Plus d'alerte de page ni de KPI « Maintenance urgente » : le compteur vit dans la carte
-    await page.assertNotExists('a[href="/planning"].block')
+    const rows = page.locator('[data-testid="dashboard-attention-row"]')
+    assert.equal(await rows.count(), 6, 'la liste « À traiter » doit être plafonnée à 6 lignes')
+    const chip = page.locator('[data-testid="dashboard-attention-chip-maintenance"]')
+    await chip.waitFor({ state: 'visible', timeout: 5000 })
+    assert.include(await chip.textContent(), '8')
+    await page.assertExists('[data-testid="dashboard-attention-more"]')
 
     await rows.first().click()
     await page.waitForURL(/\/planning\?task=\d+/)

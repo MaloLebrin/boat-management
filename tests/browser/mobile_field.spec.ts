@@ -57,6 +57,11 @@ async function seedFieldData() {
   const user = await createAdminUser()
   const boat = await createBoatForUser(user, { name: 'Mobile Field Boat' })
   await createMaintenanceEventForBoat(boat)
+  // Sortie en cours : alimente « En mer maintenant » sur /dashboard (#832)
+  await NavigationLogFactory.merge({
+    boatId: boat.id,
+    organizationId: user.organizationId!,
+  }).create()
   await NavigationLogFactory.merge({
     boatId: boat.id,
     organizationId: user.organizationId!,

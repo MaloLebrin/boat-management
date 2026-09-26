@@ -3,6 +3,7 @@ import type { Assert } from '@japa/assert'
 import type { Browser, BrowserContext } from 'playwright'
 import { truncateDb } from '#tests/utils/db'
 import { BoatMaintenanceTaskFactory } from '#database/factories/boat_maintenance_task_factory'
+import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
 import { createAdminUser, createBoatForUser } from '#tests/browser/helpers'
 
 /**
@@ -251,13 +252,17 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
    * lien pleine largeur et les « Voir tout / Voir le planning » portent
    * `min-h-11` : mesurés ici sous le doigt, pas seulement en classes CSS.
    */
-  test('les lignes urgentes et les liens « voir tout » du dashboard font 44 px (#828)', async ({
+  test('les lignes « À traiter » et les liens « voir tout » du dashboard font 44 px (#828)', async ({
     browser,
     assert,
   }) => {
     const user = await createAdminUser()
     const boat = await createBoatForUser(user, { name: 'Touch Dashboard Boat' })
     await BoatMaintenanceTaskFactory.merge({ boatId: boat.id }).apply('overdue').createMany(2)
+    await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: user.organizationId!,
+    }).create()
 
     const context = await newTouchContext(browser)
     try {
@@ -268,11 +273,12 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
       // Scopé à la colonne principale : `a[href="/planning"]` seul attraperait
       // aussi l'entrée « Planning » de la sidebar, masquée (0 px) en mobile.
       const selector = [
-        '[data-testid="dashboard-urgent-row"]',
+        '[data-testid="dashboard-attention-row"]',
+        '[data-testid="dashboard-active-trip-row"]',
         '[data-testid="dashboard-view-all"]',
         '[data-testid="dashboard-main-column"] a[href="/planning"]',
       ].join(', ')
-      await page.locator('[data-testid="dashboard-urgent-row"]').first().waitFor({
+      await page.locator('[data-testid="dashboard-attention-row"]').first().waitFor({
         state: 'visible',
         timeout: 5000,
       })
@@ -285,7 +291,9 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
       assert.isAtLeast(count, 3, 'lignes urgentes ou liens du dashboard introuvables')
 
       for (let i = 0; i < count; i++) {
-        await locator.nth(i).scrollIntoViewIfNeeded()
+        // Centrée dans le viewport : un bord collé au header ou à la bottom nav
+        // serait « recouvert » par eux et non par un défaut de la cible.
+        await locator.nth(i).evaluate((el) => el.scrollIntoView({ block: 'center' }))
         const targets = (await page.evaluate(touchTargetsJs(selector))) as TouchTarget[]
         assertTouchTarget(assert, targets[i], 'dashboard')
       }

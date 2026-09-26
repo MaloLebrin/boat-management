@@ -20,6 +20,22 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 
 import { usePage } from '@inertiajs/vue3'
 import Dashboard from '../../inertia/pages/dashboard.vue'
+import type { DashboardAttention } from '../../shared/types/dashboard'
+
+const EMPTY_ATTENTION: DashboardAttention = {
+  items: [],
+  counts: {
+    maintenanceOverdue: 3,
+    maintenanceSoon: 4,
+    incidentsOpen: 0,
+    incidentsInProgress: 0,
+    documentsExpired: 0,
+    documentsExpiring: 0,
+    invoicesOverdue: 0,
+    total: 7,
+  },
+  canViewInvoices: false,
+}
 
 /**
  * #828 — la page n'est plus qu'une orchestration : chaque bloc est stubé, on
@@ -33,16 +49,20 @@ const stubs = {
   },
   DashboardQuickAddActions: { template: '<div data-testid="quick-add" />' },
   DashboardStatsGrid: { template: '<div data-testid="stats" />' },
-  DashboardUrgentMaintenanceCard: {
-    props: ['rows', 'overdueCount', 'total'],
-    template: '<div data-testid="urgent" :data-overdue="overdueCount" :data-total="total" />',
+  DashboardAttentionCard: {
+    props: ['attention'],
+    template: '<div data-testid="attention" :data-total="attention.counts.total" />',
   },
   DashboardBoatsCard: { template: '<div data-testid="boats" />' },
+  DashboardAtSeaCard: { template: '<div data-testid="at-sea" />' },
+  DashboardActivityCard: { template: '<div data-testid="activity" />' },
+  DashboardSpendCard: { template: '<div data-testid="spend" />' },
+  DashboardUpcomingReservationsCard: { template: '<div data-testid="upcoming" />' },
   DashboardAiPanel: { template: '<div data-testid="ai-panel" />' },
   PortDashboardCard: { template: '<div data-testid="ports" />' },
 }
 
-function mountDashboard(currentPlan = 'enterprise') {
+function mountDashboard(currentPlan = 'enterprise', extraProps: Record<string, unknown> = {}) {
   vi.mocked(usePage).mockReturnValue({
     props: { currentPlan, activeModules: [], activeAddons: [] },
   } as unknown as ReturnType<typeof usePage>)
@@ -50,20 +70,19 @@ function mountDashboard(currentPlan = 'enterprise') {
   return mount(Dashboard, {
     props: {
       boats: [],
-      urgentMaintenance: [],
+      attention: EMPTY_ATTENTION,
+      pulse: { windowDays: 30, tripsCompleted: 0, distanceNm: 0, tasksDone: 0 },
+      activeTrips: { items: [], total: 0 },
+      fleetStatus: { total: 0, atSea: 0, inPort: 0, enginesInMaintenance: 0 },
+      canViewSpend: true,
+      aiFleetAnalysisAt: null,
       stats: {
         boats: 0,
         engines: 0,
         sails: 0,
         rigs: 0,
         urgentMaintenance: 7,
-        deltas: {
-          boatsInAlert: 0,
-          boatsWithEngine: 0,
-          boatsWithSail: 0,
-          boatsWithRig: 0,
-          overdueCount: 3,
-        },
+        deltas: { boatsInAlert: 0, overdueCount: 3 },
       },
       aiFleetAnalysis: null,
       ports: [],
@@ -74,6 +93,7 @@ function mountDashboard(currentPlan = 'enterprise') {
       canCreateMaintenanceTasks: false,
       canAddBoat: true,
       boatQuota: { used: 0, limit: 2 },
+      ...extraProps,
     },
     global: { stubs },
   })
@@ -86,18 +106,48 @@ function order(wrapper: ReturnType<typeof mountDashboard>, ids: string[]) {
 
 describe('Dashboard — structure de page (#828)', () => {
   test('stacks header, KPIs, then the two-column grid in that order', () => {
-    const positions = order(mountDashboard(), ['header', 'stats', 'urgent'])
+    const positions = order(mountDashboard(), ['header', 'stats', 'attention'])
     expect(positions.every((p) => p >= 0)).toBe(true)
     expect(positions).toEqual([...positions].sort((a, b) => a - b))
   })
 
-  test('puts urgent maintenance before the boats in the main column', () => {
+  test('orders the main column: attention, today grid (at sea), boats', () => {
     const wrapper = mountDashboard()
     const main = wrapper.get('[data-testid="dashboard-main-column"]')
-    expect(main.find('[data-testid="urgent"]').exists()).toBe(true)
+    expect(main.find('[data-testid="attention"]').exists()).toBe(true)
+    expect(main.find('[data-testid="at-sea"]').exists()).toBe(true)
     expect(main.find('[data-testid="boats"]').exists()).toBe(true)
-    const [urgent, boats] = order(wrapper, ['urgent', 'boats'])
-    expect(urgent).toBeLessThan(boats)
+    const positions = order(wrapper, ['attention', 'at-sea', 'activity', 'boats'])
+    expect(positions.every((p) => p >= 0)).toBe(true)
+    expect(positions).toEqual([...positions].sort((a, b) => a - b))
+  })
+
+  test('the side column shows the spend card between the AI panel and the ports, admins only', () => {
+    const admin = mountDashboard()
+    const side = admin.get('[data-testid="dashboard-side-column"]')
+    expect(side.find('[data-testid="spend"]').exists()).toBe(true)
+    const [ai, spend, ports] = order(admin, ['ai-panel', 'spend', 'ports'])
+    expect(ai).toBeLessThan(spend)
+    expect(spend).toBeLessThan(ports)
+
+    const member = mountDashboard('enterprise', { canViewSpend: false })
+    expect(member.find('[data-testid="spend"]').exists()).toBe(false)
+  })
+
+  test('the today grid is single-column without the charter module and two-column with it', () => {
+    const without = mountDashboard()
+    expect(without.find('[data-testid="upcoming"]').exists()).toBe(false)
+    expect(without.get('[data-testid="dashboard-today-grid"]').classes()).not.toContain(
+      'md:grid-cols-2'
+    )
+
+    const withModule = mountDashboard('enterprise', { upcomingReservations: [] })
+    expect(withModule.find('[data-testid="upcoming"]').exists()).toBe(true)
+    expect(withModule.get('[data-testid="dashboard-today-grid"]').classes()).toContain(
+      'md:grid-cols-2'
+    )
+    const [atSea, upcoming] = order(withModule, ['at-sea', 'upcoming'])
+    expect(atSea).toBeLessThan(upcoming)
   })
 
   test('puts the AI panel then the ports card in the side column, after the main column', () => {
@@ -123,15 +173,15 @@ describe('Dashboard — structure de page (#828)', () => {
     expect(grid.className).toContain('xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]')
   })
 
-  test('feeds the urgent card the overdue count, not the urgent total', () => {
-    const urgent = mountDashboard().get('[data-testid="urgent"]')
-    expect(urgent.attributes('data-overdue')).toBe('3')
-    expect(urgent.attributes('data-total')).toBe('7')
+  test('hands the whole attention payload to the card', () => {
+    const attention = mountDashboard().get('[data-testid="attention"]')
+    expect(attention.attributes('data-total')).toBe('7')
   })
 
   test('renders no page-level alert and no ghost link to the fleet in the header', () => {
     const wrapper = mountDashboard()
     expect(wrapper.text()).not.toContain('dashboard.overdueAlert')
+    expect(wrapper.text()).not.toContain('dashboard.subtitle')
     expect(wrapper.text()).not.toContain('nav.boats')
     expect(wrapper.get('[data-testid="header"]').find('[data-testid="quick-add"]').exists()).toBe(
       true
