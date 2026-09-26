@@ -19,14 +19,22 @@ import { routes } from '~/utils/routes'
 
 const { t } = useT()
 
-const props = defineProps<{
-  boatOptions: { value: string; label: string }[]
-  /** Flotte mono-bateau (#823) : le bateau est retenu d'office, sans sélecteur. */
-  singleBoatId: string | null
-  /** Bateau sélectionné, au format `BaseSelect` (chaîne vide = aucun). */
-  boatId: string
-  type: CsvImportType
-}>()
+const props = withDefaults(
+  defineProps<{
+    boatOptions: { value: string; label: string }[]
+    /** Flotte mono-bateau (#823) : le bateau est retenu d'office, sans sélecteur. */
+    singleBoatId: string | null
+    /** Bateau sélectionné, au format `BaseSelect` (chaîne vide = aucun). */
+    boatId: string
+    type: CsvImportType
+    /**
+     * Types ouverts par le plan (dépenses dès Pro, historique en Entreprise).
+     * Tous par défaut : le parent restreint, le formulaire seul ne sait rien du plan.
+     */
+    types?: readonly CsvImportType[]
+  }>(),
+  { types: () => CSV_IMPORT_TYPES }
+)
 
 const emit = defineEmits<{
   (e: 'update:boatId', value: string): void
@@ -50,7 +58,7 @@ const fileInput = ref<HTMLInputElement | null>(null)
 const isSubmitting = ref(false)
 
 const typeOptions = computed(() =>
-  CSV_IMPORT_TYPES.map((type) => ({ value: type, label: t(`settings.import.types.${type}`) }))
+  props.types.map((type) => ({ value: type, label: t(`settings.import.types.${type}`) }))
 )
 
 /** En-têtes modèles du type courant — les alias FR sont détaillés dans l'aide. */
@@ -59,7 +67,7 @@ const templateHeaders = computed(() =>
 )
 
 function onTypeChange(value: string | number) {
-  if (typeof value === 'string' && (CSV_IMPORT_TYPES as readonly string[]).includes(value)) {
+  if (typeof value === 'string' && (props.types as readonly string[]).includes(value)) {
     emit('update:type', value as CsvImportType)
   }
 }

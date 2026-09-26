@@ -1,4 +1,5 @@
 import type { BudgetEntryCategory } from '#shared/types/budget'
+import type { BooleanQuotaKey } from '#shared/types/plan'
 
 /**
  * Types d'import acceptés par `/settings/import`. `maintenance` importe
@@ -8,6 +9,18 @@ import type { BudgetEntryCategory } from '#shared/types/budget'
  */
 export const CSV_IMPORT_TYPES = ['maintenance', 'expenses'] as const
 export type CsvImportType = (typeof CSV_IMPORT_TYPES)[number]
+
+/**
+ * Flag de `PlanQuotas` qui ouvre chaque type d'import. Les deux types ne
+ * suivent pas le même palier : l'historique d'entretien est une reprise de
+ * données réservée à Entreprise (#715), les dépenses se chargent dès Pro.
+ * `QuotaService` et l'écran `/settings/import` s'appuient sur cette table —
+ * un troisième type s'ajoute ici, pas dans un `if`.
+ */
+export const CSV_IMPORT_PLAN_FLAGS = {
+  maintenance: 'canImport',
+  expenses: 'canImportExpenses',
+} as const satisfies Record<CsvImportType, BooleanQuotaKey>
 
 export const MAINTENANCE_CSV_HEADERS = [
   'date',

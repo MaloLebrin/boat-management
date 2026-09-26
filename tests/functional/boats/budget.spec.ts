@@ -121,8 +121,8 @@ test.group('Budget (functional)', (group) => {
 
 /**
  * Raccourci « Importer des dépenses » de la page budget : même garde que
- * l'import lui-même (plan Entreprise + `import.run`), sinon le bouton mènerait
- * à un écran qui refuse.
+ * l'import de dépenses lui-même (`canImportExpenses`, dès le plan Pro, +
+ * `import.run`), sinon le bouton mènerait à un écran qui refuse.
  */
 test.group('Budget — raccourci vers l’import de dépenses (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -137,8 +137,20 @@ test.group('Budget — raccourci vers l’import de dépenses (functional)', (gr
     response.assertInertiaPropsContains({ canImport: true })
   })
 
-  test('canImport est faux pour un admin Pro', async ({ client }) => {
+  test('canImport est vrai pour un admin Pro : les dépenses s’importent dès ce plan', async ({
+    client,
+  }) => {
     const user = await createAdminUser('pro')
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client.get(`/boats/${boat.id}/budget`).loginAs(user).withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaPropsContains({ canImport: true })
+  })
+
+  test('canImport est faux pour un admin Starter', async ({ client }) => {
+    const user = await createAdminUser('starter')
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     const response = await client.get(`/boats/${boat.id}/budget`).loginAs(user).withInertia()

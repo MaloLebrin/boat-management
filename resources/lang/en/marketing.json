@@ -629,6 +629,7 @@
     "table_g5_r3": "Insurance expiry reminders",
     "table_g5_r4": "PDF / CSV export",
     "table_g5_r5": "CSV import (history migration)",
+    "table_g5_r6": "Expense import (CSV / Excel)",
     "table_g8": "Support & onboarding",
     "table_g8_r1": "Email support",
     "table_g8_r1_s": "48h",

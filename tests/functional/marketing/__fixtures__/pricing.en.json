@@ -307,7 +307,8 @@
               ["Document storage", "1 GB", "20 GB", "unlimited"],
               ["Insurance expiry reminders", false, true, true],
               ["PDF / CSV export", false, true, true],
-              ["CSV import (history migration)", false, false, true]
+              ["CSV import (history migration)", false, false, true],
+              ["Expense import (CSV / Excel)", false, true, true]
             ]
           },
           {

@@ -224,21 +224,62 @@ test.group('QuotaService (unit)', () => {
 
   // ── canImport / assertCanImport (#715) ───────────────────────────────────
 
-  test('canImport est faux en starter et en pro, vrai en enterprise', async ({ assert }) => {
+  // Deux paliers (`CSV_IMPORT_PLAN_FLAGS`) : l'historique d'entretien en
+  // Entreprise, les dépenses dès Pro. Sans type, `canImport` dit « au moins un ».
+  test('importableTypes suit le plan : rien en starter, dépenses en pro, tout en enterprise', async ({
+    assert,
+  }) => {
+    const svc = await app.container.make(QuotaService)
+
+    assert.deepEqual(
+      svc.importableTypes(await OrganizationFactory.merge({ plan: 'starter' }).make()),
+      []
+    )
+    assert.deepEqual(svc.importableTypes(await OrganizationFactory.merge({ plan: 'pro' }).make()), [
+      'expenses',
+    ])
+    assert.deepEqual(
+      svc.importableTypes(await OrganizationFactory.merge({ plan: 'enterprise' }).make()),
+      ['maintenance', 'expenses']
+    )
+  })
+
+  test('canImport sans type est faux en starter, vrai en pro et en enterprise', async ({
+    assert,
+  }) => {
     const svc = await app.container.make(QuotaService)
 
     assert.isFalse(svc.canImport(await OrganizationFactory.merge({ plan: 'starter' }).make()))
-    assert.isFalse(svc.canImport(await OrganizationFactory.merge({ plan: 'pro' }).make()))
+    assert.isTrue(svc.canImport(await OrganizationFactory.merge({ plan: 'pro' }).make()))
     assert.isTrue(svc.canImport(await OrganizationFactory.merge({ plan: 'enterprise' }).make()))
   })
 
-  test("assertCanImport throw en pro, avec l'upsell vers enterprise", async ({ assert }) => {
+  test('canImport par type : maintenance en enterprise seul, expenses dès pro', async ({
+    assert,
+  }) => {
+    const svc = await app.container.make(QuotaService)
+    const starter = await OrganizationFactory.merge({ plan: 'starter' }).make()
+    const pro = await OrganizationFactory.merge({ plan: 'pro' }).make()
+    const enterprise = await OrganizationFactory.merge({ plan: 'enterprise' }).make()
+
+    assert.isFalse(svc.canImport(starter, 'maintenance'))
+    assert.isFalse(svc.canImport(pro, 'maintenance'))
+    assert.isTrue(svc.canImport(enterprise, 'maintenance'))
+
+    assert.isFalse(svc.canImport(starter, 'expenses'))
+    assert.isTrue(svc.canImport(pro, 'expenses'))
+    assert.isTrue(svc.canImport(enterprise, 'expenses'))
+  })
+
+  test("assertCanImport('maintenance') throw en pro, avec l'upsell vers enterprise", async ({
+    assert,
+  }) => {
     const org = await OrganizationFactory.merge({ plan: 'pro' }).make()
 
     const svc = await app.container.make(QuotaService)
     let error: QuotaExceededError | undefined
     try {
-      svc.assertCanImport(org)
+      svc.assertCanImport(org, 'maintenance')
     } catch (e) {
       error = e as QuotaExceededError
     }
@@ -246,6 +287,27 @@ test.group('QuotaService (unit)', () => {
     assert.instanceOf(error, QuotaExceededError)
     assert.equal(error!.feature, 'import')
     assert.equal(error!.upgradeTo, 'enterprise')
+    assert.doesNotThrow(() => svc.assertCanImport(org, 'expenses'))
+    assert.doesNotThrow(() => svc.assertCanImport(org))
+  })
+
+  test("assertCanImport('expenses') throw en starter avec la feature dédiée, upsell vers pro", async ({
+    assert,
+  }) => {
+    const org = await OrganizationFactory.merge({ plan: 'starter' }).make()
+
+    const svc = await app.container.make(QuotaService)
+    let error: QuotaExceededError | undefined
+    try {
+      svc.assertCanImport(org, 'expenses')
+    } catch (e) {
+      error = e as QuotaExceededError
+    }
+
+    assert.instanceOf(error, QuotaExceededError)
+    assert.equal(error!.feature, 'import_expenses')
+    assert.equal(error!.upgradeTo, 'pro')
+    assert.throws(() => svc.assertCanImport(org), QuotaExceededError)
   })
 
   test('assertCanImport passe en enterprise', async ({ assert }) => {

@@ -7,7 +7,6 @@ import { prepareImportPreview, runImport } from '#services/csv_import_service'
 import { parseUploadedTable } from '#services/table_file_parser_service'
 import { csvPreviewValidator, csvConfirmValidator } from '#validators/csv_import'
 import {
-  CSV_IMPORT_TYPES,
   type CsvBoatOption,
   type CsvImportPreviewData,
   type CsvImportRows,
@@ -31,22 +30,29 @@ export default class CsvImportController {
   /**
    * L'écran `/settings/import` sert **deux** fonctions : les exports CSV
    * (`canExport`, ouvert dès le plan Pro et à tous les rôles) et l'import
-   * d'historique (Entreprise + admin). Il reste donc ouvert à qui n'a que les
-   * exports — c'est `canImport` qui décide de la section d'import, côté front
-   * comme sur les trois routes qui agissent. Personne n'y arrive les mains
-   * vides : sans l'un ni l'autre, on repart sur la facturation avec l'upsell.
+   * (admin, avec un palier par type : dépenses dès Pro, historique d'entretien
+   * en Entreprise — `CSV_IMPORT_PLAN_FLAGS`). Il reste donc ouvert à qui n'a
+   * que les exports — `importTypes` liste les types que le plan **et** le rôle
+   * autorisent, `canImport` (au moins un) décide de la section d'import, côté
+   * front comme sur les trois routes qui agissent. Personne n'y arrive les
+   * mains vides : sans import ni export, on repart sur la facturation avec
+   * l'upsell.
    *
    * `?type=expenses&boatId=N` présélectionne le formulaire — c'est le
    * raccourci « Importer des dépenses » de la page budget. Un type inconnu ou
-   * un bateau hors de la flotte de l'utilisateur sont simplement ignorés.
+   * non autorisé, ou un bateau hors de la flotte de l'utilisateur, sont
+   * simplement ignorés.
    */
   async show({ inertia, session, auth, bouncer, response, i18n, request }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
 
-    const canImport =
-      this.quotaService.canImport(user.organization) &&
-      (await bouncer.with(OrganizationPolicy).allows('runImport'))
+    const importTypes: CsvImportType[] = (await bouncer
+      .with(OrganizationPolicy)
+      .allows('runImport'))
+      ? this.quotaService.importableTypes(user.organization)
+      : []
+    const canImport = importTypes.length > 0
 
     if (!canImport && !this.quotaService.canExport(user.organization)) {
       session.flash('error', i18n.t('flash.quota.exportExceeded'))
@@ -65,13 +71,14 @@ export default class CsvImportController {
       ? (await PendingImportModel.query().where('userId', user.id).first()) !== null
       : false
 
-    const { initialType, initialBoatId } = this.readPreselection(request.qs(), boats)
+    const { initialType, initialBoatId } = this.readPreselection(request.qs(), boats, importTypes)
 
     return inertia.render('settings/import', {
       boats,
       preview: rawPreview ? (JSON.parse(rawPreview) as CsvImportPreviewData) : null,
       hasPendingImport,
       canImport,
+      importTypes,
       initialType,
       initialBoatId,
     })
@@ -79,10 +86,11 @@ export default class CsvImportController {
 
   private readPreselection(
     qs: Record<string, unknown>,
-    boats: CsvBoatOption[]
+    boats: CsvBoatOption[],
+    importTypes: CsvImportType[]
   ): { initialType: CsvImportType | null; initialBoatId: number | null } {
     const rawType = typeof qs.type === 'string' ? qs.type : null
-    const initialType = (CSV_IMPORT_TYPES as readonly string[]).includes(rawType ?? '')
+    const initialType = (importTypes as readonly string[]).includes(rawType ?? '')
       ? (rawType as CsvImportType)
       : null
 
@@ -93,14 +101,18 @@ export default class CsvImportController {
   }
 
   /**
-   * Garde des trois routes qui agissent (#715) : plan Entreprise **puis**
-   * capability `import.run` (admin seul). Avant, seul `middleware.auth()` les
-   * couvrait — un `mechanic`, et même un `boat_owner` qui n'a aucune
-   * capability, écrivaient en masse dans l'historique d'entretien de n'importe
-   * quel bateau de leur organisation.
+   * Garde des trois routes qui agissent (#715) : plan **puis** capability
+   * `import.run` (admin seul). Avant, seul `middleware.auth()` les couvrait —
+   * un `mechanic`, et même un `boat_owner` qui n'a aucune capability,
+   * écrivaient en masse dans l'historique d'entretien de n'importe quel bateau
+   * de leur organisation.
    *
-   * Le plan d'abord : sur une organisation qui n'a pas l'import du tout,
-   * l'upsell vers la facturation dit plus qu'un 403 de rôle.
+   * Le plan d'abord : sur une organisation qui n'a aucun import (Starter),
+   * l'upsell vers la facturation dit plus qu'un 403 de rôle. Le palier du
+   * **type** demandé (dépenses dès Pro, historique en Entreprise) se vérifie
+   * ensuite par `preview` et `confirm`, une fois le type connu — un admin Pro
+   * passe cette garde et se voit refuser un import de maintenance avec le
+   * flash dédié, pas un formulaire qui accepte pour rien.
    */
   private async authorizeImport({
     auth,
@@ -119,6 +131,7 @@ export default class CsvImportController {
     const user = await this.authorizeImport({ auth, bouncer })
 
     const payload = await request.validateUsing(csvPreviewValidator)
+    this.quotaService.assertCanImport(user.organization, payload.type)
 
     let boat
     try {
@@ -227,6 +240,11 @@ export default class CsvImportController {
       session.flash('error', i18n.t('flash.csv.previewExpired'))
       return response.redirect('/settings/import')
     }
+
+    // Le type en attente se re-vérifie pour son propre compte : une
+    // prévisualisation préparée avant un changement de plan ne doit pas
+    // écrire un historique que le plan courant refuse.
+    this.quotaService.assertCanImport(user.organization, pending.type)
 
     let boat
     try {

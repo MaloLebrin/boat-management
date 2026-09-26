@@ -15,6 +15,7 @@ defineProps<{
   preview: CsvImportPreviewData | null
   hasPendingImport: boolean
   canImport: boolean
+  importTypes: CsvImportType[]
   initialType: CsvImportType | null
   initialBoatId: number | null
 }>()
@@ -30,6 +31,7 @@ const { t } = useT()
       :preview="preview"
       :has-pending-import="hasPendingImport"
       :can-import="canImport"
+      :import-types="importTypes"
       :initial-type="initialType"
       :initial-boat-id="initialBoatId"
     />

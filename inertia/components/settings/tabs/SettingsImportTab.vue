@@ -8,7 +8,12 @@ import ImportPreviewPanel from '~/components/settings/import/ImportPreviewPanel.
 import ImportUploadForm from '~/components/settings/import/ImportUploadForm.vue'
 import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
-import type { CsvBoatOption, CsvImportPreviewData, CsvImportType } from '#shared/types/csv'
+import {
+  CSV_IMPORT_TYPES,
+  type CsvBoatOption,
+  type CsvImportPreviewData,
+  type CsvImportType,
+} from '#shared/types/csv'
 
 const { t } = useT()
 
@@ -18,11 +23,17 @@ const props = withDefaults(
     preview: CsvImportPreviewData | null
     hasPendingImport: boolean
     /**
-     * Plan Entreprise **et** capability `import.run` (admin seul) — #715. Faux,
-     * la page garde ses exports : ils s'arrêtent à `canExport`, ouvert dès le
-     * plan Pro et à tous les rôles.
+     * Au moins un type d'import autorisé par le plan **et** la capability
+     * `import.run` (admin seul) — #715. Faux, la page garde ses exports : ils
+     * s'arrêtent à `canExport`, ouvert dès le plan Pro et à tous les rôles.
      */
     canImport: boolean
+    /**
+     * Types d'import ouverts par le plan (`CSV_IMPORT_PLAN_FLAGS`) : les
+     * dépenses dès Pro, l'historique d'entretien en Entreprise. Seuls ceux-là
+     * sont proposés dans le sélecteur ; un type absent est signalé.
+     */
+    importTypes?: CsvImportType[]
     /**
      * Présélection par `?type=…&boatId=…` — le raccourci « Importer des
      * dépenses » de la page budget arrive ici. Déjà filtrés par le contrôleur.
@@ -30,7 +41,7 @@ const props = withDefaults(
     initialType?: CsvImportType | null
     initialBoatId?: number | null
   }>(),
-  { initialType: null, initialBoatId: null }
+  { importTypes: () => [...CSV_IMPORT_TYPES], initialType: null, initialBoatId: null }
 )
 
 /** Flotte mono-bateau (#823) : le bateau est retenu d'office, sans sélecteur. */
@@ -44,7 +55,16 @@ watch(singleBoatId, (boatId) => {
   if (boatId) selectedBoatId.value = boatId
 })
 
-const selectedType = ref<CsvImportType>(props.initialType ?? 'maintenance')
+const selectedType = ref<CsvImportType>(
+  props.initialType !== null && props.importTypes.includes(props.initialType)
+    ? props.initialType
+    : (props.importTypes[0] ?? 'maintenance')
+)
+
+/** Type connu mais fermé par le plan — un admin Pro voit l'historique manquer. */
+const restrictedTypes = computed(() =>
+  CSV_IMPORT_TYPES.filter((type) => !props.importTypes.includes(type))
+)
 const showHelpModal = ref(false)
 
 const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id), label: b.name })))
@@ -75,13 +95,23 @@ const boatOptions = computed(() => props.boats.map((b) => ({ value: String(b.id)
 
       <p v-if="!canImport" class="text-sm text-fg-muted">{{ t('settings.import.restricted') }}</p>
 
-      <ImportUploadForm
-        v-else-if="!preview"
-        v-model:boat-id="selectedBoatId"
-        v-model:type="selectedType"
-        :boat-options="boatOptions"
-        :single-boat-id="singleBoatId"
-      />
+      <template v-else-if="!preview">
+        <ImportUploadForm
+          v-model:boat-id="selectedBoatId"
+          v-model:type="selectedType"
+          :boat-options="boatOptions"
+          :single-boat-id="singleBoatId"
+          :types="importTypes"
+        />
+        <p
+          v-for="type in restrictedTypes"
+          :key="type"
+          class="mt-4 text-xs text-fg-muted"
+          data-testid="import-type-restricted"
+        >
+          {{ t(`settings.import.typeRestricted.${type}`) }}
+        </p>
+      </template>
 
       <ImportPreviewPanel v-else :preview="preview" />
     </BaseCard>

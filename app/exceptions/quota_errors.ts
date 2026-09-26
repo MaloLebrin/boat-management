@@ -13,6 +13,7 @@ export type QuotaFeature =
   | 'invoices'
   | 'ports'
   | 'import'
+  | 'import_expenses'
 
 interface QuotaExceededOptions {
   limit: number | null

@@ -24,7 +24,7 @@ const props = defineProps<{
   portStays: BoatPortStayItem[]
   entries: BoatBudgetEntryItem[]
   canManage: boolean
-  /** Plan Entreprise + admin (`import.run`) : affiche le raccourci vers l'import de dépenses. */
+  /** Plan Pro ou Entreprise (`canImportExpenses`) + admin (`import.run`) : affiche le raccourci vers l'import de dépenses. */
   canImport: boolean
   portOptions: PortNameOption[]
 }>()

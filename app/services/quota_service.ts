@@ -7,6 +7,7 @@ import OrganizationMembership from '#models/organization_membership'
 import OrganizationModuleService from '#services/organization_module_service'
 import { PLAN_LIMITS, getUpgradeTier, type QuotaUsage } from '#shared/types/plan'
 import { canManagePortsFor, isPortlessOrganizationProfile } from '#shared/helpers/plan'
+import { CSV_IMPORT_PLAN_FLAGS, CSV_IMPORT_TYPES, type CsvImportType } from '#shared/types/csv'
 import { inject } from '@adonisjs/core'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import db from '@adonisjs/lucid/services/db'
@@ -241,30 +242,47 @@ export default class QuotaService {
   }
 
   /**
-   * Import CSV de l'historique d'entretien (#715) — capacité de **tier pure**,
-   * comme la cartographie de port : aucun module ni add-on ne l'accorde, elle
-   * suit donc `PLAN_LIMITS` et non les quotas effectifs. Réservée à Entreprise :
-   * reprendre un historique en masse est une opération de migration, qui
-   * accompagne l'offre supérieure.
+   * Types d'import CSV que le plan de l'organisation autorise, dans l'ordre de
+   * `CSV_IMPORT_TYPES`. Les deux types ne suivent pas le même palier (table
+   * `CSV_IMPORT_PLAN_FLAGS`) : l'historique d'entretien est une reprise de
+   * données réservée à Entreprise (#715), les dépenses du budget se chargent
+   * dès Pro. Capacités de **tier pur**, comme la cartographie de port : aucun
+   * module ni add-on ne les accorde, elles suivent donc `PLAN_LIMITS` et non
+   * les quotas effectifs.
    *
-   * Distincte de `canExport` (Pro et Entreprise), qui ouvre les **exports** de
-   * la même page `/settings/import` : sortir ses propres données n'est pas une
-   * migration.
+   * Distinctes de `canExport` (Pro et Entreprise), qui ouvre les **exports**
+   * de la même page `/settings/import` : sortir ses propres données n'est pas
+   * une migration.
    */
-  canImport(org: Organization | null): boolean {
+  importableTypes(org: Organization | null): CsvImportType[] {
     this.#assertOrganization(org)
-    return PLAN_LIMITS[org.plan].canImport
+    const quotas = PLAN_LIMITS[org.plan]
+    return CSV_IMPORT_TYPES.filter((type) => quotas[CSV_IMPORT_PLAN_FLAGS[type]])
   }
 
-  assertCanImport(org: Organization | null): void {
+  /**
+   * Sans `type` : l'organisation peut importer **au moins un** type — c'est ce
+   * qui ouvre la section d'import de l'écran. Avec `type` : ce type précis.
+   */
+  canImport(org: Organization | null, type?: CsvImportType): boolean {
     this.#assertOrganization(org)
-    if (!PLAN_LIMITS[org.plan].canImport) {
-      throw new QuotaExceededError('import', {
-        limit: null,
-        current: 0,
-        upgradeTo: getUpgradeTier(org.plan),
-      })
-    }
+    if (type === undefined) return this.importableTypes(org).length > 0
+    return PLAN_LIMITS[org.plan][CSV_IMPORT_PLAN_FLAGS[type]]
+  }
+
+  /**
+   * Même sémantique que `canImport`, en refus. Le flash distingue les dépenses
+   * (`import_expenses`, upsell vers Pro) de l'historique ou de l'import en
+   * général (`import`, upsell vers le palier suivant).
+   */
+  assertCanImport(org: Organization | null, type?: CsvImportType): void {
+    this.#assertOrganization(org)
+    if (this.canImport(org, type)) return
+    throw new QuotaExceededError(type === 'expenses' ? 'import_expenses' : 'import', {
+      limit: null,
+      current: 0,
+      upgradeTo: getUpgradeTier(org.plan),
+    })
   }
 
   storageLimitBytes(org: Organization | null): number | null {

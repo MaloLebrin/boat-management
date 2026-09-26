@@ -267,7 +267,7 @@
   "import": {
     "title": "Import / Export CSV",
     "importSection": "CSV Import",
-    "restricted": "CSV import is reserved to administrators of organisations on the Enterprise plan. The exports above stay available on your plan.",
+    "restricted": "Import is reserved to administrators: budget expenses from the Pro plan, maintenance history on the Enterprise plan. The exports above stay available on your plan.",
     "exportSection": "CSV Export",
     "boatLabel": "Boat",
     "boatPlaceholder": "Select a boat",
@@ -275,6 +275,10 @@
     "types": {
       "maintenance": "Maintenance events",
       "expenses": "Expenses (budget)"
+    },
+    "typeRestricted": {
+      "maintenance": "Maintenance history import is reserved to the Enterprise plan.",
+      "expenses": "Expense import is reserved to the Pro and Enterprise plans."
     },
     "fileLabel": "CSV or Excel file",
     "fileHint": "CSV: UTF-8 or UTF-8 BOM, `;` separator. Excel: .xlsx, first sheet, headers on row 1. Max size: {size} MB, {rows} rows.",
