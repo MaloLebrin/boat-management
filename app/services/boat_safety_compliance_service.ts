@@ -14,7 +14,7 @@ import type {
   SafetyComplianceItemInput,
   SafetyComplianceReport,
 } from '#shared/types/safety'
-import { ARMAMENT_ZONES } from '#shared/types/safety'
+import { ARMAMENT_ZONES, SAFETY_BLOCKING_ISSUE_KINDS } from '#shared/types/safety'
 import { DateTime } from 'luxon'
 
 /** Fenêtre « bientôt » (jours), alignée sur `NotificationScanService`. */
@@ -31,12 +31,7 @@ const ISSUE_RANK: Readonly<Record<SafetyComplianceIssueKind, number>> = {
 }
 
 /** Une échéance dépassée invalide l'exigence ; une échéance proche l'alerte seulement. */
-const BLOCKING_KINDS: ReadonlySet<SafetyComplianceIssueKind> = new Set([
-  'missing',
-  'insufficient_quantity',
-  'expired',
-  'review_due',
-])
+const BLOCKING_KINDS: ReadonlySet<SafetyComplianceIssueKind> = new Set(SAFETY_BLOCKING_ISSUE_KINDS)
 
 /**
  * Conformité de l'armement de sécurité à la Division 240 (#582).

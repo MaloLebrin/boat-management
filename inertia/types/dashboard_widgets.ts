@@ -3,11 +3,16 @@ import type {
   DashboardActivityItem,
   DashboardAttention,
   DashboardBoatSummary,
+  DashboardCharterOccupancy,
   DashboardFleetStatus,
+  DashboardFuelSummary,
+  DashboardInvoicingSummary,
+  DashboardLowStockParts,
   DashboardPlannedTasks,
   DashboardPortItem,
   DashboardPortStats,
   DashboardPulseStats,
+  DashboardSafetyCompliance,
   DashboardSpendSummary,
   DashboardStats,
   DashboardUpcomingReservation,
@@ -35,6 +40,12 @@ export interface DashboardWidgetData {
   activity?: DashboardActivityItem[]
   spend?: DashboardSpendSummary
   plannedTasks?: DashboardPlannedTasks
+  /** Widgets de la galerie (masqués par défaut) : différés, omis tant qu'ils ne sont pas ajoutés. */
+  safetyCompliance?: DashboardSafetyCompliance
+  fuel?: DashboardFuelSummary
+  lowStock?: DashboardLowStockParts
+  invoicing?: DashboardInvoicingSummary
+  charterOccupancy?: DashboardCharterOccupancy
   aiFleetAnalysisAt: string | null
   aiFleetAnalysis: AiSuggestion[] | null
   ports: DashboardPortItem[]

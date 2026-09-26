@@ -33,6 +33,7 @@ import type {
   InvoiceLink,
 } from '#shared/types/invoice'
 import type { ClientOption } from '#shared/types/client'
+import type { DashboardInvoicingSummary } from '#shared/types/dashboard'
 import { toInvoiceRow } from '#transformers/invoice_transformer'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
@@ -148,6 +149,60 @@ export default class InvoiceService {
         currentPage: paginator.currentPage,
         lastPage: paginator.lastPage,
       },
+    }
+  }
+
+  /**
+   * Widget « Facturation » : encours (envoyées non réglées), impayées (statut
+   * `overdue` **ou** envoyée avec échéance dépassée — même règle que
+   * « À traiter », le job de bascule ne passant qu'une fois par jour), encaissé
+   * depuis le 1er du mois et devis en attente. Un seul agrégat conditionnel.
+   * Ne renvoie jamais `null` (#478).
+   */
+  async getDashboardSummary(
+    org: Organization,
+    now: DateTime = DateTime.now()
+  ): Promise<DashboardInvoicingSummary> {
+    const today = now.toISODate()!
+    const monthStart = now.startOf('month').toISO()!
+    const overdueWhere =
+      "kind = 'invoice' and (status = 'overdue' or (status = 'sent' and due_at < ?))"
+    const paidWhere = "kind = 'invoice' and status = 'paid' and paid_at >= ?"
+    const outstandingWhere = "kind = 'invoice' and status in ('sent', 'overdue')"
+
+    const row = await db
+      .from('invoices')
+      .where('organization_id', org.id)
+      .select(
+        db.raw(`coalesce(sum(total) filter (where ${outstandingWhere}), 0) as outstanding_total`)
+      )
+      .select(db.raw(`count(*) filter (where ${outstandingWhere})::int as outstanding_count`))
+      .select(
+        db.raw(`coalesce(sum(total) filter (where ${overdueWhere}), 0) as overdue_total`, [today])
+      )
+      .select(db.raw(`count(*) filter (where ${overdueWhere})::int as overdue_count`, [today]))
+      .select(
+        db.raw(`coalesce(sum(total) filter (where ${paidWhere}), 0) as paid_total`, [monthStart])
+      )
+      .select(db.raw(`count(*) filter (where ${paidWhere})::int as paid_count`, [monthStart]))
+      .select(
+        db.raw(
+          "count(*) filter (where kind = 'quote' and status in ('draft', 'sent'))::int as pending_quotes"
+        )
+      )
+      .first()
+
+    const money = (value: unknown) =>
+      Math.round(Number.parseFloat(String(value ?? '0')) * 100) / 100
+
+    return {
+      outstandingTotal: money(row?.outstanding_total),
+      outstandingCount: Number(row?.outstanding_count ?? 0),
+      overdueTotal: money(row?.overdue_total),
+      overdueCount: Number(row?.overdue_count ?? 0),
+      paidThisMonthTotal: money(row?.paid_total),
+      paidThisMonthCount: Number(row?.paid_count ?? 0),
+      pendingQuotes: Number(row?.pending_quotes ?? 0),
     }
   }
 

@@ -79,6 +79,14 @@ export type SafetyComplianceIssueKind =
   | 'review_due'
   | 'review_due_soon'
 
+/** Écarts qui invalident une exigence ; les autres (`*_soon`) n'alertent que. */
+export const SAFETY_BLOCKING_ISSUE_KINDS: readonly SafetyComplianceIssueKind[] = [
+  'missing',
+  'insufficient_quantity',
+  'expired',
+  'review_due',
+]
+
 /** Une ligne du panneau de conformité. */
 export interface SafetyComplianceIssue {
   /** Exigence du corpus à l'origine de la ligne, `null` pour une échéance seule. */

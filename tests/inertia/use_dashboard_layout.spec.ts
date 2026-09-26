@@ -13,6 +13,7 @@ vi.mock('@inertiajs/vue3', () => ({
 const { useDashboardLayout } = await import('../../inertia/composables/use_dashboard_layout')
 const { ALL_WIDGETS_AVAILABLE, resolveDashboardLayout } =
   await import('../../shared/helpers/dashboard_layout')
+const { DEFAULT_HIDDEN_WIDGETS } = await import('../../shared/constants/dashboard_widgets')
 
 const layout = () => resolveDashboardLayout(null, ALL_WIDGETS_AVAILABLE)
 
@@ -40,7 +41,19 @@ describe('useDashboardLayout', () => {
     expect(api.canAdd.value).toBe(true)
     api.add('activity')
     expect(api.isDirty.value).toBe(false)
-    expect(api.canAdd.value).toBe(false)
+    // Les widgets de la galerie (masqués par défaut) restent proposés à l'ajout.
+    expect(api.addable.value.side).toEqual([...DEFAULT_HIDDEN_WIDGETS])
+    expect(api.canAdd.value).toBe(true)
+  })
+
+  test('adding a default-hidden widget makes the draft dirty and shows it in its column', () => {
+    const api = useDashboardLayout(layout)
+    api.startEditing()
+    expect(api.visibleDraft('side')).not.toContain('fuel')
+    api.add('fuel')
+    expect(api.isDirty.value).toBe(true)
+    expect(api.visibleDraft('side')).toContain('fuel')
+    expect(api.addable.value.side).not.toContain('fuel')
   })
 
   test('move swaps with the visible neighbour and skips removed widgets', () => {
@@ -102,8 +115,10 @@ describe('useDashboardLayout', () => {
       'ports',
       'notifications',
       'planned_tasks',
+      ...DEFAULT_HIDDEN_WIDGETS,
     ])
-    expect(payload.hidden).toEqual(['ports'])
+    // Les masqués par défaut sont envoyés explicitement : le blob stocké les porte.
+    expect(payload.hidden).toEqual([...DEFAULT_HIDDEN_WIDGETS, 'ports'])
     expect(options.preserveScroll).toBe(true)
     options.onStart()
     expect(api.isSaving.value).toBe(true)

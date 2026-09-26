@@ -5,8 +5,13 @@ import DashboardAiPanel from '~/components/dashboard/DashboardAiPanel.vue'
 import DashboardAtSeaCard from '~/components/dashboard/DashboardAtSeaCard.vue'
 import DashboardAttentionCard from '~/components/dashboard/DashboardAttentionCard.vue'
 import DashboardBoatsCard from '~/components/dashboard/DashboardBoatsCard.vue'
+import DashboardCharterOccupancyCard from '~/components/dashboard/DashboardCharterOccupancyCard.vue'
+import DashboardFuelCard from '~/components/dashboard/DashboardFuelCard.vue'
+import DashboardInvoicingCard from '~/components/dashboard/DashboardInvoicingCard.vue'
+import DashboardLowStockCard from '~/components/dashboard/DashboardLowStockCard.vue'
 import DashboardNotificationsCard from '~/components/dashboard/DashboardNotificationsCard.vue'
 import DashboardPlannedTasksCard from '~/components/dashboard/DashboardPlannedTasksCard.vue'
+import DashboardSafetyComplianceCard from '~/components/dashboard/DashboardSafetyComplianceCard.vue'
 import DashboardSpendCard from '~/components/dashboard/DashboardSpendCard.vue'
 import DashboardUpcomingReservationsCard from '~/components/dashboard/DashboardUpcomingReservationsCard.vue'
 import DashboardWidgetPlaceholder from '~/components/dashboard/DashboardWidgetPlaceholder.vue'
@@ -42,6 +47,16 @@ const awaitingData = computed(() => {
       return props.data.spend === undefined
     case 'planned_tasks':
       return props.data.plannedTasks === undefined
+    case 'safety_compliance':
+      return props.data.safetyCompliance === undefined
+    case 'fuel':
+      return props.data.fuel === undefined
+    case 'low_stock':
+      return props.data.lowStock === undefined
+    case 'invoicing':
+      return props.data.invoicing === undefined
+    case 'charter_occupancy':
+      return props.data.charterOccupancy === undefined
     default:
       return false
   }
@@ -77,4 +92,15 @@ const awaitingData = computed(() => {
     :planned-tasks="data.plannedTasks"
   />
   <DashboardNotificationsCard v-else-if="id === 'notifications'" />
+  <DashboardSafetyComplianceCard
+    v-else-if="id === 'safety_compliance'"
+    :safety-compliance="data.safetyCompliance"
+  />
+  <DashboardFuelCard v-else-if="id === 'fuel'" :fuel="data.fuel" />
+  <DashboardLowStockCard v-else-if="id === 'low_stock'" :low-stock="data.lowStock" />
+  <DashboardInvoicingCard v-else-if="id === 'invoicing'" :invoicing="data.invoicing" />
+  <DashboardCharterOccupancyCard
+    v-else-if="id === 'charter_occupancy'"
+    :charter-occupancy="data.charterOccupancy"
+  />
 </template>

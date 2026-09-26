@@ -196,7 +196,12 @@
     "spend": "Dépenses",
     "ports": "Ports",
     "planned_tasks": "Tâches planifiées",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "safety_compliance": "Conformité sécurité",
+    "fuel": "Carburant",
+    "low_stock": "Pièces manquantes",
+    "invoicing": "Facturation",
+    "charter_occupancy": "Occupation location"
   },
   "widgetDescriptions": {
     "kpis": "Bateaux, sorties et tâches sur 30 jours, incidents ouverts.",
@@ -209,7 +214,12 @@
     "spend": "Dépenses de l’organisation depuis le 1er janvier, par poste.",
     "ports": "Ports et taux d’occupation des places.",
     "planned_tasks": "Tâches de maintenance prévues sur 30 jours.",
-    "notifications": "Vos dernières notifications non lues."
+    "notifications": "Vos dernières notifications non lues.",
+    "safety_compliance": "Armement Division 240 : bateaux avec un écart, équipements à échéance.",
+    "fuel": "Litres, coût et prix moyen des pleins sur 30 jours.",
+    "low_stock": "Pièces moteur sous leur seuil d’alerte ou à remplacer, toute la flotte.",
+    "invoicing": "Encours, impayées, encaissé ce mois et devis en attente (module Facturation).",
+    "charter_occupancy": "Taux d’occupation confirmé sur 30 jours, options et CA (module Location)."
   },
   "plannedTasks": {
     "title": "Tâches planifiées",
@@ -223,5 +233,68 @@
     "title": "Notifications",
     "empty": "Aucune notification non lue.",
     "viewAll": "Tout voir"
+  },
+  "safetyCompliance": {
+    "title": "Conformité sécurité",
+    "viewAll": "Voir les bateaux",
+    "summary": "{compliant, plural, one {# bateau conforme} other {# bateaux conformes}} · {issues, plural, one {# à vérifier} other {# à vérifier}}",
+    "withoutZone": "{count, plural, one {# sans zone d’armement} other {# sans zone d’armement}}",
+    "noZone": "Renseignez la zone d’armement de vos bateaux pour activer le suivi Division 240.",
+    "empty": "Tout l’armement suivi est conforme.",
+    "open": "Ouvrir l’armement de sécurité de {boat}",
+    "score": "{score} %",
+    "blocking": "{count, plural, one {# écart bloquant} other {# écarts bloquants}}",
+    "warning": "{count, plural, one {# échéance proche} other {# échéances proches}}",
+    "nextDue": "Échéance le {date}",
+    "more": "{count, plural, one {# autre bateau à vérifier} other {# autres bateaux à vérifier}}"
+  },
+  "fuel": {
+    "title": "Carburant",
+    "period": "{days} derniers jours",
+    "viewAll": "Avitaillements",
+    "empty": "Aucun plein sur la période.",
+    "liters": "{liters} L",
+    "cost": "Coût",
+    "pricePerLiter": "Prix moyen",
+    "perLiter": "{price}/L",
+    "noPrice": "Coût non renseigné",
+    "fillUpsLabel": "Pleins",
+    "fillUps": "{count, plural, one {# plein} other {# pleins}}",
+    "topBoat": "Le plus avitaillé",
+    "vsPrevious": "vs {days} jours précédents",
+    "increase": "+{pct} %",
+    "decrease": "-{pct} %",
+    "noComparison": "Pas de comparaison avec la période précédente"
+  },
+  "lowStock": {
+    "title": "Pièces manquantes",
+    "viewAll": "Pièces détachées",
+    "empty": "Aucune pièce en rupture ni à remplacer.",
+    "lowStockChip": "{count, plural, one {# en rupture} other {# en rupture}}",
+    "toReplaceChip": "{count, plural, one {# à remplacer} other {# à remplacer}}",
+    "stock": "Stock {stock} / seuil {min}",
+    "open": "Ouvrir la pièce {part} ({boat})",
+    "more": "{count, plural, one {# autre pièce en alerte} other {# autres pièces en alerte}}"
+  },
+  "invoicing": {
+    "title": "Facturation",
+    "viewAll": "Factures",
+    "empty": "Aucune facture ni devis en cours.",
+    "outstanding": "Encours",
+    "overdue": "Impayées",
+    "paidThisMonth": "Encaissé ce mois",
+    "pendingQuotes": "Devis en attente",
+    "count": "{count, plural, one {# facture} other {# factures}}"
+  },
+  "charterOccupancy": {
+    "title": "Occupation location",
+    "period": "{days} prochains jours",
+    "viewAll": "Réservations",
+    "empty": "Aucune réservation sur la période.",
+    "rate": "{rate} %",
+    "boatDays": "{days} jours-bateau confirmés sur {boats, plural, one {# bateau} other {# bateaux}}",
+    "confirmed": "Confirmées",
+    "options": "Options",
+    "revenue": "CA confirmé"
   }
 }

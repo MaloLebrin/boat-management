@@ -26,7 +26,9 @@ export default class DashboardLayoutService {
    * Widgets accessibles à l'utilisateur. `user.organization` doit être chargée.
    * - `spend` : admins seulement (les membres gardent le budget par bateau) ;
    * - `upcoming_reservations` : module Location actif **et** `boats.view` ;
-   * - `ports` : plans avec cartographie de port (#604), hors profil particulier.
+   * - `ports` : plans avec cartographie de port (#604), hors profil particulier ;
+   * - `invoicing` : module CRM/Facturation actif **et** `invoices.view` ;
+   * - `charter_occupancy` : même garde que `upcoming_reservations`.
    */
   async availabilityFor(user: User, role: OrgRole | null): Promise<DashboardWidgetAvailability> {
     const org = user.organizationId ? user.organization : null
@@ -34,6 +36,14 @@ export default class DashboardLayoutService {
       org && user.organizationId
         ? (await this.quotaService.canManageReservations(org)) &&
           (await user.hasPermission(user.organizationId, 'boats.view'))
+        : false
+
+    // Factures : module CRM actif **et** capability de lecture — même garde
+    // que les factures impayées de « À traiter » (#832), calculée une fois ici.
+    const canViewInvoices =
+      org && user.organizationId
+        ? (await this.quotaService.canManageInvoices(org)) &&
+          (await user.hasPermission(user.organizationId, 'invoices.view'))
         : false
 
     return {
@@ -48,6 +58,11 @@ export default class DashboardLayoutService {
       ports: org ? this.quotaService.canManagePorts(org) : false,
       planned_tasks: true,
       notifications: true,
+      safety_compliance: true,
+      fuel: true,
+      low_stock: true,
+      invoicing: canViewInvoices,
+      charter_occupancy: canViewReservations,
     }
   }
 

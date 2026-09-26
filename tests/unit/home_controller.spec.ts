@@ -40,7 +40,9 @@ test.group('HomeController (unit)', () => {
         availabilityFor: async () => {
           throw new Error('should not be called')
         },
-      } as any
+      } as any,
+      {} as any,
+      {} as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []
@@ -129,6 +131,16 @@ test.group('HomeController (unit)', () => {
         }),
         resolveForUser: (_user: unknown, availability: DashboardWidgetAvailability) =>
           resolveDashboardLayout(storedLayout, availability),
+      } as any,
+      {
+        getDashboardSummary: async () => {
+          throw new Error('default-hidden widget: should not be called')
+        },
+      } as any,
+      {
+        listAlertsForBoats: async () => {
+          throw new Error('default-hidden widget: should not be called')
+        },
       } as any
     )
 
@@ -179,7 +191,137 @@ test.group('HomeController (unit)', () => {
       'ai_panel',
       'planned_tasks',
       'notifications',
+      'safety_compliance',
+      'fuel',
+      'low_stock',
+      'invoicing',
+      'charter_occupancy',
     ])
+    // Widgets de la galerie : masqués par défaut, donc ni calculés ni envoyés.
+    assert.deepEqual(rendered[0]!.props.layout.hidden, [
+      'safety_compliance',
+      'fuel',
+      'low_stock',
+      'invoicing',
+      'charter_occupancy',
+    ])
+    for (const prop of ['safetyCompliance', 'fuel', 'lowStock', 'invoicing', 'charterOccupancy']) {
+      assert.notProperty(rendered[0]!.props, prop)
+    }
+  })
+
+  test('defers the gallery widgets once the user has added them', async ({ assert }) => {
+    storedLayout = {
+      version: 1,
+      order: {
+        main: ['attention', 'at_sea', 'activity', 'boats'],
+        side: [
+          'fuel',
+          'safety_compliance',
+          'low_stock',
+          'invoicing',
+          'charter_occupancy',
+          'ai_panel',
+          'planned_tasks',
+          'notifications',
+        ],
+      },
+      hidden: [],
+    }
+    try {
+      const controller = new HomeController(
+        {
+          getForUser: async () => ({
+            boats: [],
+            boatIds: [7],
+            urgentMaintenance: [],
+            stats: { boats: 1, engines: 0, sails: 0, rigs: 0, urgentMaintenance: 0 },
+            ports: [],
+            portStats: { total: 0, totalBoats: 0, totalFreeSpots: 0 },
+          }),
+          getSafetyCompliance: async () => ({
+            checked: 0,
+            compliant: 0,
+            withIssues: 0,
+            withoutZone: 1,
+            items: [],
+          }),
+        } as any,
+        { getLatestFleetAnalysis: async () => null } as any,
+        { listNamesForOrg: async () => [] } as any,
+        {} as any,
+        { getBoatUsage: async () => ({ used: 1, limit: null }) } as any,
+        {} as any,
+        {
+          getForUser: async () => ({ items: [], counts: { total: 0 }, canViewInvoices: true }),
+        } as any,
+        {
+          getActiveTrips: async () => ({ items: [], total: 0 }),
+          getFleetStatus: async () => ({ total: 1, atSea: 0, inPort: 1, enginesInMaintenance: 0 }),
+          getPulse: async () => ({
+            windowDays: 30,
+            tripsCompleted: 0,
+            distanceNm: 0,
+            tasksDone: 0,
+          }),
+          getRecentActivity: async () => [],
+          getFuelSummary: async () => ({ liters: 0 }),
+        } as any,
+        {
+          listUpcomingForOrg: async () => [],
+          getOccupancyForOrg: async () => ({ occupancyRate: 0 }),
+        } as any,
+        { getOrgSpendSummary: async () => ({}) } as any,
+        {
+          availabilityFor: async () => ({ ...ALL_WIDGETS_AVAILABLE, ports: false }),
+          resolveForUser: (_user: unknown, availability: DashboardWidgetAvailability) =>
+            resolveDashboardLayout(storedLayout, availability),
+        } as any,
+        { getDashboardSummary: async () => ({ pendingQuotes: 0 }) } as any,
+        { listAlertsForBoats: async () => ({ items: [], total: 0 }) } as any
+      )
+
+      const rendered: Array<{ component: string; props: any }> = []
+      await controller.index({
+        inertia: {
+          render: (component: string, props: any) => {
+            rendered.push({ component, props })
+            return { component, props }
+          },
+          optional: (fn: unknown) => fn,
+          defer: (fn: unknown, group: string) => ({ deferred: group, fn }),
+        },
+        request: { qs: () => ({}) },
+        auth: {
+          isAuthenticated: true,
+          check: async () => {},
+          getUserOrFail: () => ({
+            id: 1,
+            organizationId: 42,
+            organization: { id: 42, plan: 'enterprise' },
+            load: async () => {},
+            hasPermission: async () => true,
+            getEffectiveRoleInOrg: async () => 'admin',
+          }),
+        },
+        i18n: { locale: 'en' },
+      } as any)
+
+      const props = rendered[0]!.props
+      assert.deepEqual(props.layout.hidden, [])
+      assert.equal(props.safetyCompliance.deferred, 'safetyCompliance')
+      assert.equal(props.fuel.deferred, 'fuel')
+      assert.equal(props.lowStock.deferred, 'lowStock')
+      assert.equal(props.invoicing.deferred, 'invoicing')
+      assert.equal(props.charterOccupancy.deferred, 'charterOccupancy')
+      // Les callbacks différés délèguent bien aux services (jamais `null`, #478).
+      assert.deepEqual(await props.fuel.fn(), { liters: 0 })
+      assert.deepEqual(await props.invoicing.fn(), { pendingQuotes: 0 })
+      // `canViewInvoices` vient désormais de la disponibilité du widget « Facturation ».
+      assert.isTrue(props.attention.canViewInvoices)
+    } finally {
+      storedLayout = null
+    }
   })
 
   test('omits the deferred props of hidden widgets', async ({ assert }) => {
@@ -249,7 +391,9 @@ test.group('HomeController (unit)', () => {
           }),
           resolveForUser: (_user: unknown, availability: DashboardWidgetAvailability) =>
             resolveDashboardLayout(storedLayout, availability),
-        } as any
+        } as any,
+        {} as any,
+        {} as any
       )
 
       const rendered: Array<{ component: string; props: any }> = []
@@ -282,7 +426,16 @@ test.group('HomeController (unit)', () => {
       assert.notProperty(props, 'activity')
       assert.notProperty(props, 'plannedTasks')
       assert.isTrue(props.layout.isCustomized)
-      assert.deepEqual(props.layout.hidden, ['activity', 'planned_tasks'])
+      // Les widgets de la galerie, absents de l'ordre stocké, restent masqués.
+      assert.deepEqual(props.layout.hidden, [
+        'activity',
+        'planned_tasks',
+        'safety_compliance',
+        'fuel',
+        'low_stock',
+        'invoicing',
+        'charter_occupancy',
+      ])
       // Sans module Location, `upcoming_reservations` n'est pas dans la disposition servie.
       assert.deepEqual(props.layout.order.main, ['boats', 'attention', 'at_sea', 'activity'])
     } finally {
@@ -323,7 +476,9 @@ test.group('HomeController (unit)', () => {
         availabilityFor: async () => {
           throw new Error('should not be called')
         },
-      } as any
+      } as any,
+      {} as any,
+      {} as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []

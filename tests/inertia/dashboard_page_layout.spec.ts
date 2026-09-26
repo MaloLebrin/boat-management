@@ -27,6 +27,7 @@ import {
   ALL_WIDGETS_AVAILABLE,
   resolveDashboardLayout,
 } from '../../shared/helpers/dashboard_layout'
+import { DEFAULT_HIDDEN_WIDGETS } from '../../shared/constants/dashboard_widgets'
 
 /** Disposition par défaut d'un admin Entreprise (tout disponible), sauf `upcoming_reservations`. */
 function defaultLayout(over: Partial<ResolvedDashboardLayout> = {}): ResolvedDashboardLayout {
@@ -77,6 +78,11 @@ const stubs = {
   PortDashboardCard: { template: '<div data-testid="ports" />' },
   DashboardPlannedTasksCard: { template: '<div data-testid="planned-tasks" />' },
   DashboardNotificationsCard: { template: '<div data-testid="notifications" />' },
+  DashboardSafetyComplianceCard: { template: '<div data-testid="safety-compliance" />' },
+  DashboardFuelCard: { template: '<div data-testid="fuel" />' },
+  DashboardLowStockCard: { template: '<div data-testid="low-stock" />' },
+  DashboardInvoicingCard: { template: '<div data-testid="invoicing" />' },
+  DashboardCharterOccupancyCard: { template: '<div data-testid="charter-occupancy" />' },
   DashboardAddWidgetModal: {
     props: ['open', 'addable'],
     template: '<div data-testid="add-modal" :data-open="String(open)" />',
@@ -244,8 +250,33 @@ describe('Dashboard — structure de page (#828)', () => {
     )
   })
 
+  test('hides the gallery widgets by default and renders them once the layout lists them', () => {
+    const byDefault = mountDashboard()
+    for (const id of ['safety-compliance', 'fuel', 'low-stock', 'invoicing', 'charter-occupancy']) {
+      expect(byDefault.find(`[data-testid="${id}"]`).exists()).toBe(false)
+    }
+    // Le bouton « Personnaliser » annonce les widgets disponibles dans la galerie.
+    expect(byDefault.get('[data-testid="dashboard-hidden-count"]').text()).toBe(
+      'dashboard.customize.hiddenCount'
+    )
+
+    const added = mountDashboard('enterprise', {
+      layout: defaultLayout({ hidden: [], isCustomized: true }),
+      safetyCompliance: { checked: 0, compliant: 0, withIssues: 0, withoutZone: 0, items: [] },
+      fuel: undefined,
+    })
+    const side = added.get('[data-testid="dashboard-side-column"]')
+    for (const id of ['safety-compliance', 'fuel', 'low-stock', 'invoicing', 'charter-occupancy']) {
+      expect(side.find(`[data-testid="${id}"]`).exists()).toBe(true)
+    }
+    const positions = order(added, ['notifications', 'safety-compliance', 'charter-occupancy'])
+    expect(positions).toEqual([...positions].sort((a, b) => a - b))
+  })
+
   test('offers the customize button in the header and no frame outside edit mode', () => {
-    const wrapper = mountDashboard()
+    const wrapper = mountDashboard('enterprise', {
+      layout: defaultLayout({ hidden: [], isCustomized: true }),
+    })
     expect(
       wrapper.get('[data-testid="header"]').find('[data-testid="dashboard-customize"]').exists()
     ).toBe(true)
@@ -327,7 +358,8 @@ describe('Dashboard — mode édition', () => {
     expect(path).toBe('/dashboard/layout')
     // Le widget retiré (`activity`) garde sa place dans l'ordre stocké : seuls les visibles permutent.
     expect(payload.order.main).toEqual(['attention', 'boats', 'activity', 'at_sea'])
-    expect(payload.hidden).toEqual(['activity'])
+    // Les widgets de la galerie restent masqués explicitement, le retrait s'y ajoute.
+    expect(payload.hidden).toEqual([...DEFAULT_HIDDEN_WIDGETS, 'activity'])
     expect(options.preserveScroll).toBe(true)
   })
 
@@ -373,6 +405,19 @@ describe('Dashboard — mode édition', () => {
       side: string[]
     }
     expect(addable.side).toEqual(['spend'])
+  })
+
+  test('the gallery lists the default-hidden widgets on a fresh dashboard', async () => {
+    const wrapper = await enterEdit()
+    const addable = wrapper.getComponent('[data-testid="add-modal"]').props('addable') as {
+      side: string[]
+    }
+    expect(addable.side).toEqual([...DEFAULT_HIDDEN_WIDGETS])
+    // Réajouté pendant l'édition, un widget de la galerie sans donnée montre un tenant-lieu.
+    wrapper.getComponent('[data-testid="add-modal"]').vm.$emit('add', 'fuel')
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-testid="dashboard-widget-placeholder"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="fuel"]').exists()).toBe(false)
   })
 
   test('a re-added widget whose data is missing shows a placeholder until saved', async () => {
