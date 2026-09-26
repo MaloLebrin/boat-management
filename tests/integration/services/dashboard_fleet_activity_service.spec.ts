@@ -190,4 +190,58 @@ test.group('DashboardFleetActivityService (#832)', () => {
     const orphan = await UserFactory.merge({ organizationId: null }).create()
     assert.deepEqual(await svc.getRecentActivity(orphan, []), [])
   })
+
+  test('the fuel summary aggregates the 30-day window, compares it to the previous one and names the top boat', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    const orgId = user.organizationId!
+    const [first, second] = await BoatFactory.merge({ organizationId: orgId }).createMany(2)
+    const now = DateTime.now()
+    const log = (boatId: number, daysAgo: number, liters: string, cost: string | null) =>
+      BoatFuelLogFactory.merge({
+        boatId,
+        organizationId: orgId,
+        fueledAt: now.minus({ days: daysAgo }),
+        quantityLiters: liters,
+        totalCost: cost,
+      }).create()
+
+    // Fenêtre courante : 40 L à 80 € et 60 L sans coût (ignoré pour le prix moyen).
+    await log(first!.id, 5, '40.000', '80.00')
+    await log(second!.id, 20, '60.000', null)
+    // Fenêtre précédente : 50 L à 100 €.
+    await log(first!.id, 45, '50.000', '100.00')
+    // Trop ancien : hors des deux fenêtres.
+    await log(first!.id, 70, '999.000', '1.00')
+    // Autre organisation.
+    const other = await UserFactory.with('organization').create()
+    const otherBoat = await BoatFactory.merge({ organizationId: other.organizationId! }).create()
+    await BoatFuelLogFactory.merge({
+      boatId: otherBoat.id,
+      organizationId: other.organizationId!,
+      fueledAt: now.minus({ days: 1 }),
+      quantityLiters: '500.000',
+    }).create()
+
+    const summary = await service().getFuelSummary(user, [first!.id, second!.id], now)
+
+    assert.equal(summary.windowDays, 30)
+    assert.equal(summary.liters, 100)
+    assert.equal(summary.cost, 80)
+    assert.equal(summary.avgPricePerLiter, 2)
+    assert.equal(summary.fillUps, 2)
+    assert.deepEqual(summary.previous, { liters: 50, cost: 100 })
+    assert.deepEqual(summary.topBoat, { boatId: second!.id, boatName: second!.name, liters: 60 })
+
+    // Sans plein sur la fenêtre précédente : pas de comparaison.
+    const recent = await service().getFuelSummary(user, [second!.id], now)
+    assert.isNull(recent.previous)
+    assert.isNull(recent.avgPricePerLiter)
+
+    const orphan = await UserFactory.create()
+    const empty = await service().getFuelSummary(orphan, [])
+    assert.equal(empty.fillUps, 0)
+    assert.isNull(empty.topBoat)
+  })
 })

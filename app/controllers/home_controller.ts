@@ -1,4 +1,5 @@
 import AiAnalysisService from '#services/ai_analysis_service'
+import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import BudgetService from '#services/budget_service'
@@ -6,6 +7,7 @@ import DashboardAttentionService from '#services/dashboard_attention_service'
 import DashboardFleetActivityService from '#services/dashboard_fleet_activity_service'
 import DashboardLayoutService from '#services/dashboard_layout_service'
 import DashboardService from '#services/dashboard_service'
+import InvoiceService from '#services/invoice_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
@@ -31,7 +33,9 @@ export default class HomeController {
     private fleetService: DashboardFleetActivityService,
     private reservationService: BoatReservationService,
     private budgetService: BudgetService,
-    private layoutService: DashboardLayoutService
+    private layoutService: DashboardLayoutService,
+    private invoiceService: InvoiceService,
+    private enginePartService: BoatEnginePartService
   ) {}
 
   async index({ inertia, auth, request, response, i18n }: HttpContext) {
@@ -95,12 +99,9 @@ export default class HomeController {
       : false
 
     // Factures impayées dans « À traiter » : module CRM actif **et** capability
-    // de lecture — sinon la donnée n'est pas envoyée du tout (#832).
-    const canViewInvoices =
-      user.organizationId && user.organization
-        ? (await this.quotaService.canManageInvoices(user.organization)) &&
-          (await user.hasPermission(user.organizationId, 'invoices.view'))
-        : false
+    // de lecture — sinon la donnée n'est pas envoyée du tout (#832). Même garde
+    // que le widget « Facturation », calculée une seule fois par le service.
+    const canViewInvoices = availability.invoicing
     const attention = await this.attentionService.getForUser(
       user,
       data.urgentMaintenance,
@@ -165,6 +166,48 @@ export default class HomeController {
             plannedTasks: inertia.defer(
               deferJson(() => this.dashboardService.getPlannedTasks(boatIds)),
               'plannedTasks'
+            ),
+          }
+        : {}),
+      // Widgets de la galerie (masqués par défaut) : différés, et omis tant que
+      // l'utilisateur ne les a pas ajoutés.
+      ...(visible.has('safety_compliance')
+        ? {
+            safetyCompliance: inertia.defer(
+              deferJson(() => this.dashboardService.getSafetyCompliance(boatIds)),
+              'safetyCompliance'
+            ),
+          }
+        : {}),
+      ...(visible.has('fuel')
+        ? {
+            fuel: inertia.defer(
+              deferJson(() => this.fleetService.getFuelSummary(user, boatIds)),
+              'fuel'
+            ),
+          }
+        : {}),
+      ...(visible.has('low_stock')
+        ? {
+            lowStock: inertia.defer(
+              deferJson(() => this.enginePartService.listAlertsForBoats(boatIds)),
+              'lowStock'
+            ),
+          }
+        : {}),
+      ...(visible.has('invoicing') && user.organization
+        ? {
+            invoicing: inertia.defer(
+              deferJson(() => this.invoiceService.getDashboardSummary(user.organization)),
+              'invoicing'
+            ),
+          }
+        : {}),
+      ...(visible.has('charter_occupancy')
+        ? {
+            charterOccupancy: inertia.defer(
+              deferJson(() => this.reservationService.getOccupancyForOrg(user, boatIds.length)),
+              'charterOccupancy'
             ),
           }
         : {}),

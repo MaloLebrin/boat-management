@@ -196,7 +196,12 @@
     "spend": "Spend",
     "ports": "Ports",
     "planned_tasks": "Planned tasks",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "safety_compliance": "Safety compliance",
+    "fuel": "Fuel",
+    "low_stock": "Missing parts",
+    "invoicing": "Invoicing",
+    "charter_occupancy": "Charter occupancy"
   },
   "widgetDescriptions": {
     "kpis": "Boats, trips and tasks over 30 days, open incidents.",
@@ -209,7 +214,12 @@
     "spend": "Organisation spend since 1 January, by category.",
     "ports": "Ports and berth occupancy.",
     "planned_tasks": "Maintenance tasks planned over 30 days.",
-    "notifications": "Your latest unread notifications."
+    "notifications": "Your latest unread notifications.",
+    "safety_compliance": "Division 240 safety gear: boats with a gap, items coming due.",
+    "fuel": "Litres, cost and average price of fill-ups over 30 days.",
+    "low_stock": "Engine parts below their alert threshold or to replace, fleet-wide.",
+    "invoicing": "Outstanding, overdue, collected this month and pending quotes (Invoicing module).",
+    "charter_occupancy": "Confirmed occupancy rate over 30 days, options and revenue (Charter module)."
   },
   "plannedTasks": {
     "title": "Planned tasks",
@@ -223,5 +233,68 @@
     "title": "Notifications",
     "empty": "No unread notification.",
     "viewAll": "View all"
+  },
+  "safetyCompliance": {
+    "title": "Safety compliance",
+    "viewAll": "View boats",
+    "summary": "{compliant, plural, one {# compliant boat} other {# compliant boats}} · {issues, plural, one {# to check} other {# to check}}",
+    "withoutZone": "{count, plural, one {# without armament zone} other {# without armament zone}}",
+    "noZone": "Set the armament zone of your boats to enable Division 240 tracking.",
+    "empty": "All tracked safety gear is compliant.",
+    "open": "Open the safety gear of {boat}",
+    "score": "{score}%",
+    "blocking": "{count, plural, one {# blocking gap} other {# blocking gaps}}",
+    "warning": "{count, plural, one {# due soon} other {# due soon}}",
+    "nextDue": "Due on {date}",
+    "more": "{count, plural, one {# more boat to check} other {# more boats to check}}"
+  },
+  "fuel": {
+    "title": "Fuel",
+    "period": "Last {days} days",
+    "viewAll": "Fuel logs",
+    "empty": "No fill-up over the period.",
+    "liters": "{liters} L",
+    "cost": "Cost",
+    "pricePerLiter": "Average price",
+    "perLiter": "{price}/L",
+    "noPrice": "No cost recorded",
+    "fillUpsLabel": "Fill-ups",
+    "fillUps": "{count, plural, one {# fill-up} other {# fill-ups}}",
+    "topBoat": "Top consumer",
+    "vsPrevious": "vs previous {days} days",
+    "increase": "+{pct}%",
+    "decrease": "-{pct}%",
+    "noComparison": "No comparison with the previous period"
+  },
+  "lowStock": {
+    "title": "Missing parts",
+    "viewAll": "Spare parts",
+    "empty": "No part out of stock or to replace.",
+    "lowStockChip": "{count, plural, one {# low stock} other {# low stock}}",
+    "toReplaceChip": "{count, plural, one {# to replace} other {# to replace}}",
+    "stock": "Stock {stock} / min {min}",
+    "open": "Open part {part} ({boat})",
+    "more": "{count, plural, one {# more part on alert} other {# more parts on alert}}"
+  },
+  "invoicing": {
+    "title": "Invoicing",
+    "viewAll": "Invoices",
+    "empty": "No invoice or quote in progress.",
+    "outstanding": "Outstanding",
+    "overdue": "Overdue",
+    "paidThisMonth": "Collected this month",
+    "pendingQuotes": "Pending quotes",
+    "count": "{count, plural, one {# invoice} other {# invoices}}"
+  },
+  "charterOccupancy": {
+    "title": "Charter occupancy",
+    "period": "Next {days} days",
+    "viewAll": "Reservations",
+    "empty": "No reservation over the period.",
+    "rate": "{rate}%",
+    "boatDays": "{days} confirmed boat-days across {boats, plural, one {# boat} other {# boats}}",
+    "confirmed": "Confirmed",
+    "options": "Options",
+    "revenue": "Confirmed revenue"
   }
 }

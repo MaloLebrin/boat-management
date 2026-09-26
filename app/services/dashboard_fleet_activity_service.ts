@@ -1,4 +1,5 @@
 import BoatDocument from '#models/boat_document'
+import Boat from '#models/boat'
 import BoatFuelLog from '#models/boat_fuel_log'
 import BoatIncident from '#models/boat_incident'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
@@ -10,10 +11,12 @@ import {
   ACTIVITY_DISPLAY_CAP,
   PULSE_WINDOW_DAYS,
 } from '#shared/constants/dashboard'
+import { FUEL_WINDOW_DAYS } from '#shared/constants/dashboard_widgets'
 import type {
   DashboardActiveTrips,
   DashboardActivityItem,
   DashboardFleetStatus,
+  DashboardFuelSummary,
   DashboardPulseStats,
 } from '#shared/types/dashboard'
 import type { IncidentType } from '#shared/types/incident'
@@ -112,6 +115,102 @@ export default class DashboardFleetActivityService {
       tripsCompleted: Number(trips?.total ?? 0),
       distanceNm: Math.round(Number.parseFloat(String(trips?.nm ?? '0')) * 10) / 10,
       tasksDone: Number(tasks?.total ?? 0),
+    }
+  }
+
+  /**
+   * Widget « Carburant » : litres, coût et prix moyen au litre des pleins de
+   * la fenêtre glissante, comparés à la fenêtre précédente de même durée, plus
+   * le bateau qui a le plus avitaillé. Trois agrégats bornés sur
+   * `boat_fuel_logs`. Ne renvoie jamais `null` (#478).
+   */
+  async getFuelSummary(
+    user: User,
+    boatIds: number[],
+    now: DateTime = DateTime.now()
+  ): Promise<DashboardFuelSummary> {
+    const empty: DashboardFuelSummary = {
+      windowDays: FUEL_WINDOW_DAYS,
+      liters: 0,
+      cost: 0,
+      avgPricePerLiter: null,
+      fillUps: 0,
+      previous: null,
+      topBoat: null,
+    }
+    const orgId = user.organizationId
+    if (!orgId || boatIds.length === 0) return empty
+
+    const today = now.toISODate()!
+    const since = now.minus({ days: FUEL_WINDOW_DAYS }).toISODate()!
+    const before = now.minus({ days: FUEL_WINDOW_DAYS * 2 }).toISODate()!
+
+    const aggregate = (from: string, to: string, inclusiveEnd: boolean) =>
+      db
+        .from('boat_fuel_logs')
+        .where('organization_id', orgId)
+        .whereIn('boat_id', boatIds)
+        .where('fueled_at', '>=', from)
+        .where('fueled_at', inclusiveEnd ? '<=' : '<', to)
+        .select(db.raw('coalesce(sum(quantity_liters), 0) as liters'))
+        .select(db.raw('coalesce(sum(total_cost), 0) as cost'))
+        .select(db.raw('count(*)::int as fill_ups'))
+        .select(
+          db.raw(
+            'coalesce(sum(quantity_liters) filter (where total_cost is not null), 0) as priced_liters'
+          )
+        )
+        .first()
+
+    const [current, previous, top] = await Promise.all([
+      aggregate(since, today, true),
+      aggregate(before, since, false),
+      db
+        .from('boat_fuel_logs')
+        .where('organization_id', orgId)
+        .whereIn('boat_id', boatIds)
+        .where('fueled_at', '>=', since)
+        .where('fueled_at', '<=', today)
+        .groupBy('boat_id')
+        .select('boat_id')
+        .select(db.raw('sum(quantity_liters) as liters'))
+        .orderBy('liters', 'desc')
+        .orderBy('boat_id', 'asc')
+        .first(),
+    ])
+
+    const toNumber = (value: unknown, digits: number) =>
+      Math.round(Number.parseFloat(String(value ?? '0')) * 10 ** digits) / 10 ** digits
+
+    const liters = toNumber(current?.liters, 1)
+    const cost = toNumber(current?.cost, 2)
+    const pricedLiters = toNumber(current?.priced_liters, 3)
+    const previousFillUps = Number(previous?.fill_ups ?? 0)
+
+    let topBoat: DashboardFuelSummary['topBoat'] = null
+    if (top) {
+      const boat = await Boat.query()
+        .where('id', Number(top.boat_id))
+        .select(['id', 'name'])
+        .first()
+      topBoat = {
+        boatId: Number(top.boat_id),
+        boatName: boat?.name ?? `#${top.boat_id}`,
+        liters: toNumber(top.liters, 1),
+      }
+    }
+
+    return {
+      windowDays: FUEL_WINDOW_DAYS,
+      liters,
+      cost,
+      avgPricePerLiter: pricedLiters > 0 ? Math.round((cost / pricedLiters) * 1000) / 1000 : null,
+      fillUps: Number(current?.fill_ups ?? 0),
+      previous:
+        previousFillUps > 0
+          ? { liters: toNumber(previous?.liters, 1), cost: toNumber(previous?.cost, 2) }
+          : null,
+      topBoat,
     }
   }
 

@@ -4,6 +4,7 @@ import {
   DASHBOARD_WIDGET_IDS,
   DASHBOARD_WIDGET_ZONES,
   DEFAULT_DASHBOARD_ORDER,
+  DEFAULT_HIDDEN_WIDGETS,
   type DashboardWidgetId,
   type DashboardWidgetZone,
 } from '#shared/constants/dashboard_widgets'
@@ -61,10 +62,11 @@ function resolveZoneOrder(
 }
 
 /**
- * Résout la disposition à afficher : défaut si rien n'est stocké, sinon la
- * disposition stockée assainie (ids inconnus, mal zonés ou indisponibles
- * ignorés, nouveaux widgets réinsérés). Utilisée par le serveur (ne calculer
- * que les données des widgets visibles) **et** par la page.
+ * Résout la disposition à afficher : défaut si rien n'est stocké (les widgets
+ * `defaultHidden` masqués), sinon la disposition stockée assainie (ids
+ * inconnus, mal zonés ou indisponibles ignorés, nouveaux widgets réinsérés).
+ * Utilisée par le serveur (ne calculer que les données des widgets visibles)
+ * **et** par la page.
  */
 export function resolveDashboardLayout(
   stored: StoredDashboardLayout | null,
@@ -77,9 +79,17 @@ export function resolveDashboardLayout(
     ])
   ) as Record<DashboardWidgetZone, DashboardWidgetId[]>
 
-  const hidden = stored
-    ? Array.from(new Set(stored.hidden)).filter((id) => id in DASHBOARD_WIDGETS && availability[id])
-    : []
+  // Un widget `defaultHidden` livré après la personnalisation (absent de
+  // l'ordre stocké) reste masqué : il rejoint la galerie, pas la page.
+  const knownStored = stored
+    ? new Set<DashboardWidgetId>([...stored.order.main, ...stored.order.side])
+    : null
+  const hidden = Array.from(
+    new Set<DashboardWidgetId>([
+      ...(stored ? stored.hidden : []),
+      ...DEFAULT_HIDDEN_WIDGETS.filter((id) => knownStored === null || !knownStored.has(id)),
+    ])
+  ).filter((id) => id in DASHBOARD_WIDGETS && availability[id])
 
   return { order, hidden, isCustomized: stored !== null }
 }

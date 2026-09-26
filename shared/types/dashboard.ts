@@ -1,7 +1,9 @@
+import type { PartWearState } from '#shared/types/boat'
 import type { BoatDocumentType } from '#shared/types/boat_document'
 import type { BudgetYearSummary } from '#shared/types/budget'
 import type { IncidentType } from '#shared/types/incident'
 import type { ReservationStatus, ReservationType } from '#shared/types/reservation'
+import type { ArmamentZone } from '#shared/types/safety'
 
 export type DashboardPortItem = {
   id: number
@@ -261,4 +263,108 @@ export interface DashboardPlannedTasks {
   items: DashboardPlannedTask[]
   /** Toutes les tâches ouvertes datées de la fenêtre (comptage exact). */
   total: number
+}
+
+// --- Widgets de la galerie (masqués par défaut) --------------------------------
+
+export interface DashboardSafetyComplianceBoat {
+  boatId: number
+  boatName: string
+  zone: ArmamentZone
+  /** `satisfiedCount / requirementCount` en pourcentage entier. */
+  score: number
+  /** Écarts qui invalident une exigence : manquant, quantité insuffisante, périmé, révision en retard. */
+  blockingCount: number
+  /** Échéances proches : bientôt périmé, révision à prévoir. */
+  warningCount: number
+  /** Plus proche échéance (`YYYY-MM-DD`) parmi les écarts datés, `null` sinon. */
+  nextDueDate: string | null
+}
+
+export interface DashboardSafetyCompliance {
+  /** Bateaux dont la zone d'armement est renseignée (les seuls contrôlés). */
+  checked: number
+  /** Contrôlés sans aucun écart. */
+  compliant: number
+  /** Contrôlés avec au moins un écart (bloquant ou alerte). */
+  withIssues: number
+  /** Bateaux sans zone d'armement : aucun contrôle possible. */
+  withoutZone: number
+  /** Bateaux avec écart, les pires d'abord, plafonnés à `SAFETY_COMPLIANCE_CAP`. */
+  items: DashboardSafetyComplianceBoat[]
+}
+
+export interface DashboardFuelPeriod {
+  liters: number
+  cost: number
+}
+
+export interface DashboardFuelSummary {
+  /** Fenêtre glissante (`FUEL_WINDOW_DAYS`), comparée à la fenêtre précédente. */
+  windowDays: number
+  liters: number
+  cost: number
+  /** Coût / litres des seuls pleins dont le coût est renseigné ; `null` sans aucun. */
+  avgPricePerLiter: number | null
+  fillUps: number
+  /** Fenêtre précédente de même durée, `null` si elle n'a aucun plein. */
+  previous: DashboardFuelPeriod | null
+  /** Bateau ayant le plus avitaillé sur la fenêtre. */
+  topBoat: { boatId: number; boatName: string; liters: number } | null
+}
+
+export interface DashboardLowStockPart {
+  id: number
+  boatId: number
+  boatName: string
+  engineId: number
+  engineBrand: string | null
+  engineModel: string | null
+  engineKind: string
+  designation: string
+  reference: string | null
+  stock: number | null
+  minStockAlert: number | null
+  wearState: PartWearState | null
+  /** `low_stock` : stock sous le seuil d'alerte ; `to_replace` : état d'usure `to_replace` / `damaged`. */
+  reason: 'low_stock' | 'to_replace'
+}
+
+export interface DashboardLowStockParts {
+  /** Ruptures d'abord puis désignation, plafonnées à `LOW_STOCK_CAP`. */
+  items: DashboardLowStockPart[]
+  /** Toutes les pièces en alerte (comptage exact). */
+  total: number
+  lowStockCount: number
+  toReplaceCount: number
+}
+
+export interface DashboardInvoicingSummary {
+  /** Factures envoyées non réglées (statuts `sent` et `overdue`). */
+  outstandingTotal: number
+  outstandingCount: number
+  /** Impayées : statut `overdue` ou envoyée avec échéance dépassée — même règle que « À traiter ». */
+  overdueTotal: number
+  overdueCount: number
+  /** Encaissé depuis le 1er du mois courant. */
+  paidThisMonthTotal: number
+  paidThisMonthCount: number
+  /** Devis en brouillon ou envoyés, non convertis. */
+  pendingQuotes: number
+}
+
+export interface DashboardCharterOccupancy {
+  /** Fenêtre (`CHARTER_OCCUPANCY_DAYS`) à partir de maintenant. */
+  windowDays: number
+  boats: number
+  /** Jours-bateau confirmés dans la fenêtre / (bateaux × jours), pourcentage entier borné à 100. */
+  occupancyRate: number
+  /** Jours-bateau confirmés dans la fenêtre (une décimale). */
+  reservedBoatDays: number
+  /** Réservations confirmées qui chevauchent la fenêtre. */
+  confirmed: number
+  /** Options (non confirmées) qui chevauchent la fenêtre. */
+  options: number
+  /** Somme des `totalPrice` des réservations confirmées qui **commencent** dans la fenêtre. */
+  confirmedRevenue: number
 }

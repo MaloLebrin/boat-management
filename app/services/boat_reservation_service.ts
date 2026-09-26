@@ -19,7 +19,11 @@ import type {
 } from '#shared/types/reservation'
 import { toUtcFromLocalInput } from '#shared/helpers/date'
 import { UPCOMING_RESERVATIONS_CAP, UPCOMING_RESERVATIONS_DAYS } from '#shared/constants/dashboard'
-import type { DashboardUpcomingReservation } from '#shared/types/dashboard'
+import { CHARTER_OCCUPANCY_DAYS } from '#shared/constants/dashboard_widgets'
+import type {
+  DashboardCharterOccupancy,
+  DashboardUpcomingReservation,
+} from '#shared/types/dashboard'
 import { countBilledNights } from '#shared/helpers/reservation_quote'
 import BoatPricingService from '#services/boat_pricing_service'
 import ReservationQuoteService from '#services/reservation_quote_service'
@@ -131,6 +135,61 @@ export default class BoatReservationService {
       })
       .sort((a, b) => a.at.localeCompare(b.at))
       .slice(0, limit)
+  }
+
+  /**
+   * Widget « Occupation location » : réservations `option` / `confirmed` qui
+   * chevauchent la fenêtre `[now, now + days)`. Le taux ne compte que les
+   * confirmées, bornées à la fenêtre (jours-bateau / bateaux × jours) ; le
+   * chiffre d'affaires ne compte que les confirmées qui **commencent** dans la
+   * fenêtre, pour ne pas compter deux fois une même réservation d'une fenêtre à
+   * l'autre. Ne renvoie jamais `null` (#478).
+   */
+  async getOccupancyForOrg(
+    user: User,
+    boatCount: number,
+    now: DateTime = DateTime.now(),
+    days: number = CHARTER_OCCUPANCY_DAYS
+  ): Promise<DashboardCharterOccupancy> {
+    const summary: DashboardCharterOccupancy = {
+      windowDays: days,
+      boats: boatCount,
+      occupancyRate: 0,
+      reservedBoatDays: 0,
+      confirmed: 0,
+      options: 0,
+      confirmedRevenue: 0,
+    }
+    if (user.organizationId === null || boatCount === 0) return summary
+    const horizon = now.plus({ days })
+
+    const rows = await BoatReservation.query()
+      .where('organizationId', user.organizationId)
+      .whereIn('status', ['option', 'confirmed'])
+      .where('startsAt', '<', horizon.toISO()!)
+      .where('endsAt', '>', now.toISO()!)
+      .select(['id', 'boatId', 'status', 'startsAt', 'endsAt', 'totalPrice'])
+
+    let reservedMs = 0
+    for (const reservation of rows) {
+      if (reservation.status !== 'confirmed') {
+        summary.options += 1
+        continue
+      }
+      summary.confirmed += 1
+      const start = reservation.startsAt < now ? now : reservation.startsAt
+      const end = reservation.endsAt > horizon ? horizon : reservation.endsAt
+      reservedMs += Math.max(end.toMillis() - start.toMillis(), 0)
+      if (reservation.startsAt >= now && reservation.totalPrice !== null) {
+        summary.confirmedRevenue += Number.parseFloat(String(reservation.totalPrice)) || 0
+      }
+    }
+
+    const reservedDays = reservedMs / 86_400_000
+    summary.reservedBoatDays = Math.round(reservedDays * 10) / 10
+    summary.occupancyRate = Math.min(100, Math.round((100 * reservedDays) / (boatCount * days)))
+    summary.confirmedRevenue = Math.round(summary.confirmedRevenue * 100) / 100
+    return summary
   }
 
   async create(

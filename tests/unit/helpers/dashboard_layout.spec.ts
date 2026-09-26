@@ -7,7 +7,10 @@ import {
   visibleWidgets,
   visibleWidgetSet,
 } from '#shared/helpers/dashboard_layout'
-import { DEFAULT_DASHBOARD_ORDER } from '#shared/constants/dashboard_widgets'
+import {
+  DEFAULT_DASHBOARD_ORDER,
+  DEFAULT_HIDDEN_WIDGETS,
+} from '#shared/constants/dashboard_widgets'
 import type { StoredDashboardLayout } from '#shared/types/dashboard_layout'
 
 const stored = (partial: Partial<StoredDashboardLayout> = {}): StoredDashboardLayout => ({
@@ -24,8 +27,54 @@ test.group('resolveDashboardLayout', () => {
     assert.deepEqual(layout.order.top, ['kpis'])
     assert.deepEqual(layout.order.main, [...DEFAULT_DASHBOARD_ORDER.main])
     assert.deepEqual(layout.order.side, [...DEFAULT_DASHBOARD_ORDER.side])
-    assert.deepEqual(layout.hidden, [])
+    // Les widgets « masqués par défaut » sont dans l'ordre (pour la galerie) mais masqués.
+    assert.deepEqual(layout.hidden, [...DEFAULT_HIDDEN_WIDGETS])
+    assert.deepEqual(visibleWidgets(layout, 'side'), [
+      'ai_panel',
+      'spend',
+      'ports',
+      'planned_tasks',
+      'notifications',
+    ])
     assert.isFalse(layout.isCustomized)
+  })
+
+  test('keeps a default-hidden widget hidden when it is missing from the stored order', ({
+    assert,
+  }) => {
+    // Disposition enregistrée avant la livraison des widgets de la galerie.
+    const layout = resolveDashboardLayout(
+      stored({
+        order: {
+          main: [...DEFAULT_DASHBOARD_ORDER.main],
+          side: ['ai_panel', 'spend', 'ports', 'planned_tasks', 'notifications'],
+        },
+        hidden: ['activity'],
+      }),
+      ALL_WIDGETS_AVAILABLE
+    )
+
+    assert.deepEqual(layout.hidden, ['activity', ...DEFAULT_HIDDEN_WIDGETS])
+    // Ils sont réinsérés dans l'ordre (fin de colonne) pour alimenter la galerie.
+    assert.deepEqual(layout.order.side, [...DEFAULT_DASHBOARD_ORDER.side])
+    assert.notInclude(visibleWidgets(layout, 'side'), 'fuel')
+  })
+
+  test('shows a default-hidden widget once the stored order lists it', ({ assert }) => {
+    const layout = resolveDashboardLayout(
+      stored({
+        order: {
+          main: [...DEFAULT_DASHBOARD_ORDER.main],
+          side: ['fuel', 'ai_panel', 'spend', 'ports', 'planned_tasks', 'notifications'],
+        },
+        hidden: ['safety_compliance', 'low_stock', 'invoicing', 'charter_occupancy'],
+      }),
+      ALL_WIDGETS_AVAILABLE
+    )
+
+    assert.equal(visibleWidgets(layout, 'side')[0], 'fuel')
+    assert.notInclude(layout.hidden, 'fuel')
+    assert.include(layout.hidden, 'invoicing')
   })
 
   test('keeps the stored order and hidden widgets', ({ assert }) => {
@@ -47,14 +96,16 @@ test.group('resolveDashboardLayout', () => {
       'at_sea',
       'upcoming_reservations',
     ])
+    // Les widgets de la galerie, absents de l'ordre stocké, sont réinsérés (et masqués).
     assert.deepEqual(layout.order.side, [
       'ports',
       'ai_panel',
       'spend',
       'notifications',
+      ...DEFAULT_HIDDEN_WIDGETS,
       'planned_tasks',
     ])
-    assert.deepEqual(layout.hidden, ['activity', 'kpis'])
+    assert.deepEqual(layout.hidden, ['activity', 'kpis', ...DEFAULT_HIDDEN_WIDGETS])
     assert.isTrue(layout.isCustomized)
   })
 
@@ -79,7 +130,7 @@ test.group('resolveDashboardLayout', () => {
       'activity',
     ])
     assert.notInclude(layout.order.side, 'attention')
-    assert.deepEqual(layout.hidden, ['spend'])
+    assert.deepEqual(layout.hidden, ['spend', ...DEFAULT_HIDDEN_WIDGETS])
   })
 
   test('re-inserts a widget missing from the stored order right after its default neighbour', ({
@@ -104,11 +155,13 @@ test.group('resolveDashboardLayout', () => {
       'upcoming_reservations',
       'boats',
     ])
-    // `planned_tasks` suit `ports`, `notifications` suit `planned_tasks`.
+    // `planned_tasks` suit `ports`, `notifications` suit `planned_tasks`, puis
+    // les widgets de la galerie s'enchaînent (masqués).
     assert.deepEqual(layout.order.side, [
       'ports',
       'planned_tasks',
       'notifications',
+      ...DEFAULT_HIDDEN_WIDGETS,
       'spend',
       'ai_panel',
     ])
@@ -132,8 +185,29 @@ test.group('resolveDashboardLayout', () => {
     })
 
     assert.deepEqual(layout.order.main, ['attention', 'at_sea', 'activity', 'boats'])
-    assert.deepEqual(layout.order.side, ['ai_panel', 'planned_tasks', 'notifications'])
+    assert.deepEqual(layout.order.side, [
+      'ai_panel',
+      'planned_tasks',
+      'notifications',
+      ...DEFAULT_HIDDEN_WIDGETS,
+    ])
+    // `stored()` liste les widgets de la galerie dans l'ordre : ils restent visibles.
     assert.deepEqual(layout.hidden, ['boats'])
+  })
+
+  test('drops an unavailable default-hidden widget from the order and the hidden list', ({
+    assert,
+  }) => {
+    const layout = resolveDashboardLayout(null, {
+      ...ALL_WIDGETS_AVAILABLE,
+      invoicing: false,
+      charter_occupancy: false,
+    })
+
+    assert.notInclude(layout.order.side, 'invoicing')
+    assert.notInclude(layout.order.side, 'charter_occupancy')
+    assert.notInclude(layout.hidden, 'invoicing')
+    assert.include(layout.hidden, 'fuel')
   })
 
   test('never reorders the top zone', ({ assert }) => {
@@ -211,7 +285,16 @@ test.group('normalizeDashboardLayoutPayload', () => {
       'upcoming_reservations',
       'activity',
     ])
-    assert.deepEqual(normalized.order.side, ['notifications', 'ai_panel', 'ports', 'planned_tasks'])
-    assert.deepEqual(normalized.hidden, ['kpis', 'ports'])
+    // Réinsertion « après le voisin précédent du défaut » : les widgets de la
+    // galerie suivent `notifications`, `ports` et `planned_tasks` suivent `ai_panel`.
+    assert.deepEqual(normalized.order.side, [
+      'notifications',
+      ...DEFAULT_HIDDEN_WIDGETS,
+      'ai_panel',
+      'ports',
+      'planned_tasks',
+    ])
+    // Les widgets de la galerie absents du corps restent masqués, explicitement.
+    assert.deepEqual(normalized.hidden, ['kpis', 'ports', ...DEFAULT_HIDDEN_WIDGETS])
   })
 })

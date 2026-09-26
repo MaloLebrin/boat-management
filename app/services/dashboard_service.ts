@@ -2,6 +2,7 @@ import Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import type User from '#models/user'
+import BoatSafetyComplianceService from '#services/boat_safety_compliance_service'
 import PortService from '#services/port_service'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
@@ -11,17 +12,27 @@ import type {
   DashboardPlannedTasks,
   DashboardPortItem,
   DashboardPortStats,
+  DashboardSafetyCompliance,
+  DashboardSafetyComplianceBoat,
   DashboardStatDeltas,
   DashboardStats,
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
-import { PLANNED_TASKS_CAP, PLANNED_TASKS_DAYS } from '#shared/constants/dashboard_widgets'
+import {
+  PLANNED_TASKS_CAP,
+  PLANNED_TASKS_DAYS,
+  SAFETY_COMPLIANCE_CAP,
+} from '#shared/constants/dashboard_widgets'
+import { SAFETY_BLOCKING_ISSUE_KINDS } from '#shared/types/safety'
 import { isDueDateOverdue } from '#shared/helpers/maintenance'
 import type { MaintenanceMaxDoneRow } from '#shared/types/maintenance'
 
 @inject()
 export default class DashboardService {
-  constructor(private portService: PortService) {}
+  constructor(
+    private portService: PortService,
+    private safetyComplianceService: BoatSafetyComplianceService
+  ) {}
 
   async getForUser(
     user: User,
@@ -265,5 +276,72 @@ export default class DashboardService {
         dueAt: task.dueAt!.toISODate()!,
       })),
     }
+  }
+
+  /**
+   * Widget « Conformité sécurité » : le rapport Division 240 de chaque bateau
+   * (calcul pur, une seule requête pour les inventaires), résumé en flotte.
+   * Seuls les bateaux avec un écart sont listés, les pires d'abord (écarts
+   * bloquants, puis score croissant, puis alertes). Ne renvoie jamais `null`.
+   */
+  async getSafetyCompliance(
+    boatIds: number[],
+    opts: { today?: string; limit?: number } = {}
+  ): Promise<DashboardSafetyCompliance> {
+    const summary: DashboardSafetyCompliance = {
+      checked: 0,
+      compliant: 0,
+      withIssues: 0,
+      withoutZone: 0,
+      items: [],
+    }
+    if (boatIds.length === 0) return summary
+
+    const boats = await Boat.query()
+      .whereIn('id', boatIds)
+      .select(['id', 'name', 'armamentZone', 'maxPersons', 'propulsionType'])
+      .preload('safetyEquipment', (q) =>
+        q.select(['id', 'boatId', 'equipmentType', 'quantity', 'expiryDate', 'purchasedAt'])
+      )
+
+    const blocking = new Set(SAFETY_BLOCKING_ISSUE_KINDS)
+    const withIssues: DashboardSafetyComplianceBoat[] = []
+
+    for (const boat of boats) {
+      const report = this.safetyComplianceService.forBoat(boat, opts.today)
+      if (report.zone === null) {
+        summary.withoutZone += 1
+        continue
+      }
+      summary.checked += 1
+      if (report.issues.length === 0) {
+        summary.compliant += 1
+        continue
+      }
+      summary.withIssues += 1
+      const dueDates = report.issues
+        .map((issue) => issue.dueDate)
+        .filter((date): date is string => date !== null)
+        .sort()
+      withIssues.push({
+        boatId: boat.id,
+        boatName: boat.name,
+        zone: report.zone,
+        score: report.score ?? 0,
+        blockingCount: report.issues.filter((issue) => blocking.has(issue.kind)).length,
+        warningCount: report.issues.filter((issue) => !blocking.has(issue.kind)).length,
+        nextDueDate: dueDates[0] ?? null,
+      })
+    }
+
+    withIssues.sort(
+      (a, b) =>
+        b.blockingCount - a.blockingCount ||
+        a.score - b.score ||
+        b.warningCount - a.warningCount ||
+        a.boatName.localeCompare(b.boatName)
+    )
+    summary.items = withIssues.slice(0, opts.limit ?? SAFETY_COMPLIANCE_CAP)
+    return summary
   }
 }

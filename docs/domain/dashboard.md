@@ -14,6 +14,7 @@ Dire ce qui se passe dans la flotte et ce qu'il faut traiter aujourd'hui (#832),
 - **« Tâches planifiées »** (prop différée) : tâches ouvertes datées des 30 prochains jours
 - **« Notifications »** : dernières notifications non lues (prop partagée `notifications`, aucune requête dédiée)
 - **Personnalisation par utilisateur** : chaque widget peut être masqué, et réordonné dans sa colonne ; la disposition ci-dessus est le défaut
+- **Widgets de la galerie** (masqués par défaut, à ajouter via « Personnaliser » → « Ajouter un widget », tous en prop différée) : **« Conformité sécurité »** (rapport Division 240 par bateau, les pires écarts d'abord), **« Carburant »** (pleins des 30 derniers jours vs 30 précédents), **« Pièces manquantes »** (pièces moteur sous seuil ou à remplacer, toute la flotte), **« Facturation »** (module CRM/Facturation : encours, impayées, encaissé ce mois, devis), **« Occupation location »** (module Location : taux d'occupation confirmé sur 30 jours, options, CA)
 
 ## Structure de l'écran
 
@@ -22,7 +23,7 @@ Deux colonnes `2fr / 1fr` à partir de `xl`, tout empilé en dessous dans cet or
 1. En-tête : titre, date du jour (calculée côté client), menu « + Créer »
 2. KPI : 4 cartes, 2 par ligne sous `lg`, 4 à partir de `lg`
 3. Colonne principale : À traiter → En mer (+ Prochains départs côte à côte dès `md`) → Activité récente → Vos bateaux
-4. Colonne latérale : Assistant IA → Dépenses (admins) → Ports → Tâches planifiées → Notifications
+4. Colonne latérale : Assistant IA → Dépenses (admins) → Ports → Tâches planifiées → Notifications → _(galerie, masqués : Conformité sécurité → Carburant → Pièces manquantes → Facturation → Occupation location)_
 
 C'est l'ordre **par défaut** (`DEFAULT_DASHBOARD_ORDER`) ; la page rend en réalité `layout.order[zone]` moins `layout.hidden` (voir « Personnalisation »).
 
@@ -30,14 +31,14 @@ C'est l'ordre **par défaut** (`DEFAULT_DASHBOARD_ORDER`) ; la page rend en réa
 
 Référence : `shared/constants/dashboard_widgets.ts`, `shared/helpers/dashboard_layout.ts`, `app/services/dashboard_layout_service.ts`, `inertia/composables/use_dashboard_layout.ts`.
 
-- **Registre** : 11 widgets, chacun avec une zone (`top` = KPI, masquable mais jamais réordonnable ; `main` ; `side`) et une taille (`full` / `half`). Deux `half` **consécutifs** et visibles (« En mer », « Prochains départs ») se partagent une ligne dès `md` (`groupDashboardWidgets`) ; un `half` isolé prend toute la largeur.
+- **Registre** : 16 widgets, chacun avec une zone (`top` = KPI, masquable mais jamais réordonnable ; `main` ; `side`), une taille (`full` / `half`) et, pour les cinq widgets de la galerie, `defaultHidden: true` (`DEFAULT_HIDDEN_WIDGETS`). Deux `half` **consécutifs** et visibles (« En mer », « Prochains départs ») se partagent une ligne dès `md` (`groupDashboardWidgets`) ; un `half` isolé prend toute la largeur.
 - **Stockage** : `users.dashboard_layout` (jsonb nullable) — `{ version: 1, order: { main, side }, hidden }`. `null` = défaut. `hidden` est explicite : un widget livré après la personnalisation apparaît à sa position par défaut.
-- **Disponibilité** (`DashboardLayoutService.availabilityFor`) : `spend` = rôle admin ; `upcoming_reservations` = module Location **et** `boats.view` ; `ports` = `QuotaService.canManagePorts` (plan + profil, #604) ; le reste toujours. Un widget indisponible est retiré de la disposition servie **et** du blob stocké.
-- **Résolution** (`resolveDashboardLayout`) : défaut filtré par disponibilité ; si une disposition est stockée, on garde son ordre (ids connus, de la bonne zone, disponibles) et on réinsère chaque widget manquant juste après son voisin précédent du défaut. La même fonction sert au contrôleur (ne calculer que le visible) et à la page.
+- **Disponibilité** (`DashboardLayoutService.availabilityFor`) : `spend` = rôle admin ; `upcoming_reservations` et `charter_occupancy` = module Location **et** `boats.view` ; `ports` = `QuotaService.canManagePorts` (plan + profil, #604) ; `invoicing` = module CRM/Facturation **et** `invoices.view` (la même valeur alimente `canViewInvoices` de « À traiter ») ; le reste toujours. Un widget indisponible est retiré de la disposition servie **et** du blob stocké.
+- **Résolution** (`resolveDashboardLayout`) : défaut filtré par disponibilité, les widgets `defaultHidden` dans `hidden` ; si une disposition est stockée, on garde son ordre (ids connus, de la bonne zone, disponibles) et on réinsère chaque widget manquant juste après son voisin précédent du défaut — un widget `defaultHidden` absent de l'ordre stocké (livré après la personnalisation) est **ajouté à `hidden`**, les autres apparaissent. Dès le premier `PUT`, le blob porte explicitement tous les masqués. La même fonction sert au contrôleur (ne calculer que le visible) et à la page.
 - **Prop `layout`** (`ResolvedDashboardLayout`) : `order` par zone (masqués inclus, pour la modale), `hidden`, `isCustomized`.
 - **Routes** : `PUT /dashboard/layout` (`{ order: { main, side }, hidden }`, ids du registre, `distinct`) et `DELETE /dashboard/layout` (retour au défaut) → `redirect().back()` + flash.
 - **Mode édition en place** (façon iOS, `useDashboardLayout`) : « Personnaliser » encadre chaque widget visible (`DashboardWidgetFrame`) — contenu **inerte** (`inert`, plus aucun lien ni bouton actif, oscillation discrète), badge « − » pour retirer, flèches ▲▼ pour déplacer dans la colonne (KPI : retrait seulement). La toolbar remplace l'en-tête d'actions : « + Ajouter un widget » (galerie des widgets retirés, par zone), « Réinitialiser », « Annuler » / `Échap`, « Terminé ». Le brouillon s'applique à l'écran immédiatement ; « Terminé » envoie **un** `PUT` s'il y a un changement, puis la page se recharge. Un widget réajouté dont la donnée a été omise côté serveur affiche un tenant-lieu jusqu'à l'enregistrement.
-- **Widgets masqués** : leurs données ne sont ni calculées ni envoyées (`upcomingReservations`, `aiFleetAnalysis`, defers `spend`, `activity`, `plannedTasks`). Les props partagées par plusieurs blocs (`boats`, `attention`, `fleetStatus`…) restent toujours envoyées.
+- **Widgets masqués** : leurs données ne sont ni calculées ni envoyées (`upcomingReservations`, `aiFleetAnalysis`, defers `spend`, `activity`, `plannedTasks`, `safetyCompliance`, `fuel`, `lowStock`, `invoicing`, `charterOccupancy`). Les props partagées par plusieurs blocs (`boats`, `attention`, `fleetStatus`…) restent toujours envoyées. Les cinq widgets de la galerie étant masqués par défaut, une page non personnalisée ne coûte aucune requête de plus qu'avant.
 - **Chevauchement assumé** : une tâche due sous 14 jours apparaît dans « À traiter » **et** dans « Tâches planifiées » (horizon 30 jours) — la seconde carte est une vue calendaire, pas une alerte.
 
 ## Entrée (routing)
@@ -58,6 +59,11 @@ Services :
 - `app/services/budget_service.ts#getOrgSpendSummary` — `spend` (différé, admins)
 - `app/services/dashboard_service.ts#getPlannedTasks` — `plannedTasks` (différé, groupe `plannedTasks`)
 - `app/services/dashboard_layout_service.ts` — `layout` (disposition résolue, disponibilité des widgets)
+- `app/services/dashboard_service.ts#getSafetyCompliance` — `safetyCompliance` (différé, galerie) : une requête bateaux + inventaire de sécurité, rapport `BoatSafetyComplianceService.forBoat` par bateau (calcul pur)
+- `app/services/dashboard_fleet_activity_service.ts#getFuelSummary` — `fuel` (différé, galerie) : trois agrégats sur `boat_fuel_logs`
+- `app/services/boat_engine_part_service.ts#listAlertsForBoats` — `lowStock` (différé, galerie) : une requête `boat_engine_parts ⋈ boat_engines`, compteurs par fonctions fenêtre
+- `app/services/invoice_service.ts#getDashboardSummary` — `invoicing` (différé, galerie, module CRM/Facturation) : un agrégat conditionnel sur `invoices`
+- `app/services/boat_reservation_service.ts#getOccupancyForOrg` — `charterOccupancy` (différé, galerie, module Location) : réservations chevauchant la fenêtre, jours-bateau bornés en mémoire
 
 Autres props : `aiFleetAnalysis`, `aiFleetAnalysisAt`, `portOptions`, `canCreate*`, `taskEquipment?` (optionnelle), `canAddBoat`, `boatQuota`, `canViewSpend`. Types dans `shared/types/dashboard.ts` et `shared/types/dashboard_layout.ts`, constantes (plafonds, fenêtres) dans `shared/constants/dashboard.ts` et `shared/constants/dashboard_widgets.ts`.
 
@@ -79,16 +85,21 @@ Référence : `DashboardService.getForUser()`.
 
 ## Fenêtres et plafonds
 
-| Bloc                 | Fenêtre                                                       | Plafond                                                          |
-| -------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------- |
-| KPI sorties / tâches | `PULSE_WINDOW_DAYS` = 30 j glissants                          | —                                                                |
-| À traiter            | maintenance 14 j / 10 h, documents 30 j                       | 6 lignes, `ATTENTION_FETCH_PER_KIND` = 6 par type                |
-| En mer               | sorties `in_progress` (une par bateau, index partiel unique)  | `ACTIVE_TRIPS_DISPLAY_CAP` = 5                                   |
-| Prochains départs    | `UPCOMING_RESERVATIONS_DAYS` = 7 j                            | `UPCOMING_RESERVATIONS_CAP` = 5                                  |
-| Activité récente     | —                                                             | `ACTIVITY_DISPLAY_CAP` = 8 (5 requêtes bornées, fusion mémoire)  |
-| Dépenses             | mois 1..courant, N et N-1                                     | ~18 agrégats, différé                                            |
-| Tâches planifiées    | `PLANNED_TASKS_DAYS` = 30 j (ouvertes, datées, non en retard) | `PLANNED_TASKS_CAP` = 5, total exact (fonction fenêtre), différé |
-| Notifications        | —                                                             | 5 dernières non lues (prop partagée `notifications`)             |
+| Bloc                 | Fenêtre                                                                                                           | Plafond                                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| KPI sorties / tâches | `PULSE_WINDOW_DAYS` = 30 j glissants                                                                              | —                                                                                                          |
+| À traiter            | maintenance 14 j / 10 h, documents 30 j                                                                           | 6 lignes, `ATTENTION_FETCH_PER_KIND` = 6 par type                                                          |
+| En mer               | sorties `in_progress` (une par bateau, index partiel unique)                                                      | `ACTIVE_TRIPS_DISPLAY_CAP` = 5                                                                             |
+| Prochains départs    | `UPCOMING_RESERVATIONS_DAYS` = 7 j                                                                                | `UPCOMING_RESERVATIONS_CAP` = 5                                                                            |
+| Activité récente     | —                                                                                                                 | `ACTIVITY_DISPLAY_CAP` = 8 (5 requêtes bornées, fusion mémoire)                                            |
+| Dépenses             | mois 1..courant, N et N-1                                                                                         | ~18 agrégats, différé                                                                                      |
+| Tâches planifiées    | `PLANNED_TASKS_DAYS` = 30 j (ouvertes, datées, non en retard)                                                     | `PLANNED_TASKS_CAP` = 5, total exact (fonction fenêtre), différé                                           |
+| Notifications        | —                                                                                                                 | 5 dernières non lues (prop partagée `notifications`)                                                       |
+| Conformité sécurité  | échéances à 30 j (corpus Division 240, `DUE_SOON_WINDOW_DAYS`)                                                    | `SAFETY_COMPLIANCE_CAP` = 5 bateaux avec écart, pires d'abord ; compteurs flotte exacts ; différé, galerie |
+| Carburant            | `FUEL_WINDOW_DAYS` = 30 j glissants, vs les 30 j précédents                                                       | 3 agrégats ; prix moyen sur les seuls pleins chiffrés ; différé, galerie                                   |
+| Pièces manquantes    | —                                                                                                                 | `LOW_STOCK_CAP` = 5, total et compteurs exacts (fonctions fenêtre) ; différé, galerie                      |
+| Facturation          | encaissé depuis le 1er du mois ; impayée = `overdue` ou `sent` échue                                              | 1 agrégat conditionnel ; différé, galerie, module CRM/Facturation                                          |
+| Occupation location  | `CHARTER_OCCUPANCY_DAYS` = 30 j ; taux sur les confirmées bornées à la fenêtre ; CA sur les départs de la fenêtre | — ; différé, galerie, module Location                                                                      |
 
 ## Index
 
