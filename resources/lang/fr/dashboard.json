@@ -162,5 +162,47 @@
     "noComparison": "Pas de comparaison N-1",
     "empty": "Aucune dépense enregistrée cette année.",
     "viewBoatBudget": "Voir le budget du bateau"
+  },
+  "customize": {
+    "button": "Personnaliser",
+    "hiddenCount": "{count, plural, one {# masqué} other {# masqués}}",
+    "title": "Personnaliser le tableau de bord",
+    "subtitle": "Choisissez les widgets à afficher et leur ordre dans chaque colonne. La disposition est propre à votre compte.",
+    "hint": "Les widgets réservés à un plan, un module ou un rôle n’apparaissent que s’ils vous sont accessibles.",
+    "toggle": "Afficher le widget {widget}",
+    "moveUp": "Monter le widget {widget}",
+    "moveDown": "Descendre le widget {widget}",
+    "reset": "Réinitialiser",
+    "zone": {
+      "top": "Indicateurs",
+      "main": "Colonne principale",
+      "side": "Colonne latérale"
+    }
+  },
+  "widgets": {
+    "kpis": "Indicateurs clés",
+    "attention": "À traiter",
+    "at_sea": "En mer maintenant",
+    "upcoming_reservations": "Prochains départs et retours",
+    "activity": "Activité récente",
+    "boats": "Vos bateaux",
+    "ai_panel": "Assistant IA",
+    "spend": "Dépenses",
+    "ports": "Ports",
+    "planned_tasks": "Tâches planifiées",
+    "notifications": "Notifications"
+  },
+  "plannedTasks": {
+    "title": "Tâches planifiées",
+    "period": "{days} prochains jours",
+    "empty": "Aucune tâche planifiée sur la période.",
+    "viewAll": "Voir le planning",
+    "open": "Ouvrir la tâche {title} ({boat})",
+    "more": "{count, plural, one {# autre tâche sur la période} other {# autres tâches sur la période}}"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification non lue.",
+    "viewAll": "Tout voir"
   }
 }

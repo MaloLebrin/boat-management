@@ -12,6 +12,7 @@ vi.mock('~/composables/use_date_format', () => ({
 vi.mock('@inertiajs/vue3', () => ({
   Head: { template: '<div><slot /></div>' },
   usePage: vi.fn(),
+  router: { put: vi.fn(), delete: vi.fn() },
 }))
 
 vi.mock('@adonisjs/inertia/vue', () => ({
@@ -20,7 +21,11 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 
 import { usePage } from '@inertiajs/vue3'
 import Dashboard from '../../inertia/pages/dashboard.vue'
-import type { DashboardAttention } from '../../shared/types/dashboard'
+import type { DashboardAttention, DashboardPortItem } from '../../shared/types/dashboard'
+import {
+  ALL_WIDGETS_AVAILABLE,
+  resolveDashboardLayout,
+} from '../../shared/helpers/dashboard_layout'
 
 const EMPTY_ATTENTION: DashboardAttention = {
   items: [],
@@ -36,7 +41,6 @@ const EMPTY_ATTENTION: DashboardAttention = {
   },
   canViewInvoices: false,
 }
-import type { DashboardPortItem } from '../../shared/types/dashboard'
 
 const PORT: DashboardPortItem = {
   id: 1,
@@ -57,6 +61,9 @@ const stubs = {
   DashboardActivityCard: { template: '<div />' },
   DashboardSpendCard: { template: '<div />' },
   DashboardUpcomingReservationsCard: { template: '<div />' },
+  DashboardPlannedTasksCard: { template: '<div />' },
+  DashboardNotificationsCard: { template: '<div />' },
+  DashboardCustomizeModal: { template: '<div />' },
   DashboardHeader: { template: '<div><slot name="actions" /></div>' },
   DashboardQuickAddActions: { template: '<div />' },
   DashboardStatsGrid: { template: '<div />' },
@@ -64,13 +71,15 @@ const stubs = {
   PortDashboardCard: { template: '<div class="port-dashboard-card" />' },
 }
 
-function mountDashboard(
-  currentPlan: unknown,
-  ports: DashboardPortItem[] = [PORT],
-  organizationType: unknown = undefined
-) {
+/**
+ * La garde de plan / profil de la carte ports (#604) est désormais tranchée
+ * côté serveur : `DashboardLayoutService.availabilityFor` retire `ports` de la
+ * disposition servie (voir `tests/functional/dashboard/dashboard_layout.spec.ts`).
+ * La page ne fait que rendre la disposition reçue — `usePage()` n'entre plus en jeu.
+ */
+function mountDashboard(portsAvailable: boolean, ports: DashboardPortItem[] = [PORT]) {
   vi.mocked(usePage).mockReturnValue({
-    props: { currentPlan, activeModules: [], activeAddons: [], organizationType },
+    props: { currentPlan: 'enterprise', activeModules: [], activeAddons: [] },
   } as unknown as ReturnType<typeof usePage>)
 
   return mount(Dashboard, {
@@ -99,46 +108,40 @@ function mountDashboard(
       canCreateMaintenanceTasks: false,
       canAddBoat: true,
       boatQuota: { used: 0, limit: 2 },
+      layout: resolveDashboardLayout(null, { ...ALL_WIDGETS_AVAILABLE, ports: portsAvailable }),
     },
     global: { stubs },
   })
 }
 
-// #604 — la carte ports du dashboard suit la même garde de plan que la nav et
-// les routes : hors Entreprise, son état vide inviterait à créer un port
-// inaccessible.
-
-test('le plan Pro masque la carte ports du dashboard', () => {
-  const wrapper = mountDashboard('pro')
+test('une disposition sans `ports` (plan ou profil sans cartographie) masque la carte', () => {
+  const wrapper = mountDashboard(false)
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(false)
 })
 
-test('le plan Entreprise affiche la carte ports du dashboard', () => {
-  const wrapper = mountDashboard('enterprise')
+test('une disposition avec `ports` affiche la carte', () => {
+  const wrapper = mountDashboard(true)
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(true)
 })
 
-test('le plan Starter masque la carte ports du dashboard', () => {
-  const wrapper = mountDashboard('starter')
-  expect(wrapper.find('.port-dashboard-card').exists()).toBe(false)
-})
-
-test('un plan absent masque la carte ports du dashboard', () => {
-  const wrapper = mountDashboard(null)
-  expect(wrapper.find('.port-dashboard-card').exists()).toBe(false)
-})
-
-test('le plan Entreprise sans aucun port affiche quand même la carte et son état vide', () => {
-  const wrapper = mountDashboard('enterprise', [])
+test('sans aucun port, la carte reste rendue avec son état vide', () => {
+  const wrapper = mountDashboard(true, [])
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(true)
 })
 
-test('the ports card is hidden for a private organization profile', () => {
-  const wrapper = mountDashboard('enterprise', [PORT], 'private')
-  expect(wrapper.find('.port-dashboard-card').exists()).toBe(false)
-})
-
-test('the ports card stays visible for a professional profile', () => {
-  const wrapper = mountDashboard('enterprise', [PORT], 'marina')
+test('un widget `ports` masqué par l’utilisateur n’est pas rendu', () => {
+  const layout = resolveDashboardLayout(
+    { version: 1, order: { main: [], side: [] }, hidden: ['ports'] },
+    ALL_WIDGETS_AVAILABLE
+  )
+  vi.mocked(usePage).mockReturnValue({
+    props: { currentPlan: 'enterprise', activeModules: [], activeAddons: [] },
+  } as unknown as ReturnType<typeof usePage>)
+  const wrapper = mountDashboard(true)
   expect(wrapper.find('.port-dashboard-card').exists()).toBe(true)
+  const hidden = mount(Dashboard, {
+    props: { ...(wrapper.props() as Record<string, unknown>), layout },
+    global: { stubs },
+  })
+  expect(hidden.find('.port-dashboard-card').exists()).toBe(false)
 })

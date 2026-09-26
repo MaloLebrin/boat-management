@@ -12,6 +12,7 @@ vi.mock('~/composables/use_date_format', () => ({
 vi.mock('@inertiajs/vue3', () => ({
   Head: { template: '<div><slot /></div>' },
   usePage: vi.fn(),
+  router: { put: vi.fn(), delete: vi.fn() },
 }))
 
 vi.mock('@adonisjs/inertia/vue', () => ({
@@ -21,6 +22,20 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 import { usePage } from '@inertiajs/vue3'
 import Dashboard from '../../inertia/pages/dashboard.vue'
 import type { DashboardAttention } from '../../shared/types/dashboard'
+import type { ResolvedDashboardLayout } from '../../shared/types/dashboard_layout'
+import {
+  ALL_WIDGETS_AVAILABLE,
+  resolveDashboardLayout,
+} from '../../shared/helpers/dashboard_layout'
+
+/** Disposition par défaut d'un admin Entreprise (tout disponible), sauf `upcoming_reservations`. */
+function defaultLayout(over: Partial<ResolvedDashboardLayout> = {}): ResolvedDashboardLayout {
+  const layout = resolveDashboardLayout(null, {
+    ...ALL_WIDGETS_AVAILABLE,
+    upcoming_reservations: false,
+  })
+  return { ...layout, ...over }
+}
 
 const EMPTY_ATTENTION: DashboardAttention = {
   items: [],
@@ -60,6 +75,9 @@ const stubs = {
   DashboardUpcomingReservationsCard: { template: '<div data-testid="upcoming" />' },
   DashboardAiPanel: { template: '<div data-testid="ai-panel" />' },
   PortDashboardCard: { template: '<div data-testid="ports" />' },
+  DashboardPlannedTasksCard: { template: '<div data-testid="planned-tasks" />' },
+  DashboardNotificationsCard: { template: '<div data-testid="notifications" />' },
+  DashboardCustomizeModal: { template: '<div data-testid="customize-modal" />' },
 }
 
 function mountDashboard(currentPlan = 'enterprise', extraProps: Record<string, unknown> = {}) {
@@ -93,6 +111,7 @@ function mountDashboard(currentPlan = 'enterprise', extraProps: Record<string, u
       canCreateMaintenanceTasks: false,
       canAddBoat: true,
       boatQuota: { used: 0, limit: 2 },
+      layout: defaultLayout(),
       ...extraProps,
     },
     global: { stubs },
@@ -130,22 +149,32 @@ describe('Dashboard — structure de page (#828)', () => {
     expect(ai).toBeLessThan(spend)
     expect(spend).toBeLessThan(ports)
 
-    const member = mountDashboard('enterprise', { canViewSpend: false })
+    // Membre : le serveur retire `spend` de la disposition (widget indisponible).
+    const member = mountDashboard('enterprise', {
+      canViewSpend: false,
+      layout: resolveDashboardLayout(null, {
+        ...ALL_WIDGETS_AVAILABLE,
+        upcoming_reservations: false,
+        spend: false,
+      }),
+    })
     expect(member.find('[data-testid="spend"]').exists()).toBe(false)
   })
 
-  test('the today grid is single-column without the charter module and two-column with it', () => {
+  test('« En mer » stands alone without the charter module and pairs with the departures with it', () => {
     const without = mountDashboard()
     expect(without.find('[data-testid="upcoming"]').exists()).toBe(false)
-    expect(without.get('[data-testid="dashboard-today-grid"]').classes()).not.toContain(
-      'md:grid-cols-2'
-    )
+    expect(without.find('[data-testid="dashboard-half-row"]').exists()).toBe(false)
 
-    const withModule = mountDashboard('enterprise', { upcomingReservations: [] })
+    const withModule = mountDashboard('enterprise', {
+      upcomingReservations: [],
+      layout: resolveDashboardLayout(null, ALL_WIDGETS_AVAILABLE),
+    })
     expect(withModule.find('[data-testid="upcoming"]').exists()).toBe(true)
-    expect(withModule.get('[data-testid="dashboard-today-grid"]').classes()).toContain(
-      'md:grid-cols-2'
-    )
+    const row = withModule.get('[data-testid="dashboard-half-row"]')
+    expect(row.classes()).toContain('md:grid-cols-2')
+    expect(row.find('[data-testid="at-sea"]').exists()).toBe(true)
+    expect(row.find('[data-testid="upcoming"]').exists()).toBe(true)
     const [atSea, upcoming] = order(withModule, ['at-sea', 'upcoming'])
     expect(atSea).toBeLessThan(upcoming)
   })
@@ -160,6 +189,15 @@ describe('Dashboard — structure de page (#828)', () => {
     expect(ai).toBeLessThan(ports)
   })
 
+  test('closes the side column with the planned tasks and the notifications by default', () => {
+    const wrapper = mountDashboard()
+    const side = wrapper.get('[data-testid="dashboard-side-column"]')
+    expect(side.find('[data-testid="planned-tasks"]').exists()).toBe(true)
+    expect(side.find('[data-testid="notifications"]').exists()).toBe(true)
+    const positions = order(wrapper, ['ports', 'planned-tasks', 'notifications'])
+    expect(positions).toEqual([...positions].sort((a, b) => a - b))
+  })
+
   /**
    * Sans alignement explicite, `align-items: stretch` (défaut d'une grille)
    * étirerait la colonne latérale — donc le panneau navy de l'assistant — sur
@@ -171,6 +209,45 @@ describe('Dashboard — structure de page (#828)', () => {
     expect(grid.className).toContain('grid')
     expect(grid.className).toContain('xl:items-start')
     expect(grid.className).toContain('xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]')
+  })
+
+  test('follows a customised order and skips hidden widgets', () => {
+    const wrapper = mountDashboard('enterprise', {
+      layout: defaultLayout({
+        order: {
+          top: ['kpis'],
+          main: ['boats', 'activity', 'attention', 'at_sea'],
+          side: ['notifications', 'spend', 'ports', 'ai_panel', 'planned_tasks'],
+        },
+        hidden: ['kpis', 'activity', 'ports'],
+        isCustomized: true,
+      }),
+    })
+
+    expect(wrapper.find('[data-testid="stats"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="activity"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="ports"]').exists()).toBe(false)
+
+    const main = order(wrapper, ['boats', 'attention', 'at-sea'])
+    expect(main.every((p) => p >= 0)).toBe(true)
+    expect(main).toEqual([...main].sort((a, b) => a - b))
+
+    const side = order(wrapper, ['notifications', 'spend', 'ai-panel', 'planned-tasks'])
+    expect(side.every((p) => p >= 0)).toBe(true)
+    expect(side).toEqual([...side].sort((a, b) => a - b))
+
+    expect(wrapper.get('[data-testid="dashboard-hidden-count"]').text()).toBe(
+      'dashboard.customize.hiddenCount'
+    )
+  })
+
+  test('offers the customize button in the header and mounts the modal', () => {
+    const wrapper = mountDashboard()
+    expect(
+      wrapper.get('[data-testid="header"]').find('[data-testid="dashboard-customize"]').exists()
+    ).toBe(true)
+    expect(wrapper.find('[data-testid="dashboard-hidden-count"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="customize-modal"]').exists()).toBe(true)
   })
 
   test('hands the whole attention payload to the card', () => {

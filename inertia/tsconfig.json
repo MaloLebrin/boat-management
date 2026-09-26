@@ -17,7 +17,9 @@
     "../.adonisjs/client/**/*.ts",
     "../.adonisjs/server/routes.d.ts",
     "../shared/constants/boats/boat_form_options.ts",
+    "../shared/constants/dashboard_widgets.ts",
     "../shared/constants/equipment_action.ts",
+    "../shared/helpers/dashboard_layout.ts",
     "../shared/helpers/equipment_action.ts",
     "../shared/helpers/navigation_title.ts",
     "../shared/types/**/*.ts"

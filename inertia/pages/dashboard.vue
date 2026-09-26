@@ -1,69 +1,30 @@
 <script setup lang="ts">
+import { AdjustmentsHorizontalIcon } from '@heroicons/vue/24/outline'
 import { Head } from '@inertiajs/vue3'
-import { computed } from 'vue'
-import DashboardActivityCard from '~/components/dashboard/DashboardActivityCard.vue'
-import DashboardAiPanel from '~/components/dashboard/DashboardAiPanel.vue'
-import DashboardAtSeaCard from '~/components/dashboard/DashboardAtSeaCard.vue'
-import DashboardAttentionCard from '~/components/dashboard/DashboardAttentionCard.vue'
-import DashboardBoatsCard from '~/components/dashboard/DashboardBoatsCard.vue'
+import { computed, ref } from 'vue'
+import BaseButton from '~/components/base/BaseButton.vue'
+import DashboardCustomizeModal from '~/components/dashboard/DashboardCustomizeModal.vue'
 import DashboardHeader from '~/components/dashboard/DashboardHeader.vue'
 import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
-import DashboardSpendCard from '~/components/dashboard/DashboardSpendCard.vue'
 import DashboardStatsGrid from '~/components/dashboard/DashboardStatsGrid.vue'
-import DashboardUpcomingReservationsCard from '~/components/dashboard/DashboardUpcomingReservationsCard.vue'
-import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
-import type {
-  DashboardActiveTrips,
-  DashboardActivityItem,
-  DashboardAttention,
-  DashboardBoatSummary,
-  DashboardFleetStatus,
-  DashboardPortItem,
-  DashboardPortStats,
-  DashboardPulseStats,
-  DashboardSpendSummary,
-  DashboardStats,
-  DashboardUpcomingReservation,
-} from '#shared/types/dashboard'
-import type { BoatTaskEquipment } from '#shared/types/maintenance'
+import DashboardWidgetColumn from '~/components/dashboard/DashboardWidgetColumn.vue'
+import { visibleWidgets } from '#shared/helpers/dashboard_layout'
 import { useT } from '~/composables/use_t'
-import { usePlan } from '~/composables/use_plan'
-import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
-import type { QuotaUsage } from '../../shared/types/plan'
+import type { DashboardPageProps } from '~/types/dashboard_widgets'
 
 const { t } = useT()
-const { effectiveQuotas } = usePlan()
 
-const canManagePorts = computed(() => effectiveQuotas.value?.canManagePorts === true)
+const props = defineProps<DashboardPageProps>()
 
-defineProps<{
-  boats: DashboardBoatSummary[]
-  stats: DashboardStats
-  /** Liste mixte « À traiter » (#832) : maintenance, incidents, documents, factures. */
-  attention: DashboardAttention
-  pulse: DashboardPulseStats
-  activeTrips: DashboardActiveTrips
-  fleetStatus: DashboardFleetStatus
-  /** Absent (pas `null`) quand le module Location n'est pas actif. */
-  upcomingReservations?: DashboardUpcomingReservation[]
-  /** Prop différée (groupe `activity`) : `undefined` tant qu'elle n'est pas arrivée. */
-  activity?: DashboardActivityItem[]
-  /** Admins seulement ; `spend` est alors une prop différée (groupe `spend`). */
-  canViewSpend: boolean
-  spend?: DashboardSpendSummary
-  aiFleetAnalysisAt: string | null
-  aiFleetAnalysis: AiSuggestion[] | null
-  ports: DashboardPortItem[]
-  portStats: DashboardPortStats
-  portOptions: NavigationLogPortOption[]
-  canCreateNavigationLogs: boolean
-  canCreateIncidents: boolean
-  canCreateMaintenanceTasks: boolean
-  /** Prop optionnelle, chargée par l'ajout rapide de tâche une fois le bateau choisi. */
-  taskEquipment?: BoatTaskEquipment
-  canAddBoat: boolean
-  boatQuota: QuotaUsage['boats']
-}>()
+// Disposition par utilisateur : la page ne fait qu'orchestrer les widgets
+// visibles dans l'ordre servi par `layout` ; la disponibilité (rôle, plan,
+// modules) est déjà tranchée côté serveur.
+const kpisVisible = computed(() => visibleWidgets(props.layout, 'top').includes('kpis'))
+const mainWidgets = computed(() => visibleWidgets(props.layout, 'main'))
+const sideWidgets = computed(() => visibleWidgets(props.layout, 'side'))
+const hiddenCount = computed(() => props.layout.hidden.length)
+
+const customizeOpen = ref(false)
 </script>
 
 <template>
@@ -71,11 +32,28 @@ defineProps<{
 
   <!-- Hiérarchie (#828) : en-tête → KPI compacts → colonne principale (ce
        qu'il y a à faire, puis la flotte) + colonne latérale (assistant IA,
-       ports). Sous xl tout s'empile dans cet ordre : l'IA passe avant les
-       ports, qui étaient auparavant au-dessus de la maintenance urgente. -->
+       ports…). Sous xl tout s'empile dans cet ordre. Chaque utilisateur peut
+       masquer et réordonner les widgets de chaque colonne (« Personnaliser »). -->
   <div class="w-full max-w-7xl px-4 py-6 sm:px-8 sm:py-10">
     <DashboardHeader>
       <template #actions>
+        <BaseButton
+          variant="outline"
+          size="sm"
+          data-testid="dashboard-customize"
+          :aria-label="t('dashboard.customize.button')"
+          @click="customizeOpen = true"
+        >
+          <AdjustmentsHorizontalIcon class="h-4 w-4" aria-hidden="true" />
+          <span class="hidden sm:inline">{{ t('dashboard.customize.button') }}</span>
+          <span
+            v-if="hiddenCount > 0"
+            class="rounded-full bg-surface-muted px-1.5 text-xs text-fg-muted"
+            data-testid="dashboard-hidden-count"
+          >
+            {{ t('dashboard.customize.hiddenCount', { count: String(hiddenCount) }) }}
+          </span>
+        </BaseButton>
         <DashboardQuickAddActions
           :boats="boats"
           :port-options="portOptions"
@@ -90,6 +68,7 @@ defineProps<{
     </DashboardHeader>
 
     <DashboardStatsGrid
+      v-if="kpisVisible"
       class="mt-6 sm:mt-8"
       :stats="stats"
       :pulse="pulse"
@@ -104,42 +83,18 @@ defineProps<{
     <div
       class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:items-start"
     >
-      <div class="space-y-6" data-testid="dashboard-main-column">
-        <DashboardAttentionCard :attention="attention" />
-        <!-- Les deux cartes « aujourd'hui » côte à côte dès md quand le module
-             Location est actif ; en colonne principale pour garder l'ordre
-             mobile (« En mer » puis départs) sans dupliquer le DOM. -->
-        <div
-          class="grid grid-cols-1 gap-6"
-          :class="{ 'md:grid-cols-2': upcomingReservations }"
-          data-testid="dashboard-today-grid"
-        >
-          <DashboardAtSeaCard
-            :active-trips="activeTrips"
-            :fleet-status="fleetStatus"
-            :boats="boats"
-            :port-options="portOptions"
-            :can-create-navigation-logs="canCreateNavigationLogs"
-          />
-          <DashboardUpcomingReservationsCard
-            v-if="upcomingReservations"
-            :items="upcomingReservations"
-          />
-        </div>
-        <DashboardActivityCard :items="activity" />
-        <DashboardBoatsCard :boats="boats" />
-      </div>
-
-      <div class="space-y-6" data-testid="dashboard-side-column">
-        <DashboardAiPanel
-          :ai-fleet-analysis="aiFleetAnalysis"
-          :ai-fleet-analysis-at="aiFleetAnalysisAt"
-        />
-        <DashboardSpendCard v-if="canViewSpend" :spend="spend" />
-        <!-- Cartographie de port réservée aux plans Pro et Entreprise (#604) : sur
-             Starter, l'état vide de la carte inviterait à créer un port inaccessible. -->
-        <PortDashboardCard v-if="canManagePorts" :ports="ports" :port-stats="portStats" />
-      </div>
+      <DashboardWidgetColumn
+        :widgets="mainWidgets"
+        :data="props"
+        data-testid="dashboard-main-column"
+      />
+      <DashboardWidgetColumn
+        :widgets="sideWidgets"
+        :data="props"
+        data-testid="dashboard-side-column"
+      />
     </div>
+
+    <DashboardCustomizeModal v-model:open="customizeOpen" :layout="layout" />
   </div>
 </template>

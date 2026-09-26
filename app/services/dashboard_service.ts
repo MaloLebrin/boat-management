@@ -8,12 +8,14 @@ import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import type {
   DashboardBoatSummary,
+  DashboardPlannedTasks,
   DashboardPortItem,
   DashboardPortStats,
   DashboardStatDeltas,
   DashboardStats,
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
+import { PLANNED_TASKS_CAP, PLANNED_TASKS_DAYS } from '#shared/constants/dashboard_widgets'
 import { isDueDateOverdue } from '#shared/helpers/maintenance'
 import type { MaintenanceMaxDoneRow } from '#shared/types/maintenance'
 
@@ -221,6 +223,47 @@ export default class DashboardService {
       stats,
       ports,
       portStats,
+    }
+  }
+  /**
+   * Widget « Tâches planifiées » : tâches ouvertes **datées** dont l'échéance
+   * tombe entre aujourd'hui et `PLANNED_TASKS_DAYS` jours, la plus proche
+   * d'abord. Les retards sont exclus à dessein (ils vivent dans « À traiter »),
+   * les tâches en heures moteur aussi (pas de date). Total exact par fonction
+   * fenêtre, lignes plafonnées à `PLANNED_TASKS_CAP`.
+   */
+  async getPlannedTasks(
+    boatIds: number[],
+    opts?: { today?: DateTime; days?: number; limit?: number }
+  ): Promise<DashboardPlannedTasks> {
+    if (boatIds.length === 0) return { items: [], total: 0 }
+
+    const today = (opts?.today ?? DateTime.now()).startOf('day')
+    const until = today.plus({ days: opts?.days ?? PLANNED_TASKS_DAYS })
+
+    const rows = await BoatMaintenanceTask.query()
+      .whereIn('boatId', boatIds)
+      .where('status', 'open')
+      .whereNotNull('dueAt')
+      .where('dueAt', '>=', today.toISODate()!)
+      .where('dueAt', '<=', until.toISODate()!)
+      .preload('boat', (q) => q.select(['id', 'name']))
+      .select(['id', 'boatId', 'title', 'subject', 'dueAt'])
+      .select(db.raw('count(*) over() as window_total'))
+      .orderBy('dueAt', 'asc')
+      .orderBy('id', 'desc')
+      .limit(opts?.limit ?? PLANNED_TASKS_CAP)
+
+    return {
+      total: Number(rows[0]?.$extras.window_total ?? 0),
+      items: rows.map((task) => ({
+        id: task.id,
+        boatId: task.boatId,
+        boatName: task.boat?.name ?? `#${task.boatId}`,
+        title: task.title,
+        subject: task.subject,
+        dueAt: task.dueAt!.toISODate()!,
+      })),
     }
   }
 }

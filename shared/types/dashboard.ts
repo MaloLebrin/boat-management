@@ -243,3 +243,22 @@ export type DashboardActivityItem =
   | DashboardActivityIncidentReported
   | DashboardActivityFuelLogged
   | DashboardActivityDocumentAdded
+
+// --- Tâches planifiées (widget personnalisable) --------------------------------
+
+export interface DashboardPlannedTask {
+  id: number
+  boatId: number
+  boatName: string
+  title: string
+  subject: string
+  /** Date civile `YYYY-MM-DD`, dans la fenêtre `PLANNED_TASKS_DAYS` à partir d'aujourd'hui. */
+  dueAt: string
+}
+
+export interface DashboardPlannedTasks {
+  /** Plafonnées à `PLANNED_TASKS_CAP`, la plus proche d'abord. */
+  items: DashboardPlannedTask[]
+  /** Toutes les tâches ouvertes datées de la fenêtre (comptage exact). */
+  total: number
+}

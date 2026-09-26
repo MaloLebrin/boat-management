@@ -162,5 +162,47 @@
     "noComparison": "No year-over-year comparison",
     "empty": "No spend recorded this year.",
     "viewBoatBudget": "View the boat budget"
+  },
+  "customize": {
+    "button": "Customize",
+    "hiddenCount": "{count, plural, one {# hidden} other {# hidden}}",
+    "title": "Customize the dashboard",
+    "subtitle": "Choose which widgets to show and their order in each column. The layout is specific to your account.",
+    "hint": "Widgets tied to a plan, a module or a role only appear when you have access to them.",
+    "toggle": "Show the {widget} widget",
+    "moveUp": "Move the {widget} widget up",
+    "moveDown": "Move the {widget} widget down",
+    "reset": "Reset to default",
+    "zone": {
+      "top": "Indicators",
+      "main": "Main column",
+      "side": "Side column"
+    }
+  },
+  "widgets": {
+    "kpis": "Key figures",
+    "attention": "To handle",
+    "at_sea": "At sea now",
+    "upcoming_reservations": "Upcoming departures and returns",
+    "activity": "Recent activity",
+    "boats": "Your boats",
+    "ai_panel": "AI assistant",
+    "spend": "Spend",
+    "ports": "Ports",
+    "planned_tasks": "Planned tasks",
+    "notifications": "Notifications"
+  },
+  "plannedTasks": {
+    "title": "Planned tasks",
+    "period": "Next {days} days",
+    "empty": "No task planned over the period.",
+    "viewAll": "View planning",
+    "open": "Open task {title} ({boat})",
+    "more": "{count, plural, one {# more task over the period} other {# more tasks over the period}}"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No unread notification.",
+    "viewAll": "View all"
   }
 }

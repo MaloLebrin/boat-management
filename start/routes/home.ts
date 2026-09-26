@@ -3,8 +3,19 @@ import router from '@adonisjs/core/services/router'
 import { marketingPath, SITE_URL, type MarketingPage } from '#shared/helpers/locale_path'
 
 const HomeController = () => import('#controllers/home_controller')
+const DashboardLayoutController = () => import('#controllers/dashboard_layout_controller')
 
 router.get('/dashboard', [HomeController, 'index']).as('dashboard').use(middleware.auth())
+
+// Personnalisation du tableau de bord (widgets visibles et ordre par colonne).
+router
+  .put('/dashboard/layout', [DashboardLayoutController, 'update'])
+  .as('dashboard.layout.update')
+  .use(middleware.auth())
+router
+  .delete('/dashboard/layout', [DashboardLayoutController, 'destroy'])
+  .as('dashboard.layout.destroy')
+  .use(middleware.auth())
 
 router
   .on('/design-system')

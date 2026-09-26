@@ -1,5 +1,13 @@
 import { test } from '@japa/runner'
 import HomeController from '#controllers/home_controller'
+import { ALL_WIDGETS_AVAILABLE, resolveDashboardLayout } from '#shared/helpers/dashboard_layout'
+import type {
+  DashboardWidgetAvailability,
+  StoredDashboardLayout,
+} from '#shared/types/dashboard_layout'
+
+/** Disposition stockée injectée dans le test « authenticated » ; `null` = défaut. */
+let storedLayout: StoredDashboardLayout | null = null
 
 test.group('HomeController (unit)', () => {
   test('renders home when unauthenticated', async ({ assert }) => {
@@ -27,7 +35,12 @@ test.group('HomeController (unit)', () => {
       {} as any,
       {} as any,
       {} as any,
-      {} as any
+      {} as any,
+      {
+        availabilityFor: async () => {
+          throw new Error('should not be called')
+        },
+      } as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []
@@ -106,6 +119,16 @@ test.group('HomeController (unit)', () => {
         getOrgSpendSummary: async () => {
           throw new Error('should not be called for a member')
         },
+      } as any,
+      {
+        availabilityFor: async () => ({
+          ...ALL_WIDGETS_AVAILABLE,
+          upcoming_reservations: false,
+          spend: false,
+          ports: false,
+        }),
+        resolveForUser: (_user: unknown, availability: DashboardWidgetAvailability) =>
+          resolveDashboardLayout(storedLayout, availability),
       } as any
     )
 
@@ -148,7 +171,123 @@ test.group('HomeController (unit)', () => {
     assert.isFalse(rendered[0]!.props.canViewSpend)
     assert.notProperty(rendered[0]!.props, 'spend')
     assert.equal(rendered[0]!.props.activity.deferred, 'activity')
+    assert.equal(rendered[0]!.props.plannedTasks.deferred, 'plannedTasks')
     assert.isNull(rendered[0]!.props.aiFleetAnalysisAt)
+    // Disposition par défaut, sans les widgets indisponibles (dépenses, ports)
+    assert.isFalse(rendered[0]!.props.layout.isCustomized)
+    assert.deepEqual(rendered[0]!.props.layout.order.side, [
+      'ai_panel',
+      'planned_tasks',
+      'notifications',
+    ])
+  })
+
+  test('omits the deferred props of hidden widgets', async ({ assert }) => {
+    storedLayout = {
+      version: 1,
+      order: { main: ['boats', 'attention'], side: ['notifications'] },
+      hidden: ['activity', 'planned_tasks'],
+    }
+    try {
+      const controller = new HomeController(
+        {
+          getForUser: async () => ({
+            boats: [],
+            boatIds: [],
+            urgentMaintenance: [],
+            stats: { boats: 0, engines: 0, sails: 0, rigs: 0, urgentMaintenance: 0 },
+            ports: [],
+            portStats: { total: 0, totalBoats: 0, totalFreeSpots: 0 },
+          }),
+        } as any,
+        { getLatestFleetAnalysis: async () => null } as any,
+        { listNamesForOrg: async () => [] } as any,
+        {} as any,
+        {
+          getBoatUsage: async () => ({ used: 0, limit: 2 }),
+          canManageInvoices: async () => false,
+          canManageReservations: async () => false,
+        } as any,
+        {} as any,
+        {
+          getForUser: async () => ({
+            items: [],
+            counts: {
+              maintenanceOverdue: 0,
+              maintenanceSoon: 0,
+              incidentsOpen: 0,
+              incidentsInProgress: 0,
+              documentsExpired: 0,
+              documentsExpiring: 0,
+              invoicesOverdue: 0,
+              total: 0,
+            },
+            canViewInvoices: false,
+          }),
+        } as any,
+        {
+          getActiveTrips: async () => ({ items: [], total: 0 }),
+          getFleetStatus: async () => ({ total: 0, atSea: 0, inPort: 0, enginesInMaintenance: 0 }),
+          getPulse: async () => ({
+            windowDays: 30,
+            tripsCompleted: 0,
+            distanceNm: 0,
+            tasksDone: 0,
+          }),
+          getRecentActivity: async () => {
+            throw new Error('hidden widget: should not be called')
+          },
+        } as any,
+        {} as any,
+        {} as any,
+        {
+          availabilityFor: async () => ({
+            ...ALL_WIDGETS_AVAILABLE,
+            upcoming_reservations: false,
+            spend: false,
+            ports: false,
+          }),
+          resolveForUser: (_user: unknown, availability: DashboardWidgetAvailability) =>
+            resolveDashboardLayout(storedLayout, availability),
+        } as any
+      )
+
+      const rendered: Array<{ component: string; props: any }> = []
+      await controller.index({
+        inertia: {
+          render: (component: string, props: any) => {
+            rendered.push({ component, props })
+            return { component, props }
+          },
+          optional: (fn: unknown) => fn,
+          defer: (fn: unknown, group: string) => ({ deferred: group, fn }),
+        },
+        request: { qs: () => ({}) },
+        auth: {
+          isAuthenticated: true,
+          check: async () => {},
+          getUserOrFail: () => ({
+            id: 1,
+            organizationId: 42,
+            organization: { id: 42, plan: 'starter' },
+            load: async () => {},
+            hasPermission: async () => true,
+            getEffectiveRoleInOrg: async () => 'member',
+          }),
+        },
+        i18n: { locale: 'en' },
+      } as any)
+
+      const props = rendered[0]!.props
+      assert.notProperty(props, 'activity')
+      assert.notProperty(props, 'plannedTasks')
+      assert.isTrue(props.layout.isCustomized)
+      assert.deepEqual(props.layout.hidden, ['activity', 'planned_tasks'])
+      // Sans module Location, `upcoming_reservations` n'est pas dans la disposition servie.
+      assert.deepEqual(props.layout.order.main, ['boats', 'attention', 'at_sea', 'activity'])
+    } finally {
+      storedLayout = null
+    }
   })
 
   test('renders the dedicated mechanic dashboard for a mechanic', async ({ assert }) => {
@@ -179,7 +318,12 @@ test.group('HomeController (unit)', () => {
       {} as any,
       {} as any,
       {} as any,
-      {} as any
+      {} as any,
+      {
+        availabilityFor: async () => {
+          throw new Error('should not be called')
+        },
+      } as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []

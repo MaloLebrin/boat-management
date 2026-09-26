@@ -418,5 +418,9 @@
       "create_client": "Client record created.",
       "set_part_stock": "Part stock updated."
     }
+  },
+  "dashboard": {
+    "layoutSaved": "Dashboard layout saved.",
+    "layoutReset": "Dashboard layout reset."
   }
 }
