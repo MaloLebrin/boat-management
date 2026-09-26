@@ -16,8 +16,10 @@ import { DateTime } from 'luxon'
 
 /**
  * Import de dépenses (`boat_budget_entries`) depuis `/settings/import`, en CSV
- * ou en classeur Excel. Même garde que l'import de maintenance (plan
- * Entreprise + `import.run`), mêmes routes ; ce qui change : les en-têtes
+ * ou en classeur Excel. Mêmes routes et même capability que l'import de
+ * maintenance (`import.run`, admin seul), mais un palier de plan différent :
+ * les dépenses s'importent dès **Pro** (`canImportExpenses`), l'historique
+ * d'entretien reste en Entreprise. Ce qui change aussi : les en-têtes
  * tolérantes (alias FR/EN), les formats de date et de montant, et le statut
  * `duplicate` qui écarte une ligne déjà présente sur le bateau.
  */
@@ -33,6 +35,13 @@ const FR_CSV = `Date;Libellé;Montant;Catégorie;Description
 const INVALID_ROW_CSV = `date;label;amount
 2026-01-15;;abc
 `
+
+/**
+ * Refus de plan servi en anglais par défaut : le même message pour le Starter
+ * qui n'a aucun import et pour le Pro qui tente l'historique d'entretien.
+ */
+const IMPORT_PLAN_FLASH =
+  'CSV import is not available on your plan: budget expenses import from the Pro plan, maintenance history requires the Enterprise plan.'
 
 async function buildXlsx(rows: unknown[][]): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook()
@@ -278,7 +287,10 @@ test.group('Import de dépenses — prévisualisation', (group) => {
 test.group('Import de dépenses — garde de plan et de rôle', (group) => {
   group.each.setup(() => truncateDb())
 
-  test('refusé en plan pro, avec l’upsell', async ({ client, assert }) => {
+  // Les dépenses s'importent dès Pro : ce cas constatait le refus, il
+  // constate désormais l'import préparé — c'est le palier des dépenses, pas
+  // celui de l'historique, qui vaut ici.
+  test('accepté en plan pro : l’import de dépenses est préparé', async ({ client, assert }) => {
     const user = await createAdminUser('pro')
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
@@ -290,11 +302,124 @@ test.group('Import de dépenses — garde de plan et de rôle', (group) => {
       .redirects(0)
 
     response.assertStatus(302)
-    response.assertFlashMessage(
-      'error',
-      'CSV import is reserved to the Enterprise plan. Upgrade to Enterprise to bring in your maintenance history.'
-    )
+    response.assertHeader('location', '/settings/import')
+    const pending = await PendingImport.findBy('userId', user.id)
+    assert.isNotNull(pending)
+    assert.equal(pending!.type, 'expenses')
+    assert.lengthOf(pending!.rows, 2)
+  })
+
+  test('un admin pro confirme son import de dépenses', async ({ client, assert }) => {
+    const user = await createAdminUser('pro')
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    await client
+      .post('/settings/import/preview')
+      .loginAs(user)
+      .fields({ type: 'expenses', boatId: String(boat.id) })
+      .file('file', Buffer.from(FR_CSV), { filename: 'depenses.csv', contentType: 'text/csv' })
+      .redirects(0)
+    const pending = await PendingImport.findByOrFail('userId', user.id)
+
+    const response = await client
+      .post('/settings/import/confirm')
+      .loginAs(user)
+      .withSession({ pendingImportId: pending.id })
+      .fields({ type: 'expenses', boatId: String(boat.id) })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/settings/import')
+    assert.lengthOf(await BoatBudgetEntry.query().where('boatId', boat.id), 2)
+    assert.isNull(await PendingImport.find(pending.id))
+  })
+
+  test('refusé en plan starter, avec l’upsell vers Pro', async ({ client, assert }) => {
+    const user = await createAdminUser('starter')
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post('/settings/import/preview')
+      .loginAs(user)
+      .fields({ type: 'expenses', boatId: String(boat.id) })
+      .file('file', Buffer.from(FR_CSV), { filename: 'depenses.csv', contentType: 'text/csv' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    // Starter n'a aucun type d'import : la garde générale tombe avant celle du
+    // type, d'où le message qui nomme les deux paliers. Le handler global
+    // redirige en arrière avec l'upsell vers la facturation en action.
+    response.assertFlashMessage('error', IMPORT_PLAN_FLASH)
+    response.assertFlashMessage('errorAction', '/settings/billing')
     assert.isNull(await PendingImport.findBy('userId', user.id))
+  })
+
+  test('un admin pro est refusé sur l’historique d’entretien, pas sur les dépenses', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser('pro')
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .post('/settings/import/preview')
+      .loginAs(user)
+      .fields({ type: 'maintenance', boatId: String(boat.id) })
+      .file('file', Buffer.from('date;title;subject\n2026-01-15;Vidange;engine\n'), {
+        filename: 'import.csv',
+        contentType: 'text/csv',
+      })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', IMPORT_PLAN_FLASH)
+    response.assertFlashMessage('errorAction', '/settings/billing')
+    assert.isNull(await PendingImport.findBy('userId', user.id))
+  })
+
+  /**
+   * Une prévisualisation préparée en Entreprise puis confirmée après un
+   * passage en Pro : `confirm` re-vérifie le palier du type en attente pour
+   * son propre compte, sinon la rétrogradation laisserait passer un historique
+   * que le plan courant refuse.
+   */
+  test('la confirmation d’un import de maintenance est refusée après rétrogradation en pro', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createEnterpriseAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const pending = await PendingImport.create({
+      userId: user.id,
+      boatId: boat.id,
+      type: 'maintenance',
+      rows: [
+        {
+          performedAt: '2026-01-15',
+          title: 'Vidange',
+          subject: 'engine',
+          notes: null,
+          engineCaption: null,
+          sailCaption: null,
+          cost: null,
+        },
+      ],
+    })
+
+    await user.load('organization')
+    user.organization.plan = 'pro'
+    await user.organization.save()
+
+    const response = await client
+      .post('/settings/import/confirm')
+      .loginAs(user)
+      .withSession({ pendingImportId: pending.id })
+      .fields({ type: 'maintenance', boatId: String(boat.id) })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage('error', IMPORT_PLAN_FLASH)
+    assert.isNotNull(await PendingImport.find(pending.id))
   })
 
   test('refusé à un membre non admin d’une organisation Entreprise', async ({ client, assert }) => {
@@ -410,6 +535,41 @@ test.group('Import de dépenses — présélection par query-string', (group) =>
 
     response.assertStatus(200)
     response.assertInertiaPropsContains({ initialType: 'expenses', initialBoatId: boat.id })
+  })
+
+  test('un admin pro n’a que le type expenses, présélectionné depuis la page budget', async ({
+    client,
+  }) => {
+    const user = await createAdminUser('pro')
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .get('/settings/import')
+      .qs({ type: 'expenses', boatId: boat.id })
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaPropsContains({
+      canImport: true,
+      importTypes: ['expenses'],
+      initialType: 'expenses',
+      initialBoatId: boat.id,
+    })
+  })
+
+  test('un type fermé par le plan n’est pas présélectionné', async ({ client }) => {
+    const user = await createAdminUser('pro')
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client
+      .get('/settings/import')
+      .qs({ type: 'maintenance', boatId: boat.id })
+      .loginAs(user)
+      .withInertia()
+
+    response.assertStatus(200)
+    response.assertInertiaPropsContains({ initialType: null, initialBoatId: boat.id })
   })
 
   test('un type inconnu ou un bateau d’une autre organisation sont ignorés', async ({ client }) => {

@@ -56,9 +56,10 @@ export default class BudgetController {
     )
 
     // Raccourci « Importer des dépenses » vers `/settings/import` : même
-    // garde que l'import lui-même (plan Entreprise + capability `import.run`),
-    // sinon le bouton mènerait à un écran qui refuse.
-    const canImport = this.quotaService.canImport(user.organization) && allowsRunImport
+    // garde que l'import des dépenses lui-même (`canImportExpenses`, dès le
+    // plan Pro, + capability `import.run`), sinon le bouton mènerait à un
+    // écran qui refuse.
+    const canImport = this.quotaService.canImport(user.organization, 'expenses') && allowsRunImport
 
     const portStaysFormatted = portStays.map(toPortStayItem)
     const entriesFormatted = entries.map(toBudgetEntryItem)

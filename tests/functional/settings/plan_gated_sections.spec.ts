@@ -68,16 +68,20 @@ test.group('Plan-gated settings sections (functional)', (group) => {
 
   /**
    * `/settings/import` est l'écran Import **et** Export (#715) : en Pro il
-   * garde ses exports (`canExport`), seule la section d'import se ferme. En
-   * Starter il ne sert plus rien — d'où la redirection avec l'upsell.
+   * garde ses exports (`canExport`) et, depuis l'ouverture des dépenses à ce
+   * plan, une section d'import limitée au type `expenses` — l'historique
+   * d'entretien reste en Entreprise. En Starter il ne sert plus rien — d'où la
+   * redirection avec l'upsell.
    */
-  test('a Pro org keeps the import screen, without its import section', async ({ client }) => {
+  test('a Pro org keeps the import screen, with expenses as its only import type', async ({
+    client,
+  }) => {
     const user = await createAdminUser()
 
     const response = await client.get('/settings/import').loginAs(user).withInertia()
 
     response.assertStatus(200)
-    response.assertInertiaPropsContains({ canImport: false })
+    response.assertInertiaPropsContains({ canImport: true, importTypes: ['expenses'] })
   })
 
   test('a Starter org is redirected away from the import screen', async ({ client }) => {
@@ -100,5 +104,12 @@ test.group('Plan-gated settings sections (functional)', (group) => {
 
     const branding = await client.get('/settings/branding').loginAs(user)
     branding.assertStatus(200)
+
+    const importScreen = await client.get('/settings/import').loginAs(user).withInertia()
+    importScreen.assertStatus(200)
+    importScreen.assertInertiaPropsContains({
+      canImport: true,
+      importTypes: ['maintenance', 'expenses'],
+    })
   })
 })

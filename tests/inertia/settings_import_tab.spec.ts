@@ -59,6 +59,63 @@ describe('SettingsImportTab — section d’import gardée (#715)', () => {
 })
 
 /**
+ * Un palier par type d'import (`CSV_IMPORT_PLAN_FLAGS`) : un admin Pro
+ * n'importe que des dépenses. Le sélecteur ne propose que les types reçus dans
+ * `importTypes`, le type manquant est signalé sous le formulaire.
+ */
+describe('SettingsImportTab — types d’import limités par le plan', () => {
+  const typeSelect = (w: ReturnType<typeof mountTab>) =>
+    w
+      .findAll('select')
+      .find((s) => s.findAll('option').some((o) => o.attributes('value') === 'expenses'))!
+
+  test('plan Pro : seul le type dépenses est proposé et retenu par défaut', () => {
+    const w = mount(SettingsImportTab, {
+      props: {
+        boats: fleet,
+        preview: null,
+        hasPendingImport: false,
+        canImport: true,
+        importTypes: ['expenses'],
+      },
+    })
+
+    const select = typeSelect(w)
+    expect(select.findAll('option').map((o) => o.attributes('value'))).toEqual(['expenses'])
+    expect(select.element.value).toBe('expenses')
+    expect(w.find('[data-testid="import-type-restricted"]').text()).toBe(
+      'settings.import.typeRestricted.maintenance'
+    )
+  })
+
+  test('une présélection sur un type fermé retombe sur le premier type ouvert', () => {
+    const w = mount(SettingsImportTab, {
+      props: {
+        boats: fleet,
+        preview: null,
+        hasPendingImport: false,
+        canImport: true,
+        importTypes: ['expenses'],
+        initialType: 'maintenance',
+      },
+    })
+
+    expect(typeSelect(w).element.value).toBe('expenses')
+  })
+
+  test('plan Entreprise : les deux types, sans mention de restriction', () => {
+    const w = mountTab(true, fleet)
+
+    expect(
+      typeSelect(w)
+        .findAll('option')
+        .map((o) => o.attributes('value'))
+    ).toEqual(['maintenance', 'expenses'])
+    expect(w.find('[data-testid="import-type-restricted"]').exists()).toBe(false)
+  })
+})
+
+/**
  * Flotte mono-bateau (#823) : le bateau est retenu d'office, les deux
  * sélecteurs (export et import) disparaissent et les exports sont actifs.
  */

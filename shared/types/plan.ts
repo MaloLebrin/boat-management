@@ -31,13 +31,24 @@ export interface PlanQuotas {
    */
   canManagePorts: boolean
   /**
-   * Import CSV de l'historique d'entretien (`/settings/import`) — Entreprise
-   * uniquement (#715). Capacité de tier pure : aucun module ni add-on ne
-   * l'accorde. À ne pas confondre avec `canExport`, qui ouvre les **exports**
-   * de la même page dès le plan Pro : reprendre un historique en masse est une
-   * opération de migration, la sortie de ses propres données ne l'est pas.
+   * Import CSV de l'historique d'entretien (`/settings/import`, type
+   * `maintenance`) — Entreprise uniquement (#715). Capacité de tier pure :
+   * aucun module ni add-on ne l'accorde. À ne pas confondre avec `canExport`,
+   * qui ouvre les **exports** de la même page dès le plan Pro : reprendre un
+   * historique en masse est une opération de migration, la sortie de ses
+   * propres données ne l'est pas.
    */
   canImport: boolean
+  /**
+   * Import CSV / Excel des dépenses du budget (`/settings/import`, type
+   * `expenses`) — dès le plan **Pro**. Contrairement à l'historique
+   * d'entretien, charger un relevé de dépenses relève du suivi courant d'un
+   * budget, pas d'une migration : le refuser à Pro n'avait pas de raison
+   * d'être. Capacité de tier pure elle aussi, sans module ni add-on. La
+   * correspondance type d'import → flag vit dans `CSV_IMPORT_PLAN_FLAGS`
+   * (`shared/types/csv.ts`).
+   */
+  canImportExpenses: boolean
 }
 
 export interface QuotaUsage {
@@ -86,6 +97,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManageInvoices: false,
     canManagePorts: false,
     canImport: false,
+    canImportExpenses: false,
   },
   pro: {
     maxBoats: 8,
@@ -104,6 +116,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManageInvoices: false,
     canManagePorts: false,
     canImport: false,
+    canImportExpenses: true,
   },
   enterprise: {
     maxBoats: null,
@@ -122,6 +135,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManageInvoices: true,
     canManagePorts: true,
     canImport: true,
+    canImportExpenses: true,
   },
 }
 

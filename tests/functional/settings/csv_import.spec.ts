@@ -21,9 +21,13 @@ const VALID_CSV = `date;title;subject;notes;engine_caption;sail_caption;cost
 2024-02-20;Révision voile;sail;OK;;Grand-voile;0
 `
 
-/** Message du refus de plan (#715), servi en anglais par défaut. */
+/**
+ * Message du refus de plan (#715), servi en anglais par défaut. Il nomme les
+ * deux paliers depuis l'ouverture des dépenses à Pro : le même flash sert au
+ * Starter qui n'a aucun import et au Pro qui tente l'historique d'entretien.
+ */
 const IMPORT_PLAN_FLASH =
-  'CSV import is reserved to the Enterprise plan. Upgrade to Enterprise to bring in your maintenance history.'
+  'CSV import is not available on your plan: budget expenses import from the Pro plan, maintenance history requires the Enterprise plan.'
 
 const INVALID_ROW_CSV = `date;title;subject;notes;engine_caption;sail_caption;cost
 2024-01-15;;engine;RAS;Moteur bâbord;;150
@@ -72,10 +76,12 @@ test.group('CSV import preview (functional)', (group) => {
     assert.equal(response.session('pendingImportId'), pending!.id)
   })
 
-  // L'import est réservé au plan Entreprise (#715) : ces deux cas constataient
-  // l'inverse — le `starter` préparait son import comme le `pro`. La
-  // redirection change de destination (facturation, pas `/settings/import`) et
-  // rien n'est préparé en session.
+  // L'import de l'historique d'entretien est réservé au plan Entreprise
+  // (#715) : ces deux cas constataient l'inverse — le `starter` préparait son
+  // import comme le `pro`. La redirection change de destination (facturation,
+  // pas `/settings/import`) et rien n'est préparé en session. Le `pro` n'est
+  // refusé que sur ce type : ses dépenses s'importent, cf.
+  // `csv_import_expenses.spec.ts`.
   for (const plan of ['starter', 'pro'] as const) {
     test(`POST /settings/import/preview est refusé en plan ${plan}`, async ({ client, assert }) => {
       const user = await createAdminUser(plan)
