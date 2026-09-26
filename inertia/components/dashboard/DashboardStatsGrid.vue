@@ -45,12 +45,15 @@ const statDeltas = computed(() => {
       d.boatsWithRig > 0
         ? t('dashboard.stats.delta.boatsWithRig', { count: String(d.boatsWithRig) })
         : t('dashboard.stats.delta.noRig'),
-    urgentMaintenance:
-      d.overdueCount > 0
-        ? t('dashboard.stats.delta.overdue', { count: String(d.overdueCount) })
-        : t('dashboard.stats.delta.noOverdue'),
   }
 })
+
+// Le badge « Bateaux » ne porte une information que quand des bateaux sont en
+// alerte : `info` fixe faisait cohabiter une pastille neutre avec un delta
+// « dont 5 en alerte » (#828).
+const boatsTone = computed<'warning' | 'neutral'>(() =>
+  props.stats.deltas.boatsInAlert > 0 ? 'warning' : 'neutral'
+)
 
 function fadeUp(delayMs: number) {
   return {
@@ -61,12 +64,15 @@ function fadeUp(delayMs: number) {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+  <!-- 4 KPI : 2 par ligne sous lg (plus de colonne de 5 cartes sur mobile, plus
+       d'orphelin en tablette), 4 en ligne à partir de lg. Le compteur de
+       maintenance urgente vit dans l'en-tête de la carte dédiée (#828). -->
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
     <BaseStatCard
       :label="t('dashboard.stats.boats')"
       :value="String(stats.boats)"
       :delta="statDeltas.boats"
-      tone="info"
+      :tone="boatsTone"
       href="/boats"
       :style="fadeUp(0)"
     >
@@ -146,7 +152,7 @@ function fadeUp(delayMs: number) {
     <div
       v-else
       data-testid="equipment-empty-card"
-      class="flex flex-col justify-between rounded-(--radius-card) border border-dashed border-border bg-surface-elevated p-5 shadow-(--shadow-xs) sm:col-span-2 lg:col-span-3"
+      class="col-span-2 flex flex-col justify-between rounded-(--radius-card) border border-dashed border-border bg-surface-elevated p-4 shadow-(--shadow-xs) sm:p-5 lg:col-span-3"
       :style="fadeUp(60)"
     >
       <div class="flex items-center gap-1.5">
@@ -176,25 +182,5 @@ function fadeUp(delayMs: number) {
         <span aria-hidden="true">&rarr;</span>
       </Link>
     </div>
-
-    <BaseStatCard
-      :label="t('dashboard.stats.urgentMaintenance')"
-      :value="String(stats.urgentMaintenance)"
-      :delta="statDeltas.urgentMaintenance"
-      :tone="stats.urgentMaintenance ? 'warning' : 'success'"
-      href="/planning"
-      :style="fadeUp(240)"
-    >
-      <template #icon>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"
-          />
-        </svg>
-      </template>
-    </BaseStatCard>
   </div>
 </template>

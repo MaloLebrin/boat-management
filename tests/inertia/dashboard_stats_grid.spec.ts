@@ -56,10 +56,9 @@ describe('DashboardStatsGrid — combined equipment empty state (#419)', () => {
     expect(cta!.attributes('href')).toBe('/boats')
   })
 
-  test('boats and urgent maintenance cards stay visible alongside the empty state', () => {
+  test('the boats card stays visible alongside the empty state', () => {
     const w = mountGrid(makeStats())
     expect(w.text()).toContain('dashboard.stats.boats')
-    expect(w.text()).toContain('dashboard.stats.urgentMaintenance')
   })
 
   test('as soon as one equipment type exists, the three individual cards are shown', () => {
@@ -69,5 +68,49 @@ describe('DashboardStatsGrid — combined equipment empty state (#419)', () => {
     expect(w.text()).toContain('dashboard.stats.engines')
     expect(w.text()).toContain('dashboard.stats.sails')
     expect(w.text()).toContain('dashboard.stats.rigs')
+  })
+})
+
+describe('DashboardStatsGrid — 4 KPI compacts (#828)', () => {
+  const full = makeStats({
+    engines: 2,
+    sails: 1,
+    rigs: 1,
+    deltas: { ...makeStats().deltas, boatsWithEngine: 2, boatsWithSail: 1, boatsWithRig: 1 },
+  })
+
+  test('renders four cards: boats + three equipment, no urgent maintenance KPI', () => {
+    const w = mountGrid(full)
+    expect(w.findAll('a').length).toBe(4)
+    expect(w.text()).not.toContain('dashboard.stats.urgentMaintenance')
+    expect(w.text()).not.toContain('dashboard.stats.delta.overdue')
+    expect(w.text()).not.toContain('dashboard.stats.delta.noOverdue')
+  })
+
+  test('lays the cards out two per row below lg and four per row from lg', () => {
+    const grid = mountGrid(full).find('div')
+    expect(grid.classes()).toContain('grid-cols-2')
+    expect(grid.classes()).toContain('lg:grid-cols-4')
+    expect(grid.classes()).not.toContain('grid-cols-1')
+    expect(grid.classes()).not.toContain('lg:grid-cols-5')
+  })
+
+  test('the boats card carries no badge when the fleet is up to date', () => {
+    const w = mountGrid(full)
+    expect(w.text()).not.toContain('common.tone.info')
+    expect(w.text()).not.toContain('common.tone.neutral')
+    expect(w.text()).toContain('dashboard.stats.delta.boatsOk')
+  })
+
+  test('the boats card turns to warning when boats are in alert', () => {
+    const w = mountGrid(makeStats({ ...full, deltas: { ...full.deltas, boatsInAlert: 2 } }))
+    expect(w.text()).toContain('common.tone.warning')
+    expect(w.text()).toContain('dashboard.stats.delta.boatsInAlert')
+  })
+
+  test('the combined empty card spans both mobile columns', () => {
+    const card = mountGrid(makeStats()).get('[data-testid="equipment-empty-card"]')
+    expect(card.classes()).toContain('col-span-2')
+    expect(card.classes()).toContain('lg:col-span-3')
   })
 })

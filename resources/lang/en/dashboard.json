@@ -28,7 +28,6 @@
     "engines": "Engines",
     "sails": "Sails",
     "rigs": "Rigs",
-    "urgentMaintenance": "Urgent maintenance",
     "equipmentEmpty": {
       "title": "Equipment",
       "description": "No engines, sails or rigs recorded for your fleet yet.",
@@ -42,9 +41,7 @@
       "boatsWithSail": "{count} with sails",
       "boatsAllSailless": "No sails",
       "boatsWithRig": "{count} rigged",
-      "noRig": "No rigs",
-      "overdue": "{count} overdue",
-      "noOverdue": "No overdue"
+      "noRig": "No rigs"
     }
   },
   "urgentMaintenance": {
@@ -55,7 +52,9 @@
     "dueSoon": "Due soon",
     "hours": "Hours",
     "dueAt": "Due {date}",
-    "dueAtHours": "Due at {hours}h · current {current}h"
+    "dueAtHours": "Due at {hours}h · current {current}h",
+    "viewMore": "View the {count, plural, one {other task} other {# others}} in the planning",
+    "openTask": "Open the {title} task on {boat}"
   },
   "yourBoats": {
     "title": "Your boats",

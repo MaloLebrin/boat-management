@@ -39,9 +39,15 @@ test('does not render delta element when delta is omitted', () => {
   expect(w.find('p.text-sm.text-fg-subtle').exists()).toBe(false)
 })
 
-test('defaults tone to neutral when not specified', () => {
+test('renders no badge at all for the default neutral tone (#828)', () => {
   const w = mount(BaseStatCard, { props: { label: 'Users', value: '3' } })
-  expect(w.text()).toContain('neutral')
+  expect(w.text()).not.toContain('neutral')
+  expect(w.find('span.rounded-full').exists()).toBe(false)
+})
+
+test('renders no badge when tone is explicitly neutral', () => {
+  const w = mount(BaseStatCard, { props: { label: 'Users', value: '3', tone: 'neutral' } })
+  expect(w.text()).not.toContain('neutral')
 })
 
 test('renders warning tone badge', () => {

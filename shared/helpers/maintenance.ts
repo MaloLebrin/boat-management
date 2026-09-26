@@ -71,3 +71,14 @@ export function computeTotalCost(parts: PartLike[]): number | null {
   }
   return hasPrice ? Math.round(total * 100) / 100 : null
 }
+
+/**
+ * Une échéance datée est en retard quand elle précède le jour courant. Les deux
+ * bornes sont des dates civiles `YYYY-MM-DD` (comparaison lexicographique) :
+ * la page et le service partagent la même règle, chacun avec *son* jour
+ * courant (date locale du navigateur côté Inertia via `todayDateInputValue()`,
+ * `DateTime.now().startOf('day')` côté serveur) — #828.
+ */
+export function isDueDateOverdue(dueAtIso: string, todayIso: string): boolean {
+  return dueAtIso < todayIso
+}
