@@ -9,6 +9,8 @@ export type ScannedRoutes = {
     'unsubscribe': { paramsTuple?: []; params?: {} }
     'health.show': { paramsTuple?: []; params?: {} }
     'dashboard': { paramsTuple?: []; params?: {} }
+    'dashboard.layout.update': { paramsTuple?: []; params?: {} }
+    'dashboard.layout.destroy': { paramsTuple?: []; params?: {} }
     'design_system': { paramsTuple?: []; params?: {} }
     'sitemap': { paramsTuple?: []; params?: {} }
     'boats.index': { paramsTuple?: []; params?: {} }
@@ -97,6 +99,9 @@ export type ScannedRoutes = {
     'boats.incidents.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.incidents.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.incidents.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
+    'boats.incidents.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
+    'boats.incidents.photos.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
+    'boats.incidents.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue,'mediaId': ParamValue} }
     'boats.equipmentActions.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.equipmentActions.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'actionId': ParamValue} }
     'boats.equipmentActions.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'actionId': ParamValue} }
@@ -371,6 +376,7 @@ export type ScannedRoutes = {
     'boats.rig.show': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.safetyEquipment.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.genericEquipment.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boats.incidents.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigationLogs.crewRole.download': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.navigationLogs.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
@@ -503,6 +509,7 @@ export type ScannedRoutes = {
     'boats.rig.show': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.safetyEquipment.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
     'boats.genericEquipment.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boats.incidents.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.simulator': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.navigationLogs.crewRole.download': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
     'boats.navigationLogs.show': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
@@ -632,6 +639,7 @@ export type ScannedRoutes = {
     'boats.genericEquipment.photos.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'genericId': ParamValue} }
     'boats.maintenanceSheets.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.incidents.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.incidents.photos.store': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
     'boats.equipmentActions.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.fuelLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'boats.navigationLogs.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
@@ -708,85 +716,8 @@ export type ScannedRoutes = {
     'demo.login': { paramsTuple?: []; params?: {} }
     'push.subscriptions.store': { paramsTuple?: []; params?: {} }
   }
-  PATCH: {
-    'boats.portStays.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
-    'boats.budget.entries.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
-    'boat_equipment.update_engine_status': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boat_equipment.update_engine_notes': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boat_equipment.increment_engine_hours': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boats.navigationLogs.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
-    'boats.navigationLogs.close': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
-    'boats.navigationLogs.crew.sync': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
-    'boats.navigationLogs.entries.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue,'entryId': ParamValue} }
-    'boats.reservations.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
-    'boats.reservations.inspections.items.set': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
-    'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
-    'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
-    'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'diagnostic.steps.toggle': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }
-    'notifications.markAsRead': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'invoices.payment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'spareParts.cart.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'itemId': ParamValue} }
-  }
-  DELETE: {
-    'boats.portStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
-    'boats.budget.entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
-    'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'boats.owners.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'userId': ParamValue} }
-    'boat_equipment.destroy_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'boat_media.destroy_engine_media': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'mediaId': ParamValue} }
-    'boats.engines.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'mediaId': ParamValue} }
-    'boat_engine_parts.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue} }
-    'boat_engine_parts.destroy_media': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue,'mediaId': ParamValue} }
-    'boats.engines.parts.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue,'mediaId': ParamValue} }
-    'boat_equipment.destroy_sail': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue} }
-    'boats.sails.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue,'mediaId': ParamValue} }
-    'boat_equipment.destroy_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
-    'boats.rig.photos.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
-    'boat_maintenances.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'eventId': ParamValue} }
-    'boats.maintenanceTasks.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
-    'boat_media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
-    'boat_safety_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
-    'boats.safetyEquipment.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'safetyId': ParamValue,'mediaId': ParamValue} }
-    'boat_generic_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
-    'boats.genericEquipment.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'genericId': ParamValue,'mediaId': ParamValue} }
-    'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
-    'boats.incidents.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
-    'boats.equipmentActions.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'actionId': ParamValue} }
-    'boats.fuelLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
-    'boats.navigationLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
-    'boats.navigationLogs.entries.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue,'entryId': ParamValue} }
-    'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
-    'boats.reservations.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
-    'boats.reservations.inspections.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
-    'boats.reservations.inspections.items.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
-    'boats.reservations.inspections.equipmentActions.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'actionId': ParamValue} }
-    'boats.reservations.inspections.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'mediaId': ParamValue} }
-    'boats.reservations.contract.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
-    'ports.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'ports.pontoons.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
-    'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
-    'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'diagnostic.reset': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
-    'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'notifications.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'crew.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'crew.certifications.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'memberId': ParamValue,'certId': ParamValue} }
-    'clients.media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'mediaId': ParamValue} }
-    'clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'pricingSeasons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'invoices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
-    'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
-    'settings.ai.apiKey.remove': { paramsTuple: [ParamValue]; params: {'provider': ParamValue} }
-    'settings.branding.logo.delete': { paramsTuple?: []; params?: {} }
-    'spareParts.cart.remove': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'itemId': ParamValue} }
-    'push.subscriptions.destroyByEndpoint': { paramsTuple?: []; params?: {} }
-    'push.subscriptions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-  }
   PUT: {
+    'dashboard.layout.update': { paramsTuple?: []; params?: {} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.pricing.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.update_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
@@ -820,6 +751,86 @@ export type ScannedRoutes = {
     'settings.ai.provider.update': { paramsTuple?: []; params?: {} }
     'settings.ai.apiKey.update': { paramsTuple: [ParamValue]; params: {'provider': ParamValue} }
     'settings.branding.update': { paramsTuple?: []; params?: {} }
+  }
+  DELETE: {
+    'dashboard.layout.destroy': { paramsTuple?: []; params?: {} }
+    'boats.portStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
+    'boats.budget.entries.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
+    'boats.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.owners.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'userId': ParamValue} }
+    'boat_equipment.destroy_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boat_media.destroy_engine_media': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'mediaId': ParamValue} }
+    'boats.engines.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'mediaId': ParamValue} }
+    'boat_engine_parts.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue} }
+    'boat_engine_parts.destroy_media': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue,'mediaId': ParamValue} }
+    'boats.engines.parts.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'partId': ParamValue,'mediaId': ParamValue} }
+    'boat_equipment.destroy_sail': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue} }
+    'boats.sails.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'sailId': ParamValue,'mediaId': ParamValue} }
+    'boat_equipment.destroy_rig': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.rig.photos.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
+    'boat_maintenances.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'eventId': ParamValue} }
+    'boats.maintenanceTasks.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'taskId': ParamValue} }
+    'boat_media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'mediaId': ParamValue} }
+    'boat_safety_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boats.safetyEquipment.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'safetyId': ParamValue,'mediaId': ParamValue} }
+    'boat_generic_equipment.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'itemId': ParamValue} }
+    'boats.genericEquipment.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'genericId': ParamValue,'mediaId': ParamValue} }
+    'boats.maintenanceSheets.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'sheetId': ParamValue} }
+    'boats.incidents.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue} }
+    'boats.incidents.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'incidentId': ParamValue,'mediaId': ParamValue} }
+    'boats.equipmentActions.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'actionId': ParamValue} }
+    'boats.fuelLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.entries.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue,'entryId': ParamValue} }
+    'boats.adminDocuments.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'documentId': ParamValue} }
+    'boats.reservations.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.inspections.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.items.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'boats.reservations.inspections.equipmentActions.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'actionId': ParamValue} }
+    'boats.reservations.inspections.photos.destroy': { paramsTuple: [ParamValue,ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue,'mediaId': ParamValue} }
+    'boats.reservations.contract.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'ports.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ports.pontoons.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
+    'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'diagnostic.reset': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notifications.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'crew.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'crew.certifications.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'memberId': ParamValue,'certId': ParamValue} }
+    'clients.media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'mediaId': ParamValue} }
+    'clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'pricingSeasons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
+    'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
+    'settings.ai.apiKey.remove': { paramsTuple: [ParamValue]; params: {'provider': ParamValue} }
+    'settings.branding.logo.delete': { paramsTuple?: []; params?: {} }
+    'spareParts.cart.remove': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'itemId': ParamValue} }
+    'push.subscriptions.destroyByEndpoint': { paramsTuple?: []; params?: {} }
+    'push.subscriptions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+  }
+  PATCH: {
+    'boats.portStays.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'stayId': ParamValue} }
+    'boats.budget.entries.update': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'entryId': ParamValue} }
+    'boat_equipment.update_engine_status': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boat_equipment.update_engine_notes': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boat_equipment.increment_engine_hours': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'boats.navigationLogs.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.close': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.crew.sync': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue} }
+    'boats.navigationLogs.entries.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'logId': ParamValue,'entryId': ParamValue} }
+    'boats.reservations.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue} }
+    'boats.reservations.inspections.items.set': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'reservationId': ParamValue,'inspectionId': ParamValue} }
+    'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
+    'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'diagnostic.steps.toggle': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
+    'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }
+    'notifications.markAsRead': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'invoices.payment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'spareParts.cart.update': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'itemId': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

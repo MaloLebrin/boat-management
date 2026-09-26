@@ -8,7 +8,12 @@ export interface ApiDefinition {
   health: {
     show: typeof routes['health.show']
   }
-  dashboard: typeof routes['dashboard']
+  dashboard: typeof routes['dashboard'] & {
+    layout: {
+      update: typeof routes['dashboard.layout.update']
+      destroy: typeof routes['dashboard.layout.destroy']
+    }
+  }
   designSystem: typeof routes['design_system']
   sitemap: typeof routes['sitemap']
   boats: {
@@ -107,6 +112,11 @@ export interface ApiDefinition {
       store: typeof routes['boats.incidents.store']
       update: typeof routes['boats.incidents.update']
       destroy: typeof routes['boats.incidents.destroy']
+      show: typeof routes['boats.incidents.show']
+      photos: {
+        store: typeof routes['boats.incidents.photos.store']
+        destroy: typeof routes['boats.incidents.photos.destroy']
+      }
     }
     equipmentActions: {
       store: typeof routes['boats.equipmentActions.store']
