@@ -67,30 +67,6 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/home_controller').default['index']>>>
     }
   }
-  'dashboard.layout.update': {
-    methods: ["PUT"]
-    pattern: '/dashboard/layout'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/dashboard_layout').updateDashboardLayoutValidator)>>
-      paramsTuple: []
-      params: {}
-      query: ExtractQuery<InferInput<(typeof import('#validators/dashboard_layout').updateDashboardLayoutValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard_layout_controller').default['update']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard_layout_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'dashboard.layout.destroy': {
-    methods: ["DELETE"]
-    pattern: '/dashboard/layout'
-    types: {
-      body: {}
-      paramsTuple: []
-      params: {}
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard_layout_controller').default['destroy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard_layout_controller').default['destroy']>>>
-    }
-  }
   'design_system': {
     methods: ["GET","HEAD"]
     pattern: '/design-system'
@@ -1145,42 +1121,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['destroy']>>>
-    }
-  }
-  'boats.incidents.show': {
-    methods: ["GET","HEAD"]
-    pattern: '/boats/:boatId/incidents/:incidentId'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue, ParamValue]
-      params: { boatId: ParamValue; incidentId: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['show']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_incidents_controller').default['show']>>>
-    }
-  }
-  'boats.incidents.photos.store': {
-    methods: ["POST"]
-    pattern: '/boats/:boatId/incidents/:incidentId/photos'
-    types: {
-      body: ExtractBody<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
-      paramsTuple: [ParamValue, ParamValue]
-      params: { boatId: ParamValue; incidentId: ParamValue }
-      query: ExtractQuery<InferInput<(typeof import('#validators/media').storeBoatPhotosValidator)>>
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_incident_media_controller').default['store']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_incident_media_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
-    }
-  }
-  'boats.incidents.photos.destroy': {
-    methods: ["DELETE"]
-    pattern: '/boats/:boatId/incidents/:incidentId/photos/:mediaId'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue, ParamValue, ParamValue]
-      params: { boatId: ParamValue; incidentId: ParamValue; mediaId: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_incident_media_controller').default['destroy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_incident_media_controller').default['destroy']>>>
     }
   }
   'boats.equipmentActions.store': {

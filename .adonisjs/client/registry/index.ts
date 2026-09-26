@@ -36,18 +36,6 @@ const routes = {
     tokens: [{"old":"/dashboard","type":0,"val":"dashboard","end":""}],
     types: placeholder as Registry['dashboard']['types'],
   },
-  'dashboard.layout.update': {
-    methods: ["PUT"],
-    pattern: '/dashboard/layout',
-    tokens: [{"old":"/dashboard/layout","type":0,"val":"dashboard","end":""},{"old":"/dashboard/layout","type":0,"val":"layout","end":""}],
-    types: placeholder as Registry['dashboard.layout.update']['types'],
-  },
-  'dashboard.layout.destroy': {
-    methods: ["DELETE"],
-    pattern: '/dashboard/layout',
-    tokens: [{"old":"/dashboard/layout","type":0,"val":"dashboard","end":""},{"old":"/dashboard/layout","type":0,"val":"layout","end":""}],
-    types: placeholder as Registry['dashboard.layout.destroy']['types'],
-  },
   'design_system': {
     methods: ["GET","HEAD"],
     pattern: '/design-system',
@@ -575,24 +563,6 @@ const routes = {
     pattern: '/boats/:boatId/incidents/:incidentId',
     tokens: [{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"incidents","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"incidentId","end":""}],
     types: placeholder as Registry['boats.incidents.destroy']['types'],
-  },
-  'boats.incidents.show': {
-    methods: ["GET","HEAD"],
-    pattern: '/boats/:boatId/incidents/:incidentId',
-    tokens: [{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":0,"val":"incidents","end":""},{"old":"/boats/:boatId/incidents/:incidentId","type":1,"val":"incidentId","end":""}],
-    types: placeholder as Registry['boats.incidents.show']['types'],
-  },
-  'boats.incidents.photos.store': {
-    methods: ["POST"],
-    pattern: '/boats/:boatId/incidents/:incidentId/photos',
-    tokens: [{"old":"/boats/:boatId/incidents/:incidentId/photos","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos","type":0,"val":"incidents","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos","type":1,"val":"incidentId","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos","type":0,"val":"photos","end":""}],
-    types: placeholder as Registry['boats.incidents.photos.store']['types'],
-  },
-  'boats.incidents.photos.destroy': {
-    methods: ["DELETE"],
-    pattern: '/boats/:boatId/incidents/:incidentId/photos/:mediaId',
-    tokens: [{"old":"/boats/:boatId/incidents/:incidentId/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos/:mediaId","type":0,"val":"incidents","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos/:mediaId","type":1,"val":"incidentId","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/incidents/:incidentId/photos/:mediaId","type":1,"val":"mediaId","end":""}],
-    types: placeholder as Registry['boats.incidents.photos.destroy']['types'],
   },
   'boats.equipmentActions.store': {
     methods: ["POST"],
