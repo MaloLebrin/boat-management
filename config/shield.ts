@@ -11,9 +11,15 @@ const shieldConfig = defineConfig({
 
     directives: {
       defaultSrc: ["'self'"],
-      // nonce géré automatiquement par Shield pour @vite et @inertiaHead
-      scriptSrc: ["'self'", "'nonce-{{nonce}}'"],
-      styleSrc: ["'self'", "'nonce-{{nonce}}'"],
+      // `@nonce` est le mot-clé Shield (cspKeywords) remplacé à chaque requête
+      // par `'nonce-<valeur>'`. La même valeur est partagée avec Edge sous
+      // `cspNonce` : les scripts inline de `inertia_layout.edge` la posent
+      // en attribut `nonce`. Les balises `@vite` / `@inertiaHead` n'en ont pas
+      // besoin : elles émettent des ressources same-origin couvertes par 'self'.
+      // Un placeholder `{{nonce}}` n'est pas interprété et rend la source
+      // invalide (avertissement Chromium sur chaque page, cf. #828).
+      scriptSrc: ["'self'", '@nonce'],
+      styleSrc: ["'self'", '@nonce'],
       // Attributs `style="…"` (#831) : Chromium les évalue via `style-src-attr`,
       // qui retombe sur `style-src` — et un nonce ne s'applique jamais à un
       // attribut. Or le SSR d'Inertia sérialise chaque `:style` de Vue (jauges,
