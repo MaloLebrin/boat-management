@@ -30,12 +30,15 @@ export default class DashboardService {
     }
   ): Promise<{
     boats: DashboardBoatSummary[]
+    /** Identifiants des bateaux de l'organisation — réutilisés par les autres services du tableau de bord (#832). */
+    boatIds: number[]
+    /** Lignes affichées (plafonnées à `urgentLimit`) ; `stats` compte toutes les tâches urgentes, sans plafond. */
     urgentMaintenance: DashboardUrgentMaintenanceRow[]
     stats: DashboardStats
     ports: DashboardPortItem[]
     portStats: DashboardPortStats
   }> {
-    if (user.organizationId === null) {
+    if (!user.organizationId) {
       const emptyDeltas: DashboardStatDeltas = {
         boatsInAlert: 0,
         boatsWithEngine: 0,
@@ -45,6 +48,7 @@ export default class DashboardService {
       }
       return {
         boats: [],
+        boatIds: [],
         urgentMaintenance: [],
         stats: {
           boats: 0,
@@ -106,7 +110,10 @@ export default class DashboardService {
       .preload('boat')
       .orderBy('dueAt', 'asc')
       .orderBy('id', 'desc')
-      .limit(urgentLimit * 3) // we filter hours-based in-memory
+    // Pas de `limit` : toutes les tâches candidates sont lues (quelques dizaines
+    // par organisation) pour que `stats.urgentMaintenance` et `overdueCount`
+    // soient exacts — le plafond `urgentLimit` ne s'applique qu'aux lignes
+    // renvoyées pour l'affichage (#832). Les tâches en heures se filtrent en mémoire.
 
     const engineIds = Array.from(
       new Set(
@@ -141,13 +148,11 @@ export default class DashboardService {
       engineHoursNow.set(e.id, current)
     }
 
-    const urgentMaintenance: DashboardUrgentMaintenanceRow[] = []
+    const allUrgent: DashboardUrgentMaintenanceRow[] = []
 
     for (const task of openTasks) {
-      if (urgentMaintenance.length >= urgentLimit) break
-
       if (task.dueAt) {
-        urgentMaintenance.push({
+        allUrgent.push({
           id: task.id,
           boatId: task.boatId,
           boatName: task.boat?.name ?? `#${task.boatId}`,
@@ -167,7 +172,7 @@ export default class DashboardService {
 
         const remaining = task.dueEngineHours - current
         if (remaining <= urgentWithinEngineHours) {
-          urgentMaintenance.push({
+          allUrgent.push({
             id: task.id,
             boatId: task.boatId,
             boatName: task.boat?.name ?? `#${task.boatId}`,
@@ -182,7 +187,7 @@ export default class DashboardService {
       }
     }
 
-    urgentMaintenance.sort((a, b) => {
+    allUrgent.sort((a, b) => {
       if (a.kind !== b.kind) return a.kind === 'date' ? -1 : 1
       if (a.kind === 'date' && b.kind === 'date') {
         return (a.dueAt ?? '').localeCompare(b.dueAt ?? '')
@@ -193,16 +198,17 @@ export default class DashboardService {
       return ar - br
     })
 
-    stats.urgentMaintenance = urgentMaintenance.length
+    const urgentMaintenance = allUrgent.slice(0, urgentLimit)
+    stats.urgentMaintenance = allUrgent.length
 
     const today = DateTime.now().startOf('day').toISODate()!
-    const alertBoatIds = new Set(urgentMaintenance.map((t) => t.boatId))
+    const alertBoatIds = new Set(allUrgent.map((t) => t.boatId))
     stats.deltas = {
       boatsInAlert: alertBoatIds.size,
       boatsWithEngine: boats.filter((b) => b.engines.length > 0).length,
       boatsWithSail: boats.filter((b) => b.sails.length > 0).length,
       boatsWithRig: boats.filter((b) => b.rig !== null).length,
-      overdueCount: urgentMaintenance.filter(
+      overdueCount: allUrgent.filter(
         (t) => t.kind === 'date' && t.dueAt !== null && isDueDateOverdue(t.dueAt, today)
       ).length,
     }
@@ -223,6 +229,13 @@ export default class DashboardService {
       totalFreeSpots: ports.reduce((acc, p) => acc + p.freeSpots, 0),
     }
 
-    return { boats: boatSummary, urgentMaintenance, stats, ports, portStats }
+    return {
+      boats: boatSummary,
+      boatIds: boats.map((b) => b.id),
+      urgentMaintenance,
+      stats,
+      ports,
+      portStats,
+    }
   }
 }
