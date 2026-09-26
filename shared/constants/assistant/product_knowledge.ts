@@ -732,8 +732,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Suivi des incidents',
     },
     body: {
-      en: 'Incidents record what went wrong at sea or in port: grounding, flooding, rigging failure, engine failure, collision, fire, theft or vandalism, or other. Each one carries a date, a location, a description, a status (open, in progress, closed) and insurance claim tracking, and targets the whole boat, one piece of equipment or an engine part. Report one from the "Incident" button on an equipment card or page, the "+ Add" menu of the boat page, the fleet incidents page (/navigation/incidents) or the dashboard. The detail page holds photos (insurance file). "Create a task" and "Repair action" on an incident open the form pre-filled and keep it linked: the card counts follow-ups, the detail page lists them. Deleting is reserved to admins.',
-      fr: 'Les incidents consignent ce qui a mal tourné en mer ou au port : échouement, voie d’eau, avarie de gréement, panne moteur, collision, incendie, vol ou vandalisme, autre. Chacun porte une date, un lieu, une description, un statut (ouvert, en cours, clos), le suivi assurance, et vise le bateau entier, un équipement ou une pièce moteur. On le déclare depuis le bouton « Incident » d’une carte ou page équipement, le menu « + Ajouter » de la fiche bateau, la page incidents flotte (/navigation/incidents) ou le dashboard. La page de détail reçoit les photos (dossier assurance). « Créer une tâche » et « Action à réparer » sur un incident ouvrent le formulaire pré-rempli et gardent la suite rattachée : la carte compte les suites, la page de détail les liste. La suppression est réservée aux admins.',
+      en: 'Incidents record what went wrong at sea or in port: grounding, flooding, rigging failure, engine failure, collision, fire, theft or vandalism, or other. Each carries a date, a location, a description, a status (open, in progress, closed) and insurance claim tracking, and targets the whole boat, one piece of equipment or an engine part. Report one from the "Incident" button on an equipment card or page, the "+ Add" menu, the fleet incidents page (/navigation/incidents) or the dashboard. At least one photo is required: it is what makes the insurance file, and an incident cannot be closed without one. Offline reports and copilot reports are exempt, but flagged "photo missing". "Create a task" and "Repair action" stay linked to the incident. Deleting is reserved to admins.',
+      fr: 'Les incidents consignent ce qui a mal tourné en mer ou au port : échouement, voie d’eau, avarie de gréement, panne moteur, collision, incendie, vol ou vandalisme, autre. Chacun porte une date, un lieu, une description, un statut (ouvert, en cours, clos), le suivi assurance, et vise le bateau entier, un équipement ou une pièce moteur. On le déclare depuis une carte ou page équipement, le menu « + Ajouter », la page incidents flotte (/navigation/incidents) ou le dashboard. Au moins une photo est requise : elle constitue le dossier assurance, et un incident ne peut pas être clôturé sans. La déclaration hors-ligne et le copilote en sont exemptés, mais signalés « photo manquante ». « Créer une tâche » et « Action à réparer » restent rattachées. La suppression est réservée aux admins.',
     },
     keywords: [
       'incident',
@@ -757,6 +757,12 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'repair',
       'suite',
       'follow-up',
+      'photo',
+      'photos',
+      'preuve',
+      'proof',
+      'cloture',
+      'close',
     ],
     navTarget: 'navigation.incidents',
   },

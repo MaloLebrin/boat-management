@@ -2,6 +2,7 @@
 import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import IncidentFollowUpButtons from '~/components/boats/incidents/IncidentFollowUpButtons.vue'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import IncidentTargetBadge from '~/components/boats/incidents/IncidentTargetBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
@@ -86,6 +87,7 @@ const CARD_COLORS: Record<IncidentStatus, string> = {
           <span v-if="incident.photosCount > 0" class="text-xs text-fg-muted">
             · {{ t('incidents.photosCount', { count: String(incident.photosCount) }) }}
           </span>
+          <BaseBadge v-else variant="warning">{{ t('incidents.missingPhoto') }}</BaseBadge>
           <span
             v-if="followUpCount !== null && followUpCount > 0"
             class="text-xs text-fg-muted"

@@ -34,6 +34,9 @@ defineProps<{ row: FleetIncidentRow }>()
         {{ t(`incidents.type.${row.type}`) }}
       </Link>
       <IncidentTargetBadge v-if="row.target" :target="row.target" :boat-id="row.boatId" />
+      <BaseBadge v-if="row.photosCount === 0" variant="warning">
+        {{ t('incidents.missingPhoto') }}
+      </BaseBadge>
     </p>
 
     <p class="text-sm text-fg-muted">

@@ -36,7 +36,15 @@
     "submit": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
-    "confirmDelete": "Delete this incident?"
+    "confirmDelete": "Delete this incident?",
+    "photos": "Photos (required)",
+    "photoHint": "At least one photo is required — it is what makes the insurance file.",
+    "photoRequired": "Add at least one photo before saving.",
+    "photoOfflineNotice": "No connection: the incident will be queued without photo. Add one from the incident page once you are back online.",
+    "photoUploading": "Sending the photos…",
+    "photoUploadFailed": "The incident was created but the photos could not be sent. Add them from the incident page.",
+    "closedNeedsPhoto": "Add a photo to this incident before closing it.",
+    "goToIncident": "Open the incident page"
   },
   "target": {
     "wholeBoat": "Whole boat",
@@ -60,7 +68,8 @@
     "photosHint": "Useful for the insurance file. Uploading photos requires a connection.",
     "detail": "Detail",
     "reportedOn": "Reported on {date}",
-    "closedOn": "Closed on {date}"
+    "closedOn": "Closed on {date}",
+    "missingPhotoHint": "This incident has no photo. Add one — it is required to close it."
   },
   "followUps": {
     "createTask": "Create a task",
@@ -76,5 +85,6 @@
     "seeActions": "See actions",
     "taskDone": "Done",
     "taskOpen": "Open"
-  }
+  },
+  "missingPhoto": "Photo missing"
 }

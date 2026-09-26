@@ -7,6 +7,8 @@ import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatEnginePartFactory } from '#database/factories/boat_engine_part_factory'
 import { BoatIncidentFactory } from '#database/factories/boat_incident_factory'
 import { BoatSailFactory } from '#database/factories/boat_sail_factory'
+import { MediaFactory } from '#database/factories/media_factory'
+import { attachIncidentPhoto } from '#tests/support/incident_photos'
 import {
   createAdminUser,
   createBoatOwnerUser,
@@ -163,6 +165,8 @@ test.group(
         boatId: boat.id,
         organizationId: boat.organizationId,
       }).create()
+      // La clôture exige une photo depuis l'obligation de preuve.
+      await attachIncidentPhoto(incident)
 
       const closing = await client
         .put(`/boats/${boat.id}/incidents/${incident.id}`)
@@ -186,6 +190,72 @@ test.group(
       await incident.refresh()
       assert.equal(incident.status, 'in_progress')
       assert.isNull(incident.closedAt)
+    })
+
+    test('clôturer un incident sans photo est refusé', async ({ client, assert }) => {
+      const { admin, boat } = await adminWithBoat()
+      const incident = await BoatIncidentFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+      }).create()
+
+      const response = await client
+        .put(`/boats/${boat.id}/incidents/${incident.id}`)
+        .loginAs(admin)
+        .form({ status: 'closed' })
+        .redirects(0)
+
+      response.assertStatus(302)
+      response.assertFlashMessage('error', 'An incident cannot be closed without a photo.')
+      // Sans ce marqueur, un rejeu hors-ligne lirait la redirection comme un
+      // succès et détruirait la saisie (#622).
+      response.assertFlashMessage('rejectedType', 'update-incident')
+
+      await incident.refresh()
+      assert.equal(incident.status, 'open')
+      assert.isNull(incident.closedAt)
+    })
+
+    test('un document ne vaut pas une photo pour la clôture', async ({ client, assert }) => {
+      const { admin, boat } = await adminWithBoat()
+      const incident = await BoatIncidentFactory.merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+      }).create()
+      await MediaFactory.merge({
+        entityType: 'boat_incident',
+        entityId: incident.id,
+        kind: 'document',
+      }).create()
+
+      await client
+        .put(`/boats/${boat.id}/incidents/${incident.id}`)
+        .loginAs(admin)
+        .form({ status: 'closed' })
+        .redirects(0)
+
+      await incident.refresh()
+      assert.equal(incident.status, 'open')
+    })
+
+    test('un incident déjà clôturé sans photo reste modifiable', async ({ client, assert }) => {
+      const { admin, boat } = await adminWithBoat()
+      // Antérieur à l'obligation de preuve : la règle ne porte que sur la
+      // *transition*, sinon cet incident deviendrait ingérable.
+      const incident = await BoatIncidentFactory.apply('closed')
+        .merge({ boatId: boat.id, organizationId: boat.organizationId })
+        .create()
+
+      const response = await client
+        .put(`/boats/${boat.id}/incidents/${incident.id}`)
+        .loginAs(admin)
+        .form({ status: 'closed', location: 'Quai Nord' })
+        .redirects(0)
+
+      response.assertFlashMessage('success', 'Incident updated.')
+      await incident.refresh()
+      assert.equal(incident.location, 'Quai Nord')
+      assert.equal(incident.status, 'closed')
     })
 
     test("un incident inconnu ou d'un autre bateau renvoie le flash « not found »", async ({
@@ -445,6 +515,7 @@ test.group('Incidents — déclarant, audit et droits de l’onglet (#816)', (gr
       boatId: boat.id,
       organizationId: boat.organizationId,
     }).create()
+    await attachIncidentPhoto(incident)
 
     await client
       .put(`/boats/${boat.id}/incidents/${incident.id}`)

@@ -93,6 +93,41 @@ export function preloadIncidentTargets(query: ModelQueryBuilderContract<typeof B
     .preload('enginePart', (q) => q.select('id', 'designation', 'boatEngineId'))
 }
 
+/**
+ * Nombre de photos par incident, en une requête — pour le badge des cartes
+ * (#814) et le compteur « photo manquante » de la page flotte. Exportée parce
+ * que `NavigationService` construit ses propres lignes d'incident et doit
+ * poser le même `$extras.photosCount`.
+ */
+export async function attachIncidentPhotosCount(incidents: BoatIncident[]): Promise<void> {
+  if (incidents.length === 0) return
+  const rows = await Media.query()
+    .where('entityType', 'boat_incident')
+    .where('kind', 'photo')
+    .whereIn(
+      'entityId',
+      incidents.map((i) => i.id)
+    )
+    .groupBy('entityId')
+    .select('entityId')
+    .count('* as total')
+  const counts = new Map(rows.map((r) => [r.entityId, Number(r.$extras.total)]))
+  for (const incident of incidents) {
+    incident.$extras.photosCount = counts.get(incident.id) ?? 0
+  }
+}
+
+/** Photos d'un seul incident — le verrou de clôture (« au moins une photo »). */
+export async function countIncidentPhotos(incidentId: number): Promise<number> {
+  const row = await Media.query()
+    .where('entityType', 'boat_incident')
+    .where('kind', 'photo')
+    .where('entityId', incidentId)
+    .count('* as total')
+    .first()
+  return Number(row?.$extras.total ?? 0)
+}
+
 @inject()
 export default class BoatIncidentService {
   constructor(private mediaService: MediaService) {}
@@ -110,25 +145,6 @@ export default class BoatIncidentService {
 
     if (!incident) throw new BoatIncidentNotFoundError()
     return incident
-  }
-
-  /** Nombre de photos par incident, en une requête — pour le badge des cartes (#814). */
-  private async attachPhotosCount(incidents: BoatIncident[]): Promise<void> {
-    if (incidents.length === 0) return
-    const rows = await Media.query()
-      .where('entityType', 'boat_incident')
-      .where('kind', 'photo')
-      .whereIn(
-        'entityId',
-        incidents.map((i) => i.id)
-      )
-      .groupBy('entityId')
-      .select('entityId')
-      .count('* as total')
-    const counts = new Map(rows.map((r) => [r.entityId, Number(r.$extras.total)]))
-    for (const incident of incidents) {
-      incident.$extras.photosCount = counts.get(incident.id) ?? 0
-    }
   }
 
   async listForBoat(user: User, boat: Boat) {
@@ -157,7 +173,7 @@ export default class BoatIncidentService {
       .orderBy('id', 'desc')
 
     const incidents = await preloadIncidentTargets(query)
-    await this.attachPhotosCount(incidents)
+    await attachIncidentPhotosCount(incidents)
     return incidents
   }
 
@@ -197,6 +213,18 @@ export default class BoatIncidentService {
       .first()
 
     if (!incident) throw new BoatIncidentNotFoundError()
+
+    // Clôturer, c'est arrêter le dossier assurance : il lui faut au moins une
+    // preuve. On ne le vérifie qu'à la *transition* — un incident historique
+    // déjà clôturé sans photo doit rester éditable (lieu, n° de sinistre).
+    if (payload.status === 'closed' && incident.status !== 'closed') {
+      if ((await countIncidentPhotos(incident.id)) === 0) {
+        throw new BoatIncidentValidationError(
+          'a photo is required to close an incident',
+          'photoRequiredToClose'
+        )
+      }
+    }
 
     if (payload.description !== undefined) {
       const description = payload.description.trim()
