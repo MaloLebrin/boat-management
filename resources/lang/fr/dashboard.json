@@ -1,6 +1,6 @@
 {
   "title": "Tableau de bord",
-  "subtitle": "Vue d'ensemble de votre flotte et de la maintenance à venir.",
+  "greeting": "Voici l'état de votre flotte au {date}",
   "newBoat": "Nouveau bateau",
   "quickAdd": {
     "menuLabel": "Créer",
@@ -13,7 +13,6 @@
     "selectBoat": "Bateau",
     "selectBoatPlaceholder": "— Choisir un bateau —"
   },
-  "overdueAlert": "{count, plural, one {# tâche en retard} other {# tâches en retard}}",
   "viewPlanning": "Voir le planning",
   "analyzeFleet": "Analyser la flotte",
   "aiPanel": {
@@ -43,18 +42,6 @@
       "boatsWithRig": "{count, plural, one {# équipé} other {# équipés}}",
       "noRig": "Aucun gréement"
     }
-  },
-  "urgentMaintenance": {
-    "title": "Maintenance urgente",
-    "period": "14 prochains jours",
-    "empty": "Aucune maintenance urgente à venir.",
-    "overdue": "En retard",
-    "dueSoon": "Bientôt dû",
-    "hours": "Heures",
-    "dueAt": "Dû le {date}",
-    "dueAtHours": "Dû à {hours}h · actuel {current}h",
-    "viewMore": "Voir {count, plural, one {l'autre tâche} other {les # autres}} dans le planning",
-    "openTask": "Ouvrir la tâche {title} sur {boat}"
   },
   "yourBoats": {
     "title": "Vos bateaux",
@@ -99,5 +86,42 @@
     "openTask": "Ouvrir l'intervention {title} sur {boat}",
     "dueAt": "Dû le {date}",
     "dueAtHours": "Dû à {hours}h · actuel {current}h"
+  },
+  "attention": {
+    "title": "À traiter",
+    "empty": "Rien à traiter aujourd'hui.",
+    "more": "{count, plural, one {# autre élément compté ci-dessus} other {# autres éléments comptés ci-dessus}}",
+    "open": "Ouvrir {title} ({boat})",
+    "type": {
+      "maintenance": "Maintenance",
+      "incident": "Incident",
+      "document": "Document",
+      "invoice": "Facture"
+    },
+    "chips": {
+      "maintenance": "{count, plural, one {# tâche} other {# tâches}}",
+      "incidents": "{count, plural, one {# incident} other {# incidents}}",
+      "documents": "{count, plural, one {# document} other {# documents}}",
+      "invoices": "{count, plural, one {# facture impayée} other {# factures impayées}}"
+    },
+    "kind": {
+      "overdue": "En retard",
+      "dueSoon": "Bientôt dû",
+      "hours": "Heures",
+      "incidentOpen": "Ouvert",
+      "incidentInProgress": "En cours",
+      "documentExpired": "Expiré",
+      "documentExpiring": "Expire bientôt",
+      "invoiceOverdue": "Impayée"
+    },
+    "detail": {
+      "dueAt": "Dû le {date}",
+      "dueAtHours": "Dû à {hours}h · actuel {current}h",
+      "reportedOn": "Déclaré le {date}",
+      "expiresAt": "Expire le {date}",
+      "expiredOn": "Expiré le {date}",
+      "invoice": "Facture {number} · {total}",
+      "invoiceDue": "Échéance le {date}"
+    }
   }
 }

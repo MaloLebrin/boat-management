@@ -11,7 +11,7 @@ import type {
   UpdateBoatDocumentPayload,
   ReminderDocumentItem,
 } from '#shared/types/boat_document'
-import { BOAT_DOCUMENT_EXPIRY_WARNING_DAYS } from '#shared/constants/boats/boat_document_constants'
+import { documentStatusFor } from '#shared/helpers/boat_document'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
@@ -19,13 +19,7 @@ import { DateTime } from 'luxon'
 export default class BoatDocumentService {
   constructor(private mediaService: MediaService) {}
   private computeStatus(expiresAt: DateTime | null): BoatDocumentStatus {
-    if (!expiresAt) return 'valid'
-    const daysUntil = Math.floor(
-      expiresAt.startOf('day').diff(DateTime.now().startOf('day'), 'days').days
-    )
-    if (daysUntil < 0) return 'expired'
-    if (daysUntil < BOAT_DOCUMENT_EXPIRY_WARNING_DAYS) return 'expiring_soon'
-    return 'valid'
+    return documentStatusFor(expiresAt?.toISODate() ?? null, DateTime.now().toISODate()!)
   }
 
   private toRow(doc: BoatDocument): BoatDocumentRow {

@@ -251,7 +251,7 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
    * lien pleine largeur et les « Voir tout / Voir le planning » portent
    * `min-h-11` : mesurés ici sous le doigt, pas seulement en classes CSS.
    */
-  test('les lignes urgentes et les liens « voir tout » du dashboard font 44 px (#828)', async ({
+  test('les lignes « À traiter » et les liens « voir tout » du dashboard font 44 px (#828)', async ({
     browser,
     assert,
   }) => {
@@ -268,11 +268,11 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
       // Scopé à la colonne principale : `a[href="/planning"]` seul attraperait
       // aussi l'entrée « Planning » de la sidebar, masquée (0 px) en mobile.
       const selector = [
-        '[data-testid="dashboard-urgent-row"]',
+        '[data-testid="dashboard-attention-row"]',
         '[data-testid="dashboard-view-all"]',
         '[data-testid="dashboard-main-column"] a[href="/planning"]',
       ].join(', ')
-      await page.locator('[data-testid="dashboard-urgent-row"]').first().waitFor({
+      await page.locator('[data-testid="dashboard-attention-row"]').first().waitFor({
         state: 'visible',
         timeout: 5000,
       })

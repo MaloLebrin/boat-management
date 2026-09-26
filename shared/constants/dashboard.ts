@@ -1,10 +1,3 @@
-/**
- * Nombre de lignes de maintenance urgente affichées sur le tableau de bord :
- * au-delà, un lien renvoie vers le planning. Le service en renvoie jusqu'à 10
- * (`urgentLimit` de `DashboardService`) — #828.
- */
-export const URGENT_DISPLAY_CAP = 5
-
 /** Lignes affichées dans « À traiter » ; au-delà, « Voir les N autres » (#832). */
 export const ATTENTION_DISPLAY_CAP = 6
 /** Lignes remontées par type (incidents, documents, factures) avant fusion. */

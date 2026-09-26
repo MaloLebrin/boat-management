@@ -2,18 +2,18 @@
 import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import DashboardAiPanel from '~/components/dashboard/DashboardAiPanel.vue'
+import DashboardAttentionCard from '~/components/dashboard/DashboardAttentionCard.vue'
 import DashboardBoatsCard from '~/components/dashboard/DashboardBoatsCard.vue'
 import DashboardHeader from '~/components/dashboard/DashboardHeader.vue'
 import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
 import DashboardStatsGrid from '~/components/dashboard/DashboardStatsGrid.vue'
-import DashboardUrgentMaintenanceCard from '~/components/dashboard/DashboardUrgentMaintenanceCard.vue'
 import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
 import type {
+  DashboardAttention,
   DashboardBoatSummary,
   DashboardPortItem,
   DashboardPortStats,
   DashboardStats,
-  DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
 import type { BoatTaskEquipment } from '#shared/types/maintenance'
 import { useT } from '~/composables/use_t'
@@ -28,8 +28,9 @@ const canManagePorts = computed(() => effectiveQuotas.value?.canManagePorts === 
 
 defineProps<{
   boats: DashboardBoatSummary[]
-  urgentMaintenance: DashboardUrgentMaintenanceRow[]
   stats: DashboardStats
+  /** Liste mixte « À traiter » (#832) : maintenance, incidents, documents, factures. */
+  attention: DashboardAttention
   aiFleetAnalysis: AiSuggestion[] | null
   ports: DashboardPortItem[]
   portStats: DashboardPortStats
@@ -77,11 +78,7 @@ defineProps<{
       class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:items-start"
     >
       <div class="space-y-6" data-testid="dashboard-main-column">
-        <DashboardUrgentMaintenanceCard
-          :rows="urgentMaintenance"
-          :overdue-count="stats.deltas.overdueCount"
-          :total="stats.urgentMaintenance"
-        />
+        <DashboardAttentionCard :attention="attention" />
         <DashboardBoatsCard :boats="boats" />
       </div>
 

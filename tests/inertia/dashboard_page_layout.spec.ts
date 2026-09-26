@@ -20,6 +20,21 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 
 import { usePage } from '@inertiajs/vue3'
 import Dashboard from '../../inertia/pages/dashboard.vue'
+import type { DashboardAttention } from '../../shared/types/dashboard'
+
+const EMPTY_ATTENTION: DashboardAttention = {
+  items: [],
+  counts: {
+    maintenanceOverdue: 3,
+    maintenanceSoon: 4,
+    incidentsOpen: 0,
+    documentsExpired: 0,
+    documentsExpiring: 0,
+    invoicesOverdue: 0,
+    total: 7,
+  },
+  canViewInvoices: false,
+}
 
 /**
  * #828 — la page n'est plus qu'une orchestration : chaque bloc est stubé, on
@@ -33,9 +48,9 @@ const stubs = {
   },
   DashboardQuickAddActions: { template: '<div data-testid="quick-add" />' },
   DashboardStatsGrid: { template: '<div data-testid="stats" />' },
-  DashboardUrgentMaintenanceCard: {
-    props: ['rows', 'overdueCount', 'total'],
-    template: '<div data-testid="urgent" :data-overdue="overdueCount" :data-total="total" />',
+  DashboardAttentionCard: {
+    props: ['attention'],
+    template: '<div data-testid="attention" :data-total="attention.counts.total" />',
   },
   DashboardBoatsCard: { template: '<div data-testid="boats" />' },
   DashboardAiPanel: { template: '<div data-testid="ai-panel" />' },
@@ -50,7 +65,7 @@ function mountDashboard(currentPlan = 'enterprise') {
   return mount(Dashboard, {
     props: {
       boats: [],
-      urgentMaintenance: [],
+      attention: EMPTY_ATTENTION,
       stats: {
         boats: 0,
         engines: 0,
@@ -86,18 +101,18 @@ function order(wrapper: ReturnType<typeof mountDashboard>, ids: string[]) {
 
 describe('Dashboard — structure de page (#828)', () => {
   test('stacks header, KPIs, then the two-column grid in that order', () => {
-    const positions = order(mountDashboard(), ['header', 'stats', 'urgent'])
+    const positions = order(mountDashboard(), ['header', 'stats', 'attention'])
     expect(positions.every((p) => p >= 0)).toBe(true)
     expect(positions).toEqual([...positions].sort((a, b) => a - b))
   })
 
-  test('puts urgent maintenance before the boats in the main column', () => {
+  test('puts the attention list before the boats in the main column', () => {
     const wrapper = mountDashboard()
     const main = wrapper.get('[data-testid="dashboard-main-column"]')
-    expect(main.find('[data-testid="urgent"]').exists()).toBe(true)
+    expect(main.find('[data-testid="attention"]').exists()).toBe(true)
     expect(main.find('[data-testid="boats"]').exists()).toBe(true)
-    const [urgent, boats] = order(wrapper, ['urgent', 'boats'])
-    expect(urgent).toBeLessThan(boats)
+    const [attention, boats] = order(wrapper, ['attention', 'boats'])
+    expect(attention).toBeLessThan(boats)
   })
 
   test('puts the AI panel then the ports card in the side column, after the main column', () => {
@@ -123,15 +138,15 @@ describe('Dashboard — structure de page (#828)', () => {
     expect(grid.className).toContain('xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]')
   })
 
-  test('feeds the urgent card the overdue count, not the urgent total', () => {
-    const urgent = mountDashboard().get('[data-testid="urgent"]')
-    expect(urgent.attributes('data-overdue')).toBe('3')
-    expect(urgent.attributes('data-total')).toBe('7')
+  test('hands the whole attention payload to the card', () => {
+    const attention = mountDashboard().get('[data-testid="attention"]')
+    expect(attention.attributes('data-total')).toBe('7')
   })
 
   test('renders no page-level alert and no ghost link to the fleet in the header', () => {
     const wrapper = mountDashboard()
     expect(wrapper.text()).not.toContain('dashboard.overdueAlert')
+    expect(wrapper.text()).not.toContain('dashboard.subtitle')
     expect(wrapper.text()).not.toContain('nav.boats')
     expect(wrapper.get('[data-testid="header"]').find('[data-testid="quick-add"]').exists()).toBe(
       true

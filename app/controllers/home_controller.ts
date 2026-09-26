@@ -1,5 +1,6 @@
 import AiAnalysisService from '#services/ai_analysis_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import DashboardAttentionService from '#services/dashboard_attention_service'
 import DashboardService from '#services/dashboard_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
@@ -19,7 +20,8 @@ export default class HomeController {
     private portService: PortService,
     private planningService: PlanningService,
     private quotaService: QuotaService,
-    private taskService: BoatMaintenanceTaskService
+    private taskService: BoatMaintenanceTaskService,
+    private attentionService: DashboardAttentionService
   ) {}
 
   async index({ inertia, auth, request, response, i18n }: HttpContext) {
@@ -43,6 +45,11 @@ export default class HomeController {
         return inertia.render('dashboard/mechanic', { overdueTasks, soonTasks })
       }
     }
+
+    // La relation `organization` n'est pas chargée à ce stade (le middleware
+    // Inertia ne la charge qu'au rendu partagé) : on la charge explicitement,
+    // pour les quotas comme pour les gardes de widgets (#418, #832).
+    if (user.organizationId) await user.load('organization')
 
     const data = await this.dashboardService.getForUser(user)
 
@@ -68,17 +75,32 @@ export default class HomeController {
       ? await user.hasPermission(user.organizationId, 'maintenance.create')
       : false
 
-    // Quota bateaux pour l'upsell du bouton « Nouveau bateau » (issue #418). La
-    // relation `organization` n'est pas chargée à ce stade (le middleware Inertia
-    // ne la charge qu'au rendu partagé) : on la charge explicitement.
-    if (user.organizationId) await user.load('organization')
+    // Factures impayées dans « À traiter » : module CRM actif **et** capability
+    // de lecture — sinon la donnée n'est pas envoyée du tout (#832).
+    const canViewInvoices =
+      user.organizationId && user.organization
+        ? (await this.quotaService.canManageInvoices(user.organization)) &&
+          (await user.hasPermission(user.organizationId, 'invoices.view'))
+        : false
+    const attention = await this.attentionService.getForUser(
+      user,
+      data.urgentMaintenance,
+      data.stats,
+      { canViewInvoices }
+    )
+
+    // Quota bateaux pour l'upsell du bouton « Nouveau bateau » (issue #418).
     const boatQuota = user.organization
       ? await this.quotaService.getBoatUsage(user.organization)
       : { used: 0, limit: 0 }
     const canAddBoat = boatQuota.limit === null || boatQuota.used < boatQuota.limit
 
     return inertia.render('dashboard', {
-      ...data,
+      boats: data.boats,
+      stats: data.stats,
+      ports: data.ports,
+      portStats: data.portStats,
+      attention,
       aiFleetAnalysis,
       portOptions,
       canCreateNavigationLogs,

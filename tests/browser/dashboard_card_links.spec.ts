@@ -84,27 +84,27 @@ test.group('E2E · Dashboard stat card links', (group) => {
     await page.waitForURL(/\/boats$/)
   })
 
-  test('the urgent list shows five rows, links to the rest and opens the planning on a task (#828)', async ({
+  test('the attention list is capped, counts every task and opens the planning on a row (#832)', async ({
     browserContext,
     visit,
     assert,
   }) => {
     const user = await createAdminUser()
     const boat = await createBoatForUser(user, { name: 'Busy Boat' })
-    // 6 tâches en retard : 5 affichées, la 6ᵉ derrière « Voir les autres »
-    await BoatMaintenanceTaskFactory.merge({ boatId: boat.id }).apply('overdue').createMany(6)
+    // 8 tâches en retard : 6 affichées (ATTENTION_DISPLAY_CAP), toutes comptées
+    await BoatMaintenanceTaskFactory.merge({ boatId: boat.id }).apply('overdue').createMany(8)
 
     await browserContext.loginAs(user)
 
     const page = await visit('/dashboard')
     await page.waitForLoadState('networkidle')
 
-    const rows = page.locator('[data-testid="dashboard-urgent-row"]')
-    assert.equal(await rows.count(), 5, 'la liste urgente doit être plafonnée à 5 lignes')
-    await page.assertExists('[data-testid="dashboard-overdue-badge"]')
-    await page.assertExists('[data-testid="dashboard-urgent-view-more"][href="/planning"]')
-    // Plus d'alerte de page ni de KPI « Maintenance urgente » : le compteur vit dans la carte
-    await page.assertNotExists('a[href="/planning"].block')
+    const rows = page.locator('[data-testid="dashboard-attention-row"]')
+    assert.equal(await rows.count(), 6, 'la liste « À traiter » doit être plafonnée à 6 lignes')
+    const chip = page.locator('[data-testid="dashboard-attention-chip-maintenance"]')
+    await chip.waitFor({ state: 'visible', timeout: 5000 })
+    assert.include(await chip.textContent(), '8')
+    await page.assertExists('[data-testid="dashboard-attention-more"]')
 
     await rows.first().click()
     await page.waitForURL(/\/planning\?task=\d+/)

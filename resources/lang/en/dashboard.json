@@ -1,6 +1,6 @@
 {
   "title": "Dashboard",
-  "subtitle": "Overview of your fleet and upcoming maintenance.",
+  "greeting": "Here is your fleet as of {date}",
   "newBoat": "New boat",
   "quickAdd": {
     "menuLabel": "Create",
@@ -13,7 +13,6 @@
     "selectBoat": "Boat",
     "selectBoatPlaceholder": "— Choose a boat —"
   },
-  "overdueAlert": "{count, plural, one {# overdue task} other {# overdue tasks}}",
   "viewPlanning": "View planning",
   "analyzeFleet": "Analyze fleet",
   "aiPanel": {
@@ -43,18 +42,6 @@
       "boatsWithRig": "{count} rigged",
       "noRig": "No rigs"
     }
-  },
-  "urgentMaintenance": {
-    "title": "Urgent maintenance",
-    "period": "Next 14 days",
-    "empty": "No urgent maintenance due soon.",
-    "overdue": "Overdue",
-    "dueSoon": "Due soon",
-    "hours": "Hours",
-    "dueAt": "Due {date}",
-    "dueAtHours": "Due at {hours}h · current {current}h",
-    "viewMore": "View the {count, plural, one {other task} other {# others}} in the planning",
-    "openTask": "Open the {title} task on {boat}"
   },
   "yourBoats": {
     "title": "Your boats",
@@ -99,5 +86,42 @@
     "openTask": "Open the {title} intervention on {boat}",
     "dueAt": "Due on {date}",
     "dueAtHours": "Due at {hours}h · current {current}h"
+  },
+  "attention": {
+    "title": "To handle",
+    "empty": "Nothing to handle today.",
+    "more": "{count, plural, one {# more item counted above} other {# more items counted above}}",
+    "open": "Open {title} ({boat})",
+    "type": {
+      "maintenance": "Maintenance",
+      "incident": "Incident",
+      "document": "Document",
+      "invoice": "Invoice"
+    },
+    "chips": {
+      "maintenance": "{count, plural, one {# task} other {# tasks}}",
+      "incidents": "{count, plural, one {# incident} other {# incidents}}",
+      "documents": "{count, plural, one {# document} other {# documents}}",
+      "invoices": "{count, plural, one {# unpaid invoice} other {# unpaid invoices}}"
+    },
+    "kind": {
+      "overdue": "Overdue",
+      "dueSoon": "Due soon",
+      "hours": "Hours",
+      "incidentOpen": "Open",
+      "incidentInProgress": "In progress",
+      "documentExpired": "Expired",
+      "documentExpiring": "Expiring soon",
+      "invoiceOverdue": "Unpaid"
+    },
+    "detail": {
+      "dueAt": "Due {date}",
+      "dueAtHours": "Due at {hours}h · current {current}h",
+      "reportedOn": "Reported on {date}",
+      "expiresAt": "Expires on {date}",
+      "expiredOn": "Expired on {date}",
+      "invoice": "Invoice {number} · {total}",
+      "invoiceDue": "Due on {date}"
+    }
   }
 }
