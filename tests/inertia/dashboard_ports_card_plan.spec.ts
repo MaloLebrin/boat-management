@@ -54,6 +54,8 @@ const stubs = {
   DashboardAiPanel: { template: '<div />' },
   DashboardBoatsCard: { template: '<div />' },
   DashboardAtSeaCard: { template: '<div />' },
+  DashboardActivityCard: { template: '<div />' },
+  DashboardSpendCard: { template: '<div />' },
   DashboardUpcomingReservationsCard: { template: '<div />' },
   DashboardHeader: { template: '<div><slot name="actions" /></div>' },
   DashboardQuickAddActions: { template: '<div />' },
@@ -78,6 +80,8 @@ function mountDashboard(
       pulse: { windowDays: 30, tripsCompleted: 0, distanceNm: 0, tasksDone: 0 },
       activeTrips: { items: [], total: 0 },
       fleetStatus: { total: 0, atSea: 0, inPort: 0, enginesInMaintenance: 0 },
+      canViewSpend: true,
+      aiFleetAnalysisAt: null,
       stats: {
         boats: 0,
         engines: 0,

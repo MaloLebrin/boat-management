@@ -7,6 +7,9 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatMaintenanceTaskFactory } from '#database/factories/boat_maintenance_task_factory'
 import { NavigationLogFactory } from '#database/factories/navigation_log_factory'
+import { BoatIncidentFactory } from '#database/factories/boat_incident_factory'
+import { BoatFuelLogFactory } from '#database/factories/boat_fuel_log_factory'
+import { BoatDocumentFactory } from '#database/factories/boat_document_factory'
 
 function service() {
   return new DashboardFleetActivityService(new EngineListService())
@@ -120,5 +123,71 @@ test.group('DashboardFleetActivityService (#832)', () => {
     const pulse = await svc.getPulse(orphan, [])
     assert.equal(pulse.tripsCompleted, 0)
     assert.equal(pulse.tasksDone, 0)
+  })
+
+  test('recent activity merges five sources, newest first, capped and never null', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    const orgId = user.organizationId!
+    const boat = await BoatFactory.merge({ organizationId: orgId }).create()
+    const now = DateTime.now()
+
+    await NavigationLogFactory.merge({
+      boatId: boat.id,
+      organizationId: orgId,
+      status: 'completed',
+      departedAt: now.minus({ hours: 6 }),
+      arrivedAt: now.minus({ hours: 1 }),
+      departurePortName: 'Brest',
+      arrivalPortName: 'Camaret',
+      distanceNm: '18.5',
+    }).create()
+    await NavigationLogFactory.merge({ boatId: boat.id, organizationId: orgId }).create() // en cours : exclue
+    await BoatMaintenanceTaskFactory.merge({
+      boatId: boat.id,
+      status: 'done',
+      doneAt: now.startOf('day').minus({ days: 2 }),
+    }).create()
+    await BoatIncidentFactory.merge({ boatId: boat.id, organizationId: orgId }).create()
+    await BoatFuelLogFactory.merge({
+      boatId: boat.id,
+      organizationId: orgId,
+      quantityLiters: '40.000',
+      totalCost: '80.00',
+    }).create()
+    await BoatDocumentFactory.merge({ boatId: boat.id, organizationId: orgId }).createMany(2)
+
+    const svc = service()
+    const items = await svc.getRecentActivity(user, [boat.id])
+
+    // 1 sortie + 1 tâche + 1 incident + 1 plein + 2 documents : tout tient sous le plafond
+    assert.equal(items.length, 6)
+    assert.sameMembers(Array.from(new Set(items.map((i) => i.kind))), [
+      'trip_completed',
+      'task_done',
+      'incident_reported',
+      'fuel_logged',
+      'document_added',
+    ])
+    for (let i = 1; i < items.length; i++) {
+      assert.isTrue(
+        items[i - 1]!.occurredAt >= items[i]!.occurredAt,
+        'trié du plus récent au plus ancien'
+      )
+    }
+    // Documents, incident et plein viennent d'être créés : plus récents que la sortie (J-1 h) et la tâche (J-2)
+    assert.equal(items.at(-1)!.kind, 'task_done')
+    const trip = items.find((i) => i.kind === 'trip_completed')!
+    assert.equal(trip.kind === 'trip_completed' ? trip.distanceNm : null, 18.5)
+    assert.equal(trip.href, `/boats/${boat.id}/navigation`)
+
+    // Le plafond s'applique après fusion
+    const capped = await svc.getRecentActivity(user, [boat.id], 3)
+    assert.equal(capped.length, 3)
+    assert.isFalse(capped.some((i) => i.kind === 'task_done'))
+
+    const orphan = await UserFactory.merge({ organizationId: null }).create()
+    assert.deepEqual(await svc.getRecentActivity(orphan, []), [])
   })
 })

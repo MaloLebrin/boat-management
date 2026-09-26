@@ -1,4 +1,5 @@
 import type { BoatDocumentType } from '#shared/types/boat_document'
+import type { BudgetYearSummary } from '#shared/types/budget'
 import type { IncidentType } from '#shared/types/incident'
 import type { ReservationStatus, ReservationType } from '#shared/types/reservation'
 
@@ -182,3 +183,63 @@ export interface DashboardUpcomingReservation {
   startsAt: string
   endsAt: string
 }
+
+// --- Dépenses et activité récente (props différées, #832) --------------------
+
+export interface DashboardSpendSummary {
+  year: number
+  /** Mois courant : les totaux couvrent `1..throughMonth` pour N comme pour N-1. */
+  throughMonth: number
+  totals: BudgetYearSummary
+  /** `null` quand l'année précédente n'a aucune dépense sur la période. */
+  previousYearToDate: BudgetYearSummary | null
+  /** Lien « voir le budget » possible seulement pour une flotte d'un seul bateau. */
+  singleBoatId: number | null
+}
+
+interface DashboardActivityBase {
+  /** Clé stable `<kind>:<id>`. */
+  key: string
+  /** Instant de l'événement, ISO (date seule pour les tâches : `done_at` est une date civile). */
+  occurredAt: string
+  boatId: number
+  boatName: string
+  href: string
+}
+
+export interface DashboardActivityTripCompleted extends DashboardActivityBase {
+  kind: 'trip_completed'
+  departurePortName: string | null
+  arrivalPortName: string | null
+  distanceNm: number | null
+}
+
+export interface DashboardActivityTaskDone extends DashboardActivityBase {
+  kind: 'task_done'
+  title: string
+  subject: string
+}
+
+export interface DashboardActivityIncidentReported extends DashboardActivityBase {
+  kind: 'incident_reported'
+  incidentType: IncidentType
+}
+
+export interface DashboardActivityFuelLogged extends DashboardActivityBase {
+  kind: 'fuel_logged'
+  quantityLiters: number
+  totalCost: number | null
+}
+
+export interface DashboardActivityDocumentAdded extends DashboardActivityBase {
+  kind: 'document_added'
+  documentType: BoatDocumentType
+  customTypeLabel: string | null
+}
+
+export type DashboardActivityItem =
+  | DashboardActivityTripCompleted
+  | DashboardActivityTaskDone
+  | DashboardActivityIncidentReported
+  | DashboardActivityFuelLogged
+  | DashboardActivityDocumentAdded

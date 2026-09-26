@@ -20,7 +20,8 @@
     "suggestions": "Suggestions",
     "empty": "Click 'Analyze fleet' to get personalized suggestions.",
     "analyzing": "Analyzing...",
-    "noSuggestions": "No suggestions at this time."
+    "noSuggestions": "No suggestions at this time.",
+    "lastAnalysedAt": "Last analysed on {date}"
   },
   "stats": {
     "boats": "Boats",
@@ -139,5 +140,27 @@
     "return": "Return at {time}",
     "empty": "No departure or return scheduled.",
     "viewAll": "Reservations"
+  },
+  "activity": {
+    "title": "Recent activity",
+    "empty": "No recent activity.",
+    "distance": "{nm} nm",
+    "kind": {
+      "tripCompleted": "Trip completed · {from} → {to}",
+      "taskDone": "Task done · {title} ({subject})",
+      "incidentReported": "Incident reported · {type}",
+      "fuelLogged": "Refuel · {liters} L · {cost}",
+      "documentAdded": "Document added · {type}"
+    }
+  },
+  "spend": {
+    "title": "Spend {year}",
+    "ytd": "Since January 1st",
+    "vsSamePeriod": "vs same period {year}",
+    "increase": "+{pct}%",
+    "decrease": "-{pct}%",
+    "noComparison": "No year-over-year comparison",
+    "empty": "No spend recorded this year.",
+    "viewBoatBudget": "View the boat budget"
   }
 }

@@ -55,6 +55,8 @@ const stubs = {
   },
   DashboardBoatsCard: { template: '<div data-testid="boats" />' },
   DashboardAtSeaCard: { template: '<div data-testid="at-sea" />' },
+  DashboardActivityCard: { template: '<div data-testid="activity" />' },
+  DashboardSpendCard: { template: '<div data-testid="spend" />' },
   DashboardUpcomingReservationsCard: { template: '<div data-testid="upcoming" />' },
   DashboardAiPanel: { template: '<div data-testid="ai-panel" />' },
   PortDashboardCard: { template: '<div data-testid="ports" />' },
@@ -72,6 +74,8 @@ function mountDashboard(currentPlan = 'enterprise', extraProps: Record<string, u
       pulse: { windowDays: 30, tripsCompleted: 0, distanceNm: 0, tasksDone: 0 },
       activeTrips: { items: [], total: 0 },
       fleetStatus: { total: 0, atSea: 0, inPort: 0, enginesInMaintenance: 0 },
+      canViewSpend: true,
+      aiFleetAnalysisAt: null,
       stats: {
         boats: 0,
         engines: 0,
@@ -113,8 +117,21 @@ describe('Dashboard — structure de page (#828)', () => {
     expect(main.find('[data-testid="attention"]').exists()).toBe(true)
     expect(main.find('[data-testid="at-sea"]').exists()).toBe(true)
     expect(main.find('[data-testid="boats"]').exists()).toBe(true)
-    const positions = order(wrapper, ['attention', 'at-sea', 'boats'])
+    const positions = order(wrapper, ['attention', 'at-sea', 'activity', 'boats'])
+    expect(positions.every((p) => p >= 0)).toBe(true)
     expect(positions).toEqual([...positions].sort((a, b) => a - b))
+  })
+
+  test('the side column shows the spend card between the AI panel and the ports, admins only', () => {
+    const admin = mountDashboard()
+    const side = admin.get('[data-testid="dashboard-side-column"]')
+    expect(side.find('[data-testid="spend"]').exists()).toBe(true)
+    const [ai, spend, ports] = order(admin, ['ai-panel', 'spend', 'ports'])
+    expect(ai).toBeLessThan(spend)
+    expect(spend).toBeLessThan(ports)
+
+    const member = mountDashboard('enterprise', { canViewSpend: false })
+    expect(member.find('[data-testid="spend"]').exists()).toBe(false)
   })
 
   test('the today grid is single-column without the charter module and two-column with it', () => {

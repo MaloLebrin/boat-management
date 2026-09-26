@@ -1,6 +1,7 @@
 import AiAnalysisService from '#services/ai_analysis_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatReservationService from '#services/boat_reservation_service'
+import BudgetService from '#services/budget_service'
 import DashboardAttentionService from '#services/dashboard_attention_service'
 import DashboardFleetActivityService from '#services/dashboard_fleet_activity_service'
 import DashboardService from '#services/dashboard_service'
@@ -13,6 +14,7 @@ import type { AiSuggestion } from '#shared/types/ai'
 import { deferJson } from '#utils/inertia_defer'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 
 @inject()
 export default class HomeController {
@@ -25,7 +27,8 @@ export default class HomeController {
     private taskService: BoatMaintenanceTaskService,
     private attentionService: DashboardAttentionService,
     private fleetService: DashboardFleetActivityService,
-    private reservationService: BoatReservationService
+    private reservationService: BoatReservationService,
+    private budgetService: BudgetService
   ) {}
 
   async index({ inertia, auth, request, response, i18n }: HttpContext) {
@@ -37,8 +40,9 @@ export default class HomeController {
 
     const user = auth.getUserOrFail()
 
+    const role = user.organizationId ? await user.getEffectiveRoleInOrg(user.organizationId) : null
+
     if (user.organizationId) {
-      const role = await user.getEffectiveRoleInOrg(user.organizationId)
       if (role === 'boat_owner') {
         return response.redirect('/owner/boats')
       }
@@ -109,6 +113,11 @@ export default class HomeController {
       ? await this.reservationService.listUpcomingForOrg(user)
       : undefined
 
+    // Dépenses de l'organisation : admins seulement (les membres gardent le
+    // budget par bateau) ; ~18 SUM, donc en prop différée avec l'activité.
+    const canViewSpend = role === 'admin'
+    const boatIds = data.boatIds
+
     // Quota bateaux pour l'upsell du bouton « Nouveau bateau » (issue #418).
     const boatQuota = user.organization
       ? await this.quotaService.getBoatUsage(user.organization)
@@ -127,7 +136,21 @@ export default class HomeController {
       // Omis (et non `null`) hors module Location : le front distingue « pas
       // de module » d'une liste vide.
       ...(upcomingReservations ? { upcomingReservations } : {}),
+      canViewSpend,
+      ...(canViewSpend
+        ? {
+            spend: inertia.defer(
+              deferJson(() => this.budgetService.getOrgSpendSummary(boatIds, DateTime.now())),
+              'spend'
+            ),
+          }
+        : {}),
+      activity: inertia.defer(
+        deferJson(() => this.fleetService.getRecentActivity(user, boatIds)),
+        'activity'
+      ),
       aiFleetAnalysis,
+      aiFleetAnalysisAt: latestAnalysis?.createdAt.toISO() ?? null,
       portOptions,
       canCreateNavigationLogs,
       canCreateIncidents,

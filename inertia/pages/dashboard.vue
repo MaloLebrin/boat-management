@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3'
 import { computed } from 'vue'
+import DashboardActivityCard from '~/components/dashboard/DashboardActivityCard.vue'
 import DashboardAiPanel from '~/components/dashboard/DashboardAiPanel.vue'
 import DashboardAtSeaCard from '~/components/dashboard/DashboardAtSeaCard.vue'
 import DashboardAttentionCard from '~/components/dashboard/DashboardAttentionCard.vue'
 import DashboardBoatsCard from '~/components/dashboard/DashboardBoatsCard.vue'
 import DashboardHeader from '~/components/dashboard/DashboardHeader.vue'
 import DashboardQuickAddActions from '~/components/dashboard/DashboardQuickAddActions.vue'
+import DashboardSpendCard from '~/components/dashboard/DashboardSpendCard.vue'
 import DashboardStatsGrid from '~/components/dashboard/DashboardStatsGrid.vue'
 import DashboardUpcomingReservationsCard from '~/components/dashboard/DashboardUpcomingReservationsCard.vue'
 import PortDashboardCard from '~/components/dashboard/PortDashboardCard.vue'
 import type {
   DashboardActiveTrips,
+  DashboardActivityItem,
   DashboardAttention,
   DashboardBoatSummary,
   DashboardFleetStatus,
   DashboardPortItem,
   DashboardPortStats,
   DashboardPulseStats,
+  DashboardSpendSummary,
   DashboardStats,
   DashboardUpcomingReservation,
 } from '#shared/types/dashboard'
@@ -42,6 +46,12 @@ defineProps<{
   fleetStatus: DashboardFleetStatus
   /** Absent (pas `null`) quand le module Location n'est pas actif. */
   upcomingReservations?: DashboardUpcomingReservation[]
+  /** Prop différée (groupe `activity`) : `undefined` tant qu'elle n'est pas arrivée. */
+  activity?: DashboardActivityItem[]
+  /** Admins seulement ; `spend` est alors une prop différée (groupe `spend`). */
+  canViewSpend: boolean
+  spend?: DashboardSpendSummary
+  aiFleetAnalysisAt: string | null
   aiFleetAnalysis: AiSuggestion[] | null
   ports: DashboardPortItem[]
   portStats: DashboardPortStats
@@ -116,11 +126,16 @@ defineProps<{
             :items="upcomingReservations"
           />
         </div>
+        <DashboardActivityCard :items="activity" />
         <DashboardBoatsCard :boats="boats" />
       </div>
 
       <div class="space-y-6" data-testid="dashboard-side-column">
-        <DashboardAiPanel :ai-fleet-analysis="aiFleetAnalysis" />
+        <DashboardAiPanel
+          :ai-fleet-analysis="aiFleetAnalysis"
+          :ai-fleet-analysis-at="aiFleetAnalysisAt"
+        />
+        <DashboardSpendCard v-if="canViewSpend" :spend="spend" />
         <!-- Cartographie de port réservée aux plans Pro et Entreprise (#604) : sur
              Starter, l'état vide de la carte inviterait à créer un port inaccessible. -->
         <PortDashboardCard v-if="canManagePorts" :ports="ports" :port-stats="portStats" />

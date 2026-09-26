@@ -291,7 +291,9 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
       assert.isAtLeast(count, 3, 'lignes urgentes ou liens du dashboard introuvables')
 
       for (let i = 0; i < count; i++) {
-        await locator.nth(i).scrollIntoViewIfNeeded()
+        // Centrée dans le viewport : un bord collé au header ou à la bottom nav
+        // serait « recouvert » par eux et non par un défaut de la cible.
+        await locator.nth(i).evaluate((el) => el.scrollIntoView({ block: 'center' }))
         const targets = (await page.evaluate(touchTargetsJs(selector))) as TouchTarget[]
         assertTouchTarget(assert, targets[i], 'dashboard')
       }
