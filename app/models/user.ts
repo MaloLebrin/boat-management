@@ -12,6 +12,7 @@ import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relat
 import type { OrgRole } from '#shared/types/organization'
 import type { Capability } from '#shared/types/permissions'
 import { ROLE_PERMISSIONS } from '#shared/types/permissions'
+import { isStoredDashboardLayout, type StoredDashboardLayout } from '#shared/types/dashboard_layout'
 
 export default class User extends compose(
   UserSchema,
@@ -28,6 +29,23 @@ export default class User extends compose(
    */
   @column.dateTime({ serializeAs: null })
   declare sessionsValidAfter: DateTime | null
+
+  /**
+   * Disposition personnalisée du tableau de bord (ordre des widgets par
+   * colonne, widgets masqués). `null` = disposition par défaut. Un blob
+   * illisible (version inconnue, ids retirés) est lu comme `null` plutôt que
+   * de casser la page : l'utilisateur retrouve le défaut et repersonnalise.
+   */
+  @column({
+    serializeAs: null,
+    prepare: (value: StoredDashboardLayout | null) =>
+      value === null ? null : JSON.stringify(value),
+    consume: (value: unknown): StoredDashboardLayout | null => {
+      const parsed: unknown = typeof value === 'string' ? JSON.parse(value) : value
+      return isStoredDashboardLayout(parsed) ? parsed : null
+    },
+  })
+  declare dashboardLayout: StoredDashboardLayout | null
 
   @beforeSave()
   static normalizeEmail(user: User) {

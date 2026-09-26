@@ -2940,6 +2940,7 @@ export class SubscriptionSchema extends BaseModel {
 export class UserSchema extends BaseModel {
   static $columns = [
     'createdAt',
+    'dashboardLayout',
     'email',
     'emailVerifiedAt',
     'fullName',
@@ -2955,6 +2956,8 @@ export class UserSchema extends BaseModel {
   $columns = UserSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare dashboardLayout: any | null
   @column()
   declare email: string
   @column.dateTime()

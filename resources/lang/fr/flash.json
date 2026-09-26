@@ -418,5 +418,9 @@
       "create_client": "Fiche client créée.",
       "set_part_stock": "Stock de la pièce mis à jour."
     }
+  },
+  "dashboard": {
+    "layoutSaved": "Disposition du tableau de bord enregistrée.",
+    "layoutReset": "Disposition du tableau de bord réinitialisée."
   }
 }

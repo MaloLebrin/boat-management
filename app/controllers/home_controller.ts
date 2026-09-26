@@ -4,11 +4,13 @@ import BoatReservationService from '#services/boat_reservation_service'
 import BudgetService from '#services/budget_service'
 import DashboardAttentionService from '#services/dashboard_attention_service'
 import DashboardFleetActivityService from '#services/dashboard_fleet_activity_service'
+import DashboardLayoutService from '#services/dashboard_layout_service'
 import DashboardService from '#services/dashboard_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import { toBoatTaskEquipment } from '#transformers/maintenance_transformer'
+import { visibleWidgetSet } from '#shared/helpers/dashboard_layout'
 import { toAppLocale } from '#shared/helpers/locale_path'
 import type { AiSuggestion } from '#shared/types/ai'
 import { deferJson } from '#utils/inertia_defer'
@@ -28,7 +30,8 @@ export default class HomeController {
     private attentionService: DashboardAttentionService,
     private fleetService: DashboardFleetActivityService,
     private reservationService: BoatReservationService,
-    private budgetService: BudgetService
+    private budgetService: BudgetService,
+    private layoutService: DashboardLayoutService
   ) {}
 
   async index({ inertia, auth, request, response, i18n }: HttpContext) {
@@ -59,15 +62,23 @@ export default class HomeController {
     // pour les quotas comme pour les gardes de widgets (#418, #832).
     if (user.organizationId) await user.load('organization')
 
+    // Disposition personnalisée : les widgets masqués (ou indisponibles pour
+    // ce rôle/plan) ne sont ni calculés ni envoyés — un defer masqué est omis,
+    // jamais `null` (#478).
+    const availability = await this.layoutService.availabilityFor(user, role)
+    const layout = this.layoutService.resolveForUser(user, availability)
+    const visible = visibleWidgetSet(layout)
+
     const data = await this.dashboardService.getForUser(user)
 
-    const latestAnalysis = user.organizationId
-      ? await this.aiService.getLatestFleetAnalysis(
-          user.id,
-          user.organizationId,
-          toAppLocale(i18n.locale)
-        )
-      : null
+    const latestAnalysis =
+      user.organizationId && visible.has('ai_panel')
+        ? await this.aiService.getLatestFleetAnalysis(
+            user.id,
+            user.organizationId,
+            toAppLocale(i18n.locale)
+          )
+        : null
     const aiFleetAnalysis: AiSuggestion[] | null = latestAnalysis
       ? (JSON.parse(latestAnalysis.responseText) as AiSuggestion[])
       : null
@@ -104,12 +115,8 @@ export default class HomeController {
       this.fleetService.getFleetStatus(data.boatIds, activeTrips.total),
       this.fleetService.getPulse(user, data.boatIds),
     ])
-    const canViewReservations =
-      user.organizationId && user.organization
-        ? (await this.quotaService.canManageReservations(user.organization)) &&
-          (await user.hasPermission(user.organizationId, 'boats.view'))
-        : false
-    const upcomingReservations = canViewReservations
+    // Module Location actif et `boats.view` (cf. `DashboardLayoutService.availabilityFor`).
+    const upcomingReservations = visible.has('upcoming_reservations')
       ? await this.reservationService.listUpcomingForOrg(user)
       : undefined
 
@@ -137,7 +144,7 @@ export default class HomeController {
       // de module » d'une liste vide.
       ...(upcomingReservations ? { upcomingReservations } : {}),
       canViewSpend,
-      ...(canViewSpend
+      ...(canViewSpend && visible.has('spend')
         ? {
             spend: inertia.defer(
               deferJson(() => this.budgetService.getOrgSpendSummary(boatIds, DateTime.now())),
@@ -145,10 +152,23 @@ export default class HomeController {
             ),
           }
         : {}),
-      activity: inertia.defer(
-        deferJson(() => this.fleetService.getRecentActivity(user, boatIds)),
-        'activity'
-      ),
+      ...(visible.has('activity')
+        ? {
+            activity: inertia.defer(
+              deferJson(() => this.fleetService.getRecentActivity(user, boatIds)),
+              'activity'
+            ),
+          }
+        : {}),
+      ...(visible.has('planned_tasks')
+        ? {
+            plannedTasks: inertia.defer(
+              deferJson(() => this.dashboardService.getPlannedTasks(boatIds)),
+              'plannedTasks'
+            ),
+          }
+        : {}),
+      layout,
       aiFleetAnalysis,
       aiFleetAnalysisAt: latestAnalysis?.createdAt.toISO() ?? null,
       portOptions,

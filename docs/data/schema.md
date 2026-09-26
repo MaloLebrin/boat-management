@@ -29,6 +29,7 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - préférences d'interface, nullables — retombent sur le cookie puis sur un défaut :
   - `locale` (`en` | `fr`, #414)
   - `theme` (`system` | `light` | `dark`, #416)
+  - `dashboard_layout` (jsonb nullable) — disposition personnalisée du tableau de bord (`shared/types/dashboard_layout.ts` : `version`, `order.main`, `order.side`, `hidden`) ; `null` = disposition par défaut
 
 ### boats
 

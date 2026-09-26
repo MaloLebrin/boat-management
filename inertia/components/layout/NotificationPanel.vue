@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { isSafeInternalPath } from '#shared/helpers/safe_path'
 import { router } from '@inertiajs/vue3'
 import { useNotifications } from '~/composables/use_notifications'
 import { useNotificationHelpers } from '~/composables/use_notification_helpers'
 import { useT } from '~/composables/use_t'
+import { openNotification } from '~/utils/notification_navigation'
 import type { NotificationForFront } from '#shared/types/notification'
 
 const props = withDefaults(
@@ -24,26 +24,7 @@ const { t } = useT()
 const { formatRelativeTime, getSeverityClasses } = useNotificationHelpers()
 
 function handleItemClick(notif: NotificationForFront) {
-  // `actionUrl` est une colonne de texte libre : on ne navigue que si la
-  // valeur est un chemin interne (#780). Ne rien faire vaut mieux qu'ouvrir
-  // une redirection ouverte — la notification est marquée lue dans les deux
-  // cas.
-  const target = isSafeInternalPath(notif.actionUrl) ? notif.actionUrl : null
-
-  if (!notif.isRead) {
-    router.patch(
-      `/notifications/${notif.id}/read`,
-      {},
-      {
-        preserveScroll: true,
-        onSuccess: () => {
-          if (target) router.visit(target)
-        },
-      }
-    )
-  } else if (target) {
-    router.visit(target)
-  }
+  openNotification(notif)
 }
 
 function markAllRead() {
