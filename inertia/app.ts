@@ -5,6 +5,7 @@ import { createApp, h, type DefineComponent } from 'vue'
 import 'vue-sonner/style.css'
 import { client } from '~/client'
 import Layout from '~/layouts/default.vue'
+import { inertiaProgressOptions } from '~/utils/inertia_progress'
 import { pageTitle } from '~/utils/page_title'
 import './css/app.css'
 
@@ -22,7 +23,6 @@ createInertiaApp({
       .use(plugin)
       .mount(el)
   },
-  progress: {
-    color: 'var(--color-brand)',
-  },
+  // CSS de la barre bundlé dans `css/app.css` (CSP, #837) — voir `utils/inertia_progress.ts`.
+  progress: inertiaProgressOptions,
 })
