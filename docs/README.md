@@ -23,6 +23,8 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/domain/ports-and-marina.md` — ports, pontons, mouillages, places et plan interactif (Entreprise, profil professionnel)
   - `docs/domain/offline-queue.md` — file hors-ligne : les cinq clés de flash, le vocabulaire d'actions, le verrou optimiste et la résolution des ID temporaires
   - `docs/domain/navigation-logs.md` — journal de bord (sorties, points de log GPS au tap avec COG/SOG, carte du tracé, offline)
+- **Guides utilisateur** (mode d'emploi, en français, pour les utilisateurs de l'app) :
+  - `docs/user-guide/import-depenses-excel.md` — importer des dépenses depuis un classeur Excel ou un CSV (colonnes, formats, catégories, doublons, erreurs fréquentes)
 - **Données**: `docs/data/schema.md`
 - **Frontend (Inertia/Vue)**:
   - `docs/frontend/ui-map.md`

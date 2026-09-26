@@ -52,6 +52,10 @@ boatId)` et `runImport(type, boatId, rows, i18n)` ; le contrôleur ne branche
 - **i18n.** `settings.import.{types.expenses, fileLabel, fileHint,
 previewColumns.*, rowDuplicate, previewDuplicates, help.*}`, `flash.csv.*`,
   `budget.importButton` — en et fr.
+- **Guide utilisateur.** `docs/user-guide/import-depenses-excel.md` : mode
+  d'emploi de l'import (préparer le classeur, colonnes et en-têtes reconnues,
+  formats de date et de montant, catégories, lecture de l'aperçu, erreurs
+  fréquentes), référencé dans `docs/README.md`.
 - **Docs.** `docs/domain/csv-import-export.md` (sections « Import — dépenses » et
   « Fichiers Excel »), `docs/frontend/ui-map.md`, `docs/data/schema.md` ;
   entrée `expenses-import` et mise à jour de `csv-import` dans
