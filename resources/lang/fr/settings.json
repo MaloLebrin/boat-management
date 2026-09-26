@@ -273,10 +273,11 @@
     "boatPlaceholder": "Sélectionner un bateau",
     "typeLabel": "Type de données",
     "types": {
-      "maintenance": "Événements de maintenance"
+      "maintenance": "Événements de maintenance",
+      "expenses": "Dépenses (budget)"
     },
-    "fileLabel": "Fichier CSV",
-    "fileHint": "Format : UTF-8 ou UTF-8 BOM, séparateur `;`. Taille max : {size} Mo, {rows} lignes.",
+    "fileLabel": "Fichier CSV ou Excel",
+    "fileHint": "CSV : UTF-8 ou UTF-8 BOM, séparateur `;`. Excel : .xlsx, première feuille, en-têtes en ligne 1. Taille max : {size} Mo, {rows} lignes.",
     "previewButton": "Prévisualiser",
     "confirmButton": "{count, plural, one {Importer # ligne} other {Importer # lignes}}",
     "cancelButton": "Annuler",
@@ -285,16 +286,21 @@
     "previewTitle": "Aperçu du fichier",
     "previewSummary": "{valid, plural, one {# ligne valide} other {# lignes valides}} sur {total}",
     "previewErrors": "{count, plural, one {# erreur} other {# erreurs}}",
+    "previewDuplicates": "{count, plural, one {# doublon ignoré} other {# doublons ignorés}}",
     "previewColumns": {
       "line": "Ligne",
       "date": "date",
       "title": "title",
       "subject": "subject",
+      "label": "libellé",
+      "amount": "montant",
+      "category": "catégorie",
       "status": "Statut",
       "errors": "Erreurs"
     },
     "rowValid": "OK",
     "rowInvalid": "Erreur",
+    "rowDuplicate": "Déjà présente",
     "noBoats": "Aucun bateau disponible. Créez d'abord un bateau.",
     "exportBoatLabel": "Exporter les données du bateau",
     "exportMaintenance": "Maintenance (.csv)",
@@ -304,16 +310,25 @@
       "title": "Comment ça marche",
       "openButton": "Aide",
       "stepsTitle": "Flux d'import CSV",
-      "step1": "Sélectionnez un bateau et le type de données (maintenance).",
-      "step2": "Uploadez votre fichier CSV (UTF-8, séparateur ;, max {size} Mo et {rows} lignes).",
-      "step3": "Vérifiez l'aperçu : les lignes valides sont surlignées, les erreurs sont signalées colonne par colonne.",
+      "step1": "Sélectionnez un bateau et le type de données (maintenance ou dépenses).",
+      "step2": "Uploadez votre fichier CSV (UTF-8, séparateur ;) ou classeur Excel (.xlsx, première feuille) — max {size} Mo et {rows} lignes.",
+      "step3": "Vérifiez l'aperçu : les lignes valides sont surlignées, les erreurs signalées colonne par colonne, et les lignes déjà présentes sont ignorées.",
       "step4": "Confirmez pour persister les lignes valides en base de données.",
       "formatTitle": "Format attendu (maintenance)",
+      "formatTitleExpenses": "Format attendu (dépenses)",
       "formatDesc": "Séparateur : ; (point-virgule). Encodage : UTF-8 ou UTF-8 BOM.",
       "requiredColumns": "Colonnes obligatoires",
       "optionalColumns": "Colonnes optionnelles",
       "exportTitle": "Export CSV",
-      "exportDesc": "Sélectionnez un bateau et cliquez sur le lien d'export souhaité. Le fichier est compatible Excel (encodage UTF-8 BOM, séparateur ;)."
+      "exportDesc": "Sélectionnez un bateau et cliquez sur le lien d'export souhaité. Le fichier est compatible Excel (encodage UTF-8 BOM, séparateur ;).",
+      "expenses": {
+        "formatDesc": "Mêmes règles de fichier que la maintenance. Les en-têtes sont reconnues souplement : en français ou en anglais, majuscules ou minuscules, avec ou sans accents.",
+        "headerAliases": "En-têtes acceptées : {headers}",
+        "dateFormats": "Dates : {formats}, ou une vraie cellule date dans Excel.",
+        "amountFormats": "Montants : virgule ou point décimal, séparateurs de milliers et signe € tolérés ; un montant négatif enregistre un remboursement.",
+        "categories": "Catégories : {values} — les libellés français (carburant, entretien, escale…) sont acceptés ; vide vaut « autre ».",
+        "duplicates": "Une ligne ayant la même date, le même libellé et le même montant qu'une dépense déjà enregistrée sur ce bateau est signalée « déjà présente » et n'est pas réimportée."
+      }
     }
   },
   "auditLog": {

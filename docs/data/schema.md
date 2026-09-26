@@ -589,9 +589,11 @@ Une ligne = l'**import CSV en attente de confirmation** d'un utilisateur (#774)
 — doc de domaine : `docs/domain/csv-import-export.md`.
 
 - `id`, `userId` (CASCADE, **unique**), `boatId` (CASCADE)
-- `type` — varchar(32), le type d'import (`maintenance` aujourd'hui)
-- `rows` (jsonb) — les lignes validées par `parseMaintenanceCsv()`, bornées à
-  `CSV_IMPORT_MAX_ROWS`
+- `type` — varchar(32), le type d'import : `maintenance` ou `expenses`
+  (`CSV_IMPORT_TYPES`)
+- `rows` (jsonb) — les lignes validées, `MaintenanceImportRow[]` ou
+  `ExpenseImportRow[]` selon `type` (les doublons de dépenses n'y entrent
+  pas), bornées à `CSV_IMPORT_MAX_ROWS`
 - `createdAt`, `updatedAt`
 
 L'unicité sur `userId` fait de cette table un **tampon**, pas un journal : une

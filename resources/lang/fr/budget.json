@@ -3,6 +3,7 @@
   "subtitle": "Dépenses annuelles par poste",
   "yearSelector": "Année",
   "exportCsv": "Exporter CSV",
+  "importButton": "Importer des dépenses",
   "categories": {
     "maintenance": "Maintenance",
     "fuel": "Carburant",

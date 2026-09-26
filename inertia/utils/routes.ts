@@ -14,6 +14,8 @@ export const routes = {
     importPreview: () => '/settings/import/preview',
     importConfirm: () => '/settings/import/confirm',
     importCancel: () => '/settings/import/cancel',
+    /** Raccourci de la page budget : formulaire présélectionné sur les dépenses du bateau. */
+    importExpenses: (boatId: number) => `/settings/import?type=expenses&boatId=${boatId}`,
     exportMaintenance: (boatId: number) => `/boats/${boatId}/export/maintenance.csv`,
     exportFuelLogs: (boatId: number) => `/boats/${boatId}/export/fuel-logs.csv`,
     exportNavigationLogs: (boatId: number) => `/boats/${boatId}/export/navigation-logs.csv`,

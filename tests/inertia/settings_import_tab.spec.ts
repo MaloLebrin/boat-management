@@ -98,3 +98,57 @@ describe('SettingsImportTab — flotte mono-bateau (#823)', () => {
     expect(w.text()).toContain('settings.import.noBoats')
   })
 })
+
+/**
+ * Présélection par `?type=expenses&boatId=N` : le raccourci « Importer des
+ * dépenses » de la page budget arrive ici avec le bateau et le type déjà
+ * choisis. Le contrôleur a filtré les valeurs ; le composant les applique.
+ */
+describe('SettingsImportTab — présélection depuis la page budget', () => {
+  test('type et bateau présélectionnés', () => {
+    const w = mount(SettingsImportTab, {
+      props: {
+        boats: fleet,
+        preview: null,
+        hasPendingImport: false,
+        canImport: true,
+        initialType: 'expenses',
+        initialBoatId: 2,
+      },
+    })
+
+    const selects = w.findAll('select')
+    const boatSelect = selects.find((s) =>
+      s.findAll('option').some((o) => o.text() === 'Pen Duick')
+    )!
+    const typeSelect = selects.find((s) =>
+      s.findAll('option').some((o) => o.attributes('value') === 'expenses')
+    )!
+
+    expect(boatSelect.element.value).toBe('2')
+    expect(typeSelect.element.value).toBe('expenses')
+  })
+
+  test('un bateau absent de la flotte est ignoré, le type reste maintenance par défaut', () => {
+    const w = mount(SettingsImportTab, {
+      props: {
+        boats: fleet,
+        preview: null,
+        hasPendingImport: false,
+        canImport: true,
+        initialType: null,
+        initialBoatId: 99,
+      },
+    })
+
+    const typeSelect = w
+      .findAll('select')
+      .find((s) => s.findAll('option').some((o) => o.attributes('value') === 'expenses'))!
+    expect(typeSelect.element.value).toBe('maintenance')
+    for (const link of w
+      .findAll('a')
+      .filter((a) => a.text().startsWith('settings.import.export'))) {
+      expect(link.attributes('href')).toBeUndefined()
+    }
+  })
+})
