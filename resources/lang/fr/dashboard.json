@@ -28,7 +28,6 @@
     "engines": "Moteurs",
     "sails": "Voiles",
     "rigs": "Gréements",
-    "urgentMaintenance": "Maintenance urgente",
     "equipmentEmpty": {
       "title": "Équipements",
       "description": "Aucun moteur, voile ou gréement saisi pour votre flotte pour l'instant.",
@@ -42,9 +41,7 @@
       "boatsWithSail": "{count} à voile",
       "boatsAllSailless": "Aucune voile",
       "boatsWithRig": "{count, plural, one {# équipé} other {# équipés}}",
-      "noRig": "Aucun gréement",
-      "overdue": "dont {count} en retard",
-      "noOverdue": "Aucun retard"
+      "noRig": "Aucun gréement"
     }
   },
   "urgentMaintenance": {
@@ -55,7 +52,9 @@
     "dueSoon": "Bientôt dû",
     "hours": "Heures",
     "dueAt": "Dû le {date}",
-    "dueAtHours": "Dû à {hours}h · actuel {current}h"
+    "dueAtHours": "Dû à {hours}h · actuel {current}h",
+    "viewMore": "Voir {count, plural, one {l'autre tâche} other {les # autres}} dans le planning",
+    "openTask": "Ouvrir la tâche {title} sur {boat}"
   },
   "yourBoats": {
     "title": "Vos bateaux",

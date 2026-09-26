@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { BoatMaintenanceTaskFactory } from '#database/factories/boat_maintenance_task_factory'
 import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import { createAdminUser, createBoatForUser } from '#tests/browser/helpers'
@@ -81,5 +82,31 @@ test.group('E2E · Dashboard stat card links', (group) => {
     // …whose CTA leads to the fleet list.
     await page.locator('[data-testid="equipment-empty-card"] a[href="/boats"]').click()
     await page.waitForURL(/\/boats$/)
+  })
+
+  test('the urgent list shows five rows, links to the rest and opens the planning on a task (#828)', async ({
+    browserContext,
+    visit,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await createBoatForUser(user, { name: 'Busy Boat' })
+    // 6 tâches en retard : 5 affichées, la 6ᵉ derrière « Voir les autres »
+    await BoatMaintenanceTaskFactory.merge({ boatId: boat.id }).apply('overdue').createMany(6)
+
+    await browserContext.loginAs(user)
+
+    const page = await visit('/dashboard')
+    await page.waitForLoadState('networkidle')
+
+    const rows = page.locator('[data-testid="dashboard-urgent-row"]')
+    assert.equal(await rows.count(), 5, 'la liste urgente doit être plafonnée à 5 lignes')
+    await page.assertExists('[data-testid="dashboard-overdue-badge"]')
+    await page.assertExists('[data-testid="dashboard-urgent-view-more"][href="/planning"]')
+    // Plus d'alerte de page ni de KPI « Maintenance urgente » : le compteur vit dans la carte
+    await page.assertNotExists('a[href="/planning"].block')
+
+    await rows.first().click()
+    await page.waitForURL(/\/planning\?task=\d+/)
   })
 })

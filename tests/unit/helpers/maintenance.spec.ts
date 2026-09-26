@@ -1,5 +1,9 @@
 import { test } from '@japa/runner'
-import { buildEngineCaption, isEngineKindCaption } from '#shared/helpers/maintenance'
+import {
+  buildEngineCaption,
+  isDueDateOverdue,
+  isEngineKindCaption,
+} from '#shared/helpers/maintenance'
 
 test.group('buildEngineCaption', () => {
   test('joins brand, model and serial number when available', ({ assert }) => {
@@ -37,5 +41,17 @@ test.group('isEngineKindCaption', () => {
     assert.isFalse(isEngineKindCaption('Inboard'))
     assert.isFalse(isEngineKindCaption(null))
     assert.isFalse(isEngineKindCaption(''))
+  })
+})
+
+test.group('isDueDateOverdue', () => {
+  test('is overdue strictly before today', ({ assert }) => {
+    assert.isTrue(isDueDateOverdue('2026-09-25', '2026-09-26'))
+    assert.isTrue(isDueDateOverdue('2025-12-31', '2026-01-01'))
+  })
+
+  test('is not overdue today or later', ({ assert }) => {
+    assert.isFalse(isDueDateOverdue('2026-09-26', '2026-09-26'))
+    assert.isFalse(isDueDateOverdue('2026-10-06', '2026-09-26'))
   })
 })

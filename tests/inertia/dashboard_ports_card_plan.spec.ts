@@ -35,12 +35,12 @@ const PORT: DashboardPortItem = {
 const stubs = {
   Head: { template: '<div><slot /></div>' },
   Link: { template: '<a><slot /></a>' },
-  BaseAlert: { template: '<div><slot /></div>' },
-  BaseButton: { template: '<button><slot /></button>' },
-  BaseCard: { template: '<div><slot name="header" /><slot /></div>' },
   DashboardAiPanel: { template: '<div />' },
+  DashboardBoatsCard: { template: '<div />' },
+  DashboardHeader: { template: '<div><slot name="actions" /></div>' },
   DashboardQuickAddActions: { template: '<div />' },
   DashboardStatsGrid: { template: '<div />' },
+  DashboardUrgentMaintenanceCard: { template: '<div />' },
   PortDashboardCard: { template: '<div class="port-dashboard-card" />' },
 }
 
@@ -77,6 +77,7 @@ function mountDashboard(
       portOptions: [],
       canCreateNavigationLogs: false,
       canCreateIncidents: false,
+      canCreateMaintenanceTasks: false,
       canAddBoat: true,
       boatQuota: { used: 0, limit: 2 },
     },

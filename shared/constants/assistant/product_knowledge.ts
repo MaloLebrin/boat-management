@@ -28,8 +28,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Tableau de bord : vue flotte et maintenance urgente',
     },
     body: {
-      en: 'The dashboard is the landing page after login. It shows fleet counters (boats, engines, sails, rigs), a summary table of your boats, and the list of urgent maintenance. A task is urgent when its due date falls within the next 14 days, or, for engine-hour tasks, when fewer than 10 engine hours remain before the due threshold (based on current engine hours). From the dashboard you can also launch the AI fleet analysis when your plan includes AI features.',
-      fr: 'Le tableau de bord est la page d’accueil une fois connecté. Il affiche les compteurs de la flotte (bateaux, moteurs, voiles, gréements), un tableau résumé de vos bateaux et la liste de la maintenance urgente. Une tâche est urgente quand son échéance tombe dans les 14 prochains jours ou, pour une tâche en heures moteur, quand il reste moins de 10 heures avant le seuil (calculé sur les heures moteur courantes). Depuis le tableau de bord, vous pouvez aussi lancer l’analyse IA de flotte si votre plan inclut l’IA.',
+      en: 'The dashboard is the landing page after login. It shows four fleet counters (boats, engines, sails, rigs), then what needs doing first: the urgent maintenance card, with the number of overdue tasks, a link to the planning and the five most pressing tasks (each row opens the planning centred on that task; a link shows the others). Below it, your boats as a table on desktop or as cards on a phone. The AI assistant and, on plans with ports, the ports card sit in the side column. A task is urgent when its due date falls within the next 14 days, or, for engine-hour tasks, when fewer than 10 engine hours remain before the due threshold (based on current engine hours). From the dashboard you can also launch the AI fleet analysis when your plan includes AI features.',
+      fr: 'Le tableau de bord est la page d’accueil une fois connecté. Il affiche quatre compteurs de flotte (bateaux, moteurs, voiles, gréements), puis ce qu’il y a à faire en premier : la carte de maintenance urgente, avec le nombre de tâches en retard, un lien vers le planning et les cinq tâches les plus pressantes (chaque ligne ouvre le planning centré sur la tâche ; un lien mène aux autres). En dessous, vos bateaux en tableau sur ordinateur ou en cartes sur téléphone. L’assistant IA et, sur les plans avec ports, la carte des ports occupent la colonne latérale. Une tâche est urgente quand son échéance tombe dans les 14 prochains jours ou, pour une tâche en heures moteur, quand il reste moins de 10 heures avant le seuil (calculé sur les heures moteur courantes). Depuis le tableau de bord, vous pouvez aussi lancer l’analyse IA de flotte si votre plan inclut l’IA.',
     },
     keywords: [
       'dashboard',
@@ -42,6 +42,10 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'compteurs',
       'flotte',
       'fleet',
+      'mobile',
+      'planning',
+      'en retard',
+      'overdue',
     ],
     navTarget: 'dashboard',
   },

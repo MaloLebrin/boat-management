@@ -24,13 +24,18 @@ Référence: `inertia/app.ts`.
 
 ### Dashboard
 
-- Page: `inertia/pages/dashboard.vue`
-- Props: `boats`, `urgentMaintenance`, `stats`
+- Page: `inertia/pages/dashboard.vue` — orchestration seule (~100 lignes) : ordre des blocs et répartition en colonnes, aucun rendu métier inline (#828)
+- Props: `boats`, `urgentMaintenance`, `stats` (+ `deltas`), `aiFleetAnalysis`, `ports`, `portStats`, `portOptions`, `canCreateNavigationLogs`, `canCreateIncidents`, `canCreateMaintenanceTasks`, `taskEquipment?` (prop différée, ajout rapide de tâche), `canAddBoat`, `boatQuota`
 - Source backend: `DashboardService.getForUser()` appelé depuis `HomeController.index`
-- Composants:
-  - KPIs: `inertia/components/dashboard/DashboardStatsGrid.vue` — grille des 5 cartes stats ; si aucun équipement saisi (0 moteur/voile/gréement), les 3 cartes équipement sont remplacées par une carte combinée avec CTA « Saisir vos équipements » → `/boats` (#419)
-  - En-tête: chips d'action « + Entrée journal » / « + Incident » (`DashboardQuickAddActions.vue`) distinctes du lien de navigation « Bateaux » (variante `ghost` + flèche, #419)
-  - Assistant IA: `inertia/components/dashboard/DashboardAiPanel.vue` — panneau navy **permanent** (sombre dans les deux thèmes, cf. `CLAUDE.md`), extrait de la page en #457. Il porte son propre état (`isAnalyzing`, garde `canUseAI` → `UpgradePlanModal`) et poste sur `/ai/fleet-analysis` ; la page ne lui passe que `aiFleetAnalysis`. Pendant de `BoatOverviewAiPanel.vue` sur la fiche bateau.
+- Structure (#828) : en-tête → KPI → grille `xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:items-start`. Colonne principale : maintenance urgente puis bateaux ; colonne latérale : assistant IA puis ports. Sous `xl` tout s'empile dans cet ordre (l'IA passe avant les ports) ; la table bateaux, elle, revient dès `lg` (motif #493).
+- Composants (`inertia/components/dashboard/`) :
+  - En-tête: `DashboardHeader.vue` — `h1` (sous-titre masqué sous `sm`) + slot `actions` qui reçoit le menu « + Créer » (`DashboardQuickAddActions.vue`). Le lien ghost « Bateaux → » (#419) a été retiré : la flotte est déjà atteignable par la sidebar, la bottom nav, la carte KPI « Bateaux » et « Vos bateaux · Voir tout »
+  - KPIs: `DashboardStatsGrid.vue` — **4** cartes (bateaux, moteurs, voiles, gréements) en `grid-cols-2 lg:grid-cols-4` ; si aucun équipement saisi, les 3 cartes équipement sont remplacées par une carte combinée `col-span-2 lg:col-span-3` avec CTA « Saisir vos équipements » → `/boats` (#419). La carte « Bateaux » passe en `warning` quand des bateaux sont en alerte, sinon aucune pastille : `BaseStatCard` ne rend plus de badge en ton `neutral`
+  - Maintenance urgente: `DashboardUrgentMaintenanceCard.vue` — en-tête = titre + total urgent + pastille `danger` « N en retard » (`stats.deltas.overdueCount`, pas le total urgent) + lien « Voir le planning » ; liste plafonnée à `URGENT_DISPLAY_CAP` (5, `shared/constants/dashboard.ts`) lignes `DashboardUrgentMaintenanceRow.vue` (ligne entière = `<Link>` vers `/planning?task=<id>`, #473) ; pied « Voir les N autres » si le service en a renvoyé plus. Le retard se calcule avec `isDueDateOverdue` (`shared/helpers/maintenance.ts`) sur la date locale du navigateur (`todayDateInputValue`)
+  - Bateaux: `DashboardBoatsCard.vue` — table `hidden lg:block` (sans `min-w`) + cartes `lg:hidden space-y-3` `DashboardBoatCard.vue` (motif #493)
+  - Assistant IA: `DashboardAiPanel.vue` — panneau navy **permanent** (sombre dans les deux thèmes, cf. `CLAUDE.md`), extrait de la page en #457. Il porte son propre état (`isAnalyzing`, garde `canUseAI` → `UpgradePlanModal`) et poste sur `/ai/fleet-analysis` ; la page ne lui passe que `aiFleetAnalysis`. Pendant de `BoatOverviewAiPanel.vue` sur la fiche bateau.
+  - Ports: `PortDashboardCard.vue` — colonne latérale, réservée aux plans avec `canManagePorts` (#604)
+- Tests : `dashboard_page_layout.spec.ts` (ordre et colonnes), `dashboard_urgent_maintenance_card.spec.ts`, `dashboard_boats_card.spec.ts`, `dashboard_stats_grid.spec.ts`, `dashboard_ports_card_plan.spec.ts` ; navigateur `mobile_field.spec.ts` (non-débordement + cartes bateaux), `dashboard_card_links.spec.ts` (ligne urgente → planning), `touch_targets.spec.ts`
 
 ### Boats (liste / création / édition)
 
@@ -542,6 +547,8 @@ table est doublée d'un bloc cartes, sur le motif de `boats/index.vue` :
 - `navigation/incidents.vue` → `IncidentCard.vue`
 - `MaintenanceHistoryTimeline.vue` → `MaintenanceHistoryCard.vue` (la rangée desktop garde ses
   badges en ligne ; la carte empile tout et porte son propre état déplié)
+- `dashboard/DashboardBoatsCard.vue` → `DashboardBoatCard.vue` (« Vos bateaux » du tableau de bord,
+  #828 ; la table desktop a perdu son `min-w-[520px]`)
 
 L'information y est hiérarchisée (trajet/date d'abord, champs secondaires ensuite), pas transposée
 colonne à colonne. Non-régression : `tests/inertia/table_card_collapse.spec.ts` (mêmes données que

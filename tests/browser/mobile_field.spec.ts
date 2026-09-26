@@ -99,7 +99,8 @@ test.group('E2E · Écrans terrain en viewport mobile (#500)', (group) => {
     const page = await visit('/dashboard')
     await page.setViewportSize(MOBILE)
 
-    for (const url of [...FIELD_SCREENS, `/boats/${boat.id}`]) {
+    // `/dashboard` : la table « Vos bateaux » forçait un `min-w-[520px]` (#828)
+    for (const url of ['/dashboard', ...FIELD_SCREENS, `/boats/${boat.id}`]) {
       await page.goto(url, { waitUntil: 'networkidle' })
       const { scrollWidth, innerWidth } = (await page.evaluate(HORIZONTAL_OVERFLOW_JS)) as {
         scrollWidth: number
@@ -166,6 +167,30 @@ test.group('E2E · Écrans terrain en viewport mobile (#500)', (group) => {
       assert.isTrue(desktop.tableVisible, `${url} : la table doit revenir en desktop`)
       assert.isFalse(desktop.cardsVisible, `${url} : les cartes doivent disparaître en desktop`)
     }
+  })
+
+  test('les cartes remplacent la table « Vos bateaux » du dashboard en mobile (#828)', async ({
+    browserContext,
+    visit,
+    assert,
+  }) => {
+    const { user } = await seedFieldData()
+    await browserContext.loginAs(user)
+
+    const page = await visit('/dashboard')
+    await page.setViewportSize(MOBILE)
+    await page.goto('/dashboard', { waitUntil: 'networkidle' })
+
+    // Seule table de la page : celle de « Vos bateaux »
+    const state = (await page.evaluate(TABLE_CARDS_STATE_JS)) as TableCardsState
+    assert.isTrue(state.cardsVisible, '/dashboard : les cartes bateaux ne rendent pas')
+    assert.equal(state.cardCount, 1, '/dashboard : une carte par bateau attendue')
+    assert.isFalse(state.tableVisible, '/dashboard : la table bateaux reste visible en mobile')
+
+    await page.setViewportSize(DESKTOP)
+    const desktop = (await page.evaluate(TABLE_CARDS_STATE_JS)) as TableCardsState
+    assert.isTrue(desktop.tableVisible, '/dashboard : la table doit revenir en desktop')
+    assert.isFalse(desktop.cardsVisible, '/dashboard : les cartes doivent disparaître en desktop')
   })
 
   test('le drawer reste atteignable en mobile', async ({ browserContext, visit, assert }) => {

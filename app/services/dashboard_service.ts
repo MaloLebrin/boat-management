@@ -14,6 +14,7 @@ import type {
   DashboardStats,
   DashboardUrgentMaintenanceRow,
 } from '#shared/types/dashboard'
+import { isDueDateOverdue } from '#shared/helpers/maintenance'
 import type { MaintenanceMaxDoneRow } from '#shared/types/maintenance'
 
 @inject()
@@ -202,7 +203,7 @@ export default class DashboardService {
       boatsWithSail: boats.filter((b) => b.sails.length > 0).length,
       boatsWithRig: boats.filter((b) => b.rig !== null).length,
       overdueCount: urgentMaintenance.filter(
-        (t) => t.kind === 'date' && t.dueAt !== null && t.dueAt < today
+        (t) => t.kind === 'date' && t.dueAt !== null && isDueDateOverdue(t.dueAt, today)
       ).length,
     }
 

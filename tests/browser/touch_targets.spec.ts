@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import type { Assert } from '@japa/assert'
 import type { Browser, BrowserContext } from 'playwright'
 import { truncateDb } from '#tests/utils/db'
+import { BoatMaintenanceTaskFactory } from '#database/factories/boat_maintenance_task_factory'
 import { createAdminUser, createBoatForUser } from '#tests/browser/helpers'
 
 /**
@@ -240,6 +241,54 @@ test.group('E2E · Cibles tactiles en contexte tactile dédié (#736)', (group) 
         `le bouton mesure désormais ${button.visualHeight}px de haut : la pseudo-zone n'est plus ce qui le porte au seuil, ce test ne prouve plus rien`
       )
       assertTouchTarget(assert, button, 'saisie de sortie en mer')
+    } finally {
+      await context.close()
+    }
+  })
+
+  /**
+   * #828 — sur le tableau de bord, chaque ligne de maintenance urgente est un
+   * lien pleine largeur et les « Voir tout / Voir le planning » portent
+   * `min-h-11` : mesurés ici sous le doigt, pas seulement en classes CSS.
+   */
+  test('les lignes urgentes et les liens « voir tout » du dashboard font 44 px (#828)', async ({
+    browser,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await createBoatForUser(user, { name: 'Touch Dashboard Boat' })
+    await BoatMaintenanceTaskFactory.merge({ boatId: boat.id }).apply('overdue').createMany(2)
+
+    const context = await newTouchContext(browser)
+    try {
+      await context.loginAs(user)
+      const page = await context.visit('/dashboard')
+      await page.waitForLoadState('networkidle')
+
+      // Scopé à la colonne principale : `a[href="/planning"]` seul attraperait
+      // aussi l'entrée « Planning » de la sidebar, masquée (0 px) en mobile.
+      const selector = [
+        '[data-testid="dashboard-urgent-row"]',
+        '[data-testid="dashboard-view-all"]',
+        '[data-testid="dashboard-main-column"] a[href="/planning"]',
+      ].join(', ')
+      await page.locator('[data-testid="dashboard-urgent-row"]').first().waitFor({
+        state: 'visible',
+        timeout: 5000,
+      })
+
+      // `elementFromPoint` ne voit que le viewport : la carte « Vos bateaux »
+      // est sous la ligne de flottaison d'un téléphone, chaque cible est donc
+      // amenée à l'écran avant sa mesure (le scroll vit dans `<main>`, #484).
+      const locator = page.locator(selector)
+      const count = await locator.count()
+      assert.isAtLeast(count, 3, 'lignes urgentes ou liens du dashboard introuvables')
+
+      for (let i = 0; i < count; i++) {
+        await locator.nth(i).scrollIntoViewIfNeeded()
+        const targets = (await page.evaluate(touchTargetsJs(selector))) as TouchTarget[]
+        assertTouchTarget(assert, targets[i], 'dashboard')
+      }
     } finally {
       await context.close()
     }
