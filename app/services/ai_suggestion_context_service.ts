@@ -103,6 +103,7 @@ export default class AiSuggestionContextService {
         }),
         genericEquipment: boat.genericEquipment.map((equipment) => ({
           category: equipment.category,
+          name: equipment.name,
           brand: equipment.brand,
           status: equipment.status,
           purchasedAt: equipment.purchasedAt ? equipment.purchasedAt.toISODate() : null,

@@ -272,6 +272,7 @@ test.group('ai_prompt_service — boat user message (#460)', () => {
         genericEquipment: [
           {
             category: 'electronics',
+            name: 'Traceur',
             brand: 'Garmin',
             status: 'to_check',
             purchasedAt: '2020-05-01',
@@ -282,10 +283,10 @@ test.group('ai_prompt_service — boat user message (#460)', () => {
 
     const en = buildBoatUserMessage(input, 'en')
     assert.include(en, 'Other equipment:')
-    assert.include(en, '- electronics Garmin (to_check) — purchased on 2020-05-01')
+    assert.include(en, '- electronics: Traceur Garmin (to_check) — purchased on 2020-05-01')
 
     const fr = buildBoatUserMessage(input, 'fr')
     assert.include(fr, 'Autres équipements :')
-    assert.include(fr, '- electronics Garmin (to_check) — acheté le 2020-05-01')
+    assert.include(fr, '- electronics: Traceur Garmin (to_check) — acheté le 2020-05-01')
   })
 })

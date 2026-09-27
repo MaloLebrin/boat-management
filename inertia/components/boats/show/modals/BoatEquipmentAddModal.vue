@@ -32,7 +32,7 @@ import {
 } from '#shared/types/boat'
 import type { BoatShowDetail } from '~/types/boat_show'
 
-type Category = 'engine' | 'sail' | 'rig' | 'safety' | GenericEquipmentCategory | 'other'
+type Category = 'engine' | 'sail' | 'rig' | 'safety' | GenericEquipmentCategory
 
 const props = defineProps<{
   boat: BoatShowDetail
@@ -67,7 +67,7 @@ watch(selectedCategory, (category) => {
   rememberedCategory.value = { category }
 })
 
-const CATEGORY_ICONS: Record<Exclude<Category, 'other'>, Component> = {
+const CATEGORY_ICONS: Record<Category, Component> = {
   engine: Cog6ToothIcon,
   sail: FlagIcon,
   rig: AdjustmentsVerticalIcon,
@@ -79,6 +79,7 @@ const CATEGORY_ICONS: Record<Exclude<Category, 'other'>, Component> = {
   energy: FireIcon,
   comfort: HomeModernIcon,
   plumbing: WrenchScrewdriverIcon,
+  other: PuzzlePieceIcon,
 }
 
 const categories = computed(() => [
@@ -86,32 +87,22 @@ const categories = computed(() => [
     key,
     label: t(`boats.equipmentAddModal.categories.${key}`),
     icon: CATEGORY_ICONS[key],
-    supported: true,
   })),
   // Les catégories d'équipement générique suivent la constante partagée : le
-  // validator, la carte Équipements et cette modale voient la même liste.
+  // validator, la carte Équipements et cette modale voient la même liste —
+  // « Autre » compris : c'est un équipement générique `category: 'other'` (#893).
   ...GENERIC_EQUIPMENT_CATEGORIES.map((key) => ({
     key,
     label: t(`boats.equipmentAddModal.categories.${key}`),
     icon: CATEGORY_ICONS[key],
-    supported: true,
   })),
-  {
-    key: 'other' as const,
-    label: t('boats.equipmentAddModal.categories.other'),
-    icon: PuzzlePieceIcon,
-    supported: false,
-  },
 ])
 
 const isGenericCategory = computed(() => isGenericEquipmentCategory(selectedCategory.value))
 
 const genericAction = { url: `/boats/${props.boat.id}/generic-equipment`, method: 'post' } as const
 
-const actionByCategory: Record<
-  Exclude<Category, 'other'>,
-  { url: string; method: 'post' | 'put' }
-> = {
+const actionByCategory: Record<Category, { url: string; method: 'post' | 'put' }> = {
   engine: { url: `/boats/${props.boat.id}/engines`, method: 'post' },
   sail: { url: `/boats/${props.boat.id}/sails`, method: 'post' },
   rig: { url: `/boats/${props.boat.id}/rig`, method: 'put' },
@@ -123,6 +114,7 @@ const actionByCategory: Record<
   energy: genericAction,
   comfort: genericAction,
   plumbing: genericAction,
+  other: genericAction,
 }
 
 function close() {
@@ -149,76 +141,59 @@ function close() {
           v-for="cat in categories"
           :key="cat.key"
           type="button"
-          :disabled="!cat.supported"
           :class="[
             'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
             selectedCategory === cat.key
-              ? 'bg-brand text-white'
-              : cat.supported
-                ? 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg'
-                : 'cursor-not-allowed bg-surface-muted/50 text-fg-subtle',
+              ? 'bg-brand text-on-brand'
+              : 'bg-surface-muted text-fg-muted hover:bg-surface-elevated hover:text-fg',
           ]"
-          @click="selectedCategory = cat.key as Category"
+          @click="selectedCategory = cat.key"
         >
           <component :is="cat.icon" class="h-4 w-4" aria-hidden="true" />
           {{ cat.label }}
-          <span v-if="!cat.supported" class="text-xs opacity-70"
-            >({{ t('boats.equipmentAddModal.comingSoon.badge') }})</span
-          >
         </button>
       </div>
     </div>
 
-    <!-- Coming soon notice -->
-    <div
-      v-if="selectedCategory === 'other'"
-      class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-700"
-    >
-      <p class="font-semibold">{{ t('boats.equipmentAddModal.comingSoon.title') }}</p>
-      <p class="mt-1 text-xs">{{ t('boats.equipmentAddModal.comingSoon.description') }}</p>
-    </div>
-
     <!-- Dynamic form by category -->
-    <template v-else>
-      <Form
-        :action="actionByCategory[selectedCategory as Exclude<Category, 'other'>]"
-        @success="close"
-        class="space-y-4"
-        #default="{ processing, errors }"
-      >
-        <BoatEquipmentEngineFields
-          v-if="selectedCategory === 'engine'"
-          :errors="errors"
-          :surface="ENGINE_FORM_SURFACE"
-        />
-        <BoatEquipmentSailFields v-else-if="selectedCategory === 'sail'" :errors="errors" />
-        <BoatEquipmentRigFields
-          v-else-if="selectedCategory === 'rig'"
-          :errors="errors"
-          :rig="boat.rig"
-        />
-        <BoatSafetyEquipmentFields v-else-if="selectedCategory === 'safety'" :errors="errors" />
-        <BoatGenericEquipmentFields
-          v-else-if="isGenericCategory"
-          :errors="errors"
-          :initial-category="selectedCategory as GenericEquipmentCategory"
-          category-locked
-          :surface="ENGINE_FORM_SURFACE"
-        />
+    <Form
+      :action="actionByCategory[selectedCategory]"
+      @success="close"
+      class="space-y-4"
+      #default="{ processing, errors }"
+    >
+      <BoatEquipmentEngineFields
+        v-if="selectedCategory === 'engine'"
+        :errors="errors"
+        :surface="ENGINE_FORM_SURFACE"
+      />
+      <BoatEquipmentSailFields v-else-if="selectedCategory === 'sail'" :errors="errors" />
+      <BoatEquipmentRigFields
+        v-else-if="selectedCategory === 'rig'"
+        :errors="errors"
+        :rig="boat.rig"
+      />
+      <BoatSafetyEquipmentFields v-else-if="selectedCategory === 'safety'" :errors="errors" />
+      <BoatGenericEquipmentFields
+        v-else-if="isGenericCategory"
+        :errors="errors"
+        :initial-category="selectedCategory as GenericEquipmentCategory"
+        category-locked
+        :surface="ENGINE_FORM_SURFACE"
+      />
 
-        <p v-if="selectedCategory === 'rig' && boat.rig" class="text-xs text-fg-muted">
-          {{ t('boats.equipmentAddModal.rigNotice') }}
-        </p>
+      <p v-if="selectedCategory === 'rig' && boat.rig" class="text-xs text-fg-muted">
+        {{ t('boats.equipmentAddModal.rigNotice') }}
+      </p>
 
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <BaseButton variant="ghost" type="button" @click="close">{{
-            t('boats.equipmentAddModal.cancel')
-          }}</BaseButton>
-          <BaseButton type="submit" :disabled="processing">
-            {{ t('boats.equipmentAddModal.submit') }}
-          </BaseButton>
-        </div>
-      </Form>
-    </template>
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <BaseButton variant="ghost" type="button" @click="close">{{
+          t('boats.equipmentAddModal.cancel')
+        }}</BaseButton>
+        <BaseButton type="submit" :disabled="processing">
+          {{ t('boats.equipmentAddModal.submit') }}
+        </BaseButton>
+      </div>
+    </Form>
   </BaseModal>
 </template>

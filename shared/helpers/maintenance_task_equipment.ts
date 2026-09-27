@@ -27,6 +27,7 @@ const SUBJECT_BY_GENERIC_CATEGORY: Record<GenericEquipmentCategory, MaintenanceS
   anchoring: 'deck',
   navigation: 'other',
   comfort: 'other',
+  other: 'other',
 }
 
 /**

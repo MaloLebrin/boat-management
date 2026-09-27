@@ -309,7 +309,8 @@
       "deck": "Pont et accastillage",
       "energy": "Énergie et chauffage",
       "comfort": "Confort et vie à bord",
-      "plumbing": "Plomberie et circuit d'eau"
+      "plumbing": "Plomberie et circuit d'eau",
+      "other": "Autre équipement"
     }
   },
   "index": {
@@ -531,11 +532,6 @@
       "comfort": "Confort",
       "plumbing": "Plomberie"
     },
-    "comingSoon": {
-      "title": "Catégorie bientôt disponible",
-      "description": "Cette catégorie n'est pas encore disponible.",
-      "badge": "bientôt"
-    },
     "rigNotice": "ⓘ Ce bateau a déjà un gréement — l'enregistrement mettra à jour les informations existantes.",
     "submit": "Créer l'équipement",
     "cancel": "Annuler"
@@ -663,7 +659,6 @@
       "supplier": "Fournisseur",
       "wearState": "État d'usure",
       "empty": "Aucune pièce enregistrée",
-      "comingSoon": "Bientôt disponible",
       "add": "Ajouter une pièce",
       "view": "Voir",
       "edit": "Modifier",
@@ -697,7 +692,6 @@
       "invoices": "Factures",
       "other": "Autres documents",
       "dropzone": "Déposez un fichier ou cliquez pour télécharger",
-      "comingSoon": "Fonctionnalité à venir",
       "modalSubtitle": "{name} · Stocké sur Cloudinary"
     }
   },

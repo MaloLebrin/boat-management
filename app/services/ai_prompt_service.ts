@@ -203,7 +203,7 @@ export function buildBoatUserMessage(
       ? boat.genericEquipment
           .map(
             (eq) =>
-              `- ${eq.category}${eq.brand ? ` ${eq.brand}` : ''} (${eq.status})${eq.purchasedAt ? ` — ${l.purchasedOn} ${eq.purchasedAt}` : ''}`
+              `- ${eq.category}: ${eq.name}${eq.brand ? ` ${eq.brand}` : ''} (${eq.status})${eq.purchasedAt ? ` — ${l.purchasedOn} ${eq.purchasedAt}` : ''}`
           )
           .join('\n')
       : l.noneMasculine

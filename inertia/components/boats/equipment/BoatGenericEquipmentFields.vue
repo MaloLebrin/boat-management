@@ -77,9 +77,12 @@ watch(
   }
 )
 
-/** Catégorie courante, pour prioriser les marques du catalogue. */
+/**
+ * Catégorie courante, pour prioriser les marques du catalogue. `other` (#893)
+ * n'a pas de marques dédiées : liste à plat plutôt qu'un groupe vide en tête.
+ */
 const catalogCategory = computed<GenericEquipmentCategory | null>(() =>
-  isGenericEquipmentCategory(category.value) ? category.value : null
+  isGenericEquipmentCategory(category.value) && category.value !== 'other' ? category.value : null
 )
 </script>
 

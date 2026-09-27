@@ -309,7 +309,8 @@
       "deck": "Deck hardware",
       "energy": "Energy and heating",
       "comfort": "Comfort and living",
-      "plumbing": "Plumbing and water systems"
+      "plumbing": "Plumbing and water systems",
+      "other": "Other equipment"
     }
   },
   "index": {
@@ -636,7 +637,6 @@
       "supplier": "Supplier",
       "wearState": "Wear state",
       "empty": "No parts recorded",
-      "comingSoon": "Coming soon",
       "add": "Add a part",
       "view": "View",
       "edit": "Edit",
@@ -670,7 +670,6 @@
       "invoices": "Invoices",
       "other": "Other documents",
       "dropzone": "Drop a file or click to upload",
-      "comingSoon": "Feature coming soon",
       "modalSubtitle": "{name} · Stored on Cloudinary"
     }
   },
@@ -945,11 +944,6 @@
       "energy": "Energy / Heating",
       "comfort": "Comfort",
       "plumbing": "Plumbing"
-    },
-    "comingSoon": {
-      "title": "Category coming soon",
-      "description": "This category is not yet available.",
-      "badge": "soon"
     },
     "rigNotice": "ⓘ This boat already has a rig — saving will update the existing information.",
     "submit": "Create equipment",
