@@ -29,12 +29,20 @@ const ACCOUNT_LIMIT = LOGIN_ACCOUNT_LIMIT.requests
  * tests prouveraient le mauvais mécanisme. C'est aussi le scénario réel : le
  * credential stuffing distribué est précisément ce que le bornage par IP ne
  * couvre pas.
+ *
+ * Le client Japa se connecte depuis le loopback et joue donc le rôle de Caddy :
+ * `trustProxy` (#844) accepte son `X-Forwarded-For`, comme il accepte celui du
+ * conteneur Caddy en production. Que ce soit vrai **depuis le réseau Docker**,
+ * et pas seulement depuis le loopback, est prouvé par
+ * `tests/unit/config/trust_proxy.spec.ts`. Les adresses sont des IPv4 valides
+ * de la plage de test 198.18.0.0/15 — l'ancien format à cinq octets n'était
+ * accepté que parce que `proxy-addr` rend tel quel ce qu'il ne sait pas parser.
  */
 let ipCounter = 0
 function fromNewIp(client: import('@japa/api-client').ApiClient, path: string) {
   ipCounter += 1
-  const block = Math.floor(ipCounter / 250) + 1
-  return client.post(path).header('x-forwarded-for', `203.0.113.${block}.${ipCounter % 250}`)
+  const block = Math.floor(ipCounter / 250)
+  return client.post(path).header('x-forwarded-for', `198.18.${block}.${(ipCounter % 250) + 1}`)
 }
 
 function failedLogin(client: import('@japa/api-client').ApiClient, email: string) {
