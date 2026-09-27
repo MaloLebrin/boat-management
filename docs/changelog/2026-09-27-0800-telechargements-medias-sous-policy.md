@@ -31,6 +31,8 @@ La garde est posée **avant** la lecture Cloudinary : un refus renvoie 403, et a
 
 Chaque refus vérifie en plus que le fake Cloudinary n'a rien servi : un 403 posé après la lecture aurait le bon statut et fuirait quand même.
 
+`tests/unit/policies/client_policy.spec.ts` : `view` entre dans la matrice (admin et member autorisés, mechanic et boat_owner refusés).
+
 Le test qui figeait l'écart inverse (« un mechanic télécharge — la route n'a aucun bouncer », #692) attend désormais 403. Sans le correctif, 10 cas échouent.
 
 ## Docs
