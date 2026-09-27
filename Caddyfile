@@ -7,6 +7,13 @@
 }
 
 {$APP_DOMAIN} {
+	# IP du visiteur (#844) : `reverse_proxy` pose X-Forwarded-For, -Proto et -Host
+	# par défaut, et **remplace** ceux qu'envoie le client (aucun `trusted_proxies`
+	# déclaré ici : Caddy est en bordure). Ne pas ajouter de `header_up` pour ces
+	# en-têtes — Caddy le signale comme redondant. Côté app, `trustProxy`
+	# (config/app.ts, `TRUST_PROXY`) accepte ces en-têtes depuis le réseau Docker :
+	# sans lui, `request.ip()` rend l'IP de ce conteneur et tous les throttles par
+	# IP deviennent globaux à la plateforme.
 	# Flux SSE de @adonisjs/transmit (config/transmit.ts, ping toutes les 30 s).
 	# Un `handle` dédié : la réponse ne doit être ni compressée ni bufferisée, et
 	# la connexion doit rester ouverte bien au-delà de l'intervalle de ping —

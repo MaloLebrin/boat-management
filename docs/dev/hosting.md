@@ -25,15 +25,49 @@ l'application de démarrer. Le point de départ est toujours `.env.example`
 
 À régler spécifiquement en production :
 
-| Variable         | Valeur                        | Pourquoi                                                                                                   |
-| ---------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `NODE_ENV`       | `production`                  | Active les optimisations et désactive les routes `/dev/*`                                                  |
-| `HOST`           | `0.0.0.0`                     | Écoute sur toutes les interfaces (forcé par le compose)                                                    |
-| `APP_URL`        | `https://<domaine>`           | URLs absolues des mails, PDFs, SEO/JSON-LD                                                                 |
-| `DB_HOST`        | `postgres` en compose         | Nom du service Postgres (forcé par le compose)                                                             |
-| `APP_KEY`        | secret 32 octets              | `node ace generate:key`                                                                                    |
-| `ENCRYPTION_KEY` | secret 32 octets, ≠ `APP_KEY` | Chiffrement au repos des clés BYOK (#786) : `openssl rand -base64 32` — voir `docs/dev/encryption-keys.md` |
-| `QUEUE_DRIVER`   | `database`                    | Les workers lisent la file en base                                                                         |
+| Variable         | Valeur                        | Pourquoi                                                                                                      |
+| ---------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`       | `production`                  | Active les optimisations et désactive les routes `/dev/*`                                                     |
+| `HOST`           | `0.0.0.0`                     | Écoute sur toutes les interfaces (forcé par le compose)                                                       |
+| `APP_URL`        | `https://<domaine>`           | URLs absolues des mails, PDFs, SEO/JSON-LD                                                                    |
+| `TRUST_PROXY`    | vide (défaut) en self-host    | Proxies dont l'app croit `X-Forwarded-*` — **sans elle, la limitation de débit par IP est inopérante** (#844) |
+| `DB_HOST`        | `postgres` en compose         | Nom du service Postgres (forcé par le compose)                                                                |
+| `APP_KEY`        | secret 32 octets              | `node ace generate:key`                                                                                       |
+| `ENCRYPTION_KEY` | secret 32 octets, ≠ `APP_KEY` | Chiffrement au repos des clés BYOK (#786) : `openssl rand -base64 32` — voir `docs/dev/encryption-keys.md`    |
+| `QUEUE_DRIVER`   | `database`                    | Les workers lisent la file en base                                                                            |
+
+### Proxy de confiance et IP du visiteur (#844)
+
+Toute la limitation de débit par IP (`start/limiter.ts` : login, inscription,
+mot de passe oublié, IA publique, contact…) repose sur `request.ip()`. Derrière
+un reverse proxy, cette IP n'est juste que si l'app **croit** l'en-tête
+`X-Forwarded-For` posé par ce proxy — c'est le rôle de `trustProxy`
+(`config/app.ts`), piloté par `TRUST_PROXY`.
+
+Le défaut d'AdonisJS ne fait confiance qu'au loopback. Or Caddy joint `web` par
+le réseau Docker, depuis une IP privée : `request.ip()` rendait l'IP du
+conteneur Caddy pour tout le monde, et chaque compteur par IP devenait global à
+la plateforme (5 inscriptions par heure pour tous les visiteurs, 10 tentatives
+de connexion par minute pour tous les comptes). Les journaux et le journal
+d'audit enregistraient la même IP fausse.
+
+| Cible                                                                 | `TRUST_PROXY`                                                                |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Self-host (`docker-compose.prod.yml` + Caddy)                         | vide — défaut `loopback, uniquelocal`                                        |
+| Fly.io, Railway, Render, Koyeb                                        | vide — leurs proxies joignent l'app depuis un réseau privé (10/8, fc00::/7…) |
+| Proxy sur une IP publique (load balancer cloud, Cloudflare en direct) | ses IP/CIDR, ex. `loopback, 203.0.113.0/24`                                  |
+| App exposée directement, sans proxy                                   | `false`                                                                      |
+
+`uniquelocal` couvre 10/8, 172.16/12, 192.168/16 et fc00::/7 : il ne fait pas
+confiance à Internet. Un client ne peut forger son IP que s'il se connecte déjà
+depuis un réseau privé du serveur. `true` fait confiance à **tout** le monde et
+ne se justifie jamais en production. Une entrée invalide empêche le boot.
+
+Côté Caddy, `reverse_proxy` pose `X-Forwarded-For`, `-Proto` et `-Host` par
+défaut et remplace ceux qu'envoie le client (voir le commentaire du
+`Caddyfile`). `tests/unit/config/trust_proxy.spec.ts` rejoue la topologie de
+production (connexion depuis 172.18.0.x) : les tests fonctionnels ne le peuvent
+pas, le client Japa se connecte toujours depuis le loopback.
 
 ### Secrets et journaux (#769)
 

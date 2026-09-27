@@ -29,6 +29,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   APP_NAME: Env.schema.string(),
   APP_KEY: Env.schema.secret(),
   APP_URL: Env.schema.string(),
+  // Proxies dont on honore `X-Forwarded-*` (#844) — vide = `loopback, uniquelocal`
+  // (voir config/app.ts). Mal réglée, tous les throttles par IP sont globaux.
+  TRUST_PROXY: Env.schema.string.optional(),
   // Chiffrement au repos (#786) — distinct d'APP_KEY (cookies, sessions) pour
   // que l'une puisse tourner sans casser l'autre. `_PREVIOUS` n'est posée que
   // le temps d'une rotation (`node ace encryption:rotate`) — voir
