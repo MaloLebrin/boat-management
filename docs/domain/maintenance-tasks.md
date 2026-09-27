@@ -125,9 +125,10 @@ Quatre points qui ne se devinent pas :
 - **`doneTasks` est plafonné à 20** (tri `updatedAt` décroissant) ; `doneTasksTotal` porte le total
   réel.
 - **L'isolation ne tient qu'au `where('organizationId', …)` sur les bateaux**, puis au
-  `whereIn('boatId', …)` sur les tâches. Il n'y a **aucun bouncer** sur `/planning` : un mécanicien y
-  accède alors que `/boats/:id` lui répond 403, et le filtrage fin est laissé à l'UI via les
-  capabilities.
+  `whereIn('boatId', …)` sur les tâches. Depuis #845, `/planning` redirige un `boat_owner` vers
+  `/owner/boats` puis exige `MaintenancePolicy.view` (capability `maintenance.view`, sans bateau) :
+  un mécanicien y accède alors que `/boats/:id` lui répond 403, et le filtrage fin des actions
+  reste laissé à l'UI via les capabilities.
 
 `countDueTasksForOrg()` réutilise les **mêmes** prédicats pour ne renvoyer que `{ overdue, soon }`.
 Elle n'alimente **aucun badge de navigation** : son unique appelant est `AssistantStarterService`,
