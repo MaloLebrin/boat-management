@@ -366,12 +366,15 @@ export default class BoatMediaController {
     response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
   }
 
-  async downloadMedia({ response, auth, params }: HttpContext) {
+  async downloadMedia({ response, auth, params, bouncer }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
+    // Même seuil que la fiche bateau (#846) : `resolveBoat` ne scope que par
+    // organisation, et ni un mechanic ni un boat_owner n'ont `boats.view`.
+    await bouncer.with(BoatPolicy).authorize('view', boat)
     const mediaId = Number(params.mediaId)
 
     const media = await this.mediaService.getForEntity(mediaId, 'boat', boat.id)
@@ -396,12 +399,15 @@ export default class BoatMediaController {
     return response.send(buffer)
   }
 
-  async downloadEngineMedia({ response, auth, params }: HttpContext) {
+  async downloadEngineMedia({ response, auth, params, bouncer }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
+    // Même seuil que la fiche bateau (#846) : `resolveBoat` ne scope que par
+    // organisation, et ni un mechanic ni un boat_owner n'ont `boats.view`.
+    await bouncer.with(BoatPolicy).authorize('view', boat)
     const engineId = Number(params.engineId)
     const engine = boat.engines.find((e) => e.id === engineId)
     if (!engine) {

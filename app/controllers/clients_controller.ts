@@ -79,7 +79,7 @@ export default class ClientsController {
     if (!loaded) return
     const { org, canManage: moduleActive } = loaded
 
-    await bouncer.with(ClientPolicy).authorize('create')
+    await bouncer.with(ClientPolicy).authorize('view')
 
     const filters = this.clientService.normalizeFilters(request.qs())
     const clients = await this.clientService.search(org, filters)
@@ -94,7 +94,7 @@ export default class ClientsController {
     if (!loaded) return
     const { org, canManage: moduleActive } = loaded
 
-    await bouncer.with(ClientPolicy).authorize('create')
+    await bouncer.with(ClientPolicy).authorize('view')
 
     // Le module résilié force la lecture seule, même pour un admin.
     const canManage = moduleActive && (await bouncer.with(ClientPolicy).allows('update'))
