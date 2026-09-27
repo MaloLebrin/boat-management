@@ -31,16 +31,31 @@ Un `boat_owner` reçoit 403 sur les quatre, même pour un bateau qui est le sien
 
 #### En-têtes par type
 
+Les en-têtes suivent la **locale de l'utilisateur** (#863) — namespace
+backend-only `csv` (`resources/lang/{en,fr}/csv.json`). Ils restaient en
+français quelle que soit la langue. Ce sont des identifiants techniques en
+`snake_case`, pas des libellés rédigés (contrairement au budget, dont les
+en-têtes viennent de `budget.csv.headers.*`).
+
+**Choix retenu pour le ré-import** : l'import de maintenance garde ses en-têtes
+**stricts et anglais** (`MAINTENANCE_CSV_HEADERS`). Les en-têtes EN de
+`maintenance.csv` en sont une copie exacte, si bien qu'un export anglais se
+ré-importe tel quel ; un export français, lui, doit être renommé avant import,
+comme avant #863. Aucun alias n'a été ajouté à l'import : ses en-têtes restent un
+contrat technique unique.
+
 **maintenance.csv**
 
 ```
-date;titre;sujet;notes;légende_moteur;légende_voile;coût_total
+fr : date;titre;sujet;notes;légende_moteur;légende_voile;coût_total
+en : date;title;subject;notes;engine_caption;sail_caption;cost
 ```
 
 **fuel-logs.csv**
 
 ```
-date;quantité_litres;prix_par_litre;coût_total;heures_moteur;carburant;fournisseur;notes
+fr : date;quantité_litres;prix_par_litre;coût_total;heures_moteur;carburant;fournisseur;notes
+en : date;quantity_liters;price_per_liter;total_cost;engine_hours;fuel;supplier;notes
 ```
 
 > `carburant` (#585) reprend le vocabulaire de `boat_engines.fuel`
@@ -50,7 +65,8 @@ date;quantité_litres;prix_par_litre;coût_total;heures_moteur;carburant;fournis
 **navigation-logs.csv**
 
 ```
-date_départ;date_arrivée;port_départ;port_arrivée;distance_nm;heures_moteur_départ;heures_moteur_arrivée;carburant_consommé_L;vent_beaufort;état_mer;nb_équipiers;statut;notes
+fr : date_départ;date_arrivée;port_départ;port_arrivée;distance_nm;heures_moteur_départ;heures_moteur_arrivée;carburant_consommé_L;vent_beaufort;état_mer;nb_équipiers;statut;notes
+en : departed_at;arrived_at;departure_port;arrival_port;distance_nm;engine_hours_start;engine_hours_end;fuel_consumed_l;wind_beaufort;sea_state;crew_count;status;notes
 ```
 
 ### Import CSV

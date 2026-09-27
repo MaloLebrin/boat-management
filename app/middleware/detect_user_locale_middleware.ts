@@ -1,5 +1,6 @@
 import { I18n } from '@adonisjs/i18n'
 import i18nManager from '@adonisjs/i18n/services/main'
+import { isAppLocale, type AppLocale } from '#shared/helpers/locale_path'
 import type { NextFn } from '@adonisjs/core/types/http'
 import { type HttpContext, RequestValidator } from '@adonisjs/core/http'
 
@@ -25,12 +26,12 @@ export default class DetectUserLocaleMiddleware {
    *
    * Feel free to use different mechanism for finding user language.
    */
-  protected getUrlLocale(ctx: HttpContext): 'en' | 'fr' | null {
+  protected getUrlLocale(ctx: HttpContext): AppLocale | null {
     const firstSegment = ctx.request.url().split('?')[0].split('/').filter(Boolean)[0]
-    return firstSegment === 'en' || firstSegment === 'fr' ? firstSegment : null
+    return isAppLocale(firstSegment) ? firstSegment : null
   }
 
-  protected getRequestLocale(ctx: HttpContext, urlLocale: 'en' | 'fr' | null) {
+  protected getRequestLocale(ctx: HttpContext, urlLocale: AppLocale | null) {
     if (urlLocale) {
       return urlLocale
     }
@@ -38,12 +39,12 @@ export default class DetectUserLocaleMiddleware {
     // Persisted profile preference wins over cookie / Accept-Language for
     // authenticated users (silent auth already ran) — cf. #414 / #403.
     const userLocale = ctx.auth?.user?.locale
-    if (userLocale === 'en' || userLocale === 'fr') {
+    if (isAppLocale(userLocale)) {
       return userLocale
     }
 
     const cookieLocale = ctx.request.cookie('locale')
-    if (cookieLocale === 'en' || cookieLocale === 'fr') {
+    if (isAppLocale(cookieLocale)) {
       return cookieLocale
     }
 

@@ -112,10 +112,10 @@ L'app supporte un thème sombre (issue #416) piloté par l'attribut `data-theme`
 
 - **Toute chaîne visible par l'utilisateur doit passer par `t()`** — jamais de texte en dur dans les templates
 - Pattern obligatoire : `import { useT } from '~/composables/useT'` → `const { t } = useT()` → `{{ t('clé') }}`
-- Clés organisées par domaine dans `resources/lang/{en,fr}/` — **un fichier par domaine** : `common.json`, `nav.json`, `auth.json`, `dashboard.json`, `planning.json`, `maintenance.json`, `settings.json`, `errors.json`, `equipment.json`, `boats.json`, `homePreview.json`, `public.json`, `ports.json` + namespaces backend-only : `flash.json`, `marketing.json`, `validator.json`
-- Le middleware Inertia exclut les namespaces `flash`, `marketing`, `validator` et passe tout le reste dans `appT`
+- Clés organisées par domaine dans `resources/lang/{en,fr}/` — **un fichier par domaine** : `common.json`, `nav.json`, `auth.json`, `dashboard.json`, `planning.json`, `maintenance.json`, `settings.json`, `errors.json`, `equipment.json`, `boats.json`, `homePreview.json`, `public.json`, `ports.json` + namespaces backend-only : `flash.json`, `marketing.json`, `validator.json`, `csv.json`
+- Le middleware Inertia exclut les namespaces `flash`, `marketing`, `validator`, `csv` et passe tout le reste dans `appT`
 - Interpolation ICU : `t('clé', { count: String(n) })` — les valeurs doivent être des strings
-- Pas de ternaire inline `locale === 'fr' ? '...' : '...'` — utiliser `t()` à la place
+- Pas de ternaire inline `locale === 'fr' ? '...' : '...'` — utiliser `t()` à la place. Côté backend (`app/**`), une règle ESLint le refuse : `i18n.t()` pour un texte (y compris dans un gabarit d'e-mail Edge, en passant `i18n` à `edge.render`), `toAppLocale()`/`isAppLocale()` pour normaliser une locale — voir `docs/frontend/i18n.md`
 - Toute PR qui ajoute un composant ou une page doit ajouter les clés correspondantes dans les **deux locales** (`en` et `fr`)
 
 #### Dates et heures

@@ -22,7 +22,9 @@
     "subject": "Contrat de location — {boatName} — {orgName}",
     "greeting": "Bonjour,",
     "body": "Veuillez trouver ci-joint le contrat de location pour {boatName}.",
-    "signature": "Cordialement,\n{orgName}"
+    "signature": "Cordialement,\n{orgName}",
+    "heading": "Contrat de location — {boatName}",
+    "attachment": "Le document PDF est joint à cet e-mail."
   },
   "pdf": {
     "title": "Contrat de location",

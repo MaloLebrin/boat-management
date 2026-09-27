@@ -3,6 +3,7 @@ import ContactMessageReceived from '#events/contact_message_received'
 import { CONTACT_MESSAGE_RETENTION_DAYS } from '#shared/constants/data_retention'
 import type { ContactMessageCreateInput } from '#shared/types/contact'
 import { DateTime } from 'luxon'
+import { toAppLocale } from '#shared/helpers/locale_path'
 
 export default class ContactMessageService {
   /**
@@ -18,7 +19,7 @@ export default class ContactMessageService {
       organization: input.organization ?? null,
       fleetSize: input.fleetSize ?? null,
       message: input.message,
-      locale: input.locale === 'fr' ? 'fr' : 'en',
+      locale: toAppLocale(input.locale, 'en'),
       ipAddress: input.ipAddress ?? null,
     })
 

@@ -3,6 +3,7 @@ import { truncateDb } from '#tests/utils/db'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { createAdminUser, createStarterAdminUser } from '#tests/functional/helpers'
 import { DateTime } from 'luxon'
+import { MAINTENANCE_CSV_HEADERS } from '#shared/types/csv'
 
 /**
  * Le contrat des quatre exports CSV (#692).
@@ -26,9 +27,9 @@ interface ExportCase {
   /** Préfixe du nom de fichier produit par `csvFilename()`. */
   filenamePrefix: string
   /**
-   * Ligne d'en-tête attendue, séparateur `;`. `null` quand elle est traduite
-   * (budget) : on vérifie alors le nombre de colonnes, une chaîne i18n ne se
-   * fige pas dans un test de contrat.
+   * Ligne d'en-tête attendue en français, séparateur `;`. `null` pour le
+   * budget, dont les en-têtes sont des libellés rédigés (« Mois », « Total ») :
+   * on vérifie alors le nombre de colonnes.
    */
   header: string | null
   /** Nombre de colonnes attendu. */
@@ -79,6 +80,9 @@ test.group('CSV exports — contrat des quatre routes', (group) => {
   for (const exportCase of EXPORTS) {
     test(`GET export/${exportCase.path} sert un CSV en plan pro`, async ({ client, assert }) => {
       const user = await createAdminUser('pro')
+      // Les en-têtes suivent la locale (#863) : ceux figés ici sont les français.
+      user.locale = 'fr'
+      await user.save()
       const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
       const response = await client.get(`/boats/${boat.id}/export/${exportCase.path}`).loginAs(user)
@@ -140,6 +144,44 @@ test.group('CSV exports — contrat des quatre routes', (group) => {
       response.assertHeader('location', '/login')
     })
   }
+
+  test('les en-têtes suivent la locale de l’utilisateur (#863)', async ({ client, assert }) => {
+    const user = await createAdminUser('pro')
+    user.locale = 'en'
+    await user.save()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const lines = await Promise.all(
+      ['maintenance.csv', 'fuel-logs.csv', 'navigation-logs.csv'].map(async (path) => {
+        const response = await client.get(`/boats/${boat.id}/export/${path}`).loginAs(user)
+        response.assertStatus(200)
+        return headerLine(response.text())
+      })
+    )
+
+    assert.deepEqual(lines, [
+      'date;title;subject;notes;engine_caption;sail_caption;cost',
+      'date;quantity_liters;price_per_liter;total_cost;engine_hours;fuel;supplier;notes',
+      'departed_at;arrived_at;departure_port;arrival_port;distance_nm;engine_hours_start;' +
+        'engine_hours_end;fuel_consumed_l;wind_beaufort;sea_state;crew_count;status;notes',
+    ])
+  })
+
+  test('l’export maintenance en anglais se ré-importe tel quel (#863)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser('pro')
+    user.locale = 'en'
+    await user.save()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+
+    const response = await client.get(`/boats/${boat.id}/export/maintenance.csv`).loginAs(user)
+    const headers = headerLine(response.text()).split(';')
+
+    // Les en-têtes EN sont exactement ceux qu'attend l'import de maintenance.
+    assert.sameMembers(headers, [...MAINTENANCE_CSV_HEADERS])
+  })
 
   test("la garde de plan passe avant la résolution du bateau — l'ordre est un contrat", async ({
     client,

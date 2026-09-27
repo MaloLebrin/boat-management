@@ -140,7 +140,12 @@
       "invoice": "Invoice"
     },
     "subject": "{kindTitle} {number} from {orgName}",
-    "text": "Hello,\n\nPlease find attached {kind} no. {number}.\n\nTotal amount: {total}\n\nBest regards,\n{orgName}"
+    "text": "Hello,\n\nPlease find attached {kind} no. {number}.\n\nTotal amount: {total}\n\nBest regards,\n{orgName}",
+    "html": {
+      "body": "Please find attached {kind} no. {number}.",
+      "totalLabel": "Total amount:",
+      "attachment": "The PDF document is attached to this email."
+    }
   },
   "paymentMethods": {
     "cash": "Cash",

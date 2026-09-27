@@ -14,6 +14,15 @@ import type Boat from '#models/boat'
 import type User from '#models/user'
 import { contentDisposition } from '#shared/helpers/content_disposition'
 
+/**
+ * En-têtes d'un export dans la langue de l'utilisateur (#863) — namespace
+ * backend-only `csv`. Les colonnes restaient en français (`légende_moteur`,
+ * `coût_total`) quelle que soit la locale.
+ */
+function csvHeaders(i18n: HttpContext['i18n'], exportName: string, columns: string[]): string[] {
+  return columns.map((column) => i18n.t(`csv.${exportName}.${column}`))
+}
+
 @inject()
 export default class CsvExportController {
   constructor(
@@ -48,7 +57,7 @@ export default class CsvExportController {
     return { user, boat: resolved.boat }
   }
 
-  async maintenance({ response, auth, bouncer, params }: HttpContext) {
+  async maintenance({ response, auth, bouncer, params, i18n }: HttpContext) {
     const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
       bouncer.with(MaintenancePolicy).authorize('view', boat)
     )
@@ -57,15 +66,15 @@ export default class CsvExportController {
 
     const events = await this.maintenanceService.listForBoat(boat)
 
-    const headers = [
+    const headers = csvHeaders(i18n, 'maintenance', [
       'date',
-      'titre',
-      'sujet',
+      'title',
+      'subject',
       'notes',
-      'légende_moteur',
-      'légende_voile',
-      'coût_total',
-    ]
+      'engineCaption',
+      'sailCaption',
+      'cost',
+    ])
     const rows = events.map((ev) => {
       const totalCost = ev.parts.reduce((sum, p) => {
         const price = p.unitPrice ? Number.parseFloat(p.unitPrice) : 0
@@ -90,7 +99,7 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async fuelLogs({ response, auth, bouncer, params }: HttpContext) {
+  async fuelLogs({ response, auth, bouncer, params, i18n }: HttpContext) {
     const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
       bouncer.with(BoatPolicy).authorize('view', boat)
     )
@@ -99,16 +108,16 @@ export default class CsvExportController {
 
     const logs = await this.fuelLogService.listForBoat(user, boat)
 
-    const headers = [
+    const headers = csvHeaders(i18n, 'fuelLogs', [
       'date',
-      'quantité_litres',
-      'prix_par_litre',
-      'coût_total',
-      'heures_moteur',
-      'carburant',
-      'fournisseur',
+      'quantityLiters',
+      'pricePerLiter',
+      'totalCost',
+      'engineHours',
+      'fuelType',
+      'supplier',
       'notes',
-    ]
+    ])
     const rows = logs.map((l) => [
       l.fueledAt.toISODate(),
       l.quantityLiters ?? '',
@@ -129,7 +138,7 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async navigationLogs({ response, auth, bouncer, params }: HttpContext) {
+  async navigationLogs({ response, auth, bouncer, params, i18n }: HttpContext) {
     const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
       bouncer.with(BoatPolicy).authorize('view', boat)
     )
@@ -138,21 +147,21 @@ export default class CsvExportController {
 
     const logs = await this.navigationLogService.listForBoat(boat)
 
-    const headers = [
-      'date_départ',
-      'date_arrivée',
-      'port_départ',
-      'port_arrivée',
-      'distance_nm',
-      'heures_moteur_départ',
-      'heures_moteur_arrivée',
-      'carburant_consommé_L',
-      'vent_beaufort',
-      'état_mer',
-      'nb_équipiers',
-      'statut',
+    const headers = csvHeaders(i18n, 'navigationLogs', [
+      'departedAt',
+      'arrivedAt',
+      'departurePort',
+      'arrivalPort',
+      'distanceNm',
+      'engineHoursStart',
+      'engineHoursEnd',
+      'fuelConsumedLiters',
+      'windBeaufort',
+      'seaState',
+      'crewCount',
+      'status',
       'notes',
-    ]
+    ])
     const rows = logs.map((l) => [
       l.departedAt.toISO(),
       l.arrivedAt?.toISO() ?? '',

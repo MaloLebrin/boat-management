@@ -10,7 +10,7 @@ import MarketingPricingTableService from '#services/marketing_pricing_table_serv
 import legalEntity from '#config/legal'
 import { CONTACT_FLEET_SIZES, CONTACT_SUBJECTS } from '#shared/types/contact'
 import { PUBLIC_DIAGNOSIS_LIFETIME_LIMIT } from '#shared/types/public_diagnosis'
-import { marketingPath } from '#shared/helpers/locale_path'
+import { marketingPath, toAppLocale } from '#shared/helpers/locale_path'
 
 /** Ancre du formulaire de contact, ciblée par les cartes et CTA « Écris-nous » (#450). */
 const CONTACT_FORM_ANCHOR = 'contact-form'
@@ -35,7 +35,7 @@ export default class MarketingContentService {
   constructor(private pricingTable: MarketingPricingTableService) {}
 
   homePage(i18n: MarketingI18n) {
-    const locale = i18n.locale === 'fr' ? 'fr' : 'en'
+    const locale = toAppLocale(i18n.locale, 'en')
     return {
       brand: {
         name: i18n.t('marketing.brand.name'),
@@ -1647,7 +1647,7 @@ export default class MarketingContentService {
    * MarketingFeaturesController) précisément pour accéder à ces paramètres.
    */
   helpPage(i18n: MarketingI18n): HelpPageProps {
-    const locale = i18n.locale === 'fr' ? 'fr' : 'en'
+    const locale = toAppLocale(i18n.locale, 'en')
     const t = (key: string) => i18n.t(`marketing.help.${key}`)
     const card = (key: string) => i18n.t(`marketing.features.shared.cards.${key}`)
     const params = this.pricingTable.copyParams(locale)

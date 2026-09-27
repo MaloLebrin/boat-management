@@ -17,7 +17,7 @@ import { describe, expect, test } from 'vitest'
 const ROOT = process.cwd()
 
 // Namespaces backend-only, exclus de `appT` par InertiaMiddleware.
-const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
+const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator', 'csv'])
 
 const LOCALES = ['en', 'fr'] as const
 

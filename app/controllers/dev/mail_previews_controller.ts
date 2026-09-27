@@ -1,4 +1,5 @@
 import edge from 'edge.js'
+import i18nManager from '@adonisjs/i18n/services/main'
 import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS } from '#shared/constants/email_verification'
 import env from '#start/env'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -151,7 +152,7 @@ export default class MailPreviewsController {
 
       case 'simulator-report-fr':
         html = await edge.render('emails/simulator_report', {
-          isFr: true,
+          i18n: i18nManager.locale('fr'),
           categories: FAKE_CATEGORIES_FR,
           totalMinFormatted: '2 200 €',
           totalMaxFormatted: '3 070 €',
@@ -161,7 +162,7 @@ export default class MailPreviewsController {
 
       case 'simulator-report-en':
         html = await edge.render('emails/simulator_report', {
-          isFr: false,
+          i18n: i18nManager.locale('en'),
           categories: FAKE_CATEGORIES_EN,
           totalMinFormatted: '€2,200',
           totalMaxFormatted: '€3,070',
@@ -171,7 +172,7 @@ export default class MailPreviewsController {
 
       case 'nurturing-d3-fr':
         html = await edge.render('emails/nurturing_d3', {
-          isFr: true,
+          i18n: i18nManager.locale('fr'),
           tips: FAKE_TIPS_FR,
           appUrl,
         })
@@ -179,7 +180,7 @@ export default class MailPreviewsController {
 
       case 'nurturing-d3-en':
         html = await edge.render('emails/nurturing_d3', {
-          isFr: false,
+          i18n: i18nManager.locale('en'),
           tips: FAKE_TIPS_EN,
           appUrl,
         })
@@ -187,7 +188,7 @@ export default class MailPreviewsController {
 
       case 'nurturing-d7-fr':
         html = await edge.render('emails/nurturing_d7', {
-          isFr: true,
+          i18n: i18nManager.locale('fr'),
           totalMin: '2 200 €',
           totalMax: '3 070 €',
           appUrl,
@@ -196,7 +197,7 @@ export default class MailPreviewsController {
 
       case 'nurturing-d7-en':
         html = await edge.render('emails/nurturing_d7', {
-          isFr: false,
+          i18n: i18nManager.locale('en'),
           totalMin: '€2,200',
           totalMax: '€3,070',
           appUrl,

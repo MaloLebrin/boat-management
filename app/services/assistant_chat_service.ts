@@ -7,7 +7,6 @@ import {
   AssistantMaxMessagesReachedError,
   AssistantNoPendingActionError,
   AssistantPendingActionRequiredError,
-  type AssistantNotExecutableReason,
 } from '#exceptions/assistant_errors'
 import AiAssistantConversation from '#models/ai_assistant_conversation'
 import type Boat from '#models/boat'
@@ -48,6 +47,8 @@ import {
 import type { AiChatOptions, AiProvider } from '#shared/types/ai'
 import type { PlanQuotas } from '#shared/types/plan'
 import { inject } from '@adonisjs/core'
+import i18nManager from '@adonisjs/i18n/services/main'
+import { toAppLocale } from '#shared/helpers/locale_path'
 import { DateTime } from 'luxon'
 import { randomBytes } from 'node:crypto'
 
@@ -68,20 +69,6 @@ import { randomBytes } from 'node:crypto'
  *   de tokens mensuel de l'app ne s'applique plus, l'usage reste enregistré
  *   pour les statistiques.
  */
-/**
- * Réponses de repli quand une proposition n'est pas exécutable en l'état :
- * texte du serveur, jamais du modèle — même règle que les cartes.
- */
-const NOT_EXECUTABLE_MESSAGES: Record<
-  AssistantNotExecutableReason,
-  Record<AiSuggestionLocale, string>
-> = {
-  no_trip_in_progress: {
-    fr: "Aucune sortie n'est en cours sur ce bateau : il n'y a rien à clôturer. Ouvrez d'abord une sortie, ou dites-moi si vous vouliez en enregistrer une déjà terminée.",
-    en: 'No trip is in progress on this boat, so there is nothing to close. Open a trip first, or tell me if you meant to record one that is already finished.',
-  },
-}
-
 /** Tour sans contexte client (appels internes, tests). */
 const EMPTY_TURN_CONTEXT: AssistantTurnContext = { pageUrl: null, tzOffsetMinutes: null }
 
@@ -392,10 +379,13 @@ export default class AssistantChatService {
         // clôturer, par exemple) : ce n'est pas une réponse malformée, on ne
         // jette pas le tour — l'assistant l'explique et le fil continue.
         if (!(error instanceof AssistantActionNotExecutableError)) throw error
+        // Réponse de repli rédigée par le serveur, jamais par le modèle — même
+        // règle que les cartes. Clés `assistant.notExecutable.<reason>` (#863).
         assistantMessage = {
           role: 'assistant',
-          content:
-            NOT_EXECUTABLE_MESSAGES[error.reason][conversation.locale === 'fr' ? 'fr' : 'en'],
+          content: i18nManager
+            .locale(toAppLocale(conversation.locale, 'en'))
+            .t(`assistant.notExecutable.${error.reason}`),
           source: 'fleet_data',
         }
       }
@@ -472,6 +462,7 @@ export default class AssistantChatService {
     }
 
     const correction =
+      // eslint-disable-next-line no-restricted-syntax -- fragment de prompt destiné au modèle, jamais affiché
       locale === 'fr'
         ? 'Réponds uniquement par l’objet JSON demandé, sans aucun texte autour.'
         : 'Reply with only the requested JSON object, with no surrounding text.'
@@ -503,6 +494,7 @@ export default class AssistantChatService {
     quotas: PlanQuotas
   ): Promise<AiChatMessage[]> {
     const locale = conversation.locale as AiSuggestionLocale
+    // eslint-disable-next-line no-restricted-syntax -- fragment de prompt destiné au modèle, jamais affiché
     const fr = locale === 'fr'
 
     const thread = pendingMessages.slice(-ASSISTANT_HISTORY_WINDOW).map((m) => ({

@@ -78,7 +78,10 @@ test.group('Simulateur — relances J+3 / J+7 (SendSimulatorNurturingJob)', (gro
 
     assert.equal(d7.subject, 'Your boat maintenance estimate — still available')
     assert.include(plain(d7.text), 'between €1,200 and €3,400 per year')
-    assert.include(plain(d7.html ?? ''), '€1,200')
+    assert.include(plain(d7.html ?? ''), '<strong>€1,200</strong>')
+    assert.include(d3.html, 'Track my expenses on FleetAi')
+    assert.include(d7.html, 'Create my free account')
+    assert.notInclude(d7.html, 'Créer mon compte')
     assert.notInclude(plain(d7.text), '1 200 €')
   })
 
@@ -92,6 +95,12 @@ test.group('Simulateur — relances J+3 / J+7 (SendSimulatorNurturingJob)', (gro
     assert.include(d3.html, 'Anticipez les petites réparations')
     assert.equal(d7.subject, "Votre estimation d'entretien bateau — toujours disponible")
     assert.include(plain(d7.text), 'entre 1 200 € et 3 400 € par an')
+    assert.include(d3.html, 'Suivre mes dépenses sur FleetAi')
+    assert.include(
+      plain(d7.html ?? ''),
+      'entre <strong>1 200 €</strong> et <strong>3 400 €</strong>'
+    )
+    assert.include(d7.html, 'Vos données ne seront pas partagées.')
   })
 })
 
@@ -106,10 +115,15 @@ test.group('Simulateur — rapport (SendSimulatorReportJob)', (group) => {
     assert.equal(en.enqueued[0].subject, 'Your boat maintenance report — FleetAi')
     assert.include(en.enqueued[0].text, 'Your cost estimation report')
     assert.include(en.enqueued[0].html, 'Rigging')
+    assert.include(en.enqueued[0].html, 'Estimated total')
+    assert.include(en.enqueued[0].html, 'Annual cost')
     assert.match(plain(en.enqueued[0].html ?? ''), /€\d{1,3}(,\d{3})*/)
 
     assert.equal(fr.enqueued[0].subject, "Votre rapport d'entretien bateau — FleetAi")
     assert.include(fr.enqueued[0].html, 'Gréement')
+    assert.include(fr.enqueued[0].html, 'Total estimé')
+    assert.include(fr.enqueued[0].html, 'Coût annuel')
+    assert.notInclude(fr.enqueued[0].html, 'Estimated total')
     assert.match(plain(fr.enqueued[0].html ?? ''), /\d{1,3}( \d{3})* €/)
   })
 })

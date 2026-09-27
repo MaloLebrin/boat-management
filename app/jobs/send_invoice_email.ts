@@ -55,9 +55,8 @@ export default class SendInvoiceEmail extends Job<SendInvoiceEmailPayload> {
     // Generate PDF
     const { buffer, filename } = await pdfService.generate(invoice, org, i18n)
 
-    // Contenu de l'email dans la langue du destinataire (sujet, texte, montant).
-    // Le gabarit Edge garde sa bascule `isFr` interne.
-    const isFr = this.payload.locale === 'fr'
+    // Contenu de l'email dans la langue du destinataire (sujet, texte, montant) :
+    // le gabarit Edge traduit par `t()` via l'`i18n` passé dans son état (#863).
     const kindLabel = i18n.t(`invoices.email.kind.${invoice.kind}`)
     const KindLabel = i18n.t(`invoices.email.kindTitle.${invoice.kind}`)
     const totalFormatted = formatCurrency(Number.parseFloat(invoice.total), this.payload.locale, {
@@ -80,7 +79,7 @@ export default class SendInvoiceEmail extends Job<SendInvoiceEmailPayload> {
     })
 
     const html = await edge.render('emails/invoice', {
-      isFr,
+      i18n,
       invoiceNumber: invoice.number,
       kindLabel,
       KindLabel,

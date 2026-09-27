@@ -61,7 +61,7 @@ export default class SendRentalContractEmail extends Job<SendRentalContractEmail
     ].join('\n\n')
 
     const html = await edge.render('emails/rental_contract', {
-      isFr: this.payload.locale === 'fr',
+      i18n,
       boatName,
       orgName: org.name,
       appUrl: env.get('APP_URL'),

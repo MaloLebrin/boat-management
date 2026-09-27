@@ -34,8 +34,7 @@ export default class SimulatorShareController {
       computeSimulatorCosts(input),
       locale
     )
-    const path = locale === 'fr' ? `/simulateur/r/${share.token}` : `/simulator/r/${share.token}`
-    return response.redirect(path)
+    return response.redirect().toRoute(`simulator.share.show.${locale}`, { token: share.token })
   }
 
   async show({ params, inertia, response, route }: HttpContext) {

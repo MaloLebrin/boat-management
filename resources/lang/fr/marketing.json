@@ -1514,11 +1514,13 @@
           "title": "Hivernez votre bateau correctement",
           "body": "Un hivernage bien fait protège votre bateau du gel, de l'humidité et de la corrosion. Investir dans un bon hivernage, c'est économiser sur les réparations au printemps."
         }
-      }
+      },
+      "cta": "Suivre mes dépenses sur FleetAi"
     },
     "nurturingD7": {
       "subject": "Votre estimation d'entretien bateau — toujours disponible",
-      "text": "Votre bateau vous coûtera entre {totalMin} et {totalMax} par an en entretien. FleetAi vous aide à planifier et anticiper ces dépenses.\n\nCréez votre compte : {signupUrl}"
+      "text": "Votre bateau vous coûtera entre {totalMin} et {totalMax} par an en entretien. FleetAi vous aide à planifier et anticiper ces dépenses.\n\nCréez votre compte : {signupUrl}",
+      "body": "Votre bateau vous coûtera entre {totalMin} et {totalMax} par an en entretien. FleetAi vous aide à planifier et anticiper ces dépenses."
     },
     "simulatorReport": {
       "subject": "Votre rapport d'entretien bateau — FleetAi",
@@ -1530,7 +1532,23 @@
         "electrical": "Électrique",
         "mooring": "Mouillage",
         "rigging": "Gréement"
-      }
+      },
+      "heading": "Votre rapport d'estimation de coûts",
+      "categoryHeader": "Catégorie",
+      "annualCostHeader": "Coût annuel",
+      "totalLabel": "Total estimé"
+    },
+    "shared": {
+      "ctaSignup": "Créer mon compte gratuitement",
+      "privacy": "Vos données ne seront pas partagées."
+    },
+    "contactAck": {
+      "subject": "Message bien reçu — FleetAi",
+      "text": "Bonjour {firstName},\n\nMerci pour votre message. Un membre de l'équipe FleetAi vous répond sous 4 heures en jours ouvrés.\n\nCopie de votre message :\n{message}",
+      "heading": "Bien reçu, {firstName} 👋",
+      "intro": "Merci pour votre message. Un membre de l'équipe FleetAi vous répond sous 4 heures en jours ouvrés — pas de bot, c'est l'un de nous qui vous lit.",
+      "copyLabel": "Copie de votre message",
+      "cta": "Tester FleetAi 14 jours"
     }
   }
 }

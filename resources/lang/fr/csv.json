@@ -1,0 +1,36 @@
+{
+  "maintenance": {
+    "date": "date",
+    "title": "titre",
+    "subject": "sujet",
+    "notes": "notes",
+    "engineCaption": "légende_moteur",
+    "sailCaption": "légende_voile",
+    "cost": "coût_total"
+  },
+  "fuelLogs": {
+    "date": "date",
+    "quantityLiters": "quantité_litres",
+    "pricePerLiter": "prix_par_litre",
+    "totalCost": "coût_total",
+    "engineHours": "heures_moteur",
+    "fuelType": "carburant",
+    "supplier": "fournisseur",
+    "notes": "notes"
+  },
+  "navigationLogs": {
+    "departedAt": "date_départ",
+    "arrivedAt": "date_arrivée",
+    "departurePort": "port_départ",
+    "arrivalPort": "port_arrivée",
+    "distanceNm": "distance_nm",
+    "engineHoursStart": "heures_moteur_départ",
+    "engineHoursEnd": "heures_moteur_arrivée",
+    "fuelConsumedLiters": "carburant_consommé_L",
+    "windBeaufort": "vent_beaufort",
+    "seaState": "état_mer",
+    "crewCount": "nb_équipiers",
+    "status": "statut",
+    "notes": "notes"
+  }
+}

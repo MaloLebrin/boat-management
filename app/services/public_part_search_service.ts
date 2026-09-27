@@ -428,6 +428,7 @@ export default class PublicPartSearchService {
       locale,
       {
         engineLabel:
+          // eslint-disable-next-line no-restricted-syntax -- fragment de prompt destiné au modèle, jamais affiché
           engineLabel || (locale === 'fr' ? 'moteur non identifié' : 'unidentified engine'),
         vocabularyLines,
       },

@@ -120,19 +120,34 @@ test.group('SendInvoiceEmail job', (group) => {
       }
       const dedup = await app.container.make(QueueDedupService)
       await new TestSendInvoiceEmail(dedup).execute()
-      const sent = messages.sent().at(-1)!.toObject().message as { subject: string; text: string }
+      const sent = messages.sent().at(-1)!.toObject().message as {
+        subject: string
+        text: string
+        html: string
+      }
       const icuSpaces = new RegExp('[\\u00a0\\u202f]', 'g')
-      return { subject: sent.subject, text: sent.text.replace(icuSpaces, ' ') }
+      return {
+        subject: sent.subject,
+        text: sent.text.replace(icuSpaces, ' '),
+        html: sent.html.replace(icuSpaces, ' '),
+      }
     }
 
     const en = await send('en')
     assert.equal(en.subject, `Invoice FAC-000002 from ${org.name}`)
     assert.include(en.text, 'Please find attached invoice no. FAC-000002.')
     assert.include(en.text, 'Total amount: €1,200.00')
+    // Le gabarit HTML suit la même langue (#863) — il n'a plus de bascule `isFr`.
+    assert.include(en.html, 'Please find attached invoice no. FAC-000002.')
+    assert.include(en.html, '<strong>Total amount:</strong>')
+    assert.include(en.html, 'The PDF document is attached to this email.')
 
     const fr = await send('fr')
     assert.equal(fr.subject, `Facture FAC-000002 de ${org.name}`)
     assert.include(fr.text, 'Veuillez trouver ci-joint la facture n° FAC-000002.')
     assert.include(fr.text, 'Montant total : 1 200,00 €')
+    assert.include(fr.html, 'Veuillez trouver ci-joint la facture n° FAC-000002.')
+    assert.include(fr.html, '<strong>Montant total :</strong>')
+    assert.notInclude(fr.html, 'Please find attached')
   })
 })

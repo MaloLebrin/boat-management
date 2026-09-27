@@ -9,6 +9,8 @@ import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS } from '#shared/constants/email_veri
 import env from '#start/env'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
+import i18nManager from '@adonisjs/i18n/services/main'
+import { toAppLocale } from '#shared/helpers/locale_path'
 
 @inject()
 export default class EmailQueueService {
@@ -559,16 +561,17 @@ export default class EmailQueueService {
     message: string
     locale: string
   }) {
-    const isFr = params.locale === 'fr'
-    const subject = isFr ? 'Message bien reçu — FleetAi' : 'We received your message — FleetAi'
-    const text = isFr
-      ? `Bonjour ${params.firstName},\n\nMerci pour votre message. Un membre de l'équipe FleetAi vous répond sous 4 heures en jours ouvrés.\n\nCopie de votre message :\n${params.message}`
-      : `Hello ${params.firstName},\n\nThanks for reaching out. A member of the FleetAi team will get back to you within 4 hours on business days.\n\nA copy of your message:\n${params.message}`
+    const i18n = i18nManager.locale(toAppLocale(params.locale, 'en'))
+    const subject = i18n.t('marketing.emails.contactAck.subject')
+    const text = i18n.t('marketing.emails.contactAck.text', {
+      firstName: params.firstName,
+      message: params.message,
+    })
 
     const html = await edge.render('emails/contact_message_ack', {
+      i18n,
       firstName: params.firstName,
       messageLines: params.message.split('\n'),
-      locale: isFr ? 'fr' : 'en',
       appUrl: env.get('APP_URL'),
     })
 

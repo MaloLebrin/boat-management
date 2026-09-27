@@ -23,8 +23,8 @@ interface Payload {
 
 /**
  * Rapport d'estimation envoyé après une simulation publique. Sujet, texte,
- * libellés de catégories et montants suivent la langue du lead via `i18n` ;
- * le gabarit Edge garde sa bascule `isFr` interne.
+ * libellés de catégories et montants suivent la langue du lead via `i18n`, que
+ * le gabarit Edge reçoit dans son état pour ses `t()` (#863).
  */
 @inject()
 export default class SendSimulatorReportJob extends Job<Payload> {
@@ -45,7 +45,6 @@ export default class SendSimulatorReportJob extends Job<Payload> {
     }
 
     const i18n = i18nManager.locale(lead.locale)
-    const isFr = lead.locale === 'fr'
     const boatType = lead.boatType as SimulatorBoatType
 
     const input: SimulatorBoatInput = {
@@ -83,7 +82,7 @@ export default class SendSimulatorReportJob extends Job<Payload> {
     }))
 
     const html = await edge.render('emails/simulator_report', {
-      isFr,
+      i18n,
       categories,
       totalMinFormatted,
       totalMaxFormatted,
