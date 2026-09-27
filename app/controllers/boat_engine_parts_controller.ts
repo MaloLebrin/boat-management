@@ -30,6 +30,9 @@ export default class BoatEnginePartsController {
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
     const { boat } = loaded
+    // Même garde que `/boats/:id` : `resolveBoat` ne scope que par organisation,
+    // et mechanic/boat_owner n'ont pas `boats.view`.
+    await bouncer.with(BoatPolicy).authorize('view', boat)
 
     const engineId = Number(params.engineId)
     const engine = boat.engines.find((e) => e.id === engineId)

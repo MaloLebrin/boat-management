@@ -241,6 +241,9 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
+    // Même garde que `/boats/:id` : `resolveBoat` ne scope que par organisation,
+    // et mechanic/boat_owner n'ont pas `boats.view`.
+    await bouncer.with(BoatPolicy).authorize('view', boat)
     const sail = boat.sails.find((s) => s.id === Number(params.sailId))
     if (!sail) {
       session.flash('error', i18n.t('flash.sail.notFound'))
@@ -287,6 +290,9 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
+    // Même garde que `/boats/:id` : `resolveBoat` ne scope que par organisation,
+    // et mechanic/boat_owner n'ont pas `boats.view`.
+    await bouncer.with(BoatPolicy).authorize('view', boat)
     const rig = boat.rig
     if (!rig) {
       session.flash('error', i18n.t('flash.rig.notFound'))
@@ -439,6 +445,9 @@ export default class BoatEquipmentController {
     if (!loaded) return
 
     const { boat } = loaded
+    // Même garde que `/boats/:id` : `resolveBoat` ne scope que par organisation,
+    // et mechanic/boat_owner n'ont pas `boats.view`.
+    await bouncer.with(BoatPolicy).authorize('view', boat)
     const engineId = Number(params.engineId)
     const engine = boat.engines.find((e) => e.id === engineId)
 
