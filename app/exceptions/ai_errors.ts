@@ -31,3 +31,19 @@ export class AiProviderKeyMissingError extends Error {
     super(`No API key configured for AI provider "${provider}"`)
   }
 }
+
+/**
+ * Le fournisseur IA n'a pas répondu dans le délai imparti (#853) :
+ * `AI_CHAT_TIMEOUT_MS` pour un tour de chat, `AI_ANALYSIS_TIMEOUT_MS` pour une
+ * analyse. L'appel est annulé, et les tokens réservés sont libérés par le
+ * `finally` de `withReservedTokens`.
+ */
+export class AiProviderTimeoutError extends Error {
+  name = 'AiProviderTimeoutError'
+  status = 504
+  code = 'E_AI_PROVIDER_TIMEOUT'
+
+  constructor(timeoutMs: number) {
+    super(`AI provider did not answer within ${timeoutMs} ms`)
+  }
+}

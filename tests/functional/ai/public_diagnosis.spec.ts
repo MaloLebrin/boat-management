@@ -8,6 +8,8 @@ import { createAdminUser } from '#tests/functional/helpers'
 import { PUBLIC_DIAGNOSIS_SESSION_KEY } from '#shared/types/public_diagnosis'
 import type { AiChatMessage as StoredChatMessage } from '#shared/types/ai'
 import { restoreAiService, swapAiService } from '#tests/support/fakes'
+import { AiProviderTimeoutError } from '#exceptions/ai_errors'
+import { AI_CHAT_TIMEOUT_MS } from '#shared/constants/ai'
 
 const QUESTION_RESPONSE = JSON.stringify({
   type: 'question',
@@ -290,6 +292,24 @@ test.group('Public AI diagnosis chat (functional, #602)', (group) => {
       'error',
       'The AI assistant returned an unusable response. Please try again.'
     )
+    assert.lengthOf(await AiDiagnosisConversation.all(), 0)
+  })
+
+  test('a provider timeout flashes a dedicated message and persists nothing (#853)', async ({
+    assert,
+    client,
+  }) => {
+    const calls = swapAiService([{ error: new AiProviderTimeoutError(AI_CHAT_TIMEOUT_MS) }])
+
+    const response = await client.post('/diagnosis-ai/conversations').form(startForm()).redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'The AI assistant is taking too long to answer. Please try again in a moment.'
+    )
+    // Pas de délai explicite : un tour de chat prend le défaut d'AiService (30 s).
+    assert.isNull(calls[0].timeoutMs)
     assert.lengthOf(await AiDiagnosisConversation.all(), 0)
   })
 

@@ -8,6 +8,7 @@ import Organization from '#models/organization'
 import { QuotaExceededError } from '#exceptions/quota_errors'
 import { createHash } from 'node:crypto'
 import { inject } from '@adonisjs/core'
+import { AI_ANALYSIS_TIMEOUT_MS } from '#shared/constants/ai'
 
 export interface RunAiChatPayload {
   messages: AiChatMessage[]
@@ -53,7 +54,10 @@ export default class RunAiChat extends Job<RunAiChatPayload> {
       throw error
     }
 
-    const { content, tokensUsed } = await this.aiService.chat(this.payload.messages)
+    // Hors requête HTTP : la queue `ai` s'accorde la marge des analyses (#853).
+    const { content, tokensUsed } = await this.aiService.chat(this.payload.messages, {
+      timeoutMs: AI_ANALYSIS_TIMEOUT_MS,
+    })
 
     await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
 

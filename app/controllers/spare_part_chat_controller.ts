@@ -1,4 +1,4 @@
-import { AiInvalidResponseError } from '#exceptions/ai_errors'
+import { AiInvalidResponseError, AiProviderTimeoutError } from '#exceptions/ai_errors'
 import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import {
   PartSearchConversationCompletedError,
@@ -146,6 +146,8 @@ export default class SparePartChatController {
       session.flash('error', i18n.t('flash.spareParts.chatMaxMessages'))
     } else if (error instanceof AiInvalidResponseError) {
       session.flash('error', i18n.t('flash.ai.diagnosisInvalidResponse'))
+    } else if (error instanceof AiProviderTimeoutError) {
+      session.flash('error', i18n.t('flash.ai.timeout'))
     } else if (error instanceof BoatEquipmentNotFoundError) {
       session.flash('error', i18n.t('flash.engine.notFound'))
     } else if (error instanceof EngineNotSparePartsEligibleError) {

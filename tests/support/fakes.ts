@@ -163,6 +163,8 @@ export interface FakeAiTurn {
   content?: string
   toolCalls?: AiToolCall[]
   tokensUsed?: number
+  /** Levée à la place d'une réponse : fournisseur en panne, délai dépassé (#853). */
+  error?: Error
 }
 
 /** Un appel capturé à `AiService.chat`, options incluses. */
@@ -172,6 +174,7 @@ export interface FakeAiCall {
   model: string | null
   apiKey: string | null
   tools: AiToolDefinition[] | null
+  timeoutMs: number | null
 }
 
 /**
@@ -204,8 +207,10 @@ export function swapAiService(
             model: options.model ?? null,
             apiKey: options.apiKey ?? null,
             tools: options.tools ?? null,
+            timeoutMs: options.timeoutMs ?? null,
           })
           const turn = turns[Math.min(calls.length - 1, turns.length - 1)]
+          if (turn.error) throw turn.error
           return {
             content: turn.content ?? '',
             toolCalls: turn.toolCalls ?? [],

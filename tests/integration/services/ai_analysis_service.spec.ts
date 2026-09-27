@@ -1,5 +1,8 @@
 import { test } from '@japa/runner'
 import AiAnalysis from '#models/ai_analysis'
+import AiTokenUsage from '#models/ai_token_usage'
+import { AiProviderTimeoutError } from '#exceptions/ai_errors'
+import { AI_ANALYSIS_TIMEOUT_MS } from '#shared/constants/ai'
 import { AiAnalysisFactory } from '#database/factories/ai_analysis_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
@@ -313,5 +316,41 @@ test.group('AiAnalysisService — generation honours the caller locale (#460)', 
     const system = calls.at(-1)!.messages.find((m) => m.role === 'system')!.content
     assert.isTrue(system.startsWith('Focus on safety equipment.'))
     assert.include(system, 'Write every suggestion in English')
+  })
+})
+
+test.group('AiAnalysisService — délai du fournisseur (#853)', (group) => {
+  group.each.teardown(() => restoreAiService())
+
+  test('une analyse passe la marge AI_ANALYSIS_TIMEOUT_MS, pas celle du chat', async ({
+    assert,
+  }) => {
+    const calls = swapAiService('[{"text":"A suggestion"}]')
+    const org = await OrganizationFactory.merge({ plan: 'pro' }).create()
+    const user = await UserFactory.merge({ organizationId: org.id }).create()
+
+    const svc = await app.container.make(AiAnalysisService)
+    await svc.generateFleetAnalysis(user.id, org, FLEET_INPUT, 'en')
+
+    assert.equal(calls.at(-1)!.timeoutMs, AI_ANALYSIS_TIMEOUT_MS)
+  })
+
+  test('un délai dépassé remonte, libère la réservation et ne persiste rien', async ({
+    assert,
+  }) => {
+    swapAiService([{ error: new AiProviderTimeoutError(AI_ANALYSIS_TIMEOUT_MS) }])
+    const org = await OrganizationFactory.merge({ plan: 'pro' }).create()
+    const user = await UserFactory.merge({ organizationId: org.id }).create()
+
+    const svc = await app.container.make(AiAnalysisService)
+    await assert.rejects(
+      () => svc.generateFleetAnalysis(user.id, org, FLEET_INPUT, 'en'),
+      AiProviderTimeoutError
+    )
+
+    const usage = await AiTokenUsage.query().where('organizationId', org.id).firstOrFail()
+    assert.equal(Number(usage.reservedTokens), 0)
+    assert.equal(Number(usage.tokensUsed), 0)
+    assert.isNull(await AiAnalysis.query().where('userId', user.id).first())
   })
 })

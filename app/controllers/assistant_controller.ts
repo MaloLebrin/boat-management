@@ -1,4 +1,4 @@
-import { AiInvalidResponseError } from '#exceptions/ai_errors'
+import { AiInvalidResponseError, AiProviderTimeoutError } from '#exceptions/ai_errors'
 import {
   AssistantActionEntityGoneError,
   AssistantActionNotAllowedError,
@@ -184,6 +184,8 @@ export default class AssistantController {
       session.flash('error', i18n.t('flash.assistant.customKeyFailed'))
     } else if (error instanceof AiInvalidResponseError) {
       session.flash('error', i18n.t('flash.assistant.invalidResponse'))
+    } else if (error instanceof AiProviderTimeoutError) {
+      session.flash('error', i18n.t('flash.ai.timeout'))
     } else if (error instanceof BoatNotFoundError) {
       // Le bateau de la proposition a disparu entre-temps (supprimé) :
       // la proposition n'est plus exécutable.

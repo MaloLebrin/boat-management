@@ -1,3 +1,4 @@
+import { AI_ANALYSIS_TIMEOUT_MS } from '#shared/constants/ai'
 import AiAnalysis from '#models/ai_analysis'
 import AiService from '#services/ai_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
@@ -140,7 +141,7 @@ export default class AiAnalysisService {
           { role: 'system', content: systemContent },
           { role: 'user', content: userMessage },
         ],
-        { model: orgModelOverride }
+        { model: orgModelOverride, timeoutMs: AI_ANALYSIS_TIMEOUT_MS }
       )
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
@@ -185,7 +186,7 @@ export default class AiAnalysisService {
           { role: 'system', content: systemContent },
           { role: 'user', content: userMessage },
         ],
-        { model: orgModelOverride }
+        { model: orgModelOverride, timeoutMs: AI_ANALYSIS_TIMEOUT_MS }
       )
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
@@ -232,7 +233,7 @@ export default class AiAnalysisService {
           { role: 'system', content: systemContent },
           { role: 'user', content: userMessage },
         ],
-        { model: orgModelOverride }
+        { model: orgModelOverride, timeoutMs: AI_ANALYSIS_TIMEOUT_MS }
       )
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)
@@ -316,7 +317,7 @@ export default class AiAnalysisService {
           { role: 'system', content: systemContent },
           { role: 'user', content: userMessage },
         ],
-        { model: orgModelOverride }
+        { model: orgModelOverride, timeoutMs: AI_ANALYSIS_TIMEOUT_MS }
       )
 
       await this.aiTokenQuotaService.recordUsage(org, tokensUsed)

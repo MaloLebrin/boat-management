@@ -1,9 +1,11 @@
-import { AiProviderKeyMissingError } from '#exceptions/ai_errors'
+import { AiProviderKeyMissingError, AiProviderTimeoutError } from '#exceptions/ai_errors'
+import { AI_CHAT_TIMEOUT_MS, AI_SDK_MAX_RETRIES } from '#shared/constants/ai'
 import {
   DEFAULT_AI_MODEL_BY_PROVIDER,
   modelBelongsToProvider,
   type AiChatOptions,
   type AiProvider,
+  type AiProviderCall,
   type AiToolCall,
   type AiToolDefinition,
 } from '#shared/types/ai'
@@ -335,6 +337,50 @@ export function parseGoogleToolCalls(
 }
 
 /**
+ * Exécute un appel fournisseur borné dans le temps (#853). `fn` reçoit un
+ * signal qu'il transmet au SDK pour que la requête HTTP soit réellement
+ * annulée. La course avec le minuteur borne aussi un SDK qui ignorerait le
+ * signal. Tout échec après expiration du délai devient
+ * `AiProviderTimeoutError`, quelle que soit la classe d'erreur propre au SDK.
+ */
+export async function runWithTimeout<T>(
+  timeoutMs: number,
+  fn: (signal: AbortSignal) => Promise<T>
+): Promise<T> {
+  const controller = new AbortController()
+  let timer: NodeJS.Timeout | undefined
+  const expired = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort()
+      reject(new AiProviderTimeoutError(timeoutMs))
+    }, timeoutMs)
+  })
+
+  try {
+    return await Promise.race([fn(controller.signal), expired])
+  } catch (error) {
+    if (controller.signal.aborted) throw new AiProviderTimeoutError(timeoutMs)
+    throw error
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/**
+ * Options de construction des clients SDK (#853). Le délai du SDK doublonne
+ * celui de `runWithTimeout`, qui reste la borne effective. Les relances
+ * automatiques passent de 2 à 1.
+ */
+export function sdkClientOptions(apiKey: string, timeoutMs: number) {
+  return {
+    mistral: { apiKey, timeoutMs },
+    openai: { apiKey, timeout: timeoutMs, maxRetries: AI_SDK_MAX_RETRIES },
+    anthropic: { apiKey, timeout: timeoutMs, maxRetries: AI_SDK_MAX_RETRIES },
+    google: { apiKey, httpOptions: { timeout: timeoutMs } },
+  }
+}
+
+/**
  * Façade unique des appels aux modèles de langage — un adaptateur par
  * fournisseur (`mistral`, `anthropic`, `openai`, `google`), même contrat de
  * sortie `{ content, toolCalls, tokensUsed }` (#642 : `toolCalls` est vide
@@ -352,6 +398,8 @@ export default class AiService {
   #model: string
 
   constructor() {
+    // Le délai de la requête est passé à chaque appel (`timeoutMs` + signal) :
+    // le client de l'app sert à la fois les tours de chat et les analyses.
     this.#client = new Mistral({ apiKey: env.get('MISTRAL_API_KEY').release() })
     this.#model = env.get('AI_MODEL', 'mistral-small-latest')
   }
@@ -361,16 +409,24 @@ export default class AiService {
     const model = this.#resolveModel(provider, options.model ?? null)
     const apiKey = options.apiKey ?? null
     const tools = options.tools ?? []
+    const timeoutMs = options.timeoutMs ?? AI_CHAT_TIMEOUT_MS
 
-    if (provider === 'mistral') return this.#chatMistral(messages, model, apiKey, tools)
+    if (provider === 'mistral') {
+      return runWithTimeout(timeoutMs, (signal) =>
+        this.#chatMistral(messages, model, apiKey, tools, { timeoutMs, signal })
+      )
+    }
 
     // Défensif : les appelants (assistant) garantissent la clé pour un
     // fournisseur BYOK — il n'y a pas de clé d'app hors Mistral.
     if (!apiKey) throw new AiProviderKeyMissingError(provider)
 
-    if (provider === 'anthropic') return this.#chatAnthropic(messages, model, apiKey, tools)
-    if (provider === 'openai') return this.#chatOpenAi(messages, model, apiKey, tools)
-    return this.#chatGoogle(messages, model, apiKey, tools)
+    return runWithTimeout(timeoutMs, (signal) => {
+      const call = { timeoutMs, signal }
+      if (provider === 'anthropic') return this.#chatAnthropic(messages, model, apiKey, tools, call)
+      if (provider === 'openai') return this.#chatOpenAi(messages, model, apiKey, tools, call)
+      return this.#chatGoogle(messages, model, apiKey, tools, call)
+    })
   }
 
   /**
@@ -388,18 +444,24 @@ export default class AiService {
     messages: AiChatMessage[],
     model: string,
     apiKey: string | null,
-    tools: AiToolDefinition[]
+    tools: AiToolDefinition[],
+    call: AiProviderCall
   ): Promise<AiChatResult> {
     // BYOK : une org avec sa propre clé Mistral consomme sur son compte —
     // client dédié pour l'appel, la clé de l'app reste le défaut.
-    const client = apiKey ? new Mistral({ apiKey }) : this.#client
-    const response = await client.chat.complete({
-      model,
-      messages: toMistralMessages(messages) as Parameters<
-        typeof client.chat.complete
-      >[0]['messages'],
-      ...(tools.length ? { tools: toFunctionDialectTools(tools) } : {}),
-    })
+    const client = apiKey
+      ? new Mistral(sdkClientOptions(apiKey, call.timeoutMs).mistral)
+      : this.#client
+    const response = await client.chat.complete(
+      {
+        model,
+        messages: toMistralMessages(messages) as Parameters<
+          typeof client.chat.complete
+        >[0]['messages'],
+        ...(tools.length ? { tools: toFunctionDialectTools(tools) } : {}),
+      },
+      { timeoutMs: call.timeoutMs, signal: call.signal }
+    )
 
     const tokensUsed = response.usage?.totalTokens ?? 0
     const message = response.choices?.[0]?.message
@@ -425,20 +487,24 @@ export default class AiService {
     messages: AiChatMessage[],
     model: string,
     apiKey: string,
-    tools: AiToolDefinition[]
+    tools: AiToolDefinition[],
+    call: AiProviderCall
   ): Promise<AiChatResult> {
-    const client = new Anthropic({ apiKey })
+    const client = new Anthropic(sdkClientOptions(apiKey, call.timeoutMs).anthropic)
 
     // Anthropic : le prompt système est un paramètre top-level, pas un message.
     const { system, messages: thread } = toAnthropicPayload(messages)
 
-    const response = await client.messages.create({
-      model,
-      max_tokens: ANTHROPIC_MAX_TOKENS,
-      system: system || undefined,
-      messages: thread as Anthropic.MessageParam[],
-      ...(tools.length ? { tools: toAnthropicTools(tools) as Anthropic.Tool[] } : {}),
-    })
+    const response = await client.messages.create(
+      {
+        model,
+        max_tokens: ANTHROPIC_MAX_TOKENS,
+        system: system || undefined,
+        messages: thread as Anthropic.MessageParam[],
+        ...(tools.length ? { tools: toAnthropicTools(tools) as Anthropic.Tool[] } : {}),
+      },
+      { signal: call.signal }
+    )
 
     const content = response.content
       .filter((block): block is Anthropic.TextBlock => block.type === 'text')
@@ -464,18 +530,22 @@ export default class AiService {
     messages: AiChatMessage[],
     model: string,
     apiKey: string,
-    tools: AiToolDefinition[]
+    tools: AiToolDefinition[],
+    call: AiProviderCall
   ): Promise<AiChatResult> {
-    const client = new OpenAI({ apiKey })
+    const client = new OpenAI(sdkClientOptions(apiKey, call.timeoutMs).openai)
 
     // Le shape system/user/assistant passe tel quel en chat.completions.
-    const response = await client.chat.completions.create({
-      model,
-      messages: toOpenAiMessages(messages) as OpenAI.ChatCompletionMessageParam[],
-      ...(tools.length
-        ? { tools: toFunctionDialectTools(tools) as OpenAI.ChatCompletionTool[] }
-        : {}),
-    })
+    const response = await client.chat.completions.create(
+      {
+        model,
+        messages: toOpenAiMessages(messages) as OpenAI.ChatCompletionMessageParam[],
+        ...(tools.length
+          ? { tools: toFunctionDialectTools(tools) as OpenAI.ChatCompletionTool[] }
+          : {}),
+      },
+      { signal: call.signal }
+    )
 
     const message = response.choices[0]?.message
 
@@ -483,8 +553,8 @@ export default class AiService {
       content: message?.content ?? '',
       toolCalls: parseFunctionDialectToolCalls(
         message?.tool_calls?.filter(
-          (call): call is OpenAI.ChatCompletionMessageToolCall & { type: 'function' } =>
-            call.type === 'function'
+          (toolCall): toolCall is OpenAI.ChatCompletionMessageToolCall & { type: 'function' } =>
+            toolCall.type === 'function'
         )
       ),
       tokensUsed: response.usage?.total_tokens ?? 0,
@@ -495,21 +565,22 @@ export default class AiService {
     messages: AiChatMessage[],
     model: string,
     apiKey: string,
-    tools: AiToolDefinition[]
+    tools: AiToolDefinition[],
+    call: AiProviderCall
   ): Promise<AiChatResult> {
-    const client = new GoogleGenAI({ apiKey })
+    const client = new GoogleGenAI(sdkClientOptions(apiKey, call.timeoutMs).google)
 
     // Gemini : rôles `user` | `model`, prompt système via `systemInstruction`.
     const { system, contents } = toGoogleContents(messages)
 
-    const config: Record<string, unknown> = {}
+    const config: Record<string, unknown> = { abortSignal: call.signal }
     if (system) config.systemInstruction = system
     if (tools.length) config.tools = toGoogleTools(tools)
 
     const response = await client.models.generateContent({
       model,
       contents: contents as Parameters<typeof client.models.generateContent>[0]['contents'],
-      config: Object.keys(config).length ? config : undefined,
+      config,
     })
 
     return {

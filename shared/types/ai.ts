@@ -80,6 +80,18 @@ export interface AiChatOptions {
   model?: string | null
   apiKey?: string | null
   tools?: AiToolDefinition[]
+  /**
+   * Délai maximal de l'appel, relances comprises (#853). Par défaut
+   * `AI_CHAT_TIMEOUT_MS`. Les analyses et la queue passent
+   * `AI_ANALYSIS_TIMEOUT_MS`.
+   */
+  timeoutMs?: number
+}
+
+/** Bornes d'un appel fournisseur, transmises au SDK par `AiService` (#853). */
+export interface AiProviderCall {
+  timeoutMs: number
+  signal: AbortSignal
 }
 
 export type AiAnalysisStatus = 'pending' | 'running' | 'done' | 'failed'

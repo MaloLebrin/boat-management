@@ -95,12 +95,52 @@ SELECT tokens_used FROM public_ai_usages
 WHERE day = CURRENT_DATE - 1 AND surface = 'all' AND client_key = 'global';
 ```
 
+## Durée des appels (#853)
+
+Le throttle et les deux compteurs bornent le **nombre** de conversations, pas
+leur **durée**. Or les SDK attendaient longtemps par défaut : aucune limite pour
+`@mistralai/mistralai`, 10 minutes avec 2 relances pour `openai` et
+`@anthropic-ai/sdk`. Un fournisseur lent occupait alors une requête du serveur
+`web` (instance unique, event loop partagé avec les pages et le SSE) pendant
+tout ce temps.
+
+`AiService.chat` borne désormais chaque appel, relances comprises :
+
+| Appel                                                                 | Délai                               |
+| --------------------------------------------------------------------- | ----------------------------------- |
+| Tour de chat (diagnostic public, recherche de pièces, assistant…)     | `AI_CHAT_TIMEOUT_MS` (30 s, défaut) |
+| Analyse / suggestions (`AiAnalysisService`), job de queue `RunAiChat` | `AI_ANALYSIS_TIMEOUT_MS` (120 s)    |
+
+Les constantes vivent dans `shared/constants/ai.ts`. `runWithTimeout` passe un
+`AbortSignal` au SDK, pour que la requête HTTP soit réellement annulée, et fait
+la course avec un minuteur, pour qu'un SDK qui ignorerait le signal reste borné.
+Les clients sont construits avec le même délai et une seule relance
+(`sdkClientOptions`).
+
+À l'échéance, `AiProviderTimeoutError` (504) remonte. Les contrôleurs la
+traduisent en flash `flash.ai.timeout`, et le `finally` de `withReservedTokens`
+libère les tokens réservés. Côté assistant, un délai dépassé en BYOK n'est pas
+présenté comme une clé invalide (`customKeyFailed`) : le fournisseur est lent,
+la clé n'y est pour rien.
+
+**Pourquoi les chats publics restent synchrones.** Les passer en job + SSE ou
+polling les sortirait du chemin HTTP, mais un tour de chat est court et
+interactif : le visiteur attend la réponse pour continuer. Avec le délai de
+30 s, aligné sur le timeout idle de Caddy, une requête ne peut plus occuper le
+serveur plus longtemps qu'une connexion que Caddy aurait déjà coupée. Le
+passage en asynchrone reste possible si la charge l'exige.
+
+**Pas d'annulation à la déconnexion du client.** Un visiteur qui ferme l'onglet
+n'annule pas l'appel en cours : il se termine, ou expire au bout de 30 s. Le
+propager demanderait de faire traverser un signal à chaque service de chat,
+pour un gain borné désormais par ce délai.
+
 ## Où c'est testé
 
 | Fichier                                                   | Ce qu'il couvre                                                                                                                                                                                                                                       |
 | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `tests/functional/marketing/public_ai_budget.spec.ts`     | le plafond par IP survit au vidage de cookies ; les deux surfaces ne se volent pas leur plafond ; le budget global dégrade les deux chats ; les tokens sont comptés et la clé n'est pas l'IP ; le budget coupe aussi les messages suivants ; la purge |
-| `tests/functional/ai/public_diagnosis.spec.ts`            | le chat de diagnostic lui-même (#602)                                                                                                                                                                                                                 |
+| `tests/functional/ai/public_diagnosis.spec.ts`            | le chat de diagnostic lui-même (#602) ; un délai dépassé affiche `flash.ai.timeout` sans rien persister (#853)                                                                                                                                        |
 | `tests/functional/spare_parts/public_part_search.spec.ts` | le chat de recherche de pièce (#634)                                                                                                                                                                                                                  |
 
 ## Hors périmètre
