@@ -146,6 +146,8 @@ pnpm start
 
 Le `Dockerfile` et `docker-compose.yml` sont fournis pour le déploiement conteneurisé. Le CI/CD GitHub Actions gère le build, les tests et le déploiement automatique.
 
+> **Sauvegardes.** Le compose de prod (`docker-compose.prod.yml`) n'est complet qu'avec son service `backup` **et** une copie des dumps hors de la machine : le volume `pg_backups` est sur le même disque que la base. Voir `docs/dev/runbook.md`.
+
 ---
 
 ## Structure du projet

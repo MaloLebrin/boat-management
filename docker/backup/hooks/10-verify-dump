@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Hook du service `backup` (#847), monté dans /hooks de l'image
+# prodrigestivill/postgres-backup-local. `run-parts` l'appelle avec l'étape en
+# argument (pre-backup, post-backup, error). Après chaque dump, il vérifie que le
+# fichier existe, n'est pas vide, que l'archive gzip est intègre et que pg_dump
+# est allé jusqu'au bout. Un échec sort en erreur : backup.sh échoue, le log du
+# conteneur porte « ERREUR » et le hook `error` (WEBHOOK_ERROR_URL) se déclenche.
+set -Eeuo pipefail
+
+[ "${1:-}" = "post-backup" ] || exit 0
+
+BACKUP_DIR="${BACKUP_DIR:-/backups}"
+BACKUP_SUFFIX="${BACKUP_SUFFIX:-.sql.gz}"
+MIN_BYTES="${BACKUP_MIN_BYTES:-1024}"
+
+for DB in ${POSTGRES_DB//,/ }; do
+  FILE="$(readlink -f "${BACKUP_DIR}/last/${DB}-latest${BACKUP_SUFFIX}" || true)"
+  if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
+    echo "[backup] ERREUR : aucun dump pour « ${DB} » dans ${BACKUP_DIR}/last" >&2
+    exit 1
+  fi
+  SIZE="$(stat -c %s "$FILE")"
+  if [ "$SIZE" -lt "$MIN_BYTES" ]; then
+    echo "[backup] ERREUR : dump « ${FILE} » trop petit (${SIZE} octets < ${MIN_BYTES})" >&2
+    exit 1
+  fi
+  if ! gzip -t "$FILE"; then
+    echo "[backup] ERREUR : archive gzip corrompue « ${FILE} »" >&2
+    exit 1
+  fi
+  # pg_dump écrit ce commentaire en toute fin de dump : son absence signale un
+  # dump tronqué.
+  if ! grep -q "PostgreSQL database dump complete" <<<"$(gzip -dc "$FILE" | tail -n 5)"; then
+    echo "[backup] ERREUR : dump « ${FILE} » tronqué (marqueur de fin absent)" >&2
+    exit 1
+  fi
+  echo "[backup] OK : ${FILE} (${SIZE} octets)"
+done

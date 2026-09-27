@@ -158,6 +158,94 @@ jobs:
             exit 1
           fi
 
+  # Sauvegarde et restauration PostgreSQL (#847) : produit un dump avec l'image
+  # et le hook du service `backup` de docker-compose.prod.yml, puis le restaure
+  # avec scripts/db_restore.sh --check dans une base jetable. Une sauvegarde
+  # jamais restaurée n'est pas une sauvegarde — voir docs/dev/runbook.md.
+  backup-restore:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      BACKUP_IMAGE: prodrigestivill/postgres-backup-local:18-alpine
+    steps:
+      - uses: actions/checkout@v4
+      # Pas de `version:` ici : l'action lit `packageManager` de package.json.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Migrations (schéma complet à sauvegarder)
+        run: node ace migration:run --force
+        env:
+          NODE_ENV: test
+          TZ: UTC
+          PORT: 3333
+          HOST: localhost
+          APP_NAME: fleetai
+          APP_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          ENCRYPTION_KEY: BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=
+          APP_URL: http://localhost:3333
+          LOG_LEVEL: error
+          QUEUE_DRIVER: sync
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: test
+          DB_PASSWORD: test
+          DB_DATABASE: test
+          AI_PROVIDER: mistral
+          MISTRAL_API_KEY: test
+          CLOUDINARY_CLOUD_NAME: test
+          CLOUDINARY_API_KEY: test
+          CLOUDINARY_API_SECRET: test
+          SMTP_HOST: localhost
+          SMTP_PORT: 1025
+          SMTP_SECURE: false
+          MAIL_FROM_ADDRESS: noreply@fleetai.app
+          MAIL_FROM_NAME: FleetAi
+      - name: Sauvegarde (image et hook du service backup)
+        run: |
+          mkdir -p "$RUNNER_TEMP/backups" && chmod 777 "$RUNNER_TEMP/backups"
+          docker run --rm --network host \
+            -e POSTGRES_HOST=localhost -e POSTGRES_DB=test \
+            -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test \
+            -e "POSTGRES_EXTRA_OPTS=-Z6 --no-owner --no-privileges" \
+            -v "$PWD/docker/backup/hooks/10-verify-dump:/hooks/10-verify-dump:ro" \
+            -v "$RUNNER_TEMP/backups:/backups" \
+            "$BACKUP_IMAGE" /backup.sh
+      - name: Restauration dans une base jetable
+        run: |
+          docker run --rm --network host \
+            -e POSTGRES_HOST=localhost -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test \
+            -v "$PWD/scripts/db_restore.sh:/usr/local/bin/db_restore:ro" \
+            -v "$RUNNER_TEMP/backups:/backups" \
+            --entrypoint db_restore "$BACKUP_IMAGE" --check /backups/last/test-latest.sql.gz
+      - name: Un dump tronqué est refusé
+        run: |
+          gzip -dc "$RUNNER_TEMP/backups/last/test-latest.sql.gz" | head -n 200 | gzip > "$RUNNER_TEMP/backups/truncated.sql.gz"
+          if docker run --rm --network host \
+            -e POSTGRES_HOST=localhost -e POSTGRES_USER=test -e POSTGRES_PASSWORD=test \
+            -v "$PWD/scripts/db_restore.sh:/usr/local/bin/db_restore:ro" \
+            -v "$RUNNER_TEMP/backups:/backups" \
+            --entrypoint db_restore "$BACKUP_IMAGE" --check /backups/truncated.sql.gz; then
+            echo "db_restore a accepté un dump tronqué"
+            exit 1
+          fi
+
   test-frontend:
     runs-on: ubuntu-latest
     steps:
