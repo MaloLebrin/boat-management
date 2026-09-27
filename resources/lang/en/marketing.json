@@ -693,6 +693,8 @@
     "config_extra_boats_name": "Extra boats",
     "config_extra_boats_desc": "Beyond the boats included in the Pro base, on demand.",
     "config_per_boat": "/boat/month",
+    "config_extra_boats_decrement": "Remove a boat",
+    "config_extra_boats_increment": "Add a boat",
     "table_addon_badge": "Add-on",
     "table_modules_group": "Add-on modules",
     "table_modules_pricing": "Per-boat pricing & seasons",

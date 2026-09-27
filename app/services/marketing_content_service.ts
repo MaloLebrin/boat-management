@@ -804,6 +804,8 @@ export default class MarketingContentService {
             priceMonthly: ADDON_PRICES.extra_boats.monthly,
             priceAnnual: ADDON_PRICES.extra_boats.annualMonthly,
             perBoatLabel: t('config_per_boat'),
+            decrementLabel: t('config_extra_boats_decrement'),
+            incrementLabel: t('config_extra_boats_increment'),
           },
         },
         detailedTable: {

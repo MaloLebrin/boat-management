@@ -112,6 +112,8 @@ function makePropsWithExtraBoats(billing: 'monthly' | 'annual') {
       priceMonthly: 4,
       priceAnnual: 3,
       perBoatLabel: '/bateau/mois',
+      decrementLabel: 'Retirer un bateau',
+      incrementLabel: 'Ajouter un bateau',
     },
   }
 }
@@ -144,4 +146,13 @@ describe('dark mode (#416)', () => {
     expect(html).toContain('bg-surface-elevated')
     expect(html).not.toContain('bg-white')
   })
+})
+
+test('le stepper des bateaux supplémentaires porte des noms accessibles traduits (#861)', () => {
+  const w = mount(PricingConfigurator, { props: makePropsWithExtraBoats('monthly') })
+  const labels = w.findAll('button').map((b) => b.attributes('aria-label'))
+
+  expect(labels).toContain('Retirer un bateau')
+  expect(labels).toContain('Ajouter un bateau')
+  expect(labels).not.toContain('increment')
 })

@@ -106,7 +106,7 @@ function apply() {
             variant="secondary"
             size="sm"
             :disabled="quantity <= 0"
-            aria-label="decrement"
+            :aria-label="t('common.decrement')"
             @click="decrement"
           >
             −
@@ -118,7 +118,7 @@ function apply() {
             variant="secondary"
             size="sm"
             :disabled="quantity >= MAX_EXTRA_BOATS"
-            aria-label="increment"
+            :aria-label="t('common.increment')"
             @click="increment"
           >
             +

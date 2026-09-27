@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
           'relative z-10 inline-flex shrink-0 snap-start items-center gap-2 rounded-(--radius-control) px-3 py-2 text-sm whitespace-nowrap transition-colors duration-(--motion-fast) ease-premium focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 disabled:opacity-50 disabled:cursor-not-allowed',
           tab.key === modelValue
             ? 'font-semibold text-fg cursor-default'
-            : 'font-medium text-fg-subtle hover:text-fg-muted cursor-pointer',
+            : 'font-medium text-fg-muted hover:text-fg cursor-pointer',
         ]"
         @click="$emit('update:modelValue', tab.key)"
       >

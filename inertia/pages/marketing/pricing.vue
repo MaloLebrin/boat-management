@@ -86,6 +86,8 @@ interface Configurator {
     priceMonthly: number
     priceAnnual: number
     perBoatLabel: string
+    decrementLabel: string
+    incrementLabel: string
   }
 }
 interface PlanHeader {

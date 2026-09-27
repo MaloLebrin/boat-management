@@ -482,6 +482,18 @@ Consommateurs : `InspectionPhotos.vue` (wrapper fin), et les onglets « Photos �
 `EngineShowTabPhotos`, `EnginePartShowTabPhotos`, `SailShowTabPhotos`, `RigShowTabPhotos`,
 `GenericShowTabPhotos`, `SafetyShowTabPhotos`.
 
+## Accessibilité — modales, évitement, test axe (#861)
+
+- **`BaseModal` gère le focus** via `useFocusTrap` (`inertia/composables/use_focus_trap.ts`) :
+  - à l'ouverture, le focus va sur `initialFocus` (sélecteur CSS, prop optionnelle), sinon sur le premier élément focalisable du **corps** (pas le bouton « Fermer » de l'en-tête), sinon sur le panneau lui-même (`tabindex="-1"`) ;
+  - `Tab` / `Maj+Tab` bouclent dans le dialogue, et un focus qui en sort y est ramené ;
+  - à la fermeture, le focus revient à l'élément qui l'avait avant l'ouverture (le bouton déclencheur).
+    Les pièges sont empilés : une modale ouverte depuis une autre prend la main, et `Échap` ne ferme que la dernière. Headless UI (`Dialog`) n'a pas été retenu : il impose son propre portail, incompatible avec le `Teleport` désactivé jusqu'au montage qui évite le mismatch d'hydratation SSR (#835).
+- **Lien d'évitement** : premier élément du layout authentifié (`default.vue`), visible seulement au focus, il mène à `<main id="main" tabindex="-1">` (`common.skipToContent`).
+- **Pas de nom accessible en dur** : un bouton icône porte un `aria-label` traduit (`common.increment` / `common.decrement` pour les steppers ; côté marketing, le libellé arrive par les props).
+- **Contraste des tokens** : `fg-subtle` et `coral-700` (donc `danger-strong`) ont été assombris pour tenir 4.5:1 ; sur `surface-muted`, préférer `fg-muted` à `fg-subtle`.
+- **Test automatique** : `tests/browser/a11y.spec.ts` passe axe-core (`@axe-core/playwright`, WCAG 2.1 A/AA) sur `/dashboard`, `/boats/:id`, `/planning` et `/settings/billing` dans les deux thèmes et sur une modale ouverte, sans tolérer de violation `serious`/`critical`. Il vérifie aussi au clavier le piège de focus et le lien d'évitement. Un nouvel écran clé s'ajoute à la liste des URL.
+
 ## Cibles tactiles (#494)
 
 Sur les écrans terrain, tout contrôle interactif vise **≥ 44 px** de zone tactile (Apple HIG).

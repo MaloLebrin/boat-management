@@ -30,6 +30,8 @@ interface ExtraBoatsInfo {
   priceMonthly: number
   priceAnnual: number
   perBoatLabel: string
+  decrementLabel: string
+  incrementLabel: string
 }
 
 const props = defineProps<{
@@ -189,7 +191,7 @@ const { formatPrice } = useNumberFormat()
                 variant="outline"
                 size="sm"
                 :disabled="extraBoatsQty <= 0"
-                aria-label="decrement"
+                :aria-label="extraBoats.decrementLabel"
                 @click="decrementBoats"
               >
                 −
@@ -203,7 +205,7 @@ const { formatPrice } = useNumberFormat()
               <BaseButton
                 variant="outline"
                 size="sm"
-                aria-label="increment"
+                :aria-label="extraBoats.incrementLabel"
                 @click="incrementBoats"
               >
                 +

@@ -1,5 +1,5 @@
-import { mount } from '@vue/test-utils'
-import { afterEach, test, expect } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { afterEach, beforeEach, describe, expect, test } from 'vitest'
 import BaseModal from '../../inertia/components/base/BaseModal.vue'
 
 afterEach(() => {
@@ -91,4 +91,132 @@ test('une modale ordinaire reste fermable au clic sur l’arrière-plan et à É
   window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
   await w.vm.$nextTick()
   expect(w.emitted('update:open')).toEqual([[false], [false]])
+})
+
+describe('gestion du focus (#861)', () => {
+  let trigger: HTMLButtonElement
+
+  beforeEach(() => {
+    trigger = document.createElement('button')
+    trigger.textContent = 'Ouvrir'
+    document.body.appendChild(trigger)
+    trigger.focus()
+  })
+
+  afterEach(() => {
+    trigger.remove()
+  })
+
+  function mountForm(props: Record<string, unknown> = {}) {
+    return mount(BaseModal, {
+      props: { open: false, title: 'Nouveau client', ...props },
+      slots: {
+        default: '<input id="name" /><input id="email" />',
+        footer: '<button id="save" type="button">Enregistrer</button>',
+      },
+      attachTo: document.body,
+      global: { stubs: { teleport: true } },
+    })
+  }
+
+  async function open(w: ReturnType<typeof mountForm>) {
+    await w.setProps({ open: true })
+    await flushPromises()
+  }
+
+  test('à l’ouverture, le focus va au premier champ du corps plutôt qu’au bouton Fermer', async () => {
+    const w = mountForm()
+    await open(w)
+
+    expect(document.activeElement?.id).toBe('name')
+    w.unmount()
+  })
+
+  test('initialFocus cible un élément précis', async () => {
+    const w = mountForm({ initialFocus: '#email' })
+    await open(w)
+
+    expect(document.activeElement?.id).toBe('email')
+    w.unmount()
+  })
+
+  test('Tab depuis le dernier élément revient au premier, Maj+Tab fait l’inverse', async () => {
+    const w = mountForm()
+    await open(w)
+    const dialog = w.get('[role="dialog"]').element as HTMLElement
+    const items = Array.from(dialog.querySelectorAll<HTMLElement>('button, input'))
+    const first = items[0]
+    const last = items.at(-1)!
+    expect(first.textContent).toBe('Close')
+    expect(last.id).toBe('save')
+
+    last.focus()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', cancelable: true }))
+    expect(document.activeElement).toBe(first)
+
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, cancelable: true })
+    )
+    expect(document.activeElement).toBe(last)
+    w.unmount()
+  })
+
+  test('un focus qui sort du dialogue y est ramené', async () => {
+    const w = mountForm()
+    await open(w)
+
+    trigger.focus()
+    expect(document.activeElement?.id).toBe('name')
+    w.unmount()
+  })
+
+  test('à la fermeture, le focus revient au déclencheur', async () => {
+    const w = mountForm()
+    await open(w)
+    expect(document.activeElement).not.toBe(trigger)
+
+    await w.setProps({ open: false })
+    await flushPromises()
+    expect(document.activeElement).toBe(trigger)
+    w.unmount()
+  })
+
+  test('sans élément focalisable, le dialogue lui-même reçoit le focus', async () => {
+    const w = mount(BaseModal, {
+      props: { open: false, dismissible: false },
+      slots: { default: 'Traitement en cours…' },
+      attachTo: document.body,
+      global: { stubs: { teleport: true } },
+    })
+    await w.setProps({ open: true })
+    await flushPromises()
+
+    expect(document.activeElement).toBe(w.get('[role="dialog"]').element)
+    w.unmount()
+  })
+
+  test('deux modales empilées : Échap et le piège ne concernent que la dernière', async () => {
+    const parent = mountForm()
+    await open(parent)
+    const child = mount(BaseModal, {
+      props: { open: false, title: 'Confirmer' },
+      slots: { default: '<button id="confirm" type="button">OK</button>' },
+      attachTo: document.body,
+      global: { stubs: { teleport: true } },
+    })
+    await child.setProps({ open: true })
+    await flushPromises()
+    expect(document.activeElement?.id).toBe('confirm')
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    expect(child.emitted('update:open')).toEqual([[false]])
+    expect(parent.emitted('update:open')).toBeUndefined()
+
+    await child.setProps({ open: false })
+    await flushPromises()
+    expect(document.activeElement?.id).toBe('name')
+
+    child.unmount()
+    parent.unmount()
+  })
 })

@@ -35,6 +35,7 @@ function onClick() {
     @click="onClick"
   >
     <span class="text-lilac-300" aria-hidden="true">&#10022;</span>
-    <span class="font-display">Fleet<em class="text-coral-500">Ai</em></span>
+    <!-- coral-400 : le 500 plafonne à 4.3:1 sur ce fond navy (#861) -->
+    <span class="font-display">Fleet<em class="text-coral-400">Ai</em></span>
   </button>
 </template>
