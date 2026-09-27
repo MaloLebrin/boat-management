@@ -150,8 +150,14 @@ const storageOverflow = computed(() => {
         </div>
 
         <template #footer>
+          <!-- Portail et checkout réservés à `subscription.manage` (#843) : le
+               serveur refuse déjà, on n'expose pas un bouton qui finirait en 403. -->
+          <p v-if="!canManageBilling" class="text-sm text-fg-muted">
+            {{ t('settings.billing.subscription.adminOnly') }}
+          </p>
+
           <!-- Abonné : bouton portail -->
-          <div v-if="subscription">
+          <div v-else-if="subscription">
             <BaseButton
               variant="secondary"
               size="sm"

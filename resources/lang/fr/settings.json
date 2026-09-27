@@ -114,7 +114,8 @@
         "month": "Mensuel",
         "year": "Annuel"
       },
-      "annualDiscount": "−20 %"
+      "annualDiscount": "−20 %",
+      "adminOnly": "Seul un administrateur peut changer de plan ou gérer l'abonnement."
     },
     "modules": {
       "title": "Modules add-ons",
@@ -375,7 +376,14 @@
       "client_create": "Client créé",
       "engine_part_set_stock": "Stock de pièce mis à jour",
       "incident_update": "Incident modifié",
-      "incident_delete": "Incident supprimé"
+      "incident_delete": "Incident supprimé",
+      "billing_checkout": "Paiement lancé",
+      "billing_portal": "Portail de facturation ouvert",
+      "billing_module_add": "Module ajouté à l'abonnement",
+      "billing_module_remove": "Module retiré de l'abonnement",
+      "billing_module_activate": "Module inclus activé",
+      "billing_module_deactivate": "Module inclus désactivé",
+      "billing_addon_set": "Bateaux supplémentaires modifiés"
     },
     "empty": {
       "title": "Aucune activité",
