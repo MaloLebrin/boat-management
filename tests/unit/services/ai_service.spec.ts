@@ -1,8 +1,16 @@
 import { test } from '@japa/runner'
+import { AiProviderTimeoutError } from '#exceptions/ai_errors'
+import {
+  AI_ANALYSIS_TIMEOUT_MS,
+  AI_CHAT_TIMEOUT_MS,
+  AI_SDK_MAX_RETRIES,
+} from '#shared/constants/ai'
 import {
   parseFunctionDialectToolCalls,
   parseGoogleToolCalls,
   parseToolArguments,
+  runWithTimeout,
+  sdkClientOptions,
   toAnthropicPayload,
   toAnthropicTools,
   toFunctionDialectTools,
@@ -231,5 +239,75 @@ test.group('AiService — Google', () => {
       { id: 'x', name: 'get_boat', arguments: {} },
     ])
     assert.deepEqual(parseGoogleToolCalls(undefined), [])
+  })
+})
+
+test.group('AiService — délai des appels fournisseur (#853)', () => {
+  test('un fournisseur qui ne répond jamais lève AiProviderTimeoutError et annule le signal', async ({
+    assert,
+  }) => {
+    let received: AbortSignal | null = null
+    const started = Date.now()
+
+    await assert.rejects(
+      () =>
+        runWithTimeout(50, (signal) => {
+          received = signal
+          return new Promise<never>(() => {})
+        }),
+      AiProviderTimeoutError
+    )
+
+    assert.isTrue(received!.aborted)
+    assert.isBelow(Date.now() - started, 1_000)
+  })
+
+  test('le rejet du SDK sur abort devient AiProviderTimeoutError', async ({ assert }) => {
+    await assert.rejects(
+      () =>
+        runWithTimeout(
+          30,
+          (signal) =>
+            new Promise<never>((_, reject) => {
+              signal.addEventListener('abort', () => reject(new Error('Request was aborted.')))
+            })
+        ),
+      AiProviderTimeoutError
+    )
+  })
+
+  test("une erreur du fournisseur avant l'échéance passe telle quelle", async ({ assert }) => {
+    const boom = new Error('401 invalid api key')
+    try {
+      await runWithTimeout(1_000, async () => {
+        throw boom
+      })
+      assert.fail('should have thrown')
+    } catch (error) {
+      assert.strictEqual(error, boom)
+    }
+  })
+
+  test("une réponse dans le délai est rendue et le signal n'est pas annulé", async ({ assert }) => {
+    let received: AbortSignal | null = null
+    const result = await runWithTimeout(1_000, async (signal) => {
+      received = signal
+      return 'ok'
+    })
+    assert.equal(result, 'ok')
+    assert.isFalse(received!.aborted)
+  })
+
+  test('les clients SDK sont construits avec le délai et une seule relance', ({ assert }) => {
+    const options = sdkClientOptions('sk-test', AI_CHAT_TIMEOUT_MS)
+    assert.deepEqual(options.mistral, { apiKey: 'sk-test', timeoutMs: 30_000 })
+    assert.deepEqual(options.openai, { apiKey: 'sk-test', timeout: 30_000, maxRetries: 1 })
+    assert.deepEqual(options.anthropic, { apiKey: 'sk-test', timeout: 30_000, maxRetries: 1 })
+    assert.deepEqual(options.google, { apiKey: 'sk-test', httpOptions: { timeout: 30_000 } })
+  })
+
+  test("un tour de chat a moins de marge qu'une analyse", ({ assert }) => {
+    assert.isBelow(AI_CHAT_TIMEOUT_MS, AI_ANALYSIS_TIMEOUT_MS)
+    assert.equal(AI_SDK_MAX_RETRIES, 1)
   })
 })

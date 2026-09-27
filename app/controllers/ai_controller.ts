@@ -10,7 +10,7 @@ import BoatHullService from '#services/boat_hull_service'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import DashboardService from '#services/dashboard_service'
 import QuotaService from '#services/quota_service'
-import { AiInvalidResponseError } from '#exceptions/ai_errors'
+import { AiInvalidResponseError, AiProviderTimeoutError } from '#exceptions/ai_errors'
 import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import { aiChatValidator, engineDiagnosisValidator } from '#validators/ai'
 import { toAppLocale } from '#shared/helpers/locale_path'
@@ -73,6 +73,8 @@ export default class AiController {
     } catch (error) {
       if (error instanceof QuotaExceededError) {
         session.flash('error', i18n.t(quotaFlashKey(error)))
+      } else if (error instanceof AiProviderTimeoutError) {
+        session.flash('error', i18n.t('flash.ai.timeout'))
       } else {
         session.flash('error', i18n.t('flash.ai.analysisError'))
       }
@@ -113,6 +115,8 @@ export default class AiController {
         session.flash('error', i18n.t(quotaFlashKey(error)))
       } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
         throw error
+      } else if (error instanceof AiProviderTimeoutError) {
+        session.flash('error', i18n.t('flash.ai.timeout'))
       } else {
         session.flash('error', i18n.t('flash.ai.analysisError'))
       }
@@ -165,6 +169,8 @@ export default class AiController {
         session.flash('error', i18n.t(quotaFlashKey(error)))
       } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
         throw error
+      } else if (error instanceof AiProviderTimeoutError) {
+        session.flash('error', i18n.t('flash.ai.timeout'))
       } else {
         session.flash('error', i18n.t('flash.ai.analysisError'))
       }
@@ -225,6 +231,8 @@ export default class AiController {
         session.flash('error', i18n.t('flash.ai.diagnosisInvalidResponse'))
       } else if (error instanceof bouncerErrors.E_AUTHORIZATION_FAILURE) {
         throw error
+      } else if (error instanceof AiProviderTimeoutError) {
+        session.flash('error', i18n.t('flash.ai.timeout'))
       } else {
         session.flash('error', i18n.t('flash.ai.analysisError'))
       }

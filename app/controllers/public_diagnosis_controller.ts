@@ -1,4 +1,4 @@
-import { AiInvalidResponseError } from '#exceptions/ai_errors'
+import { AiInvalidResponseError, AiProviderTimeoutError } from '#exceptions/ai_errors'
 import {
   DiagnosisConversationCompletedError,
   DiagnosisConversationNotFoundError,
@@ -129,6 +129,8 @@ export default class PublicDiagnosisController {
       session.flash('error', i18n.t(quotaFlashKey(error)))
     } else if (error instanceof AiInvalidResponseError) {
       session.flash('error', i18n.t('flash.ai.diagnosisInvalidResponse'))
+    } else if (error instanceof AiProviderTimeoutError) {
+      session.flash('error', i18n.t('flash.ai.timeout'))
     } else {
       throw error
     }

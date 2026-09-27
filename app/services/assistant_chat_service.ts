@@ -1,4 +1,4 @@
-import { AiInvalidResponseError } from '#exceptions/ai_errors'
+import { AiInvalidResponseError, AiProviderTimeoutError } from '#exceptions/ai_errors'
 import {
   AssistantActionNotExecutableError,
   AssistantConversationBudgetExceededError,
@@ -444,6 +444,9 @@ export default class AssistantChatService {
     try {
       return await this.aiService.chat(messages, options)
     } catch (error) {
+      // Un délai dépassé n'accuse pas la clé : le fournisseur est lent, pas
+      // l'org mal configurée (#853).
+      if (error instanceof AiProviderTimeoutError) throw error
       if (active !== null) throw new AssistantCustomKeyFailedError()
       throw error
     }

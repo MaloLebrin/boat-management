@@ -38,6 +38,10 @@ tokens_used + reserved_tokens + N <= limite`. **Zéro ligne affectée =
    `tokens_used`, inchangé.
 3. `release()` rend la réservation, dans un `finally`.
 
+La réservation ne dure pas plus longtemps que l'appel, et l'appel est borné
+(#853) : 30 s pour un tour de chat, 120 s pour une analyse. À l'échéance,
+`AiProviderTimeoutError` traverse le `finally`, qui rend la réservation.
+
 `reserved_tokens` est une colonne **distincte** à dessein : les seuils de
 notification (80 %, 100 %), `getUsage()` et les statistiques ne lisent que la
 consommation réelle, donc une réservation en vol ne déclenche pas d'alerte

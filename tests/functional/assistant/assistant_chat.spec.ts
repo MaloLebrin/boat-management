@@ -12,6 +12,8 @@ import { createAdminUser, createMechanicUser } from '#tests/functional/helpers'
 import OrganizationAiKey from '#models/organization_ai_key'
 import { ASSISTANT_CONVERSATION_TOKEN_BUDGET, type AssistantMessage } from '#shared/types/assistant'
 import { restoreAiService, swapAiService } from '#tests/support/fakes'
+import { AiProviderTimeoutError } from '#exceptions/ai_errors'
+import { AI_CHAT_TIMEOUT_MS } from '#shared/constants/ai'
 import DataEncryptionService from '#services/data_encryption_service'
 
 const dataEncryption = new DataEncryptionService()
@@ -599,6 +601,36 @@ test.group('Assistant FleetAi chat (functional)', (group) => {
     // L'usage reste émargé pour les statistiques.
     const usage = await AiTokenUsage.query().where('organizationId', user.organizationId!).first()
     assert.equal(Number(usage!.tokensUsed), 1_000_060)
+  })
+
+  test('a BYOK timeout is reported as a timeout, not as a broken key (#853)', async ({
+    assert,
+    client,
+  }) => {
+    const user = await createAdminUser()
+    await makeBoat(user.organizationId!)
+    const org = await Organization.findOrFail(user.organizationId!)
+    await OrganizationAiKey.create({
+      organizationId: org.id,
+      provider: 'anthropic',
+      apiKeyEncrypted: dataEncryption.encrypt('sk-ant-org-key'),
+    })
+    org.aiProvider = 'anthropic'
+    await org.save()
+
+    const calls = swapAiService([{ error: new AiProviderTimeoutError(AI_CHAT_TIMEOUT_MS) }])
+
+    const response = await client
+      .post('/assistant/conversations')
+      .loginAs(user)
+      .form({ message: 'Hello' })
+      .redirects(0)
+
+    response.assertFlashMessage(
+      'error',
+      'The AI assistant is taking too long to answer. Please try again in a moment.'
+    )
+    assert.lengthOf(calls, 1)
   })
 
   test('the active provider (e.g. Claude) routes the AI call with its key', async ({
