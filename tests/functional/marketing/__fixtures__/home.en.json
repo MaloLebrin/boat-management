@@ -151,7 +151,7 @@
           "bullets": [
             "Reminders by date or engine hours",
             "Calendar and Kanban view",
-            "Team assignment",
+            "Nearby tasks grouped per boat",
             "Automatic recurrence"
           ]
         },
@@ -203,7 +203,7 @@
             "bullets": [
               "Safety equipment tracking with expiration alerts",
               "Maintenance calendar respecting lesson schedules",
-              "Shareable boat status for instructors"
+              "Dockside inspection checklists, even offline"
             ],
             "quote": {
               "text": "Our instructors now check boat status before each lesson. It changed our safety culture overnight.",
@@ -426,11 +426,11 @@
           },
           {
             "q": "Can I migrate from another tool?",
-            "a": "Yes — we import Excel, Google Sheets, Airtable and CSV/PDF exports from your existing tools."
+            "a": "Yes — maintenance history imports from a CSV or Excel file (Enterprise plan) and expenses from a CSV (Pro plan). Boats and equipment take a few minutes to create in the app."
           },
           {
             "q": "Is my data kept if I cancel my subscription?",
-            "a": "For 90 days after cancellation, you can export to CSV/PDF. After that, permanent deletion (GDPR)."
+            "a": "Yes. Your organization moves back to the free Starter plan and your data is kept: the maintenance log stays downloadable as a PDF, while CSV export requires a Pro plan. You can request permanent deletion at any time (GDPR)."
           },
           {
             "q": "Does the AI see other customers' data?",
@@ -499,7 +499,7 @@
         "results": [
           "Zero safety delays since rollout",
           "Complete maintenance history accessible in one click",
-          "Monthly report generated automatically"
+          "PDF maintenance log ready for every audit"
         ],
         "metrics": [
           {
@@ -526,9 +526,9 @@
         "items": [
           {
             "step": "01",
-            "title": "Import your fleet",
-            "description": "From Excel, CSV, or manual entry. All your boats and equipment are ready in under 10 minutes.",
-            "detail": "Supported formats: Excel, CSV, Google Sheets"
+            "title": "Add your fleet",
+            "description": "Create your boats and equipment in a few minutes, then import your maintenance history if you have one.",
+            "detail": "History import: CSV, Excel (Enterprise)"
           },
           {
             "step": "02",
@@ -540,7 +540,7 @@
             "step": "03",
             "title": "Navigate with AI",
             "description": "Every morning, your dashboard surfaces urgent tasks, upcoming deadlines, and anomalies detected by the AI.",
-            "detail": "Automatic weekly report sent to your inbox"
+            "detail": "Urgent items sorted by severity on the dashboard"
           }
         ],
         "timeline": {
@@ -548,7 +548,7 @@
           "items": [
             {
               "day": "Day 1",
-              "label": "Fleet imported"
+              "label": "Your fleet added"
             },
             {
               "day": "Day 7",

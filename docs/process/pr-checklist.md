@@ -8,10 +8,12 @@
 - [ ] Si la PR change la DB: `docs/data/schema.md` est mis à jour.
 - [ ] Les contrôleurs restent **fins** (logique dans services).
 - [ ] Tests ajoutés/ajustés si logique métier.
+- [ ] Tout bullet, FAQ ou ligne de comparatif ajouté au site marketing (`marketing.json`) cite dans la PR la **route ou l’écran** qui le tient. Une fonctionnalité pas encore livrée reste hors du site (#866).
 
 ## Checklist auteur
 
 - [ ] J’ai écrit `Closes #<issue>` en anglais — « Ferme #123 » ne ferme rien, GitHub ne lit que les mots-clés anglais.
 - [ ] J’ai mis à jour la doc liée à ma feature.
+- [ ] Si j’ai ajouté une promesse marketing, j’ai cité la route ou l’écran qui la tient.
 - [ ] J’ai vérifié les routes impactées (mapping routes→controller→service→page).
 - [ ] J’ai lancé `pnpm test` et/ou `pnpm test:inertia` si pertinent.

@@ -51,7 +51,7 @@
             ["Calendrier + Kanban"],
             ["Documents & assurances", "20 Go"],
             ["Export PDF / CSV"],
-            ["App mobile complète"],
+            ["Application installable sur mobile, mode hors-ligne"],
             ["Notifications email"],
             ["Support prioritaire", "sous 4h"]
           ],
@@ -281,7 +281,7 @@
           {
             "title": "Équipe & collaboration",
             "rows": [
-              ["Rôles & permissions granulaires", false, "basique", "avancé"],
+              ["Rôles & permissions par membre", false, "4 rôles", "4 rôles"],
               ["Audit log", false, "90 jours", "illimité"],
               ["Notifications email", true, true, true]
             ]
@@ -358,7 +358,7 @@
           {
             "icon": "🔗",
             "title": "Intégration sur mesure",
-            "sub": "API custom, connecteurs tiers, plateforme de réservation.",
+            "sub": "Connecteur vers tes outils existants, étudié et développé sur demande.",
             "price": "Sur devis",
             "priceSub": "plans Entreprise",
             "tone": "bone"
@@ -412,7 +412,7 @@
           },
           {
             "q": "Que se passe-t-il si j'annule ?",
-            "a": "Tu gardes l'accès jusqu'à la fin de la période payée. Ensuite, tu retombes sur le plan Starter gratuit pendant 90 jours pour exporter tes données."
+            "a": "Tu gardes l'accès jusqu'à la fin de la période payée. Ensuite, ton organisation repasse sur le plan Starter gratuit : tes données restent conservées et le carnet d'entretien reste téléchargeable en PDF, mais l'export CSV demande un plan Pro."
           },
           {
             "q": "Vous prenez quels moyens de paiement ?",
