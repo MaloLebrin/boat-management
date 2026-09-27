@@ -320,13 +320,15 @@ test.group('Diagnostic pages (functional)', (group) => {
     assert.equal(props.engine.strokeType, '2_stroke')
   })
 
-  test('GET /diagnostic is refused to a boat_owner (no maintenance.view)', async ({ client }) => {
+  test('GET /diagnostic sends a boat_owner to their portal (no maintenance.view)', async ({
+    client,
+  }) => {
     const admin = await createAdminUser()
     const owner = await createBoatOwnerUser(admin.organizationId!)
 
     const response = await client.get('/diagnostic').loginAs(owner).redirects(0)
 
     response.assertStatus(302)
-    response.assertHeader('location', '/dashboard')
+    response.assertHeader('location', '/owner/boats')
   })
 })

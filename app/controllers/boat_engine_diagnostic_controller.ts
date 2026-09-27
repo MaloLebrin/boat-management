@@ -17,6 +17,7 @@ import {
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 
 @inject()
 export default class BoatEngineDiagnosticController {
@@ -26,28 +27,29 @@ export default class BoatEngineDiagnosticController {
     private aiAnalysisService: AiAnalysisService
   ) {}
 
-  async index({ inertia, auth, response }: HttpContext) {
+  async index({ inertia, auth, bouncer, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const canView = user.organizationId
-      ? await user.hasPermission(user.organizationId, 'maintenance.view')
-      : false
-    if (!canView) return response.redirect('/dashboard')
+    const portalRedirect = await boatOwnerPortalRedirect(user)
+    if (portalRedirect) return response.redirect(portalRedirect)
+
+    // Moteurs de toute la flotte : même seuil que la maintenance d'un bateau (#900).
+    await bouncer.with(MaintenancePolicy).authorize('view')
 
     const engines = await this.diagnosticService.listEligibleEnginesForUser(user)
 
     return inertia.render('diagnostic/index', { engines })
   }
 
-  async firstContact({ inertia, auth, response }: HttpContext) {
+  async firstContact({ inertia, auth, bouncer, response }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
 
-    const canView = user.organizationId
-      ? await user.hasPermission(user.organizationId, 'maintenance.view')
-      : false
-    if (!canView) return response.redirect('/dashboard')
+    const portalRedirect = await boatOwnerPortalRedirect(user)
+    if (portalRedirect) return response.redirect(portalRedirect)
+
+    await bouncer.with(MaintenancePolicy).authorize('view')
 
     return inertia.render('diagnostic/first_contact', {})
   }
