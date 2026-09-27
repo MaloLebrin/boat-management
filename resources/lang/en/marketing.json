@@ -1514,11 +1514,13 @@
           "title": "Winter your boat properly",
           "body": "Proper winterization protects your boat from frost, humidity, and corrosion. Investing in good winterization saves on spring repairs."
         }
-      }
+      },
+      "cta": "Track my expenses on FleetAi"
     },
     "nurturingD7": {
       "subject": "Your boat maintenance estimate — still available",
-      "text": "Your boat will cost between {totalMin} and {totalMax} per year in maintenance. FleetAi helps you plan and anticipate these expenses.\n\nCreate your account: {signupUrl}"
+      "text": "Your boat will cost between {totalMin} and {totalMax} per year in maintenance. FleetAi helps you plan and anticipate these expenses.\n\nCreate your account: {signupUrl}",
+      "body": "Your boat will cost between {totalMin} and {totalMax} per year in maintenance. FleetAi helps you plan and anticipate these expenses."
     },
     "simulatorReport": {
       "subject": "Your boat maintenance report — FleetAi",
@@ -1530,7 +1532,23 @@
         "electrical": "Electrical",
         "mooring": "Mooring",
         "rigging": "Rigging"
-      }
+      },
+      "heading": "Your cost estimation report",
+      "categoryHeader": "Category",
+      "annualCostHeader": "Annual cost",
+      "totalLabel": "Estimated total"
+    },
+    "shared": {
+      "ctaSignup": "Create my free account",
+      "privacy": "Your data will not be shared."
+    },
+    "contactAck": {
+      "subject": "We received your message — FleetAi",
+      "text": "Hello {firstName},\n\nThanks for reaching out. A member of the FleetAi team will get back to you within 4 hours on business days.\n\nA copy of your message:\n{message}",
+      "heading": "Got it, {firstName} 👋",
+      "intro": "Thanks for reaching out. A member of the FleetAi team will get back to you within 4 hours on business days — no bot, one of us reads you.",
+      "copyLabel": "A copy of your message",
+      "cta": "Try FleetAi for 14 days"
     }
   }
 }

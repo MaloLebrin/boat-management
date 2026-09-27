@@ -101,4 +101,15 @@ test.group('AssistantPlaybookService — garde-fous du contenu', () => {
     assert.isNotNull(section)
     assert.include(section!, 'expert')
   })
+
+  test('buildPromptSection titre la section dans la langue de la conversation (#863)', ({
+    assert,
+  }) => {
+    const playbooks = ASSISTANT_PLAYBOOKS.slice(0, 1)
+    assert.match(
+      service.buildPromptSection(playbooks, 'fr')!,
+      /^Repères d'expert pour cette demande :\n/
+    )
+    assert.match(service.buildPromptSection(playbooks, 'en')!, /^Expert notes for this request:\n/)
+  })
 })

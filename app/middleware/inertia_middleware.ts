@@ -156,7 +156,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
         ? storedDemoSessionStartedAt
         : undefined
 
-    const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator'])
+    const BACKEND_NAMESPACES = new Set(['flash', 'marketing', 'validator', 'csv'])
 
     // L'organisation est chargée une seule fois (ou pas du tout si le
     // contrôleur l'a déjà fait) : les résolveurs ci-dessous la réutilisent.

@@ -140,7 +140,12 @@
       "invoice": "Facture"
     },
     "subject": "{kindTitle} {number} de {orgName}",
-    "text": "Bonjour,\n\nVeuillez trouver ci-joint {kind} n° {number}.\n\nMontant total : {total}\n\nCordialement,\n{orgName}"
+    "text": "Bonjour,\n\nVeuillez trouver ci-joint {kind} n° {number}.\n\nMontant total : {total}\n\nCordialement,\n{orgName}",
+    "html": {
+      "body": "Veuillez trouver ci-joint {kind} n° {number}.",
+      "totalLabel": "Montant total :",
+      "attachment": "Le document PDF est joint à cet e-mail."
+    }
   },
   "paymentMethods": {
     "cash": "Espèces",

@@ -9,8 +9,16 @@ export const DEFAULT_APP_LOCALE: AppLocale = 'fr'
  * to a locale the app actually supports. Anything unknown falls back to the
  * default locale rather than leaking a bogus tag downstream.
  */
-export function toAppLocale(locale: string | null | undefined): AppLocale {
-  return APP_LOCALES.includes(locale as AppLocale) ? (locale as AppLocale) : DEFAULT_APP_LOCALE
+export function toAppLocale(
+  locale: string | null | undefined,
+  fallback: AppLocale = DEFAULT_APP_LOCALE
+): AppLocale {
+  return isAppLocale(locale) ? locale : fallback
+}
+
+/** Garde de type : `locale` est-elle l'une des locales de l'app ? */
+export function isAppLocale(locale: string | null | undefined): locale is AppLocale {
+  return APP_LOCALES.includes(locale as AppLocale)
 }
 
 const LOCALE_PREFIX = /^\/(en|fr)(?=\/|$)/

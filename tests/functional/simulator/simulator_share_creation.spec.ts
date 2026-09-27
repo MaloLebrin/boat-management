@@ -70,6 +70,19 @@ function tokenOf(location: string | undefined): string {
 test.group('Simulateur — la création de partage', (group) => {
   group.each.setup(() => truncateDb())
 
+  test('un partage anglais renvoie sur la lecture anglaise, dérivée de la route nommée (#863)', async ({
+    client,
+    assert,
+  }) => {
+    const created = await client
+      .post('/simulator/share')
+      .json({ input: INPUT, locale: 'en' })
+      .redirects(0)
+
+    created.assertStatus(302)
+    assert.match(String(created.header('location')), /^\/simulator\/r\/[\da-f]{32}$/)
+  })
+
   test('un visiteur anonyme crée un partage consultable', async ({ client, assert }) => {
     const created = await client
       .post('/simulator/share')

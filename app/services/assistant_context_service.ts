@@ -79,6 +79,7 @@ export default class AssistantContextService {
   /** Digest planning : compteurs + top N en retard + top N bientôt dues. */
   async buildFleetDigestLines(user: User, locale: AiSuggestionLocale): Promise<string> {
     const planning = await this.planningService.getPlanningForOrg(user)
+    // eslint-disable-next-line no-restricted-syntax -- fragment de prompt destiné au modèle, jamais affiché
     const fr = locale === 'fr'
 
     const lines: string[] = [

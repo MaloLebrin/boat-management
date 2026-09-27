@@ -91,5 +91,30 @@ export default [
       ],
     },
   },
+  {
+    files: ['app/**/*.ts'],
+    rules: {
+      /**
+       * Pas de bascule `locale === 'fr'` côté backend (#863) : un texte vu par
+       * l'utilisateur passe par `i18n.t()` (clé dans les deux locales), une
+       * locale à normaliser par `toAppLocale()` / `isAppLocale()`
+       * (`#shared/helpers/locale_path`). Ce motif fermait la porte à une
+       * troisième langue et laissait des en-têtes CSV en français pour un
+       * utilisateur anglophone.
+       *
+       * Exception : les fragments de prompt destinés au modèle IA, jamais
+       * affichés tels quels — `eslint-disable-next-line` motivé.
+       */
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "BinaryExpression[operator=/^[!=]==?$/][right.type='Literal'][right.value='fr'], BinaryExpression[operator=/^[!=]==?$/][left.type='Literal'][left.value='fr']",
+          message:
+            "Pas de `locale === 'fr'` dans app/ : i18n.t() pour un texte, toAppLocale()/isAppLocale() pour normaliser une locale.",
+        },
+      ],
+    },
+  },
   prettierConfig,
 ]

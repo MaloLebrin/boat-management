@@ -155,5 +155,11 @@
     "ports": "Which port spots are free right now?",
     "fleetSummary": "How is the fleet doing overall?",
     "help": "What can you do?"
+  },
+  "notExecutable": {
+    "no_trip_in_progress": "No trip is in progress on this boat, so there is nothing to close. Open a trip first, or tell me if you meant to record one that is already finished."
+  },
+  "playbooks": {
+    "promptHeader": "Expert notes for this request:"
   }
 }

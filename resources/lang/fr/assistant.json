@@ -155,5 +155,11 @@
     "ports": "Quelles places de port sont libres en ce moment ?",
     "fleetSummary": "Quel est l'état général de la flotte ?",
     "help": "Que savez-vous faire ?"
+  },
+  "notExecutable": {
+    "no_trip_in_progress": "Aucune sortie n'est en cours sur ce bateau : il n'y a rien à clôturer. Ouvrez d'abord une sortie, ou dites-moi si vous vouliez en enregistrer une déjà terminée."
+  },
+  "playbooks": {
+    "promptHeader": "Repères d'expert pour cette demande :"
   }
 }

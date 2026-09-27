@@ -66,5 +66,11 @@ test.group('SendRentalContractEmail job', (group) => {
     const pdf = node.attachments?.find((a) => a.contentType === 'application/pdf')
     assert.exists(pdf, 'expected a PDF attachment on the sent email')
     assert.match(pdf!.filename ?? '', /\.pdf$/)
+
+    // Gabarit HTML traduit par `t()` (#863), plus de bascule `isFr`.
+    const html = (sent.toObject().message as { html: string }).html
+    assert.include(html, `Rental contract — ${boat.name}`)
+    assert.include(html, 'The PDF document is attached to this email.')
+    assert.notInclude(html, 'Contrat de location')
   })
 })

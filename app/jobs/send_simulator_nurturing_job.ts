@@ -19,7 +19,7 @@ interface Payload {
  * Relances J+3 (conseils) et J+7 (rappel de l'estimation) après une simulation
  * publique. Sujets, textes et montants suivent la langue du lead via `i18n` —
  * la relance J+7 formatait ses montants en `fr-FR` quelle que soit la langue.
- * Les gabarits Edge gardent leur bascule `isFr` interne.
+ * Les gabarits Edge reçoivent ce même `i18n` pour leurs `t()` (#863).
  */
 @inject()
 export default class SendSimulatorNurturingJob extends Job<Payload> {
@@ -47,7 +47,6 @@ export default class SendSimulatorNurturingJob extends Job<Payload> {
   }
 
   async #scheduleD3(lead: SimulatorLead, i18n: I18n, appUrl: string) {
-    const isFr = lead.locale === 'fr'
     const signupUrl = `${appUrl}/signup`
     const subject = i18n.t('marketing.emails.nurturingD3.subject')
     const text = i18n.t('marketing.emails.nurturingD3.text', { signupUrl })
@@ -56,13 +55,12 @@ export default class SendSimulatorNurturingJob extends Job<Payload> {
       body: i18n.t(`marketing.emails.nurturingD3.tips.${n}.body`),
     }))
 
-    const html = await edge.render('emails/nurturing_d3', { isFr, tips, appUrl })
+    const html = await edge.render('emails/nurturing_d3', { i18n, tips, appUrl })
 
     await this.#enqueue(lead.email, `simulator-nurture-d3:${lead.email}`, subject, text, html, '3d')
   }
 
   async #scheduleD7(lead: SimulatorLead, i18n: I18n, appUrl: string) {
-    const isFr = lead.locale === 'fr'
     const signupUrl = `${appUrl}/signup`
     const totalMin = formatCurrency(lead.totalMin, lead.locale, { fractionDigits: 0 })
     const totalMax = formatCurrency(lead.totalMax, lead.locale, { fractionDigits: 0 })
@@ -70,7 +68,7 @@ export default class SendSimulatorNurturingJob extends Job<Payload> {
     const subject = i18n.t('marketing.emails.nurturingD7.subject')
     const text = i18n.t('marketing.emails.nurturingD7.text', { totalMin, totalMax, signupUrl })
 
-    const html = await edge.render('emails/nurturing_d7', { isFr, totalMin, totalMax, appUrl })
+    const html = await edge.render('emails/nurturing_d7', { i18n, totalMin, totalMax, appUrl })
 
     await this.#enqueue(lead.email, `simulator-nurture-d7:${lead.email}`, subject, text, html, '7d')
   }

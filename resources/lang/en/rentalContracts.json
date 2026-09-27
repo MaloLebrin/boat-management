@@ -22,7 +22,9 @@
     "subject": "Rental contract — {boatName} — {orgName}",
     "greeting": "Hello,",
     "body": "Please find attached the rental contract for {boatName}.",
-    "signature": "Best regards,\n{orgName}"
+    "signature": "Best regards,\n{orgName}",
+    "heading": "Rental contract — {boatName}",
+    "attachment": "The PDF document is attached to this email."
   },
   "pdf": {
     "title": "Rental contract",

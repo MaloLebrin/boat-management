@@ -61,6 +61,7 @@ export default class AssistantPageContextService {
     const boats = await this.boatListService.listNamesForOrg(user)
     const boat = boats.find((b) => b.id === boatId)
     if (boat === undefined) return null
+    // eslint-disable-next-line no-restricted-syntax -- fragment de prompt destiné au modèle, jamais affiché
     return locale === 'fr'
       ? `Fiche du bateau ${boat.name} (#${boat.id})`
       : `Boat page for ${boat.name} (#${boat.id})`
@@ -85,6 +86,7 @@ export default class AssistantPageContextService {
 
     const baseLabel = [engine.brand, engine.model].filter(Boolean).join(' ') || `#${engine.id}`
     const label = engineLabelWithStroke(baseLabel, engine)
+    // eslint-disable-next-line no-restricted-syntax -- fragment de prompt destiné au modèle, jamais affiché
     return locale === 'fr'
       ? `Moteur ${label} (#${engine.id}) du bateau ${boat.name} (#${boat.id})`
       : `Engine ${label} (#${engine.id}) of boat ${boat.name} (#${boat.id})`
@@ -102,6 +104,7 @@ export default class AssistantPageContextService {
       .where('organizationId', user.organizationId)
       .first()
     if (client === null) return null
+    // eslint-disable-next-line no-restricted-syntax -- fragment de prompt destiné au modèle, jamais affiché
     return locale === 'fr'
       ? `Fiche du client ${client.fullName} (#${client.id})`
       : `Client page for ${client.fullName} (#${client.id})`

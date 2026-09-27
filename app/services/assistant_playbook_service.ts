@@ -7,6 +7,7 @@ import {
 import { normalizeHelpText, tokenizeHelpQuery } from '#services/assistant_product_help_service'
 import type { AiSuggestionLocale } from '#shared/types/ai'
 import type { PlanQuotas } from '#shared/types/plan'
+import i18nManager from '@adonisjs/i18n/services/main'
 
 /**
  * Sélection des playbooks du copilote — déterministe, donc testable : même
@@ -44,8 +45,7 @@ export default class AssistantPlaybookService {
   /** Section de prompt « Repères d'expert » — `null` quand rien n'est retenu. */
   buildPromptSection(playbooks: AssistantPlaybook[], locale: AiSuggestionLocale): string | null {
     if (playbooks.length === 0) return null
-    const header =
-      locale === 'fr' ? "Repères d'expert pour cette demande :" : 'Expert notes for this request:'
+    const header = i18nManager.locale(locale).t('assistant.playbooks.promptHeader')
     const blocks = playbooks.map((p) => `[${p.title[locale]}] ${p.body[locale]}`)
     return `${header}\n${blocks.join('\n')}`
   }

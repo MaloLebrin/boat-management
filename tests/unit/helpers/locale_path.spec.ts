@@ -4,12 +4,26 @@ import {
   MARKETING_SLUGS,
   buildLocaleSwitchHref,
   hasLocalePathPrefix,
+  isAppLocale,
   marketingPath,
   stripLocalePathPrefix,
+  toAppLocale,
   type MarketingPage,
 } from '#shared/helpers/locale_path'
 
 test.group('locale_path', () => {
+  test('toAppLocale / isAppLocale bornent une locale à celles de l’app (#863)', ({ assert }) => {
+    assert.isTrue(isAppLocale('fr'))
+    assert.isTrue(isAppLocale('en'))
+    assert.isFalse(isAppLocale('de'))
+    assert.isFalse(isAppLocale(null))
+
+    assert.equal(toAppLocale('en'), 'en')
+    assert.equal(toAppLocale('de'), 'fr', 'repli par défaut : la locale par défaut de l’app')
+    assert.equal(toAppLocale(undefined, 'en'), 'en', 'repli explicite')
+    assert.equal(toAppLocale('fr', 'en'), 'fr')
+  })
+
   test('does not strip arbitrary two-letter segments from /login', ({ assert }) => {
     assert.equal(stripLocalePathPrefix('/login'), '/login')
     assert.isFalse(hasLocalePathPrefix('/login'))
