@@ -1,0 +1,10 @@
+# 2026-09-27 — Facturation : les actions Stripe sont réservées aux admins (#843)
+
+Seules les deux actions du module Entreprise de `BillingController` passaient par le bouncer. Les cinq autres (`checkout`, `portal`, `addModule`, `removeModule`, `setAddon`) s'arrêtaient à `auth.authenticate()` : un `member`, un `mechanic` ou un `boat_owner` pouvait lancer un checkout vers le plan Entreprise, ouvrir le portail client Stripe (factures, **résiliation**), ajouter ou retirer des modules payants et changer la quantité de bateaux supplémentaires.
+
+- **Correctif.** `bouncer.with(OrganizationPolicy).authorize('manageBilling')` (capability `subscription.manage`, admin seul) en tête des cinq actions, avant la validation et avant tout appel Stripe. Un non-admin reçoit un 403.
+- **Journal d'audit.** Sept nouvelles actions `billing.*` dans `AUDIT_ACTIONS` (`billing.checkout`, `billing.portal`, `billing.module_add`, `billing.module_remove`, `billing.module_activate`, `billing.module_deactivate`, `billing.addon_set`), écrites après chaque geste réussi, avec le module / l'add-on / le plan en métadonnées. Libellés FR/EN dans `settings.auditLog.actions`.
+- **UI.** Sur `/settings/billing`, les boutons « Gérer mon abonnement » et « Passer à … » du pied de la carte plan sont masqués sans `subscription.manage`, remplacés par « Seul un administrateur peut changer de plan ou gérer l'abonnement. » (les cartes modules / bateaux supplémentaires l'étaient déjà).
+- **Tests.** `tests/functional/billing/billing_authorization.spec.ts` : pour `member`, `mechanic` et `boat_owner`, chacune des cinq routes renvoie 403 sur une organisation où tout est prêt pour parler à Stripe, avec un fake `StripeService` qui prouve qu'aucun appel n'est émis et qu'aucune entrée d'audit n'est écrite ; l'admin passe et chaque geste est journalisé. `tests/inertia/settings_billing_tab.spec.ts` couvre le masquage des boutons.
+- **Docs.** `docs/billing-and-quotas.md` §2.1, `docs/frontend/ui-map.md`.
+- **Copilote.** L'entrée « Plans » de `product_knowledge.ts` précise que seul un admin gère l'abonnement.

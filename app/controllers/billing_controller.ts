@@ -7,6 +7,7 @@ import StripeService from '#services/stripe_service'
 import StripeWebhookService from '#services/stripe_webhook_service'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
+import AuditLogService from '#services/audit_log_service'
 import { addonActionValidator, checkoutValidator, moduleActionValidator } from '#validators/billing'
 import OrganizationPolicy from '#policies/organization_policy'
 import { inject } from '@adonisjs/core'
@@ -20,12 +21,16 @@ export default class BillingController {
     private stripeService: StripeService,
     private subscriptionService: SubscriptionService,
     private stripeWebhookService: StripeWebhookService,
-    private organizationModuleService: OrganizationModuleService
+    private organizationModuleService: OrganizationModuleService,
+    private auditLogService: AuditLogService
   ) {}
 
-  async checkout({ request, inertia, auth, response, session, i18n }: HttpContext) {
+  async checkout({ request, inertia, auth, bouncer, response, session, i18n }: HttpContext) {
     try {
       const user = await auth.authenticate()
+      // Engager l'organisation sur un plan est un geste d'admin (#843) : le
+      // contrôle passe avant la validation et avant tout appel Stripe.
+      await bouncer.with(OrganizationPolicy).authorize('manageBilling')
       await user.load('organization')
 
       const { planTier, interval, modules } = await request.validateUsing(checkoutValidator)
@@ -48,6 +53,13 @@ export default class BillingController {
         cancelUrl: `${env.get('APP_URL')}/settings/billing`,
       })
 
+      await this.auditLogService.log({
+        organizationId: user.organization.id,
+        userId: user.id,
+        action: 'billing.checkout',
+        metadata: { planTier, interval, modules: modules ?? [] },
+      })
+
       return inertia.location(url)
     } catch (error) {
       if (error instanceof StripeNotConfiguredError) {
@@ -62,9 +74,12 @@ export default class BillingController {
     }
   }
 
-  async portal({ inertia, auth, response, session, i18n }: HttpContext) {
+  async portal({ inertia, auth, bouncer, response, session, i18n }: HttpContext) {
     try {
       const user = await auth.authenticate()
+      // Le portail Stripe permet de résilier l'abonnement et de consulter les
+      // factures : réservé à `subscription.manage` comme le reste (#843).
+      await bouncer.with(OrganizationPolicy).authorize('manageBilling')
       await user.load('organization')
       const org = user.organization
 
@@ -77,6 +92,12 @@ export default class BillingController {
         org.stripeCustomerId,
         `${env.get('APP_URL')}/settings/billing`
       )
+
+      await this.auditLogService.log({
+        organizationId: org.id,
+        userId: user.id,
+        action: 'billing.portal',
+      })
 
       return inertia.location(url)
     } catch (error) {
@@ -92,9 +113,10 @@ export default class BillingController {
    * Active un module add-on sur l'abonnement Pro existant (#327). Ajoute un item
    * à l'abonnement Stripe ; le webhook réconcilie ensuite `organization_modules`.
    */
-  async addModule({ request, auth, response, session, i18n }: HttpContext) {
+  async addModule({ request, auth, bouncer, response, session, i18n }: HttpContext) {
     try {
       const user = await auth.authenticate()
+      await bouncer.with(OrganizationPolicy).authorize('manageBilling')
       await user.load('organization')
       const org = user.organization
       const { module } = await request.validateUsing(moduleActionValidator)
@@ -119,6 +141,13 @@ export default class BillingController {
       const priceId = this.stripeService.priceIdForModule(module, sub.billingInterval)
       await this.stripeService.addSubscriptionItem(sub.stripeSubscriptionId, priceId)
 
+      await this.auditLogService.log({
+        organizationId: org.id,
+        userId: user.id,
+        action: 'billing.module_add',
+        metadata: { module },
+      })
+
       session.flash('success', i18n.t('flash.billing.moduleAdded'))
       return response.redirect().back()
     } catch (error) {
@@ -127,9 +156,10 @@ export default class BillingController {
   }
 
   /** Résilie un module add-on : retire son item de l'abonnement Stripe (#327). */
-  async removeModule({ request, auth, response, session, i18n }: HttpContext) {
+  async removeModule({ request, auth, bouncer, response, session, i18n }: HttpContext) {
     try {
       const user = await auth.authenticate()
+      await bouncer.with(OrganizationPolicy).authorize('manageBilling')
       await user.load('organization')
       const org = user.organization
       const { module } = await request.validateUsing(moduleActionValidator)
@@ -141,6 +171,13 @@ export default class BillingController {
       }
 
       await this.stripeService.removeSubscriptionItem(row.stripeSubscriptionItemId)
+
+      await this.auditLogService.log({
+        organizationId: org.id,
+        userId: user.id,
+        action: 'billing.module_remove',
+        metadata: { module },
+      })
 
       session.flash('success', i18n.t('flash.billing.moduleRemoved'))
       return response.redirect().back()
@@ -165,6 +202,13 @@ export default class BillingController {
       if (org.plan !== 'enterprise') throw new ModulesRequireEnterprisePlanError()
 
       await this.organizationModuleService.grantModule(org.id, module, { source: 'granted' })
+
+      await this.auditLogService.log({
+        organizationId: org.id,
+        userId: user.id,
+        action: 'billing.module_activate',
+        metadata: { module },
+      })
 
       session.flash('success', i18n.t('flash.billing.moduleActivated'))
       return response.redirect().back()
@@ -197,6 +241,13 @@ export default class BillingController {
 
       await this.organizationModuleService.revokeModule(org.id, module, { source: 'granted' })
 
+      await this.auditLogService.log({
+        organizationId: org.id,
+        userId: user.id,
+        action: 'billing.module_deactivate',
+        metadata: { module },
+      })
+
       session.flash('success', i18n.t('flash.billing.moduleDeactivated'))
       return response.redirect().back()
     } catch (error) {
@@ -210,9 +261,10 @@ export default class BillingController {
    * (première souscription) ou on met à jour sa quantité. Le webhook réconcilie
    * ensuite `organization_modules`.
    */
-  async setAddon({ request, auth, response, session, i18n }: HttpContext) {
+  async setAddon({ request, auth, bouncer, response, session, i18n }: HttpContext) {
     try {
       const user = await auth.authenticate()
+      await bouncer.with(OrganizationPolicy).authorize('manageBilling')
       await user.load('organization')
       const org = user.organization
       const { addon, quantity } = await request.validateUsing(addonActionValidator)
@@ -233,6 +285,12 @@ export default class BillingController {
           return response.redirect().back()
         }
         await this.stripeService.removeSubscriptionItem(existing.stripeSubscriptionItemId)
+        await this.auditLogService.log({
+          organizationId: org.id,
+          userId: user.id,
+          action: 'billing.addon_set',
+          metadata: { addon, quantity },
+        })
         session.flash('success', i18n.t('flash.billing.addonRemoved'))
         return response.redirect().back()
       }
@@ -246,6 +304,13 @@ export default class BillingController {
         const priceId = this.stripeService.priceIdForAddon(addon, sub.billingInterval)
         await this.stripeService.addSubscriptionItem(sub.stripeSubscriptionId, priceId, quantity)
       }
+
+      await this.auditLogService.log({
+        organizationId: org.id,
+        userId: user.id,
+        action: 'billing.addon_set',
+        metadata: { addon, quantity },
+      })
 
       session.flash('success', i18n.t('flash.billing.addonUpdated'))
       return response.redirect().back()

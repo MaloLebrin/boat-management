@@ -367,6 +367,7 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 ### Settings — facturation (`/settings/billing`)
 
 - Page : `inertia/pages/settings/billing.vue` → `components/settings/tabs/SettingsBillingTab.vue` (props `plan`, `quotaUsage`, `subscription`, `orgModules`, `orgAddons`, servies par `SettingsController.billing`)
+- Page consultable par tous les rôles ; les boutons portail Stripe / checkout du pied de carte, comme les CTA des sous-composants, ne s'affichent que pour un porteur de `subscription.manage` (#843) — sinon le message `settings.billing.subscription.adminOnly`
 - Sous-composants (le tab reste sous la limite de 250 lignes) :
   - `SettingsBillingUsageGauge.vue` — jauges bateaux / membres / stockage / tokens IA
   - `SettingsBillingFeatureList.vue` — capacités du plan. Deux lignes IA distinctes (#456) : « IA / Copilote » (depuis `quotaUsage.canUseAI`) et « Personnalisation IA (prompt métier) » (depuis `PLAN_LIMITS[plan].canCustomizeAI`, qu'aucun module add-on n'accorde). En Pro la première est cochée et la seconde non — les fusionner laissait croire que `/settings/ai` était accessible

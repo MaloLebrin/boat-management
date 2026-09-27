@@ -114,7 +114,8 @@
         "month": "Monthly",
         "year": "Annual"
       },
-      "annualDiscount": "−20%"
+      "annualDiscount": "−20%",
+      "adminOnly": "Only an administrator can change the plan or manage the subscription."
     },
     "modules": {
       "title": "Add-on modules",
@@ -375,7 +376,14 @@
       "client_create": "Client created",
       "engine_part_set_stock": "Part stock updated",
       "incident_update": "Incident updated",
-      "incident_delete": "Incident deleted"
+      "incident_delete": "Incident deleted",
+      "billing_checkout": "Checkout started",
+      "billing_portal": "Billing portal opened",
+      "billing_module_add": "Module added to subscription",
+      "billing_module_remove": "Module removed from subscription",
+      "billing_module_activate": "Included module activated",
+      "billing_module_deactivate": "Included module deactivated",
+      "billing_addon_set": "Extra boats updated"
     },
     "empty": {
       "title": "No activity yet",

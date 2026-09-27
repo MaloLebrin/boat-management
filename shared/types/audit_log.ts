@@ -27,6 +27,15 @@ export const AUDIT_ACTIONS = [
   // ci-dessus est partagé avec le copilote.
   'incident.update',
   'incident.delete',
+  // Facturation (#843) : chaque geste qui parle à Stripe ou change les modules
+  // de l'organisation, réservé à `subscription.manage`.
+  'billing.checkout',
+  'billing.portal',
+  'billing.module_add',
+  'billing.module_remove',
+  'billing.module_activate',
+  'billing.module_deactivate',
+  'billing.addon_set',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]

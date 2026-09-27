@@ -85,6 +85,24 @@ POST /webhooks/stripe ──► BillingController.webhook()
        (COUNT bateaux/membres)        pour affichage)
 ```
 
+### 2.1 Autorisations (#843)
+
+Toutes les actions de `BillingController` qui parlent à Stripe ou changent les modules de l'organisation exigent la capability `subscription.manage` (rôle `admin` seul), via `bouncer.with(OrganizationPolicy).authorize('manageBilling')` **en tête d'action** — avant la validation du payload et avant tout appel à `StripeService`. Un `member`, un `mechanic` ou un `boat_owner` reçoit un 403.
+
+| Route                                        | Action                       | Journal d'audit             |
+| -------------------------------------------- | ---------------------------- | --------------------------- |
+| `POST /settings/billing/checkout`            | `checkout`                   | `billing.checkout`          |
+| `POST /settings/billing/portal`              | `portal`                     | `billing.portal`            |
+| `POST /settings/billing/module`              | `addModule`                  | `billing.module_add`        |
+| `DELETE /settings/billing/module`            | `removeModule`               | `billing.module_remove`     |
+| `POST /settings/billing/module/enterprise`   | `activateEnterpriseModule`   | `billing.module_activate`   |
+| `DELETE /settings/billing/module/enterprise` | `deactivateEnterpriseModule` | `billing.module_deactivate` |
+| `POST /settings/billing/addon`               | `setAddon`                   | `billing.addon_set`         |
+
+L'entrée d'audit n'est écrite qu'après un appel Stripe réussi (ou l'écriture en base pour les modules Entreprise) ; un refus, une erreur Stripe ou un court-circuit d'idempotence n'en laissent aucune. Seul le webhook (`POST /webhooks/stripe`) reste hors bouncer : il est authentifié par la signature Stripe.
+
+La page `GET /settings/billing` reste consultable par tous les rôles (usage et quotas) ; côté UI, `SettingsBillingTab.vue` masque les boutons portail / checkout, et les sous-composants leurs CTA, quand `can('subscription.manage')` est faux, et affiche « seul un administrateur… » à la place.
+
 ---
 
 ## 3. Flux de souscription (Checkout)
