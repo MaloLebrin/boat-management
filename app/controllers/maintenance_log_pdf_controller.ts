@@ -1,3 +1,4 @@
+import MaintenancePolicy from '#policies/maintenance_policy'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatHullService from '#services/boat_hull_service'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
@@ -16,7 +17,7 @@ export default class MaintenanceLogPdfController {
     private quotaService: QuotaService
   ) {}
 
-  async download({ request, response, auth, params, i18n }: HttpContext) {
+  async download({ request, response, auth, bouncer, params, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
@@ -32,6 +33,11 @@ export default class MaintenanceLogPdfController {
       }
       throw error
     }
+
+    // `getFullDetailForUser` ne scope que par organisation (#845). Le carnet
+    // d'entretien relève de la maintenance, pas de la fiche bateau : un
+    // mechanic (`maintenance.view` sans `boats.view`) le garde, un boat_owner non.
+    await bouncer.with(MaintenancePolicy).authorize('view', boat)
 
     await boat.load('engines', (q) => q.preload('parts'))
 

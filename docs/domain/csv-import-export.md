@@ -22,7 +22,12 @@ Routes (`start/routes/boats.ts`) → controller `app/controllers/csv_export_cont
 
 **Format de sortie** : UTF-8 BOM (`﻿`) + séparateur `;` (compatibilité Excel FR), `\r\n` entre les lignes.
 
-**Vérifications** : quota export (`QuotaService.assertCanExport`) + appartenance du bateau à l'organisation de l'utilisateur.
+**Vérifications** : quota export (`QuotaService.assertCanExport`) + appartenance du bateau à l'organisation de l'utilisateur + policy de la donnée exportée, dans le helper privé `resolveExportBoat` qui l'exige en paramètre (#845) :
+
+- `maintenance.csv` → `MaintenancePolicy.view` (un `mechanic` l'exporte) ;
+- `fuel-logs.csv`, `navigation-logs.csv`, `budget.csv` → `BoatPolicy.view` (`boats.view`).
+
+Un `boat_owner` reçoit 403 sur les quatre, même pour un bateau qui est le sien : son accès passe par le portail `/owner/boats/:id`.
 
 #### En-têtes par type
 

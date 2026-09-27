@@ -4,8 +4,13 @@ import type { AuthorizerResponse } from '@adonisjs/bouncer/types'
 import OrgScopedPolicy from '#utils/org_scoped_policy'
 
 export default class MaintenancePolicy extends OrgScopedPolicy {
-  async view(user: User, boat: Boat): Promise<AuthorizerResponse> {
-    return this.sameOrg(user, boat) && (await this.can(user, 'maintenance.view'))
+  /**
+   * Sans bateau : écrans flotte (planning, historique, PDF d'historique) — la
+   * capability seule décide, le service scope déjà par organisation (#845).
+   */
+  async view(user: User, boat?: Boat): Promise<AuthorizerResponse> {
+    if (boat && !this.sameOrg(user, boat)) return false
+    return this.can(user, 'maintenance.view')
   }
 
   async create(user: User, boat: Boat): Promise<AuthorizerResponse> {
