@@ -123,6 +123,39 @@ Appelé par : `boat_engine_service.delete` (moteur + ses pièces), `boat_engine_
 bateau). Le paramètre `org` est optionnel : sans lui, le nettoyage est ignoré (le quota ne peut pas
 être décrémenté).
 
+## Réconciliation des orphelins (#859)
+
+La table `media` est polymorphe : `(entity_type, entity_id)` ne porte aucune clé étrangère, et une entité
+supprimée ne cascade pas sur ses médias. Le nettoyage à la main ci-dessus n'est pas transactionnel avec
+Cloudinary, et certaines suppressions l'oublient : un bateau supprimé emporte en cascade ses réservations, donc ses
+inspections et ses contrats de location, mais `boat_hull_service` ne nettoie pas leurs médias. Deux dérives en découlent : des lignes `media` sans propriétaire, et un compteur
+`organizations.storage_used_bytes` faux.
+
+`MediaReconciliationService.reconcile({ dryRun })` les rattrape :
+
+1. **Orphelins** — pour chaque `entity_type`, les lignes dont l'entité n'existe plus (`OWNER_TABLES`) sont
+   supprimées sur Cloudinary puis en base. Un échec Cloudinary **garde la ligne** : la passe suivante
+   réessaie, au lieu de perdre la trace d'un fichier encore facturé. Un `entity_type` inconnu est signalé,
+   jamais supprimé.
+2. **Quota** — `storage_used_bytes` est recalculé par organisation depuis la somme des `media.bytes`
+   (`ORGANIZATION_OF` résout l'organisation de chaque type, via le bateau pour les équipements ; les
+   avatars `user` ne comptent pas, comme à l'upload). L'écriture est conditionnée à la valeur lue : si un
+   upload a modifié le compteur entre-temps, l'organisation est laissée pour la passe suivante.
+
+Il tourne chaque dimanche à 03:30 (job `ReconcileMedia`, queue `media`) et à la main :
+
+```bash
+node ace media:reconcile --dry-run   # rapport seul : orphelins par type, écarts de quota
+node ace media:reconcile             # corrige
+```
+
+Pas encore couverts : les fichiers présents sur Cloudinary **sans** ligne `media` (une ligne supprimée
+alors que l'appel Cloudinary avait échoué) — il faudra lister les ressources par préfixe d'organisation ;
+et la suppression en deux temps (`pending_deletion` puis purge par la queue) proposée par l'issue.
+
+Un nouveau porteur de médias ajoute son entrée dans `OWNER_TABLES` et `ORGANIZATION_OF` : le `Record` sur
+`MediaEntityType` fait échouer `tsc` tant qu'elle manque.
+
 ## Ajouter un nouveau porteur de photos
 
 1. Étendre `MEDIA_ENTITY_TYPES` (`shared/constants/media.ts`).
@@ -132,4 +165,5 @@ bateau). Le paramètre `org` est optionnel : sans lui, le nettoyage est ignoré 
    (l'auto-nommage AdonisJS collisionne, six routes partageant `store`).
 5. Charger `photos` dans l'action `show` (`mediaService.listForEntity` + `toMediaRow`).
 6. Appeler `deleteAllForEntity` dans le `delete` du service, et dans `boat_hull_service`.
+   Déclarer la table et l'organisation du type dans `MediaReconciliationService`.
 7. Tests : upload, suppression, **IDOR**, non authentifié.

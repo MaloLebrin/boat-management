@@ -14,7 +14,7 @@ import QuotaService from '#services/quota_service'
 
 export type { UploadMediaPayload }
 
-function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw' {
+export function resourceTypeFromKind(kind: MediaKind, format?: string): 'image' | 'raw' {
   if (kind === 'photo') return 'image'
   if (format === 'pdf') return 'raw'
   return 'raw'
