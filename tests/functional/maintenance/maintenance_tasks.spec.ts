@@ -7,7 +7,12 @@ import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { BoatSafetyEquipmentFactory } from '#database/factories/boat_safety_equipment_factory'
 import { BoatGenericEquipmentFactory } from '#database/factories/boat_generic_equipment_factory'
-import { createAdminUser, createBoatOwnerUser, createMechanicUser } from '#tests/functional/helpers'
+import {
+  createAdminUser,
+  createBoatOwnerUser,
+  createMechanicUser,
+  createMemberUser,
+} from '#tests/functional/helpers'
 
 test.group('Maintenance tasks — quick add (functional)', (group) => {
   group.each.setup(() => truncateDb())
@@ -284,18 +289,20 @@ test.group('Maintenance tasks — equipment detail pages (functional)', (group) 
     assert.isTrue(props.taskPermissions.canCreate)
   })
 
-  test('a mechanic can create tasks but not delete them on an equipment page', async ({
+  // Un mécanicien n'ouvre plus les pages d'équipement (`boats.view` requis) :
+  // la matrice est vérifiée sur un member, qui a les mêmes droits maintenance.
+  test('a member can create tasks but not delete them on an equipment page', async ({
     client,
     assert,
   }) => {
     const admin = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
     const sail = await BoatSailFactory.merge({ boatId: boat.id }).create()
-    const mechanic = await createMechanicUser(admin.organizationId!)
+    const member = await createMemberUser(admin.organizationId!)
 
     const response = await client
       .get(`/boats/${boat.id}/sails/${sail.id}`)
-      .loginAs(mechanic)
+      .loginAs(member)
       .withInertia()
 
     const { taskPermissions } = response.inertiaProps as {

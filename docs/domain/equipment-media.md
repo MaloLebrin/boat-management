@@ -51,6 +51,24 @@ générique/sécurité → `/boats/:id?tab=equipment`.
 Couverture : `tests/functional/boats/boat_equipment_photos.spec.ts` (upload, suppression, IDOR par
 entité, non authentifié).
 
+## Lecture des pages d'équipement
+
+`resolveBoat` ne scope que par organisation : il ne dit rien du rôle. Les six fiches d'équipement
+(moteur, pièce moteur, voile, gréement, matériel de sécurité, équipement générique) appellent donc
+`bouncer.with(BoatPolicy).authorize('view', boat)` juste après lui — la même garde que `/boats/:id`,
+capability `boats.view`. Admin et member passent ; `mechanic` et `boat_owner` reçoivent un 403, y
+compris un propriétaire rattaché au bateau (son accès passe par le portail `/owner/boats/:id`).
+
+Les `allows('edit', boat)` qui suivent ne servent qu'à afficher ou masquer les boutons : ils ne
+protègent pas la lecture. Les pages d'édition, elles, sont sous `authorize('edit', boat)`.
+
+Aucun écran du mécanicien (dashboard dédié, planning, historique de maintenance) ne mène à ces
+pages, et `/engines` exige déjà `boats.view`. Avant la garde, il ne les atteignait qu'en tapant
+l'URL.
+
+Couverture : `tests/functional/boats/equipment_show_access.spec.ts` (mechanic 403, boat_owner 403,
+member 200, pour chacune des six fiches).
+
 ## Envois groupés : ce qui est refusé, et quand (#764)
 
 Les treize routes de `LARGE_UPLOAD_ROUTES` (`config/bodyparser.ts`) sortent du
