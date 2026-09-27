@@ -95,6 +95,47 @@ services:
     <<: *app
     command: ['node', 'ace', 'queue:work', '--queue=ai']
 
+  # Sauvegardes PostgreSQL (#847) — procédure complète : docs/dev/runbook.md.
+  # Dump quotidien compressé dans le volume `pg_backups`, rotation
+  # 7 jours / 4 semaines / 6 mois (dossiers daily/, weekly/, monthly/).
+  # Le hook `10-verify-dump` fait échouer la sauvegarde si le dump est absent,
+  # vide, corrompu ou tronqué : « ERREUR » dans les logs du conteneur.
+  #
+  # ⚠️ Ce volume est sur la même machine que `pg_data` : une perte de disque
+  # emporte les deux. La copie hors machine (rclone, S3, Backblaze…) est une
+  # étape obligatoire du déploiement, pas une option — voir le runbook.
+  backup:
+    image: prodrigestivill/postgres-backup-local:18-alpine
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      # Sans propriétaire ni droits : le dump se restaure sous n'importe quel rôle.
+      POSTGRES_EXTRA_OPTS: -Z6 --no-owner --no-privileges
+      SCHEDULE: ${BACKUP_SCHEDULE:-@daily}
+      TZ: ${BACKUP_TZ:-UTC}
+      BACKUP_KEEP_DAYS: 7
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 6
+      # Un premier dump dès le démarrage : la restauration se teste tout de suite.
+      BACKUP_ON_START: 'TRUE'
+      # Alerte sur échec : POST vers cette URL. À décommenter seulement avec une
+      # valeur — vide, le hook webhook de l'image échoue à chaque sauvegarde.
+      # WEBHOOK_ERROR_URL: https://…
+    volumes:
+      - pg_backups:/backups
+      - ./docker/backup/hooks/10-verify-dump:/hooks/10-verify-dump:ro
+      - ./scripts/db_restore.sh:/usr/local/bin/db_restore:ro
+    # Après le `migrator` : sur une base vierge, un dump d'avant les migrations
+    # serait vide et rejeté par le hook — fausse alerte à chaque installation.
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
   caddy:
     image: caddy:2-alpine
     ports:
@@ -115,5 +156,6 @@ services:
 
 volumes:
   pg_data:
+  pg_backups:
   caddy_data:
   caddy_config:

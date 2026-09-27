@@ -134,7 +134,16 @@ Les services :
 | `web`       | `node bin/server.js`, healthcheck sur `/up`, exposé au seul réseau Compose |
 | `worker`    | `queue:work --queue=default,emails,media,exports,maintenance,push`         |
 | `worker-ai` | `queue:work --queue=ai`, isolé (jobs Mistral longs)                        |
+| `backup`    | Dump quotidien de la base, rotation 7 j / 4 sem. / 6 mois (#847)           |
 | `caddy`     | HTTPS automatique (Let's Encrypt), reverse proxy vers `web`                |
+
+### Sauvegardes
+
+Le service `backup` écrit ses dumps dans le volume `pg_backups`, **sur la même
+machine** que la base. Un déploiement self-host n'est complet qu'avec une copie
+de ces dumps hors de la machine. La procédure est dans
+[`docs/dev/runbook.md`](runbook.md) : copie hors site, alertes d'échec,
+restauration, test trimestriel.
 
 ### Pourquoi deux workers, et pas `pnpm queue:work`
 
@@ -180,7 +189,9 @@ L'image GHCR fonctionne telle quelle. À configurer :
   Une plateforme qui ne permet qu'un seul process type ⇒ fusionner en
   `queue:work --queue=default,emails,media,exports,maintenance,push,ai`, en
   acceptant que les jobs IA retardent les mails ;
-- **Postgres** : managé par la plateforme, `DB_*` fournis par elle ;
+- **Postgres** : managé par la plateforme, `DB_*` fournis par elle. Activez
+  ses sauvegardes et vérifiez leur rétention
+  ([`docs/dev/runbook.md`](runbook.md) § 3) ;
 - **Une seule instance web** (voir ci-dessus).
 
 ## 6. Healthcheck `/up`
@@ -224,5 +235,6 @@ ordinaires.
 
 ## Voir aussi
 
+- `docs/dev/runbook.md` — sauvegardes, restauration, test de restauration
 - `docs/dev/setup.md` — environnement local
 - `docs/dev/cloudinary.md`, `docs/dev/stripe.md` — services tiers
