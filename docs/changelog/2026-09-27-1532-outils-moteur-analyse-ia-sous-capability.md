@@ -1,0 +1,10 @@
+# 2026-09-27 — Outils moteur et analyse IA flotte : garde par capability
+
+Suite de #845. Trois pages moteur à l'échelle de la flotte et l'analyse IA flotte échappaient aux policies Bouncer.
+
+- **Pages moteur.** `GET /diagnostic`, `GET /diagnostic/first-contact` et `GET /spare-parts` vérifiaient `maintenance.view` par un `hasPermission` en dur et renvoyaient vers `/dashboard`, ce qui imposait au `boat_owner` un second saut vers son portail. Elles appellent désormais `boatOwnerPortalRedirect()` puis `bouncer.with(MaintenancePolicy).authorize('view')`, comme `/planning`. Admin, member et mechanic passent. Le `boat_owner` est renvoyé directement vers `/owner/boats`.
+- **Analyse IA flotte.** `POST /ai/fleet-analysis` n'avait aucune garde de rôle. Un `boat_owner` ou un `mechanic` lançait une analyse de toute la flotte (bateaux, maintenance urgente, ports) et consommait le quota IA de l'organisation. L'action appelle maintenant `bouncer.with(BoatPolicy).authorize('view')` avant `assertCanUseAI`. Le `mechanic` et le `boat_owner` sont refusés (redirection arrière avec `errorsBag.E_AUTHORIZATION_FAILURE`), sans appel au service IA.
+- **`MaintenancePolicy.view`.** Le paramètre bateau devient optionnel, comme pour `BoatPolicy.view`. Sans bateau, la capability seule décide : le service scope déjà par organisation. La modification est identique à celle de #899.
+- **`POST /ai/chat` inchangé.** La route relaie à Mistral les messages envoyés par le client, sans contexte d'organisation. Elle ne sert aucune donnée flotte, et aucune capability ne correspond à ce qu'elle expose.
+- **Tests.** `tests/functional/maintenance/engine_tools_capability_guard.spec.ts` couvre la matrice des rôles (admin, member, mechanic, boat_owner) sur les trois pages et sur l'analyse flotte, avec un faux `AiAnalysisService`. Dans `tests/functional/diagnostic/diagnostic_pages.spec.ts`, le cas `boat_owner` attend désormais `/owner/boats`.
+- **Docs.** `docs/domain/auth-acl.md`, section « Outils moteur et analyse IA flotte (#900) ».

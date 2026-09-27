@@ -372,8 +372,23 @@ const { role, isAdmin, isMember, can } = usePermissions()
 - **Dernier admin protégé** : `OrganizationMemberService.ensureNotLastAdmin` empêche de rétrograder/supprimer le dernier admin d'une organisation (`LastAdminError`)
 - **Auto-réparation des memberships** : `OrganizationMemberService.ensureMembershipsForOrgUsers` crée une ligne `organization_memberships` (rôle `admin`) pour tout utilisateur rattaché via `organizationId` qui n'en a pas encore — typiquement le propriétaire d'une org créée avant l'introduction de la table pivot
 
+### Outils moteur et analyse IA flotte (#900)
+
+Suite de #845. Les pages moteur à l'échelle de la flotte vérifiaient `maintenance.view` par un `hasPermission` en dur, hors policy, et renvoyaient vers `/dashboard`. L'analyse IA flotte n'avait aucune garde de rôle : un `boat_owner` ou un `mechanic` déclenchait une synthèse de toute la flotte sur le quota IA de l'organisation.
+
+| Route                                                                  | Garde                                                     |
+| ---------------------------------------------------------------------- | --------------------------------------------------------- |
+| `GET /diagnostic`, `GET /diagnostic/first-contact`, `GET /spare-parts` | `boatOwnerPortalRedirect()` puis `MaintenancePolicy.view` |
+| `POST /ai/fleet-analysis`                                              | `BoatPolicy.view`, avant l'assertion de quota             |
+| `POST /ai/chat`                                                        | aucune garde de rôle (voir ci-dessous)                    |
+
+- Diagnostic et pièces détachées servent des données de maintenance : le `mechanic` y garde accès. Le `boat_owner` est renvoyé vers `/owner/boats`.
+- L'analyse flotte agrège bateaux, maintenance urgente et ports (`DashboardService.getForUser`), comme les KPIs du tableau de bord. Elle exige donc `boats.view` : le `mechanic`, qui a son propre tableau de bord sans ces KPIs, est refusé comme le `boat_owner`. La garde passe avant `assertCanUseAI` pour qu'un rôle refusé ne consomme pas de quota.
+- `POST /ai/chat` ne lit aucune donnée de l'organisation : il relaie à Mistral les messages envoyés par le client, sans contexte injecté. Aucune capability ne correspond aux données servies, la route reste donc ouverte à tout membre authentifié. Aucun écran ne l'appelle aujourd'hui.
+
 ### Tests
 
+- `tests/functional/maintenance/engine_tools_capability_guard.spec.ts` — matrice des rôles sur les pages moteur flotte et l'analyse IA flotte (#900)
 - `tests/unit/permissions_taxonomy.spec.ts` — invariant `member ⊂ admin`, couverture de la taxonomie
 - `tests/integration/permissions/user_has_permission.spec.ts` — `User#hasPermission()` avec de vraies lignes DB
 - `tests/integration/permissions/policies_capabilities.spec.ts` — admin autorisé / member refusé / cross-org refusé sur plusieurs policies représentatives

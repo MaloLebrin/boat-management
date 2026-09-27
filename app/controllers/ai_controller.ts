@@ -49,9 +49,13 @@ export default class AiController {
     return response.redirect().back()
   }
 
-  async fleetAnalysis({ response, auth, session, i18n }: HttpContext) {
+  async fleetAnalysis({ response, auth, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
+
+    // Synthèse de toute la flotte (bateaux, maintenance, ports) : `boats.view`,
+    // vérifié avant le quota pour qu'un rôle refusé ne consomme rien (#900).
+    await bouncer.with(BoatPolicy).authorize('view')
 
     await user.load('organization')
     this.quotaService.assertCanUseAI(user.organization)
