@@ -4,7 +4,15 @@ import Media from '#models/media'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { MediaFactory } from '#database/factories/media_factory'
-import { createAdminUser, createMechanicUser, createMemberUser } from '#tests/functional/helpers'
+import { BoatEnginePartFactory } from '#database/factories/boat_engine_part_factory'
+import Client from '#models/client'
+import {
+  createAdminUser,
+  createBoatOwnerUser,
+  createEnterpriseAdminUser,
+  createMechanicUser,
+  createMemberUser,
+} from '#tests/functional/helpers'
 import { restoreCloudinary, swapFakeCloudinary } from '#tests/support/fakes'
 
 /**
@@ -174,7 +182,7 @@ test.group('Boat media download — GET /boats/:boatId/media/:mediaId/download',
     assert.isEmpty(cloud.downloaded)
   })
 
-  test("un mechanic de l'organisation télécharge — la route n'a aucun bouncer", async ({
+  test("un mechanic de l'organisation est refusé — le téléchargement exige boats.view (#846)", async ({
     client,
     assert,
   }) => {
@@ -185,14 +193,12 @@ test.group('Boat media download — GET /boats/:boatId/media/:mediaId/download',
     const response = await client
       .get(`/boats/${boat.id}/media/${media.id}/download`)
       .loginAs(mechanic)
+      .redirects(0)
 
-    // Contraste délibéré avec la suppression, qui exige `boats.edit` : le
-    // téléchargement ne demande que l'appartenance à l'organisation. Ce n'est
-    // pas une faille — c'est un écart d'autorisation entre deux routes
-    // voisines, figé ici pour qu'un durcissement futur soit un choix et non
-    // une surprise.
-    response.assertStatus(200)
-    assert.lengthOf(cloud.downloaded, 1)
+    // Ce test figeait l'écart inverse (200) : le durcissement annoncé est fait.
+    // Un document ne doit pas être plus accessible que la fiche qui l'affiche.
+    response.assertStatus(403)
+    assert.isEmpty(cloud.downloaded)
   })
 })
 
@@ -390,3 +396,149 @@ test.group(
     })
   }
 )
+
+/**
+ * Matrice des rôles intra-organisation (#846).
+ *
+ * Le cloisonnement cross-org est couvert plus haut ; ce qui manquait, c'est la
+ * frontière **à l'intérieur** d'une organisation. Les quatre routes de
+ * téléchargement authentifiaient et scopaient par organisation, sans policy :
+ * un `mechanic` récupérait la pièce d'identité d'un client, un `boat_owner`
+ * l'acte de francisation d'un bateau qui n'est pas le sien.
+ *
+ * Chaque refus vérifie aussi que Cloudinary n'a rien servi : un 403 posé
+ * **après** la lecture du fichier aurait le bon statut et fuirait quand même.
+ */
+type Role = 'member' | 'mechanic' | 'boat_owner'
+
+async function userWithRole(role: Role, organizationId: number) {
+  if (role === 'member') return createMemberUser(organizationId)
+  if (role === 'mechanic') return createMechanicUser(organizationId)
+  return createBoatOwnerUser(organizationId)
+}
+
+/** Les trois routes bateau, chacune avec son média. */
+async function seedBoatDownloads() {
+  const admin = await createAdminUser()
+  const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+  const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+  const part = await BoatEnginePartFactory.merge({ boatEngineId: engine.id }).create()
+
+  const doc = (entityType: Media['entityType'], entityId: number) =>
+    MediaFactory.merge({
+      entityType,
+      entityId,
+      kind: 'document',
+      format: 'pdf',
+      uploadedById: admin.id,
+    }).create()
+
+  const boatMedia = await doc('boat', boat.id)
+  const engineMedia = await doc('boat_engine', engine.id)
+  const partMedia = await doc('boat_engine_part', part.id)
+
+  return {
+    admin,
+    boat,
+    urls: {
+      boat: `/boats/${boat.id}/media/${boatMedia.id}/download`,
+      engine: `/boats/${boat.id}/engines/${engine.id}/media/${engineMedia.id}/download`,
+      part: `/boats/${boat.id}/engines/${engine.id}/parts/${part.id}/media/${partMedia.id}/download`,
+    },
+  }
+}
+
+test.group('Media download — matrice des rôles intra-organisation (#846)', (group) => {
+  group.each.setup(() => truncateDb())
+  group.each.teardown(() => restoreCloudinary())
+
+  const boatRoutes = ['boat', 'engine', 'part'] as const
+  const refused: Role[] = ['mechanic', 'boat_owner']
+
+  for (const route of boatRoutes) {
+    for (const role of refused) {
+      test(`${role} → 403 sur le téléchargement ${route}`, async ({ client, assert }) => {
+        const cloud = swapFakeCloudinary()
+        const { admin, urls } = await seedBoatDownloads()
+        const user = await userWithRole(role, admin.organizationId!)
+
+        const response = await client.get(urls[route]).loginAs(user).redirects(0)
+
+        response.assertStatus(403)
+        assert.isEmpty(cloud.downloaded)
+      })
+    }
+
+    test(`member (boats.view) → 200 sur le téléchargement ${route}`, async ({ client, assert }) => {
+      const cloud = swapFakeCloudinary()
+      const { admin, urls } = await seedBoatDownloads()
+      const member = await createMemberUser(admin.organizationId!)
+
+      const response = await client.get(urls[route]).loginAs(member)
+
+      response.assertStatus(200)
+      assert.lengthOf(cloud.downloaded, 1)
+    })
+  }
+
+  test("boat_owner rattaché au bateau → 403 : la route staff n'est pas son portail", async ({
+    client,
+    assert,
+  }) => {
+    const cloud = swapFakeCloudinary()
+    const { admin, boat, urls } = await seedBoatDownloads()
+    const owner = await createBoatOwnerUser(admin.organizationId!)
+    await owner.related('ownedBoats').attach([boat.id])
+
+    const response = await client.get(urls.boat).loginAs(owner).redirects(0)
+
+    // Le jeu de capabilities du boat_owner est volontairement vide : son accès
+    // passe par `/owner/boats/:id`, scopé par ownership. Posséder le bateau ne
+    // lui ouvre pas les routes staff, qui servent tous les documents.
+    response.assertStatus(403)
+    assert.isEmpty(cloud.downloaded)
+  })
+
+  async function seedClientDocument() {
+    const admin = await createEnterpriseAdminUser()
+    const record = await Client.create({
+      organizationId: admin.organizationId!,
+      firstName: 'Alice',
+      lastName: 'Martin',
+      status: 'active',
+    })
+    const media = await MediaFactory.merge({
+      entityType: 'client',
+      entityId: record.id,
+      kind: 'document',
+      format: 'pdf',
+      originalFilename: 'permis',
+      uploadedById: admin.id,
+    }).create()
+    return { admin, url: `/clients/${record.id}/media/${media.id}/download` }
+  }
+
+  for (const role of refused) {
+    test(`${role} → 403 sur un document client (permis, identité)`, async ({ client, assert }) => {
+      const cloud = swapFakeCloudinary()
+      const { admin, url } = await seedClientDocument()
+      const user = await userWithRole(role, admin.organizationId!)
+
+      const response = await client.get(url).loginAs(user).redirects(0)
+
+      response.assertStatus(403)
+      assert.isEmpty(cloud.downloaded)
+    })
+  }
+
+  test('member (clients.create) → 200 sur un document client', async ({ client, assert }) => {
+    const cloud = swapFakeCloudinary()
+    const { admin, url } = await seedClientDocument()
+    const member = await createMemberUser(admin.organizationId!)
+
+    const response = await client.get(url).loginAs(member)
+
+    response.assertStatus(200)
+    assert.lengthOf(cloud.downloaded, 1)
+  })
+})

@@ -243,12 +243,15 @@ export default class BoatEnginePartsController {
     response.redirect(`/boats/${boat.id}/engines/${engineId}/parts/${partId}?tab=documents`)
   }
 
-  async downloadMedia({ response, auth, params }: HttpContext) {
+  async downloadMedia({ response, auth, params, bouncer }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.boatContext.resolveBoat({ auth, response, params })
     if (!loaded) return
 
     const { boat } = loaded
+    // Même seuil que la fiche bateau (#846) : `resolveBoat` ne scope que par
+    // organisation, et ni un mechanic ni un boat_owner n'ont `boats.view`.
+    await bouncer.with(BoatPolicy).authorize('view', boat)
     const engineId = Number(params.engineId)
     const partId = Number(params.partId)
     const mediaId = Number(params.mediaId)

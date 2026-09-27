@@ -122,8 +122,9 @@ livré ici remplace donc la dépendance email notée en #288.
 Réutilise le sous-système média polymorphe (`entity_type='client'`).
 
 - **Upload / suppression / téléchargement** via `ClientMediaController`
-  (`storeDocument` / `destroy` / `downloadMedia`), org-scopé et gaté Enterprise,
-  ACL `ClientPolicy.update`. Réutilise `MediaService` et
+  (`storeDocument` / `destroy` / `downloadMedia`), org-scopé et gaté Enterprise.
+  ACL : `ClientPolicy.update` pour l'upload et la suppression, `ClientPolicy.view`
+  pour le téléchargement — le même seuil que la fiche (#846). Réutilise `MediaService` et
   `storeBoatDocumentValidator` (PDF/DOCX/XLSX/CSV, 20 Mo).
 - **Dossier Cloudinary** : `CloudinaryFolders.clientDocuments(orgSlug, clientId)`.
 - **Cleanup** : `ClientService.delete(org, client)` supprime les médias
@@ -216,7 +217,10 @@ désormais un `clientId` optionnel.
   cas distinct : `loadOrgForRead` lève `UserNotInOrganizationError`, traitée par le
   handler global (retour à l'accueil), car `/settings/billing` planterait sur
   `PLAN_LIMITS[org.plan]` (#279).
-- **ACL** : `ClientPolicy` (Bouncer) — `delete` réservé aux admins.
+- **ACL** : `ClientPolicy` (Bouncer) — `delete` réservé aux admins. `view`
+  (capability `clients.create`, faute de `clients.view`) garde la liste, la fiche
+  et le téléchargement des documents : un `mechanic` ou un `boat_owner` de
+  l'organisation reçoit un 403 sur les trois (#846).
 - **Org-scoping / IDOR** : toute lecture/écriture passe par
   `getForOrganizationOrFail` / `#resolveClientId` org-scopés ; un id d'une autre
   organisation renvoie `NotFound` (redirect) ou est ignoré.

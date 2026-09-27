@@ -33,7 +33,10 @@ photosUrl }` ou une redirection.
   params distincts (`:genericId`, `:safetyId`) plutôt qu'un `:itemId` partagé.
 
 Les routes **documents** existantes (moteur, pièce moteur) ne sont pas touchées : `kind`
-différent, UI différente, et elles ont des routes `/download`.
+différent, UI différente, et elles ont des routes `/download`. Ces téléchargements (bateau,
+moteur, pièce moteur) passent par `bouncer.with(BoatPolicy).authorize('view', boat)` — le même
+seuil que la fiche bateau : un `mechanic` ou un `boat_owner` reçoit un 403, sans que Cloudinary
+soit appelé (#846).
 
 ## Défense IDOR (deux couches)
 

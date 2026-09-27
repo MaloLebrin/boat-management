@@ -123,12 +123,17 @@ export default class ClientMediaController {
     response.redirect(`/clients/${client.id}`)
   }
 
-  async downloadMedia({ response, auth, params, session, i18n }: HttpContext) {
+  async downloadMedia({ response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const loaded = await this.loadClient({ auth, session, response, i18n, params })
     if (!loaded) return
 
     const { client } = loaded
+    // Permis, pièce d'identité : même seuil que la fiche client (#846). Le
+    // scoping organisation de `loadClient` ne suffit pas — un mechanic est de
+    // la même organisation, mais le CRM lui est fermé.
+    await bouncer.with(ClientPolicy).authorize('view')
+
     const media = await this.mediaService.getForEntity(Number(params.mediaId), 'client', client.id)
 
     if (!media) {
