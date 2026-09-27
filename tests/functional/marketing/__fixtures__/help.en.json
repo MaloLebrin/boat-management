@@ -50,7 +50,7 @@
             },
             {
               "q": "Can I migrate from another tool?",
-              "a": "Yes — we import Excel, Google Sheets, Airtable and CSV/PDF exports from your existing tools."
+              "a": "Yes — maintenance history imports from a CSV or Excel file (Enterprise plan) and expenses from a CSV (Pro plan). Boats and equipment take a few minutes to create in the app."
             },
             {
               "q": "How many users can I add?",
@@ -75,7 +75,7 @@
             },
             {
               "q": "What happens if I cancel?",
-              "a": "You keep access until the end of the paid period. Then you move to the free Starter plan for 90 days to export your data."
+              "a": "You keep access until the end of the paid period. Then your organization moves to the free Starter plan: your data is kept and the maintenance log stays downloadable as a PDF, but CSV export requires a Pro plan."
             }
           ]
         },
@@ -92,7 +92,7 @@
             },
             {
               "q": "Is my data kept if I cancel my subscription?",
-              "a": "For 90 days after cancellation, you can export to CSV/PDF. After that, permanent deletion (GDPR)."
+              "a": "Yes. Your organization moves back to the free Starter plan and your data is kept: the maintenance log stays downloadable as a PDF, while CSV export requires a Pro plan. You can request permanent deletion at any time (GDPR)."
             },
             {
               "q": "Does the AI see other customers' data?",

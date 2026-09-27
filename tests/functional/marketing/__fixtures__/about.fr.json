@@ -155,7 +155,7 @@
           {
             "d": "Mai 2026",
             "t": "Lancement plan Entreprise",
-            "sub": "5 grandes flottes en pilote · API publique",
+            "sub": "5 grandes flottes en pilote",
             "tone": "coral"
           },
           {
@@ -178,8 +178,8 @@
           },
           {
             "d": "Mars 2025",
-            "t": "App mobile iOS / Android",
-            "sub": "Saisie depuis le ponton, en bottes",
+            "t": "Application installable sur mobile",
+            "sub": "Saisie depuis le ponton, même hors-ligne",
             "tone": "mint"
           },
           {

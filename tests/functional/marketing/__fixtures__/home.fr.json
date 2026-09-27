@@ -151,7 +151,7 @@
           "bullets": [
             "Rappels par date ou heures moteur",
             "Vue calendrier et Kanban",
-            "Assignation à l'équipe",
+            "Tâches proches regroupées par bateau",
             "Récurrence automatique"
           ]
         },
@@ -203,7 +203,7 @@
             "bullets": [
               "Suivi équipements sécurité avec alertes d'expiration",
               "Calendrier maintenance respectant les plannings de cours",
-              "Statut bateau partageable avec les moniteurs"
+              "Checklists d'inspection sur le ponton, même hors-ligne"
             ],
             "quote": {
               "text": "Nos moniteurs vérifient désormais l'état du bateau avant chaque cours. Ça a changé notre culture sécurité.",
@@ -426,11 +426,11 @@
           },
           {
             "q": "Puis-je migrer depuis un autre outil ?",
-            "a": "Oui — on importe Excel, Google Sheets, Airtable et les exports CSV/PDF de tes outils existants."
+            "a": "Oui — l'historique d'entretien s'importe depuis un fichier CSV ou Excel (plan Entreprise) et les dépenses depuis un CSV (plan Pro). Les bateaux et équipements se créent en quelques minutes dans l'app."
           },
           {
             "q": "Les données sont-elles conservées si j'arrête mon abonnement ?",
-            "a": "Pendant 90 jours après l'arrêt, tu peux exporter en CSV/PDF. Au-delà, suppression définitive (RGPD)."
+            "a": "Oui. Ton organisation repasse sur le plan Starter gratuit et tes données restent conservées : le carnet d'entretien reste téléchargeable en PDF, l'export CSV demande un plan Pro. Tu peux demander la suppression définitive à tout moment (RGPD)."
           },
           {
             "q": "L'IA voit-elle les données des autres clients ?",
@@ -499,7 +499,7 @@
         "results": [
           "Zéro retard de sécurité depuis la mise en place",
           "Historique complet accessible en un clic",
-          "Rapport mensuel généré automatiquement"
+          "Carnet d'entretien PDF prêt pour chaque audit"
         ],
         "metrics": [
           {
@@ -526,9 +526,9 @@
         "items": [
           {
             "step": "01",
-            "title": "Importe ta flotte",
-            "description": "Depuis Excel, CSV ou en saisie manuelle. Tous tes bateaux et équipements sont disponibles en moins de 10 minutes.",
-            "detail": "Formats supportés : Excel, CSV, Google Sheets"
+            "title": "Ajoute ta flotte",
+            "description": "Crée tes bateaux et équipements en quelques minutes, puis importe ton historique d'entretien si tu en as un.",
+            "detail": "Import d'historique : CSV, Excel (Entreprise)"
           },
           {
             "step": "02",
@@ -540,7 +540,7 @@
             "step": "03",
             "title": "Pilote avec l'IA",
             "description": "Chaque matin, ton tableau de bord affiche les urgences, les prochaines échéances et les anomalies détectées par l'IA.",
-            "detail": "Rapport hebdomadaire envoyé automatiquement"
+            "detail": "Urgences triées par gravité sur le tableau de bord"
           }
         ],
         "timeline": {
@@ -548,7 +548,7 @@
           "items": [
             {
               "day": "J1",
-              "label": "Import de ta flotte"
+              "label": "Ajout de ta flotte"
             },
             {
               "day": "J7",

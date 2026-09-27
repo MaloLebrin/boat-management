@@ -50,7 +50,7 @@
             },
             {
               "q": "Puis-je migrer depuis un autre outil ?",
-              "a": "Oui — on importe Excel, Google Sheets, Airtable et les exports CSV/PDF de tes outils existants."
+              "a": "Oui — l'historique d'entretien s'importe depuis un fichier CSV ou Excel (plan Entreprise) et les dépenses depuis un CSV (plan Pro). Les bateaux et équipements se créent en quelques minutes dans l'app."
             },
             {
               "q": "Combien d'utilisateurs puis-je ajouter ?",
@@ -75,7 +75,7 @@
             },
             {
               "q": "Que se passe-t-il si j'annule ?",
-              "a": "Tu gardes l'accès jusqu'à la fin de la période payée. Ensuite, tu retombes sur le plan Starter gratuit pendant 90 jours pour exporter tes données."
+              "a": "Tu gardes l'accès jusqu'à la fin de la période payée. Ensuite, ton organisation repasse sur le plan Starter gratuit : tes données restent conservées et le carnet d'entretien reste téléchargeable en PDF, mais l'export CSV demande un plan Pro."
             }
           ]
         },
@@ -92,7 +92,7 @@
             },
             {
               "q": "Les données sont-elles conservées si j'arrête mon abonnement ?",
-              "a": "Pendant 90 jours après l'arrêt, tu peux exporter en CSV/PDF. Au-delà, suppression définitive (RGPD)."
+              "a": "Oui. Ton organisation repasse sur le plan Starter gratuit et tes données restent conservées : le carnet d'entretien reste téléchargeable en PDF, l'export CSV demande un plan Pro. Tu peux demander la suppression définitive à tout moment (RGPD)."
             },
             {
               "q": "L'IA voit-elle les données des autres clients ?",

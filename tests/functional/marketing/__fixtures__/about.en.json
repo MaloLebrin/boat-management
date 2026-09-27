@@ -155,7 +155,7 @@
           {
             "d": "May 2026",
             "t": "Enterprise plan launch",
-            "sub": "5 large fleets in pilot · public API",
+            "sub": "5 large fleets in pilot",
             "tone": "coral"
           },
           {
@@ -178,8 +178,8 @@
           },
           {
             "d": "Mar 2025",
-            "t": "iOS / Android mobile app",
-            "sub": "Log from the dock, in wellies",
+            "t": "Installable mobile app",
+            "sub": "Logging from the dock, even offline",
             "tone": "mint"
           },
           {

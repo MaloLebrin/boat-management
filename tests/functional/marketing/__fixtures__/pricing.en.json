@@ -51,7 +51,7 @@
             ["Calendar + Kanban"],
             ["Documents & insurance", "20 GB"],
             ["PDF / CSV export"],
-            ["Full mobile app"],
+            ["Installable mobile app, offline mode"],
             ["Email notifications"],
             ["Priority support", "4h response"]
           ],
@@ -281,7 +281,7 @@
           {
             "title": "Team & collaboration",
             "rows": [
-              ["Granular roles & permissions", false, "basic", "advanced"],
+              ["Roles & permissions per member", false, "4 roles", "4 roles"],
               ["Audit log", false, "90 days", "unlimited"],
               ["Email notifications", true, true, true]
             ]
@@ -358,7 +358,7 @@
           {
             "icon": "🔗",
             "title": "Custom integration",
-            "sub": "Custom API, third-party connectors, booking platform.",
+            "sub": "A connector to your existing tools, scoped and built on request.",
             "price": "Custom quote",
             "priceSub": "Enterprise plans",
             "tone": "bone"
@@ -412,7 +412,7 @@
           },
           {
             "q": "What happens if I cancel?",
-            "a": "You keep access until the end of the paid period. Then you move to the free Starter plan for 90 days to export your data."
+            "a": "You keep access until the end of the paid period. Then your organization moves to the free Starter plan: your data is kept and the maintenance log stays downloadable as a PDF, but CSV export requires a Pro plan."
           },
           {
             "q": "Which payment methods do you accept?",
