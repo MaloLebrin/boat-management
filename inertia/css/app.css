@@ -72,7 +72,9 @@
   /* ============================================================
      CORAL — alertes vives, actions urgentes
      ============================================================ */
-  --color-coral-700: #c84a3a;
+  /* #b84233 : ≥ 4.5:1 sur coral-50 et sur la surface (le #c84a3a d'origine
+     plafonnait à 4.1:1 sur coral-50 — test axe, #861). */
+  --color-coral-700: #b84233;
   --color-coral-500: #e2674f;
   --color-coral-400: #ea7f6a;
   --color-coral-200: #f6c9ba;
@@ -122,7 +124,10 @@
      ============================================================ */
   --color-fg: #0d1b26;
   --color-fg-muted: #56697d;
-  --color-fg-subtle: #8a9aab;
+  /* ≥ 4.5:1 (AA) sur surface-elevated (5:1) et surface (4.7:1) — l'ancien
+     #8a9aab plafonnait à 2.9:1, relevé par le test axe (#861). Sur
+     surface-muted, préférer fg-muted. */
+  --color-fg-subtle: #5f7183;
   --color-fg-inverse: var(--color-cream);
 
   /* ============================================================
@@ -329,10 +334,10 @@
   --color-surface-inverse: #eef3f8;
 
   /* Texte — contrastes sur --color-surface : fg ≈ 15:1, muted ≈ 9:1,
-     subtle ≈ 5:1 (tous ≥ AA) */
+     subtle ≈ 5.7:1, et ≥ 5:1 sur surface-elevated (tous ≥ AA, #861) */
   --color-fg: #e9eff5;
   --color-fg-muted: #a3b4c4;
-  --color-fg-subtle: #78899b;
+  --color-fg-subtle: #8494a5;
   /* Doit être explicite : pointait sur --color-cream, remappé ci-dessus */
   --color-fg-inverse: #0b1d2e;
 

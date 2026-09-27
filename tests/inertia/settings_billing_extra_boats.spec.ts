@@ -70,7 +70,7 @@ test('incrementing then applying posts the new quantity to the addon endpoint', 
   post.mockClear()
   const w = mountExtraBoats({ activeAddons: [] })
   const buttons = w.findAll('button')
-  const increment = buttons.find((b) => b.attributes('aria-label') === 'increment')!
+  const increment = buttons.find((b) => b.attributes('aria-label') === 'common.increment')!
   await increment.trigger('click')
   await increment.trigger('click')
   expect(w.find('[data-testid="extra-boats-quantity"]').text()).toBe('2')

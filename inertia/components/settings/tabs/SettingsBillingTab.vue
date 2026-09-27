@@ -176,7 +176,7 @@ const storageOverflow = computed(() => {
                 class="rounded-md px-3 py-1 text-sm font-medium transition-colors"
                 :class="
                   interval === 'month'
-                    ? 'bg-brand text-white'
+                    ? 'bg-brand text-on-brand'
                     : 'bg-surface-muted text-fg-muted hover:text-fg'
                 "
                 @click="interval = 'month'"
@@ -188,7 +188,7 @@ const storageOverflow = computed(() => {
                 class="flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors"
                 :class="
                   interval === 'year'
-                    ? 'bg-brand text-white'
+                    ? 'bg-brand text-on-brand'
                     : 'bg-surface-muted text-fg-muted hover:text-fg'
                 "
                 @click="interval = 'year'"

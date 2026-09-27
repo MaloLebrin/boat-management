@@ -101,6 +101,16 @@ onBeforeUnmount(() => {
   <!-- h-dvh (pas h-screen) : sur iOS Safari, 100vh ignore la barre d'URL
        dynamique et le bas de page devient inaccessible avec overflow-hidden (#484) -->
   <div class="h-dvh overflow-hidden flex bg-navy-900">
+    <!-- Lien d'évitement (#861) : premier arrêt de Tab, il saute la sidebar et
+         l'en-tête. Une ancre de fragment, pas une navigation : <Link> n'a rien
+         à faire ici. `tabindex="-1"` sur <main> y déplace réellement le focus. -->
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-60 focus:rounded-(--radius-card) focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-on-brand focus:shadow-(--shadow-lg)"
+    >
+      {{ t('common.skipToContent') }}
+    </a>
+
     <!-- Desktop Sidebar (always visible on lg+) -->
     <AsideMenu :user="page.props.user" />
 
@@ -154,7 +164,7 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- Scrollable content area -->
-      <main class="flex-1 overflow-y-auto bg-cream">
+      <main id="main" tabindex="-1" class="flex-1 overflow-y-auto bg-cream outline-none">
         <OfflinePendingQueue />
         <PushOptInCard />
         <Transition name="page" mode="out-in">

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useMounted } from '@vueuse/core'
-import { onBeforeUnmount, onMounted, useId, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import { useFocusTrap } from '~/composables/use_focus_trap'
 
 const props = withDefaults(
   defineProps<{
@@ -16,6 +17,11 @@ const props = withDefaults(
      * du pied de modale la referme.
      */
     dismissible?: boolean
+    /**
+     * Sélecteur CSS de l'élément à focaliser à l'ouverture (#861). Par défaut,
+     * le premier élément focalisable du corps de la modale.
+     */
+    initialFocus?: string
   }>(),
   {
     title: undefined,
@@ -23,6 +29,7 @@ const props = withDefaults(
     closeLabel: 'Close',
     size: 'lg',
     dismissible: true,
+    initialFocus: undefined,
   }
 )
 
@@ -42,13 +49,22 @@ const titleId = useId()
 // dans `<body>`.
 const isMounted = useMounted()
 
+// Focus initial, piège et restauration du focus sur le déclencheur (#861).
+const panel = ref<HTMLElement | null>(null)
+const body = ref<HTMLElement | null>(null)
+const { isTop } = useFocusTrap(panel, () => props.open, {
+  initialFocus: () => props.initialFocus,
+  preferredZone: () => body.value,
+})
+
 function close() {
   if (!props.dismissible) return
   emit('update:open', false)
 }
 
 function onKeyDown(e: KeyboardEvent) {
-  if (!props.open || !props.dismissible) return
+  // Une modale ouverte par-dessus une autre : Échap ne ferme que la dernière.
+  if (!props.open || !props.dismissible || !isTop()) return
   if (e.key === 'Escape') {
     e.preventDefault()
     close()
@@ -85,8 +101,10 @@ onBeforeUnmount(() => {
     <Transition name="modal-panel">
       <div v-if="open" class="fixed inset-0 z-51 flex items-center justify-center p-6">
         <div
+          ref="panel"
+          tabindex="-1"
           :class="[
-            'flex max-h-[90dvh] w-full flex-col rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-lg)',
+            'flex max-h-[90dvh] w-full outline-none flex-col rounded-(--radius-card) border border-border bg-surface-elevated shadow-(--shadow-lg)',
             size === 'md'
               ? 'max-w-md'
               : size === 'xl'
@@ -113,7 +131,7 @@ onBeforeUnmount(() => {
               </BaseButton>
             </div>
           </div>
-          <div class="overflow-y-auto px-5 py-5">
+          <div ref="body" class="overflow-y-auto px-5 py-5">
             <slot />
           </div>
           <div v-if="$slots.footer" class="border-t border-border px-5 py-4">
