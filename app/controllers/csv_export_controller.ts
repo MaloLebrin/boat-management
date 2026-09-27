@@ -1,4 +1,5 @@
 import BoatPolicy from '#policies/boat_policy'
+import MaintenancePolicy from '#policies/maintenance_policy'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import NavigationLogService from '#services/navigation_log_service'
@@ -9,6 +10,8 @@ import { budgetYearValidator } from '#validators/budget_validator'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import type Boat from '#models/boat'
+import type User from '#models/user'
 import { contentDisposition } from '#shared/helpers/content_disposition'
 
 @inject()
@@ -22,7 +25,16 @@ export default class CsvExportController {
     private quotaService: QuotaService
   ) {}
 
-  async maintenance({ response, auth, params }: HttpContext) {
+  /**
+   * Préambule commun aux exports par bateau : quota, bateau de l'organisation,
+   * puis la policy propre à la donnée exportée. `authorize` est obligatoire —
+   * trois exports sur quatre s'arrêtaient au scope organisation, et un
+   * boat_owner exportait les données de n'importe quel bateau (#845).
+   */
+  private async resolveExportBoat(
+    { auth, response, params }: Pick<HttpContext, 'auth' | 'response' | 'params'>,
+    authorize: (boat: Boat) => Promise<void>
+  ): Promise<{ user: User; boat: Boat } | null> {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
@@ -30,6 +42,16 @@ export default class CsvExportController {
     this.quotaService.assertCanExport(user.organization)
 
     const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    if (!resolved) return null
+
+    await authorize(resolved.boat)
+    return { user, boat: resolved.boat }
+  }
+
+  async maintenance({ response, auth, bouncer, params }: HttpContext) {
+    const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
+      bouncer.with(MaintenancePolicy).authorize('view', boat)
+    )
     if (!resolved) return
     const { boat } = resolved
 
@@ -68,16 +90,12 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async fuelLogs({ response, auth, params }: HttpContext) {
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
-    await user.load('organization')
-
-    this.quotaService.assertCanExport(user.organization)
-
-    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+  async fuelLogs({ response, auth, bouncer, params }: HttpContext) {
+    const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
+      bouncer.with(BoatPolicy).authorize('view', boat)
+    )
     if (!resolved) return
-    const { boat } = resolved
+    const { user, boat } = resolved
 
     const logs = await this.fuelLogService.listForBoat(user, boat)
 
@@ -111,14 +129,10 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async navigationLogs({ response, auth, params }: HttpContext) {
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
-    await user.load('organization')
-
-    this.quotaService.assertCanExport(user.organization)
-
-    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+  async navigationLogs({ response, auth, bouncer, params }: HttpContext) {
+    const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
+      bouncer.with(BoatPolicy).authorize('view', boat)
+    )
     if (!resolved) return
     const { boat } = resolved
 
@@ -164,17 +178,11 @@ export default class CsvExportController {
   }
 
   async budget({ response, auth, bouncer, params, request, i18n }: HttpContext) {
-    await auth.authenticate()
-    const user = auth.getUserOrFail()
-    await user.load('organization')
-
-    this.quotaService.assertCanExport(user.organization)
-
-    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
+    const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
+      bouncer.with(BoatPolicy).authorize('view', boat)
+    )
     if (!resolved) return
     const { boat } = resolved
-
-    await bouncer.with(BoatPolicy).authorize('view', boat)
 
     const { year: rawYear } = await request.validateUsing(budgetYearValidator)
     const year = rawYear ?? new Date().getFullYear()

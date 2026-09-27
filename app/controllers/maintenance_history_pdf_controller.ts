@@ -1,3 +1,4 @@
+import MaintenancePolicy from '#policies/maintenance_policy'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import MaintenanceHistoryPdfService from '#services/maintenance_history_pdf_service'
 import QuotaService from '#services/quota_service'
@@ -13,10 +14,13 @@ export default class MaintenanceHistoryPdfController {
     private quotaService: QuotaService
   ) {}
 
-  async download({ request, response, auth, i18n }: HttpContext) {
+  async download({ request, response, auth, bouncer, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
     await user.load('organization')
+
+    // Même garde que l'écran `/maintenance/history` qu'il imprime (#845).
+    await bouncer.with(MaintenancePolicy).authorize('view')
 
     this.quotaService.assertCanExport(user.organization)
 

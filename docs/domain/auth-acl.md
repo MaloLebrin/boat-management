@@ -372,6 +372,20 @@ const { role, isAdmin, isMember, can } = usePermissions()
 - **Dernier admin protégé** : `OrganizationMemberService.ensureNotLastAdmin` empêche de rétrograder/supprimer le dernier admin d'une organisation (`LastAdminError`)
 - **Auto-réparation des memberships** : `OrganizationMemberService.ensureMembershipsForOrgUsers` crée une ligne `organization_memberships` (rôle `admin`) pour tout utilisateur rattaché via `organizationId` qui n'en a pas encore — typiquement le propriétaire d'une org créée avant l'introduction de la table pivot
 
+### Écrans et exports flotte (#845)
+
+Les écrans qui agrègent toute la flotte et les exports par bateau s'arrêtaient au scope organisation. Un `boat_owner`, sans aucune capability staff, lisait donc la maintenance de tous les bateaux de l'exploitant. Chaque route porte désormais une garde de rôle :
+
+| Route                                                          | Garde                                                     |
+| -------------------------------------------------------------- | --------------------------------------------------------- |
+| `GET /planning`, `GET /maintenance/history`                    | `boatOwnerPortalRedirect()` puis `MaintenancePolicy.view` |
+| `GET /maintenance/history.pdf`                                 | `MaintenancePolicy.view` (403)                            |
+| `GET /boats/:id/maintenance-log.pdf`                           | `MaintenancePolicy.view` (bateau)                         |
+| `GET /boats/:id/export/maintenance.csv`                        | `MaintenancePolicy.view` (bateau)                         |
+| `GET /boats/:id/export/{fuel-logs,navigation-logs,budget}.csv` | `BoatPolicy.view` (bateau)                                |
+
+`MaintenancePolicy.view` accepte un bateau optionnel, comme `BoatPolicy.view` : sans bateau, la capability seule décide (le service scope déjà par organisation). Les pages redirigent le `boat_owner` vers son portail, comme `/boats` ou `/engines`, plutôt que de lui opposer un 403 brut ; les téléchargements répondent 403.
+
 ### Outils moteur et analyse IA flotte (#900)
 
 Suite de #845. Les pages moteur à l'échelle de la flotte vérifiaient `maintenance.view` par un `hasPermission` en dur, hors policy, et renvoyaient vers `/dashboard`. L'analyse IA flotte n'avait aucune garde de rôle : un `boat_owner` ou un `mechanic` déclenchait une synthèse de toute la flotte sur le quota IA de l'organisation.
@@ -388,6 +402,7 @@ Suite de #845. Les pages moteur à l'échelle de la flotte vérifiaient `mainten
 
 ### Tests
 
+- `tests/functional/maintenance/fleet_capability_guard.spec.ts` — matrice des rôles sur les écrans et exports flotte (#845)
 - `tests/functional/maintenance/engine_tools_capability_guard.spec.ts` — matrice des rôles sur les pages moteur flotte et l'analyse IA flotte (#900)
 - `tests/unit/permissions_taxonomy.spec.ts` — invariant `member ⊂ admin`, couverture de la taxonomie
 - `tests/integration/permissions/user_has_permission.spec.ts` — `User#hasPermission()` avec de vraies lignes DB
