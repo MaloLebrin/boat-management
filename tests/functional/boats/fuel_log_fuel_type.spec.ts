@@ -85,6 +85,9 @@ test.group('Fuel log fuel type (functional)', (group) => {
     assert,
   }) => {
     const user = await createAdminUser()
+    // Les en-têtes suivent la locale de l'utilisateur (#863) : `carburant` en FR.
+    user.locale = 'fr'
+    await user.save()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
     await BoatFuelLogFactory.merge({
