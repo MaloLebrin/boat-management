@@ -253,6 +253,8 @@ export interface BoatSuggestionsInput {
     }>
     genericEquipment: Array<{
       category: string
+      /** Seul descripteur utile d'un équipement `other` (#893) : « Annexe », « Outillage »… */
+      name: string
       brand: string | null
       status: string
       purchasedAt: string | null

@@ -183,4 +183,5 @@ export const GENERIC_EQUIPMENT_CATEGORY_OPTIONS = [
   { value: 'energy', label: 'Energy & heating' },
   { value: 'comfort', label: 'Comfort & living' },
   { value: 'plumbing', label: 'Plumbing & water' },
+  { value: 'other', label: 'Other' },
 ] as const

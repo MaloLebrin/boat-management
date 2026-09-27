@@ -31,7 +31,11 @@ vi.mock('~/components/boats/engine/BoatEquipmentEngineFields.vue', () => ({
   default: { template: '<div />' },
 }))
 vi.mock('~/components/boats/equipment/BoatGenericEquipmentFields.vue', () => ({
-  default: { template: '<div />' },
+  default: {
+    name: 'BoatGenericEquipmentFields',
+    template: '<div class="generic-fields" />',
+    props: ['errors', 'initialCategory', 'categoryLocked', 'surface'],
+  },
 }))
 vi.mock('~/components/boats/rig/BoatEquipmentRigFields.vue', () => ({
   default: { template: '<div />' },
@@ -95,6 +99,8 @@ test('renders category buttons as SVG icons instead of emoji', () => {
   })
   const buttons = w.findAll('button').filter((b) => b.find('svg').exists())
   expect(buttons.length).toBe(12)
+  // Plus aucune tuile « bientôt disponible » (#893).
+  expect(buttons.every((b) => b.attributes('disabled') === undefined)).toBe(true)
   expect(w.text()).not.toMatch(EMOJI_REGEX)
 })
 
@@ -107,4 +113,21 @@ test('switches category on click', async () => {
     .find((b) => b.text().includes('boats.equipmentAddModal.categories.sail'))
   await sailButton?.trigger('click')
   expect(sailButton?.classes()).toContain('bg-brand')
+})
+
+test('la tuile « Autre » ouvre le formulaire d’équipement générique (#893)', async () => {
+  const w = mount(BoatEquipmentAddModal, {
+    props: { boat: minimalBoat, canManageEquipment: true, open: true },
+  })
+  const otherButton = w
+    .findAll('button')
+    .find((b) => b.text().includes('boats.equipmentAddModal.categories.other'))
+  await otherButton?.trigger('click')
+
+  expect(otherButton?.classes()).toContain('bg-brand')
+  expect(w.text()).not.toContain('comingSoon')
+  const fields = w.findComponent({ name: 'BoatGenericEquipmentFields' })
+  expect(fields.exists()).toBe(true)
+  expect(fields.props('initialCategory')).toBe('other')
+  expect(fields.props('categoryLocked')).not.toBe(false)
 })

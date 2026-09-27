@@ -281,7 +281,9 @@ catalogue moteur ci-dessus, appliqué à `boat_generic_equipment`.
   `ON DELETE SET NULL`). Un équipement hors catalogue est parfaitement valide.
 - Les catégories du catalogue sont celles de l'équipement lui-même
   (`GENERIC_EQUIPMENT_CATEGORIES`, étendu par #577 : `energy`, `comfort`, `plumbing` en plus des
-  quatre historiques) — pas de vocabulaire intermédiaire comme les familles moteur.
+  quatre historiques ; #893 : `other`, la tuile « Autre » de la modale d'ajout) — pas de
+  vocabulaire intermédiaire comme les familles moteur. `other` n'a aucune marque dédiée : le
+  formulaire liste alors toutes les marques à plat, et une tâche rattachée prend le sujet `other`.
 - `listBrands({ category })` **priorise** la catégorie, elle ne la filtre jamais ; une marque peut
   couvrir plusieurs catégories (`equipment_brands.categories`, jsonb).
 - `resolveBrand(freeText)` : mêmes deux passes que le catalogue moteur (égalité stricte sur

@@ -23,6 +23,7 @@ test.group('maintenance_task_equipment helpers', () => {
     assert.equal(subjectForEquipment('generic', 'anchoring'), 'deck')
     assert.equal(subjectForEquipment('generic', 'navigation'), 'other')
     assert.equal(subjectForEquipment('generic', 'comfort'), 'other')
+    assert.equal(subjectForEquipment('generic', 'other'), 'other')
     assert.equal(subjectForEquipment('generic'), 'other')
   })
 

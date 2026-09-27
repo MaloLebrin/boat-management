@@ -339,7 +339,7 @@ test.group('Validators équipement générique — catalogue et garde-fous (#577
   test('acceptent les nouvelles catégories et refusent une catégorie inconnue', async ({
     assert,
   }) => {
-    for (const category of ['energy', 'comfort', 'plumbing']) {
+    for (const category of ['energy', 'comfort', 'plumbing', 'other']) {
       const body = await createGenericEquipmentValidator.validate({
         category,
         name: 'Équipement',
@@ -489,10 +489,11 @@ test.group('EquipmentCatalogSeeder — idempotence (#577)', (group) => {
     assert.isAtLeast(Number(brands.total), 120)
 
     // Chaque catégorie du vocabulaire doit être représentée par au moins une
-    // marque — c'est le critère d'acceptation de l'issue.
+    // marque — c'est le critère d'acceptation de l'issue. `other` (#893) est
+    // la catégorie fourre-tout, sans marques dédiées.
     const rows = await EquipmentBrand.query().select(['categories'])
     const covered = new Set(rows.flatMap((row) => row.categories))
-    for (const category of GENERIC_EQUIPMENT_CATEGORIES) {
+    for (const category of GENERIC_EQUIPMENT_CATEGORIES.filter((c) => c !== 'other')) {
       assert.isTrue(covered.has(category), `catégorie « ${category} » sans marque`)
     }
   }).timeout(120_000)

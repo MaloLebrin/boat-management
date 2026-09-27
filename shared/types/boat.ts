@@ -163,6 +163,10 @@ export type BoatSafetyEquipmentPayload = {
  * Catégories d'équipement générique (#577). Les trois dernières (`energy`,
  * `comfort`, `plumbing`) étendent les quatre historiques — les valeurs déjà en
  * base restent toutes valides, il n'y a pas de backfill.
+ *
+ * `other` (#893) est la catégorie fourre-tout de la tuile « Autre » de la
+ * modale d'ajout : ce qui n'entre dans aucune case (annexe, outillage…). Elle
+ * n'a pas de marques dédiées au catalogue — la saisie libre suffit.
  */
 export const GENERIC_EQUIPMENT_CATEGORIES = [
   'navigation',
@@ -172,6 +176,7 @@ export const GENERIC_EQUIPMENT_CATEGORIES = [
   'energy',
   'comfort',
   'plumbing',
+  'other',
 ] as const
 export type GenericEquipmentCategory = (typeof GENERIC_EQUIPMENT_CATEGORIES)[number]
 

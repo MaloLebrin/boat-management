@@ -183,7 +183,8 @@ plomberie).
 
 - `id`, `boatId` (FK `boats`, `onDelete cascade`)
 - `category` — `GENERIC_EQUIPMENT_CATEGORIES` (#577 : `navigation`, `electrical`, `anchoring`,
-  `deck`, `energy`, `comfort`, `plumbing`)
+  `deck`, `energy`, `comfort`, `plumbing` ; #893 : `other`, catégorie fourre-tout de la tuile
+  « Autre »). Colonne `string` sans contrainte CHECK : la liste est tenue par le validator
 - `name`, `brand`, `model` (texte libre), `quantity`, `status` (`ok | to_check | to_replace`),
   `notes`
 - `equipmentModelId` (FK `equipment_models`, **nullable**, `onDelete set null`) — rattachement au
