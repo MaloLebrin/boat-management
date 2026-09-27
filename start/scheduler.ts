@@ -8,6 +8,7 @@ import ResetDemoData from '#jobs/reset_demo_data'
 import MarkOverdueInvoices from '#jobs/mark_overdue_invoices'
 import ScanFleetNotifications from '#jobs/scan_fleet_notifications'
 import GenerateAiSuggestions from '#jobs/generate_ai_suggestions'
+import ReconcileMedia from '#jobs/reconcile_media'
 
 await SendReminderEmails.schedule({})
   .cron('0 8 * * *')
@@ -75,4 +76,13 @@ await GenerateAiSuggestions.schedule({})
   .cron('0 5 * * *')
   .timezone('Europe/Paris')
   .id('daily-generate-ai-suggestions')
+  .run()
+
+// Le dimanche à 03:30, après la purge des journaux d'audit de 03:00 et avant
+// la remise à zéro de la démo de 04:00 : médias orphelins et compteurs de
+// stockage réconciliés une fois par semaine (#859).
+await ReconcileMedia.schedule({})
+  .cron('30 3 * * 0')
+  .timezone('Europe/Paris')
+  .id('weekly-reconcile-media')
   .run()

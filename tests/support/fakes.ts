@@ -43,6 +43,11 @@ export interface FakeCloudinaryOptions {
    * Passer une image permet de couvrir l'autre branche (#692).
    */
   download?: { buffer: Buffer; contentType: string }
+  /**
+   * `publicId` dont la suppression doit échouer — simule une panne Cloudinary
+   * pendant un nettoyage (#859). L'appel n'est pas enregistré.
+   */
+  failDeleteFor?: string[]
 }
 
 export interface FakeCloudinary {
@@ -132,6 +137,9 @@ export function swapFakeCloudinary(options: FakeCloudinaryOptions = {}): FakeClo
         uploadImage: async (_file: unknown, folder: string) => upload(folder, 'image'),
         uploadDocument: async (_file: unknown, folder: string) => upload(folder, 'document'),
         deleteFile: async (publicId: string, resourceType: 'image' | 'raw' = 'image') => {
+          if (options.failDeleteFor?.includes(publicId)) {
+            throw new Error('Cloudinary delete failed')
+          }
           state.deletedPublicIds.push(publicId)
           state.deletedFiles.push({ publicId, resourceType })
         },

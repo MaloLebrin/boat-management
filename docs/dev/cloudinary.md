@@ -118,6 +118,13 @@ await mediaService.deleteAllForEntity('boat', boat.id, CloudinaryFolders.boat(or
 await mediaService.replaceAvatar(user, file, CloudinaryFolders.userAvatar(org.slug, user.id))
 ```
 
+### Réconciliation (#859)
+
+`app/services/media_reconciliation_service.ts` supprime les médias orphelins (entité disparue) et
+recalcule `storage_used_bytes` par organisation. Job hebdomadaire `ReconcileMedia` (dimanche 03:30,
+queue `media`) et commande `node ace media:reconcile [--dry-run]`. Détails dans
+`docs/domain/equipment-media.md`, section « Réconciliation des orphelins ».
+
 ---
 
 ## Endpoints HTTP (bateaux)
