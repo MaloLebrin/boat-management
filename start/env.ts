@@ -58,6 +58,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Stripe
   STRIPE_SECRET_KEY: Env.schema.secret.optional(),
   STRIPE_WEBHOOK_SECRET: Env.schema.secret.optional(),
+  // Endpoint « comptes connectés » (Stripe Connect, #876) : signé par son
+  // propre secret, distinct de celui du compte plateforme.
+  STRIPE_CONNECT_WEBHOOK_SECRET: Env.schema.secret.optional(),
   STRIPE_PRO_MONTHLY_PRICE_ID: Env.schema.string.optional(),
   STRIPE_PRO_ANNUAL_PRICE_ID: Env.schema.string.optional(),
   STRIPE_ENTERPRISE_MONTHLY_PRICE_ID: Env.schema.string.optional(),

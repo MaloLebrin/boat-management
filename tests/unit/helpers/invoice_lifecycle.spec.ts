@@ -4,6 +4,7 @@ import {
   canEditInvoicePayment,
   isIssuedInvoice,
   INVOICE_PAYMENT_METHODS,
+  isInvoicePayableOnline,
 } from '#shared/helpers/invoice_lifecycle'
 
 /**
@@ -47,5 +48,27 @@ test.group('invoice_lifecycle — édition du paiement', () => {
   test('les moyens de paiement proposés sont uniques et non vides', ({ assert }) => {
     assert.isAbove(INVOICE_PAYMENT_METHODS.length, 0)
     assert.lengthOf(new Set(INVOICE_PAYMENT_METHODS), INVOICE_PAYMENT_METHODS.length)
+  })
+})
+
+test.group('invoice_lifecycle — paiement en ligne (#876)', () => {
+  const payable = { kind: 'invoice', status: 'sent', paidAt: null, total: '120.50' } as const
+
+  test('une facture envoyée ou en retard, non réglée et positive est payable', ({ assert }) => {
+    assert.isTrue(isInvoicePayableOnline(payable))
+    assert.isTrue(isInvoicePayableOnline({ ...payable, status: 'overdue' }))
+  })
+
+  test('ni un devis, ni un brouillon, ni une facture réglée, annulée ou à zéro', ({ assert }) => {
+    assert.isFalse(isInvoicePayableOnline({ ...payable, kind: 'quote' }))
+    for (const status of ['draft', 'paid', 'cancelled'] as const) {
+      assert.isFalse(isInvoicePayableOnline({ ...payable, status }), status)
+    }
+    assert.isFalse(isInvoicePayableOnline({ ...payable, paidAt: '2026-08-01' }))
+    assert.isFalse(isInvoicePayableOnline({ ...payable, total: 0 }))
+  })
+
+  test('« online » ne se saisit pas à la main', ({ assert }) => {
+    assert.notInclude(INVOICE_PAYMENT_METHODS as readonly string[], 'online')
   })
 })

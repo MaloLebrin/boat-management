@@ -121,6 +121,12 @@
         "title": "Soldes à encaisser sur {boatName}",
         "body": "{count, plural, one {# départ dans moins de 7 jours n'est pas soldé} other {# départs dans moins de 7 jours ne sont pas soldés}} sur {boatName}."
       }
+    },
+    "invoice": {
+      "paid_online": {
+        "title": "Facture {number} réglée en ligne",
+        "body": "{clientName} a réglé {amount} par Stripe."
+      }
     }
   },
   "title": "Notifications",
@@ -158,6 +164,7 @@
     "boat.status_changed": "Statut du bateau modifié",
     "boat.available_again": "Bateau de nouveau disponible",
     "reservation.deposit_due": "Acompte non reçu",
-    "reservation.balance_due": "Solde à encaisser"
+    "reservation.balance_due": "Solde à encaisser",
+    "invoice.paid_online": "Facture réglée en ligne"
   }
 }

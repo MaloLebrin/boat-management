@@ -77,26 +77,29 @@ Deux principes structurants :
 
 Devis **et** factures partagent la même table, discriminés par `kind`.
 
-| Colonne           | Type                                                | Notes                                                                |
-| ----------------- | --------------------------------------------------- | -------------------------------------------------------------------- |
-| `organization_id` | FK organisations, `CASCADE`                         | Scope obligatoire                                                    |
-| `client_id`       | FK clients, **`SET NULL`**, nullable                | Le document survit à la suppression du client                        |
-| `reservation_id`  | FK boat_reservations, **`SET NULL`**, nullable      | Lien vers la réservation d'origine (#288)                            |
-| `source_quote_id` | FK **auto-référente** invoices, `SET NULL`, indexée | Facture ← devis converti (#287)                                      |
-| `kind`            | enum `quote` / `invoice`                            | **Figé après création**                                              |
-| `number`          | string                                              | `DEV-000001` / `FAC-000001` (voir §4)                                |
-| `client_name`     | string, nullable                                    | **Snapshot** dénormalisé (lisible même sans FK)                      |
-| `status`          | enum `draft`/`sent`/`paid`/`overdue`/`cancelled`    | Défaut `draft` (voir §6)                                             |
-| `issued_at`       | date                                                | Date d'émission                                                      |
-| `due_at`          | date, nullable                                      | Échéance (base du calcul `overdue`)                                  |
-| `paid_at`         | date, nullable                                      | Date de paiement (#287) — **⇔ `status = 'paid'`** (#717)             |
-| `payment_method`  | string(20), nullable                                | Moyen de règlement : `cash`/`card`/`transfer`/`check`/`other` (#717) |
-| `subtotal`        | decimal(10,2)                                       | Recalculé serveur                                                    |
-| `tax_rate`        | decimal(5,2)                                        | Pourcentage TVA (0–100)                                              |
-| `tax_amount`      | decimal(10,2)                                       | Recalculé serveur                                                    |
-| `total`           | decimal(10,2)                                       | Recalculé serveur                                                    |
-| `currency`        | string(3), défaut `EUR`                             | Champ libre                                                          |
-| `notes`           | text, nullable                                      |                                                                      |
+| Colonne                      | Type                                                | Notes                                                                                                           |
+| ---------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `organization_id`            | FK organisations, `CASCADE`                         | Scope obligatoire                                                                                               |
+| `client_id`                  | FK clients, **`SET NULL`**, nullable                | Le document survit à la suppression du client                                                                   |
+| `reservation_id`             | FK boat_reservations, **`SET NULL`**, nullable      | Lien vers la réservation d'origine (#288)                                                                       |
+| `source_quote_id`            | FK **auto-référente** invoices, `SET NULL`, indexée | Facture ← devis converti (#287)                                                                                 |
+| `kind`                       | enum `quote` / `invoice`                            | **Figé après création**                                                                                         |
+| `number`                     | string                                              | `DEV-000001` / `FAC-000001` (voir §4)                                                                           |
+| `client_name`                | string, nullable                                    | **Snapshot** dénormalisé (lisible même sans FK)                                                                 |
+| `status`                     | enum `draft`/`sent`/`paid`/`overdue`/`cancelled`    | Défaut `draft` (voir §6)                                                                                        |
+| `issued_at`                  | date                                                | Date d'émission                                                                                                 |
+| `due_at`                     | date, nullable                                      | Échéance (base du calcul `overdue`)                                                                             |
+| `paid_at`                    | date, nullable                                      | Date de paiement (#287) — **⇔ `status = 'paid'`** (#717)                                                        |
+| `payment_method`             | string(20), nullable                                | Moyen de règlement : `cash`/`card`/`transfer`/`check`/`other` (#717), `online` posé par Stripe seulement (#876) |
+| `payment_token`              | string(64), nullable, unique                        | Jeton opaque de `/pay/:token` (#876), jamais sérialisé                                                          |
+| `stripe_checkout_session_id` | string, nullable                                    | Dernière session Checkout ouverte (#876)                                                                        |
+| `stripe_payment_intent_id`   | string, nullable                                    | Paiement Stripe qui a réglé la facture (#876)                                                                   |
+| `subtotal`                   | decimal(10,2)                                       | Recalculé serveur                                                                                               |
+| `tax_rate`                   | decimal(5,2)                                        | Pourcentage TVA (0–100)                                                                                         |
+| `tax_amount`                 | decimal(10,2)                                       | Recalculé serveur                                                                                               |
+| `total`                      | decimal(10,2)                                       | Recalculé serveur                                                                                               |
+| `currency`                   | string(3), défaut `EUR`                             | Champ libre                                                                                                     |
+| `notes`                      | text, nullable                                      |                                                                                                                 |
 
 Contraintes : `UNIQUE(organization_id, kind, number)` + index
 `(organization_id, kind, status)` et `(organization_id, issued_at)`.
@@ -258,7 +261,52 @@ Le passage en `overdue` est câblé via un **job de queue planifié**
 
 `EmailQueueService.sendInvoice(...)` enfile avec une **clé de dédup unique par
 envoi** (composant timestamp) → les renvois sont autorisés. Le contrôleur
-transitionne `draft → sent` après l'enfilement.
+transitionne `draft → sent` **avant** l'enfilement, puis pose le lien de
+paiement en ligne (§7 bis) : la facture doit être payable quand le job le lit.
+
+Quand l'organisation encaisse en ligne, l'e-mail porte un bouton « Payer en
+ligne » (texte et HTML) et le PDF une ligne « Payer en ligne » cliquable.
+
+## 7 bis. Paiement en ligne par le client final (#876)
+
+Le client du loueur règle sa facture par carte (ou tout moyen que Checkout
+propose selon le compte : SEPA…) sans compte FleetAi.
+
+- **Stripe Connect Standard** : un admin (`subscription.manage`) connecte le
+  compte Stripe **de l'organisation** depuis `/settings/billing`
+  (`OnlinePaymentsController`). Le compte appartient au loueur : l'argent y
+  arrive directement (charge directe, `stripeAccount`), FleetAi ne prélève
+  aucune commission. État : `none` → `pending` (onboarding non terminé) →
+  `active` (`charges_enabled`, relu au retour d'onboarding et poussé par
+  `account.updated`). Déconnecter oublie le compte côté FleetAi, sans le
+  supprimer chez Stripe.
+- **Payable en ligne** (`isInvoicePayableOnline`) : facture (`kind = 'invoice'`)
+  `sent` ou `overdue`, non réglée, total > 0 — et organisation `active` avec le
+  module Facturation actif (`canAcceptOnlinePayments`).
+- **Lien** : `payment_token` (32 octets aléatoires, base64url) posé à l'envoi
+  par e-mail, ou depuis la fiche (`POST /invoices/:id/payment-link`) pour une
+  facture envoyée avant la connexion. Idempotent : un lien envoyé reste valable.
+- **Page publique `/pay/:token`** (sans login, throttle `invoice_payment`) :
+  émetteur, numéro, client, dates et montant — rien de plus que la facture.
+  États `payable` / `paid` / `unavailable` ; jeton inconnu → même page en
+  « lien invalide », statut 404. `POST /pay/:token/checkout` ouvre une session
+  Checkout (`mode: payment`, montant = total, métadonnées `invoice_id` +
+  `organization_id` sur la session **et** le PaymentIntent) et redirige.
+- **Webhook** `POST /webhooks/stripe/connect` (secret
+  `STRIPE_CONNECT_WEBHOOK_SECRET`, même traitement idempotent que les
+  abonnements via `processed_stripe_events`) : un événement porteur de
+  `account` est aiguillé vers `OnlinePaymentService`.
+  `checkout.session.completed` (session payée) et
+  `checkout.session.async_payment_succeeded` règlent la facture :
+  `status = 'paid'`, `paid_at`, `payment_method = 'online'`,
+  `stripe_payment_intent_id`. La facture est cherchée **dans l'organisation
+  propriétaire du compte émetteur** : des métadonnées pointant la facture d'une
+  autre organisation ne trouvent rien. Une facture déjà réglée ou annulée n'est
+  pas réécrite (warning loggé).
+- Après validation de la transaction : journal `invoice.paid_online` (sans
+  auteur) et notification `invoice.paid_online` (poussable) aux admins.
+- Le bloc Paiement de la fiche garde la date corrigeable ; le moyen `online`
+  n'est jamais saisi à la main (absent de `INVOICE_PAYMENT_METHODS`).
 
 ---
 
@@ -342,6 +390,13 @@ Toutes sous `middleware.auth()`, préfixe `/invoices` (voir `start/routes/invoic
 | `PATCH /invoices/:id/payment`                    | `updatePayment`         | Corriger date + moyen de paiement (#717)                             |
 | `PUT /invoices/:id`                              | `update`                | Modifier (jamais `number`/`kind`, refusé sur une facture émise #717) |
 | `DELETE /invoices/:id`                           | `destroy`               | Supprimer (admin uniquement)                                         |
+| `POST /invoices/:id/payment-link`                | `createPaymentLink`     | Poser le lien de paiement en ligne (#876)                            |
+
+Routes publiques du paiement en ligne (#876, sans login, throttle
+`invoice_payment`) : `GET /pay/:token` et `POST /pay/:token/checkout`
+(`InvoicePaymentLinksController`). Réglages : `POST|DELETE
+/settings/billing/online-payments`, `GET …/refresh`, `GET …/return`. Webhook :
+`POST /webhooks/stripe/connect`.
 
 Toutes les mutations répondent par **redirection Inertia** (pas de JSON) et le
 frontend utilise `router.*` / `<Form>` (conventions Inertia du projet).
@@ -419,6 +474,11 @@ cannotMarkPaid,quoteFromReservation}` + `flash.quota.invoicesExceeded`.
   client par email (§8) par une FK directe. Complète le CRM (épic #108).
 - Relance email automatique des factures en retard (`overdue`) — évoquée comme
   optionnelle en #287, non implémentée.
+- Paiement en ligne (#876) — non couverts : remboursement (`charge.refunded`) —
+  il se fait dans le tableau de bord Stripe du loueur, la facture reste payée
+  jusqu'à un avoir (#877) ; commission FleetAi (`application_fee`, 0 %) ;
+  paiement en ligne de l'acompte/solde d'une **réservation** et caution en
+  pré-autorisation — facturer la réservation donne déjà un lien de paiement.
 - **Avoir (note de crédit)** : la voie comptable pour corriger une facture émise,
   désormais figée (#717). Aujourd'hui, une erreur de montant sur une facture
   envoyée ne se rattrape que par une annulation suivie d'une nouvelle facture.

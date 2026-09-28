@@ -470,5 +470,13 @@
   "dashboard": {
     "layoutSaved": "Dashboard layout saved.",
     "layoutReset": "Dashboard layout reset."
+  },
+  "onlinePayments": {
+    "unavailable": "Online payment is not available: Stripe is not configured or the Invoicing module is inactive.",
+    "connected": "Your Stripe account is connected: your customers can pay their invoices online.",
+    "pending": "Stripe has not activated your account yet. Complete the requested steps to accept online payments.",
+    "disconnected": "Stripe account disconnected. Payment links already sent no longer work.",
+    "notPayable": "This invoice cannot be paid online.",
+    "linkCreated": "Payment link created."
   }
 }

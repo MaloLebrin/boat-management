@@ -16,6 +16,11 @@ export default class StripeService {
     return new Stripe(key)
   }
 
+  /** Vrai si la clé API est posée : sans elle, aucun appel Stripe n'aboutit. */
+  isConfigured(): boolean {
+    return Boolean(env.get('STRIPE_SECRET_KEY')?.release())
+  }
+
   async getOrCreateCustomer(org: Organization, email: string): Promise<string> {
     if (org.stripeCustomerId) return org.stripeCustomerId
 
@@ -118,6 +123,97 @@ export default class StripeService {
    */
   async retrievePrice(priceId: string): Promise<Stripe.Price> {
     return this.stripe.prices.retrieve(priceId)
+  }
+
+  // ── Stripe Connect : encaissement pour le compte de l'organisation (#876) ──
+
+  /**
+   * Crée le compte connecté **Standard** de l'organisation : le loueur possède
+   * son compte Stripe, reçoit les fonds directement et gère lui-même
+   * remboursements et litiges depuis son tableau de bord.
+   */
+  async createConnectedAccount(org: Organization, email: string): Promise<string> {
+    const account = await this.stripe.accounts.create(
+      {
+        type: 'standard',
+        email,
+        metadata: { organizationId: String(org.id) },
+      },
+      // Un double clic sur « Connecter » ne crée qu'un compte.
+      { idempotencyKey: `connect-account:${org.id}` }
+    )
+    return account.id
+  }
+
+  /** Lien d'onboarding hébergé par Stripe (à usage unique, expire en quelques minutes). */
+  async createAccountLink(opts: {
+    accountId: string
+    refreshUrl: string
+    returnUrl: string
+  }): Promise<string> {
+    const link = await this.stripe.accountLinks.create({
+      account: opts.accountId,
+      refresh_url: opts.refreshUrl,
+      return_url: opts.returnUrl,
+      type: 'account_onboarding',
+    })
+    return link.url
+  }
+
+  async retrieveAccount(accountId: string): Promise<Stripe.Account> {
+    return this.stripe.accounts.retrieve(accountId)
+  }
+
+  /**
+   * Session Checkout de paiement d'une facture, créée **sur le compte
+   * connecté** (charge directe) : l'argent ne transite pas par FleetAi.
+   * Les métadonnées sont posées sur la session et sur le PaymentIntent, pour
+   * que le webhook retrouve la facture quel que soit l'événement lu.
+   */
+  async createInvoiceCheckoutSession(opts: {
+    accountId: string
+    amountCents: number
+    currency: string
+    productName: string
+    customerEmail: string | null
+    successUrl: string
+    cancelUrl: string
+    metadata: Record<string, string>
+  }): Promise<{ id: string; url: string }> {
+    const session = await this.stripe.checkout.sessions.create(
+      {
+        mode: 'payment',
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: opts.currency.toLowerCase(),
+              unit_amount: opts.amountCents,
+              product_data: { name: opts.productName },
+            },
+          },
+        ],
+        ...(opts.customerEmail ? { customer_email: opts.customerEmail } : {}),
+        success_url: opts.successUrl,
+        cancel_url: opts.cancelUrl,
+        metadata: opts.metadata,
+        payment_intent_data: { metadata: opts.metadata },
+      },
+      { stripeAccount: opts.accountId }
+    )
+
+    return { id: session.id, url: session.url! }
+  }
+
+  /**
+   * Vérifie un événement de l'endpoint « comptes connectés ». Stripe signe
+   * cet endpoint avec son propre secret : il ne se confond pas avec celui des
+   * abonnements.
+   */
+  constructConnectWebhookEvent(rawBody: string, signature: string): Stripe.Event {
+    const secret = env.get('STRIPE_CONNECT_WEBHOOK_SECRET')?.release()
+    if (!secret) throw new StripeNotConfiguredError()
+    return Stripe.webhooks.constructEvent(rawBody, signature, secret)
   }
 
   constructWebhookEvent(rawBody: string, signature: string): Stripe.Event {

@@ -34,7 +34,11 @@ export interface InvoiceLinks {
   convertedInvoice?: Invoice | null
 }
 
-export function toInvoiceDetail(invoice: Invoice, links: InvoiceLinks = {}): InvoiceDetail {
+export function toInvoiceDetail(
+  invoice: Invoice,
+  links: InvoiceLinks = {},
+  onlinePaymentUrl: string | null = null
+): InvoiceDetail {
   const sortedLines = [...invoice.lines].sort((a, b) => a.position - b.position)
 
   const lines: InvoiceLineRow[] = sortedLines.map((line) => ({
@@ -53,5 +57,6 @@ export function toInvoiceDetail(invoice: Invoice, links: InvoiceLinks = {}): Inv
     sourceQuote: toInvoiceLink(links.sourceQuote),
     convertedInvoice: toInvoiceLink(links.convertedInvoice),
     reservationBoatId: invoice.reservation?.boatId ?? null,
+    onlinePaymentUrl,
   }
 }

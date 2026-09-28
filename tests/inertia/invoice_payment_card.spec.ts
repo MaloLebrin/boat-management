@@ -69,6 +69,7 @@ function makeInvoice(overrides: Partial<InvoiceDetail> = {}): InvoiceDetail {
     sourceQuote: null,
     convertedInvoice: null,
     reservationBoatId: null,
+    onlinePaymentUrl: null,
     ...overrides,
   }
 }
@@ -119,5 +120,21 @@ describe('InvoicePaymentCard', () => {
     expect(wrapper.find('input').element.value).toBe('')
     // Pas de date ⇒ pas de moyen de paiement à choisir.
     expect(wrapper.find('select').attributes('disabled')).toBeDefined()
+  })
+
+  test('an invoice paid online keeps its Stripe method: the key is not sent (#876)', async () => {
+    const wrapper = mount(InvoicePaymentCard, {
+      props: { invoice: makeInvoice({ paymentMethod: 'online' }) },
+    })
+
+    expect(wrapper.find('select').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('select').text()).toContain('invoices.paymentMethods.online')
+
+    await wrapper.find('form').trigger('submit')
+    expect(mockPatch).toHaveBeenCalledWith(
+      '/invoices/42/payment',
+      { paidAt: '2026-08-12' },
+      expect.objectContaining({ preserveScroll: true })
+    )
   })
 })

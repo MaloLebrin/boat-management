@@ -26,6 +26,7 @@ export type NotificationType =
   | 'boat.available_again'
   | 'reservation.deposit_due'
   | 'reservation.balance_due'
+  | 'invoice.paid_online'
   | (string & {}) // extensible pour les futurs types sans casser le type
 
 export type NotificationSeverity = 'info' | 'success' | 'warning' | 'error'

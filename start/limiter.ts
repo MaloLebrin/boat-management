@@ -151,6 +151,13 @@ export const simulatorLeadThrottle = limiter.define('simulator_lead', (ctx) => {
   return limiter.allowRequests(5).every('10 minutes').usingKey(`simulator_lead_${ctx.request.ip()}`)
 })
 
+// Page publique de paiement d'une facture (#876) : chaque « Payer » ouvre une
+// session Checkout chez Stripe pour le compte du loueur. Un client paie une
+// fois ; au-delà de quelques essais par minute, c'est un script.
+export const invoicePaymentThrottle = limiter.define('invoice_payment', (ctx) => {
+  return limiter.allowRequests(10).every('1 minute').usingKey(`invoice_payment_${ctx.request.ip()}`)
+})
+
 // Abonnements Web Push (#497) : le navigateur ne (ré)abonne qu'à l'activation
 // ou au chargement — au-delà, c'est un script.
 export const pushThrottle = limiter.define('push', (ctx) => {

@@ -74,6 +74,7 @@ function makeInvoice(overrides: Partial<InvoiceDetail> = {}): InvoiceDetail {
     sourceQuote: null,
     convertedInvoice: null,
     reservationBoatId: null,
+    onlinePaymentUrl: null,
     ...overrides,
   }
 }

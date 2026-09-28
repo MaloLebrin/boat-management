@@ -1,6 +1,9 @@
 import { middleware } from '#start/kernel'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
+import { invoicePaymentThrottle } from '#start/limiter'
+
+const InvoicePaymentLinksController = () => import('#controllers/invoice_payment_links_controller')
 
 router
   .group(() => {
@@ -33,6 +36,11 @@ router
           .post('invoices/:id/convert', [controllers.Invoices, 'convert'])
           .as('invoices.convert')
         router.post('invoices/:id/pay', [controllers.Invoices, 'markPaid']).as('invoices.pay')
+        // Lien de paiement en ligne d'une facture envoyée avant la connexion
+        // du compte Stripe (#876).
+        router
+          .post('invoices/:id/payment-link', [controllers.Invoices, 'createPaymentLink'])
+          .as('invoices.paymentLink')
         // Facture émise : seule écriture encore permise (#717).
         router
           .patch('invoices/:id/payment', [controllers.Invoices, 'updatePayment'])
@@ -43,3 +51,14 @@ router
       .use(middleware.requireModulePlan({ feature: 'invoices' }))
   })
   .use(middleware.auth())
+
+// Page publique de paiement d'une facture (#876) : sans login, le jeton opaque
+// fait office d'autorisation.
+router
+  .get('pay/:token', [InvoicePaymentLinksController, 'show'])
+  .as('invoices.pay.public.show')
+  .use(invoicePaymentThrottle)
+router
+  .post('pay/:token/checkout', [InvoicePaymentLinksController, 'checkout'])
+  .as('invoices.pay.public.checkout')
+  .use(invoicePaymentThrottle)

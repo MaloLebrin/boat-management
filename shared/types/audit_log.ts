@@ -50,6 +50,11 @@ export const AUDIT_ACTIONS = [
   'billing.module_activate',
   'billing.module_deactivate',
   'billing.addon_set',
+  // Paiement en ligne des factures (#876) : compte Stripe connecté de
+  // l'organisation, et règlement confirmé par le webhook (sans auteur).
+  'online_payments.connect',
+  'online_payments.disconnect',
+  'invoice.paid_online',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]

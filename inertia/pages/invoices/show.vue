@@ -9,6 +9,7 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
 import InvoiceLinesCard from '~/components/invoices/InvoiceLinesCard.vue'
 import InvoicePaymentCard from '~/components/invoices/InvoicePaymentCard.vue'
+import InvoiceOnlinePaymentCard from '~/components/invoices/InvoiceOnlinePaymentCard.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useDeleteConfirmation } from '~/composables/use_delete_confirmation'
 import { useT } from '~/composables/use_t'
@@ -18,6 +19,7 @@ import type { InvoiceDetail } from '../../../shared/types/invoice'
 const props = defineProps<{
   invoice: InvoiceDetail
   canDelete: boolean
+  canAcceptOnlinePayments?: boolean
 }>()
 
 const { t } = useT()
@@ -234,6 +236,11 @@ function markPaid() {
 
     <!-- Paiement d'une facture émise (#717) -->
     <InvoicePaymentCard v-if="canEditPayment" :invoice="invoice" class="mt-4" />
+    <InvoiceOnlinePaymentCard
+      :invoice="invoice"
+      :can-accept-online-payments="canAcceptOnlinePayments ?? false"
+      class="mt-4"
+    />
 
     <!-- Lines + totals -->
     <InvoiceLinesCard :invoice="invoice" class="mt-4" />

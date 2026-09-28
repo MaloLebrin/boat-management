@@ -291,6 +291,71 @@ export function restoreStripeService(): void {
   app.container.restore(StripeService)
 }
 
+/** Ce qu'un test peut asserter après coup sur le faux Stripe Connect (#876). */
+export interface FakeStripeConnect {
+  createdAccounts: Array<{ organizationId: number; email: string }>
+  accountLinks: Array<{ accountId: string; refreshUrl: string; returnUrl: string }>
+  checkoutSessions: Array<Parameters<StripeService['createInvoiceCheckoutSession']>[0]>
+  restore(): void
+}
+
+/**
+ * Remplace `StripeService` pour le paiement en ligne des factures (#876) :
+ * création du compte connecté, lien d'onboarding, lecture du compte et
+ * session Checkout — les seuls appels réseau du chemin.
+ *
+ * Les vérifications de signature restent les vraies, comme dans
+ * `swapStripeService`.
+ */
+export function swapStripeConnectService(
+  options: { chargesEnabled?: boolean; detailsSubmitted?: boolean } = {}
+): FakeStripeConnect {
+  const real = new StripeService()
+  const state: FakeStripeConnect = {
+    createdAccounts: [],
+    accountLinks: [],
+    checkoutSessions: [],
+    restore: restoreStripeService,
+  }
+
+  app.container.swap(
+    StripeService,
+    () =>
+      ({
+        isConfigured: () => true,
+        constructWebhookEvent: (rawBody: string, signature: string) =>
+          real.constructWebhookEvent(rawBody, signature),
+        constructConnectWebhookEvent: (rawBody: string, signature: string) =>
+          real.constructConnectWebhookEvent(rawBody, signature),
+        moduleForPriceId: (priceId: string) => real.moduleForPriceId(priceId),
+        addonForPriceId: (priceId: string) => real.addonForPriceId(priceId),
+        createConnectedAccount: async (org: { id: number }, email: string) => {
+          state.createdAccounts.push({ organizationId: org.id, email })
+          return `acct_fake_${org.id}`
+        },
+        createAccountLink: async (opts: FakeStripeConnect['accountLinks'][number]) => {
+          state.accountLinks.push(opts)
+          return `https://connect.stripe.test/setup/${opts.accountId}`
+        },
+        retrieveAccount: async (accountId: string) =>
+          ({
+            id: accountId,
+            charges_enabled: options.chargesEnabled ?? true,
+            details_submitted: options.detailsSubmitted ?? true,
+          }) as Stripe.Account,
+        createInvoiceCheckoutSession: async (
+          opts: FakeStripeConnect['checkoutSessions'][number]
+        ) => {
+          state.checkoutSessions.push(opts)
+          const id = `cs_fake_${state.checkoutSessions.length}`
+          return { id, url: `https://checkout.stripe.test/${id}` }
+        },
+      }) as unknown as StripeService
+  )
+
+  return state
+}
+
 /** Ce qu'un test peut asserter après coup sur les appels à la synchro. */
 export interface CountingSubscriptionService {
   /** Un compteur par méthode de synchro, dans l'ordre d'appel. */

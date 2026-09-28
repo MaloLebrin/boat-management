@@ -11,6 +11,7 @@
 | ---------------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
 | `STRIPE_SECRET_KEY`                            | Oui         | Clé secrète API (`sk_live_...` en prod, `sk_test_...` en dev)                           |
 | `STRIPE_WEBHOOK_SECRET`                        | Oui         | Secret de signature webhook (`whsec_...`)                                               |
+| `STRIPE_CONNECT_WEBHOOK_SECRET`                | Connect     | Secret de l'endpoint « comptes connectés » `/webhooks/stripe/connect` (#876)            |
 | `STRIPE_PUBLIC_KEY`                            | Non         | Clé publique (`pk_live_...` / `pk_test_...`)                                            |
 | `STRIPE_PRO_MONTHLY_PRICE_ID`                  | Oui         | Price ID mensuel plan Pro (`price_...`)                                                 |
 | `STRIPE_PRO_ANNUAL_PRICE_ID`                   | Oui         | Price ID annuel plan Pro (`price_...`)                                                  |
@@ -202,6 +203,31 @@ Aucun nouvel event webhook à configurer : l'ajout / le changement de quantité 
 Les prix des **modules** (`charter`, `crm_invoicing`) suivent le même schéma `licensed` (quantité 1), variables `STRIPE_MODULE_*`.
 
 ---
+
+## Stripe Connect — paiement en ligne des factures (#876)
+
+Les organisations encaissent leurs clients **sur leur propre compte Stripe**
+(Connect Standard, charges directes) ; le compte FleetAi ne voit passer aucun
+fonds. Architecture et règles métier : [`docs/domain/invoicing.md`](../domain/invoicing.md) §7 bis.
+
+1. **Activer Connect** sur le compte plateforme (dashboard → Connect → Get
+   started), type de compte **Standard**.
+2. **Endpoint webhook des comptes connectés** : dashboard → Developers →
+   Webhooks → Add endpoint → « Events on **Connected accounts** », URL
+   `https://<domaine>/webhooks/stripe/connect`, événements
+   `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+   `account.updated`. Copier son `whsec_...` dans
+   `STRIPE_CONNECT_WEBHOOK_SECRET` — il est **distinct** de
+   `STRIPE_WEBHOOK_SECRET`.
+3. En local :
+
+```bash
+stripe listen --forward-connect-to localhost:5555/webhooks/stripe/connect
+```
+
+Sans `STRIPE_SECRET_KEY`, la carte « Paiement en ligne » de `/settings/billing`
+affiche « indisponible » ; sans `STRIPE_CONNECT_WEBHOOK_SECRET`, l'endpoint
+répond 400 à tout événement.
 
 ## Tester le webhook (#698)
 

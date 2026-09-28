@@ -362,6 +362,7 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 
 - Page : `inertia/pages/invoices/show.vue` (props `invoice`, `canDelete`, `readOnly`), sous-composants `InvoiceStatusBadge`, `InvoiceLinesCard`, `InvoicePaymentCard`.
 - **Facture émise = fiche en lecture** : dès qu'une facture (`kind: 'invoice'`) quitte le brouillon, le bouton « Modifier » disparaît de la fiche **et** de la liste (`canEditInvoice`, `shared/helpers/invoice_lifecycle.ts`), remplacé par une ligne d'explication (`invoices.lockedNotice`). Les devis et les factures brouillon gardent le bouton.
+- `InvoiceOnlinePaymentCard.vue` (#876) — visible sur une facture payable en ligne (`isInvoicePayableOnline`) quand un lien existe ou que l'organisation encaisse en ligne (prop de page `canAcceptOnlinePayments`) : champ en lecture seule avec l'URL `/pay/:token` + « Copier le lien », ou bouton « Créer le lien de paiement » (`router.post('/invoices/:id/payment-link')`).
 - `InvoicePaymentCard.vue` — visible sur une facture émise non annulée : date de paiement (`<input type="date">`, format machine) + moyen de paiement (`cash`/`card`/`transfer`/`check`/`other`, désactivé tant qu'aucune date n'est posée). Soumission par visite Inertia `router.patch('/invoices/:id/payment', …, { preserveScroll: true })` — jamais de `fetch` + CSRF manuel. Vider la date annule le paiement enregistré.
 - Le détail affiche « Payé le » et « Moyen de paiement » uniquement quand un paiement est enregistré — l'invariant `paid_at ⇔ status paid` (#717) garantit qu'aucun brouillon n'affiche de date de règlement.
 
@@ -377,6 +378,10 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 - Les deux gardes sont côté backend, pas seulement dans le rendu : `authorize('viewMembers')` sur le `GET`, `authorize('manageOrganization')` sur le `PUT` — un mechanic ou un boat_owner qui tape l'URL reçoit la page 403.
 - Le logo de l'organisation ne vit **pas** ici mais sur `/settings/branding` (`branding.configure`), avec le reste de la marque.
 
+### Paiement public d'une facture (`/pay/:token`, #876)
+
+- Page : `inertia/pages/pay/show.vue` (layout `auth`, sans login), prop `payment: PublicInvoicePayment | null`. Carte émetteur, numéro, client, dates, montant ; bouton « Payer {montant} » (`useForm().post('/pay/:token/checkout')` → Stripe Checkout) si `state === 'payable'`, sinon alerte « réglée », « paiement en cours de confirmation » (retour `?status=success`) ou « indisponible ». `payment === null` : carte « lien invalide ».
+
 ### Settings — facturation (`/settings/billing`)
 
 - Page : `inertia/pages/settings/billing.vue` → `components/settings/tabs/SettingsBillingTab.vue` (props `plan`, `quotaUsage`, `subscription`, `orgModules`, `orgAddons`, servies par `SettingsController.billing`)
@@ -386,6 +391,7 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
   - `SettingsBillingFeatureList.vue` — capacités du plan. Deux lignes IA distinctes (#456) : « IA / Copilote » (depuis `quotaUsage.canUseAI`) et « Personnalisation IA (prompt métier) » (depuis `PLAN_LIMITS[plan].canCustomizeAI`, qu'aucun module add-on n'accorde). En Pro la première est cochée et la seconde non — les fusionner laissait croire que `/settings/ai` était accessible
   - `SettingsBillingSubscriptionNotice.vue` — bandeau affiché quand `plan === 'pro' && subscription === null` (#456). L'organisation **a** le plan Pro en base mais aucun abonnement Stripe actif ; le bandeau nomme le plan possédé et explique que modules et add-ons sont facturés sur l'abonnement. CTA « Finaliser l'abonnement » (→ `startCheckout('pro')`) pour un porteur de `subscription.manage`, renvoi vers un administrateur sinon
   - `SettingsBillingModules.vue` — modules add-ons (`charter`, `crm_invoicing`)
+  - `SettingsOnlinePayments.vue` (#876, rendu par la page sous le tab, prop `onlinePayments`) — compte Stripe connecté : badge d'état (`none`/`pending`/`active`), « Connecter mon compte Stripe » / « Terminer la configuration » (`useForm().post('/settings/billing/online-payments')` → redirection Stripe) et « Déconnecter » (`router.delete`, après confirmation) pour un porteur de `subscription.manage` ; message « module requis » si `available` est faux
   - `SettingsBillingExtraBoats.vue` — add-on quantitatif `extra_boats` (stepper). Même distinction plan/abonnement que les modules : la branche « Pro sans abonnement actif » propose de finaliser l'abonnement, la branche Starter affiche « Disponible à partir du plan Pro »
 - **Plan ≠ abonnement** : `plan` est une colonne de `organizations`, `subscription` l'abonnement Stripe actif. Tout libellé qui les confond finit par nier au client un plan qu'il possède — c'est le bug #456. Les libellés « Nécessite un plan Pro actif » sont réservés au vrai Starter.
 - Écrans gatés (`/invoices`, `/pricing/seasons`, `/clients`, `/settings/ai`, `/settings/branding`, `/settings/import`) : la redirection d'upsell vise `/settings/billing` (`BILLING_SETTINGS_PATH`) et **jamais** `/`, qui redirige sur `/en` — le layout public ne rend aucun toast, le flash y serait perdu (#456).

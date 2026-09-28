@@ -24,20 +24,30 @@ const paidAt = ref(props.invoice.paidAt ?? '')
 const paymentMethod = ref<InvoicePaymentMethod | ''>(props.invoice.paymentMethod ?? '')
 const busy = ref(false)
 
+// Réglée en ligne (#876) : le moyen vient de Stripe, il ne se ressaisit pas.
+// La date reste corrigeable, et son effacement annule toujours le paiement.
+const paidOnline = computed(() => props.invoice.paymentMethod === 'online')
+
 const methodOptions = computed(() =>
-  INVOICE_PAYMENT_METHODS.map((method) => ({
-    label: t(`invoices.paymentMethods.${method}`),
-    value: method,
-  }))
+  [...INVOICE_PAYMENT_METHODS, ...(paidOnline.value ? (['online'] as const) : [])].map(
+    (method) => ({
+      label: t(`invoices.paymentMethods.${method}`),
+      value: method,
+    })
+  )
 )
+
+function paymentMethodPayload(): { paymentMethod?: InvoicePaymentMethod | null } {
+  if (!paidAt.value) return { paymentMethod: null }
+  // Clé absente : le serveur conserve le moyen déjà enregistré.
+  if (paidOnline.value) return {}
+  return { paymentMethod: paymentMethod.value || null }
+}
 
 function submit() {
   router.patch(
     `/invoices/${props.invoice.id}/payment`,
-    {
-      paidAt: paidAt.value || null,
-      paymentMethod: paidAt.value ? paymentMethod.value || null : null,
-    },
+    { paidAt: paidAt.value || null, ...paymentMethodPayload() },
     {
       preserveScroll: true,
       onStart: () => {
@@ -73,7 +83,7 @@ function submit() {
         :label="t('invoices.payment.method')"
         :placeholder="t('invoices.paymentMethods.none')"
         :options="methodOptions"
-        :disabled="!paidAt"
+        :disabled="!paidAt || paidOnline"
       />
       <div class="sm:col-span-2">
         <BaseButton variant="primary" size="sm" type="submit" :disabled="busy">

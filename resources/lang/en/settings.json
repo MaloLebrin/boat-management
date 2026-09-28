@@ -161,6 +161,23 @@
       "body": "Your organisation is on the {plan} plan, but no active subscription is attached to it. Add-on modules and extra boats are billed on that subscription — complete it to enable them.",
       "cta": "Complete billing setup",
       "adminOnly": "An administrator must complete the billing setup."
+    },
+    "onlinePayments": {
+      "title": "Online invoice payment",
+      "description": "Connect your Stripe account: your customers pay their invoices by card from the link in the email, and the money goes straight to your account.",
+      "state": {
+        "none": "Not connected",
+        "pending": "Waiting for Stripe",
+        "active": "Active"
+      },
+      "unavailable": "Available with the CRM & Invoicing module, once Stripe is configured.",
+      "pendingHint": "Stripe still needs information about your business before enabling payments.",
+      "activeHint": "Invoices sent by email include a “Pay online” button.",
+      "connect": "Connect my Stripe account",
+      "resume": "Finish setup",
+      "disconnect": "Disconnect",
+      "disconnectConfirm": "Disconnect your Stripe account? Payment links already sent will stop working.",
+      "adminOnly": "Only an administrator can connect the organization's Stripe account."
     }
   },
   "upgrade": {
@@ -393,7 +410,10 @@
       "billing_module_remove": "Module removed from subscription",
       "billing_module_activate": "Included module activated",
       "billing_module_deactivate": "Included module deactivated",
-      "billing_addon_set": "Extra boats updated"
+      "billing_addon_set": "Extra boats updated",
+      "online_payments_connect": "Stripe account connected",
+      "online_payments_disconnect": "Stripe account disconnected",
+      "invoice_paid_online": "Invoice paid online"
     },
     "empty": {
       "title": "No activity yet",

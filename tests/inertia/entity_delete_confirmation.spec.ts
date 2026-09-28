@@ -83,6 +83,7 @@ describe('invoices/show — suppression de la facture affichée', () => {
       sourceQuote: null,
       convertedInvoice: null,
       reservationBoatId: null,
+      onlinePaymentUrl: null,
     } as InvoiceDetail
   }
 

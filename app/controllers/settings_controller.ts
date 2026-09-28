@@ -8,6 +8,7 @@ import QuotaService from '#services/quota_service'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import BoatListService from '#services/boat_list_service'
+import OnlinePaymentService from '#services/online_payment_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
@@ -46,7 +47,8 @@ export default class SettingsController {
     private boatListService: BoatListService,
     private pushSubscriptionService: PushSubscriptionService,
     private organizationAiKeyService: OrganizationAiKeyService,
-    private passwordResetService: PasswordResetService
+    private passwordResetService: PasswordResetService,
+    private onlinePaymentService: OnlinePaymentService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -105,7 +107,7 @@ export default class SettingsController {
     })
   }
 
-  async billing({ inertia, auth }: HttpContext) {
+  async billing({ inertia, auth, bouncer }: HttpContext) {
     const user = await auth.authenticate()
     await user.load('organization')
     const org = user.organization
@@ -122,6 +124,7 @@ export default class SettingsController {
         this.organizationModuleService.getActiveAddons(org.id),
         this.organizationModuleService.getEffectiveQuotas(org),
       ])
+    const canManageBilling = await bouncer.with(OrganizationPolicy).allows('manageBilling')
 
     return inertia.render('settings/billing', {
       plan: org.plan,
@@ -142,6 +145,8 @@ export default class SettingsController {
       orgModules,
       // Add-ons quantitatifs actifs (ex. `extra_boats`) avec quantité + origine.
       orgAddons,
+      // Compte Stripe connecté pour le paiement en ligne des factures (#876).
+      onlinePayments: await this.onlinePaymentService.settingsFor(org, canManageBilling),
     })
   }
 

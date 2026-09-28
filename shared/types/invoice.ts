@@ -1,7 +1,10 @@
 export type InvoiceKind = 'quote' | 'invoice'
 export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled'
-/** Moyen de règlement d'une facture (#717). */
-export type InvoicePaymentMethod = 'cash' | 'card' | 'transfer' | 'check' | 'other'
+/**
+ * Moyen de règlement d'une facture (#717). `online` n'est jamais saisi à la
+ * main : seul le webhook Stripe d'un paiement en ligne le pose (#876).
+ */
+export type InvoicePaymentMethod = 'cash' | 'card' | 'transfer' | 'check' | 'other' | 'online'
 export type InvoiceSortField = 'issuedAt' | 'number' | 'total' | 'status'
 export type InvoiceSortDirection = 'asc' | 'desc'
 
@@ -53,6 +56,11 @@ export interface InvoiceDetail extends InvoiceRow {
   convertedInvoice: InvoiceLink | null
   // Boat id of the linked reservation, so the UI can deep-link to it.
   reservationBoatId: number | null
+  /**
+   * Lien public de paiement en ligne (`/pay/:token`, #876), `null` tant qu'il
+   * n'a pas été créé ou quand la facture n'est plus payable.
+   */
+  onlinePaymentUrl: string | null
 }
 
 export interface CreateInvoicePayload {
