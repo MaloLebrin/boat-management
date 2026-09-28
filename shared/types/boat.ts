@@ -1,6 +1,7 @@
 import type { DateTime } from 'luxon'
 import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { ArmamentZone } from '#shared/types/safety'
+import type { BoatStatus } from '#shared/types/boat_status'
 
 export type BoatPositionSource = 'manual' | 'ais' | 'gps'
 
@@ -209,6 +210,7 @@ export type BoatSerializedRow = {
   registrationNumber: string | null
   category: string | null
   propulsionType: string | null
+  status: string
   updatedAt: string | null
 }
 
@@ -218,6 +220,11 @@ export type BoatListDirection = 'asc' | 'desc'
 export type BoatListQuery = {
   q?: string
   category?: string
+  /**
+   * Statut de disponibilité (#870). Vide = flotte active (tout sauf `sold`) :
+   * un bateau vendu ne réapparaît que filtré explicitement.
+   */
+  status?: string
   propulsionType?: string
   hasEngine?: boolean
   hasSails?: boolean
@@ -234,6 +241,7 @@ export type BoatListItem = {
   registrationNumber: string | null
   category: BoatCategory | null
   propulsionType: string | null
+  status: BoatStatus
   updatedAt: string | null
   maintenance: {
     urgentCount: number

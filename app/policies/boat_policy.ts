@@ -26,6 +26,14 @@ export default class BoatPolicy extends OrgScopedPolicy {
     return this.sameOrg(user, boat) && (await this.can(user, 'boats.manage'))
   }
 
+  /**
+   * Poser une réservation confirmée sur un bateau indisponible (#870), avec un
+   * motif tracé au journal d'audit.
+   */
+  async forceReservation(user: User, boat: Boat): Promise<AuthorizerResponse> {
+    return this.sameOrg(user, boat) && (await this.can(user, 'boats.reservations.force'))
+  }
+
   async deleteReservation(
     user: User,
     boat: Boat,

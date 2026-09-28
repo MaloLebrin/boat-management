@@ -22,6 +22,8 @@ export type NotificationType =
   | 'safety_equipment.expired'
   | 'invitation.accepted'
   | 'ai.suggestions_ready'
+  | 'boat.status_changed'
+  | 'boat.available_again'
   | (string & {}) // extensible pour les futurs types sans casser le type
 
 export type NotificationSeverity = 'info' | 'success' | 'warning' | 'error'

@@ -53,7 +53,9 @@
     "delete": "Supprimer",
     "confirmDelete": "Supprimer cette réservation ?",
     "type": "Type de prestation",
-    "noType": "Non précisé"
+    "noType": "Non précisé",
+    "forceReason": "Motif de forçage (administrateur)",
+    "forceReasonHint": "Si le bateau est indisponible sur ces dates, renseigner un motif confirme quand même la réservation. Le forçage est tracé au journal d'activité."
   },
   "calendar": {
     "noReservations": "Aucune réservation ce mois-ci",

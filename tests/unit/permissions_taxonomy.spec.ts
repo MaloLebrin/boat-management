@@ -10,6 +10,7 @@ const ADMIN_ONLY: Capability[] = [
   'organization.manage',
   'import.run',
   'boats.delete',
+  'boats.reservations.force',
   'clients.delete',
   'clients.anonymize',
   'crew.delete',

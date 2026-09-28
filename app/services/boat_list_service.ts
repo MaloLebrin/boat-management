@@ -16,6 +16,7 @@ import type {
   BoatSerializedRow,
 } from '#shared/types/boat'
 import { BOAT_CATEGORIES, type BoatCategory } from '#shared/types/boat_catalog'
+import { isBoatStatus } from '#shared/types/boat_status'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 
@@ -35,6 +36,8 @@ export default class BoatListService {
     const rawCategory = toTrimmedStringOrUndefined(raw.category) ?? ''
     const category = (BOAT_CATEGORIES as readonly string[]).includes(rawCategory) ? rawCategory : ''
     const propulsionType = toTrimmedStringOrUndefined(raw.propulsionType) ?? ''
+    const rawStatus = toTrimmedStringOrUndefined(raw.status) ?? ''
+    const status = isBoatStatus(rawStatus) ? rawStatus : ''
 
     const hasEngine = toBooleanFlag(raw.hasEngine)
     const hasSails = toBooleanFlag(raw.hasSails)
@@ -54,6 +57,7 @@ export default class BoatListService {
       q,
       category,
       propulsionType,
+      status,
       hasEngine,
       hasSails,
       hasRig,
@@ -88,7 +92,15 @@ export default class BoatListService {
 
     const query = Boat.query()
       .where('organizationId', user.organizationId)
-      .select(['id', 'name', 'registrationNumber', 'category', 'propulsionType', 'updatedAt'])
+      .select([
+        'id',
+        'name',
+        'registrationNumber',
+        'category',
+        'propulsionType',
+        'status',
+        'updatedAt',
+      ])
 
     if (filters.q) {
       const needle = `%${escapeLike(filters.q)}%`
@@ -99,6 +111,10 @@ export default class BoatListService {
 
     if (filters.category) query.where('category', filters.category)
     if (filters.propulsionType) query.where('propulsionType', filters.propulsionType)
+    // Flotte active par défaut (#870) : un bateau vendu garde son historique
+    // mais ne revient que si on le demande.
+    if (filters.status) query.where('status', filters.status)
+    else query.whereNot('status', 'sold')
 
     // Filtres de présence d'équipement (cartes du tableau de bord) : on cible
     // les bateaux qui possèdent réellement l'équipement, pas un type de propulsion.
@@ -128,6 +144,7 @@ export default class BoatListService {
           registrationNumber: b.registrationNumber ?? null,
           category: (b.category as BoatCategory | null) ?? null,
           propulsionType: b.propulsionType ?? null,
+          status: isBoatStatus(b.status) ? b.status : 'available',
           updatedAt: b.updatedAt ?? null,
           maintenance: badges.get(Number(b.id)) ?? {
             urgentCount: 0,

@@ -5,6 +5,8 @@ import {
   ReservationDurationError,
   ReservationBlacklistedClientError,
 } from '#exceptions/reservation_errors'
+import { BoatUnavailableError } from '#exceptions/boat_errors'
+import type { BoatUnavailabilityWindow } from '#shared/types/boat_status'
 import BoatReservation from '#models/boat_reservation'
 import BoatModel from '#models/boat'
 import Client from '#models/client'
@@ -25,6 +27,7 @@ import type {
   DashboardUpcomingReservation,
 } from '#shared/types/dashboard'
 import { countBilledNights } from '#shared/helpers/reservation_quote'
+import BoatAvailabilityService from '#services/boat_availability_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import ReservationQuoteService from '#services/reservation_quote_service'
 import { inject } from '@adonisjs/core'
@@ -49,7 +52,8 @@ const ALLOWED_RESERVATION_TRANSITIONS: Record<ReservationStatus, ReservationStat
 export default class BoatReservationService {
   constructor(
     private pricingService: BoatPricingService,
-    private quoteService: ReservationQuoteService
+    private quoteService: ReservationQuoteService,
+    private availabilityService: BoatAvailabilityService
   ) {}
 
   async listForBoat(user: User, boat: Boat): Promise<BoatReservation[]> {
@@ -196,7 +200,12 @@ export default class BoatReservationService {
     user: User,
     boat: Boat,
     payload: CreateReservationPayload
-  ): Promise<{ reservation: BoatReservation; cancelledOptions: number }> {
+  ): Promise<{
+    reservation: BoatReservation
+    cancelledOptions: number
+    /** Indisponibilités passées outre par un forçage (#870) — vide sinon. */
+    forcedOver: BoatUnavailabilityWindow[]
+  }> {
     assertBoatInUserOrg(user, boat, () => new ReservationNotFoundError())
 
     const startsAt = toUtcFromLocalInput(payload.startsAt, payload.tzOffsetMinutes)
@@ -238,6 +247,14 @@ export default class BoatReservationService {
 
     return db.transaction(async (trx) => {
       await this.checkConflict(boat.id, startsAt, endsAt, null, status, trx)
+      const forcedOver = await this.assertBoatAvailable(
+        boat,
+        startsAt,
+        endsAt,
+        status,
+        payload.forceReason,
+        trx
+      )
 
       const cancelledOptions =
         status === 'confirmed'
@@ -262,7 +279,7 @@ export default class BoatReservationService {
         { client: trx }
       )
 
-      return { reservation, cancelledOptions }
+      return { reservation, cancelledOptions, forcedOver }
     })
   }
 
@@ -271,7 +288,12 @@ export default class BoatReservationService {
     boat: Boat,
     reservationId: number,
     payload: UpdateReservationPayload
-  ): Promise<{ reservation: BoatReservation; cancelledOptions: number }> {
+  ): Promise<{
+    reservation: BoatReservation
+    cancelledOptions: number
+    /** Indisponibilités passées outre par un forçage (#870) — vide sinon. */
+    forcedOver: BoatUnavailabilityWindow[]
+  }> {
     assertBoatInUserOrg(user, boat, () => new ReservationNotFoundError())
 
     const reservation = await BoatReservation.query()
@@ -329,6 +351,24 @@ export default class BoatReservationService {
     return db.transaction(async (trx) => {
       await this.checkConflict(boat.id, startsAt, endsAt, reservationId, effectiveStatus, trx)
 
+      // Une réservation déjà posée reste modifiable (notes, client…) même si le
+      // bateau est devenu indisponible depuis : seuls un déplacement ou un
+      // changement de statut repassent par la règle de disponibilité (#870).
+      const touchesAvailability =
+        payload.startsAt !== undefined ||
+        payload.endsAt !== undefined ||
+        (payload.status !== undefined && payload.status !== reservation.status)
+      const forcedOver = touchesAvailability
+        ? await this.assertBoatAvailable(
+            boat,
+            startsAt,
+            endsAt,
+            effectiveStatus,
+            payload.forceReason,
+            trx
+          )
+        : []
+
       const cancelledOptions =
         effectiveStatus === 'confirmed'
           ? await this.cancelOverlappingOptions(boat.id, startsAt, endsAt, reservationId, trx)
@@ -352,7 +392,7 @@ export default class BoatReservationService {
       reservation.useTransaction(trx)
       await reservation.save()
 
-      return { reservation, cancelledOptions }
+      return { reservation, cancelledOptions, forcedOver }
     })
   }
 
@@ -460,6 +500,41 @@ export default class BoatReservationService {
     if (conflict) {
       throw new ReservationConflictError()
     }
+  }
+
+  /**
+   * Règle de disponibilité du bateau (#870) :
+   * - un bateau vendu n'accepte plus aucune réservation (non forçable) ;
+   * - une réservation `confirmed` ne peut chevaucher une fenêtre
+   *   d'indisponibilité (statut, tâche datée, incident ouvert) que si un motif
+   *   de forçage est fourni — les fenêtres forcées sont alors renvoyées pour
+   *   être tracées ;
+   * - une `option` et une annulation ne sont jamais bloquées.
+   */
+  private async assertBoatAvailable(
+    boat: Boat,
+    startsAt: DateTime,
+    endsAt: DateTime,
+    incomingStatus: ReservationStatus,
+    forceReason: string | null | undefined,
+    trx: TransactionClientContract
+  ): Promise<BoatUnavailabilityWindow[]> {
+    if (incomingStatus === 'cancelled') return []
+
+    if (boat.status === 'sold') {
+      const windows = await this.availabilityService.conflictsFor(boat, startsAt, endsAt, trx)
+      throw new BoatUnavailableError(
+        windows.filter((w) => w.source === 'status'),
+        false
+      )
+    }
+
+    if (incomingStatus !== 'confirmed') return []
+
+    const conflicts = await this.availabilityService.conflictsFor(boat, startsAt, endsAt, trx)
+    if (conflicts.length === 0) return []
+    if (forceReason?.trim()) return conflicts
+    throw new BoatUnavailableError(conflicts, true)
   }
 
   /**

@@ -20,6 +20,7 @@ function makeBoat(overrides: Partial<BoatListItem> = {}): BoatListItem {
     registrationNumber: null,
     category: null,
     propulsionType: 'sailboat',
+    status: 'available',
     updatedAt: null,
     maintenance: { urgentCount: 0, upcomingCount: 0, nextDueAt: null },
     ...overrides,
@@ -30,7 +31,7 @@ test('hides Registration and Category columns when no boat has that data', () =>
   const w = mount(BoatTable, { props: { boats: [makeBoat(), makeBoat({ id: 2 })] } })
   expect(w.text()).not.toContain('boats.list.table.registration')
   expect(w.text()).not.toContain('boats.list.table.category')
-  expect(w.findAll('th').length).toBe(3)
+  expect(w.findAll('th').length).toBe(4)
 })
 
 test('shows Registration column when at least one boat has a registration number', () => {
@@ -49,4 +50,13 @@ test('shows Category column when at least one boat has a category', () => {
   expect(w.text()).toContain('boats.list.table.category')
   // Le libellé passe par `boatCategoryLabel` : le mock de `t` renvoie la clé.
   expect(w.text()).toContain('boats.options.category.sailboat_monohull')
+})
+
+test('shows the availability status of each boat (#870)', () => {
+  const w = mount(BoatTable, {
+    props: { boats: [makeBoat(), makeBoat({ id: 2, status: 'out_of_service' })] },
+  })
+  expect(w.text()).toContain('boats.list.table.status')
+  expect(w.text()).toContain('boats.availability.status.available')
+  expect(w.text()).toContain('boats.availability.status.out_of_service')
 })

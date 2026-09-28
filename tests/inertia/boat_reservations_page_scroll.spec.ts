@@ -26,6 +26,8 @@ const baseProps = {
   boatPricing: null,
   pricingSeasons: [],
   clientOptions: [],
+  availability: { status: 'available', statusReason: null, statusChangedAt: null, windows: [] },
+  canForceUnavailable: false,
 }
 
 let scrollIntoView: ReturnType<typeof vi.fn>

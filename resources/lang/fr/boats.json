@@ -554,7 +554,8 @@
       "registration": "Immatriculation",
       "category": "Catégorie",
       "propulsion": "Propulsion",
-      "maintenance": "Maintenance"
+      "maintenance": "Maintenance",
+      "status": "Disponibilité"
     },
     "cards": {
       "unknownCategory": "Catégorie inconnue",
@@ -566,7 +567,9 @@
       "ok": "OK"
     },
     "viewTable": "Tableau",
-    "viewCards": "Cartes"
+    "viewCards": "Cartes",
+    "status": "Statut",
+    "statusActive": "Flotte active"
   },
   "engineShow": {
     "breadcrumb": {
@@ -1145,6 +1148,38 @@
       "charts": "cartes marines et documents nautiques",
       "weather_forecast": "moyen de réception des bulletins météo",
       "summary_document": "document de synthèse (fiche d'armement)"
+    }
+  },
+  "availability": {
+    "status": {
+      "available": "Disponible",
+      "in_maintenance": "En entretien",
+      "out_of_service": "Hors service",
+      "sold": "Vendu"
+    },
+    "change": "Changer le statut",
+    "modal": {
+      "title": "Changer le statut du bateau",
+      "status": "Nouveau statut",
+      "reason": "Motif (facultatif)",
+      "reasonPlaceholder": "Ex. moteur démonté, attente de pièce…",
+      "submit": "Enregistrer",
+      "immobilizedHint": "Tant que ce statut est actif, aucune réservation confirmée ne peut être posée sur le bateau (une option reste possible).",
+      "soldHint": "Un bateau vendu sort de la liste active et du quota de bateaux ; son historique reste consultable. Il n'accepte plus aucune réservation."
+    },
+    "banner": {
+      "immobilized": "Bateau indisponible — {status}",
+      "upcoming": "Indisponibilités à venir",
+      "since": "Depuis le {date}.",
+      "reason": "Motif : {reason}",
+      "task": "Tâche « {title} » le {date}",
+      "incident": "Incident ouvert ({type}) depuis le {date}",
+      "rule": "Une réservation confirmée qui chevauche ces périodes est refusée ; une option reste possible."
+    },
+    "history": {
+      "title": "Historique des statuts",
+      "entry": "{from} → {to}",
+      "by": "par {name}"
     }
   }
 }

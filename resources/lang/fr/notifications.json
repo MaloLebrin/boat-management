@@ -93,6 +93,24 @@
         "title": "Nouvelles suggestions IA pour {boatName}",
         "body": "{count, plural, one {# nouvelle analyse IA est disponible} other {# nouvelles analyses IA sont disponibles}} pour {boatName}."
       }
+    },
+    "boat": {
+      "statuses": {
+        "available": "disponible",
+        "in_maintenance": "en entretien",
+        "out_of_service": "hors service",
+        "sold": "vendu"
+      },
+      "status_changed": {
+        "title": "{boatName} est désormais {toStatus}",
+        "body": "{changedBy} a passé {boatName} de « {fromStatus} » à « {toStatus} ».",
+        "bodyWithReason": "{changedBy} a passé {boatName} de « {fromStatus} » à « {toStatus} ». Motif : {reason}"
+      },
+      "available_again": {
+        "title": "{boatName} est de nouveau disponible",
+        "body": "{changedBy} a remis {boatName} en service (il était {fromStatus}).",
+        "bodyWithReason": "{changedBy} a remis {boatName} en service (il était {fromStatus}). Motif : {reason}"
+      }
     }
   },
   "title": "Notifications",
@@ -126,6 +144,8 @@
     "safety_equipment.expiring_soon": "Équipement de sécurité expirant",
     "safety_equipment.expired": "Équipement de sécurité expiré",
     "invitation.accepted": "Invitation acceptée",
-    "ai.suggestions_ready": "Suggestions IA"
+    "ai.suggestions_ready": "Suggestions IA",
+    "boat.status_changed": "Statut du bateau modifié",
+    "boat.available_again": "Bateau de nouveau disponible"
   }
 }

@@ -10,12 +10,14 @@ import BoatReservation from '#models/boat_reservation'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
+import BoatStatusChange from '#models/boat_status_change'
 import NavigationLog from '#models/navigation_log'
 import Spot from '#models/spot'
 import User from '#models/user'
 import { BaseModel, belongsTo, column, hasMany, hasOne, manyToMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany, HasOne, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import type { BoatStatus } from '#shared/types/boat_status'
 
 export default class Boat extends BaseModel {
   static table = 'boats'
@@ -109,6 +111,16 @@ export default class Boat extends BaseModel {
   @column()
   declare spotId: number | null
 
+  /** Disponibilité du bateau (#870) — voir `BOAT_STATUSES`. */
+  @column()
+  declare status: BoatStatus
+
+  @column()
+  declare statusReason: string | null
+
+  @column.dateTime()
+  declare statusChangedAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -153,6 +165,9 @@ export default class Boat extends BaseModel {
 
   @hasMany(() => BoatReservation)
   declare reservations: HasMany<typeof BoatReservation>
+
+  @hasMany(() => BoatStatusChange)
+  declare statusChanges: HasMany<typeof BoatStatusChange>
 
   @hasOne(() => BoatPricing)
   declare pricing: HasOne<typeof BoatPricing>

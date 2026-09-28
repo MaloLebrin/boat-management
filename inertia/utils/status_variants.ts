@@ -58,3 +58,11 @@ export function documentStatusVariant(status: string): BadgeVariant {
   if (status === 'expired') return 'danger'
   return 'neutral'
 }
+
+/** Disponibilité d'un bateau (#870). */
+export function boatStatusVariant(status: string): BadgeVariant {
+  if (status === 'available') return 'success'
+  if (status === 'in_maintenance') return 'warning'
+  if (status === 'out_of_service') return 'danger'
+  return 'neutral'
+}

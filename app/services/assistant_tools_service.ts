@@ -3,6 +3,8 @@ import type User from '#models/user'
 import AiTokenQuotaService from '#services/ai_token_quota_service'
 import AssistantProductHelpService from '#services/assistant_product_help_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
+import BoatAvailabilityService from '#services/boat_availability_service'
+import { BOAT_STATUSES } from '#shared/types/boat_status'
 import BoatHullService from '#services/boat_hull_service'
 import BoatListService from '#services/boat_list_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -111,7 +113,8 @@ export default class AssistantToolsService {
     private quotaService: QuotaService,
     private reservationService: BoatReservationService,
     private safetyComplianceService: BoatSafetyComplianceService,
-    private subscriptionService: SubscriptionService
+    private subscriptionService: SubscriptionService,
+    private availabilityService: BoatAvailabilityService
   ) {}
 
   /** Outils proposés au modèle pour cet utilisateur (rôle + plan). */
@@ -186,11 +189,16 @@ export default class AssistantToolsService {
       {
         name: 'list_boats',
         description:
-          'List the boats of the fleet with their maintenance badge (urgent/upcoming counts). Supports text search and pagination.',
+          'List the boats of the active fleet (sold boats excluded unless status "sold" is requested) with their availability status and maintenance badge (urgent/upcoming counts). Supports text search, status filter and pagination.',
         parameters: {
           type: 'object',
           properties: {
             search: { type: 'string', description: 'Free-text search on name or registration' },
+            status: {
+              type: 'string',
+              enum: [...BOAT_STATUSES],
+              description: 'Availability status filter',
+            },
             page: { type: 'number', description: 'Page number, default 1' },
           },
         },
@@ -198,6 +206,7 @@ export default class AssistantToolsService {
         execute: async (user, args) => {
           const { boats } = await this.boatListService.listForUser(user, {
             q: toStr(args.search) ?? undefined,
+            status: toStr(args.status) ?? undefined,
             page: toInt(args.page) ?? 1,
             perPage: 20,
           })
@@ -207,7 +216,7 @@ export default class AssistantToolsService {
       {
         name: 'get_boat',
         description:
-          'Full detail of one boat: hull, engines, sails, equipment, Division 240 safety compliance, and optionally the yearly budget.',
+          'Full detail of one boat: availability status (with reason, date and upcoming unavailability windows from dated tasks and open incidents), hull, engines, sails, equipment, Division 240 safety compliance, and optionally the yearly budget.',
         parameters: {
           type: 'object',
           properties: {
@@ -223,6 +232,7 @@ export default class AssistantToolsService {
           if (boatId === null) return { error: 'boatId is required' }
           const boat = await this.boatHullService.getFullDetailForUser(user, boatId)
           const safety = this.safetyComplianceService.forBoat(boat)
+          const availability = await this.availabilityService.summaryForBoat(boat)
           const budget = toBool(args.includeBudget)
             ? await this.budgetService.getForBoat(
                 boat,
@@ -244,6 +254,9 @@ export default class AssistantToolsService {
             navigationCategory: boat.navigationCategory,
             armamentZone: boat.armamentZone,
             maxPersons: boat.maxPersons,
+            // Disponibilité (#870) : « le bateau X est hors service depuis le 3
+            // pour cause de … ».
+            availability,
             engines: boat.engines.map((engine) => ({
               id: engine.id,
               brand: engine.brand,

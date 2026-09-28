@@ -2,6 +2,7 @@
 import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
+import BoatStatusBadge from '~/components/boats/BoatStatusBadge.vue'
 import type { BoatListItem } from './types'
 import { useT } from '~/composables/use_t'
 import { maintenanceVariant } from '~/utils/status_variants'
@@ -42,6 +43,7 @@ function maintenanceLabel(b: BoatListItem) {
             {{ t('boats.list.table.category') }}
           </th>
           <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.propulsion') }}</th>
+          <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.status') }}</th>
           <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.maintenance') }}</th>
         </tr>
       </thead>
@@ -64,6 +66,9 @@ function maintenanceLabel(b: BoatListItem) {
           </td>
           <td class="px-4 py-3 text-fg-muted">
             {{ propulsionLabel(t, boat.propulsionType) ?? '—' }}
+          </td>
+          <td class="px-4 py-3">
+            <BoatStatusBadge :status="boat.status" />
           </td>
           <td class="px-4 py-3">
             <BaseBadge :variant="maintenanceVariant(boat.maintenance)">

@@ -359,6 +359,8 @@
       "boat_create": "Boat created",
       "boat_update": "Boat updated",
       "boat_delete": "Boat deleted",
+      "boat_status_change": "Boat status changed",
+      "reservation_force_unavailable": "Reservation forced on an unavailable boat",
       "member_add": "Member added",
       "member_remove": "Member removed",
       "member_update_role": "Role updated",

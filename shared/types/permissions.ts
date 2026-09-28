@@ -15,6 +15,7 @@ export type Capability =
   | 'boats.delete'
   | 'boats.manage'
   | 'boats.reservations.delete'
+  | 'boats.reservations.force'
   | 'clients.create'
   | 'clients.update'
   | 'clients.delete'
@@ -86,6 +87,9 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   // n'est pas du même ordre qu'une saisie unitaire.
   'import.run',
   'boats.delete',
+  // Poser une réservation confirmée sur un bateau indisponible (#870), avec
+  // un motif tracé : une décision d'exploitant, pas une saisie courante.
+  'boats.reservations.force',
   'clients.delete',
   'clients.anonymize',
   'crew.delete',
