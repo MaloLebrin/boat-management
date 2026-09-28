@@ -18,6 +18,9 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   'reservation.balance_due',
   // Facture réglée en ligne par le client (#876) : de l'argent arrivé.
   'invoice.paid_online',
+  // Facture passée en retard (#878) : de l'argent qui n'est pas arrivé. Les
+  // relances envoyées restent in-app, le job en fait une par facture et palier.
+  'invoice.overdue',
   'document.expiring_soon',
   'document.expired',
   'safety_equipment.expiring_soon',

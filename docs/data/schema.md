@@ -18,6 +18,13 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
   dans [`docs/domain/invoicing.md`](../domain/invoicing.md) §3 — comme les
   avoirs (#877) : `invoices.kind = 'credit_note'`, `status = 'credited'` et la
   FK auto-référente `invoices.credited_invoice_id` (`RESTRICT`)
+- relances des factures en retard (#878) : `invoiceRemindersEnabled` (booléen,
+  défaut `false`), `invoiceReminderMessage`, `invoiceLatePenaltyNote` (texte
+  libre, nullables) — les colonnes `invoices.reminder_count`,
+  `last_reminder_tier`, `last_reminder_at`, `reminders_disabled` et la table
+  `invoice_reminders` (historique : facture, palier, `automatic`/`manual`,
+  `sent`/`skipped`, motif, auteur) sont décrites dans
+  [`docs/domain/invoicing.md`](../domain/invoicing.md) §3 et §7 quater
 
 ### users
 

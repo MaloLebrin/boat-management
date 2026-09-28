@@ -614,6 +614,41 @@ export default class EmailQueueService {
     })
   }
 
+  /**
+   * Relance d'une facture en retard (#878). La clé est fournie par l'appelant :
+   * `invoice_reminder:<id>:<palier>` pour le job quotidien (un palier ne part
+   * qu'une fois), horodatée pour une relance manuelle.
+   */
+  async sendInvoiceReminder(params: {
+    invoiceId: number
+    organizationId: number
+    to: string
+    locale: string
+    tier: number
+    dedupKey: string
+  }) {
+    const payload = {
+      invoiceId: params.invoiceId,
+      organizationId: params.organizationId,
+      to: params.to,
+      locale: params.locale,
+      tier: params.tier,
+      dedupKey: params.dedupKey,
+    }
+
+    const { default: SendInvoiceReminderEmail } = await import('#jobs/send_invoice_reminder_email')
+
+    return this.dedup.enqueueUnique({
+      key: params.dedupKey,
+      jobName: SendInvoiceReminderEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendInvoiceReminderEmail.dispatch(p)
+      },
+    })
+  }
+
   async sendRentalContract(params: {
     contractId: number
     organizationId: number

@@ -82,6 +82,12 @@ function hourOf(cron: string): number {
   return Number(cron.split(' ')[1])
 }
 
+/** Minute de la journée d'une expression cron `m h * * *`. */
+function minuteOfDay(cron: string): number {
+  const [minute, hour] = cron.split(' ')
+  return Number(hour) * 60 + Number(minute)
+}
+
 test.group('Hygiene — every job and every cron is covered', () => {
   test('the jobs directory still holds what this guard assumes', ({ assert }) => {
     // Si la découverte se casse, tous les autres tests passent au vert sur un
@@ -143,6 +149,23 @@ test.group('Hygiene — every job and every cron is covered', () => {
       hourOf(suggestions!),
       hourOf(scan!),
       'les suggestions IA doivent être générées avant le scan qui les notifie'
+    )
+  })
+
+  test('invoice reminders run after invoices are marked overdue', ({ assert }) => {
+    // Contrat d'ordonnancement (#878) : les relances ne portent que sur les
+    // factures `overdue`. Avant le passage de 06:00, elles partiraient avec un
+    // jour de retard.
+    const scheduled = new Map(scheduledJobs().map(({ job, cron }) => [job, cron]))
+    const overdue = scheduled.get('mark_overdue_invoices')
+    const reminders = scheduled.get('send_invoice_reminders')
+
+    assert.isDefined(overdue)
+    assert.isDefined(reminders)
+    assert.isBelow(
+      minuteOfDay(overdue!),
+      minuteOfDay(reminders!),
+      'les relances doivent partir après le passage des factures en retard'
     )
   })
 })

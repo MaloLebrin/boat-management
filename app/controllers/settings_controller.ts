@@ -9,6 +9,7 @@ import AiTokenQuotaService from '#services/ai_token_quota_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import BoatListService from '#services/boat_list_service'
 import OnlinePaymentService from '#services/online_payment_service'
+import InvoiceReminderService from '#services/invoice_reminder_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
@@ -48,7 +49,8 @@ export default class SettingsController {
     private pushSubscriptionService: PushSubscriptionService,
     private organizationAiKeyService: OrganizationAiKeyService,
     private passwordResetService: PasswordResetService,
-    private onlinePaymentService: OnlinePaymentService
+    private onlinePaymentService: OnlinePaymentService,
+    private invoiceReminderService: InvoiceReminderService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -147,6 +149,8 @@ export default class SettingsController {
       orgAddons,
       // Compte Stripe connecté pour le paiement en ligne des factures (#876).
       onlinePayments: await this.onlinePaymentService.settingsFor(org, canManageBilling),
+      // Relances automatiques des factures en retard (#878).
+      invoiceReminders: await this.invoiceReminderService.settingsFor(org, canManageBilling),
     })
   }
 

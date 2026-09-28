@@ -244,5 +244,51 @@
       "method": "Moyen de remboursement",
       "submit": "Enregistrer le remboursement"
     }
+  },
+  "reminderEmail": {
+    "subject": {
+      "tier1": "Rappel : facture {number} de {orgName}",
+      "tier2": "Deuxième rappel : facture {number} de {orgName}",
+      "tier3": "Dernière relance : facture {number} de {orgName}"
+    },
+    "heading": {
+      "tier1": "Rappel de paiement — facture {number}",
+      "tier2": "Deuxième rappel — facture {number}",
+      "tier3": "Dernière relance — facture {number}"
+    },
+    "greeting": "Bonjour,",
+    "body": {
+      "tier1": "Sauf erreur de notre part, la facture n° {number}, arrivée à échéance le {dueDate}, n'a pas encore été réglée. Nous vous remercions de bien vouloir procéder à son règlement.",
+      "tier2": "Malgré notre premier rappel, la facture n° {number}, arrivée à échéance le {dueDate}, reste impayée. Merci de procéder à son règlement dans les meilleurs délais.",
+      "tier3": "Malgré nos précédents rappels, la facture n° {number}, arrivée à échéance le {dueDate}, reste impayée. Nous vous demandons de la régler sans délai."
+    },
+    "balanceLabel": "Reste à payer :",
+    "alreadyPaid": "Si vous avez réglé cette facture entre-temps, merci de ne pas tenir compte de ce message.",
+    "signature": "Cordialement,\n{orgName}"
+  },
+  "reminders": {
+    "title": "Relances",
+    "count": "{count, plural, =0 {Aucune relance envoyée} one {# relance envoyée} other {# relances envoyées}}",
+    "last": "Dernière le {date}",
+    "automaticOn": "Relances automatiques à J+3, J+10 et J+30 après l'échéance.",
+    "automaticOff": "Les relances automatiques sont désactivées pour votre organisation (Paramètres → Facturation).",
+    "sendNow": "Relancer maintenant",
+    "disable": "Ne plus relancer ce client pour cette facture",
+    "disabledHint": "Aucune relance, automatique ou manuelle, ne partira pour cette facture.",
+    "history": "Historique",
+    "tier": "Relance {tier}",
+    "trigger": {
+      "automatic": "automatique",
+      "manual": "manuelle"
+    },
+    "by": "par {name}",
+    "skipped": "non envoyée : {reason}",
+    "skipReason": {
+      "no_client": "aucun client rattaché",
+      "no_email": "client sans e-mail",
+      "anonymized": "client anonymisé",
+      "blacklisted": "client blacklisté"
+    },
+    "badge": "Relancée ×{count}"
   }
 }

@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BasePagination from '~/components/base/BasePagination.vue'
 import InvoiceListToolbar from '~/components/invoices/InvoiceListToolbar.vue'
@@ -95,6 +96,9 @@ function formatTotal(invoice: InvoiceRow): string {
             <div class="flex items-center gap-3">
               <p class="font-semibold text-fg">{{ invoice.number }}</p>
               <InvoiceStatusBadge :status="invoice.status" :kind="invoice.kind" />
+              <BaseBadge v-if="invoice.reminderCount > 0" variant="warning">
+                {{ t('invoices.reminders.badge', { count: String(invoice.reminderCount) }) }}
+              </BaseBadge>
             </div>
             <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
               <span>{{ t(`invoices.kind.${invoice.kind}`) }}</span>

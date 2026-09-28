@@ -1336,6 +1336,34 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageInvoices',
   },
   {
+    id: 'invoice-reminders',
+    title: {
+      en: 'Automatic reminders for overdue invoices',
+      fr: 'Relances automatiques des factures en retard',
+    },
+    body: {
+      en: 'FleetAi can chase unpaid invoices for you. Turn it on in Settings → Billing, “Overdue invoice reminders”: an e-mail with the invoice PDF and the online payment link goes to the client 3, 10 and 30 days after the due date, the last one firmer and carrying your late-penalty notice. You can add your own message. Clients without an e-mail, anonymized or blacklisted are never written to: you are notified instead. On an overdue invoice, the Reminders block shows the history, “Remind now” and a switch to stop reminding a client in dispute.',
+      fr: 'FleetAi relance vos factures impayées à votre place. Activez-le dans Paramètres → Facturation, « Relances des factures en retard » : un e-mail avec la facture PDF et le lien de paiement en ligne part au client 3, 10 puis 30 jours après l’échéance, le dernier plus ferme avec votre mention des pénalités. Vous pouvez ajouter votre message. Un client sans e-mail, anonymisé ou blacklisté n’est jamais relancé : vous êtes notifié à la place. Sur une facture en retard, le bloc Relances montre l’historique, « Relancer maintenant » et « ne plus relancer » (client en litige).',
+    },
+    keywords: [
+      'relance',
+      'relances',
+      'relancer',
+      'reminder',
+      'reminders',
+      'facture impayee',
+      'unpaid invoice',
+      'facture en retard',
+      'overdue invoice',
+      'penalites de retard',
+      'late penalty',
+      'recouvrement',
+      'dunning',
+    ],
+    navTarget: 'settings.billing',
+    planFlag: 'canManageInvoices',
+  },
+  {
     id: 'email-verification',
     title: {
       en: 'Confirming your email address',

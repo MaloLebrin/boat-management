@@ -244,5 +244,51 @@
       "method": "Refund method",
       "submit": "Save refund"
     }
+  },
+  "reminderEmail": {
+    "subject": {
+      "tier1": "Reminder: invoice {number} from {orgName}",
+      "tier2": "Second reminder: invoice {number} from {orgName}",
+      "tier3": "Final reminder: invoice {number} from {orgName}"
+    },
+    "heading": {
+      "tier1": "Payment reminder — invoice {number}",
+      "tier2": "Second reminder — invoice {number}",
+      "tier3": "Final reminder — invoice {number}"
+    },
+    "greeting": "Hello,",
+    "body": {
+      "tier1": "Unless we are mistaken, invoice no. {number}, due on {dueDate}, has not been paid yet. We kindly ask you to settle it.",
+      "tier2": "Despite our first reminder, invoice no. {number}, due on {dueDate}, remains unpaid. Please settle it as soon as possible.",
+      "tier3": "Despite our previous reminders, invoice no. {number}, due on {dueDate}, remains unpaid. We ask you to settle it without delay."
+    },
+    "balanceLabel": "Amount due:",
+    "alreadyPaid": "If you have paid this invoice in the meantime, please disregard this message.",
+    "signature": "Kind regards,\n{orgName}"
+  },
+  "reminders": {
+    "title": "Reminders",
+    "count": "{count, plural, =0 {No reminder sent} one {# reminder sent} other {# reminders sent}}",
+    "last": "Last on {date}",
+    "automaticOn": "Automatic reminders 3, 10 and 30 days after the due date.",
+    "automaticOff": "Automatic reminders are turned off for your organization (Settings → Billing).",
+    "sendNow": "Remind now",
+    "disable": "Stop reminding this client about this invoice",
+    "disabledHint": "No reminder, automatic or manual, will be sent for this invoice.",
+    "history": "History",
+    "tier": "Reminder {tier}",
+    "trigger": {
+      "automatic": "automatic",
+      "manual": "manual"
+    },
+    "by": "by {name}",
+    "skipped": "not sent: {reason}",
+    "skipReason": {
+      "no_client": "no client linked",
+      "no_email": "client has no e-mail",
+      "anonymized": "client anonymized",
+      "blacklisted": "client blacklisted"
+    },
+    "badge": "Reminded ×{count}"
   }
 }

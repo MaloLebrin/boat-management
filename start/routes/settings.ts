@@ -11,6 +11,7 @@ const BillingController = () => import('#controllers/billing_controller')
 const AuditLogsController = () => import('#controllers/audit_logs_controller')
 const CsvImportController = () => import('#controllers/csv_import_controller')
 const OnlinePaymentsController = () => import('#controllers/online_payments_controller')
+const InvoiceRemindersController = () => import('#controllers/invoice_reminders_controller')
 
 // Préférences pré-auth (switchers de langue et de thème, aussi disponibles
 // sur le marketing et l'écran de login) : persistées sur le profil quand
@@ -73,6 +74,10 @@ router
     router
       .delete('settings/billing/online-payments', [OnlinePaymentsController, 'disconnect'])
       .as('settings.billing.onlinePayments.disconnect')
+    // Relances automatiques des factures en retard (#878).
+    router
+      .patch('settings/billing/invoice-reminders', [InvoiceRemindersController, 'updateSettings'])
+      .as('settings.billing.invoiceReminders.update')
     router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')

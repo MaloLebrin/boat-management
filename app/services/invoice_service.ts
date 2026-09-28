@@ -675,19 +675,45 @@ export default class InvoiceService {
    * safe to run daily from the scheduler.
    */
   async markOverdueInvoices(now: DateTime = DateTime.now()): Promise<number> {
-    const today = now.toISODate()
-    if (!today) return 0
+    const flagged = await this.flagOverdueInvoices(now)
+    return flagged.length
+  }
 
-    const rows = await Invoice.query()
+  /**
+   * Same as `markOverdueInvoices`, but returns the invoices it just flipped, so
+   * the daily job can tell each organization about them (#878).
+   */
+  async flagOverdueInvoices(now: DateTime = DateTime.now()): Promise<Invoice[]> {
+    const today = now.toISODate()
+    if (!today) return []
+
+    const candidates = await Invoice.query()
       .where('kind', 'invoice')
       .where('status', 'sent')
       .whereNull('paidAt')
       .whereNotNull('dueAt')
       .where('dueAt', '<', today)
-      .update({ status: 'overdue' })
+    if (candidates.length === 0) return []
 
-    // Lucid's update() returns the affected-row count in an array-ish shape.
-    return Array.isArray(rows) ? Number(rows[0] ?? 0) : Number(rows ?? 0)
+    // Re-checks `status = 'sent'`: an invoice paid between the read and the
+    // write stays paid.
+    const flipped: Array<{ id: number }> = await Invoice.query()
+      .whereIn(
+        'id',
+        candidates.map((invoice) => invoice.id)
+      )
+      .where('status', 'sent')
+      .whereNull('paidAt')
+      .update({ status: 'overdue' })
+      .returning('id')
+    const flippedIds = new Set(flipped.map((row) => row.id))
+
+    return candidates
+      .filter((invoice) => flippedIds.has(invoice.id))
+      .map((invoice) => {
+        invoice.status = 'overdue'
+        return invoice
+      })
   }
 
   /**

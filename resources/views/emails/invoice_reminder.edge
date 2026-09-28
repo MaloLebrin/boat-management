@@ -1,0 +1,52 @@
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      {{ t(`invoices.reminderEmail.heading.tier${tier}`, params) }}
+    </h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      {{ t('invoices.reminderEmail.greeting') }}
+    </p>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">
+      {{ t(`invoices.reminderEmail.body.tier${tier}`, params) }}
+    </p>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">
+      <strong>{{ t('invoices.reminderEmail.balanceLabel') }}</strong>
+      {{ params.amount }}
+    </p>
+    @if(messageLines.length)
+      <div
+        style="margin:0 0 20px;padding:16px;background-color:#f4f4f7;border-radius:6px;color:#333333;font-size:15px;line-height:1.6;"
+      >
+        @each(line in messageLines)
+          <p style="margin:0 0 6px;">{{ line }}</p>
+        @end
+      </div>
+    @end
+    @if(penaltyLines.length)
+      <div style="margin:0 0 20px;color:#555555;font-size:14px;line-height:1.5;">
+        @each(line in penaltyLines)
+          <p style="margin:0 0 6px;">{{ line }}</p>
+        @end
+      </div>
+    @end
+    @if(paymentUrl)
+      <p style="margin:0 0 25px;">
+        <a
+          href="{{ paymentUrl }}"
+          style="display:inline-block;padding:12px 24px;background-color:#1e3a5f;color:#ffffff;text-decoration:none;border-radius:6px;font-size:16px;font-weight:bold;"
+        >
+          {{ t('invoices.email.html.payOnline') }}
+        </a>
+      </p>
+    @end
+
+    <p style="margin:0 0 15px;color:#888888;font-size:14px;line-height:1.5;">
+      {{ t('invoices.reminderEmail.alreadyPaid') }}
+    </p>
+    <p style="margin:0 0 15px;color:#888888;font-size:14px;line-height:1.5;">
+      {{ t('invoices.email.html.attachment') }}
+    </p>
+    <hr style="border:none;border-top:1px solid #e0e0e0;margin:25px 0;" />
+    <p style="margin:0;color:#888888;font-size:12px;">{{ params.orgName }}</p>
+  @end
+@end

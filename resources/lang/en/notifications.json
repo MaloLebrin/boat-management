@@ -126,6 +126,18 @@
       "paid_online": {
         "title": "Invoice {number} paid online",
         "body": "{clientName} paid {amount} via Stripe."
+      },
+      "overdue": {
+        "title": "Invoice {number} is overdue",
+        "body": "{clientName} has not paid {amount}, due on {dueDate}."
+      },
+      "reminder_sent": {
+        "title": "Reminder {tier} sent for {number}",
+        "body": "{clientName} was reminded by e-mail about {amount}."
+      },
+      "reminder_skipped": {
+        "title": "Reminder {tier} not sent for {number}",
+        "body": "{clientName} cannot be reminded by e-mail ({reason}). Contact them directly."
       }
     }
   },
@@ -165,6 +177,9 @@
     "boat.available_again": "Boat available again",
     "reservation.deposit_due": "Deposit not received",
     "reservation.balance_due": "Balance to collect",
-    "invoice.paid_online": "Invoice paid online"
+    "invoice.paid_online": "Invoice paid online",
+    "invoice.overdue": "Overdue invoice",
+    "invoice.reminder_sent": "Invoice reminder sent",
+    "invoice.reminder_skipped": "Invoice reminder not sent"
   }
 }

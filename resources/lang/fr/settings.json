@@ -178,6 +178,23 @@
       "disconnect": "Déconnecter",
       "disconnectConfirm": "Déconnecter votre compte Stripe ? Les liens de paiement déjà envoyés cesseront de fonctionner.",
       "adminOnly": "Seul un administrateur peut connecter le compte Stripe de l'organisation."
+    },
+    "invoiceReminders": {
+      "title": "Relances des factures en retard",
+      "description": "FleetAi écrit à vos clients à votre place quand une facture n'est pas réglée : un e-mail à J+{first}, J+{second} puis J+{third} après l'échéance, facture PDF jointe.",
+      "state": {
+        "on": "Activées",
+        "off": "Désactivées"
+      },
+      "enabled": "Relancer automatiquement les factures en retard",
+      "enabledHint": "Les clients sans e-mail, anonymisés ou blacklistés ne sont jamais relancés : vous êtes prévenu à la place.",
+      "message": "Message ajouté à chaque relance",
+      "messagePlaceholder": "Ex. : Pour toute question, appelez-nous au 02 00 00 00 00.",
+      "latePenaltyNote": "Mention des pénalités de retard (dernière relance)",
+      "latePenaltyNotePlaceholder": "Ex. : Des pénalités de retard au taux de 10 % et une indemnité forfaitaire de 40 € pour frais de recouvrement sont exigibles.",
+      "save": "Enregistrer",
+      "adminOnly": "Seul un administrateur peut modifier les réglages des relances.",
+      "unavailable": "Disponible avec le module CRM & Facturation."
     }
   },
   "upgrade": {
@@ -414,7 +431,11 @@
       "online_payments_connect": "Compte Stripe connecté",
       "online_payments_disconnect": "Compte Stripe déconnecté",
       "invoice_paid_online": "Facture réglée en ligne",
-      "invoice_credit_note_issued": "Avoir émis"
+      "invoice_credit_note_issued": "Avoir émis",
+      "invoice_reminder_sent": "Relance de facture envoyée",
+      "invoice_reminders_disabled": "Relances d'une facture désactivées",
+      "invoice_reminders_enabled": "Relances d'une facture réactivées",
+      "invoice_reminders_update": "Réglages des relances modifiés"
     },
     "empty": {
       "title": "Aucune activité",
