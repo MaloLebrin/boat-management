@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { computed, ref, watch } from 'vue'
+import { computed } from 'vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSegmentedControl from '~/components/base/BaseSegmentedControl.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
 import type { DashboardPlannedTasks } from '#shared/types/dashboard'
 import { PLANNED_TASKS_DAYS } from '#shared/constants/dashboard_widgets'
 import { useDateFormat } from '~/composables/use_date_format'
+import { useMineAllScope } from '~/composables/use_mine_all_scope'
 import { useT } from '~/composables/use_t'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
 
@@ -19,12 +20,10 @@ const { formatDate } = useDateFormat()
 // « Mes tâches à venir » (#868) : la bascule n'apparaît que si des tâches de la
 // fenêtre me sont confiées, et elle s'ouvre alors sur les miennes.
 const hasMine = computed(() => (props.plannedTasks?.mine?.total ?? 0) > 0)
-const scope = ref<'mine' | 'all'>('all')
-watch(hasMine, (value) => (scope.value = value ? 'mine' : 'all'), { immediate: true })
-const scopeOptions = computed(() => [
-  { value: 'mine', label: t('dashboard.plannedTasks.scope.mine') },
-  { value: 'all', label: t('dashboard.plannedTasks.scope.all') },
-])
+const { scope, scopeOptions, setScope } = useMineAllScope(() => (hasMine.value ? 'mine' : 'all'), {
+  mine: 'dashboard.plannedTasks.scope.mine',
+  all: 'dashboard.plannedTasks.scope.all',
+})
 
 const list = computed(() => {
   if (!props.plannedTasks) return undefined
@@ -57,7 +56,7 @@ const list = computed(() => {
         class="mt-2"
         :model-value="scope"
         :options="scopeOptions"
-        @update:model-value="scope = $event === 'mine' ? 'mine' : 'all'"
+        @update:model-value="setScope"
       />
     </template>
 

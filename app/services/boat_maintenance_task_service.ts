@@ -20,6 +20,7 @@ import {
   requiredSubjectForEquipment,
   subjectForEquipment,
 } from '#shared/helpers/maintenance_task_equipment'
+import { decimalColumnToNumber } from '#shared/helpers/number_format'
 import type { GenericEquipmentCategory } from '#shared/types/boat'
 import { ROLE_PERMISSIONS } from '#shared/types/permissions'
 import type {
@@ -127,13 +128,6 @@ async function assertAssignable(organizationId: number, userId: number): Promise
 function trimmedOrNull(value: string | null | undefined): string | null {
   const trimmed = value?.trim()
   return trimmed ? trimmed : null
-}
-
-/** Montant décimal (colonne `decimal`, lue en chaîne) comparable à un nombre. */
-function decimalOrNull(value: string | number | null): number | null {
-  if (value === null) return null
-  const n = Number(value)
-  return Number.isFinite(n) ? n : null
 }
 
 /** Tâches ouvertes d'abord, puis datées avant non datées (NULLS LAST portable PG/SQLite). */
@@ -400,7 +394,7 @@ export default class BoatMaintenanceTaskService {
     }
 
     if (payload.estimatedCost !== undefined) {
-      if (payload.estimatedCost !== decimalOrNull(task.estimatedCost)) {
+      if (payload.estimatedCost !== decimalColumnToNumber(task.estimatedCost)) {
         task.estimatedCost = payload.estimatedCost === null ? null : String(payload.estimatedCost)
         changedFields.push('estimatedCost')
       }

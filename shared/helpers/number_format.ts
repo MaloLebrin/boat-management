@@ -28,6 +28,18 @@ export function parseDecimalInput(raw: string | null | undefined): number | null
   return Number.isFinite(value) ? value : null
 }
 
+/**
+ * Reads a nullable `decimal` column into a number. Lucid hands PostgreSQL
+ * `decimal` values back as strings (`'120.50'`), so a raw comparison with a
+ * payload number never matches; `null`, `undefined` and anything that does not
+ * read as a finite number give `null`.
+ */
+export function decimalColumnToNumber(value: string | number | null | undefined): number | null {
+  if (value === null || value === undefined) return null
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
 /** A length in metres — `10,5 m` (fr) · `10.5 m` (en), separator and space included. */
 export function formatLength(value: number, locale?: string | null): string {
   return new Intl.NumberFormat(resolveLocaleTag(locale), {
