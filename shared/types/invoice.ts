@@ -51,6 +51,8 @@ export interface InvoiceRow {
   total: number
   currency: string
   createdAt: string | null
+  /** Relances envoyées au client (#878) : badge « relancée ×2 » de la liste. */
+  reminderCount: number
 }
 
 /** Lightweight reference to a linked document (origin quote / converted invoice). */

@@ -12,16 +12,19 @@ import InvoicePaymentCard from '~/components/invoices/InvoicePaymentCard.vue'
 import InvoiceOnlinePaymentCard from '~/components/invoices/InvoiceOnlinePaymentCard.vue'
 import InvoiceDetailsCard from '~/components/invoices/InvoiceDetailsCard.vue'
 import InvoiceCreditNotesCard from '~/components/invoices/InvoiceCreditNotesCard.vue'
+import InvoiceRemindersCard from '~/components/invoices/InvoiceRemindersCard.vue'
 import { useDeleteConfirmation } from '~/composables/use_delete_confirmation'
 import { useT } from '~/composables/use_t'
 import { canEditInvoice, canEditInvoicePayment } from '#shared/helpers/invoice_lifecycle'
 import type { InvoiceDetail } from '../../../shared/types/invoice'
+import type { InvoiceRemindersInfo } from '../../../shared/types/invoice_reminder'
 
 const props = defineProps<{
   invoice: InvoiceDetail
   canDelete: boolean
   readOnly?: boolean
   canAcceptOnlinePayments?: boolean
+  reminders?: InvoiceRemindersInfo | null
 }>()
 
 const { t } = useT()
@@ -220,6 +223,13 @@ function markPaid() {
     <InvoiceCreditNotesCard
       v-if="showCreditNotes"
       :invoice="invoice"
+      :read-only="readOnly ?? false"
+      class="mt-4"
+    />
+    <InvoiceRemindersCard
+      v-if="reminders && showCreditNotes"
+      :invoice="invoice"
+      :reminders="reminders"
       :read-only="readOnly ?? false"
       class="mt-4"
     />

@@ -57,6 +57,12 @@ export const AUDIT_ACTIONS = [
   'invoice.paid_online',
   // Avoir émis sur une facture (#877).
   'invoice.credit_note_issued',
+  // Relances des factures en retard (#878) : e-mail au client (auteur `null`
+  // pour le job quotidien), interrupteur « ne plus relancer », réglages.
+  'invoice.reminder_sent',
+  'invoice.reminders_disabled',
+  'invoice.reminders_enabled',
+  'invoice_reminders.update',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]

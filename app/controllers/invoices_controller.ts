@@ -22,6 +22,7 @@ import {
 } from '#validators/invoice'
 import { canEditInvoice } from '#shared/helpers/invoice_lifecycle'
 import { toInvoiceDetail } from '#transformers/invoice_transformer'
+import InvoiceReminderService from '#services/invoice_reminder_service'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type Organization from '#models/organization'
@@ -36,7 +37,8 @@ export default class InvoicesController {
     private emailQueueService: EmailQueueService,
     private reservationService: BoatReservationService,
     private quotaService: QuotaService,
-    private onlinePaymentService: OnlinePaymentService
+    private onlinePaymentService: OnlinePaymentService,
+    private invoiceReminderService: InvoiceReminderService
   ) {}
 
   /**
@@ -130,6 +132,11 @@ export default class InvoicesController {
         // que si l'organisation encaisse en ligne.
         canAcceptOnlinePayments:
           moduleActive && (await this.onlinePaymentService.canAcceptOnlinePayments(org)),
+        // Relances (#878) : historique et interrupteur, sur une facture seulement.
+        reminders:
+          invoice.kind === 'invoice'
+            ? await this.invoiceReminderService.infoFor(invoice, org)
+            : null,
       })
     } catch (error) {
       if (error instanceof InvoiceNotFoundError) {

@@ -126,6 +126,18 @@
       "paid_online": {
         "title": "Facture {number} réglée en ligne",
         "body": "{clientName} a réglé {amount} par Stripe."
+      },
+      "overdue": {
+        "title": "Facture {number} en retard",
+        "body": "{clientName} n'a pas réglé {amount}, échu le {dueDate}."
+      },
+      "reminder_sent": {
+        "title": "Relance {tier} envoyée pour {number}",
+        "body": "{clientName} a été relancé par e-mail pour {amount}."
+      },
+      "reminder_skipped": {
+        "title": "Relance {tier} non envoyée pour {number}",
+        "body": "{clientName} ne peut pas être relancé par e-mail ({reason}). Contactez-le directement."
       }
     }
   },
@@ -165,6 +177,9 @@
     "boat.available_again": "Bateau de nouveau disponible",
     "reservation.deposit_due": "Acompte non reçu",
     "reservation.balance_due": "Solde à encaisser",
-    "invoice.paid_online": "Facture réglée en ligne"
+    "invoice.paid_online": "Facture réglée en ligne",
+    "invoice.overdue": "Facture en retard",
+    "invoice.reminder_sent": "Relance de facture envoyée",
+    "invoice.reminder_skipped": "Relance de facture non envoyée"
   }
 }

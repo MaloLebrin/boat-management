@@ -100,7 +100,8 @@
     "aiSettingsRequirePlan": "AI settings require a plan with AI access.",
     "aiProviderUpdated": "AI provider updated.",
     "aiProviderKeyMissing": "Add an API key for this provider first.",
-    "passwordUpdatedOtherDevicesSignedOut": "Password updated. Your other devices have been signed out."
+    "passwordUpdatedOtherDevicesSignedOut": "Password updated. Your other devices have been signed out.",
+    "invoiceRemindersUpdated": "Reminder settings saved."
   },
   "enginePart": {
     "created": "Part added.",
@@ -274,7 +275,12 @@
     "creditNoteIssued": "Credit note issued.",
     "creditNoteAmount": "The credit note amount must be positive and must not exceed what remains to be credited on the invoice.",
     "creditNoteLinesRequired": "A credit note was already issued on this invoice: provide the lines of the new credit note.",
-    "creditNoteDelete": "A credit note, or an invoice carrying credit notes, cannot be deleted."
+    "creditNoteDelete": "A credit note, or an invoice carrying credit notes, cannot be deleted.",
+    "reminderSent": "Reminder sent to the client.",
+    "cannotRemind": "Only an overdue invoice whose reminders are not turned off can be reminded.",
+    "reminderNoRecipient": "Cannot send a reminder: {reason}.",
+    "remindersDisabled": "This invoice will no longer be reminded.",
+    "remindersEnabled": "Reminders for this invoice are back on."
   },
   "rentalContracts": {
     "created": "Rental contract created.",

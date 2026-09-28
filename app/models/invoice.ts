@@ -2,6 +2,7 @@ import Organization from '#models/organization'
 import Client from '#models/client'
 import BoatReservation from '#models/boat_reservation'
 import InvoiceLine from '#models/invoice_line'
+import InvoiceReminder from '#models/invoice_reminder'
 import { BaseModel, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
@@ -85,6 +86,21 @@ export default class Invoice extends BaseModel {
   @column()
   declare notes: string | null
 
+  /** Relances envoyées au client (#878). */
+  @column()
+  declare reminderCount: number
+
+  /** Dernier palier de relance traité, envoyé ou non (#878). */
+  @column()
+  declare lastReminderTier: number
+
+  @column.dateTime()
+  declare lastReminderAt: DateTime | null
+
+  /** « Ne plus relancer » : client en litige (#878). */
+  @column()
+  declare remindersDisabled: boolean
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -102,4 +118,7 @@ export default class Invoice extends BaseModel {
 
   @hasMany(() => InvoiceLine)
   declare lines: HasMany<typeof InvoiceLine>
+
+  @hasMany(() => InvoiceReminder)
+  declare reminders: HasMany<typeof InvoiceReminder>
 }

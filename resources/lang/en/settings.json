@@ -178,6 +178,23 @@
       "disconnect": "Disconnect",
       "disconnectConfirm": "Disconnect your Stripe account? Payment links already sent will stop working.",
       "adminOnly": "Only an administrator can connect the organization's Stripe account."
+    },
+    "invoiceReminders": {
+      "title": "Overdue invoice reminders",
+      "description": "FleetAi chases unpaid invoices for you: an e-mail {first}, {second} and then {third} days after the due date, with the invoice PDF attached.",
+      "state": {
+        "on": "On",
+        "off": "Off"
+      },
+      "enabled": "Automatically remind clients about overdue invoices",
+      "enabledHint": "Clients without an e-mail, anonymized or blacklisted are never reminded: you are notified instead.",
+      "message": "Message added to every reminder",
+      "messagePlaceholder": "E.g.: For any question, call us on +33 2 00 00 00 00.",
+      "latePenaltyNote": "Late payment penalties notice (last reminder)",
+      "latePenaltyNotePlaceholder": "E.g.: Late payment interest at 10% and a fixed €40 recovery fee are due.",
+      "save": "Save",
+      "adminOnly": "Only an administrator can change reminder settings.",
+      "unavailable": "Available with the CRM & Invoicing module."
     }
   },
   "upgrade": {
@@ -414,7 +431,11 @@
       "online_payments_connect": "Stripe account connected",
       "online_payments_disconnect": "Stripe account disconnected",
       "invoice_paid_online": "Invoice paid online",
-      "invoice_credit_note_issued": "Credit note issued"
+      "invoice_credit_note_issued": "Credit note issued",
+      "invoice_reminder_sent": "Invoice reminder sent",
+      "invoice_reminders_disabled": "Invoice reminders turned off",
+      "invoice_reminders_enabled": "Invoice reminders turned back on",
+      "invoice_reminders_update": "Reminder settings updated"
     },
     "empty": {
       "title": "No activity yet",

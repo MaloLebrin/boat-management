@@ -1,5 +1,6 @@
 import vine from '@vinejs/vine'
 import { INVOICE_PAYMENT_METHODS } from '#shared/helpers/invoice_lifecycle'
+import { INVOICE_REMINDER_TEXT_MAX_LENGTH } from '#shared/constants/invoice_reminders'
 
 const invoiceLineSchema = vine.object({
   label: vine.string().trim().minLength(1).maxLength(255),
@@ -66,5 +67,26 @@ export const createCreditNoteValidator = vine.compile(
   vine.object({
     reason: vine.string().trim().minLength(1).maxLength(1000),
     lines: vine.array(invoiceLineSchema).minLength(1).optional(),
+  })
+)
+
+/** Interrupteur « ne plus relancer » d'une facture (#878). */
+export const updateInvoiceRemindersValidator = vine.compile(
+  vine.object({
+    disabled: vine.boolean(),
+  })
+)
+
+/** Réglages des relances de l'organisation (#878), `/settings/billing`. */
+export const updateInvoiceRemindersSettingsValidator = vine.compile(
+  vine.object({
+    enabled: vine.boolean(),
+    message: vine.string().trim().maxLength(INVOICE_REMINDER_TEXT_MAX_LENGTH).nullable().optional(),
+    latePenaltyNote: vine
+      .string()
+      .trim()
+      .maxLength(INVOICE_REMINDER_TEXT_MAX_LENGTH)
+      .nullable()
+      .optional(),
   })
 )

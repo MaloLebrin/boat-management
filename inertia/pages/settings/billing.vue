@@ -8,6 +8,7 @@ import { Head } from '@inertiajs/vue3'
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsBillingTab from '~/components/settings/tabs/SettingsBillingTab.vue'
 import SettingsOnlinePayments from '~/components/settings/SettingsOnlinePayments.vue'
+import SettingsInvoiceReminders from '~/components/settings/SettingsInvoiceReminders.vue'
 import { useT } from '~/composables/use_t'
 import type {
   ActiveAddonInfo,
@@ -17,6 +18,7 @@ import type {
 } from '../../../shared/types/plan'
 import type { SubscriptionInfo } from '../../../shared/types/billing'
 import type { OnlinePaymentsSettings } from '../../../shared/types/online_payment'
+import type { InvoiceRemindersSettings } from '../../../shared/types/invoice_reminder'
 
 defineProps<{
   plan: PlanTier
@@ -25,6 +27,7 @@ defineProps<{
   orgModules: ActiveModuleInfo[]
   orgAddons: ActiveAddonInfo[]
   onlinePayments: OnlinePaymentsSettings
+  invoiceReminders: InvoiceRemindersSettings
 }>()
 
 const { t } = useT()
@@ -41,5 +44,6 @@ const { t } = useT()
       :org-addons="orgAddons"
     />
     <SettingsOnlinePayments :settings="onlinePayments" class="mt-6" />
+    <SettingsInvoiceReminders :settings="invoiceReminders" class="mt-6" />
   </SettingsShell>
 </template>

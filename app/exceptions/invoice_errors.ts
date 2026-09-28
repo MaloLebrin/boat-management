@@ -1,3 +1,5 @@
+import type { InvoiceReminderSkipReason } from '#shared/types/invoice_reminder'
+
 export class InvoiceNotFoundError extends Error {
   name = 'InvoiceNotFoundError'
 }
@@ -72,4 +74,24 @@ export class CreditNoteLinesRequiredError extends Error {
  */
 export class CreditNoteDeleteError extends Error {
   name = 'CreditNoteDeleteError'
+}
+
+/**
+ * Raised when a reminder (#878) is requested on a document that cannot be
+ * reminded: not an overdue invoice, or reminders disabled on it.
+ */
+export class CannotRemindInvoiceError extends Error {
+  name = 'CannotRemindInvoiceError'
+}
+
+/**
+ * Raised when a manual reminder (#878) has nobody to write to: no CRM client,
+ * client without e-mail, anonymized or blacklisted client.
+ */
+export class InvoiceReminderRecipientError extends Error {
+  name = 'InvoiceReminderRecipientError'
+
+  constructor(public readonly reason: InvoiceReminderSkipReason) {
+    super(`Invoice reminder has no recipient: ${reason}`)
+  }
 }

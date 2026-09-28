@@ -101,6 +101,10 @@ Devis **et** factures partagent la même table, discriminés par `kind`.
 | `total`                      | decimal(10,2)                                          | Recalculé serveur                                                                                               |
 | `currency`                   | string(3), défaut `EUR`                                | Champ libre                                                                                                     |
 | `notes`                      | text, nullable                                         |                                                                                                                 |
+| `reminder_count`             | smallint, défaut 0                                     | Relances envoyées au client (#878), badge « Relancée ×N »                                                       |
+| `last_reminder_tier`         | smallint, défaut 0                                     | Dernier palier de relance traité, envoyé ou non (#878) — un palier ne se rejoue pas                             |
+| `last_reminder_at`           | timestamptz, nullable                                  | Date de la dernière relance envoyée (#878)                                                                      |
+| `reminders_disabled`         | bool, défaut `false`                                   | « Ne plus relancer » : client en litige (#878)                                                                  |
 
 Contraintes : `UNIQUE(organization_id, kind, number)` + index
 `(organization_id, kind, status)` et `(organization_id, issued_at)`.
@@ -186,14 +190,15 @@ Statuts : `draft` → `sent` → `paid`, avec `overdue` (retard) et `cancelled`
    quote (kind=quote) ──(convert)──▶ nouvelle invoice (kind=invoice, source_quote_id)
 ```
 
-| Transition                  | Déclencheur                        | Règles / gardes                                                                                                                                                                                                          |
-| --------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Envoi** (#286)            | `POST /invoices/:id/send`          | `draft → sent` uniquement (payée/annulée non rétrogradée) ; refuse si le client n'a pas d'email                                                                                                                          |
-| **Conversion** (#287)       | `POST /invoices/:id/convert`       | Uniquement un `quote` (`NotAQuoteError`), une seule fois (`QuoteAlreadyConvertedError`). Crée une **nouvelle** facture `FAC-`, recopie client/réservation/lignes/TVA/notes, `status=draft`, `source_quote_id` = devis    |
-| **Paiement** (#287)         | `POST /invoices/:id/pay`           | Uniquement une `invoice` non annulée (`CannotMarkPaidError`) → `status=paid`, `paid_at` horodaté                                                                                                                         |
-| **Retard auto** (#287)      | Job planifié `MarkOverdueInvoices` | Bascule en `overdue` toute facture `sent`, non payée, `due_at` dépassée. Idempotent                                                                                                                                      |
-| **Paiement corrigé** (#717) | `PATCH /invoices/:id/payment`      | Facture émise ni annulée ni avoirée (`CannotEditPaymentError`). Écrit **uniquement** `paid_at` + `payment_method` ; une date posée règle la facture, une date effacée la remet à `sent`. Sur un avoir : le remboursement |
-| **Avoir** (#877)            | `POST /invoices/:id/credit-notes`  | Facture `sent`/`overdue`/`paid`. Crée un avoir `AV-` (`sent`) ; la facture passe à `credited` quand la somme des avoirs atteint son total — voir §7 ter                                                                  |
+| Transition                  | Déclencheur                                                        | Règles / gardes                                                                                                                                                                                                          |
+| --------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Envoi** (#286)            | `POST /invoices/:id/send`                                          | `draft → sent` uniquement (payée/annulée non rétrogradée) ; refuse si le client n'a pas d'email                                                                                                                          |
+| **Conversion** (#287)       | `POST /invoices/:id/convert`                                       | Uniquement un `quote` (`NotAQuoteError`), une seule fois (`QuoteAlreadyConvertedError`). Crée une **nouvelle** facture `FAC-`, recopie client/réservation/lignes/TVA/notes, `status=draft`, `source_quote_id` = devis    |
+| **Paiement** (#287)         | `POST /invoices/:id/pay`                                           | Uniquement une `invoice` non annulée (`CannotMarkPaidError`) → `status=paid`, `paid_at` horodaté                                                                                                                         |
+| **Retard auto** (#287)      | Job planifié `MarkOverdueInvoices`                                 | Bascule en `overdue` toute facture `sent`, non payée, `due_at` dépassée. Idempotent. Notifie les administrateurs (`invoice.overdue`, #878)                                                                               |
+| **Relance** (#878)          | Job `SendInvoiceReminders` (06:30), `POST /invoices/:id/reminders` | Facture `overdue` sans « ne plus relancer ». Ne change pas le statut — voir §7 quater                                                                                                                                    |
+| **Paiement corrigé** (#717) | `PATCH /invoices/:id/payment`                                      | Facture émise ni annulée ni avoirée (`CannotEditPaymentError`). Écrit **uniquement** `paid_at` + `payment_method` ; une date posée règle la facture, une date effacée la remet à `sent`. Sur un avoir : le remboursement |
+| **Avoir** (#877)            | `POST /invoices/:id/credit-notes`                                  | Facture `sent`/`overdue`/`paid`. Crée un avoir `AV-` (`sent`) ; la facture passe à `credited` quand la somme des avoirs atteint son total — voir §7 ter                                                                  |
 
 ### Verrouillage d'une facture émise (#717)
 
@@ -358,6 +363,39 @@ Une facture émise est figée (#717) : on ne la corrige pas, on émet un **avoir
 
 ---
 
+## 7 quater. Relances des factures en retard (#878)
+
+- **Activation** : par organisation, désactivée par défaut
+  (`organizations.invoice_reminders_enabled`), depuis `/settings/billing`
+  (`manageBilling`), avec un message libre ajouté à chaque relance et une
+  mention des pénalités de retard ajoutée à la dernière.
+- **Job quotidien** `SendInvoiceReminders` (06:30, après `MarkOverdueInvoices`
+  de 06:00) → `InvoiceReminderService.runDaily`. Facture `overdue`, sans
+  « ne plus relancer », organisation qui a activé les relances et dont le module
+  Facturation est actif. Paliers `INVOICE_REMINDER_TIERS = [3, 10, 30]` jours
+  après `due_at` (jours de Paris) : le palier atteint part s'il dépasse
+  `last_reminder_tier` — une facture découverte à J+40 reçoit la seule relance
+  ferme.
+- **Un palier ne part qu'une fois** : facture `FOR UPDATE`, palier avancé dans
+  la transaction, e-mail dédupliqué `invoice_reminder:<id>:<palier>`.
+- **Destinataire** : jamais un client absent, sans e-mail, anonymisé ou
+  blacklisté. Le palier est alors inscrit `skipped` (motif) et les
+  administrateurs reçoivent `invoice.reminder_skipped`. `reminder_count` ne
+  compte que les relances envoyées.
+- **E-mail** `SendInvoiceReminderEmail` (gabarit `emails/invoice_reminder.edge`,
+  un gabarit paramétré par palier) : ton qui monte, reste à payer net des
+  avoirs, lien « Payer en ligne », PDF joint, branding marque blanche. Une
+  facture réglée entre la mise en file et l'envoi n'est pas relancée.
+- **Manuel** : `POST /invoices/:id/reminders` envoie le palier suivant (plafonné
+  au dernier) ; `PATCH /invoices/:id/reminders` bascule « ne plus relancer ».
+- **Notifications** : `invoice.overdue` (push) le jour du passage en retard,
+  `invoice.reminder_sent` / `invoice.reminder_skipped` (in-app) pour le job.
+- **Journal** : `invoice.reminder_sent` (auteur `null` pour le job),
+  `invoice.reminders_disabled`, `invoice.reminders_enabled`,
+  `invoice_reminders.update`.
+
+---
+
 ## 8. Devis depuis une réservation (#288)
 
 Raccourci métier : générer un devis pré-rempli depuis une réservation.
@@ -423,30 +461,33 @@ bouton menait à un 403 (#735).
 
 Toutes sous `middleware.auth()`, préfixe `/invoices` (voir `start/routes/invoices.ts`).
 
-| Méthode & chemin                                 | Action                  | Rôle                                                                 |
-| ------------------------------------------------ | ----------------------- | -------------------------------------------------------------------- |
-| `GET /invoices`                                  | `index`                 | Liste filtrable/paginée                                              |
-| `GET /invoices/new`                              | `create`                | Formulaire de création                                               |
-| `POST /invoices`                                 | `store`                 | Créer un devis/facture                                               |
-| `POST /invoices/from-reservation/:reservationId` | `createFromReservation` | Devis pré-rempli depuis réservation (#288)                           |
-| `GET /invoices/:id`                              | `show`                  | Fiche détail                                                         |
-| `GET /invoices/:id/edit`                         | `edit`                  | Formulaire d'édition                                                 |
-| `GET /invoices/:id/pdf`                          | `downloadPdf`           | Télécharger le PDF (#286)                                            |
-| `POST /invoices/:id/send`                        | `send`                  | Envoyer par email (#286)                                             |
-| `POST /invoices/:id/convert`                     | `convert`               | Convertir un devis en facture (#287)                                 |
-| `POST /invoices/:id/pay`                         | `markPaid`              | Marquer payée (#287)                                                 |
-| `PATCH /invoices/:id/payment`                    | `updatePayment`         | Corriger date + moyen de paiement (#717)                             |
-| `PUT /invoices/:id`                              | `update`                | Modifier (jamais `number`/`kind`, refusé sur une facture émise #717) |
-| `DELETE /invoices/:id`                           | `destroy`               | Supprimer (admin uniquement)                                         |
-| `POST /invoices/:id/payment-link`                | `createPaymentLink`     | Poser le lien de paiement en ligne (#876)                            |
-| `GET /invoices/:id/credit-note`                  | `CreditNotes.create`    | Écran d'émission d'un avoir (#877)                                   |
-| `POST /invoices/:id/credit-notes`                | `CreditNotes.store`     | Émettre un avoir (#877)                                              |
+| Méthode & chemin                                 | Action                    | Rôle                                                                 |
+| ------------------------------------------------ | ------------------------- | -------------------------------------------------------------------- |
+| `GET /invoices`                                  | `index`                   | Liste filtrable/paginée                                              |
+| `GET /invoices/new`                              | `create`                  | Formulaire de création                                               |
+| `POST /invoices`                                 | `store`                   | Créer un devis/facture                                               |
+| `POST /invoices/from-reservation/:reservationId` | `createFromReservation`   | Devis pré-rempli depuis réservation (#288)                           |
+| `GET /invoices/:id`                              | `show`                    | Fiche détail                                                         |
+| `GET /invoices/:id/edit`                         | `edit`                    | Formulaire d'édition                                                 |
+| `GET /invoices/:id/pdf`                          | `downloadPdf`             | Télécharger le PDF (#286)                                            |
+| `POST /invoices/:id/send`                        | `send`                    | Envoyer par email (#286)                                             |
+| `POST /invoices/:id/convert`                     | `convert`                 | Convertir un devis en facture (#287)                                 |
+| `POST /invoices/:id/pay`                         | `markPaid`                | Marquer payée (#287)                                                 |
+| `PATCH /invoices/:id/payment`                    | `updatePayment`           | Corriger date + moyen de paiement (#717)                             |
+| `PUT /invoices/:id`                              | `update`                  | Modifier (jamais `number`/`kind`, refusé sur une facture émise #717) |
+| `DELETE /invoices/:id`                           | `destroy`                 | Supprimer (admin uniquement)                                         |
+| `POST /invoices/:id/payment-link`                | `createPaymentLink`       | Poser le lien de paiement en ligne (#876)                            |
+| `GET /invoices/:id/credit-note`                  | `CreditNotes.create`      | Écran d'émission d'un avoir (#877)                                   |
+| `POST /invoices/:id/credit-notes`                | `CreditNotes.store`       | Émettre un avoir (#877)                                              |
+| `POST /invoices/:id/reminders`                   | `InvoiceReminders.store`  | Relancer maintenant (#878, e-mail vérifié requis)                    |
+| `PATCH /invoices/:id/reminders`                  | `InvoiceReminders.update` | « Ne plus relancer » `{ disabled }` (#878)                           |
 
 Routes publiques du paiement en ligne (#876, sans login, throttle
 `invoice_payment`) : `GET /pay/:token` et `POST /pay/:token/checkout`
 (`InvoicePaymentLinksController`). Réglages : `POST|DELETE
 /settings/billing/online-payments`, `GET …/refresh`, `GET …/return`. Webhook :
-`POST /webhooks/stripe/connect`.
+`POST /webhooks/stripe/connect`. Relances (#878) : `PATCH
+/settings/billing/invoice-reminders` (`manageBilling`).
 
 Toutes les mutations répondent par **redirection Inertia** (pas de JSON) et le
 frontend utilise `router.*` / `<Form>` (conventions Inertia du projet).
@@ -471,24 +512,25 @@ creditNoteDelete}` + `flash.quota.invoicesExceeded`.
 
 ## 12. Fichiers clés
 
-| Rôle              | Fichier                                                                                      |
-| ----------------- | -------------------------------------------------------------------------------------------- |
-| Contrôleur        | `app/controllers/invoices_controller.ts`                                                     |
-| Service (métier)  | `app/services/invoice_service.ts`                                                            |
-| Avoirs (#877)     | `app/services/credit_note_service.ts`, `app/controllers/credit_notes_controller.ts`          |
-| Service PDF       | `app/services/invoice_pdf_service.ts`                                                        |
-| Job email         | `app/jobs/send_invoice_email.ts`                                                             |
-| Job retard        | `app/jobs/mark_overdue_invoices.ts`                                                          |
-| Enfilement email  | `app/services/email_queue_service.ts` (`sendInvoice`)                                        |
-| Cœur pur (totaux) | `shared/helpers/invoice_totals.ts`                                                           |
-| Modèles           | `app/models/invoice.ts`, `invoice_line.ts`, `invoice_counter.ts`                             |
-| Types partagés    | `shared/types/invoice.ts`                                                                    |
-| Validators        | `app/validators/invoice.ts`                                                                  |
-| Transformers      | `app/transformers/invoice_transformer.ts`                                                    |
-| Erreurs métier    | `app/exceptions/invoice_errors.ts`                                                           |
-| Policy (ACL)      | `app/policies/invoice_policy.ts`                                                             |
-| Routes            | `start/routes/invoices.ts`                                                                   |
-| Frontend          | `inertia/pages/invoices/{index,form,show,credit_note}.vue` + `inertia/components/invoices/*` |
+| Rôle              | Fichier                                                                                                                                                                                                               |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Contrôleur        | `app/controllers/invoices_controller.ts`                                                                                                                                                                              |
+| Service (métier)  | `app/services/invoice_service.ts`                                                                                                                                                                                     |
+| Avoirs (#877)     | `app/services/credit_note_service.ts`, `app/controllers/credit_notes_controller.ts`                                                                                                                                   |
+| Service PDF       | `app/services/invoice_pdf_service.ts`                                                                                                                                                                                 |
+| Job email         | `app/jobs/send_invoice_email.ts`                                                                                                                                                                                      |
+| Job retard        | `app/jobs/mark_overdue_invoices.ts`                                                                                                                                                                                   |
+| Relances (#878)   | `app/services/invoice_reminder_service.ts`, `app/jobs/send_invoice_reminders.ts`, `app/jobs/send_invoice_reminder_email.ts`, `app/controllers/invoice_reminders_controller.ts`, `shared/helpers/invoice_reminders.ts` |
+| Enfilement email  | `app/services/email_queue_service.ts` (`sendInvoice`)                                                                                                                                                                 |
+| Cœur pur (totaux) | `shared/helpers/invoice_totals.ts`                                                                                                                                                                                    |
+| Modèles           | `app/models/invoice.ts`, `invoice_line.ts`, `invoice_counter.ts`                                                                                                                                                      |
+| Types partagés    | `shared/types/invoice.ts`                                                                                                                                                                                             |
+| Validators        | `app/validators/invoice.ts`                                                                                                                                                                                           |
+| Transformers      | `app/transformers/invoice_transformer.ts`                                                                                                                                                                             |
+| Erreurs métier    | `app/exceptions/invoice_errors.ts`                                                                                                                                                                                    |
+| Policy (ACL)      | `app/policies/invoice_policy.ts`                                                                                                                                                                                      |
+| Routes            | `start/routes/invoices.ts`                                                                                                                                                                                            |
+| Frontend          | `inertia/pages/invoices/{index,form,show,credit_note}.vue` + `inertia/components/invoices/*`                                                                                                                          |
 
 ---
 
@@ -522,7 +564,14 @@ creditNoteDelete}` + `flash.quota.invoicesExceeded`.
   `invoice_payment_card.spec.ts` (bloc paiement → `router.patch`),
   `fleet_reservation_list.spec.ts` (boutons convertir/payer/créer-devis + liens),
   `invoice_credit_notes.spec.ts` (bloc « Avoirs », écran d'émission, badge,
-  fiche d'un avoir — #877).
+  fiche d'un avoir — #877), `invoice_reminders.spec.ts` (bloc « Relances »,
+  réglages — #878).
+- **Relances (#878)** : `tests/unit/helpers/invoice_reminders.spec.ts`
+  (paliers), `tests/integration/jobs/send_invoice_reminders.spec.ts` (job
+  quotidien : paliers, dédup, désactivation, module, clients non relançables),
+  `tests/functional/invoices/invoice_reminders.spec.ts` (relance manuelle,
+  interrupteur, réglages, rôles), `send_invoice_reminder_email_job.spec.ts`
+  (contenu de l'e-mail, pénalités, facture réglée entre-temps).
 
 ---
 
@@ -530,8 +579,10 @@ creditNoteDelete}` + `flash.quota.invoicesExceeded`.
 
 - **#275** (FK `client_id` sur les réservations) : remplacerait la résolution du
   client par email (§8) par une FK directe. Complète le CRM (épic #108).
-- Relance email automatique des factures en retard (`overdue`) — évoquée comme
-  optionnelle en #287, non implémentée.
+- Relances (#878) — non couverts : paliers configurables par organisation,
+  texte différent par palier, aperçu de l'e-mail dans les réglages, copie de la
+  relance à l'organisation (la notification in-app en tient lieu), calcul
+  automatique des pénalités de retard (mention textuelle seulement).
 - Paiement en ligne (#876) — non couverts : remboursement (`charge.refunded`) —
   il se fait dans le tableau de bord Stripe du loueur, puis se saisit comme
   remboursement de l'avoir (#877) ; commission FleetAi (`application_fee`, 0 %) ;

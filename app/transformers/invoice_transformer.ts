@@ -29,6 +29,7 @@ export function toInvoiceRow(invoice: Invoice): InvoiceRow {
     total: Number.parseFloat(invoice.total),
     currency: invoice.currency,
     createdAt: invoice.createdAt?.toISO() ?? null,
+    reminderCount: invoice.reminderCount ?? 0,
   }
 }
 

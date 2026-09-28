@@ -57,6 +57,7 @@ export const controllers = {
   Health: () => import('#controllers/health_controller'),
   Home: () => import('#controllers/home_controller'),
   InvoicePaymentLinks: () => import('#controllers/invoice_payment_links_controller'),
+  InvoiceReminders: () => import('#controllers/invoice_reminders_controller'),
   Invoices: () => import('#controllers/invoices_controller'),
   MaintenanceHistory: () => import('#controllers/maintenance_history_controller'),
   MaintenanceHistoryPdf: () => import('#controllers/maintenance_history_pdf_controller'),

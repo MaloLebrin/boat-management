@@ -1953,6 +1953,39 @@ export class InvoiceLineSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class InvoiceReminderSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'invoiceId',
+    'organizationId',
+    'outcome',
+    'skipReason',
+    'tier',
+    'trigger',
+    'userId',
+  ] as const
+  $columns = InvoiceReminderSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare invoiceId: number
+  @column()
+  declare organizationId: number
+  @column()
+  declare outcome: string
+  @column()
+  declare skipReason: string | null
+  @column()
+  declare tier: number
+  @column()
+  declare trigger: string
+  @column()
+  declare userId: number | null
+}
+
 export class InvoiceSchema extends BaseModel {
   static $columns = [
     'clientId',
@@ -1964,12 +1997,16 @@ export class InvoiceSchema extends BaseModel {
     'id',
     'issuedAt',
     'kind',
+    'lastReminderAt',
+    'lastReminderTier',
     'notes',
     'number',
     'organizationId',
     'paidAt',
     'paymentMethod',
     'paymentToken',
+    'reminderCount',
+    'remindersDisabled',
     'reservationId',
     'sourceQuoteId',
     'status',
@@ -2000,6 +2037,10 @@ export class InvoiceSchema extends BaseModel {
   declare issuedAt: DateTime
   @column()
   declare kind: string
+  @column.dateTime()
+  declare lastReminderAt: DateTime | null
+  @column()
+  declare lastReminderTier: number
   @column()
   declare notes: string | null
   @column()
@@ -2012,6 +2053,10 @@ export class InvoiceSchema extends BaseModel {
   declare paymentMethod: string | null
   @column()
   declare paymentToken: string | null
+  @column()
+  declare reminderCount: number
+  @column()
+  declare remindersDisabled: boolean
   @column()
   declare reservationId: number | null
   @column()
@@ -2412,6 +2457,9 @@ export class OrganizationSchema extends BaseModel {
     'createdAt',
     'fleetSize',
     'id',
+    'invoiceLatePenaltyNote',
+    'invoiceReminderMessage',
+    'invoiceRemindersEnabled',
     'logoPublicId',
     'logoUrl',
     'name',
@@ -2442,6 +2490,12 @@ export class OrganizationSchema extends BaseModel {
   declare fleetSize: string | null
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare invoiceLatePenaltyNote: string | null
+  @column()
+  declare invoiceReminderMessage: string | null
+  @column()
+  declare invoiceRemindersEnabled: boolean
   @column()
   declare logoPublicId: string | null
   @column()

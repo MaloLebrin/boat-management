@@ -48,6 +48,15 @@ router
         router
           .post('invoices/:id/credit-notes', [controllers.CreditNotes, 'store'])
           .as('invoices.creditNotes.store')
+        // Relances des factures en retard (#878) : « Relancer maintenant » écrit
+        // au client en notre nom, comme l'envoi de la facture (#768).
+        router
+          .post('invoices/:id/reminders', [controllers.InvoiceReminders, 'store'])
+          .as('invoices.reminders.store')
+          .use(middleware.requireVerifiedEmail())
+        router
+          .patch('invoices/:id/reminders', [controllers.InvoiceReminders, 'update'])
+          .as('invoices.reminders.update')
         // Facture émise : seule écriture encore permise (#717).
         router
           .patch('invoices/:id/payment', [controllers.Invoices, 'updatePayment'])

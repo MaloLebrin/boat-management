@@ -6,6 +6,7 @@ import PurgePublicFormData from '#jobs/purge_public_form_data'
 import ResetAiTokenUsage from '#jobs/reset_ai_token_usage'
 import ResetDemoData from '#jobs/reset_demo_data'
 import MarkOverdueInvoices from '#jobs/mark_overdue_invoices'
+import SendInvoiceReminders from '#jobs/send_invoice_reminders'
 import ScanFleetNotifications from '#jobs/scan_fleet_notifications'
 import GenerateAiSuggestions from '#jobs/generate_ai_suggestions'
 import ReconcileMedia from '#jobs/reconcile_media'
@@ -62,6 +63,14 @@ await MarkOverdueInvoices.schedule({})
   .cron('0 6 * * *')
   .timezone('Europe/Paris')
   .id('daily-mark-overdue-invoices')
+  .run()
+
+// À 06:30, après le passage en retard de 06:00 : les relances partent sur des
+// statuts à jour, avant l'ouverture des bureaux (#878).
+await SendInvoiceReminders.schedule({})
+  .cron('30 6 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-send-invoice-reminders')
   .run()
 
 await ScanFleetNotifications.schedule({})

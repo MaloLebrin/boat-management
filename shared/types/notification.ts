@@ -27,6 +27,9 @@ export type NotificationType =
   | 'reservation.deposit_due'
   | 'reservation.balance_due'
   | 'invoice.paid_online'
+  | 'invoice.overdue'
+  | 'invoice.reminder_sent'
+  | 'invoice.reminder_skipped'
   | (string & {}) // extensible pour les futurs types sans casser le type
 
 export type NotificationSeverity = 'info' | 'success' | 'warning' | 'error'

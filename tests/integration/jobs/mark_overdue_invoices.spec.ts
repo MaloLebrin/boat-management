@@ -2,9 +2,12 @@ import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice'
+import Notification from '#models/notification'
+import OrganizationMembership from '#models/organization_membership'
 import MarkOverdueInvoices from '#jobs/mark_overdue_invoices'
 import { InvoiceFactory } from '#database/factories/invoice_factory'
 import { OrganizationFactory } from '#database/factories/organization_factory'
+import { UserFactory } from '#database/factories/user_factory'
 
 /**
  * Passage des factures en retard — cron quotidien 06:00 (#699).
@@ -113,5 +116,30 @@ test.group('MarkOverdueInvoices (cron 06:00)', () => {
     const twice = await Invoice.findOrFail(invoice.id)
     assert.equal(twice.status, 'overdue')
     assert.equal(twice.updatedAt.toISO(), after.updatedAt.toISO())
+  })
+})
+
+test.group('MarkOverdueInvoices — organization notified (#878)', () => {
+  test('each admin is told, the same day, that an invoice has become overdue', async ({
+    assert,
+  }) => {
+    const org = await OrganizationFactory.create()
+    const admin = await UserFactory.merge({ organizationId: org.id }).create()
+    await OrganizationMembership.create({ userId: admin.id, organizationId: org.id, role: 'admin' })
+    const invoice = await InvoiceFactory.merge({ organizationId: org.id })
+      .apply('invoice')
+      .apply('overdue')
+      .create()
+
+    await run()
+    await run()
+
+    const notifications = await Notification.query()
+      .where('userId', admin.id)
+      .where('type', 'invoice.overdue')
+    // Une seule fois : le second passage ne rebascule rien.
+    assert.lengthOf(notifications, 1)
+    assert.equal(notifications[0].actionUrl, `/invoices/${invoice.id}`)
+    assert.equal(notifications[0].severity, 'warning')
   })
 })
