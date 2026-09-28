@@ -12,6 +12,7 @@ import { computed, ref } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
+import { useCurrentUser } from '~/composables/use_current_user'
 import {
   doneTotalForAssigneeFilter,
   matchesAssigneeFilter,
@@ -36,10 +37,10 @@ const props = defineProps<{
 const { t } = useT()
 const page = usePage()
 const { can, isMechanic } = usePermissions()
+const { currentUserId } = useCurrentUser()
 
 // Filtre « Assigné à » (#868). Un mécanicien à qui des tâches sont confiées
 // arrive sur les siennes ; les autres rôles voient toute la flotte.
-const currentUserId = computed(() => (page.props.user as { id: number } | undefined)?.id ?? null)
 const assigneeFilter = ref<TaskAssigneeFilter>(
   isMechanic.value && props.tasks.some((task) => task.assignee?.id === currentUserId.value)
     ? 'mine'

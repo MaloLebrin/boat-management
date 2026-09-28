@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Head, usePage } from '@inertiajs/vue3'
-import { computed, ref } from 'vue'
+import { Head } from '@inertiajs/vue3'
+import { computed } from 'vue'
 import BaseAlert from '~/components/base/BaseAlert.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
@@ -8,6 +8,8 @@ import BaseSegmentedControl from '~/components/base/BaseSegmentedControl.vue'
 import BaseStatCard from '~/components/base/BaseStatCard.vue'
 import MechanicInterventionRow from '~/components/dashboard/MechanicInterventionRow.vue'
 import type { PlanningTask } from '#shared/types/planning'
+import { useCurrentUser } from '~/composables/use_current_user'
+import { useMineAllScope } from '~/composables/use_mine_all_scope'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -16,21 +18,19 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const page = usePage()
+const { currentUserId } = useCurrentUser()
 
 // « Mes tâches » (#868) : celles qui me sont confiées. C'est la vue par défaut
 // dès qu'on m'en a confié une ; sans assignation dans l'organisation, le
 // mécanicien garde la vue de toute la flotte.
-const currentUserId = computed(() => (page.props.user as { id: number } | undefined)?.id ?? null)
 const isMine = (task: PlanningTask) =>
   currentUserId.value !== null && task.assignee?.id === currentUserId.value
 const hasAssignedTasks = [...props.overdueTasks, ...props.soonTasks].some(isMine)
 
-const scope = ref<'mine' | 'all'>(hasAssignedTasks ? 'mine' : 'all')
-const scopeOptions = computed(() => [
-  { value: 'mine', label: t('dashboard.mechanic.scope.mine') },
-  { value: 'all', label: t('dashboard.mechanic.scope.all') },
-])
+const { scope, scopeOptions, setScope } = useMineAllScope(hasAssignedTasks ? 'mine' : 'all', {
+  mine: 'dashboard.mechanic.scope.mine',
+  all: 'dashboard.mechanic.scope.all',
+})
 
 const visibleOverdue = computed(() =>
   scope.value === 'mine' ? props.overdueTasks.filter(isMine) : props.overdueTasks
@@ -76,7 +76,7 @@ const upcomingCount = computed(() => visibleSoon.value.length)
       class="mt-6"
       :model-value="scope"
       :options="scopeOptions"
-      @update:model-value="scope = $event === 'mine' ? 'mine' : 'all'"
+      @update:model-value="setScope"
     />
 
     <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">

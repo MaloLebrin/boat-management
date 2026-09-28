@@ -15,6 +15,7 @@ import type {
   SheetType,
   TaskEquipmentSource,
 } from '#shared/types/maintenance'
+import { decimalColumnToNumber } from '#shared/helpers/number_format'
 
 interface TaskEquipmentModels {
   engines?: BoatEngine[]
@@ -73,12 +74,6 @@ export function toBoatTaskEquipment(boat: Boat | null): BoatTaskEquipment {
   }
 }
 
-function decimal(value: string | null | undefined): number | null {
-  if (value === null || value === undefined) return null
-  const n = Number(value)
-  return Number.isFinite(n) ? n : null
-}
-
 /**
  * Ordre de travail d'une tâche (#868). L'assigné n'est connu que si la
  * relation `assignee` a été préchargée ; sinon `null`.
@@ -88,8 +83,8 @@ export function toMaintenanceTaskWorkOrder(t: BoatMaintenanceTask): MaintenanceT
   return {
     assignee: assignee ? { id: assignee.id, fullName: assignee.fullName || assignee.email } : null,
     providerName: t.providerName ?? null,
-    estimatedCost: decimal(t.estimatedCost),
-    actualCost: decimal(t.actualCost),
+    estimatedCost: decimalColumnToNumber(t.estimatedCost),
+    actualCost: decimalColumnToNumber(t.actualCost),
     estimatedDurationMinutes: t.estimatedDurationMinutes ?? null,
     actualDurationMinutes: t.actualDurationMinutes ?? null,
   }
