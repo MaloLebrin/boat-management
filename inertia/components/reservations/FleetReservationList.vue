@@ -7,6 +7,7 @@ import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
 import ReservationTypeBadge from '~/components/reservations/ReservationTypeBadge.vue'
+import ReservationPaymentBadge from '~/components/reservations/payment/ReservationPaymentBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatReservationRow, FleetBoatOption } from '~/types/reservation'
@@ -49,6 +50,7 @@ function createQuote(reservationId: number) {
             <th class="px-4 pb-3">{{ t('reservations.columns.status') }}</th>
             <th class="px-4 pb-3">{{ t('reservations.columns.type') }}</th>
             <th class="px-4 pb-3 text-right">{{ t('reservations.columns.price') }}</th>
+            <th class="px-4 pb-3">{{ t('reservations.columns.payment') }}</th>
             <th class="px-4 pb-3 text-right last:pr-0">
               {{ t('reservations.columns.documents') }}
             </th>
@@ -90,6 +92,9 @@ function createQuote(reservationId: number) {
             </td>
             <td class="px-4 py-3 text-right font-medium text-fg">
               {{ row.totalPrice ? `${row.totalPrice} €` : '—' }}
+            </td>
+            <td class="px-4 py-3">
+              <ReservationPaymentBadge :reservation="row" />
             </td>
             <td class="px-4 py-3 last:pr-0 text-right">
               <div class="flex flex-wrap items-center justify-end gap-2">

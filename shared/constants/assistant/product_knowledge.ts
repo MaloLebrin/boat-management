@@ -1021,6 +1021,33 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageReservations',
   },
   {
+    id: 'reservation-payment',
+    title: {
+      en: 'Reservation payment: deposit, balance and security deposit',
+      fr: 'Paiement d’une réservation : acompte, solde et caution',
+    },
+    body: {
+      en: 'Each reservation tracks its money from the “Payment” action of the boat’s reservation list. Once confirmed, it expects a 30 % deposit and copies the security deposit from the boat pricing. You record “Deposit received” (amount editable), then “Balance received”, with the method (transfer, card, cash, cheque), or a refund. A badge flags an awaited deposit, or a balance still due within 7 days of departure; admins get a daily reminder. On the return inspection, the security deposit is released or retained with an amount and a reason. Manual tracking only: no online payment.',
+      fr: 'Chaque réservation suit son argent depuis l’action « Paiement » de la liste des réservations du bateau. Une fois confirmée, elle attend un acompte de 30 % et reprend la caution du tarif du bateau. On enregistre « Acompte reçu » (montant modifiable), puis « Solde reçu », avec le moyen (virement, carte, espèces, chèque), ou un remboursement. Un badge signale un acompte attendu, ou un solde dû à moins de 7 jours du départ ; les admins reçoivent un rappel quotidien. À l’état des lieux de retour, la caution est restituée ou retenue avec un montant et un motif. Suivi manuel : pas de paiement en ligne.',
+    },
+    keywords: [
+      'paiement',
+      'payment',
+      'acompte',
+      'deposit',
+      'solde',
+      'balance',
+      'caution',
+      'security deposit',
+      'encaissement',
+      'rembourser',
+      'refund',
+      'impaye',
+    ],
+    navTarget: 'reservations.index',
+    planFlag: 'canManageReservations',
+  },
+  {
     id: 'reservation-pricing',
     title: {
       en: 'Pricing and seasonal rates',

@@ -510,6 +510,8 @@ Fiches CRM (module `crm_invoicing`).
 - période : `startsAt`, `endsAt`
 - instantané client : `clientName`, `clientEmail`, `clientPhone`
 - `notes`, `totalPrice`
+- paiement (#875) : `depositAmount` (acompte attendu, nullable), `depositPaidAt`, `balancePaidAt`, `paidAmount` (decimal, défaut 0), `paymentStatus` (`unpaid` | `deposit_paid` | `paid` | `refunded`, CHECK, défaut `unpaid`), `paymentMethod` (`transfer` | `card` | `cash` | `check`, nullable, CHECK)
+- caution (#875) : `securityDepositAmount` (copiée de `boat_pricing.depositAmount` à la confirmation), `securityDepositStatus` (`none` | `held` | `released` | `retained`, CHECK, défaut `none`), `securityDepositRetainedAmount`, `securityDepositNote`
 - `createdAt`, `updatedAt`
 
 ### boat_inspections

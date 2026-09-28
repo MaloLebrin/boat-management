@@ -173,6 +173,16 @@ chemin hors-ligne) et l'**ajout de photos** (#621). Mécanique détaillée dans
 
 ## Hors périmètre (#584)
 
-PDF d'état des lieux signable, caution/facturation des dommages, checklists
+PDF d'état des lieux signable, facturation des dommages, checklists
 personnalisables par organisation, checklist et photos hors-ligne (voir
 ci-dessus).
+
+## Caution au retour (#875)
+
+L'écran d'état des lieux porte, sous la comparaison départ/retour, le bloc
+**Caution** (`SecurityDepositPanel.vue`) : c'est au vu des défauts constatés au
+retour qu'on la restitue ou qu'on en retient une partie (montant ≤ caution
+bloquée, motif obligatoire). Le bloc lit la prop `reservation` et ne recharge
+qu'elle ; ses gestes sont réservés à `boats.manage` (prop `canManagePayment`).
+Règles et routes : `docs/domain/reservations-and-pricing.md`, section 5.5.
+Retenir une caution ne crée pas encore de facture de dommages.

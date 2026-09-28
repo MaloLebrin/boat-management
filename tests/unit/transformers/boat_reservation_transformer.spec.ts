@@ -65,6 +65,34 @@ test.group('toBoatReservationRow', () => {
     assert.isNull(result.totalPrice)
   })
 
+  test('payment fields (#875): dates as ISO, SQL defaults when the row was not re-read', ({
+    assert,
+  }) => {
+    const fresh = toBoatReservationRow(makeReservation(), 'Boat')
+    assert.equal(fresh.paidAmount, '0.00')
+    assert.equal(fresh.paymentStatus, 'unpaid')
+    assert.equal(fresh.securityDepositStatus, 'none')
+    assert.isNull(fresh.depositPaidAt)
+
+    const paid = toBoatReservationRow(
+      makeReservation({
+        depositAmount: '450.00',
+        depositPaidAt: DateTime.fromISO('2026-07-05T08:00:00.000Z'),
+        paidAmount: '450.00',
+        paymentStatus: 'deposit_paid',
+        paymentMethod: 'card',
+        securityDepositAmount: '1500.00',
+        securityDepositStatus: 'held',
+      }),
+      'Boat'
+    )
+    assert.equal(paid.depositAmount, '450.00')
+    assert.match(paid.depositPaidAt!, /^2026-07-05T/)
+    assert.equal(paid.paymentStatus, 'deposit_paid')
+    assert.equal(paid.paymentMethod, 'card')
+    assert.equal(paid.securityDepositStatus, 'held')
+  })
+
   test('startsAt and endsAt are ISO strings', ({ assert }) => {
     const reservation = makeReservation()
     const result = toBoatReservationRow(reservation, 'Boat')

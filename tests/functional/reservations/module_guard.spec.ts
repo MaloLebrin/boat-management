@@ -102,6 +102,24 @@ const GUARDED_FACES: GuardedFace[] = [
         .redirects(0),
   },
   {
+    name: 'PATCH un encaissement (#875)',
+    call: (client, user, { boat, reservation }) =>
+      client
+        .patch(`/boats/${boat.id}/reservations/${reservation.id}/payment`)
+        .form({ kind: 'deposit', method: 'card', amount: 100 })
+        .loginAs(user)
+        .redirects(0),
+  },
+  {
+    name: 'PATCH la caution (#875)',
+    call: (client, user, { boat, reservation }) =>
+      client
+        .patch(`/boats/${boat.id}/reservations/${reservation.id}/security-deposit`)
+        .form({ action: 'hold', amount: 500 })
+        .loginAs(user)
+        .redirects(0),
+  },
+  {
     name: 'DELETE une réservation',
     call: (client, user, { boat, reservation }) =>
       client.delete(`/boats/${boat.id}/reservations/${reservation.id}`).loginAs(user).redirects(0),

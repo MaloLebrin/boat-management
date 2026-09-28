@@ -65,6 +65,10 @@ export async function domainState() {
 
   return {
     reservations: reservations.length,
+    // Un encaissement ne crée pas de ligne : il se lit sur la réservation (#875).
+    payments: reservations.filter(
+      (r) => r.paymentStatus !== 'unpaid' || r.securityDepositStatus !== 'none'
+    ).length,
     inspections: inspections.length,
     items: items.length,
     equipmentActions: equipmentActions.length,

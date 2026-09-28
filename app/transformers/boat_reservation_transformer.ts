@@ -27,6 +27,17 @@ export function toBoatReservationRow(
     clientPhone: reservation.clientPhone,
     notes: reservation.notes,
     totalPrice: reservation.totalPrice,
+    depositAmount: reservation.depositAmount ?? null,
+    depositPaidAt: reservation.depositPaidAt?.toISO() ?? null,
+    balancePaidAt: reservation.balancePaidAt?.toISO() ?? null,
+    // Une ligne créée sans relecture (`create`) n'a pas les défauts SQL.
+    paidAmount: reservation.paidAmount ?? '0.00',
+    paymentStatus: reservation.paymentStatus ?? 'unpaid',
+    paymentMethod: reservation.paymentMethod ?? null,
+    securityDepositAmount: reservation.securityDepositAmount ?? null,
+    securityDepositStatus: reservation.securityDepositStatus ?? 'none',
+    securityDepositRetainedAmount: reservation.securityDepositRetainedAmount ?? null,
+    securityDepositNote: reservation.securityDepositNote ?? null,
     createdAt: reservation.createdAt.toISO()!,
     linkedInvoices,
   }

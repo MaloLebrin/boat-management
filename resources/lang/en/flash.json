@@ -390,6 +390,31 @@
       "status": "boat {status}",
       "task": "task “{title}” on {date}",
       "incident": "open incident: {type}"
+    },
+    "payment": {
+      "recorded": {
+        "deposit": "Deposit recorded.",
+        "balance": "Balance recorded: the reservation is fully paid.",
+        "refund": "Refund recorded."
+      },
+      "securityDeposit": {
+        "hold": "Security deposit recorded as held.",
+        "release": "Security deposit released.",
+        "retain": "Security deposit retained."
+      },
+      "errors": {
+        "nothingToRefund": "Nothing was received on this reservation: there is nothing to refund.",
+        "cancelled": "This reservation is cancelled: only a refund is still possible.",
+        "alreadyPaid": "This reservation is already fully paid.",
+        "depositAlreadyPaid": "The deposit was already received: record the balance.",
+        "amountRequired": "Enter an amount greater than zero.",
+        "amountAboveTotal": "The deposit cannot exceed the rental price.",
+        "noPrice": "Set the rental price before recording the balance.",
+        "depositNotNone": "The security deposit is already held.",
+        "depositNotHeld": "The security deposit is not held: there is nothing to release or retain.",
+        "retainedAboveDeposit": "The retained amount cannot exceed the security deposit.",
+        "noteRequired": "Enter the reason for retaining the deposit."
+      }
     }
   },
   "ports": {

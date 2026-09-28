@@ -14,6 +14,7 @@ const appT = vi.hoisted(() => ({
   'reservations.actions.inspectionFor': 'Inspection for {client}',
   'reservations.actions.contractFor': 'Rental contract for {client}',
   'reservations.actions.editFor': 'Edit the reservation for {client}',
+  'reservations.actions.paymentFor': 'Payment for the reservation for {client}',
   'reservations.actions.deleteFor': 'Delete the reservation for {client}',
 }))
 
@@ -46,6 +47,15 @@ vi.mock('~/components/reservations/ReservationStatusBadge.vue', () => ({
   },
 }))
 
+vi.mock('~/components/reservations/payment/ReservationPaymentModal.vue', () => ({
+  default: {
+    name: 'ReservationPaymentModal',
+    template: '<div data-testid="payment-modal" :data-open="String(open)" />',
+    props: ['open', 'boatId', 'reservation', 'canManage', 'reloadProps'],
+    emits: ['update:open'],
+  },
+}))
+
 vi.mock('~/components/reservations/ReservationEditModal.vue', () => ({
   default: {
     template: '<div />',
@@ -56,6 +66,7 @@ vi.mock('~/components/reservations/ReservationEditModal.vue', () => ({
 
 import ReservationList from '../../inertia/components/reservations/ReservationList.vue'
 import type { BoatReservationRow } from '../../shared/types/reservation'
+import { UNPAID_RESERVATION_FIELDS } from './helpers/reservation_payment'
 
 const row: BoatReservationRow = {
   id: 1,
@@ -70,6 +81,7 @@ const row: BoatReservationRow = {
   clientPhone: null,
   notes: null,
   totalPrice: '1500',
+  ...UNPAID_RESERVATION_FIELDS,
   createdAt: '2026-05-01T00:00:00.000Z',
   linkedInvoices: [],
 }
@@ -138,11 +150,34 @@ describe('ReservationList', () => {
     expect(wrapper.findAll('button')).toHaveLength(0)
   })
 
-  test('shows action buttons (inspection, contract, edit, delete) when canManage is true', () => {
+  test('shows action buttons (inspection, contract, payment, edit, delete) when canManage is true', () => {
     const wrapper = mount(ReservationList, {
       props: { boatId: 5, reservations: [row], canManage: true },
     })
-    expect(wrapper.findAll('button')).toHaveLength(4)
+    expect(wrapper.findAll('button')).toHaveLength(5)
+  })
+
+  test('the payment action opens the payment modal on the fresh row (#875)', async () => {
+    const wrapper = mount(ReservationList, {
+      props: { boatId: 5, reservations: [row], canManage: true },
+    })
+    const modal = () => wrapper.findComponent({ name: 'ReservationPaymentModal' })
+    expect(modal().props('open')).toBe(false)
+
+    const paymentButton = wrapper
+      .findAll('button')
+      .find((b) => b.attributes('aria-label') === 'Payment for the reservation for Alice Martin')
+    await paymentButton!.trigger('click')
+    expect(modal().props('open')).toBe(true)
+    expect(modal().props('reservation')).toMatchObject({ id: 1 })
+
+    // Un encaissement recharge `reservations` : la modale lit la nouvelle ligne.
+    await wrapper.setProps({ reservations: [{ ...row, paymentStatus: 'deposit_paid' }] })
+    expect(modal().props('reservation')).toMatchObject({ paymentStatus: 'deposit_paid' })
+
+    modal().vm.$emit('update:open', false)
+    await wrapper.vm.$nextTick()
+    expect(modal().props('open')).toBe(false)
   })
 
   test('delete calls router.delete with correct URL after confirm', async () => {
@@ -174,6 +209,7 @@ describe('ReservationList', () => {
     expect(labels).toEqual([
       'Inspection for Alice Martin',
       'Rental contract for Alice Martin',
+      'Payment for the reservation for Alice Martin',
       'Edit the reservation for Alice Martin',
       'Delete the reservation for Alice Martin',
     ])
@@ -192,7 +228,7 @@ describe('ReservationList', () => {
       props: { boatId: 5, reservations: [row], canManage: true },
     })
     expect(wrapper.text()).not.toContain('Create a quote')
-    expect(wrapper.findAll('thead th')).toHaveLength(6)
+    expect(wrapper.findAll('thead th')).toHaveLength(7)
   })
 
   test('offers a create-quote action when the org may invoice (#735)', () => {

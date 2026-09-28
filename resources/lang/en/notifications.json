@@ -111,6 +111,16 @@
         "body": "{changedBy} put {boatName} back in service (it was {fromStatus}).",
         "bodyWithReason": "{changedBy} put {boatName} back in service (it was {fromStatus}). Reason: {reason}"
       }
+    },
+    "reservation": {
+      "deposit_due": {
+        "title": "Deposits not received on {boatName}",
+        "body": "{count, plural, one {# confirmed reservation is waiting} other {# confirmed reservations are waiting}} for a deposit on {boatName}."
+      },
+      "balance_due": {
+        "title": "Balances to collect on {boatName}",
+        "body": "{count, plural, one {# departure within 7 days is not fully paid} other {# departures within 7 days are not fully paid}} on {boatName}."
+      }
     }
   },
   "title": "Notifications",
@@ -146,6 +156,8 @@
     "invitation.accepted": "Invitation accepted",
     "ai.suggestions_ready": "AI suggestions",
     "boat.status_changed": "Boat status changed",
-    "boat.available_again": "Boat available again"
+    "boat.available_again": "Boat available again",
+    "reservation.deposit_due": "Deposit not received",
+    "reservation.balance_due": "Balance to collect"
   }
 }

@@ -30,6 +30,7 @@ import { countBilledNights } from '#shared/helpers/reservation_quote'
 import BoatAvailabilityService from '#services/boat_availability_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import ReservationQuoteService from '#services/reservation_quote_service'
+import ReservationPaymentService from '#services/reservation_payment_service'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
@@ -53,7 +54,8 @@ export default class BoatReservationService {
   constructor(
     private pricingService: BoatPricingService,
     private quoteService: ReservationQuoteService,
-    private availabilityService: BoatAvailabilityService
+    private availabilityService: BoatAvailabilityService,
+    private paymentService: ReservationPaymentService
   ) {}
 
   async listForBoat(user: User, boat: Boat): Promise<BoatReservation[]> {
@@ -261,23 +263,23 @@ export default class BoatReservationService {
           ? await this.cancelOverlappingOptions(boat.id, startsAt, endsAt, null, trx)
           : 0
 
-      const reservation = await BoatReservation.create(
-        {
-          boatId: boat.id,
-          organizationId: boat.organizationId,
-          status,
-          type: payload.type ?? null,
-          startsAt,
-          endsAt,
-          clientId,
-          clientName: payload.clientName.trim(),
-          clientEmail: payload.clientEmail?.trim() || null,
-          clientPhone: payload.clientPhone?.trim() || null,
-          notes: payload.notes?.trim() || null,
-          totalPrice,
-        },
-        { client: trx }
-      )
+      const reservation = new BoatReservation().merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+        status,
+        type: payload.type ?? null,
+        startsAt,
+        endsAt,
+        clientId,
+        clientName: payload.clientName.trim(),
+        clientEmail: payload.clientEmail?.trim() || null,
+        clientPhone: payload.clientPhone?.trim() || null,
+        notes: payload.notes?.trim() || null,
+        totalPrice,
+      })
+      // Acompte attendu et caution du tarif dès la confirmation (#875).
+      this.paymentService.applyDefaults(reservation, pricing?.depositAmount ?? null)
+      await reservation.useTransaction(trx).save()
 
       return { reservation, cancelledOptions, forcedOver }
     })
@@ -388,6 +390,8 @@ export default class BoatReservationService {
       if (payload.totalPrice !== undefined) {
         reservation.totalPrice = payload.totalPrice !== null ? String(payload.totalPrice) : null
       }
+
+      this.paymentService.applyDefaults(reservation, pricing?.depositAmount ?? null)
 
       reservation.useTransaction(trx)
       await reservation.save()

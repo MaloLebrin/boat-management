@@ -559,7 +559,7 @@ en faire autant au clavier et les nommer :
   la ligne (`reservations.actions.contractFor` → « Rental contract for {client} »),
   sinon vingt lignes annoncent toutes le même nom.
 
-Référence : `ReservationList.vue` (état des lieux, contrat, modifier, supprimer). Les
+Référence : `ReservationRowActions.vue`, rendu par `ReservationList.vue` (état des lieux, contrat, paiement, modifier, supprimer). Les
 tests navigateur ciblent alors l'action par son rôle et son nom accessible plutôt que
 par `[title="…"]` — ce que voit Playwright est ce qu'annonce un lecteur d'écran.
 
@@ -577,6 +577,21 @@ factures déjà émis (`linkedInvoices`) et le bouton « Créer un devis » sous
 
 Le bouton poste sur `POST /invoices/from-reservation/:id` (`router.post`,
 `preserveScroll`) et le contrôleur redirige vers la fiche du devis.
+
+## Reservations — paiement et caution (#875)
+
+- Colonne « Paiement » des deux listes : `payment/ReservationPaymentBadge.vue` (acompte
+  attendu, solde à encaisser, sinon statut de paiement ; rien pour une option non réglée).
+  Le calendrier `ReservationCalendar.vue` pose un point `bg-danger` sur la pastille et
+  complète l'infobulle.
+- Action « Paiement » de `ReservationRowActions.vue` → `payment/ReservationPaymentModal.vue`,
+  qui relit la ligne dans la prop `reservations` (elle suit chaque encaissement sans se
+  refermer) → `payment/ReservationPaymentPanel.vue` : montants, moyen, « Acompte reçu »,
+  « Solde reçu », « Rembourser » (confirmation native), puis `payment/SecurityDepositPanel.vue`.
+- `boats/reservation_inspection.vue` : bloc « Caution » (`SecurityDepositPanel`) sous la
+  comparaison départ/retour, prop `canManagePayment`.
+- Mutations : `router.patch` sur `/payment` et `/security-deposit`, `preserveScroll`,
+  `only` = props de la page hôte (`reservations` ou `reservation`, `errors`, `flash`).
 
 ## Repli carte mobile des tableaux (#493)
 

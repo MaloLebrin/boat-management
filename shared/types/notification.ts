@@ -24,6 +24,8 @@ export type NotificationType =
   | 'ai.suggestions_ready'
   | 'boat.status_changed'
   | 'boat.available_again'
+  | 'reservation.deposit_due'
+  | 'reservation.balance_due'
   | (string & {}) // extensible pour les futurs types sans casser le type
 
 export type NotificationSeverity = 'info' | 'success' | 'warning' | 'error'

@@ -8,6 +8,11 @@ export const AUDIT_ACTIONS = [
   // malgré une indisponibilité (forçage admin, motif en métadonnée).
   'boat.status_change',
   'reservation.force_unavailable',
+  // Argent de la location (#875) : encaissements et caution.
+  'reservation.payment_recorded',
+  'reservation.security_deposit_held',
+  'reservation.security_deposit_released',
+  'reservation.security_deposit_retained',
   'member.add',
   'member.remove',
   'member.update_role',

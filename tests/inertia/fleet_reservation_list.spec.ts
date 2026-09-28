@@ -25,6 +25,7 @@ vi.mock('~/components/reservations/ReservationStatusBadge.vue', () => ({
 
 import FleetReservationList from '../../inertia/components/reservations/FleetReservationList.vue'
 import type { BoatReservationRow } from '../../shared/types/reservation'
+import { UNPAID_RESERVATION_FIELDS } from './helpers/reservation_payment'
 
 const row: BoatReservationRow = {
   id: 1,
@@ -39,6 +40,7 @@ const row: BoatReservationRow = {
   clientPhone: null,
   notes: null,
   totalPrice: '900',
+  ...UNPAID_RESERVATION_FIELDS,
   createdAt: '2026-05-01T00:00:00.000Z',
   linkedInvoices: [],
 }

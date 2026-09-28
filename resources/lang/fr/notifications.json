@@ -111,6 +111,16 @@
         "body": "{changedBy} a remis {boatName} en service (il était {fromStatus}).",
         "bodyWithReason": "{changedBy} a remis {boatName} en service (il était {fromStatus}). Motif : {reason}"
       }
+    },
+    "reservation": {
+      "deposit_due": {
+        "title": "Acomptes non reçus sur {boatName}",
+        "body": "{count, plural, one {# réservation confirmée attend} other {# réservations confirmées attendent}} son acompte sur {boatName}."
+      },
+      "balance_due": {
+        "title": "Soldes à encaisser sur {boatName}",
+        "body": "{count, plural, one {# départ dans moins de 7 jours n'est pas soldé} other {# départs dans moins de 7 jours ne sont pas soldés}} sur {boatName}."
+      }
     }
   },
   "title": "Notifications",
@@ -146,6 +156,8 @@
     "invitation.accepted": "Invitation acceptée",
     "ai.suggestions_ready": "Suggestions IA",
     "boat.status_changed": "Statut du bateau modifié",
-    "boat.available_again": "Bateau de nouveau disponible"
+    "boat.available_again": "Bateau de nouveau disponible",
+    "reservation.deposit_due": "Acompte non reçu",
+    "reservation.balance_due": "Solde à encaisser"
   }
 }

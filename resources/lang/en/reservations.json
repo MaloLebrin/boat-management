@@ -84,7 +84,8 @@
     "status": "Status",
     "price": "Price",
     "documents": "Documents",
-    "type": "Type"
+    "type": "Type",
+    "payment": "Payment"
   },
   "actions": {
     "createQuote": "Create a quote",
@@ -94,7 +95,9 @@
     "contractFor": "Rental contract for {client}",
     "editFor": "Edit the reservation for {client}",
     "deleteFor": "Delete the reservation for {client}",
-    "createQuoteFor": "Create a quote for {client}"
+    "createQuoteFor": "Create a quote for {client}",
+    "payment": "Payment",
+    "paymentFor": "Payment for the reservation for {client}"
   },
   "types": {
     "bareboat": "Bareboat",
@@ -102,5 +105,62 @@
     "day_charter": "Day charter",
     "cabin": "Cabin charter",
     "other": "Other"
+  },
+  "payment": {
+    "title": "Payment",
+    "subtitle": "Deposit, balance and security deposit — {client}",
+    "status": {
+      "unpaid": "Unpaid",
+      "deposit_paid": "Deposit received",
+      "paid": "Paid",
+      "refunded": "Refunded"
+    },
+    "attention": {
+      "deposit_due": "Deposit expected",
+      "balance_due": "Balance to collect"
+    },
+    "methods": {
+      "transfer": "Bank transfer",
+      "card": "Card",
+      "cash": "Cash",
+      "check": "Cheque"
+    },
+    "summary": {
+      "total": "Total price",
+      "deposit": "Deposit",
+      "paid": "Received",
+      "remaining": "Balance due",
+      "paidOn": "Received on {date}"
+    },
+    "fields": {
+      "method": "Payment method",
+      "depositAmount": "Deposit amount"
+    },
+    "actions": {
+      "deposit": "Deposit received",
+      "balance": "Balance received",
+      "refund": "Refund",
+      "confirmRefund": "Record a refund of {amount}?"
+    },
+    "noPrice": "No price is set: add it to the reservation to track the balance.",
+    "securityDeposit": {
+      "title": "Security deposit",
+      "status": {
+        "none": "Not held",
+        "held": "Held",
+        "released": "Released",
+        "retained": "Retained"
+      },
+      "amount": "Security deposit amount",
+      "retainedAmount": "Amount retained",
+      "note": "Reason for retaining",
+      "notePlaceholder": "E.g. propeller damaged on return",
+      "hold": "Security deposit held",
+      "release": "Release the deposit",
+      "retain": "Retain",
+      "noAmount": "The boat's pricing has no security deposit: enter an amount.",
+      "retainedSummary": "{amount} retained: {note}",
+      "inspectionHint": "On return, release the security deposit or retain an amount based on the defects found."
+    }
   }
 }

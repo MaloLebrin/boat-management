@@ -4,16 +4,26 @@ import { DateTime } from 'luxon'
 import type Boat from '#models/boat'
 import BoatDocument from '#models/boat_document'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import BoatReservation from '#models/boat_reservation'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import OrganizationMembership from '#models/organization_membership'
 import NotificationService from '#services/notification_service'
+import OrganizationModuleService from '#services/organization_module_service'
+import QuotaService from '#services/quota_service'
+import Organization from '#models/organization'
 import { resolveEffectiveExpiry } from '#shared/helpers/safety_compliance'
+import { paymentAttention } from '#shared/helpers/reservation_payment'
 import type { NotificationSeverity, NotificationType } from '#shared/types/notification'
 
 /** Fenêtre « bientôt » (jours) pour les échéances/expirations à venir. */
 const DUE_SOON_WINDOW_DAYS = 30
 /** Anti-doublon : pas de re-notification d'une même entité avant N jours. */
 const DEDUPE_WINDOW_DAYS = 30
+/**
+ * Paiements de location (#875) : les départs s'enchaînent chaque semaine, une
+ * relance par bateau et par mois en laisserait passer. Une par semaine.
+ */
+const PAYMENT_DEDUPE_WINDOW_DAYS = 7
 
 /**
  * Notification agrégée par bateau (une notif par bateau + type, avec compte).
@@ -28,26 +38,36 @@ interface ScanGroup {
   boatName: string
   count: number
   recipientUserId?: number
+  /** Écran d'arrivée, à défaut la fiche du bateau (ou le planning pour un assigné). */
+  actionUrl?: string
+  /** Fenêtre anti-doublon, à défaut `DEDUPE_WINDOW_DAYS`. */
+  dedupeDays?: number
 }
 
 /**
  * Scanne la flotte pour créer des notifications planifiées : tâches de
  * maintenance en retard / à venir, documents et équipements de sécurité expirés
- * ou expirant bientôt. Les notifications sont agrégées par bateau (une notif par
- * bateau + type, avec un compte) et destinées aux admins de l'organisation.
+ * ou expirant bientôt, acomptes et soldes de location à encaisser (#875). Les
+ * notifications sont agrégées par bateau (une notif par bateau + type, avec un
+ * compte) et destinées aux admins de l'organisation.
  * L'anti-doublon (`NotificationService.createIfNotRecent`) évite le spam d'un
  * scan quotidien sur une condition persistante.
  */
 @inject()
 export default class NotificationScanService {
-  constructor(private notificationService: NotificationService) {}
+  constructor(
+    private notificationService: NotificationService,
+    // Défaut : les tests et le job construisent le service à la main.
+    private quotaService: QuotaService = new QuotaService(new OrganizationModuleService())
+  ) {}
 
   async run(): Promise<{ created: number }> {
-    // Les trois scans sont indépendants → en parallèle.
+    // Les scans sont indépendants → en parallèle.
     const scanned = await Promise.all([
       this.scanMaintenance(),
       this.scanDocuments(),
       this.scanSafetyEquipment(),
+      this.scanReservationPayments(),
     ])
     const groups = scanned.flat()
 
@@ -100,10 +120,12 @@ export default class NotificationScanService {
             // Un assigné peut être mécanicien, sans accès à la fiche bateau :
             // il est envoyé vers le planning, ouvert à tous les rôles de
             // maintenance.
-            actionUrl: group.recipientUserId !== undefined ? '/planning' : `/boats/${group.boatId}`,
+            actionUrl:
+              group.actionUrl ??
+              (group.recipientUserId !== undefined ? '/planning' : `/boats/${group.boatId}`),
             metadata: { boatId: group.boatId, count: group.count },
           },
-          { metadataKey: 'boatId', withinDays: DEDUPE_WINDOW_DAYS }
+          { metadataKey: 'boatId', withinDays: group.dedupeDays ?? DEDUPE_WINDOW_DAYS }
         )
       })
     )
@@ -236,6 +258,61 @@ export default class NotificationScanService {
         'safety_equipment.expiring_soon',
         'warning'
       ),
+    ]
+  }
+
+  /**
+   * Argent des locations (#875) : réservations confirmées dont l'acompte n'est
+   * pas arrivé, et départs à moins de 7 jours pas encore soldés. La règle est
+   * celle du badge de la liste (`paymentAttention`), pour que la notification
+   * et l'écran disent la même chose.
+   */
+  private async scanReservationPayments(): Promise<ScanGroup[]> {
+    const now = DateTime.now()
+    const reservations = await BoatReservation.query()
+      .where('status', 'confirmed')
+      .whereIn('paymentStatus', ['unpaid', 'deposit_paid'])
+      .where('endsAt', '>', now.toISO()!)
+      .preload('boat')
+
+    // Module Location coupé : la page des réservations est fermée, le rappel
+    // mènerait à un refus.
+    const orgIds = [...new Set(reservations.map((r) => r.organizationId))]
+    const organizations = orgIds.length ? await Organization.query().whereIn('id', orgIds) : []
+    const charterOrgIds = new Set<number>()
+    for (const organization of organizations) {
+      if (await this.quotaService.canManageReservations(organization)) {
+        charterOrgIds.add(organization.id)
+      }
+    }
+
+    const depositDue: BoatReservation[] = []
+    const balanceDue: BoatReservation[] = []
+    for (const reservation of reservations) {
+      if (!charterOrgIds.has(reservation.organizationId)) continue
+      const attention = paymentAttention(
+        {
+          status: reservation.status,
+          paymentStatus: reservation.paymentStatus,
+          depositAmount: reservation.depositAmount,
+          totalPrice: reservation.totalPrice,
+          paidAmount: reservation.paidAmount,
+          startsAt: reservation.startsAt.toISO()!,
+        },
+        now.toJSDate()
+      )
+      if (attention === 'deposit_due') depositDue.push(reservation)
+      else if (attention === 'balance_due') balanceDue.push(reservation)
+    }
+
+    const toReservations = (group: ScanGroup): ScanGroup => ({
+      ...group,
+      actionUrl: `/boats/${group.boatId}/reservations`,
+      dedupeDays: PAYMENT_DEDUPE_WINDOW_DAYS,
+    })
+    return [
+      ...this.groupByBoat(depositDue, 'reservation.deposit_due', 'warning').map(toReservations),
+      ...this.groupByBoat(balanceDue, 'reservation.balance_due', 'warning').map(toReservations),
     ]
   }
 
