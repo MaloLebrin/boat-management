@@ -185,6 +185,28 @@ est **terminal**. Référence : `ALLOWED_RESERVATION_TRANSITIONS` dans
 
 Chevauchement = `starts_at < autre.ends_at AND ends_at > autre.starts_at`.
 
+### 5.2 bis Disponibilité du bateau (#870)
+
+Après le contrôle anti-double-booking, `assertBoatAvailable` consulte les fenêtres
+d'indisponibilité de `BoatAvailabilityService`. Les règles :
+
+- **bateau `sold`** : toute réservation non annulée est refusée, option comprise, et rien ne
+  permet de forcer (flash `flash.reservation.boatSold`) ;
+- **`confirmed`** chevauchant une fenêtre (statut `in_maintenance` / `out_of_service`, tâche
+  ouverte datée, incident immobilisant ouvert) : refusée avec `BoatUnavailableError`. Le flash
+  `flash.reservation.boatUnavailable` liste les motifs ;
+- **`option`** : jamais bloquée par une indisponibilité ;
+- **forçage** : `forceReason`, facultatif, est accepté par les deux validators. Le contrôleur ne le
+  transmet que si l'utilisateur a `boats.reservations.force`, une capability réservée à l'admin.
+  La réservation est alors posée et une ligne d'audit `reservation.force_unavailable` est écrite
+  (motif et fenêtres passées outre), avec le flash `flash.reservation.forcedUnavailable` ;
+- à la **modification**, la règle ne rejoue que si les dates ou le statut changent. Une
+  réservation déjà confirmée reste éditable (notes, client…) si le bateau est devenu
+  indisponible depuis.
+
+La page `boats/reservations` reçoit `availability` (bandeau) et `canForceUnavailable`. Ce dernier
+affiche le champ « motif de forçage » du formulaire quand le statut choisi est `confirmed`.
+
 ### 5.3 Routes → controllers → pages
 
 Réf. routes : `start/routes/boats.ts` (per-boat) et `start/routes/reservations.ts` (flotte).

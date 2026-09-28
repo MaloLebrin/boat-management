@@ -5,7 +5,11 @@ import {
   ReservationDurationError,
   ReservationBlacklistedClientError,
 } from '#exceptions/reservation_errors'
-import { BoatNotFoundError } from '#exceptions/boat_errors'
+import { BoatNotFoundError, BoatUnavailableError } from '#exceptions/boat_errors'
+import AuditLogService from '#services/audit_log_service'
+import BoatAvailabilityService from '#services/boat_availability_service'
+import { describeUnavailability } from '#transformers/boat_status_transformer'
+import type { BoatUnavailabilityWindow } from '#shared/types/boat_status'
 import BoatReservationService from '#services/boat_reservation_service'
 import BoatHullService from '#services/boat_hull_service'
 import BoatPricingService from '#services/boat_pricing_service'
@@ -36,8 +40,59 @@ export default class BoatReservationsController {
     private pricingSeasonService: PricingSeasonService,
     private clientService: ClientService,
     private invoiceService: InvoiceService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private availabilityService: BoatAvailabilityService,
+    private auditLogService: AuditLogService
   ) {}
+
+  /**
+   * Motif de forçage retenu (#870) : seulement pour qui a
+   * `boats.reservations.force`, sinon la règle de disponibilité s'applique.
+   */
+  private async forceReasonFor(
+    bouncer: HttpContext['bouncer'],
+    boat: Boat,
+    forceReason: string | null | undefined
+  ): Promise<string | null> {
+    if (!forceReason) return null
+    return (await bouncer.with(BoatPolicy).allows('forceReservation', boat)) ? forceReason : null
+  }
+
+  private flashUnavailable(
+    error: BoatUnavailableError,
+    session: HttpContext['session'],
+    i18n: HttpContext['i18n']
+  ) {
+    session.flash(
+      'error',
+      error.forceable
+        ? i18n.t('flash.reservation.boatUnavailable', {
+            reasons: describeUnavailability(error.windows, i18n),
+          })
+        : i18n.t('flash.reservation.boatSold')
+    )
+  }
+
+  private async recordForce(
+    user: User,
+    boat: Boat,
+    reservationId: number,
+    reason: string,
+    forcedOver: BoatUnavailabilityWindow[]
+  ) {
+    await this.auditLogService.log({
+      organizationId: boat.organizationId,
+      userId: user.id,
+      action: 'reservation.force_unavailable',
+      entityType: 'reservation',
+      entityId: reservationId,
+      metadata: {
+        boatName: boat.name,
+        reason,
+        windows: forcedOver.map((w) => ({ source: w.source, label: w.label, refId: w.refId })),
+      },
+    })
+  }
 
   private async resolveBoat(
     user: User,
@@ -65,15 +120,25 @@ export default class BoatReservationsController {
 
     await bouncer.with(BoatPolicy).authorize('view', boat)
 
-    const [reservations, canManage, pricingModel, pricingSeasons, clientOptions, mayCreateInvoice] =
-      await Promise.all([
-        this.reservationService.listForBoat(user, boat),
-        bouncer.with(BoatPolicy).allows('manage', boat),
-        this.boatPricingService.getForBoat(boat),
-        this.pricingSeasonService.listForBoatScope(boat.organizationId, boat.id),
-        this.clientService.listOptions(boat.organizationId),
-        bouncer.with(InvoicePolicy).allows('create'),
-      ])
+    const [
+      reservations,
+      canManage,
+      pricingModel,
+      pricingSeasons,
+      clientOptions,
+      mayCreateInvoice,
+      availability,
+      canForceUnavailable,
+    ] = await Promise.all([
+      this.reservationService.listForBoat(user, boat),
+      bouncer.with(BoatPolicy).allows('manage', boat),
+      this.boatPricingService.getForBoat(boat),
+      this.pricingSeasonService.listForBoatScope(boat.organizationId, boat.id),
+      this.clientService.listOptions(boat.organizationId),
+      bouncer.with(InvoicePolicy).allows('create'),
+      this.availabilityService.summaryForBoat(boat),
+      bouncer.with(BoatPolicy).allows('forceReservation', boat),
+    ])
 
     const boatPricing = pricingModel ? toBoatPricingRow(pricingModel) : null
 
@@ -104,6 +169,8 @@ export default class BoatReservationsController {
       boatPricing,
       pricingSeasons,
       clientOptions,
+      availability,
+      canForceUnavailable,
     })
   }
 
@@ -117,10 +184,11 @@ export default class BoatReservationsController {
     await bouncer.with(BoatPolicy).authorize('manage', boat)
 
     const payload = await request.validateUsing(createBoatReservationValidator)
+    const forceReason = await this.forceReasonFor(bouncer, boat, payload.forceReason)
 
-    let cancelledOptions = 0
+    let result
     try {
-      ;({ cancelledOptions } = await this.reservationService.create(user, boat, {
+      result = await this.reservationService.create(user, boat, {
         startsAt: payload.startsAt,
         endsAt: payload.endsAt,
         tzOffsetMinutes: payload.tzOffsetMinutes,
@@ -132,8 +200,13 @@ export default class BoatReservationsController {
         type: payload.type ?? null,
         notes: payload.notes ?? null,
         totalPrice: payload.totalPrice ?? null,
-      }))
+        forceReason,
+      })
     } catch (error) {
+      if (error instanceof BoatUnavailableError) {
+        this.flashUnavailable(error, session, i18n)
+        return response.redirect().back()
+      }
       if (error instanceof ReservationConflictError) {
         session.flash('error', i18n.t('flash.reservation.conflict'))
         return response.redirect().back()
@@ -160,11 +233,18 @@ export default class BoatReservationsController {
       throw error
     }
 
+    const { cancelledOptions, forcedOver, reservation } = result
+    if (forcedOver.length > 0 && forceReason) {
+      await this.recordForce(user, boat, reservation.id, forceReason, forcedOver)
+    }
+
     session.flash(
       'success',
-      cancelledOptions > 0
-        ? i18n.t('flash.reservation.optionsOverridden', { count: String(cancelledOptions) })
-        : i18n.t('flash.reservation.created')
+      forcedOver.length > 0
+        ? i18n.t('flash.reservation.forcedUnavailable')
+        : cancelledOptions > 0
+          ? i18n.t('flash.reservation.optionsOverridden', { count: String(cancelledOptions) })
+          : i18n.t('flash.reservation.created')
     )
     return response.redirect().back()
   }
@@ -179,28 +259,29 @@ export default class BoatReservationsController {
     await bouncer.with(BoatPolicy).authorize('manage', boat)
 
     const payload = await request.validateUsing(updateBoatReservationValidator)
+    const forceReason = await this.forceReasonFor(bouncer, boat, payload.forceReason)
 
-    let cancelledOptions = 0
+    let result
     try {
-      ;({ cancelledOptions } = await this.reservationService.update(
-        user,
-        boat,
-        Number(params.reservationId),
-        {
-          startsAt: payload.startsAt,
-          endsAt: payload.endsAt,
-          tzOffsetMinutes: payload.tzOffsetMinutes,
-          clientId: payload.clientId,
-          clientName: payload.clientName,
-          clientEmail: payload.clientEmail,
-          clientPhone: payload.clientPhone,
-          status: payload.status,
-          type: payload.type,
-          notes: payload.notes,
-          totalPrice: payload.totalPrice,
-        }
-      ))
+      result = await this.reservationService.update(user, boat, Number(params.reservationId), {
+        startsAt: payload.startsAt,
+        endsAt: payload.endsAt,
+        tzOffsetMinutes: payload.tzOffsetMinutes,
+        clientId: payload.clientId,
+        clientName: payload.clientName,
+        clientEmail: payload.clientEmail,
+        clientPhone: payload.clientPhone,
+        status: payload.status,
+        type: payload.type,
+        notes: payload.notes,
+        totalPrice: payload.totalPrice,
+        forceReason,
+      })
     } catch (error) {
+      if (error instanceof BoatUnavailableError) {
+        this.flashUnavailable(error, session, i18n)
+        return response.redirect().back()
+      }
       if (error instanceof ReservationNotFoundError) {
         session.flash('error', i18n.t('flash.reservation.notFound'))
         return response.redirect().back()
@@ -231,11 +312,18 @@ export default class BoatReservationsController {
       throw error
     }
 
+    const { cancelledOptions, forcedOver, reservation } = result
+    if (forcedOver.length > 0 && forceReason) {
+      await this.recordForce(user, boat, reservation.id, forceReason, forcedOver)
+    }
+
     session.flash(
       'success',
-      cancelledOptions > 0
-        ? i18n.t('flash.reservation.optionsOverridden', { count: String(cancelledOptions) })
-        : i18n.t('flash.reservation.updated')
+      forcedOver.length > 0
+        ? i18n.t('flash.reservation.forcedUnavailable')
+        : cancelledOptions > 0
+          ? i18n.t('flash.reservation.optionsOverridden', { count: String(cancelledOptions) })
+          : i18n.t('flash.reservation.updated')
     )
     return response.redirect().back()
   }

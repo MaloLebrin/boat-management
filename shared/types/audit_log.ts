@@ -4,6 +4,10 @@ export const AUDIT_ACTIONS = [
   'boat.create',
   'boat.update',
   'boat.delete',
+  // Disponibilité (#870) : changement de statut, et réservation confirmée posée
+  // malgré une indisponibilité (forçage admin, motif en métadonnée).
+  'boat.status_change',
+  'reservation.force_unavailable',
   'member.add',
   'member.remove',
   'member.update_role',

@@ -44,6 +44,8 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - réglementaire: `flagCountry` (code ISO 3166-1 alpha-2, vocabulaire `COUNTRY_CODES`, nullable —
   cf. #580), `navigationCategory`, `hullIdentificationNumber`, `francisationNumber`, `maxPersons`
 - armement: `armamentZone` (`basic | coastal | semi_offshore | offshore`, nullable — cf. #582)
+- disponibilité (#870): `status` (`available | in_maintenance | out_of_service | sold`, défaut
+  `available`, CHECK, indexé), `statusReason` (text nullable), `statusChangedAt` (timestamptz nullable)
 
 `category` ne doit pas être confondue avec `navigationCategory` (catégorie CE A/B/C/D).
 
@@ -58,6 +60,13 @@ La migration `1834000000000_normalize_country_codes` a normalisé l'existant en 
 **conserve les valeurs non mappables** : la colonne peut donc encore porter du texte libre
 historique, que l'affichage rend brut. Les largeurs de colonnes n'ont pas été rétrécies pour cette
 raison.
+
+### boat_status_changes
+
+Historique des changements de statut d'un bateau (#870) : `boatId` (FK `boats`, CASCADE, indexé),
+`organizationId` (FK `organizations`, CASCADE, indexé), `fromStatus`, `toStatus`, `reason` (text
+nullable), `userId` (FK `users`, SET NULL, indexé), `createdAt`. Pas de `updatedAt` : une ligne
+n'est jamais modifiée.
 
 ### boat_brands
 

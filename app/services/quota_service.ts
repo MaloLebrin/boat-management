@@ -31,7 +31,13 @@ export default class QuotaService {
 
   async countBoats(org: Organization | null): Promise<number> {
     this.#assertOrganization(org)
-    const rows = await Boat.query().where('organizationId', org.id).count('* as total')
+    // Un bateau vendu (#870) sort de la flotte active : il ne consomme plus de
+    // place dans le quota. Le remettre en service repasse par ce plafond
+    // (`BoatStatusService.change`).
+    const rows = await Boat.query()
+      .where('organizationId', org.id)
+      .whereNot('status', 'sold')
+      .count('* as total')
     return Number(rows[0].$extras.total)
   }
 

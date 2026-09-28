@@ -7,6 +7,9 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import BoatShowHeaderActions from '~/components/boats/show/BoatShowHeaderActions.vue'
 import BoatShowTabContent from '~/components/boats/show/BoatShowTabContent.vue'
+import BoatAvailabilityBanner from '~/components/boats/show/availability/BoatAvailabilityBanner.vue'
+import BoatAvailabilityControl from '~/components/boats/show/availability/BoatAvailabilityControl.vue'
+import type { BoatAvailabilitySummary, BoatStatusChangeRow } from '#shared/types/boat_status'
 import NavigationActiveCard from '~/components/boats/show/tabs/NavigationActiveCard.vue'
 import { useBoatShowTabs } from '~/composables/use_boat_show_tabs'
 import { useT } from '~/composables/use_t'
@@ -75,6 +78,9 @@ const props = defineProps<{
   homePortId: number | null
   /** Rapport de conformité Division 240 (#582) — calculé côté serveur. */
   safetyCompliance: SafetyComplianceReport
+  /** Disponibilité (#870) : statut, motif et fenêtres d'indisponibilité. */
+  availability: BoatAvailabilitySummary
+  statusHistory: BoatStatusChangeRow[]
 }>()
 
 const {
@@ -148,7 +154,7 @@ const activeNavigationLog = computed(
 // `initialTab` ne concerne que la résolution de l'onglet : inutile de le laisser
 // retomber en attribut HTML sur le panneau de contenu.
 const tabContentProps = computed(() => {
-  const { initialTab: _initialTab, ...rest } = props
+  const { initialTab: _initialTab, availability: _a, statusHistory: _h, ...rest } = props
   return rest
 })
 </script>
@@ -171,6 +177,12 @@ const tabContentProps = computed(() => {
             <BaseBadge :variant="statusBadge.variant">
               {{ statusBadge.label }}
             </BaseBadge>
+            <BoatAvailabilityControl
+              :boat-id="boat.id"
+              :availability="availability"
+              :history="statusHistory"
+              :can-change="canManageMaintenance"
+            />
           </div>
           <div class="mt-2 flex flex-wrap items-center gap-2 text-sm text-fg-muted">
             <span v-if="boat.category">{{ boatCategoryLabel(t, boat.category) }}</span>
@@ -201,6 +213,8 @@ const tabContentProps = computed(() => {
           />
         </div>
       </div>
+
+      <BoatAvailabilityBanner :availability="availability" />
 
       <BaseTabs :model-value="activeGroupKey" :tabs="groupTabs" @update:model-value="goToGroup" />
 

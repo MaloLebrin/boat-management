@@ -532,7 +532,8 @@
       "registration": "Registration",
       "category": "Category",
       "propulsion": "Propulsion",
-      "maintenance": "Maintenance"
+      "maintenance": "Maintenance",
+      "status": "Availability"
     },
     "cards": {
       "unknownCategory": "Unknown category",
@@ -544,7 +545,9 @@
       "ok": "OK"
     },
     "viewTable": "Table",
-    "viewCards": "Cards"
+    "viewCards": "Cards",
+    "status": "Status",
+    "statusActive": "Active fleet"
   },
   "engineShow": {
     "breadcrumb": {
@@ -1145,6 +1148,38 @@
       "charts": "nautical charts and publications",
       "weather_forecast": "means of receiving weather forecasts",
       "summary_document": "safety equipment summary sheet"
+    }
+  },
+  "availability": {
+    "status": {
+      "available": "Available",
+      "in_maintenance": "In maintenance",
+      "out_of_service": "Out of service",
+      "sold": "Sold"
+    },
+    "change": "Change status",
+    "modal": {
+      "title": "Change boat status",
+      "status": "New status",
+      "reason": "Reason (optional)",
+      "reasonPlaceholder": "E.g. engine removed, waiting for a part…",
+      "submit": "Save",
+      "immobilizedHint": "While this status is active, no confirmed reservation can be booked on the boat (an option is still possible).",
+      "soldHint": "A sold boat leaves the active list and the boat quota; its history stays available. It no longer accepts any reservation."
+    },
+    "banner": {
+      "immobilized": "Boat unavailable — {status}",
+      "upcoming": "Upcoming unavailability",
+      "since": "Since {date}.",
+      "reason": "Reason: {reason}",
+      "task": "Task “{title}” on {date}",
+      "incident": "Open incident ({type}) since {date}",
+      "rule": "A confirmed reservation overlapping these periods is refused; an option is still possible."
+    },
+    "history": {
+      "title": "Status history",
+      "entry": "{from} → {to}",
+      "by": "by {name}"
     }
   }
 }

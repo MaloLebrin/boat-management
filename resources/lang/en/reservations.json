@@ -53,7 +53,9 @@
     "delete": "Delete",
     "confirmDelete": "Delete this reservation?",
     "type": "Charter type",
-    "noType": "Unspecified"
+    "noType": "Unspecified",
+    "forceReason": "Override reason (administrator)",
+    "forceReasonHint": "If the boat is unavailable on these dates, entering a reason confirms the reservation anyway. The override is recorded in the activity log."
   },
   "calendar": {
     "noReservations": "No reservations this month",

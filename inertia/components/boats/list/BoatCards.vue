@@ -2,6 +2,7 @@
 import { Link } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BoatStatusBadge from '~/components/boats/BoatStatusBadge.vue'
 import type { BoatListItem } from './types'
 import { useT } from '~/composables/use_t'
 import { maintenanceVariant } from '~/utils/status_variants'
@@ -49,6 +50,8 @@ function maintenanceLabel(b: BoatListItem) {
         </template>
 
         <div class="flex flex-wrap gap-2">
+          <!-- Disponibilité (#870) : on ne signale que l'écart à la normale. -->
+          <BoatStatusBadge v-if="boat.status !== 'available'" :status="boat.status" />
           <span
             class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-surface-muted text-fg-muted ring-1 ring-border"
           >

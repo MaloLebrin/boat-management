@@ -1,3 +1,5 @@
+import type { BoatStatus } from '#shared/types/boat_status'
+
 export type BoatListSort = 'recent' | 'name'
 export type BoatListDirection = 'asc' | 'desc'
 
@@ -5,6 +7,8 @@ export type BoatListFilters = {
   q?: string
   category?: string
   propulsionType?: string
+  /** Statut de disponibilité (#870) — vide = flotte active (hors vendus). */
+  status?: string
   sort: BoatListSort
   direction: BoatListDirection
   page: number
@@ -30,6 +34,7 @@ export type BoatListItem = {
   registrationNumber: string | null
   category: string | null
   propulsionType: string | null
+  status: BoatStatus
   updatedAt: string | null
   maintenance: BoatMaintenanceBadge
 }

@@ -9,7 +9,7 @@ import {
   AssistantNoPendingActionError,
   AssistantPendingActionRequiredError,
 } from '#exceptions/assistant_errors'
-import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import { BoatEquipmentNotFoundError, BoatUnavailableError } from '#exceptions/boat_errors'
 import { BoatFuelLogValidationError } from '#exceptions/fuel_log_errors'
 import { BoatIncidentValidationError } from '#exceptions/incident_errors'
 import { BoatMaintenanceTaskValidationError } from '#exceptions/maintenance_errors'
@@ -209,6 +209,7 @@ export default class AssistantController {
       error instanceof ReservationConflictError ||
       error instanceof ReservationDurationError ||
       error instanceof ReservationBlacklistedClientError ||
+      error instanceof BoatUnavailableError ||
       error instanceof BoatEquipmentNotFoundError
     ) {
       session.flash('error', i18n.t('flash.assistant.actionFailed'))

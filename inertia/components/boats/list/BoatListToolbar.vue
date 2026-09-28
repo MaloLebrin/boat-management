@@ -7,6 +7,7 @@ import BaseTabs from '~/components/base/BaseTabs.vue'
 import type { BoatListDirection, BoatListFilters, BoatListSort } from './types'
 import { useT } from '~/composables/use_t'
 import { useListFilters } from '~/composables/use_list_filters'
+import { BOAT_STATUSES } from '#shared/types/boat_status'
 
 const { t } = useT()
 
@@ -40,6 +41,10 @@ const directionOptions = computed<Array<{ label: string; value: BoatListDirectio
   { label: t('boats.list.desc'), value: 'desc' },
 ])
 
+const statusOptions = computed(() =>
+  BOAT_STATUSES.map((value) => ({ label: t(`boats.availability.status.${value}`), value }))
+)
+
 const { qDraft, update, onSearchInput } = useListFilters<BoatListFilters>({
   filters: () => props.filters,
   apply: (next) => emit('update:filters', next),
@@ -50,7 +55,8 @@ const hasActiveFilters = computed(() => {
   return (
     Boolean(props.filters.q?.trim()) ||
     Boolean(props.filters.category) ||
-    Boolean(props.filters.propulsionType)
+    Boolean(props.filters.propulsionType) ||
+    Boolean(props.filters.status)
   )
 })
 </script>
@@ -83,7 +89,17 @@ const hasActiveFilters = computed(() => {
         </BaseInput>
       </div>
 
-      <div class="grid gap-2 sm:grid-cols-2 md:col-span-6 md:justify-end">
+      <div class="grid gap-2 sm:grid-cols-3 md:col-span-6 md:justify-end">
+        <div>
+          <BaseSelect
+            :label="t('boats.list.status')"
+            allow-empty
+            :placeholder="t('boats.list.statusActive')"
+            :model-value="filters.status ?? ''"
+            :options="statusOptions"
+            @update:model-value="(v) => update({ status: String(v || '') || undefined, page: 1 })"
+          />
+        </div>
         <div v-if="categoryOptions.length > 0">
           <BaseSelect
             :label="t('boats.list.category')"

@@ -377,6 +377,37 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'planning.index',
   },
   {
+    id: 'boat-availability-status',
+    title: {
+      en: 'Boat availability status (available, in maintenance, out of service, sold)',
+      fr: 'Statut de disponibilité du bateau (disponible, en entretien, hors service, vendu)',
+    },
+    body: {
+      en: 'Each boat has an availability status shown on the fleet list and the boat page. Anyone who can edit a boat changes it from the “Change status” link next to the name, with an optional reason; the history is kept and admins and owners are notified. In maintenance or out of service, and also a dated open task (one day by default, or its planned duration) or an open incident that immobilizes the boat (grounding, flooding, engine or rigging failure, collision, fire), a confirmed reservation over those dates is refused — an option is still accepted. An admin can force the confirmation with a reason recorded in the activity log. A sold boat accepts no reservation, leaves the active list (filter “Sold” to see it) and no longer counts in the boat quota.',
+      fr: 'Chaque bateau a un statut de disponibilité, visible dans la liste et sur sa fiche. On le change via « Changer le statut » à côté du nom, avec un motif facultatif ; l’historique est gardé, admins et propriétaires sont notifiés. En entretien ou hors service, ou sur une tâche ouverte datée (un jour par défaut, ou sa durée prévue) ou un incident ouvert qui immobilise le bateau (échouage, voie d’eau, avarie moteur ou gréement, collision, incendie), une réservation confirmée sur ces dates est refusée — une option reste acceptée. Un admin peut forcer la confirmation avec un motif tracé au journal d’activité. Un bateau vendu n’accepte plus de réservation, sort de la liste active (filtre « Vendu » pour le revoir) et ne compte plus dans le quota de bateaux.',
+    },
+    keywords: [
+      'statut',
+      'status',
+      'disponibilite',
+      'availability',
+      'disponible',
+      'available',
+      'indisponible',
+      'unavailable',
+      'hors service',
+      'out of service',
+      'en entretien',
+      'in maintenance',
+      'vendu',
+      'sold',
+      'forcer',
+      'force',
+      'bloquer reservation',
+    ],
+    navTarget: 'boats.index',
+  },
+  {
     id: 'maintenance-operations-catalog',
     title: {
       en: 'Standard maintenance operations catalog',

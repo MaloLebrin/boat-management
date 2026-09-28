@@ -1374,6 +1374,36 @@ export class BoatSailSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatStatusChangeSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'fromStatus',
+    'id',
+    'organizationId',
+    'reason',
+    'toStatus',
+    'userId',
+  ] as const
+  $columns = BoatStatusChangeSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare fromStatus: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare organizationId: number
+  @column()
+  declare reason: string | null
+  @column()
+  declare toStatus: string
+  @column()
+  declare userId: number | null
+}
+
 export class BoatSchema extends BaseModel {
   static $columns = [
     'armamentZone',
@@ -1401,6 +1431,9 @@ export class BoatSchema extends BaseModel {
     'propulsionType',
     'registrationNumber',
     'spotId',
+    'status',
+    'statusChangedAt',
+    'statusReason',
     'type',
     'updatedAt',
     'yearBuilt',
@@ -1456,6 +1489,12 @@ export class BoatSchema extends BaseModel {
   declare registrationNumber: string | null
   @column()
   declare spotId: number | null
+  @column()
+  declare status: string
+  @column.dateTime()
+  declare statusChangedAt: DateTime | null
+  @column()
+  declare statusReason: string | null
   @column()
   declare type: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })

@@ -12,6 +12,7 @@ import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 import AiKeyUndecryptable from '#events/ai_key_undecryptable'
 import MaintenanceTaskAssigned from '#events/maintenance_task_assigned'
+import BoatStatusChanged from '#events/boat_status_changed'
 
 emitter.listen(SimulatorLeadCreated, [() => import('#listeners/on_simulator_lead_created')])
 emitter.listen(ContactMessageReceived, [() => import('#listeners/on_contact_message_received')])
@@ -40,3 +41,4 @@ emitter.listen(AiTokenThresholdCrossed, [
 ])
 emitter.listen(AiKeyUndecryptable, [() => import('#listeners/log_ai_key_undecryptable')])
 emitter.listen(MaintenanceTaskAssigned, [() => import('#listeners/on_maintenance_task_assigned')])
+emitter.listen(BoatStatusChanged, [() => import('#listeners/on_boat_status_changed')])

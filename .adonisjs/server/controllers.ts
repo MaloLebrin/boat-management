@@ -34,6 +34,7 @@ export const controllers = {
   BoatReservations: () => import('#controllers/boat_reservations_controller'),
   BoatSafetyEquipment: () => import('#controllers/boat_safety_equipment_controller'),
   BoatSimulator: () => import('#controllers/boat_simulator_controller'),
+  BoatStatus: () => import('#controllers/boat_status_controller'),
   Boats: () => import('#controllers/boats_controller'),
   Budget: () => import('#controllers/budget_controller'),
   ClientMedia: () => import('#controllers/client_media_controller'),

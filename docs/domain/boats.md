@@ -36,7 +36,9 @@ C'est le même contrat que pour les contrôleurs « sous » un bateau
   - Service: `app/services/boat_service.ts` → `listForUser`
   - Page: `inertia/pages/boats/index.vue`
   - Filtres: `?q=`, `?category=` (vocabulaire fermé `BOAT_CATEGORIES`, #571 — remplace `?type=`),
-    `?propulsionType=`, `?sort=`, `?direction=`. Une `category` hors enum est ignorée.
+    `?propulsionType=`, `?status=` (#870), `?sort=`, `?direction=`. Une `category` hors enum est ignorée.
+  - Sans `?status=`, la liste montre la **flotte active** : les bateaux `sold` n'y reviennent
+    qu'avec `?status=sold`.
 - `GET /boats/new` (`boats.create`)
   - Controller: `BoatsController.create`
   - ACL: `bouncer.authorize('boatCreate')`
@@ -193,6 +195,33 @@ peut être membre d'une organisation autre que celle portée par son
 `user.organizationId`).
 
 ## Règles métier notables
+
+### Statut de disponibilité (#870)
+
+- `boats.status` : `available` (défaut) · `in_maintenance` · `out_of_service` · `sold`
+  (`BOAT_STATUSES`, `shared/types/boat_status.ts`), avec `status_reason` et `status_changed_at`.
+  Chaque changement écrit une ligne dans `boat_status_changes` (de → vers, motif, auteur, date).
+- `PATCH /boats/:id/status` (`boats.status.update`) → `BoatStatusController.update`
+  (validator `changeBoatStatusValidator`, policy `BoatPolicy.edit`) → `BoatStatusService.change`.
+  Redirection arrière ; même statut = flash `flash.boat.statusUnchanged`.
+- Chaque changement produit :
+  - une ligne d'audit `boat.status_change` ;
+  - l'événement `BoatStatusChanged`, qui notifie les admins (lien `/boats/:id`) et les
+    propriétaires (lien `/owner/boats/:id`), jamais l'auteur. La notification est
+    `boat.available_again` pour un retour à `available` (hors bateau vendu), sinon
+    `boat.status_changed` ; les deux sont poussables.
+- `sold` : le bateau sort du quota (`QuotaService.countBoats` l'exclut) et de la liste active.
+  Le remettre en service repasse par `assertCanAddBoat`.
+- **Indisponibilités calculées** — `BoatAvailabilityService` et le cœur pur
+  `shared/helpers/boat_availability.ts` agrègent :
+  - un statut immobilisant : fenêtre ouverte depuis `status_changed_at` ;
+  - les tâches **ouvertes datées** : de l'échéance, à minuit UTC, sur la durée prévue arrondie
+    au jour, une journée par défaut ;
+  - les incidents **non clos** de type immobilisant (`IMMOBILIZING_INCIDENT_TYPES` : tout sauf
+    `theft_vandalism` et `other`) : fenêtre ouverte depuis la survenue.
+- La fiche (`availability`, `statusHistory`) affiche le badge, la modale « Changer le statut »
+  avec l'historique et un bandeau d'indisponibilité. La liste affiche une colonne ou un badge.
+- L'outil `get_boat` de l'assistant renvoie `availability`, et `list_boats` accepte `status`.
 
 Référence: `app/services/boat_service.ts`.
 

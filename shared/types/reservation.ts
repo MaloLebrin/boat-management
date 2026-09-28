@@ -58,6 +58,12 @@ export interface CreateReservationPayload {
   type?: ReservationType | null
   notes?: string | null
   totalPrice?: number | null
+  /**
+   * Motif de forçage (#870) : pose la réservation confirmée malgré une
+   * indisponibilité du bateau. Le contrôleur ne le transmet que si l'utilisateur
+   * a `boats.reservations.force` ; il est tracé au journal d'audit.
+   */
+  forceReason?: string | null
 }
 
 export interface UpdateReservationPayload {
@@ -73,4 +79,10 @@ export interface UpdateReservationPayload {
   type?: ReservationType | null
   notes?: string | null
   totalPrice?: number | null
+  /**
+   * Motif de forçage (#870) : pose la réservation confirmée malgré une
+   * indisponibilité du bateau. Le contrôleur ne le transmet que si l'utilisateur
+   * a `boats.reservations.force` ; il est tracé au journal d'audit.
+   */
+  forceReason?: string | null
 }

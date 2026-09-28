@@ -6,6 +6,8 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import ReservationCalendar from '~/components/reservations/ReservationCalendar.vue'
 import ReservationForm from '~/components/reservations/ReservationForm.vue'
 import ReservationList from '~/components/reservations/ReservationList.vue'
+import BoatAvailabilityBanner from '~/components/boats/show/availability/BoatAvailabilityBanner.vue'
+import type { BoatAvailabilitySummary } from '#shared/types/boat_status'
 import { useT } from '~/composables/use_t'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
@@ -20,6 +22,9 @@ const props = defineProps<{
   pricingSeasons: PricingSeasonRow[]
   clientOptions: ClientOption[]
   canCreateQuote: boolean
+  /** Disponibilité du bateau (#870) et droit de forcer une confirmation. */
+  availability: BoatAvailabilitySummary
+  canForceUnavailable: boolean
 }>()
 
 const { t } = useT()
@@ -107,6 +112,8 @@ onMounted(() => {
       </div>
     </div>
 
+    <BoatAvailabilityBanner class="mt-6" :availability="availability" />
+
     <div class="mt-6">
       <ReservationCalendar :reservations="reservations" />
     </div>
@@ -118,6 +125,7 @@ onMounted(() => {
         :boat-pricing="boatPricing"
         :pricing-seasons="pricingSeasons"
         :client-options="clientOptions"
+        :can-force-unavailable="canForceUnavailable && availability.status !== 'sold'"
       />
     </div>
 

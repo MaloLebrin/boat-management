@@ -35,6 +35,9 @@ import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_servic
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatContextService from '#services/boat_context_service'
 import BoatHullService from '#services/boat_hull_service'
+import BoatAvailabilityService from '#services/boat_availability_service'
+import BoatStatusService from '#services/boat_status_service'
+import { toBoatStatusChangeRow } from '#transformers/boat_status_transformer'
 import { RegistrationNumberTakenError } from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
@@ -82,7 +85,9 @@ export default class BoatsController {
     private engineCatalogService: EngineCatalogService,
     private equipmentCatalogService: EquipmentCatalogService,
     private sailLoftService: SailLoftService,
-    private safetyComplianceService: BoatSafetyComplianceService
+    private safetyComplianceService: BoatSafetyComplianceService,
+    private availabilityService: BoatAvailabilityService,
+    private statusService: BoatStatusService
   ) {}
 
   async index({ inertia, auth, request, bouncer, response }: HttpContext) {
@@ -283,7 +288,16 @@ export default class BoatsController {
     const pricing = pricingRow ? toBoatPricingRow(pricingRow) : null
     const initialTab = initialTabParam(request)
 
+    // Disponibilité (#870) : dans la réponse initiale, le bandeau et le badge
+    // de l'en-tête ne doivent pas clignoter après le rendu.
+    const [availability, statusChanges] = await Promise.all([
+      this.availabilityService.summaryForBoat(boat),
+      this.statusService.listHistory(boat),
+    ])
+
     return inertia.render('boats/show', {
+      availability,
+      statusHistory: statusChanges.map(toBoatStatusChangeRow),
       ...toShowShellProps(boat, {
         positionHistory,
         boatMedia,

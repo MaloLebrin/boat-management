@@ -5,6 +5,7 @@
 
 export const listeners = {
   LogAiKeyUndecryptable: () => import('#listeners/log_ai_key_undecryptable'),
+  OnBoatStatusChanged: () => import('#listeners/on_boat_status_changed'),
   OnContactMessageReceived: () => import('#listeners/on_contact_message_received'),
   OnMaintenanceTaskAssigned: () => import('#listeners/on_maintenance_task_assigned'),
   OnOrganizationInvitationAccepted: () => import('#listeners/on_organization_invitation_accepted'),

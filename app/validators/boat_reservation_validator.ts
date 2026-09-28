@@ -15,6 +15,8 @@ export const createBoatReservationValidator = vine.compile(
     type: vine.enum(RESERVATION_TYPES).optional().nullable(),
     notes: vine.string().trim().maxLength(2000).optional().nullable(),
     totalPrice: vine.number().min(0).decimal([0, 2]).optional().nullable(),
+    // Forçage d'une indisponibilité (#870) — ignoré sans `boats.reservations.force`.
+    forceReason: vine.string().trim().maxLength(500).optional().nullable(),
   })
 )
 
@@ -32,5 +34,7 @@ export const updateBoatReservationValidator = vine.compile(
     type: vine.enum(RESERVATION_TYPES).optional().nullable(),
     notes: vine.string().trim().maxLength(2000).optional().nullable(),
     totalPrice: vine.number().min(0).decimal([0, 2]).optional().nullable(),
+    // Forçage d'une indisponibilité (#870) — ignoré sans `boats.reservations.force`.
+    forceReason: vine.string().trim().maxLength(500).optional().nullable(),
   })
 )

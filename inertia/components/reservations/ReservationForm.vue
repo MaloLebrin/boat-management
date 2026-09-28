@@ -22,6 +22,8 @@ const props = defineProps<{
   boatPricing: BoatPricingRow | null
   pricingSeasons: PricingSeasonRow[]
   clientOptions?: ClientOption[]
+  /** `boats.reservations.force` (#870) : champ « motif de forçage » affiché. */
+  canForceUnavailable?: boolean
 }>()
 
 const { t } = useT()
@@ -40,6 +42,7 @@ const form = useForm({
   type: '' as ReservationType | '',
   notes: '',
   totalPrice: '',
+  forceReason: '',
 })
 
 const statusOptions = [
@@ -84,6 +87,7 @@ function submit() {
       clientId: data.clientId ? Number(data.clientId) : null,
       // Un select vide vaut « non précisé », pas la chaîne vide (#585).
       type: data.type || null,
+      forceReason: data.forceReason.trim() || null,
       tzOffsetMinutes: tzOffsetMinutes(),
     }))
     .post(`/boats/${props.boatId}/reservations`, {
@@ -168,6 +172,15 @@ function submit() {
 
       <BaseField :label="t('reservations.form.notes')" :error="form.errors.notes">
         <BaseTextarea v-model="form.notes" :rows="3" />
+      </BaseField>
+
+      <BaseField
+        v-if="canForceUnavailable && form.status === 'confirmed'"
+        :label="t('reservations.form.forceReason')"
+        :hint="t('reservations.form.forceReasonHint')"
+        :error="form.errors.forceReason"
+      >
+        <BaseInput v-model="form.forceReason" data-testid="reservation-force-reason" />
       </BaseField>
 
       <div class="flex justify-end">

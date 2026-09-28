@@ -13,6 +13,7 @@ const BoatPricingController = () => import('#controllers/boat_pricing_controller
 const BoatEquipmentMediaController = () => import('#controllers/boat_equipment_media_controller')
 const BoatIncidentMediaController = () => import('#controllers/boat_incident_media_controller')
 const BoatOwnersController = () => import('#controllers/boat_owners_controller')
+const BoatStatusController = () => import('#controllers/boat_status_controller')
 
 router
   .group(() => {
@@ -67,6 +68,8 @@ router
     router.get('boats/:id/edit', [controllers.Boats, 'edit']).as('boats.edit')
     router.put('boats/:id', [controllers.Boats, 'update']).as('boats.update')
     router.delete('boats/:id', [controllers.Boats, 'destroy']).as('boats.destroy')
+    // Statut de disponibilité (#870).
+    router.patch('boats/:id/status', [BoatStatusController, 'update']).as('boats.status.update')
 
     router.put('boats/:id/pricing', [BoatPricingController, 'update']).as('boats.pricing.update')
 
