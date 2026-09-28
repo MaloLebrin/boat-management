@@ -13,6 +13,10 @@ export const AUDIT_ACTIONS = [
   'maintenance_task.create',
   'maintenance_task.complete',
   'maintenance_task.delete',
+  // Modification d'une tâche planifiée (#867) : `postpone` quand seule
+  // l'échéance recule, `update` pour toute autre correction.
+  'maintenance_task.update',
+  'maintenance_task.postpone',
   // Actions confirmées depuis le copilote FleetAi (agent actionnable) : même
   // journal que les créations manuelles correspondantes.
   'engine.add_hours',

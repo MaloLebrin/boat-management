@@ -325,6 +325,31 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'planning.index',
   },
   {
+    id: 'maintenance-task-edit-postpone',
+    title: {
+      en: 'Editing and postponing a maintenance task',
+      fr: 'Modifier et reporter une tâche de maintenance',
+    },
+    body: {
+      en: 'An open maintenance task can be edited or postponed; a completed task is history and no longer changes. The pencil button opens the edit form: title, notes, due date, month recurrence and, for an engine task, engine-hour threshold and interval. Subject and equipment stay fixed. The Postpone menu moves a dated task by one week, one month or to a chosen date, from the boat Tasks tab, equipment pages or the planning; an overdue task is postponed from today. Each postponement is counted (“Postponed 3 times”) and logged. A new recurrence interval applies to the next occurrences.',
+      fr: 'Une tâche de maintenance ouverte se modifie et se reporte ; une tâche terminée fait partie de l’historique. Le bouton crayon ouvre l’édition : titre, notes, échéance, récurrence en mois et, pour une tâche moteur, seuil et intervalle en heures. Sujet et équipement restent figés. Le menu Reporter décale une tâche datée d’une semaine, d’un mois ou à une date choisie, depuis l’onglet Tâches, les pages d’équipement ou le planning ; une tâche en retard part d’aujourd’hui. Chaque report est compté (« Reportée 3 fois ») et journalisé. Un nouvel intervalle vaut pour les occurrences suivantes.',
+    },
+    keywords: [
+      'reporter',
+      'report',
+      'postpone',
+      'decaler',
+      'repousser',
+      'modifier',
+      'edit',
+      'echeance',
+      'due date',
+      'tache',
+      'task',
+    ],
+    navTarget: 'planning.index',
+  },
+  {
     id: 'maintenance-operations-catalog',
     title: {
       en: 'Standard maintenance operations catalog',

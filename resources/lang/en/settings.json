@@ -367,6 +367,8 @@
       "maintenance_task_create": "Maintenance task created",
       "maintenance_task_complete": "Maintenance task completed",
       "maintenance_task_delete": "Maintenance task deleted",
+      "maintenance_task_update": "Maintenance task updated",
+      "maintenance_task_postpone": "Maintenance task postponed",
       "engine_add_hours": "Engine hours added",
       "navigation_log_create": "Trip opened",
       "navigation_log_close": "Trip closed",

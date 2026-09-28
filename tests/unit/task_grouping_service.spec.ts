@@ -16,6 +16,7 @@ function makeTask(
     dueEngineHours: overrides.dueEngineHours ?? null,
     currentEngineHours: overrides.currentEngineHours ?? null,
     status: overrides.status ?? 'open',
+    postponedCount: overrides.postponedCount ?? 0,
   }
 }
 

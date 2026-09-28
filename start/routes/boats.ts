@@ -192,6 +192,12 @@ router
       .post('boats/:boatId/maintenance-tasks', [controllers.BoatMaintenanceTasks, 'store'])
       .as('boats.maintenanceTasks.store')
     router
+      .patch('boats/:boatId/maintenance-tasks/:taskId', [
+        controllers.BoatMaintenanceTasks,
+        'update',
+      ])
+      .as('boats.maintenanceTasks.update')
+    router
       .put('boats/:boatId/maintenance-tasks/:taskId/done', [
         controllers.BoatMaintenanceTasks,
         'markDone',

@@ -179,6 +179,31 @@ export interface TaskFormPrefill {
   boatIncidentId?: number
 }
 
+/**
+ * Modification d'une tâche planifiée (#867). Clé absente = champ inchangé,
+ * `null` = champ vidé. Le sujet et l'équipement visé ne se modifient pas :
+ * changer de cible, c'est une autre tâche.
+ */
+export type UpdateMaintenanceTaskPayload = {
+  title?: string
+  notes?: string | null
+  dueAt?: Date | string | DateTime | null
+  recurrenceIntervalMonths?: number | null
+  dueEngineHours?: number | null
+  recurrenceIntervalEngineHours?: number | null
+}
+
+export type MaintenanceTaskEditableField = keyof UpdateMaintenanceTaskPayload
+
+/**
+ * Ce qu'une modification a réellement changé. `postponed` : l'échéance (date ou
+ * heures moteur) a reculé — le compteur `postponedCount` a été incrémenté.
+ */
+export interface MaintenanceTaskUpdateOutcome {
+  changedFields: MaintenanceTaskEditableField[]
+  postponed: boolean
+}
+
 export type MarkTaskDonePayload = {
   doneAt?: Date | string | DateTime
   doneEngineHours?: number | null

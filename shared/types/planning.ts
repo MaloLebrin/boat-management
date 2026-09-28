@@ -9,6 +9,8 @@ export interface PlanningTask {
   dueEngineHours: number | null
   currentEngineHours: number | null
   status: 'open' | 'done'
+  /** Nombre de reports de l'échéance (#867). */
+  postponedCount: number
 }
 
 export interface MaintenanceHistoryEvent {

@@ -22,14 +22,22 @@ import {
 import type { GenericEquipmentCategory } from '#shared/types/boat'
 import type {
   CreateMaintenanceTaskPayload,
+  MaintenanceTaskEditableField,
   MaintenanceTaskSubject,
+  MaintenanceTaskUpdateOutcome,
   MarkTaskDonePayload,
   TaskEquipmentRef,
+  UpdateMaintenanceTaskPayload,
 } from '#shared/types/maintenance'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
 import { incidentBelongsToBoat } from '#utils/incident_utils'
 
-export type { CreateMaintenanceTaskPayload, MaintenanceTaskSubject, MarkTaskDonePayload }
+export type {
+  CreateMaintenanceTaskPayload,
+  MaintenanceTaskSubject,
+  MarkTaskDonePayload,
+  UpdateMaintenanceTaskPayload,
+}
 
 function toDateTime(value: Date | string | DateTime): DateTime {
   if (DateTime.isDateTime(value)) return value
@@ -199,6 +207,133 @@ export default class BoatMaintenanceTaskService {
       lastDoneEngineHours: null,
       doneEngineHours: null,
     })
+  }
+
+  /**
+   * Modifie une tâche planifiée (#867). Seuls les champs présents dans le
+   * payload sont touchés (`null` vide le champ). Une tâche close est de
+   * l'historique : elle ne se modifie plus. Changer l'intervalle de récurrence
+   * ne touche que les occurrences à venir — la suivante est créée à la clôture
+   * avec l'intervalle en vigueur à ce moment-là.
+   *
+   * Reculer l'échéance (date ou heures moteur) compte comme un report et
+   * incrémente `postponedCount`.
+   */
+  async updateForBoat(
+    user: User,
+    boat: Boat,
+    taskId: number,
+    payload: UpdateMaintenanceTaskPayload
+  ): Promise<{ task: BoatMaintenanceTask } & MaintenanceTaskUpdateOutcome> {
+    assertBoatInUserOrg(user, boat, () => new BoatMaintenanceTaskNotFoundError())
+
+    const task = await BoatMaintenanceTask.query()
+      .where('id', taskId)
+      .where('boatId', boat.id)
+      .first()
+
+    if (!task) throw new BoatMaintenanceTaskNotFoundError()
+    if (task.status === 'done') {
+      throw new BoatMaintenanceTaskValidationError('A completed task is history', 'taskDone')
+    }
+
+    const changedFields: MaintenanceTaskEditableField[] = []
+    let postponed = false
+
+    if (payload.title !== undefined) {
+      const title = payload.title.trim()
+      if (!title) throw new BoatMaintenanceTaskValidationError('title is required', 'titleRequired')
+      if (title !== task.title) {
+        task.title = title
+        changedFields.push('title')
+      }
+    }
+
+    if (payload.notes !== undefined) {
+      const notes = payload.notes?.trim() ? payload.notes.trim() : null
+      if (notes !== task.notes) {
+        task.notes = notes
+        changedFields.push('notes')
+      }
+    }
+
+    if (payload.dueAt !== undefined) {
+      const dueAt = payload.dueAt === null ? null : toDateTime(payload.dueAt).startOf('day')
+      const previous = task.dueAt
+      if (dueAt?.toISODate() !== previous?.toISODate()) {
+        task.dueAt = dueAt
+        changedFields.push('dueAt')
+        if (previous && dueAt && dueAt > previous) postponed = true
+      }
+    }
+
+    if (payload.recurrenceIntervalMonths !== undefined) {
+      const months = payload.recurrenceIntervalMonths || null
+      if (months !== task.recurrenceIntervalMonths) {
+        task.recurrenceIntervalMonths = months
+        changedFields.push('recurrenceIntervalMonths')
+      }
+    }
+
+    const engineHoursTouched =
+      (payload.dueEngineHours !== undefined && payload.dueEngineHours !== null) ||
+      (payload.recurrenceIntervalEngineHours !== undefined &&
+        payload.recurrenceIntervalEngineHours !== null)
+    if (engineHoursTouched) {
+      // Mêmes règles qu'à la création : le sujet et le moteur sont figés, une
+      // tâche qui n'en a pas ne devient pas une tâche au compteur.
+      if (task.subject !== 'engine') {
+        throw new BoatMaintenanceTaskValidationError(
+          'Engine-hour tasks must have subject=engine',
+          'engineSubjectRequired'
+        )
+      }
+      if (!task.boatEngineId) {
+        throw new BoatMaintenanceTaskValidationError(
+          'boatEngineId is required for engine-hour tasks',
+          'engineIdRequired'
+        )
+      }
+    }
+
+    if (payload.dueEngineHours !== undefined) {
+      const dueEngineHours = payload.dueEngineHours
+      const previous = task.dueEngineHours
+      if (dueEngineHours !== previous) {
+        if (dueEngineHours !== null) {
+          const engine = await findBoatEquipment(boat.id, {
+            type: 'engine',
+            id: task.boatEngineId!,
+          })
+          const currentEngineHours = engine.engineHours ?? 0
+          if (dueEngineHours <= currentEngineHours) {
+            throw new BoatMaintenanceTaskValidationError(
+              'dueEngineHours must be above the current engine hours',
+              'dueEngineHoursNotAboveCurrent',
+              { currentHours: currentEngineHours }
+            )
+          }
+        }
+        task.dueEngineHours = dueEngineHours
+        changedFields.push('dueEngineHours')
+        if (previous !== null && dueEngineHours !== null && dueEngineHours > previous) {
+          postponed = true
+        }
+      }
+    }
+
+    if (payload.recurrenceIntervalEngineHours !== undefined) {
+      const interval = payload.recurrenceIntervalEngineHours || null
+      if (interval !== task.recurrenceIntervalEngineHours) {
+        task.recurrenceIntervalEngineHours = interval
+        changedFields.push('recurrenceIntervalEngineHours')
+      }
+    }
+
+    if (postponed) task.postponedCount += 1
+    if (changedFields.length > 0) await task.save()
+
+    return { task, changedFields, postponed }
   }
 
   /**

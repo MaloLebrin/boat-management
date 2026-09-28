@@ -949,6 +949,7 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
     'id',
     'lastDoneEngineHours',
     'notes',
+    'postponedCount',
     'recurrenceIntervalEngineHours',
     'recurrenceIntervalMonths',
     'status',
@@ -987,6 +988,8 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare lastDoneEngineHours: number | null
   @column()
   declare notes: string | null
+  @column()
+  declare postponedCount: number
   @column()
   declare recurrenceIntervalEngineHours: number | null
   @column()

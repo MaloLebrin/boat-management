@@ -781,7 +781,20 @@
       "plumbing": "Plomberie",
       "safety": "Sécurité",
       "deck": "Pont / Accastillage",
-      "other": "Autre"
+      "other": "Autre",
+      "postpone": {
+        "label": "Reporter",
+        "week": "+1 semaine",
+        "month": "+1 mois",
+        "customDate": "Autre date",
+        "apply": "Reporter"
+      },
+      "edit": {
+        "open": "Modifier la tâche",
+        "title": "Modifier la tâche",
+        "submit": "Enregistrer",
+        "recurrenceHint": "Un nouvel intervalle de récurrence s'applique aux prochaines occurrences, créées à la clôture de celle-ci."
+      }
     },
     "operations": {
       "hint": "Choisissez une opération du catalogue, ou saisissez librement votre propre intitulé.",

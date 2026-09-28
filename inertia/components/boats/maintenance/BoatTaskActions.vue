@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
-import { TrashIcon } from '@heroicons/vue/24/outline'
+import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BoatMaintenanceTaskEditModal from '~/components/boats/maintenance/BoatMaintenanceTaskEditModal.vue'
+import MaintenanceTaskPostponeMenu from '~/components/boats/maintenance/MaintenanceTaskPostponeMenu.vue'
 import type { MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 
@@ -10,7 +13,8 @@ import { useT } from '~/composables/use_t'
 // être réutilisées partout où une tâche est listée (sections de l'onglet Tâches,
 // panneau de gestion) — un libellé unique « Marquer fait » et un flux identique
 // (#407). Quand la tâche est jalonnée en heures moteur, la clôture demande le
-// relevé d'heures.
+// relevé d'heures. Une tâche ouverte se reporte (tâche datée) et se modifie
+// (#867) ; une tâche close est de l'historique, sans ces deux actions.
 const props = withDefaults(
   defineProps<{
     boatId: number
@@ -21,10 +25,19 @@ const props = withDefaults(
 )
 
 const { t } = useT()
+
+const editOpen = ref(false)
 </script>
 
 <template>
   <div class="flex items-center gap-2">
+    <MaintenanceTaskPostponeMenu
+      v-if="task.status === 'open' && task.dueAt"
+      :boat-id="props.boatId"
+      :task-id="task.id"
+      :due-at="task.dueAt"
+    />
+
     <Form
       :action="{ url: `/boats/${props.boatId}/maintenance-tasks/${task.id}/done`, method: 'put' }"
       class="flex items-center gap-2"
@@ -47,6 +60,17 @@ const { t } = useT()
       </BaseButton>
     </Form>
 
+    <BaseButton
+      v-if="task.status === 'open'"
+      type="button"
+      variant="ghost"
+      size="sm"
+      :aria-label="t('boats.maintenance.tasks.edit.open')"
+      @click="editOpen = true"
+    >
+      <PencilSquareIcon class="w-4 h-4" />
+    </BaseButton>
+
     <Form
       :action="{ url: `/boats/${props.boatId}/maintenance-tasks/${task.id}`, method: 'delete' }"
       #default="{ processing }"
@@ -61,5 +85,12 @@ const { t } = useT()
         <TrashIcon class="w-4 h-4 text-danger-strong" />
       </BaseButton>
     </Form>
+
+    <BoatMaintenanceTaskEditModal
+      v-if="task.status === 'open'"
+      v-model:open="editOpen"
+      :boat-id="props.boatId"
+      :task="task"
+    />
   </div>
 </template>
