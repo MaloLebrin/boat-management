@@ -11,6 +11,8 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BasePagination from '~/components/base/BasePagination.vue'
 import InvoiceListToolbar from '~/components/invoices/InvoiceListToolbar.vue'
 import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
+import InvoicesExportDialog from '~/components/invoices/InvoicesExportDialog.vue'
+import { useCanExport } from '~/composables/use_can_export'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import { useNumberFormat } from '~/composables/use_number_format'
@@ -35,6 +37,7 @@ const props = defineProps<{
 const { t } = useT()
 const { formatCurrency } = useNumberFormat()
 const { formatDate } = useDateFormat()
+const { canExport } = useCanExport()
 
 const invoiceDeletion = useRowDeleteConfirmation<InvoiceRow>({
   url: (invoice) => `/invoices/${invoice.id}`,
@@ -76,11 +79,14 @@ function formatTotal(invoice: InvoiceRow): string {
           {{ t('invoices.count', { count: String(invoices.meta.total) }) }}
         </p>
       </div>
-      <Link v-if="!readOnly" href="/invoices/new">
-        <BaseButton variant="primary" size="sm" type="button">
-          {{ t('invoices.add') }}
-        </BaseButton>
-      </Link>
+      <div class="flex items-center gap-3">
+        <InvoicesExportDialog v-if="canExport" />
+        <Link v-if="!readOnly" href="/invoices/new">
+          <BaseButton variant="primary" size="sm" type="button">
+            {{ t('invoices.add') }}
+          </BaseButton>
+        </Link>
+      </div>
     </div>
 
     <BaseAlert v-if="readOnly" variant="warning" class="mb-6">

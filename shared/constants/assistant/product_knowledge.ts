@@ -1364,6 +1364,32 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageInvoices',
   },
   {
+    id: 'accounting-exports',
+    title: {
+      en: 'Accounting exports: sales journal and FEC',
+      fr: 'Exports comptables : journal des ventes et FEC',
+    },
+    body: {
+      en: 'Invoicing plans export their sales for the accountant from the Export button of the Invoices screen. The sales journal (CSV) lists every issued invoice and credit note over a period, credit notes as negative amounts, one row per document or per invoice line. The FEC file of a fiscal year gathers sales and bank entries in the tax authority format. Set your SIREN and accounts (706, 44571, 411, 512 by default) in Settings → Billing. The FEC is an aid for your accountant, not a certified ledger.',
+      fr: 'Avec la facturation, le bouton Exporter de l’écran Factures prépare les ventes pour votre comptable. Le journal des ventes (CSV) liste les factures et avoirs émis sur une période, les avoirs en négatif, par pièce ou par ligne de facture. Le fichier FEC d’un exercice réunit les écritures de ventes et de banque au format de l’administration fiscale. Renseignez votre SIREN et vos comptes (706, 44571, 411, 512 par défaut) dans Paramètres → Facturation. Le FEC aide votre comptable, ce n’est pas un livre certifié.',
+    },
+    keywords: [
+      'export comptable',
+      'accounting export',
+      'comptable',
+      'accountant',
+      'journal des ventes',
+      'sales journal',
+      'fec',
+      'fichier des ecritures comptables',
+      'ecritures',
+      'siren',
+      'plan comptable',
+    ],
+    navTarget: 'invoices.index',
+    planFlag: 'canManageInvoices',
+  },
+  {
     id: 'email-verification',
     title: {
       en: 'Confirming your email address',
@@ -1690,8 +1716,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
   {
     id: 'csv-pdf-export',
     title: {
-      en: 'CSV and PDF exports',
-      fr: 'Exports CSV et PDF',
+      en: 'On Pro and Enterprise plans, each boat exports maintenance history, tasks, fuel logs and logbook trips as CSV, for a chosen period (from/to), from Settings → Import/Export. Fleet-wide CSV exports sit behind the Export button of the reservations, clients and maintenance history screens, with a period. Files use UTF-8 with BOM and semicolons for French Excel. Over 5,000 rows, the file is built in the background: you are notified and download it from Settings → Exports for 7 days. PDFs: crew role, quotes, invoices.',
+      fr: 'En plans Pro et Entreprise, chaque bateau exporte en CSV son historique de maintenance, ses tâches, ses pleins et son journal de bord, sur une période choisie (du/au), depuis Paramètres → Import/Export. Les exports CSV de toute la flotte sont derrière le bouton Exporter des réservations, des clients et de l’historique de maintenance, avec une période. Au-delà de 5 000 lignes, le fichier est préparé en arrière-plan : vous êtes notifié et le téléchargez dans Paramètres → Exports pendant 7 jours.',
     },
     body: {
       en: 'On Pro and Enterprise plans, each boat exports its data as CSV files: maintenance history (with total cost), fuel logs and logbook trips. Files use UTF-8 with BOM and semicolon separators, so they open cleanly in French Excel. Export links live on the Import/Export settings page and the relevant boat tabs. Beyond CSV, FleetAi also produces PDFs: crew role per trip, quotes and invoices, and the spare-parts repair list exports to CSV too. Client records export as GDPR JSON files.',

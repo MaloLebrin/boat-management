@@ -139,6 +139,16 @@
         "title": "Relance {tier} non envoyée pour {number}",
         "body": "{clientName} ne peut pas être relancé par e-mail ({reason}). Contactez-le directement."
       }
+    },
+    "export": {
+      "ready": {
+        "title": "Export prêt : {type}",
+        "body": "{rowCount} lignes, à télécharger dans Paramètres → Exports. Le fichier est conservé {days} jours."
+      },
+      "failed": {
+        "title": "Export impossible : {type}",
+        "body": "La génération de l'export a échoué. Relancez-le, ou réduisez la période."
+      }
     }
   },
   "title": "Notifications",
@@ -180,6 +190,8 @@
     "invoice.paid_online": "Facture réglée en ligne",
     "invoice.overdue": "Facture en retard",
     "invoice.reminder_sent": "Relance de facture envoyée",
-    "invoice.reminder_skipped": "Relance de facture non envoyée"
+    "invoice.reminder_skipped": "Relance de facture non envoyée",
+    "export.ready": "Export prêt",
+    "export.failed": "Export en échec"
   }
 }

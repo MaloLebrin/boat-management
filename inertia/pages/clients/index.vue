@@ -12,6 +12,8 @@ import BasePagination from '~/components/base/BasePagination.vue'
 import ClientForm from '~/components/clients/ClientForm.vue'
 import ClientListToolbar from '~/components/clients/ClientListToolbar.vue'
 import ClientStatusBadge from '~/components/clients/ClientStatusBadge.vue'
+import ClientsExportDialog from '~/components/clients/ClientsExportDialog.vue'
+import { useCanExport } from '~/composables/use_can_export'
 import { useNavigationTitles } from '~/composables/use_navigation_titles'
 import { useT } from '~/composables/use_t'
 import type { ClientListFilters, ClientRow, ClientsPaginated } from '../../../shared/types/client'
@@ -26,6 +28,7 @@ const props = defineProps<{
 
 const { t } = useT()
 const { navigationTitleLabel } = useNavigationTitles()
+const { canExport } = useCanExport()
 
 const showCreateForm = ref(false)
 const editingClientId = ref<number | null>(null)
@@ -67,15 +70,18 @@ function getPermitLabel(client: ClientRow): string {
           {{ t('clients.count', { count: String(clients.meta.total) }) }}
         </p>
       </div>
-      <BaseButton
-        v-if="!readOnly"
-        variant="primary"
-        size="sm"
-        type="button"
-        @click="showCreateForm = true"
-      >
-        {{ t('clients.add') }}
-      </BaseButton>
+      <div class="flex items-center gap-3">
+        <ClientsExportDialog v-if="canExport" />
+        <BaseButton
+          v-if="!readOnly"
+          variant="primary"
+          size="sm"
+          type="button"
+          @click="showCreateForm = true"
+        >
+          {{ t('clients.add') }}
+        </BaseButton>
+      </div>
     </div>
 
     <BaseAlert v-if="readOnly" variant="warning" class="mb-6">

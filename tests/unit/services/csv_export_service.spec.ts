@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
-import { buildCsv, escapeCell } from '#services/csv_export_service'
+import { buildCsv, escapeCell, isInPeriod } from '#services/csv_export_service'
+import { DateTime } from 'luxon'
 
 /**
  * Injection de formule dans les exports CSV (#773, CWE-1236).
@@ -117,5 +118,33 @@ test.group('CSV export — formula injection (unit)', () => {
         .toString('utf-8')
         .startsWith('\uFEFF')
     )
+  })
+})
+
+test.group('CSV export — période (#879)', () => {
+  const day = (iso: string) => DateTime.fromISO(iso)
+
+  test('without a period, everything passes, even an undated row', ({ assert }) => {
+    const all = { from: null, to: null }
+    assert.isTrue(isInPeriod(day('2020-01-01'), all))
+    assert.isTrue(isInPeriod(null, all))
+  })
+
+  test('both bounds are inclusive', ({ assert }) => {
+    const period = { from: '2026-04-01', to: '2026-04-30' }
+    assert.isTrue(isInPeriod(day('2026-04-01T00:00'), period))
+    assert.isTrue(isInPeriod(day('2026-04-30T23:59'), period))
+    assert.isFalse(isInPeriod(day('2026-03-31T23:59'), period))
+    assert.isFalse(isInPeriod(day('2026-05-01'), period))
+  })
+
+  test('an open bound only checks the other one', ({ assert }) => {
+    assert.isTrue(isInPeriod(day('2030-01-01'), { from: '2026-01-01', to: null }))
+    assert.isFalse(isInPeriod(day('2025-12-31'), { from: '2026-01-01', to: null }))
+    assert.isTrue(isInPeriod(day('2000-01-01'), { from: null, to: '2026-01-01' }))
+  })
+
+  test('an undated row is left out as soon as there is a period', ({ assert }) => {
+    assert.isFalse(isInPeriod(null, { from: '2026-01-01', to: null }))
   })
 })

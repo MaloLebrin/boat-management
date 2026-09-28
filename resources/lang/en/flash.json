@@ -101,7 +101,8 @@
     "aiProviderUpdated": "AI provider updated.",
     "aiProviderKeyMissing": "Add an API key for this provider first.",
     "passwordUpdatedOtherDevicesSignedOut": "Password updated. Your other devices have been signed out.",
-    "invoiceRemindersUpdated": "Reminder settings saved."
+    "invoiceRemindersUpdated": "Reminder settings saved.",
+    "accountingUpdated": "Accounting export settings saved."
   },
   "enginePart": {
     "created": "Part added.",
@@ -489,5 +490,8 @@
     "disconnected": "Stripe account disconnected. Payment links already sent no longer work.",
     "notPayable": "This invoice cannot be paid online.",
     "linkCreated": "Payment link created."
+  },
+  "exports": {
+    "queued": "Large export: it is being generated. You will be notified as soon as it is ready, and will find it under Settings → Exports."
   }
 }

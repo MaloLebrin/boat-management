@@ -539,6 +539,7 @@ export interface ApiDefinition {
         delete: typeof routes['settings.branding.logo.delete']
       }
     }
+    exports: typeof routes['settings.exports']
     import: typeof routes['settings.import'] & {
       preview: typeof routes['settings.import.preview']
       confirm: typeof routes['settings.import.confirm']

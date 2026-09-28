@@ -25,6 +25,11 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
   `invoice_reminders` (historique : facture, palier, `automatic`/`manual`,
   `sent`/`skipped`, motif, auteur) sont décrites dans
   [`docs/domain/invoicing.md`](../domain/invoicing.md) §3 et §7 quater
+- export comptable (#879) : `accountingSiren` (9 chiffres, nullable — en tête
+  du nom du fichier FEC), `accountingSalesAccount` (défaut `706`),
+  `accountingVatAccount` (`44571`), `accountingCustomerAccount` (`411`),
+  `accountingBankAccount` (`512`) — voir
+  [`docs/domain/invoicing.md`](../domain/invoicing.md) §7 quinquies
 
 ### users
 
@@ -637,6 +642,27 @@ quelques centaines de lignes dépassaient les ~4 Ko d'un cookie et l'import
 échouait silencieusement à la confirmation ; la session ne porte plus que
 `pendingImportId`, et la propriété se prouve en base (`where('userId')`).
 
+### data_exports
+
+Une ligne = un **export généré en arrière-plan** (#879), au-delà de
+`EXPORT_ASYNC_THRESHOLD` lignes — doc de domaine :
+`docs/domain/csv-import-export.md`.
+
+- `id`, `organizationId` (CASCADE), `userId` (SET NULL — le demandeur, seul à
+  voir et télécharger l'export)
+- `type` — `invoices`, `invoice_lines`, `fec`, `reservations`, `clients`,
+  `maintenance_history` (`FLEET_EXPORT_TYPES`) ; `params` (jsonb) — période et
+  filtres, rejoués par le job
+- `status` — `pending` → `ready` | `failed` ; `error` (texte, en échec)
+- `rowCount`, `filename`, `contentType`, `content` (bytea, **gzip**) — le
+  fichier vit en base : le worker et le serveur web ne partagent pas de disque
+- `expiresAt` (indexée, création + `EXPORT_RETENTION_DAYS` = 7 j),
+  `completedAt`, `createdAt`, `updatedAt`
+- index `(organization_id, created_at)`, `(user_id)`
+
+Purgée à `expires_at` par `PurgeExpiredExports` (01:30). Ne jamais charger
+`content` dans une liste : `DataExportService` sélectionne ses colonnes.
+
 ### public_ai_usages
 
 Compteurs journaliers de la surface IA publique (#762) — doc de domaine :
@@ -676,8 +702,12 @@ visiteur remplit depuis le site public et qui portent des adresses e-mail.
 | 00:30 | `PurgePublicFormData`        | `contact_messages`         | `created_at`   | 24 mois                                   |
 | 00:30 | `PurgePublicFormData`        | `simulator_leads`          | `updated_at`   | 24 mois                                   |
 | 00:30 | `PurgePublicFormData`        | `simulator_shares`         | `expires_at`   | 6 mois (échéance posée à la création)     |
+| 01:30 | `PurgeExpiredExports`        | `data_exports`             | `expires_at`   | 7 j (#879, échéance posée à la création)  |
 | 02:00 | `PurgeProcessedStripeEvents` | `processed_stripe_events`  | `processed_at` | 30 j (#703)                               |
 | 03:00 | `PurgeAuditLogs`             | `audit_logs`               | `created_at`   | `PLAN_LIMITS[plan].auditLogRetentionDays` |
+
+La purge des exports générés en arrière-plan (#879, 01:30) s'y ajoute : sa durée vit dans
+`shared/constants/exports.ts` (`EXPORT_RETENTION_DAYS`), l'échéance est posée à la création.
 
 Les durées vivent dans `shared/constants/data_retention.ts` et sont celles qu'annonce la section
 « Durée de conservation » de la politique de confidentialité (`marketing.json`, clés `privacy.s6_*`) :

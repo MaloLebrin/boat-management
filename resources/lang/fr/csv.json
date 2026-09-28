@@ -46,5 +46,93 @@
     "actualCost": "coût_réel",
     "estimatedDurationMinutes": "durée_prévue_min",
     "actualDurationMinutes": "durée_réelle_min"
+  },
+  "invoices": {
+    "number": "numéro",
+    "kind": "type",
+    "issuedAt": "date",
+    "dueAt": "échéance",
+    "client": "client",
+    "creditedInvoice": "facture_avoirée",
+    "subtotal": "montant_ht",
+    "taxRate": "taux_tva",
+    "taxAmount": "montant_tva",
+    "total": "montant_ttc",
+    "currency": "devise",
+    "status": "statut",
+    "paidAt": "date_paiement",
+    "paymentMethod": "moyen_paiement"
+  },
+  "invoiceLines": {
+    "number": "numéro",
+    "kind": "type",
+    "issuedAt": "date",
+    "client": "client",
+    "label": "libellé",
+    "quantity": "quantité",
+    "unitPrice": "prix_unitaire_ht",
+    "amount": "montant_ht",
+    "taxRate": "taux_tva",
+    "currency": "devise"
+  },
+  "reservations": {
+    "boat": "bateau",
+    "type": "prestation",
+    "status": "statut",
+    "startsAt": "début",
+    "endsAt": "fin",
+    "client": "client",
+    "email": "email",
+    "phone": "téléphone",
+    "totalPrice": "prix_total",
+    "depositAmount": "acompte",
+    "paidAmount": "encaissé",
+    "paymentStatus": "statut_paiement",
+    "paymentMethod": "moyen_paiement",
+    "depositPaidAt": "acompte_reçu_le",
+    "balancePaidAt": "solde_reçu_le",
+    "securityDepositAmount": "caution",
+    "securityDepositStatus": "statut_caution"
+  },
+  "clients": {
+    "lastName": "nom",
+    "firstName": "prénom",
+    "email": "email",
+    "phone": "téléphone",
+    "address": "adresse",
+    "permitNumber": "numéro_permis",
+    "permitType": "type_permis",
+    "status": "statut",
+    "gdprConsentAt": "consentement_rgpd_le",
+    "createdAt": "créé_le"
+  },
+  "maintenanceHistory": {
+    "date": "date",
+    "boat": "bateau",
+    "title": "titre",
+    "subject": "sujet",
+    "notes": "notes",
+    "engineCaption": "légende_moteur",
+    "sailCaption": "légende_voile",
+    "parts": "pièces",
+    "cost": "coût_total"
+  },
+  "fec": {
+    "journals": {
+      "sales": "Ventes",
+      "bank": "Banque"
+    },
+    "accounts": {
+      "sales": "Prestations de services",
+      "vat": "TVA collectée",
+      "customers": "Clients",
+      "bank": "Banque"
+    },
+    "labels": {
+      "invoice": "Facture {number} {client}",
+      "creditNote": "Avoir {number} {client}",
+      "payment": "Règlement {number} {client}",
+      "refund": "Remboursement {number} {client}"
+    }
   }
 }

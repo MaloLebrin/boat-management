@@ -3835,6 +3835,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['deleteLogo']>>>
     }
   }
+  'settings.exports': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/exports'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/data_exports_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/data_exports_controller').default['index']>>>
+    }
+  }
   'settings.import': {
     methods: ["GET","HEAD"]
     pattern: '/settings/import'

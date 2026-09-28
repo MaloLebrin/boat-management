@@ -139,6 +139,16 @@
         "title": "Reminder {tier} not sent for {number}",
         "body": "{clientName} cannot be reminded by e-mail ({reason}). Contact them directly."
       }
+    },
+    "export": {
+      "ready": {
+        "title": "Export ready: {type}",
+        "body": "{rowCount} rows, to download under Settings → Exports. The file is kept for {days} days."
+      },
+      "failed": {
+        "title": "Export failed: {type}",
+        "body": "The export could not be generated. Run it again, or narrow the period."
+      }
     }
   },
   "title": "Notifications",
@@ -180,6 +190,8 @@
     "invoice.paid_online": "Invoice paid online",
     "invoice.overdue": "Overdue invoice",
     "invoice.reminder_sent": "Invoice reminder sent",
-    "invoice.reminder_skipped": "Invoice reminder not sent"
+    "invoice.reminder_skipped": "Invoice reminder not sent",
+    "export.ready": "Export ready",
+    "export.failed": "Export failed"
   }
 }

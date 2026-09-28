@@ -87,4 +87,14 @@ test.group('Settings pages contract (functional)', (group) => {
       'settings/import'
     )
   })
+
+  test('GET /settings/exports renders settings/exports', async ({ client, assert }) => {
+    const user = await createEnterpriseAdminUser()
+
+    assertPageContract(
+      assert,
+      await client.get('/settings/exports').loginAs(user).withInertia(),
+      'settings/exports'
+    )
+  })
 })

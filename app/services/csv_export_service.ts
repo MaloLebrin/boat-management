@@ -69,3 +69,20 @@ export function csvFilename(base: string, boatName: string): string {
   const safe = boatName.replace(/[^a-z0-9]/gi, '_').toLowerCase()
   return `${base}_${safe}_${DateTime.now().toISODate()}.csv`
 }
+
+/**
+ * Une date tombe-t-elle dans la période (bornes `YYYY-MM-DD` incluses) ? Sans
+ * borne, tout passe ; une date absente ne passe que sans période (#879).
+ */
+export function isInPeriod(
+  date: DateTime | null | undefined,
+  period: { from: string | null; to: string | null }
+): boolean {
+  if (period.from === null && period.to === null) return true
+  if (!date) return false
+  const day = date.toISODate()
+  if (day === null) return false
+  if (period.from !== null && day < period.from) return false
+  if (period.to !== null && day > period.to) return false
+  return true
+}

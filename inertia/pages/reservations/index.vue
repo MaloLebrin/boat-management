@@ -5,7 +5,9 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import FleetReservationList from '~/components/reservations/FleetReservationList.vue'
 import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
+import ReservationsExportDialog from '~/components/reservations/ReservationsExportDialog.vue'
 import ReservationTimeline from '~/components/reservations/ReservationTimeline.vue'
+import { useCanExport } from '~/composables/use_can_export'
 import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import { RESERVATION_TYPES } from '#shared/types/reservation'
@@ -26,6 +28,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
+const { canExport } = useCanExport()
 
 type ViewMode = 'list' | 'timeline'
 const viewMode = ref<ViewMode>('timeline')
@@ -104,6 +107,7 @@ function applyFilters(next: { boatId?: string | number; type?: string | number }
           </BaseButton>
         </div>
 
+        <ReservationsExportDialog v-if="canExport" :boats="boats" />
         <ReservationCreateButton :boats="boats" :selected-boat-id="selectedBoatId" />
       </div>
     </div>

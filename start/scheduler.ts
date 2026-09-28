@@ -3,6 +3,7 @@ import PurgeAuditLogs from '#jobs/purge_audit_logs'
 import PurgeProcessedStripeEvents from '#jobs/purge_processed_stripe_events'
 import PurgeExpiredTokens from '#jobs/purge_expired_tokens'
 import PurgePublicFormData from '#jobs/purge_public_form_data'
+import PurgeExpiredExports from '#jobs/purge_expired_exports'
 import ResetAiTokenUsage from '#jobs/reset_ai_token_usage'
 import ResetDemoData from '#jobs/reset_demo_data'
 import MarkOverdueInvoices from '#jobs/mark_overdue_invoices'
@@ -45,6 +46,14 @@ await PurgePublicFormData.schedule({})
   .cron('30 0 * * *')
   .timezone('Europe/Paris')
   .id('daily-purge-public-form-data')
+  .run()
+
+// À 01:30 : les exports générés en arrière-plan (#879) ne survivent pas à
+// leur expiration — le fichier est en base et peut porter des données clients.
+await PurgeExpiredExports.schedule({})
+  .cron('30 1 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-purge-expired-exports')
   .run()
 
 await ResetAiTokenUsage.schedule({})

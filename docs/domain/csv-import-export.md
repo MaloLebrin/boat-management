@@ -4,7 +4,7 @@
 
 Permettre aux gestionnaires de flotte d'importer et d'exporter des données tabulaires au format CSV.
 
-- **Export** : téléchargement direct (streaming) depuis le controller, pour les maintenance, avitaillements et journal de bord d'un bateau
+- **Export** : téléchargement direct depuis le controller, pour les maintenance, avitaillements et journal de bord d'un bateau (avec période, #879) ; exports **flotte** et **comptables** (journal des ventes, FEC, réservations, clients, historique de maintenance), générés en arrière-plan au-delà de 5 000 lignes (#879)
 - **Import** : upload d'un fichier CSV **ou d'un classeur Excel (`.xlsx`)**, dry-run avec rapport d'erreurs ligne par ligne, puis confirmation pour persister les données — deux types : l'historique de maintenance et les dépenses du budget
 - **Quota** : fonctionnalité réservée aux plans Pro et Enterprise (`canExport`)
 
@@ -68,6 +68,63 @@ en : date;quantity_liters;price_per_liter;total_cost;engine_hours;fuel;supplier;
 fr : date_départ;date_arrivée;port_départ;port_arrivée;distance_nm;heures_moteur_départ;heures_moteur_arrivée;carburant_consommé_L;vent_beaufort;état_mer;nb_équipiers;statut;notes
 en : departed_at;arrived_at;departure_port;arrival_port;distance_nm;engine_hours_start;engine_hours_end;fuel_consumed_l;wind_beaufort;sea_state;crew_count;status;notes
 ```
+
+#### Période (#879)
+
+Les quatre exports d'un bateau acceptent `?from=YYYY-MM-DD&to=YYYY-MM-DD`
+(bornes incluses, `exportPeriodValidator`, `to` antérieur à `from` → 422).
+Sans période, l'export couvre tout l'historique comme avant. La date qui fait
+foi : `performed_at` (maintenance), `done_at` à défaut `due_at` (tâches),
+`fueled_at` (avitaillements), `departed_at` (journal de bord) ; une ligne sans
+date n'entre que dans un export sans période (`isInPeriod()`). Sur
+`/settings/import`, deux champs de date alimentent les quatre liens.
+
+### Exports flotte et comptables (#879)
+
+Une ligne par entité de **toute l'organisation**, avec une période.
+Controller `app/controllers/fleet_exports_controller.ts` → service
+`app/services/fleet_export_service.ts` (un type sait se **compter** et se
+**construire**) ; FEC dans `app/services/fec_service.ts`.
+
+| Route                            | Garde (en plus de `canExport`)                                              | Contenu                                                                                                      |
+| -------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `GET /invoices/export.csv`       | module CRM & Facturation **ou** pièces existantes ; `InvoicePolicy.view`    | Journal des ventes : factures et avoirs émis (`from`/`to` sur `issued_at`, `kind`, `status`, `detail=lines`) |
+| `GET /invoices/export/fec?year=` | idem                                                                        | FEC de l'exercice — voir `docs/domain/invoicing.md` §7 quinquies                                             |
+| `GET /reservations/export.csv`   | module Location (groupe de routes) ; `BoatPolicy.view`, pas de propriétaire | Réservations qui **chevauchent** la période ; `boatId`, `status`, `paymentStatus`                            |
+| `GET /clients/export.csv`        | module CRM **ou** fiches existantes ; `ClientPolicy.update`                 | Fiches créées sur la période, **hors anonymisées** ; journal `client.export_bulk`                            |
+| `GET /maintenance/history.csv`   | `MaintenancePolicy.view`, pas de propriétaire                               | Historique de la flotte avec les filtres de l'écran (`q`, `subject`, `boatId`, `dateFrom`, `dateTo`)         |
+
+- **Journal des ventes** : devis et brouillons exclus ; les **avoirs en
+  négatif** pour que les colonnes se somment en chiffre d'affaires net ;
+  type, statut et moyen de paiement traduits (`invoices.kind/status/paymentMethods`).
+  `detail=lines` : une ligne par ligne de facture (`sales-journal-lines_…csv`).
+- **Nom de fichier** : `<base>_<from>_<to>.csv`, ou `<base>_<date du jour>.csv`
+  sans période (`fleetExportFilename()`).
+- **Journal d'audit** : chaque export écrit `export.run` (type, `from`, `to`,
+  `rowCount`, `async`, paramètres), synchrone ou non.
+- **Gros volumes** : au-delà de `EXPORT_ASYNC_THRESHOLD` (5 000) lignes — pour
+  le FEC, 5 000 **pièces** —, la route ne répond pas le fichier : elle crée une
+  ligne `data_exports`, dispatch `GenerateExport` (file `exports`) et revient
+  sur l'écran avec `flash.exports.queued`. Le job construit le même fichier,
+  le garde **compressé en base** (le worker et le serveur web ne partagent pas
+  de disque en production), puis notifie le demandeur (`export.ready`, ou
+  `export.failed` avec l'erreur gardée sur la ligne). `/settings/exports`
+  liste les exports **du demandeur seul**, avec un lien signé
+  (`GET /exports/:id/download`, `purpose: data_export`) valable jusqu'à
+  l'expiration ; le lien exige aussi la session du demandeur. Purge à
+  `expires_at` (7 jours) par `PurgeExpiredExports` (01:30).
+
+#### En-têtes des exports flotte
+
+```
+invoices      fr : numéro;type;date;échéance;client;facture_avoirée;montant_ht;taux_tva;montant_tva;montant_ttc;devise;statut;date_paiement;moyen_paiement
+invoiceLines  fr : numéro;type;date;client;libellé;quantité;prix_unitaire_ht;montant_ht;taux_tva;devise
+reservations  fr : bateau;prestation;statut;début;fin;client;email;téléphone;prix_total;acompte;encaissé;statut_paiement;moyen_paiement;acompte_reçu_le;solde_reçu_le;caution;statut_caution
+clients       fr : nom;prénom;email;téléphone;adresse;numéro_permis;type_permis;statut;consentement_rgpd_le;créé_le
+maintenance   fr : date;bateau;titre;sujet;notes;légende_moteur;légende_voile;pièces;coût_total
+```
+
+Les versions anglaises sont dans `resources/lang/en/csv.json`.
 
 ### Import CSV
 
@@ -236,23 +293,29 @@ aussi l'xlsx.
 
 ## Fichiers clés
 
-| Fichier                                                  | Rôle                                                                                 |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `shared/types/csv.ts`                                    | Types partagés, `CSV_IMPORT_TYPES`, `MAINTENANCE_CSV_HEADERS`, `EXPENSE_CSV_HEADERS` |
-| `app/exceptions/csv_errors.ts`                           | `CsvImportValidationError`, `TableFileUnreadableError`                               |
-| `app/validators/csv_import.ts`                           | `csvPreviewValidator`, `csvConfirmValidator` (VineJS)                                |
-| `app/services/table_file_parser_service.ts`              | Lecture CSV / xlsx (`exceljs`) → `ParsedTable`, `normalizeImportToken()`             |
-| `app/services/csv_import_service.ts`                     | Validation maintenance, aiguillage `prepareImportPreview()` / `runImport()`          |
-| `app/services/expense_import_service.ts`                 | Validation dépenses (alias, dates, montants, catégories), doublons, import           |
-| `app/services/csv_export_service.ts`                     | `escapeCell()`, `buildCsv()`, `csvFilename()` — **seul** constructeur de CSV         |
-| `app/controllers/csv_import_controller.ts`               | Attente en base + Inertia render                                                     |
-| `app/models/pending_import.ts`                           | `pending_imports` — une attente par utilisateur                                      |
-| `shared/constants/csv_import.ts`                         | Plafonds, extensions, alias d'en-têtes et de catégories des dépenses                 |
-| `app/controllers/csv_export_controller.ts`               | Streaming CSV par type                                                               |
-| `inertia/pages/settings/import.vue`                      | Page shell Inertia                                                                   |
-| `inertia/components/settings/tabs/SettingsImportTab.vue` | Composition : exports, formulaire, aperçu, aide                                      |
-| `inertia/components/settings/import/*.vue`               | `ImportExportCard`, `ImportUploadForm`, `ImportPreviewPanel`                         |
-| `inertia/utils/routes.ts`                                | Helpers `routes.csv.*`                                                               |
+| Fichier                                                   | Rôle                                                                                 |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `shared/types/csv.ts`                                     | Types partagés, `CSV_IMPORT_TYPES`, `MAINTENANCE_CSV_HEADERS`, `EXPENSE_CSV_HEADERS` |
+| `app/exceptions/csv_errors.ts`                            | `CsvImportValidationError`, `TableFileUnreadableError`                               |
+| `app/validators/csv_import.ts`                            | `csvPreviewValidator`, `csvConfirmValidator` (VineJS)                                |
+| `app/services/table_file_parser_service.ts`               | Lecture CSV / xlsx (`exceljs`) → `ParsedTable`, `normalizeImportToken()`             |
+| `app/services/csv_import_service.ts`                      | Validation maintenance, aiguillage `prepareImportPreview()` / `runImport()`          |
+| `app/services/expense_import_service.ts`                  | Validation dépenses (alias, dates, montants, catégories), doublons, import           |
+| `app/services/csv_export_service.ts`                      | `escapeCell()`, `buildCsv()`, `csvFilename()` — **seul** constructeur de CSV         |
+| `app/controllers/csv_import_controller.ts`                | Attente en base + Inertia render                                                     |
+| `app/models/pending_import.ts`                            | `pending_imports` — une attente par utilisateur                                      |
+| `shared/constants/csv_import.ts`                          | Plafonds, extensions, alias d'en-têtes et de catégories des dépenses                 |
+| `app/controllers/csv_export_controller.ts`                | Streaming CSV par type                                                               |
+| `app/controllers/fleet_exports_controller.ts`             | Exports flotte et comptables (#879), aiguillage synchrone / arrière-plan             |
+| `app/services/fleet_export_service.ts`                    | Comptage et construction des exports flotte                                          |
+| `app/services/fec_service.ts`                             | FEC : `buildFecLines()`, `renderFec()` (ISO-8859-15)                                 |
+| `app/services/data_export_service.ts`                     | Exports en arrière-plan : file, stockage, liens signés, purge                        |
+| `app/jobs/generate_export.ts`, `purge_expired_exports.ts` | Génération d'un export volumineux, purge quotidienne                                 |
+| `app/validators/export.ts`                                | Période, filtres, année du FEC, comptes                                              |
+| `inertia/pages/settings/import.vue`                       | Page shell Inertia                                                                   |
+| `inertia/components/settings/tabs/SettingsImportTab.vue`  | Composition : exports, formulaire, aperçu, aide                                      |
+| `inertia/components/settings/import/*.vue`                | `ImportExportCard`, `ImportUploadForm`, `ImportPreviewPanel`                         |
+| `inertia/utils/routes.ts`                                 | Helpers `routes.csv.*`                                                               |
 
 ## Échappement des cellules (#773)
 
@@ -296,4 +359,3 @@ un champ de notes. C'est la sortie vers un format évalué qui doit être
 
 - Ajouter les types `fuel_logs` et `navigation_logs` à l'import (`CSV_IMPORT_TYPES`, un service de validation dédié, une branche dans `prepareImportPreview()` / `runImport()`, les colonnes d'aperçu dans `ImportPreviewPanel`)
 - Brancher le job `ProcessBoatMaintenanceImport` pour les imports volumineux (> 500 lignes) : stocker le fichier CSV sur Cloudinary, passer son URL dans le payload du job, implémenter `execute()` qui parse + persiste en background
-- Ajouter un filtre de période (date de début / fin) sur les exports

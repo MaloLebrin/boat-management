@@ -1683,6 +1683,57 @@ export class CrewMemberSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class DataExportSchema extends BaseModel {
+  static $columns = [
+    'completedAt',
+    'content',
+    'contentType',
+    'createdAt',
+    'error',
+    'expiresAt',
+    'filename',
+    'id',
+    'organizationId',
+    'params',
+    'rowCount',
+    'status',
+    'type',
+    'updatedAt',
+    'userId',
+  ] as const
+  $columns = DataExportSchema.$columns
+  @column.dateTime()
+  declare completedAt: DateTime | null
+  @column()
+  declare content: Buffer | null
+  @column()
+  declare contentType: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare error: string | null
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column()
+  declare filename: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare organizationId: number
+  @column()
+  declare params: any
+  @column()
+  declare rowCount: number | null
+  @column()
+  declare status: string
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number | null
+}
+
 export class EmailVerificationTokenSchema extends BaseModel {
   static $columns = ['createdAt', 'email', 'expiresAt', 'id', 'token'] as const
   $columns = EmailVerificationTokenSchema.$columns
@@ -2450,6 +2501,11 @@ export class OrganizationModuleSchema extends BaseModel {
 
 export class OrganizationSchema extends BaseModel {
   static $columns = [
+    'accountingBankAccount',
+    'accountingCustomerAccount',
+    'accountingSalesAccount',
+    'accountingSiren',
+    'accountingVatAccount',
     'aiModelOverride',
     'aiProvider',
     'aiSystemPrompt',
@@ -2476,6 +2532,16 @@ export class OrganizationSchema extends BaseModel {
     'updatedAt',
   ] as const
   $columns = OrganizationSchema.$columns
+  @column()
+  declare accountingBankAccount: string
+  @column()
+  declare accountingCustomerAccount: string
+  @column()
+  declare accountingSalesAccount: string
+  @column()
+  declare accountingSiren: string | null
+  @column()
+  declare accountingVatAccount: string
   @column()
   declare aiModelOverride: string | null
   @column()

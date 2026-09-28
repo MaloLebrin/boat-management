@@ -9,7 +9,8 @@
     "auditLog": "Journal d'activité",
     "branding": "Marque blanche",
     "import": "Import / Export",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "exports": "Exports"
   },
   "org": {
     "title": "Profil organisation",
@@ -195,6 +196,24 @@
       "save": "Enregistrer",
       "adminOnly": "Seul un administrateur peut modifier les réglages des relances.",
       "unavailable": "Disponible avec le module CRM & Facturation."
+    },
+    "accounting": {
+      "title": "Export comptable (FEC)",
+      "description": "Paramétrez les comptes utilisés pour générer le fichier des écritures comptables (FEC). Ce fichier est une aide pour votre comptable, pas un grand livre certifié.",
+      "sirenLabel": "SIREN",
+      "sirenPlaceholder": "123456789",
+      "sirenHint": "9 chiffres, utilisé en préfixe du nom de fichier FEC.",
+      "salesLabel": "Compte ventes",
+      "salesPlaceholder": "706",
+      "vatLabel": "Compte TVA collectée",
+      "vatPlaceholder": "44571",
+      "customersLabel": "Compte clients",
+      "customersPlaceholder": "411",
+      "bankLabel": "Compte banque",
+      "bankPlaceholder": "512",
+      "fecNote": "Le FEC est une aide pour votre comptable, pas un grand livre certifié.",
+      "save": "Enregistrer",
+      "adminOnly": "Seul un administrateur peut modifier les réglages de l'export comptable."
     }
   },
   "upgrade": {
@@ -435,7 +454,10 @@
       "invoice_reminder_sent": "Relance de facture envoyée",
       "invoice_reminders_disabled": "Relances d'une facture désactivées",
       "invoice_reminders_enabled": "Relances d'une facture réactivées",
-      "invoice_reminders_update": "Réglages des relances modifiés"
+      "invoice_reminders_update": "Réglages des relances modifiés",
+      "export_run": "Export réalisé",
+      "client_export_bulk": "Fiches clients exportées",
+      "accounting_settings_update": "Réglages de l’export comptable modifiés"
     },
     "empty": {
       "title": "Aucune activité",
@@ -460,6 +482,39 @@
       "lastUsed": "Dernière notification le {date}",
       "remove": "Retirer",
       "removeAriaLabel": "Retirer l'appareil : {device}"
+    }
+  },
+  "exports": {
+    "title": "Exports",
+    "description": "Les exports de plus de {threshold} lignes sont générés en arrière-plan et conservés {days} jours.",
+    "types": {
+      "invoices": "Journal des ventes",
+      "invoice_lines": "Journal des ventes (par ligne)",
+      "fec": "FEC",
+      "reservations": "Réservations",
+      "clients": "Clients",
+      "maintenance_history": "Historique de maintenance"
+    },
+    "status": {
+      "pending": "En cours",
+      "ready": "Prêt",
+      "failed": "Échec"
+    },
+    "columns": {
+      "type": "Type",
+      "period": "Période",
+      "status": "Statut",
+      "rows": "Lignes",
+      "createdAt": "Créé le",
+      "expiresAt": "Expire le",
+      "actions": "Actions"
+    },
+    "periodFrom": "À partir du {date}",
+    "periodTo": "Jusqu'au {date}",
+    "download": "Télécharger",
+    "empty": {
+      "title": "Aucun export",
+      "description": "Les exports volumineux apparaîtront ici une fois générés."
     }
   }
 }

@@ -6,8 +6,9 @@ import BoatFuelLogService from '#services/boat_fuel_log_service'
 import NavigationLogService from '#services/navigation_log_service'
 import BudgetService from '#services/budget_service'
 import QuotaService from '#services/quota_service'
-import { buildCsv, csvFilename } from '#services/csv_export_service'
+import { buildCsv, csvFilename, isInPeriod } from '#services/csv_export_service'
 import { budgetYearValidator } from '#validators/budget_validator'
+import { exportPeriodValidator } from '#validators/export'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
@@ -20,6 +21,18 @@ import { contentDisposition } from '#shared/helpers/content_disposition'
  * backend-only `csv`. Les colonnes restaient en français (`légende_moteur`,
  * `coût_total`) quelle que soit la locale.
  */
+/**
+ * Période `from`/`to` (bornes incluses) des exports par bateau (#879) —
+ * absente, l'export couvre tout l'historique comme avant.
+ */
+async function exportPeriod(request: HttpContext['request']) {
+  const { from, to } = await request.validateUsing(exportPeriodValidator)
+  return {
+    from: from?.toISODate() ?? null,
+    to: to?.toISODate() ?? null,
+  }
+}
+
 function csvHeaders(i18n: HttpContext['i18n'], exportName: string, columns: string[]): string[] {
   return columns.map((column) => i18n.t(`csv.${exportName}.${column}`))
 }
@@ -64,14 +77,18 @@ export default class CsvExportController {
    * prestataire, combien prévu et combien réalisé. Même garde que l'export de
    * l'historique.
    */
-  async maintenanceTasks({ response, auth, bouncer, params, i18n }: HttpContext) {
+  async maintenanceTasks({ response, auth, bouncer, params, request, i18n }: HttpContext) {
     const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
       bouncer.with(MaintenancePolicy).authorize('view', boat)
     )
     if (!resolved) return
     const { user, boat } = resolved
 
-    const tasks = await this.taskService.listForBoat(user, boat)
+    // Une tâche tombe dans la période par sa date de réalisation, à défaut
+    // par son échéance ; sans date, elle n'en fait partie que sans période.
+    const period = await exportPeriod(request)
+    const allTasks = await this.taskService.listForBoat(user, boat)
+    const tasks = allTasks.filter((task) => isInPeriod(task.doneAt ?? task.dueAt, period))
 
     const headers = csvHeaders(i18n, 'maintenanceTasks', [
       'title',
@@ -114,14 +131,16 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async maintenance({ response, auth, bouncer, params, i18n }: HttpContext) {
+  async maintenance({ response, auth, bouncer, params, request, i18n }: HttpContext) {
     const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
       bouncer.with(MaintenancePolicy).authorize('view', boat)
     )
     if (!resolved) return
     const { boat } = resolved
 
-    const events = await this.maintenanceService.listForBoat(boat)
+    const period = await exportPeriod(request)
+    const allEvents = await this.maintenanceService.listForBoat(boat)
+    const events = allEvents.filter((ev) => isInPeriod(ev.performedAt, period))
 
     const headers = csvHeaders(i18n, 'maintenance', [
       'date',
@@ -156,14 +175,16 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async fuelLogs({ response, auth, bouncer, params, i18n }: HttpContext) {
+  async fuelLogs({ response, auth, bouncer, params, request, i18n }: HttpContext) {
     const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
       bouncer.with(BoatPolicy).authorize('view', boat)
     )
     if (!resolved) return
     const { user, boat } = resolved
 
-    const logs = await this.fuelLogService.listForBoat(user, boat)
+    const period = await exportPeriod(request)
+    const allLogs = await this.fuelLogService.listForBoat(user, boat)
+    const logs = allLogs.filter((l) => isInPeriod(l.fueledAt, period))
 
     const headers = csvHeaders(i18n, 'fuelLogs', [
       'date',
@@ -195,14 +216,16 @@ export default class CsvExportController {
     return response.send(buffer)
   }
 
-  async navigationLogs({ response, auth, bouncer, params, i18n }: HttpContext) {
+  async navigationLogs({ response, auth, bouncer, params, request, i18n }: HttpContext) {
     const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
       bouncer.with(BoatPolicy).authorize('view', boat)
     )
     if (!resolved) return
     const { boat } = resolved
 
-    const logs = await this.navigationLogService.listForBoat(boat)
+    const period = await exportPeriod(request)
+    const allLogs = await this.navigationLogService.listForBoat(boat)
+    const logs = allLogs.filter((l) => isInPeriod(l.departedAt, period))
 
     const headers = csvHeaders(i18n, 'navigationLogs', [
       'departedAt',

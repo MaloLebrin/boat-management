@@ -30,6 +30,8 @@ export type NotificationType =
   | 'invoice.overdue'
   | 'invoice.reminder_sent'
   | 'invoice.reminder_skipped'
+  | 'export.ready'
+  | 'export.failed'
   | (string & {}) // extensible pour les futurs types sans casser le type
 
 export type NotificationSeverity = 'info' | 'success' | 'warning' | 'error'

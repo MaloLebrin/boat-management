@@ -467,6 +467,19 @@ export default class BoatMaintenanceService {
   }
 
   /**
+   * Nombre d'interventions d'un export de l'historique (#879) — décide s'il
+   * part dans la réponse ou en arrière-plan.
+   */
+  async countHistoryEvents(user: User, rawQuery: Record<string, unknown> = {}): Promise<number> {
+    const filters = this.normalizeHistoryQuery(rawQuery)
+    if (!user.organizationId) return 0
+    const { filtered } = await this.#buildFilteredHistoryQuery(user, filters)
+    if (!filtered) return 0
+    const [row] = await filtered.clone().count('* as total').pojo<{ total: number | string }>()
+    return Number(row?.total ?? 0)
+  }
+
+  /**
    * Historique de maintenance filtré pour toute l'organisation, sans
    * pagination — utilisé pour l'export PDF (#362) qui doit couvrir tout le
    * jeu de résultats filtré, pas seulement la page affichée à l'écran.

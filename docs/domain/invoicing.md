@@ -396,6 +396,43 @@ Une facture émise est figée (#717) : on ne la corrige pas, on émet un **avoir
 
 ---
 
+## 7 quinquies. Exports comptables : journal des ventes et FEC (#879)
+
+Deux exports pour le comptable, depuis le bouton « Exporter » de `/invoices`
+(`FleetExportsController`, `FleetExportService`, `FecService`). Ouverts dès que
+l'organisation a le module **ou** des pièces existantes (lecture seule après
+résiliation, #332), à qui a `invoices.view`, sur un plan `canExport`. Détails
+communs (seuil de 5 000 lignes, arrière-plan, journal `export.run`) :
+`docs/domain/csv-import-export.md`.
+
+- **Journal des ventes** `GET /invoices/export.csv?from=&to=&kind=&status=&detail=` :
+  une ligne par facture ou avoir **émis** (ni devis, ni brouillon), période sur
+  `issued_at`. Colonnes : numéro, type, date, échéance, client, facture avoirée,
+  HT, taux de TVA, TVA, TTC, devise, statut, date et moyen de paiement. Les
+  **avoirs sont en négatif** : la somme d'une colonne est le chiffre d'affaires
+  net. Le taux de TVA est unique par pièce (§5) — une colonne suffit.
+  `detail=lines` : une ligne par ligne de facture.
+- **FEC** `GET /invoices/export/fec?year=` : les 18 colonnes de l'article
+  A47 A-1 du LPF, tabulations, dates `AAAAMMJJ`, virgule décimale,
+  ISO-8859-15, fichier `<SIREN>FEC<AAAA>1231.txt`. Écritures reconstituées :
+  - journal **VE** à l'émission — facture : débit 411 (TTC, compte auxiliaire
+    `C<id client>` ou `DIVERS`), crédit 706 (HT), crédit 44571 (TVA, omis à 0) ; avoir : l'inverse ;
+  - journal **BQ** au paiement — facture : débit 512 / crédit 411 pour le total
+    **moins les avoirs non remboursés** ; avoir remboursé : débit 411 / crédit 512.
+    Chaque écriture est équilibrée, numérotée par journal dans l'ordre
+    chronologique (`VE000001`, `BQ000001`). Une facture `cancelled` (statut
+    antérieur aux avoirs) n'est pas reprise. Devise autre que l'euro :
+    `Montantdevise`/`Idevise` renseignés, montants non convertis (#627).
+- **Comptes et SIREN** : `organizations.accounting_{sales,vat,customer,bank}_account`
+  (défauts 706, 44571, 411, 512) et `accounting_siren`, carte « Export
+  comptable » de `/settings/billing`, `PUT /settings/billing/accounting`
+  (`manageBilling`, journal `accounting_settings.update`).
+- **Une aide, pas un livre certifié** : pas de clôture, de validation ni de
+  lettrage (`EcritureLet`, `DateLet` vides) ; `ValidDate` = date d'écriture.
+  L'UI le dit à côté du bouton.
+
+---
+
 ## 8. Devis depuis une réservation (#288)
 
 Raccourci métier : générer un devis pré-rempli depuis une réservation.
@@ -481,13 +518,16 @@ Toutes sous `middleware.auth()`, préfixe `/invoices` (voir `start/routes/invoic
 | `POST /invoices/:id/credit-notes`                | `CreditNotes.store`       | Émettre un avoir (#877)                                              |
 | `POST /invoices/:id/reminders`                   | `InvoiceReminders.store`  | Relancer maintenant (#878, e-mail vérifié requis)                    |
 | `PATCH /invoices/:id/reminders`                  | `InvoiceReminders.update` | « Ne plus relancer » `{ disabled }` (#878)                           |
+| `GET /invoices/export.csv`                       | `FleetExports.invoices`   | Journal des ventes CSV, par pièce ou par ligne (#879)                |
+| `GET /invoices/export/fec`                       | `FleetExports.fec`        | FEC d'un exercice `?year=` (#879)                                    |
 
 Routes publiques du paiement en ligne (#876, sans login, throttle
 `invoice_payment`) : `GET /pay/:token` et `POST /pay/:token/checkout`
 (`InvoicePaymentLinksController`). Réglages : `POST|DELETE
 /settings/billing/online-payments`, `GET …/refresh`, `GET …/return`. Webhook :
 `POST /webhooks/stripe/connect`. Relances (#878) : `PATCH
-/settings/billing/invoice-reminders` (`manageBilling`).
+/settings/billing/invoice-reminders` (`manageBilling`). Export comptable (#879) :
+`PUT /settings/billing/accounting` (`manageBilling`).
 
 Toutes les mutations répondent par **redirection Inertia** (pas de JSON) et le
 frontend utilise `router.*` / `<Form>` (conventions Inertia du projet).
@@ -530,6 +570,7 @@ creditNoteDelete}` + `flash.quota.invoicesExceeded`.
 | Erreurs métier    | `app/exceptions/invoice_errors.ts`                                                                                                                                                                                    |
 | Policy (ACL)      | `app/policies/invoice_policy.ts`                                                                                                                                                                                      |
 | Routes            | `start/routes/invoices.ts`                                                                                                                                                                                            |
+| Exports (#879)    | `app/controllers/fleet_exports_controller.ts`, `app/services/fleet_export_service.ts`, `app/services/fec_service.ts`, `app/services/accounting_settings_service.ts`                                                   |
 | Frontend          | `inertia/pages/invoices/{index,form,show,credit_note}.vue` + `inertia/components/invoices/*`                                                                                                                          |
 
 ---
@@ -572,6 +613,10 @@ creditNoteDelete}` + `flash.quota.invoicesExceeded`.
   `tests/functional/invoices/invoice_reminders.spec.ts` (relance manuelle,
   interrupteur, réglages, rôles), `send_invoice_reminder_email_job.spec.ts`
   (contenu de l'e-mail, pénalités, facture réglée entre-temps).
+- **Exports comptables (#879)** : `tests/unit/services/fec_service.spec.ts`
+  (écritures, équilibre, numérotation, exercice, format du fichier),
+  `tests/functional/exports/accounting_exports.spec.ts` (journal des ventes,
+  filtres, variante par ligne, injection de formule, rôles, FEC, comptes).
 
 ---
 
@@ -591,6 +636,9 @@ creditNoteDelete}` + `flash.quota.invoicesExceeded`.
 - Avoirs (#877) — non couverts : e-mail dédié (l'envoi réutilise le gabarit
   des factures, libellé « l'avoir ») ; proposition automatique d'un avoir à
   l'annulation d'une réservation facturée ; remboursement Stripe déclenché
-  depuis FleetAi ; export comptable (FEC), qui devra inclure les avoirs.
+  depuis FleetAi. L'export comptable (FEC, #879) inclut les avoirs.
+- Exports comptables (#879) — non couverts : connecteurs comptables
+  (Pennylane, QuickBooks — via l'API publique), comptes de vente par taux de
+  TVA ou par prestation, lettrage automatique, conversion des devises.
 - Statuts en machine à états stricte : `status` reste librement settable via
   `update` sur les devis et les brouillons, en dehors des transitions dédiées.

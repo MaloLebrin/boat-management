@@ -12,6 +12,8 @@ const AuditLogsController = () => import('#controllers/audit_logs_controller')
 const CsvImportController = () => import('#controllers/csv_import_controller')
 const OnlinePaymentsController = () => import('#controllers/online_payments_controller')
 const InvoiceRemindersController = () => import('#controllers/invoice_reminders_controller')
+const AccountingSettingsController = () => import('#controllers/accounting_settings_controller')
+const DataExportsController = () => import('#controllers/data_exports_controller')
 
 // Préférences pré-auth (switchers de langue et de thème, aussi disponibles
 // sur le marketing et l'écran de login) : persistées sur le profil quand
@@ -111,6 +113,13 @@ router
     router
       .delete('settings/branding/logo', [SettingsController, 'deleteLogo'])
       .as('settings.branding.logo.delete')
+    // Exports comptables (#879) : comptes du FEC, exports générés en
+    // arrière-plan et leur téléchargement par lien signé.
+    router
+      .put('settings/billing/accounting', [AccountingSettingsController, 'update'])
+      .as('settings.billing.accounting.update')
+    router.get('settings/exports', [DataExportsController, 'index']).as('settings.exports')
+    router.get('exports/:id/download', [DataExportsController, 'download']).as('exports.download')
     router.get('settings/import', [CsvImportController, 'show']).as('settings.import')
     router
       .post('settings/import/preview', [CsvImportController, 'preview'])
