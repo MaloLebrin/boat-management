@@ -39,3 +39,16 @@ export class ReservationBlacklistedClientError extends Error {
     super('Cannot book for a blacklisted client')
   }
 }
+
+/**
+ * Encaissement ou geste de caution refusé par les règles de #875 (ex. solde
+ * sans prix, caution restituée sans avoir été bloquée). `errorCode` est la clé
+ * de `flash.reservation.payment.*`.
+ */
+export class ReservationPaymentError extends Error {
+  name = 'ReservationPaymentError'
+
+  constructor(readonly errorCode: string) {
+    super(`reservation payment rejected: ${errorCode}`)
+  }
+}

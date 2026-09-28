@@ -84,7 +84,8 @@
     "status": "Statut",
     "price": "Prix",
     "documents": "Documents",
-    "type": "Type"
+    "type": "Type",
+    "payment": "Paiement"
   },
   "actions": {
     "createQuote": "Créer un devis",
@@ -94,7 +95,9 @@
     "contractFor": "Contrat de location de {client}",
     "editFor": "Modifier la réservation de {client}",
     "deleteFor": "Supprimer la réservation de {client}",
-    "createQuoteFor": "Créer un devis pour {client}"
+    "createQuoteFor": "Créer un devis pour {client}",
+    "payment": "Paiement",
+    "paymentFor": "Paiement de la réservation de {client}"
   },
   "types": {
     "bareboat": "Coque nue",
@@ -102,5 +105,62 @@
     "day_charter": "Journée",
     "cabin": "Cabine",
     "other": "Autre"
+  },
+  "payment": {
+    "title": "Paiement",
+    "subtitle": "Acompte, solde et caution — {client}",
+    "status": {
+      "unpaid": "Non réglée",
+      "deposit_paid": "Acompte reçu",
+      "paid": "Réglée",
+      "refunded": "Remboursée"
+    },
+    "attention": {
+      "deposit_due": "Acompte attendu",
+      "balance_due": "Solde à encaisser"
+    },
+    "methods": {
+      "transfer": "Virement",
+      "card": "Carte bancaire",
+      "cash": "Espèces",
+      "check": "Chèque"
+    },
+    "summary": {
+      "total": "Prix total",
+      "deposit": "Acompte",
+      "paid": "Encaissé",
+      "remaining": "Reste dû",
+      "paidOn": "Reçu le {date}"
+    },
+    "fields": {
+      "method": "Moyen de paiement",
+      "depositAmount": "Montant de l'acompte"
+    },
+    "actions": {
+      "deposit": "Acompte reçu",
+      "balance": "Solde reçu",
+      "refund": "Rembourser",
+      "confirmRefund": "Enregistrer le remboursement de {amount} ?"
+    },
+    "noPrice": "Aucun prix n'est renseigné : indiquez-le dans la réservation pour suivre le solde.",
+    "securityDeposit": {
+      "title": "Caution",
+      "status": {
+        "none": "Non bloquée",
+        "held": "Bloquée",
+        "released": "Restituée",
+        "retained": "Retenue"
+      },
+      "amount": "Montant de la caution",
+      "retainedAmount": "Montant retenu",
+      "note": "Motif de la retenue",
+      "notePlaceholder": "Ex. : hélice endommagée au retour",
+      "hold": "Caution bloquée",
+      "release": "Restituer la caution",
+      "retain": "Retenir",
+      "noAmount": "Aucune caution n'est prévue au tarif du bateau : indiquez un montant.",
+      "retainedSummary": "{amount} retenus : {note}",
+      "inspectionHint": "Au retour, restituez la caution ou retenez un montant au vu des défauts constatés."
+    }
   }
 }

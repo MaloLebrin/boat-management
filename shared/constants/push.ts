@@ -13,6 +13,9 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   // Disponibilité d'un bateau (#870) : un événement de terrain, comme la maintenance.
   'boat.status_changed',
   'boat.available_again',
+  // Argent des locations (#875) : à réclamer avant le départ.
+  'reservation.deposit_due',
+  'reservation.balance_due',
   'document.expiring_soon',
   'document.expired',
   'safety_equipment.expiring_soon',

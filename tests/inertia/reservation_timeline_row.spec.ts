@@ -7,6 +7,7 @@ vi.mock('~/composables/use_t', () => ({
 
 import ReservationTimelineRow from '../../inertia/components/reservations/ReservationTimelineRow.vue'
 import type { FleetBoatCalendarEntry } from '../../shared/types/reservation'
+import { UNPAID_RESERVATION_FIELDS } from './helpers/reservation_payment'
 
 const days = Array.from({ length: 30 }, (_, i) => i + 1)
 const monthStart = '2026-06-01'
@@ -29,6 +30,7 @@ const entry: FleetBoatCalendarEntry = {
       clientPhone: null,
       notes: null,
       totalPrice: null,
+      ...UNPAID_RESERVATION_FIELDS,
       createdAt: '2026-05-01',
     },
   ],

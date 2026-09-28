@@ -4,6 +4,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useMonthNav } from '~/composables/use_month_nav'
 import { useT } from '~/composables/use_t'
+import { paymentAttention } from '#shared/helpers/reservation_payment'
 import type { BoatReservationRow, ReservationStatus } from '~/types/reservation'
 
 const props = defineProps<{
@@ -57,8 +58,12 @@ const calendarDays = computed(() =>
  * prestation rejoint l'infobulle, à côté du nom du client (#585).
  */
 function pillTitle(row: BoatReservationRow): string {
-  if (!row.type) return row.clientName
-  return `${row.clientName} — ${t(`reservations.types.${row.type}`)}`
+  const parts = [row.clientName]
+  if (row.type) parts.push(t(`reservations.types.${row.type}`))
+  // Argent à réclamer (#875) : la pastille porte un point, l'infobulle le dit.
+  const attention = paymentAttention(row)
+  if (attention) parts.push(t(`reservations.payment.attention.${attention}`))
+  return parts.join(' — ')
 }
 
 const pillClass: Record<ReservationStatus, string> = {
@@ -133,6 +138,11 @@ const pillClass: Record<ReservationStatus, string> = {
               :class="['truncate rounded px-1 py-0.5 text-xs font-medium', pillClass[res.status]]"
               :title="pillTitle(res)"
             >
+              <span
+                v-if="paymentAttention(res)"
+                class="mr-0.5 inline-block h-1.5 w-1.5 rounded-full bg-danger align-middle"
+                data-testid="payment-attention-dot"
+              />
               {{ res.clientName }}
             </div>
             <div

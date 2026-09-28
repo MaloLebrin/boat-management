@@ -160,6 +160,26 @@ const FACES: RoleFace[] = [
         .redirects(0),
   },
   {
+    name: 'enregistrer un encaissement (#875)',
+    kind: 'write',
+    call: (client, user, { boat, reservation }) =>
+      client
+        .patch(`/boats/${boat.id}/reservations/${reservation.id}/payment`)
+        .form({ kind: 'deposit', method: 'card', amount: 100 })
+        .loginAs(user)
+        .redirects(0),
+  },
+  {
+    name: 'bloquer la caution (#875)',
+    kind: 'write',
+    call: (client, user, { boat, reservation }) =>
+      client
+        .patch(`/boats/${boat.id}/reservations/${reservation.id}/security-deposit`)
+        .form({ action: 'hold', amount: 500 })
+        .loginAs(user)
+        .redirects(0),
+  },
+  {
     name: 'supprimer le contrat',
     kind: 'write',
     call: (client, user, { boat, reservation }) =>

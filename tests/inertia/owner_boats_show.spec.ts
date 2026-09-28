@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { test, expect, vi } from 'vitest'
 import OwnerBoatsShow from '../../inertia/pages/owner/boats/show.vue'
+import { UNPAID_RESERVATION_FIELDS } from './helpers/reservation_payment'
 
 vi.mock('@adonisjs/inertia/vue', () => ({
   Link: {
@@ -53,6 +54,7 @@ const reservations = [
     clientPhone: null,
     notes: null,
     totalPrice: null,
+    ...UNPAID_RESERVATION_FIELDS,
     createdAt: '2026-01-01T00:00:00.000Z',
     linkedInvoices: [],
   },

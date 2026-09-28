@@ -14,6 +14,51 @@ export type ReservationStatus = (typeof RESERVATION_STATUSES)[number]
 export const RESERVATION_TYPES = ['bareboat', 'skippered', 'day_charter', 'cabin', 'other'] as const
 export type ReservationType = (typeof RESERVATION_TYPES)[number]
 
+/**
+ * Suivi de l'argent d'une location (#875). `unpaid` → `deposit_paid` (acompte
+ * reçu) → `paid` (solde reçu) ; `refunded` quand l'encaissé a été rendu.
+ */
+export const RESERVATION_PAYMENT_STATUSES = ['unpaid', 'deposit_paid', 'paid', 'refunded'] as const
+export type ReservationPaymentStatus = (typeof RESERVATION_PAYMENT_STATUSES)[number]
+
+/** Moyens d'encaissement saisis à la main (#875) — pas de paiement en ligne ici. */
+export const RESERVATION_PAYMENT_METHODS = ['transfer', 'card', 'cash', 'check'] as const
+export type ReservationPaymentMethod = (typeof RESERVATION_PAYMENT_METHODS)[number]
+
+/**
+ * Caution (#875) : `none` tant qu'elle n'est pas bloquée, `held` pendant la
+ * location, puis `released` (restituée) ou `retained` (retenue, en tout ou
+ * partie, après l'état des lieux de retour).
+ */
+export const SECURITY_DEPOSIT_STATUSES = ['none', 'held', 'released', 'retained'] as const
+export type SecurityDepositStatus = (typeof SECURITY_DEPOSIT_STATUSES)[number]
+
+/** Encaissement enregistré sur une réservation (#875). */
+export const RESERVATION_PAYMENT_KINDS = ['deposit', 'balance', 'refund'] as const
+export type ReservationPaymentKind = (typeof RESERVATION_PAYMENT_KINDS)[number]
+
+/** Geste sur la caution (#875). */
+export const SECURITY_DEPOSIT_ACTIONS = ['hold', 'release', 'retain'] as const
+export type SecurityDepositAction = (typeof SECURITY_DEPOSIT_ACTIONS)[number]
+
+export interface RecordReservationPaymentPayload {
+  kind: ReservationPaymentKind
+  method?: ReservationPaymentMethod | null
+  /** Acompte seulement : montant reçu, à défaut l'acompte attendu. */
+  amount?: number | null
+}
+
+export interface SettleSecurityDepositPayload {
+  action: SecurityDepositAction
+  /** `hold` : montant bloqué (défaut : celui du tarif) ; `retain` : montant retenu. */
+  amount?: number | null
+  /** `retain` : motif, obligatoire. */
+  note?: string | null
+}
+
+/** Ce qui réclame une action côté paiement (#875) : badge et notifications. */
+export type ReservationPaymentAttention = 'deposit_due' | 'balance_due' | null
+
 export interface BoatReservationRow {
   id: number
   boatId: number
@@ -29,6 +74,17 @@ export interface BoatReservationRow {
   clientPhone: string | null
   notes: string | null
   totalPrice: string | null
+  /** Paiement (#875) — montants en chaînes décimales, comme `totalPrice`. */
+  depositAmount: string | null
+  depositPaidAt: string | null
+  balancePaidAt: string | null
+  paidAmount: string
+  paymentStatus: ReservationPaymentStatus
+  paymentMethod: ReservationPaymentMethod | null
+  securityDepositAmount: string | null
+  securityDepositStatus: SecurityDepositStatus
+  securityDepositRetainedAmount: string | null
+  securityDepositNote: string | null
   createdAt: string
   // Quotes/invoices generated from this reservation (empty when none).
   linkedInvoices: InvoiceLink[]

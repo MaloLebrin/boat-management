@@ -1199,16 +1199,26 @@ export class BoatPricingSchema extends BaseModel {
 
 export class BoatReservationSchema extends BaseModel {
   static $columns = [
+    'balancePaidAt',
     'boatId',
     'clientEmail',
     'clientId',
     'clientName',
     'clientPhone',
     'createdAt',
+    'depositAmount',
+    'depositPaidAt',
     'endsAt',
     'id',
     'notes',
     'organizationId',
+    'paidAmount',
+    'paymentMethod',
+    'paymentStatus',
+    'securityDepositAmount',
+    'securityDepositNote',
+    'securityDepositRetainedAmount',
+    'securityDepositStatus',
     'startsAt',
     'status',
     'totalPrice',
@@ -1216,6 +1226,8 @@ export class BoatReservationSchema extends BaseModel {
     'updatedAt',
   ] as const
   $columns = BoatReservationSchema.$columns
+  @column.dateTime()
+  declare balancePaidAt: DateTime | null
   @column()
   declare boatId: number
   @column()
@@ -1228,6 +1240,10 @@ export class BoatReservationSchema extends BaseModel {
   declare clientPhone: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare depositAmount: string | null
+  @column.dateTime()
+  declare depositPaidAt: DateTime | null
   @column.dateTime()
   declare endsAt: DateTime
   @column({ isPrimary: true })
@@ -1236,6 +1252,20 @@ export class BoatReservationSchema extends BaseModel {
   declare notes: string | null
   @column()
   declare organizationId: number
+  @column()
+  declare paidAmount: string
+  @column()
+  declare paymentMethod: string | null
+  @column()
+  declare paymentStatus: string
+  @column()
+  declare securityDepositAmount: string | null
+  @column()
+  declare securityDepositNote: string | null
+  @column()
+  declare securityDepositRetainedAmount: string | null
+  @column()
+  declare securityDepositStatus: string
   @column.dateTime()
   declare startsAt: DateTime
   @column()

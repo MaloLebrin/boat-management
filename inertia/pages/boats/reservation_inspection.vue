@@ -5,6 +5,8 @@ import BaseBreadcrumb from '~/components/base/BaseBreadcrumb.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
 import InspectionComparison from '~/components/reservations/inspection/InspectionComparison.vue'
 import InspectionPanel from '~/components/reservations/inspection/InspectionPanel.vue'
+import SecurityDepositPanel from '~/components/reservations/payment/SecurityDepositPanel.vue'
+import BaseCard from '~/components/base/BaseCard.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { BoatCategory } from '#shared/types/boat_catalog'
@@ -19,6 +21,8 @@ const props = defineProps<{
   canDelete: boolean
   canManageActions: boolean
   canDeleteActions: boolean
+  /** Caution (#875) : restituer ou retenir au vu de l'état des lieux de retour. */
+  canManagePayment: boolean
 }>()
 
 const { t } = useT()
@@ -97,5 +101,17 @@ const breadcrumbs = computed(() => [
     <div class="mt-6">
       <InspectionComparison :checkout="checkout" :checkin="checkin" />
     </div>
+
+    <BaseCard class="mt-6">
+      <p class="mb-3 text-sm text-fg-muted">
+        {{ t('reservations.payment.securityDeposit.inspectionHint') }}
+      </p>
+      <SecurityDepositPanel
+        :boat-id="boat.id"
+        :reservation="reservation"
+        :can-manage="canManagePayment"
+        :reload-props="['reservation', 'errors', 'flash']"
+      />
+    </BaseCard>
   </div>
 </template>

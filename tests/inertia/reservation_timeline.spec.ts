@@ -29,6 +29,7 @@ vi.mock('~/components/reservations/ReservationCreateButton.vue', () => ({
 
 import ReservationTimeline from '../../inertia/components/reservations/ReservationTimeline.vue'
 import type { FleetBoatCalendarEntry } from '../../shared/types/reservation'
+import { UNPAID_RESERVATION_FIELDS } from './helpers/reservation_payment'
 
 const boats = [
   { id: 1, name: 'Mistral' },
@@ -49,6 +50,7 @@ const reservation = {
   clientPhone: null,
   notes: null,
   totalPrice: null,
+  ...UNPAID_RESERVATION_FIELDS,
   createdAt: '2026-03-01T10:00:00.000+00:00',
   linkedInvoices: [],
 } satisfies FleetBoatCalendarEntry['reservations'][number]

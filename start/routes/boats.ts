@@ -419,6 +419,19 @@ router
             'destroy',
           ])
           .as('boats.reservations.destroy')
+        // Argent de la location (#875) : encaissements et caution.
+        router
+          .patch('boats/:boatId/reservations/:reservationId/payment', [
+            controllers.ReservationPayments,
+            'update',
+          ])
+          .as('boats.reservations.payment.update')
+        router
+          .patch('boats/:boatId/reservations/:reservationId/security-deposit', [
+            controllers.ReservationPayments,
+            'securityDeposit',
+          ])
+          .as('boats.reservations.securityDeposit.update')
 
         router
           .get('boats/:boatId/reservations/:reservationId/inspection', [

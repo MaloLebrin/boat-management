@@ -75,26 +75,27 @@ unitairement.
 
 Modèle : `app/models/boat_reservation.ts`.
 
-| Colonne                         | Type               | Notes                                           |
-| ------------------------------- | ------------------ | ----------------------------------------------- |
-| `id`                            | pk                 |                                                 |
-| `boat_id`                       | fk → boats         |                                                 |
-| `organization_id`               | fk → organizations | scope org                                       |
-| `status`                        | enum               | `option` \| `confirmed` \| `cancelled`          |
-| `type`                          | enum?              | Type de prestation (#585) — voir ci-dessous     |
-| `starts_at` / `ends_at`         | datetime           | Luxon `DateTime` (heure incluse)                |
-| `client_id`                     | fk → clients?      | Lien CRM optionnel (#275), `ON DELETE SET NULL` |
-| `client_name`                   | string             | Instantané dénormalisé, conservé même sans lien |
-| `client_email` / `client_phone` | string?            | dénormalisés                                    |
-| `notes`                         | text?              |                                                 |
-| `total_price`                   | decimal(., 2)?     | stocké en **string** côté Lucid (précision)     |
-| `created_at` / `updated_at`     | timestamps         |                                                 |
+| Colonne                                    | Type               | Notes                                           |
+| ------------------------------------------ | ------------------ | ----------------------------------------------- |
+| `id`                                       | pk                 |                                                 |
+| `boat_id`                                  | fk → boats         |                                                 |
+| `organization_id`                          | fk → organizations | scope org                                       |
+| `status`                                   | enum               | `option` \| `confirmed` \| `cancelled`          |
+| `type`                                     | enum?              | Type de prestation (#585) — voir ci-dessous     |
+| `starts_at` / `ends_at`                    | datetime           | Luxon `DateTime` (heure incluse)                |
+| `client_id`                                | fk → clients?      | Lien CRM optionnel (#275), `ON DELETE SET NULL` |
+| `client_name`                              | string             | Instantané dénormalisé, conservé même sans lien |
+| `client_email` / `client_phone`            | string?            | dénormalisés                                    |
+| `notes`                                    | text?              |                                                 |
+| `total_price`                              | decimal(., 2)?     | stocké en **string** côté Lucid (précision)     |
+| `deposit_amount` … `security_deposit_note` | —                  | Paiement et caution (#875) — voir § 5.5         |
+| `created_at` / `updated_at`                | timestamps         |                                                 |
 
 > ℹ️ Le client est **dénormalisé** — nom, e-mail et téléphone sont recopiés sur
 > la réservation — mais un `client_id` optionnel le relie au CRM depuis #275 :
-> supprimer le client annule la clé étrangère et laisse l'instantané intact. Il
-> n'y a en revanche **ni caution ni devise** sur la réservation : ces
-> informations vivent sur `boat_pricing`.
+> supprimer le client annule la clé étrangère et laisse l'instantané intact. La
+> **devise** vit sur `boat_pricing` ; la **caution** y est définie, puis
+> recopiée sur la réservation à la confirmation (#875, § 5.5).
 
 **Type de prestation (#585).** `bareboat` | `skippered` | `day_charter` |
 `cabin` | `other` (`RESERVATION_TYPES`, `shared/types/reservation.ts`),
@@ -227,6 +228,72 @@ Réf. routes : `start/routes/boats.ts` (per-boat) et `start/routes/reservations.
 > `maintenance.view`), rendu en liseré sous les locations. À l'inverse,
 > `/planning` superpose les réservations aux tâches — voir
 > [`planning.md`](planning.md).
+
+### 5.5 Paiement : acompte, solde et caution (#875)
+
+Suivi **manuel** de l'argent d'une location — le paiement en ligne est une issue
+séparée (#876). Service : `app/services/reservation_payment_service.ts` ; calculs
+purs : `shared/helpers/reservation_payment.ts` ; types :
+`RESERVATION_PAYMENT_STATUSES`, `RESERVATION_PAYMENT_METHODS`,
+`SECURITY_DEPOSIT_STATUSES` (`shared/types/reservation.ts`).
+
+**À la confirmation** (création en `confirmed` ou passage `option` → `confirmed`),
+`applyDefaults` pose :
+
+- l'**acompte attendu** `deposit_amount` = 30 % du prix (`DEFAULT_DEPOSIT_PERCENT`),
+  recalculé à chaque modification du prix tant qu'il n'est pas reçu ;
+- la **caution** `security_deposit_amount` = `boat_pricing.deposit_amount`, tant
+  qu'elle n'est pas bloquée.
+
+Un prix corrigé après un encaissement recalcule `payment_status` (un dossier
+soldé dont le prix augmente redevient `deposit_paid`).
+
+**Encaissements** — `PATCH /boats/:boatId/reservations/:reservationId/payment`
+(`kind`, `method?`, `amount?`) :
+
+| `kind`    | Condition                                                    | Effet                                                                       |
+| --------- | ------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| `deposit` | réservation non annulée, `unpaid`                            | `amount` (défaut : l'acompte attendu, ≤ prix) → `deposit_paid_at`, encaissé |
+| `balance` | non annulée, `unpaid` ou `deposit_paid`, prix renseigné      | encaissé = prix, `balance_paid_at`, statut `paid`                           |
+| `refund`  | quelque chose d'encaissé, pas déjà `refunded` (même annulée) | statut `refunded` (l'encaissé reste lisible)                                |
+
+Le statut dérive de l'encaissé : rien → `unpaid`, une partie → `deposit_paid`,
+tout → `paid`. `payment_method` garde le moyen du dernier encaissement.
+
+**Caution** — `PATCH /boats/:boatId/reservations/:reservationId/security-deposit`
+(`action`, `amount?`, `note?`) : `hold` (`none` → `held`, montant par défaut celui
+du tarif), puis `release` (`held` → `released`) ou `retain` (`held` → `retained`,
+montant retenu ≤ caution et motif obligatoires).
+
+Les deux routes vivent dans le groupe du module Location et exigent
+`BoatPolicy.manage` (`boats.manage`). Un refus métier (`ReservationPaymentError`)
+revient en flash `flash.reservation.payment.errors.<code>` sans rien écrire.
+Chaque geste est tracé au journal d'audit : `reservation.payment_recorded` (type,
+montant, moyen, statut), `reservation.security_deposit_held|released|retained`.
+
+**Ce qui réclame une action** — `paymentAttention()`, partagé par l'écran et le
+scan quotidien :
+
+- `balance_due` : réservation confirmée, départ à moins de 7 jours (ou passé),
+  solde restant ;
+- `deposit_due` : réservation confirmée `unpaid` avec un acompte attendu.
+
+Le scan `NotificationScanService` crée `reservation.deposit_due` et
+`reservation.balance_due` (une notification par bateau, avec le compte, vers
+`/boats/:id/reservations`, anti-doublon 7 jours), adressées aux admins et
+poussables (`PUSHABLE_NOTIFICATION_TYPES`).
+
+**Écrans.** Colonne « Paiement » (`ReservationPaymentBadge.vue`) dans la liste
+par bateau et la liste flotte ; point rouge sur la pastille du calendrier ;
+action « Paiement » de la ligne → `ReservationPaymentModal.vue` /
+`ReservationPaymentPanel.vue` (montants, encaissements, caution) ; bloc
+« Caution » sur l'écran d'état des lieux (`docs/domain/inspections.md`).
+
+> Hors périmètre de ce lot : factures d'acompte et de solde générées depuis la
+> réservation, facture de dommages sur caution retenue, widget « Encaissements
+> à venir » du tableau de bord, colonnes paiement dans un export CSV des
+> réservations (qui n'existe pas encore, #879), pourcentage d'acompte
+> configurable par organisation ou par tarif.
 
 ### 5.4 Validation (`app/validators/boat_reservation_validator.ts`)
 
@@ -397,6 +464,9 @@ Toutes les clés existent en **`en` et `fr`**.
 | Fonctionnel     | `tests/functional/pricing/pricing_seasons.spec.ts`                                                             | saisons : CRUD, chevauchement, XOR, priorité, gating, IDOR (#293)                                                   |
 | Fonctionnel     | `tests/functional/boats/reservation_pricing.spec.ts`                                                           | auto-remplissage, saison appliquée, rejets hors bornes, props exposées, non-régression (#294)                       |
 | Vitest          | `tests/inertia/boat_show_tab_pricing.spec.ts`, `pricing_season_form.spec.ts`, `reservation_quote_card.spec.ts` | composants UI                                                                                                       |
+| Unitaire (Japa) | `tests/unit/helpers/reservation_payment.spec.ts`                                                               | acompte par défaut, reste dû, statut, `paymentAttention` (#875)                                                     |
+| Fonctionnel     | `tests/functional/reservations/payment.spec.ts`                                                                | défauts à la confirmation, encaissements, refus, caution, cross-org, scan (#875)                                    |
+| Vitest          | `tests/inertia/reservation_payment.spec.ts`                                                                    | badge, panneau Paiement, bloc Caution (#875)                                                                        |
 
 ---
 
@@ -408,6 +478,10 @@ Toutes les clés existent en **`en` et `fr`**.
   `app/controllers/reservations_controller.ts`,
   `app/validators/boat_reservation_validator.ts`,
   `shared/types/reservation.ts`, `app/exceptions/reservation_errors.ts`
+- **Paiement (#875)** : `app/services/reservation_payment_service.ts`,
+  `app/controllers/reservation_payments_controller.ts`,
+  `app/validators/reservation_payment.ts`, `shared/helpers/reservation_payment.ts`,
+  `inertia/components/reservations/payment/`
 - **Tarif de base** : `app/models/boat_pricing.ts`,
   `app/services/boat_pricing_service.ts`,
   `app/transformers/boat_pricing_transformer.ts`,

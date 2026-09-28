@@ -390,6 +390,31 @@
       "status": "bateau {status}",
       "task": "tâche « {title} » le {date}",
       "incident": "incident ouvert : {type}"
+    },
+    "payment": {
+      "recorded": {
+        "deposit": "Acompte enregistré.",
+        "balance": "Solde enregistré : la réservation est réglée.",
+        "refund": "Remboursement enregistré."
+      },
+      "securityDeposit": {
+        "hold": "Caution enregistrée comme bloquée.",
+        "release": "Caution restituée.",
+        "retain": "Caution retenue."
+      },
+      "errors": {
+        "nothingToRefund": "Rien n'a été encaissé sur cette réservation : il n'y a rien à rembourser.",
+        "cancelled": "Cette réservation est annulée : seul un remboursement reste possible.",
+        "alreadyPaid": "Cette réservation est déjà réglée.",
+        "depositAlreadyPaid": "L'acompte a déjà été reçu : enregistrez le solde.",
+        "amountRequired": "Indiquez un montant supérieur à zéro.",
+        "amountAboveTotal": "L'acompte ne peut pas dépasser le prix de la location.",
+        "noPrice": "Renseignez le prix de la location avant d'enregistrer le solde.",
+        "depositNotNone": "La caution a déjà été bloquée.",
+        "depositNotHeld": "La caution n'est pas bloquée : il n'y a rien à restituer ni à retenir.",
+        "retainedAboveDeposit": "Le montant retenu ne peut pas dépasser la caution.",
+        "noteRequired": "Indiquez le motif de la retenue."
+      }
     }
   },
   "ports": {

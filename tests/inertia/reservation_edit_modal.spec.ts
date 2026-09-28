@@ -44,6 +44,7 @@ vi.mock('~/components/base/BaseModal.vue', () => ({
 
 import ReservationEditModal from '../../inertia/components/reservations/ReservationEditModal.vue'
 import type { BoatReservationRow } from '../../shared/types/reservation'
+import { UNPAID_RESERVATION_FIELDS } from './helpers/reservation_payment'
 
 const reservation: BoatReservationRow = {
   id: 1,
@@ -58,6 +59,7 @@ const reservation: BoatReservationRow = {
   clientPhone: null,
   notes: null,
   totalPrice: '1500',
+  ...UNPAID_RESERVATION_FIELDS,
   createdAt: '2026-05-01T00:00:00.000Z',
 }
 

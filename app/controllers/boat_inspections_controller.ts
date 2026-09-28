@@ -13,6 +13,7 @@ import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
 import InspectionPolicy from '#policies/inspection_policy'
 import EquipmentActionPolicy from '#policies/equipment_action_policy'
+import BoatPolicy from '#policies/boat_policy'
 import {
   clearBoatInspectionItemValidator,
   createBoatInspectionValidator,
@@ -68,12 +69,15 @@ export default class BoatInspectionsController {
       throw error
     }
 
-    const [canEdit, canDelete, canManageActions, canDeleteActions] = await Promise.all([
-      bouncer.with(InspectionPolicy).allows('edit', reservation),
-      bouncer.with(InspectionPolicy).allows('delete', reservation),
-      bouncer.with(EquipmentActionPolicy).allows('create', boat),
-      bouncer.with(EquipmentActionPolicy).allows('delete', boat),
-    ])
+    const [canEdit, canDelete, canManageActions, canDeleteActions, canManagePayment] =
+      await Promise.all([
+        bouncer.with(InspectionPolicy).allows('edit', reservation),
+        bouncer.with(InspectionPolicy).allows('delete', reservation),
+        bouncer.with(EquipmentActionPolicy).allows('create', boat),
+        bouncer.with(EquipmentActionPolicy).allows('delete', boat),
+        // Caution (#875) : même garde que les encaissements.
+        bouncer.with(BoatPolicy).allows('manage', boat),
+      ])
 
     const inspectionsWithMedia = await Promise.all(
       inspections.map(async (inspection) => {
@@ -97,6 +101,7 @@ export default class BoatInspectionsController {
       canDelete,
       canManageActions,
       canDeleteActions,
+      canManagePayment,
     })
   }
 

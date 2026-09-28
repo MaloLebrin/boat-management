@@ -15,6 +15,7 @@ vi.mock('~/components/base/BaseButton.vue', () => ({
 
 import ReservationCalendar from '../../inertia/components/reservations/ReservationCalendar.vue'
 import type { BoatReservationRow } from '../../shared/types/reservation'
+import { UNPAID_RESERVATION_FIELDS } from './helpers/reservation_payment'
 
 function currentMonthIso(day: number): string {
   const now = new Date()
@@ -36,6 +37,7 @@ const res: BoatReservationRow = {
   clientPhone: null,
   notes: null,
   totalPrice: null,
+  ...UNPAID_RESERVATION_FIELDS,
   createdAt: currentMonthIso(1),
 }
 
@@ -64,6 +66,16 @@ describe('ReservationCalendar', () => {
     const wrapper = mount(ReservationCalendar, { props: { reservations: extras } })
     // The "+n more" div has classes text-xs text-fg-muted
     expect(wrapper.find('.text-xs.text-fg-muted').exists()).toBe(true)
+  })
+
+  test('marks a reservation whose deposit is awaited with a dot (#875)', () => {
+    const awaiting = { ...res, totalPrice: '1000.00', depositAmount: '300.00' }
+    const flagged = mount(ReservationCalendar, { props: { reservations: [awaiting] } })
+    expect(flagged.find('[data-testid="payment-attention-dot"]').exists()).toBe(true)
+
+    const paid = { ...awaiting, paymentStatus: 'paid' as const, paidAmount: '1000.00' }
+    const clear = mount(ReservationCalendar, { props: { reservations: [paid] } })
+    expect(clear.find('[data-testid="payment-attention-dot"]').exists()).toBe(false)
   })
 
   test('renders prev and next navigation buttons', () => {
