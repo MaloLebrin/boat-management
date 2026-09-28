@@ -92,6 +92,7 @@ Référence: `inertia/app.ts`.
   - sails: `inertia/components/boats/sail/BoatShowSailsCard.vue`
   - rig: `inertia/components/boats/rig/BoatShowRigCard.vue`
   - maintenance: `inertia/components/boats/show/tabs/BoatShowTabTasks.vue` (onglet « Tâches ») et `inertia/components/boats/show/tabs/BoatShowTabHistory.vue` (onglet « Historique »)
+  - actions d'une tâche (#407, #867) : `inertia/components/boats/maintenance/BoatTaskActions.vue` — « Marquer fait », « Reporter » (`MaintenanceTaskPostponeMenu.vue` : +1 semaine, +1 mois, date libre, tâches datées ouvertes), « Modifier » (`BoatMaintenanceTaskEditModal.vue`, tâches ouvertes) et suppression ; réutilisé par l'onglet Tâches, `BoatTaskUrgentCard`, `EquipmentTasksSection` et l'onglet maintenance du moteur. `PlanningTaskCard.vue` porte aussi « Reporter » (capability `maintenance.edit`) et « Reportée N fois »
     - `BoatMaintenanceTasksPanel.vue` garde le point d'entrée de création et délègue le formulaire à `BoatMaintenanceTaskForm.vue` (#581)
     - le champ titre du formulaire de tâche et des modales d'événement (`BoatMaintenanceEventModal.vue`, `EngineMaintenanceEventModal.vue`) est une `BaseCombobox` alimentée par le catalogue d'opérations standard, via `inertia/composables/use_maintenance_operations.ts` (#581) — la saisie libre reste acceptée telle quelle
   - equipment-actions (onglet "Achats/réparations"):

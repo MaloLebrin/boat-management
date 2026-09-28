@@ -20,6 +20,7 @@ Champs clés:
 - `recurrence_interval_engine_hours` (int)
 - cibles optionnelles: `boat_engine_id`, `boat_sail_id`, `boat_rig_id`, `boat_safety_equipment_id`, `boat_generic_equipment_id`
 - `boat_incident_id` (FK nullable, `SET NULL`) — incident à l'origine de la tâche (#815), voir `docs/domain/incidents.md`
+- `postponed_count` (int, défaut 0) — nombre de reports de l'échéance (#867)
 
 ## Routes → controllers → services → UI
 
@@ -66,6 +67,45 @@ Règles (source: `markDone`):
 - si récurrence configurée, **auto-crée** la prochaine task:
   - date: `doneAt + recurrenceIntervalMonths`
   - heures: `doneEngineHours + recurrenceIntervalEngineHours`
+
+### Modifier ou reporter une task (#867)
+
+- `PATCH /boats/:boatId/maintenance-tasks/:taskId` (`boats.maintenanceTasks.update`)
+  - Controller: `BoatMaintenanceTasksController.update`
+  - Validation: `updateBoatMaintenanceTaskValidator`
+  - ACL: `MaintenancePolicy.edit` (capability `maintenance.edit` — admin, member, mechanic ; comme « Marquer fait »)
+  - Service: `BoatMaintenanceTaskService.updateForBoat`
+
+Champs modifiables : `title`, `notes`, `dueAt`, `recurrenceIntervalMonths`, `dueEngineHours`,
+`recurrenceIntervalEngineHours`. **Clé absente = champ inchangé**, valeur vide = champ vidé (le
+bodyparser convertit `''` en `null`, d'où `nullable().optional()` dans le validateur).
+
+Règles (source: `updateForBoat`):
+
+- une task `done` est de l'historique : refus `taskDone` (flash d'erreur) ;
+- le sujet et l'équipement visé ne se modifient pas — changer de cible, c'est une autre task ;
+- heures moteur : mêmes règles qu'à la création (`subject=engine`, moteur rattaché, seuil
+  strictement supérieur au compteur actuel → erreur de champ `dueEngineHours`) ;
+- **report** : quand `dueAt` ou `dueEngineHours` recule, `postponed_count` est incrémenté. Retirer
+  l'échéance ou l'avancer n'est pas un report ;
+- **récurrence** : un nouvel intervalle ne touche que les occurrences à venir — la suivante est
+  créée à la clôture avec l'intervalle en vigueur à ce moment-là, et repart à `postponed_count = 0` ;
+- journal d'audit : `maintenance_task.postpone` quand seule l'échéance recule,
+  `maintenance_task.update` sinon (métadonnées : `fields` modifiés, `postponedCount` si report).
+  Une soumission sans changement n'écrit rien.
+
+UI :
+
+- `MaintenanceTaskPostponeMenu` — « Reporter » : +1 semaine, +1 mois (borné à la fin du mois) ou
+  date libre. Le report part de l'échéance, ou d'aujourd'hui si elle est dépassée
+  (`inertia/utils/task_postpone.ts`). Tâches datées uniquement ; une échéance en heures se décale
+  depuis la modale.
+- `BoatMaintenanceTaskEditModal` — formulaire complet ; champs heures moteur sur une tâche moteur seulement.
+- Les deux vivent dans `BoatTaskActions` (onglet Tâches, carte urgente, sections équipement, onglet
+  maintenance moteur) ; le menu « Reporter » est aussi sur `PlanningTaskCard`, qui affiche
+  « Reportée N fois ».
+- Hors-ligne : non couvert — la file hors-ligne (`docs/domain/offline-queue.md`) ne rejoue aucune
+  mutation de task, clôture comprise.
 
 ### Supprimer une task
 

@@ -325,6 +325,31 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'planning.index',
   },
   {
+    id: 'maintenance-task-edit-postpone',
+    title: {
+      en: 'Editing and postponing a maintenance task',
+      fr: 'Modifier et reporter une tâche de maintenance',
+    },
+    body: {
+      en: 'An open maintenance task can be edited or postponed; a completed task is part of the history and no longer changes. The pencil button next to a task opens the edit form: title, notes, due date, recurrence in months and, for an engine task, due engine hours and hour interval. The subject and targeted equipment cannot change — create another task instead. The Postpone menu moves a dated task by one week, one month or to a chosen date, from the boat Tasks tab, equipment pages or the planning; an overdue task is postponed from today. Each postponement is counted (“Postponed 3 times” on the planning card) and recorded in the activity log. A new recurrence interval only applies to the occurrences created after this one is completed.',
+      fr: 'Une tâche de maintenance ouverte se modifie et se reporte ; une tâche terminée fait partie de l’historique et ne change plus. Le bouton crayon à côté d’une tâche ouvre le formulaire d’édition : titre, notes, date d’échéance, récurrence en mois et, pour une tâche moteur, seuil et intervalle en heures. Le sujet et l’équipement visé ne changent pas — créez une autre tâche. Le menu Reporter décale une tâche datée d’une semaine, d’un mois ou à une date choisie, depuis l’onglet Tâches du bateau, les pages d’équipement ou le planning ; une tâche en retard est reportée à partir d’aujourd’hui. Chaque report est compté (« Reportée 3 fois » sur la carte du planning) et tracé dans le journal d’activité. Un nouvel intervalle de récurrence ne s’applique qu’aux occurrences créées après la clôture de celle-ci.',
+    },
+    keywords: [
+      'reporter',
+      'report',
+      'postpone',
+      'decaler',
+      'repousser',
+      'modifier',
+      'edit',
+      'echeance',
+      'due date',
+      'tache',
+      'task',
+    ],
+    navTarget: 'planning.index',
+  },
+  {
     id: 'maintenance-operations-catalog',
     title: {
       en: 'Standard maintenance operations catalog',
