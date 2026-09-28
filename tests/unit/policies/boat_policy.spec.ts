@@ -101,3 +101,17 @@ test.group('BoatPolicy — deleteReservation business rule (unit)', () => {
     assert.isFalse(await policy.deleteReservation(user, boat, reservation('pending')))
   })
 })
+
+test.group('BoatPolicy — forceReservation (#870) (unit)', () => {
+  test('requires boats.reservations.force on a boat of the same organization', async ({
+    assert,
+  }) => {
+    const policy = new BoatPolicy()
+    const allowed = userWithCapabilities(ORG_ID, ['boats.reservations.force'])
+    const denied = userWithCapabilities(ORG_ID, ['boats.manage'])
+
+    assert.isTrue(await policy.forceReservation(allowed, orgResource(ORG_ID) as never))
+    assert.isFalse(await policy.forceReservation(denied, orgResource(ORG_ID) as never))
+    assert.isFalse(await policy.forceReservation(allowed, orgResource(OTHER_ORG_ID) as never))
+  })
+})
