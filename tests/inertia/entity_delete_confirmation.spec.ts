@@ -72,6 +72,7 @@ describe('invoices/show — suppression de la facture affichée', () => {
       dueAt: null,
       paidAt: null,
       sourceQuoteId: null,
+      creditedInvoiceId: null,
       subtotal: 100,
       taxRate: 20,
       taxAmount: 20,
@@ -84,6 +85,10 @@ describe('invoices/show — suppression de la facture affichée', () => {
       convertedInvoice: null,
       reservationBoatId: null,
       onlinePaymentUrl: null,
+      creditedInvoice: null,
+      creditNotes: [],
+      creditedTotal: 0,
+      balanceDue: 0,
     } as InvoiceDetail
   }
 

@@ -94,7 +94,7 @@ function formatTotal(invoice: InvoiceRow): string {
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-3">
               <p class="font-semibold text-fg">{{ invoice.number }}</p>
-              <InvoiceStatusBadge :status="invoice.status" />
+              <InvoiceStatusBadge :status="invoice.status" :kind="invoice.kind" />
             </div>
             <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
               <span>{{ t(`invoices.kind.${invoice.kind}`) }}</span>

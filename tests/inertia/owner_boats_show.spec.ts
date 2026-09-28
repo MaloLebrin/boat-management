@@ -73,6 +73,7 @@ const invoices = [
     dueAt: null,
     paidAt: '2026-01-05',
     sourceQuoteId: null,
+    creditedInvoiceId: null,
     subtotal: 100,
     taxRate: 20,
     taxAmount: 20,

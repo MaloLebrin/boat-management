@@ -36,8 +36,12 @@ export interface InvoiceLifecycleState {
   status: InvoiceStatus
 }
 
-/** Vrai pour une facture émise : une facture qui a quitté le brouillon. */
+/**
+ * Vrai pour une pièce émise : une facture qui a quitté le brouillon, ou un
+ * avoir (#877) — toujours émis, jamais brouillon.
+ */
 export function isIssuedInvoice(invoice: InvoiceLifecycleState): boolean {
+  if (invoice.kind === 'credit_note') return true
   return invoice.kind === 'invoice' && invoice.status !== 'draft'
 }
 
@@ -51,11 +55,52 @@ export function canEditInvoice(invoice: InvoiceLifecycleState): boolean {
 
 /**
  * Vrai si les informations de paiement (date + moyen) sont modifiables : une
- * facture émise et non annulée. Une facture annulée n'encaisse rien ; un
- * brouillon passe par le formulaire d'édition classique.
+ * facture émise, ni annulée ni entièrement avoirée — l'une et l'autre
+ * n'encaissent plus rien. Un brouillon passe par le formulaire d'édition
+ * classique. Sur un avoir (#877), le « paiement » est le remboursement.
  */
 export function canEditInvoicePayment(invoice: InvoiceLifecycleState): boolean {
-  return isIssuedInvoice(invoice) && invoice.status !== 'cancelled'
+  return isIssuedInvoice(invoice) && invoice.status !== 'cancelled' && invoice.status !== 'credited'
+}
+
+/**
+ * Vrai si la facture accepte un avoir (#877) : une facture émise — envoyée,
+ * en retard ou payée. Ni un devis, ni un brouillon (qui se corrige
+ * directement), ni une facture annulée ou déjà entièrement avoirée.
+ */
+export function canIssueCreditNote(invoice: InvoiceLifecycleState): boolean {
+  return (
+    invoice.kind === 'invoice' &&
+    (invoice.status === 'sent' || invoice.status === 'overdue' || invoice.status === 'paid')
+  )
+}
+
+/** Arrondi au centime, pour comparer des sommes de montants décimaux. */
+export function roundMoney(value: number): number {
+  return Math.round(value * 100) / 100
+}
+
+/** Montant TTC qu'un nouvel avoir peut encore retrancher de la facture. */
+export function creditableRemaining(total: number, creditedTotal: number): number {
+  return Math.max(0, roundMoney(total - creditedTotal))
+}
+
+export interface InvoiceBalanceState extends InvoiceLifecycleState {
+  paidAt: unknown
+  total: number | string
+}
+
+/**
+ * Reste à régler d'une facture, net des avoirs (#877) : `0` pour ce qui n'est
+ * pas une facture émise, pour une facture payée, annulée ou entièrement
+ * avoirée. Une facture payée puis avoirée doit de l'argent au client : ce
+ * remboursement se suit sur l'avoir, pas ici.
+ */
+export function invoiceBalanceDue(invoice: InvoiceBalanceState, creditedTotal: number): number {
+  if (invoice.kind !== 'invoice') return 0
+  if (invoice.status !== 'sent' && invoice.status !== 'overdue') return 0
+  if (invoice.paidAt) return 0
+  return creditableRemaining(Number(invoice.total), creditedTotal)
 }
 
 export interface InvoicePayableState extends InvoiceLifecycleState {

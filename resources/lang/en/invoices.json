@@ -15,7 +15,8 @@
       "sent": "Sent",
       "paid": "Paid",
       "overdue": "Overdue",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "credited": "Credited"
     },
     "colDescription": "Description",
     "colQuantity": "Quantity",
@@ -27,7 +28,15 @@
     "notes": "Notes",
     "legalMentions": "This document was generated electronically. Please retain it for your records.",
     "footer": "Page {page} of {total} - {org}",
-    "payOnline": "Pay online"
+    "payOnline": "Pay online",
+    "titleCreditNote": "Credit note",
+    "creditNoteFor": "Credit note for invoice no. {number} dated {date}",
+    "totalCreditNote": "Credit note total (to deduct)",
+    "creditNoteReason": "Reason for the credit note",
+    "creditNoteStatuses": {
+      "sent": "Issued",
+      "paid": "Refunded"
+    }
   },
   "add": "+ New invoice",
   "addQuote": "+ New quote",
@@ -49,14 +58,16 @@
   },
   "kind": {
     "quote": "Quote",
-    "invoice": "Invoice"
+    "invoice": "Invoice",
+    "credit_note": "Credit note"
   },
   "status": {
     "draft": "Draft",
     "sent": "Sent",
     "paid": "Paid",
     "overdue": "Overdue",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "credited": "Credited"
   },
   "filters": {
     "status": "Status",
@@ -119,7 +130,9 @@
     "convertedFrom": "Created from quote {number}",
     "convertedTo": "Converted to invoice {number}",
     "viewReservation": "View reservation",
-    "paymentMethod": "Payment method"
+    "paymentMethod": "Payment method",
+    "refundedOn": "Refunded on",
+    "refundMethod": "Refund method"
   },
   "actions": {
     "downloadPdf": "Download PDF",
@@ -134,11 +147,13 @@
   "email": {
     "kind": {
       "quote": "quote",
-      "invoice": "invoice"
+      "invoice": "invoice",
+      "credit_note": "the credit note"
     },
     "kindTitle": {
       "quote": "Quote",
-      "invoice": "Invoice"
+      "invoice": "Invoice",
+      "credit_note": "Credit note"
     },
     "subject": "{kindTitle} {number} from {orgName}",
     "text": "Hello,\n\nPlease find attached {kind} no. {number}.\n\nTotal amount: {total}\n\nBest regards,\n{orgName}",
@@ -191,6 +206,43 @@
       "secured": "Payment secured by Stripe. Your card details never go through FleetAi.",
       "invalidTitle": "Invalid payment link",
       "invalidBody": "This link does not match any invoice. Check that it was copied in full, or contact the company that sent it."
+    }
+  },
+  "creditNote": {
+    "status": {
+      "sent": "Issued",
+      "paid": "Refunded"
+    },
+    "issue": "Issue a credit note",
+    "creditFor": "Credit note for invoice {number}",
+    "lockedNotice": "Issued credit note: it can no longer be edited. Only its refund can be recorded here.",
+    "card": {
+      "title": "Credit notes",
+      "empty": "No credit note issued on this invoice.",
+      "hint": "An issued invoice cannot be edited: to fix an amount, grant a discount or cancel the invoice, issue a credit note.",
+      "creditedTotal": "Total credited",
+      "balanceDue": "Balance due",
+      "fullyCredited": "This invoice is fully credited."
+    },
+    "form": {
+      "title": "Issue a credit note",
+      "subtitle": "For invoice {number} — total {total}",
+      "intro": "The credit note takes the client, currency and VAT rate of the invoice. It is issued immediately and gets its own number (AV-…). Remove or adjust lines for a partial credit note.",
+      "reason": "Reason for the credit note",
+      "reasonPlaceholder": "E.g. wrong amount, commercial discount, reservation cancelled…",
+      "remaining": "Amount still creditable: {amount}",
+      "alreadyCredited": "Already credited: {amount}",
+      "exceeds": "The credit note exceeds what remains to be credited on the invoice.",
+      "empty": "The credit note must carry a positive amount.",
+      "submit": "Issue the credit note"
+    },
+    "refund": {
+      "title": "Refund",
+      "description": "A credit note is an issued document: its amounts can no longer be edited. If the client had already paid the invoice, record the refund here.",
+      "paidAt": "Refund date",
+      "paidAtHint": "Leave empty to cancel the recorded refund.",
+      "method": "Refund method",
+      "submit": "Save refund"
     }
   }
 }

@@ -49,6 +49,10 @@ export default class Invoice extends BaseModel {
   @column()
   declare sourceQuoteId: number | null
 
+  /** Avoir (#877) : la facture qu'il corrige. */
+  @column()
+  declare creditedInvoiceId: number | null
+
   /**
    * Jeton opaque de la page publique `/pay/:token` (#876) : il suffit à
    * ouvrir le paiement, il ne sort donc jamais d'une sérialisation — la fiche

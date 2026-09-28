@@ -55,6 +55,8 @@ export const AUDIT_ACTIONS = [
   'online_payments.connect',
   'online_payments.disconnect',
   'invoice.paid_online',
+  // Avoir émis sur une facture (#877).
+  'invoice.credit_note_issued',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]

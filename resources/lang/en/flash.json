@@ -269,7 +269,12 @@
     "quoteFromReservation": "Quote created from the reservation.",
     "locked": "This invoice has been issued: it can no longer be edited. Only its payment can be corrected.",
     "paymentUpdated": "Payment updated.",
-    "cannotEditPayment": "This document's payment cannot be edited."
+    "cannotEditPayment": "This document's payment cannot be edited.",
+    "cannotIssueCreditNote": "A credit note can only be issued on a sent, overdue or paid invoice that is not already fully credited.",
+    "creditNoteIssued": "Credit note issued.",
+    "creditNoteAmount": "The credit note amount must be positive and must not exceed what remains to be credited on the invoice.",
+    "creditNoteLinesRequired": "A credit note was already issued on this invoice: provide the lines of the new credit note.",
+    "creditNoteDelete": "A credit note, or an invoice carrying credit notes, cannot be deleted."
   },
   "rentalContracts": {
     "created": "Rental contract created.",

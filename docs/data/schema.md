@@ -15,7 +15,9 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
   `stripeConnectAccountId` (nullable, unique), `stripeConnectChargesEnabled`,
   `stripeConnectDetailsSubmitted` (booléens, défaut `false`, recopiés de Stripe) —
   les colonnes de facture associées (`payment_token`, `stripe_*`) sont décrites
-  dans [`docs/domain/invoicing.md`](../domain/invoicing.md) §3
+  dans [`docs/domain/invoicing.md`](../domain/invoicing.md) §3 — comme les
+  avoirs (#877) : `invoices.kind = 'credit_note'`, `status = 'credited'` et la
+  FK auto-référente `invoices.credited_invoice_id` (`RESTRICT`)
 
 ### users
 

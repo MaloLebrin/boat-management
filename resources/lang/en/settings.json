@@ -413,7 +413,8 @@
       "billing_addon_set": "Extra boats updated",
       "online_payments_connect": "Stripe account connected",
       "online_payments_disconnect": "Stripe account disconnected",
-      "invoice_paid_online": "Invoice paid online"
+      "invoice_paid_online": "Invoice paid online",
+      "invoice_credit_note_issued": "Credit note issued"
     },
     "empty": {
       "title": "No activity yet",

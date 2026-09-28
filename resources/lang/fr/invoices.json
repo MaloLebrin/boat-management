@@ -15,7 +15,8 @@
       "sent": "Envoyé",
       "paid": "Payé",
       "overdue": "En retard",
-      "cancelled": "Annulé"
+      "cancelled": "Annulé",
+      "credited": "Annulée par avoir"
     },
     "colDescription": "Description",
     "colQuantity": "Quantité",
@@ -27,7 +28,15 @@
     "notes": "Notes",
     "legalMentions": "Ce document a été généré électroniquement. Veuillez le conserver pour vos archives.",
     "footer": "Page {page} sur {total} - {org}",
-    "payOnline": "Payer en ligne"
+    "payOnline": "Payer en ligne",
+    "titleCreditNote": "Avoir",
+    "creditNoteFor": "Avoir sur la facture n° {number} du {date}",
+    "totalCreditNote": "Total de l'avoir (à déduire)",
+    "creditNoteReason": "Motif de l'avoir",
+    "creditNoteStatuses": {
+      "sent": "Émis",
+      "paid": "Remboursé"
+    }
   },
   "add": "+ Nouvelle facture",
   "addQuote": "+ Nouveau devis",
@@ -49,14 +58,16 @@
   },
   "kind": {
     "quote": "Devis",
-    "invoice": "Facture"
+    "invoice": "Facture",
+    "credit_note": "Avoir"
   },
   "status": {
     "draft": "Brouillon",
     "sent": "Envoyé",
     "paid": "Payé",
     "overdue": "En retard",
-    "cancelled": "Annulé"
+    "cancelled": "Annulé",
+    "credited": "Annulée par avoir"
   },
   "filters": {
     "status": "Statut",
@@ -119,7 +130,9 @@
     "convertedFrom": "Créé depuis le devis {number}",
     "convertedTo": "Converti en facture {number}",
     "viewReservation": "Voir la réservation",
-    "paymentMethod": "Moyen de paiement"
+    "paymentMethod": "Moyen de paiement",
+    "refundedOn": "Remboursé le",
+    "refundMethod": "Moyen de remboursement"
   },
   "actions": {
     "downloadPdf": "Télécharger le PDF",
@@ -134,11 +147,13 @@
   "email": {
     "kind": {
       "quote": "le devis",
-      "invoice": "la facture"
+      "invoice": "la facture",
+      "credit_note": "l'avoir"
     },
     "kindTitle": {
       "quote": "Devis",
-      "invoice": "Facture"
+      "invoice": "Facture",
+      "credit_note": "Avoir"
     },
     "subject": "{kindTitle} {number} de {orgName}",
     "text": "Bonjour,\n\nVeuillez trouver ci-joint {kind} n° {number}.\n\nMontant total : {total}\n\nCordialement,\n{orgName}",
@@ -191,6 +206,43 @@
       "secured": "Paiement sécurisé par Stripe. Vos coordonnées bancaires ne transitent pas par FleetAi.",
       "invalidTitle": "Lien de paiement invalide",
       "invalidBody": "Ce lien ne correspond à aucune facture. Vérifiez qu'il a été copié en entier, ou contactez l'entreprise qui vous l'a envoyé."
+    }
+  },
+  "creditNote": {
+    "status": {
+      "sent": "Émis",
+      "paid": "Remboursé"
+    },
+    "issue": "Émettre un avoir",
+    "creditFor": "Avoir sur la facture {number}",
+    "lockedNotice": "Avoir émis : il n'est plus modifiable. Seul son remboursement se saisit ici.",
+    "card": {
+      "title": "Avoirs",
+      "empty": "Aucun avoir émis sur cette facture.",
+      "hint": "Une facture émise ne se modifie pas : pour corriger un montant, accorder une remise ou annuler la facture, émettez un avoir.",
+      "creditedTotal": "Total des avoirs",
+      "balanceDue": "Reste à régler",
+      "fullyCredited": "Cette facture est entièrement annulée par avoir."
+    },
+    "form": {
+      "title": "Émettre un avoir",
+      "subtitle": "Sur la facture {number} — total {total}",
+      "intro": "L'avoir reprend le client, la devise et le taux de TVA de la facture. Il est émis immédiatement et reçoit son propre numéro (AV-…). Retirez ou ajustez les lignes pour un avoir partiel.",
+      "reason": "Motif de l'avoir",
+      "reasonPlaceholder": "Ex. : erreur de montant, remise commerciale, annulation de la réservation…",
+      "remaining": "Montant encore créditable : {amount}",
+      "alreadyCredited": "Déjà crédité par avoir : {amount}",
+      "exceeds": "Le montant de l'avoir dépasse ce qui reste à créditer sur la facture.",
+      "empty": "L'avoir doit porter un montant positif.",
+      "submit": "Émettre l'avoir"
+    },
+    "refund": {
+      "title": "Remboursement",
+      "description": "Un avoir est une pièce émise : ses montants ne se modifient plus. Si le client avait déjà réglé la facture, enregistrez ici son remboursement.",
+      "paidAt": "Date du remboursement",
+      "paidAtHint": "Laissez vide pour annuler le remboursement enregistré.",
+      "method": "Moyen de remboursement",
+      "submit": "Enregistrer le remboursement"
     }
   }
 }

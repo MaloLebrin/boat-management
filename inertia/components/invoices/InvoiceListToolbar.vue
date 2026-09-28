@@ -36,11 +36,13 @@ const statusOptions: Array<{ label: string; value: InvoiceStatus }> = [
   { label: t('invoices.status.paid'), value: 'paid' },
   { label: t('invoices.status.overdue'), value: 'overdue' },
   { label: t('invoices.status.cancelled'), value: 'cancelled' },
+  { label: t('invoices.status.credited'), value: 'credited' },
 ]
 
 const kindOptions: Array<{ label: string; value: InvoiceKind }> = [
   { label: t('invoices.kind.quote'), value: 'quote' },
   { label: t('invoices.kind.invoice'), value: 'invoice' },
+  { label: t('invoices.kind.credit_note'), value: 'credit_note' },
 ]
 
 const clientSelectOptions = props.clientOptions.map((c) => ({

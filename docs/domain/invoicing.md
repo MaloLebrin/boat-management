@@ -77,29 +77,30 @@ Deux principes structurants :
 
 Devis **et** factures partagent la même table, discriminés par `kind`.
 
-| Colonne                      | Type                                                | Notes                                                                                                           |
-| ---------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `organization_id`            | FK organisations, `CASCADE`                         | Scope obligatoire                                                                                               |
-| `client_id`                  | FK clients, **`SET NULL`**, nullable                | Le document survit à la suppression du client                                                                   |
-| `reservation_id`             | FK boat_reservations, **`SET NULL`**, nullable      | Lien vers la réservation d'origine (#288)                                                                       |
-| `source_quote_id`            | FK **auto-référente** invoices, `SET NULL`, indexée | Facture ← devis converti (#287)                                                                                 |
-| `kind`                       | enum `quote` / `invoice`                            | **Figé après création**                                                                                         |
-| `number`                     | string                                              | `DEV-000001` / `FAC-000001` (voir §4)                                                                           |
-| `client_name`                | string, nullable                                    | **Snapshot** dénormalisé (lisible même sans FK)                                                                 |
-| `status`                     | enum `draft`/`sent`/`paid`/`overdue`/`cancelled`    | Défaut `draft` (voir §6)                                                                                        |
-| `issued_at`                  | date                                                | Date d'émission                                                                                                 |
-| `due_at`                     | date, nullable                                      | Échéance (base du calcul `overdue`)                                                                             |
-| `paid_at`                    | date, nullable                                      | Date de paiement (#287) — **⇔ `status = 'paid'`** (#717)                                                        |
-| `payment_method`             | string(20), nullable                                | Moyen de règlement : `cash`/`card`/`transfer`/`check`/`other` (#717), `online` posé par Stripe seulement (#876) |
-| `payment_token`              | string(64), nullable, unique                        | Jeton opaque de `/pay/:token` (#876), jamais sérialisé                                                          |
-| `stripe_checkout_session_id` | string, nullable                                    | Dernière session Checkout ouverte (#876)                                                                        |
-| `stripe_payment_intent_id`   | string, nullable                                    | Paiement Stripe qui a réglé la facture (#876)                                                                   |
-| `subtotal`                   | decimal(10,2)                                       | Recalculé serveur                                                                                               |
-| `tax_rate`                   | decimal(5,2)                                        | Pourcentage TVA (0–100)                                                                                         |
-| `tax_amount`                 | decimal(10,2)                                       | Recalculé serveur                                                                                               |
-| `total`                      | decimal(10,2)                                       | Recalculé serveur                                                                                               |
-| `currency`                   | string(3), défaut `EUR`                             | Champ libre                                                                                                     |
-| `notes`                      | text, nullable                                      |                                                                                                                 |
+| Colonne                      | Type                                                   | Notes                                                                                                           |
+| ---------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `organization_id`            | FK organisations, `CASCADE`                            | Scope obligatoire                                                                                               |
+| `client_id`                  | FK clients, **`SET NULL`**, nullable                   | Le document survit à la suppression du client                                                                   |
+| `reservation_id`             | FK boat_reservations, **`SET NULL`**, nullable         | Lien vers la réservation d'origine (#288)                                                                       |
+| `source_quote_id`            | FK **auto-référente** invoices, `SET NULL`, indexée    | Facture ← devis converti (#287)                                                                                 |
+| `credited_invoice_id`        | FK **auto-référente** invoices, `RESTRICT`, indexée    | Avoir → facture qu'il corrige (#877)                                                                            |
+| `kind`                       | `quote` / `invoice` / `credit_note` (#877)             | **Figé après création**                                                                                         |
+| `number`                     | string                                                 | `DEV-000001` / `FAC-000001` / `AV-000001` (voir §4)                                                             |
+| `client_name`                | string, nullable                                       | **Snapshot** dénormalisé (lisible même sans FK)                                                                 |
+| `status`                     | `draft`/`sent`/`paid`/`overdue`/`cancelled`/`credited` | Défaut `draft` (voir §6) ; `credited` = entièrement avoirée (#877)                                              |
+| `issued_at`                  | date                                                   | Date d'émission                                                                                                 |
+| `due_at`                     | date, nullable                                         | Échéance (base du calcul `overdue`)                                                                             |
+| `paid_at`                    | date, nullable                                         | Date de paiement (#287) — **⇔ `status = 'paid'`** (#717), sauf facture `credited` qui garde le sien (#877)      |
+| `payment_method`             | string(20), nullable                                   | Moyen de règlement : `cash`/`card`/`transfer`/`check`/`other` (#717), `online` posé par Stripe seulement (#876) |
+| `payment_token`              | string(64), nullable, unique                           | Jeton opaque de `/pay/:token` (#876), jamais sérialisé                                                          |
+| `stripe_checkout_session_id` | string, nullable                                       | Dernière session Checkout ouverte (#876)                                                                        |
+| `stripe_payment_intent_id`   | string, nullable                                       | Paiement Stripe qui a réglé la facture (#876)                                                                   |
+| `subtotal`                   | decimal(10,2)                                          | Recalculé serveur                                                                                               |
+| `tax_rate`                   | decimal(5,2)                                           | Pourcentage TVA (0–100)                                                                                         |
+| `tax_amount`                 | decimal(10,2)                                          | Recalculé serveur                                                                                               |
+| `total`                      | decimal(10,2)                                          | Recalculé serveur                                                                                               |
+| `currency`                   | string(3), défaut `EUR`                                | Champ libre                                                                                                     |
+| `notes`                      | text, nullable                                         |                                                                                                                 |
 
 Contraintes : `UNIQUE(organization_id, kind, number)` + index
 `(organization_id, kind, status)` et `(organization_id, issued_at)`.
@@ -123,11 +124,11 @@ Contraintes : `UNIQUE(organization_id, kind, number)` + index
 
 Compteur de numérotation, une ligne par `(organisation, kind)`.
 
-| Colonne           | Type          | Notes                 |
-| ----------------- | ------------- | --------------------- |
-| `organization_id` | FK, `CASCADE` |                       |
-| `kind`            | string        | `quote` / `invoice`   |
-| `last_number`     | int, défaut 0 | Dernier numéro alloué |
+| Colonne           | Type          | Notes                               |
+| ----------------- | ------------- | ----------------------------------- |
+| `organization_id` | FK, `CASCADE` |                                     |
+| `kind`            | string        | `quote` / `invoice` / `credit_note` |
+| `last_number`     | int, défaut 0 | Dernier numéro alloué               |
 
 Contrainte : `UNIQUE(organization_id, kind)`.
 
@@ -137,7 +138,8 @@ Contrainte : `UNIQUE(organization_id, kind)`.
 
 Objectif : des numéros **contigus** (aucun trou), **indépendants par type**, sans
 remise à zéro annuelle. Réalisé dans **la même transaction** que l'insert du
-document (`InvoiceService.#allocateNumber`) :
+document (`InvoiceService.allocateNumber`, public depuis #877 : le service des
+avoirs l'appelle dans sa propre transaction) :
 
 1. **Garantir la ligne compteur** : `INSERT ... ON CONFLICT (organization_id,
 kind) DO NOTHING` (absorbe la course à la toute première création).
@@ -145,11 +147,11 @@ kind) DO NOTHING` (absorbe la course à la toute première création).
    compteur → sérialise les allocations concurrentes (pas de lecture obsolète
    comme un `MAX(number)+1`).
 3. `number = PREFIX[kind] + String(last_number + 1).padStart(6, '0')` avec
-   `PREFIX = { quote: 'DEV-', invoice: 'FAC-' }`.
+   `PREFIX = { quote: 'DEV-', invoice: 'FAC-', credit_note: 'AV-' }`.
 
 Comme le compteur et le document sont dans la **même transaction**, un rollback
-annule aussi l'incrément : **aucun numéro n'est « brûlé »**. Les séquences devis
-et factures sont totalement indépendantes.
+annule aussi l'incrément : **aucun numéro n'est « brûlé »**. Les séquences devis,
+factures et avoirs sont totalement indépendantes.
 
 ---
 
@@ -184,13 +186,14 @@ Statuts : `draft` → `sent` → `paid`, avec `overdue` (retard) et `cancelled`
    quote (kind=quote) ──(convert)──▶ nouvelle invoice (kind=invoice, source_quote_id)
 ```
 
-| Transition                  | Déclencheur                        | Règles / gardes                                                                                                                                                                                                       |
-| --------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Envoi** (#286)            | `POST /invoices/:id/send`          | `draft → sent` uniquement (payée/annulée non rétrogradée) ; refuse si le client n'a pas d'email                                                                                                                       |
-| **Conversion** (#287)       | `POST /invoices/:id/convert`       | Uniquement un `quote` (`NotAQuoteError`), une seule fois (`QuoteAlreadyConvertedError`). Crée une **nouvelle** facture `FAC-`, recopie client/réservation/lignes/TVA/notes, `status=draft`, `source_quote_id` = devis |
-| **Paiement** (#287)         | `POST /invoices/:id/pay`           | Uniquement une `invoice` non annulée (`CannotMarkPaidError`) → `status=paid`, `paid_at` horodaté                                                                                                                      |
-| **Retard auto** (#287)      | Job planifié `MarkOverdueInvoices` | Bascule en `overdue` toute facture `sent`, non payée, `due_at` dépassée. Idempotent                                                                                                                                   |
-| **Paiement corrigé** (#717) | `PATCH /invoices/:id/payment`      | Facture émise non annulée (`CannotEditPaymentError`). Écrit **uniquement** `paid_at` + `payment_method` ; une date posée règle la facture, une date effacée la remet à `sent`                                         |
+| Transition                  | Déclencheur                        | Règles / gardes                                                                                                                                                                                                          |
+| --------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Envoi** (#286)            | `POST /invoices/:id/send`          | `draft → sent` uniquement (payée/annulée non rétrogradée) ; refuse si le client n'a pas d'email                                                                                                                          |
+| **Conversion** (#287)       | `POST /invoices/:id/convert`       | Uniquement un `quote` (`NotAQuoteError`), une seule fois (`QuoteAlreadyConvertedError`). Crée une **nouvelle** facture `FAC-`, recopie client/réservation/lignes/TVA/notes, `status=draft`, `source_quote_id` = devis    |
+| **Paiement** (#287)         | `POST /invoices/:id/pay`           | Uniquement une `invoice` non annulée (`CannotMarkPaidError`) → `status=paid`, `paid_at` horodaté                                                                                                                         |
+| **Retard auto** (#287)      | Job planifié `MarkOverdueInvoices` | Bascule en `overdue` toute facture `sent`, non payée, `due_at` dépassée. Idempotent                                                                                                                                      |
+| **Paiement corrigé** (#717) | `PATCH /invoices/:id/payment`      | Facture émise ni annulée ni avoirée (`CannotEditPaymentError`). Écrit **uniquement** `paid_at` + `payment_method` ; une date posée règle la facture, une date effacée la remet à `sent`. Sur un avoir : le remboursement |
+| **Avoir** (#877)            | `POST /invoices/:id/credit-notes`  | Facture `sent`/`overdue`/`paid`. Crée un avoir `AV-` (`sent`) ; la facture passe à `credited` quand la somme des avoirs atteint son total — voir §7 ter                                                                  |
 
 ### Verrouillage d'une facture émise (#717)
 
@@ -205,6 +208,8 @@ son statut ne se réécrivent.
 | Facture `draft`                           | ✅               | ❌ (le formulaire suffit) |
 | Facture `sent` / `paid` / `overdue`       | ❌               | ✅                        |
 | Facture `cancelled`                       | ❌               | ❌ (rien à encaisser)     |
+| Facture `credited` (#877)                 | ❌               | ❌ (soldée par avoir)     |
+| Avoir (`credit_note`, #877)               | ❌               | ✅ (le remboursement)     |
 
 - `GET /invoices/:id/edit` sur une facture émise **redirige** vers sa fiche avec
   un flash (`flash.invoices.locked`) ; le bouton « Modifier » disparaît de la
@@ -310,6 +315,49 @@ propose selon le compte : SEPA…) sans compte FleetAi.
 
 ---
 
+## 7 ter. Avoirs (#877)
+
+Une facture émise est figée (#717) : on ne la corrige pas, on émet un **avoir**
+(note de crédit) qui l'annule en tout ou partie. Logique dans
+`CreditNoteService` (`app/services/credit_note_service.ts`), écran
+`invoices/credit_note` (`GET /invoices/:id/credit-note`), émission
+`POST /invoices/:id/credit-notes` (`CreditNotesController`, capacité
+`invoices.create`, module CRM & Facturation requis).
+
+- **Même table** : un avoir est une ligne `invoices` `kind = 'credit_note'`,
+  liée à sa facture par `credited_invoice_id` (`RESTRICT`), numérotée dans sa
+  propre séquence `AV-000001`. Il hérite du client, de la réservation, de la
+  devise et du **taux de TVA** de la facture ; le motif (obligatoire) est porté
+  par `notes`.
+- **Montants positifs** : c'est la nature de la pièce qui les retranche (PDF :
+  « Total de l'avoir (à déduire) »). Pas de montant négatif dans
+  `invoice_lines`.
+- **Avoir total ou partiel** : sans `lines`, l'avoir reprend les lignes de la
+  facture en miroir — refusé si un avoir existe déjà
+  (`CreditNoteLinesRequiredError`). Avec `lines`, avoir partiel. Dans les deux
+  cas `Σ avoirs ≤ total` de la facture, comparé au centime
+  (`CreditNoteAmountError`) ; la facture est verrouillée `FOR UPDATE` pendant
+  l'émission, deux avoirs simultanés ne dépassent pas le reste.
+- **Statuts** : l'avoir naît `sent` (lu « Émis ») — jamais brouillon. Son
+  « paiement » (`PATCH /invoices/:id/payment`) est le **remboursement** du
+  client (`paid`, lu « Remboursé »). La facture passe à **`credited`** quand
+  la somme des avoirs atteint son total : elle n'encaisse plus rien, et une
+  facture payée puis avoirée **garde son `paid_at`** — seule exception à
+  l'invariant `paid_at ⇔ paid`, le remboursement se suivant sur l'avoir.
+- **Reste à régler** (`invoiceBalanceDue`, `shared/helpers/invoice_lifecycle.ts`)
+  = `total − Σ avoirs` pour une facture `sent`/`overdue` non payée, `0`
+  sinon. Exposé sur la fiche (`creditNotes`, `creditedTotal`, `balanceDue` de
+  `InvoiceDetail`) et utilisé par le **paiement en ligne** (§7 bis) : la page
+  `/pay/:token` et la session Checkout portent le reste, pas le total.
+- **Indélébiles** : un avoir, et une facture qui en porte, ne se suppriment
+  pas (`CreditNoteDeleteError`) ; un avoir ne s'édite pas (`isIssuedInvoice`).
+- **Tableau de bord** : l'encours et les impayés sont **nets des avoirs** ;
+  l'encaissé du mois retranche les avoirs remboursés depuis le 1er.
+- **Journal** : `invoice.credit_note_issued` (entité = la facture, metadata :
+  numéro de l'avoir, montant, avoir total ou non).
+
+---
+
 ## 8. Devis depuis une réservation (#288)
 
 Raccourci métier : générer un devis pré-rempli depuis une réservation.
@@ -391,6 +439,8 @@ Toutes sous `middleware.auth()`, préfixe `/invoices` (voir `start/routes/invoic
 | `PUT /invoices/:id`                              | `update`                | Modifier (jamais `number`/`kind`, refusé sur une facture émise #717) |
 | `DELETE /invoices/:id`                           | `destroy`               | Supprimer (admin uniquement)                                         |
 | `POST /invoices/:id/payment-link`                | `createPaymentLink`     | Poser le lien de paiement en ligne (#876)                            |
+| `GET /invoices/:id/credit-note`                  | `CreditNotes.create`    | Écran d'émission d'un avoir (#877)                                   |
+| `POST /invoices/:id/credit-notes`                | `CreditNotes.store`     | Émettre un avoir (#877)                                              |
 
 Routes publiques du paiement en ligne (#876, sans login, throttle
 `invoice_payment`) : `GET /pay/:token` et `POST /pay/:token/checkout`
@@ -407,10 +457,12 @@ frontend utilise `router.*` / `<Form>` (conventions Inertia du projet).
 
 - Namespace **`invoices`** (`resources/lang/{en,fr}/invoices.json`) : `pdf.*`,
   `status.*`, `kind.*`, `columns.*`, `filters.*`, `fields.*`, `lines.*`,
-  `totals.*`, `show.*`, `actions.*`, `fromReservation.*`.
+  `totals.*`, `show.*`, `actions.*`, `fromReservation.*`, `creditNote.*` (#877).
 - Namespace **`flash`** (backend) : `flash.invoices.{created,updated,deleted,
 notFound,sent,noClientEmail,converted,notAQuote,alreadyConverted,paid,
-cannotMarkPaid,quoteFromReservation}` + `flash.quota.invoicesExceeded`.
+cannotMarkPaid,quoteFromReservation}` + avoirs (#877) `flash.invoices.{
+cannotIssueCreditNote,creditNoteIssued,creditNoteAmount,creditNoteLinesRequired,
+creditNoteDelete}` + `flash.quota.invoicesExceeded`.
 - Côté réservations : `reservations.actions.createQuote`,
   `reservations.columns.documents`.
 - Toutes les clés sont présentes dans **les deux locales** (`en` + `fr`).
@@ -419,23 +471,24 @@ cannotMarkPaid,quoteFromReservation}` + `flash.quota.invoicesExceeded`.
 
 ## 12. Fichiers clés
 
-| Rôle              | Fichier                                                                          |
-| ----------------- | -------------------------------------------------------------------------------- |
-| Contrôleur        | `app/controllers/invoices_controller.ts`                                         |
-| Service (métier)  | `app/services/invoice_service.ts`                                                |
-| Service PDF       | `app/services/invoice_pdf_service.ts`                                            |
-| Job email         | `app/jobs/send_invoice_email.ts`                                                 |
-| Job retard        | `app/jobs/mark_overdue_invoices.ts`                                              |
-| Enfilement email  | `app/services/email_queue_service.ts` (`sendInvoice`)                            |
-| Cœur pur (totaux) | `shared/helpers/invoice_totals.ts`                                               |
-| Modèles           | `app/models/invoice.ts`, `invoice_line.ts`, `invoice_counter.ts`                 |
-| Types partagés    | `shared/types/invoice.ts`                                                        |
-| Validators        | `app/validators/invoice.ts`                                                      |
-| Transformers      | `app/transformers/invoice_transformer.ts`                                        |
-| Erreurs métier    | `app/exceptions/invoice_errors.ts`                                               |
-| Policy (ACL)      | `app/policies/invoice_policy.ts`                                                 |
-| Routes            | `start/routes/invoices.ts`                                                       |
-| Frontend          | `inertia/pages/invoices/{index,form,show}.vue` + `inertia/components/invoices/*` |
+| Rôle              | Fichier                                                                                      |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| Contrôleur        | `app/controllers/invoices_controller.ts`                                                     |
+| Service (métier)  | `app/services/invoice_service.ts`                                                            |
+| Avoirs (#877)     | `app/services/credit_note_service.ts`, `app/controllers/credit_notes_controller.ts`          |
+| Service PDF       | `app/services/invoice_pdf_service.ts`                                                        |
+| Job email         | `app/jobs/send_invoice_email.ts`                                                             |
+| Job retard        | `app/jobs/mark_overdue_invoices.ts`                                                          |
+| Enfilement email  | `app/services/email_queue_service.ts` (`sendInvoice`)                                        |
+| Cœur pur (totaux) | `shared/helpers/invoice_totals.ts`                                                           |
+| Modèles           | `app/models/invoice.ts`, `invoice_line.ts`, `invoice_counter.ts`                             |
+| Types partagés    | `shared/types/invoice.ts`                                                                    |
+| Validators        | `app/validators/invoice.ts`                                                                  |
+| Transformers      | `app/transformers/invoice_transformer.ts`                                                    |
+| Erreurs métier    | `app/exceptions/invoice_errors.ts`                                                           |
+| Policy (ACL)      | `app/policies/invoice_policy.ts`                                                             |
+| Routes            | `start/routes/invoices.ts`                                                                   |
+| Frontend          | `inertia/pages/invoices/{index,form,show,credit_note}.vue` + `inertia/components/invoices/*` |
 
 ---
 
@@ -461,10 +514,15 @@ cannotMarkPaid,quoteFromReservation}` + `flash.quota.invoicesExceeded`.
     sur devis/annulée, IDOR.
   - `invoice_from_reservation.spec.ts` — pré-remplissage, résolution client par
     email, lien bidirectionnel, gating.
+  - `credit_notes.spec.ts` — avoirs (#877) : total/partiel, numérotation `AV-`,
+    plafond, pièces refusées, rôles, module, PDF, remboursement, suppression
+    refusée, tableau de bord net des avoirs.
 - **Front (Vitest)** : `tests/inertia/invoice_show_actions.spec.ts` (boutons
   convertir/payer, bouton « Modifier » masqué sur une facture émise),
   `invoice_payment_card.spec.ts` (bloc paiement → `router.patch`),
-  `fleet_reservation_list.spec.ts` (boutons convertir/payer/créer-devis + liens).
+  `fleet_reservation_list.spec.ts` (boutons convertir/payer/créer-devis + liens),
+  `invoice_credit_notes.spec.ts` (bloc « Avoirs », écran d'émission, badge,
+  fiche d'un avoir — #877).
 
 ---
 
@@ -475,12 +533,13 @@ cannotMarkPaid,quoteFromReservation}` + `flash.quota.invoicesExceeded`.
 - Relance email automatique des factures en retard (`overdue`) — évoquée comme
   optionnelle en #287, non implémentée.
 - Paiement en ligne (#876) — non couverts : remboursement (`charge.refunded`) —
-  il se fait dans le tableau de bord Stripe du loueur, la facture reste payée
-  jusqu'à un avoir (#877) ; commission FleetAi (`application_fee`, 0 %) ;
+  il se fait dans le tableau de bord Stripe du loueur, puis se saisit comme
+  remboursement de l'avoir (#877) ; commission FleetAi (`application_fee`, 0 %) ;
   paiement en ligne de l'acompte/solde d'une **réservation** et caution en
   pré-autorisation — facturer la réservation donne déjà un lien de paiement.
-- **Avoir (note de crédit)** : la voie comptable pour corriger une facture émise,
-  désormais figée (#717). Aujourd'hui, une erreur de montant sur une facture
-  envoyée ne se rattrape que par une annulation suivie d'une nouvelle facture.
+- Avoirs (#877) — non couverts : e-mail dédié (l'envoi réutilise le gabarit
+  des factures, libellé « l'avoir ») ; proposition automatique d'un avoir à
+  l'annulation d'une réservation facturée ; remboursement Stripe déclenché
+  depuis FleetAi ; export comptable (FEC), qui devra inclure les avoirs.
 - Statuts en machine à états stricte : `status` reste librement settable via
   `update` sur les devis et les brouillons, en dehors des transitions dédiées.

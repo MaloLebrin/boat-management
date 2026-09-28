@@ -40,6 +40,7 @@ export const controllers = {
   ClientMedia: () => import('#controllers/client_media_controller'),
   Clients: () => import('#controllers/clients_controller'),
   ContactMessages: () => import('#controllers/contact_messages_controller'),
+  CreditNotes: () => import('#controllers/credit_notes_controller'),
   CrewCertifications: () => import('#controllers/crew_certifications_controller'),
   CrewMembers: () => import('#controllers/crew_members_controller'),
   CrewRolePdf: () => import('#controllers/crew_role_pdf_controller'),

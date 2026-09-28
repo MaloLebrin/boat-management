@@ -1257,8 +1257,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Une facture émise est figée, seul son paiement se corrige',
     },
     body: {
-      en: 'Once an invoice leaves the draft status — sent, paid, overdue or cancelled — it becomes an accounting document and can no longer be rewritten: not its lines or amounts, not its number, not its issue date, not its status. The Edit button disappears from the document page and the list. Only the payment date and the payment method (cash, card, bank transfer, cheque, other) can still be corrected, from the Payment block on the invoice page; setting a date marks the invoice paid, clearing it puts the invoice back to sent. A cancelled invoice has no payment to correct. Quotes, and invoices still in draft, stay fully editable. To correct an amount on an issued invoice, issue a new document rather than rewriting it.',
-      fr: 'Dès qu’une facture quitte le brouillon — envoyée, payée, en retard ou annulée — elle devient une pièce comptable et ne se réécrit plus : ni ses lignes ou ses montants, ni son numéro, ni sa date d’émission, ni son statut. Le bouton Modifier disparaît de la fiche et de la liste. Seuls la date et le moyen de paiement (espèces, carte, virement, chèque, autre) restent corrigeables, depuis le bloc Paiement de la fiche ; poser une date règle la facture, l’effacer la remet à envoyée. Une facture annulée n’a aucun paiement à corriger. Les devis, et les factures encore en brouillon, restent librement modifiables. Pour corriger un montant sur une facture émise, émettez un nouveau document plutôt que de la réécrire.',
+      en: 'Once an invoice leaves the draft status — sent, paid, overdue or cancelled — it becomes an accounting document and can no longer be rewritten: not its lines or amounts, not its number, not its issue date, not its status. The Edit button disappears from the document page and the list. Only the payment date and the payment method (cash, card, bank transfer, cheque, other) can still be corrected, from the Payment block on the invoice page; setting a date marks the invoice paid, clearing it puts the invoice back to sent. A cancelled invoice has no payment to correct. Quotes, and invoices still in draft, stay fully editable. To correct an amount on an issued invoice, issue a credit note from its page.',
+      fr: 'Dès qu’une facture quitte le brouillon — envoyée, payée, en retard ou annulée — elle devient une pièce comptable et ne se réécrit plus : ni ses lignes ou ses montants, ni son numéro, ni sa date d’émission, ni son statut. Le bouton Modifier disparaît de la fiche et de la liste. Seuls la date et le moyen de paiement (espèces, carte, virement, chèque, autre) restent corrigeables, depuis le bloc Paiement de la fiche ; poser une date règle la facture, l’effacer la remet à envoyée. Une facture annulée n’a aucun paiement à corriger. Les devis, et les factures encore en brouillon, restent librement modifiables. Pour corriger un montant sur une facture émise, émettez un avoir depuis sa fiche.',
     },
     keywords: [
       'facture emise',
@@ -1285,8 +1285,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Paiement en ligne des factures avec Stripe',
     },
     body: {
-      en: 'An admin connects the organization’s own Stripe account from Settings → Billing (“Connect my Stripe account”); the money goes straight to that account, never through FleetAi. Once Stripe activates it, every invoice sent by email carries a “Pay online” button, also printed on the PDF. The customer pays by card from a public page, without an account. As soon as Stripe confirms, the invoice switches to paid with the “Online (Stripe)” method, and admins are notified. An invoice sent earlier gets its link from the Online payment block of its page. Refunds are handled in Stripe.',
-      fr: 'Un admin connecte le compte Stripe de l’organisation depuis Paramètres → Facturation (« Connecter mon compte Stripe ») ; l’argent arrive directement sur ce compte, jamais chez FleetAi. Une fois le compte activé par Stripe, chaque facture envoyée par e-mail porte un bouton « Payer en ligne », repris dans le PDF. Le client paie par carte depuis une page publique, sans compte. Dès que Stripe confirme, la facture passe à payée avec le moyen « En ligne (Stripe) » et les admins sont notifiés. Une facture envoyée avant obtient son lien depuis le bloc Paiement en ligne de sa fiche. Les remboursements se font dans Stripe.',
+      en: 'An admin connects the organization’s own Stripe account from Settings → Billing (“Connect my Stripe account”); the money goes straight to that account, never through FleetAi. Once Stripe activates it, every invoice sent by email carries a “Pay online” button, also printed on the PDF. The customer pays by card from a public page, without an account. As soon as Stripe confirms, the invoice switches to paid with the “Online (Stripe)” method, and admins are notified. An invoice sent earlier gets its link from the Online payment block of its page. Refunds are handled in Stripe, then recorded on a credit note; a partially credited invoice is charged its balance only.',
+      fr: 'Un admin connecte le compte Stripe de l’organisation depuis Paramètres → Facturation (« Connecter mon compte Stripe ») ; l’argent arrive directement sur ce compte, jamais chez FleetAi. Une fois le compte activé par Stripe, chaque facture envoyée par e-mail porte un bouton « Payer en ligne », repris dans le PDF. Le client paie par carte depuis une page publique, sans compte. Dès que Stripe confirme, la facture passe à payée avec le moyen « En ligne (Stripe) » et les admins sont notifiés. Une facture envoyée avant obtient son lien depuis le bloc Paiement en ligne de sa fiche. Les remboursements se font dans Stripe, puis se saisissent sur un avoir ; une facture partiellement avoirée n’est payée que pour son reste.',
     },
     keywords: [
       'paiement en ligne',
@@ -1304,6 +1304,35 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'invoice',
     ],
     navTarget: 'settings.billing',
+    planFlag: 'canManageInvoices',
+  },
+  {
+    id: 'invoice-credit-note',
+    title: {
+      en: 'Credit notes: correcting an issued invoice',
+      fr: 'Avoirs : corriger une facture émise',
+    },
+    body: {
+      en: 'An issued invoice cannot be edited: to fix an amount, grant a late discount or cancel it, open the invoice and click “Issue a credit note” in the Credit notes block. The form takes the invoice lines (full credit note); remove or adjust lines for a partial one, and give a reason. The credit note keeps the client, currency and VAT rate, gets its own number (AV-000001…) and never exceeds what remains of the invoice; once fully credited, the invoice becomes “Credited”. The invoice page shows the balance due net of credit notes, also charged by online payment. Record a refund on the credit note itself. Credit notes have their own PDF and cannot be deleted.',
+      fr: 'Une facture émise ne se modifie pas : pour corriger un montant, accorder une remise après coup ou l’annuler, ouvrez la facture et cliquez « Émettre un avoir » dans le bloc Avoirs. Le formulaire reprend ses lignes (avoir total) ; retirez-en ou ajustez-les pour un avoir partiel, et indiquez un motif. L’avoir garde client, devise et TVA, reçoit son numéro (AV-000001…) et ne dépasse jamais le reste de la facture ; soldée, celle-ci passe à « Annulée par avoir ». La fiche montre le reste à régler net des avoirs, aussi demandé en paiement en ligne. Le remboursement se saisit sur l’avoir. Un avoir a son PDF et ne se supprime pas.',
+    },
+    keywords: [
+      'avoir',
+      'avoirs',
+      'credit note',
+      'note de credit',
+      'annuler une facture',
+      'cancel invoice',
+      'corriger une facture',
+      'correct invoice',
+      'remise',
+      'discount',
+      'remboursement',
+      'refund',
+      'reste a regler',
+      'balance due',
+    ],
+    navTarget: 'invoices.index',
     planFlag: 'canManageInvoices',
   },
   {
