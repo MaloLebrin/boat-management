@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
 import BudgetService from '#services/budget_service'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatFuelLogFactory } from '#database/factories/boat_fuel_log_factory'
@@ -86,5 +87,59 @@ test.group('BudgetService — périmètre multi-bateaux (#832)', () => {
     )
     assert.isNull(two.singleBoatId)
     assert.isNull(two.previousYearToDate)
+  })
+})
+
+test.group('BudgetService — entretien prévu ce trimestre (#868)', () => {
+  test('sums the estimates of open tasks due by the end of the quarter, overdue included', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    // 15 août 2026 : troisième trimestre, jusqu'au 30 septembre.
+    const now = DateTime.fromObject({ year: 2026, month: 8, day: 15 })
+
+    const task = (dueAt: string | null, estimatedCost: string | null, status = 'open') =>
+      BoatMaintenanceTask.create({
+        boatId: boat.id,
+        subject: 'boat',
+        title: `Tâche ${dueAt}`,
+        status,
+        dueAt: dueAt ? DateTime.fromISO(dueAt) : null,
+        estimatedCost,
+      })
+    await task('2026-06-01', '100.50') // en retard : compte
+    await task('2026-09-30', '400') // dernier jour du trimestre : compte
+    await task('2026-09-10', null) // sans estimation
+    await task('2026-10-01', '999') // trimestre suivant : ignorée
+    await task('2026-08-20', '777', 'done') // close : ignorée
+    await task(null, '555') // non datée : ignorée
+
+    const summary = await new BudgetService().getPlannedMaintenance([boat.id], now)
+
+    assert.deepEqual(summary, {
+      year: 2026,
+      quarter: 3,
+      amount: 500.5,
+      estimatedCount: 2,
+      unestimatedCount: 1,
+    })
+
+    const dashboard = await new BudgetService().getOrgSpendSummary([boat.id], now)
+    assert.equal(dashboard.plannedMaintenance.amount, 500.5)
+  })
+
+  test('is empty without boats', async ({ assert }) => {
+    const summary = await new BudgetService().getPlannedMaintenance(
+      [],
+      DateTime.fromObject({ year: 2026, month: 1, day: 2 })
+    )
+    assert.deepEqual(summary, {
+      year: 2026,
+      quarter: 1,
+      amount: 0,
+      estimatedCount: 0,
+      unestimatedCount: 0,
+    })
   })
 })

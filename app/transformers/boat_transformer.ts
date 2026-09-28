@@ -25,6 +25,7 @@ import type { BoatOwnerBoatSummary } from '#shared/types/boat'
 import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { SafetyComplianceReport } from '#shared/types/safety'
 import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_transformer'
+import { toMaintenanceTaskWorkOrder } from '#transformers/maintenance_transformer'
 
 /**
  * Le squelette de la fiche bateau : tout ce qui est rendu avant que les données
@@ -441,6 +442,7 @@ function toMaintenanceTask(t: BoatMaintenanceTask) {
     recurrenceIntervalMonths: t.recurrenceIntervalMonths,
     recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
     postponedCount: t.postponedCount ?? 0,
+    ...toMaintenanceTaskWorkOrder(t),
   }
 }
 

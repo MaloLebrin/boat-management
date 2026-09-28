@@ -934,6 +934,10 @@ export class BoatMaintenanceSheetSchema extends BaseModel {
 
 export class BoatMaintenanceTaskSchema extends BaseModel {
   static $columns = [
+    'actualCost',
+    'actualDurationMinutes',
+    'assignedAt',
+    'assigneeId',
     'boatEngineId',
     'boatGenericEquipmentId',
     'boatId',
@@ -946,10 +950,13 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
     'doneEngineHours',
     'dueAt',
     'dueEngineHours',
+    'estimatedCost',
+    'estimatedDurationMinutes',
     'id',
     'lastDoneEngineHours',
     'notes',
     'postponedCount',
+    'providerName',
     'recurrenceIntervalEngineHours',
     'recurrenceIntervalMonths',
     'status',
@@ -958,6 +965,14 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
     'updatedAt',
   ] as const
   $columns = BoatMaintenanceTaskSchema.$columns
+  @column()
+  declare actualCost: string | null
+  @column()
+  declare actualDurationMinutes: number | null
+  @column.dateTime()
+  declare assignedAt: DateTime | null
+  @column()
+  declare assigneeId: number | null
   @column()
   declare boatEngineId: number | null
   @column()
@@ -982,6 +997,10 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare dueAt: DateTime | null
   @column()
   declare dueEngineHours: number | null
+  @column()
+  declare estimatedCost: string | null
+  @column()
+  declare estimatedDurationMinutes: number | null
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -990,6 +1009,8 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare notes: string | null
   @column()
   declare postponedCount: number
+  @column()
+  declare providerName: string | null
   @column()
   declare recurrenceIntervalEngineHours: number | null
   @column()

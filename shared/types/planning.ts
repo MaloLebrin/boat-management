@@ -1,4 +1,7 @@
-export interface PlanningTask {
+import type { MaintenanceTaskWorkOrder } from '#shared/types/maintenance'
+
+/** Tâche du planning, avec son ordre de travail (#868). */
+export interface PlanningTask extends MaintenanceTaskWorkOrder {
   id: number
   boatId: number
   boatName: string

@@ -226,3 +226,83 @@ test.group('NotificationScanService — durées de vie par défaut (#582)', (gro
     assert.equal(notification.type, 'safety_equipment.expiring_soon')
   })
 })
+
+test.group('NotificationScanService — tâches assignées (#868)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  async function seedOrg() {
+    const org = await OrganizationFactory.create()
+    const admin = await UserFactory.merge({ organizationId: org.id }).create()
+    await OrganizationMembership.create({ userId: admin.id, organizationId: org.id, role: 'admin' })
+    const mechanic = await UserFactory.merge({ organizationId: org.id }).create()
+    await OrganizationMembership.create({
+      userId: mechanic.id,
+      organizationId: org.id,
+      role: 'mechanic',
+    })
+    const boat = await BoatFactory.merge({ organizationId: org.id }).create()
+    return { org, admin, mechanic, boat }
+  }
+
+  async function task(boatId: number, dueInDays: number, assigneeId: number | null) {
+    return await BoatMaintenanceTask.create({
+      boatId,
+      subject: 'boat',
+      status: 'open',
+      title: `Tâche J${dueInDays}`,
+      dueAt: DateTime.now().startOf('day').plus({ days: dueInDays }),
+      assigneeId,
+    })
+  }
+
+  test('une échéance proche assignée va à l’assigné, pas aux admins', async ({ assert }) => {
+    const { admin, mechanic, boat } = await seedOrg()
+    await task(boat.id, 5, mechanic.id)
+
+    await makeService().run()
+
+    const toMechanic = await Notification.query().where('userId', mechanic.id)
+    assert.lengthOf(toMechanic, 1)
+    assert.equal(toMechanic[0].type, 'maintenance.due_soon')
+    // Le mécanicien n'a pas accès à la fiche bateau : lien vers le planning.
+    assert.equal(toMechanic[0].actionUrl, '/planning')
+    assert.lengthOf(await Notification.query().where('userId', admin.id), 0)
+  })
+
+  test('une échéance proche non assignée reste aux admins', async ({ assert }) => {
+    const { admin, mechanic, boat } = await seedOrg()
+    await task(boat.id, 5, null)
+
+    await makeService().run()
+
+    assert.lengthOf(await Notification.query().where('userId', admin.id), 1)
+    assert.lengthOf(await Notification.query().where('userId', mechanic.id), 0)
+  })
+
+  test('un retard assigné remonte aux admins et à l’assigné', async ({ assert }) => {
+    const { admin, mechanic, boat } = await seedOrg()
+    await task(boat.id, -3, mechanic.id)
+
+    await makeService().run()
+
+    const [toAdmin] = await Notification.query().where('userId', admin.id)
+    const [toMechanic] = await Notification.query().where('userId', mechanic.id)
+    assert.equal(toAdmin.type, 'maintenance.overdue')
+    assert.equal(toMechanic.type, 'maintenance.overdue')
+  })
+
+  test('un admin assigné ne reçoit qu’une notification par bateau et par type', async ({
+    assert,
+  }) => {
+    const { admin, boat } = await seedOrg()
+    await task(boat.id, -3, admin.id)
+    await task(boat.id, -1, null)
+
+    await makeService().run()
+
+    const notifications = await Notification.query().where('userId', admin.id)
+    assert.lengthOf(notifications, 1)
+    // Le groupe admin, qui compte tout le bateau, l'emporte.
+    assert.equal(notifications[0].metadata?.count, 2)
+  })
+})

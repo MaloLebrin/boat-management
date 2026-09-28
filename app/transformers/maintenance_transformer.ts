@@ -9,6 +9,7 @@ import type BoatSail from '#models/boat_sail'
 import type { GenericEquipmentCategory } from '#shared/types/boat'
 import type Boat from '#models/boat'
 import type {
+  MaintenanceTaskWorkOrder,
   BoatOwnerMaintenanceEventRow,
   BoatTaskEquipment,
   SheetType,
@@ -72,6 +73,28 @@ export function toBoatTaskEquipment(boat: Boat | null): BoatTaskEquipment {
   }
 }
 
+function decimal(value: string | null): number | null {
+  if (value === null) return null
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
+/**
+ * Ordre de travail d'une tâche (#868). L'assigné n'est connu que si la
+ * relation `assignee` a été préchargée ; sinon `null`.
+ */
+export function toMaintenanceTaskWorkOrder(t: BoatMaintenanceTask): MaintenanceTaskWorkOrder {
+  const assignee = t.assigneeId !== null && t.$preloaded.assignee ? t.assignee : null
+  return {
+    assignee: assignee ? { id: assignee.id, fullName: assignee.fullName || assignee.email } : null,
+    providerName: t.providerName,
+    estimatedCost: decimal(t.estimatedCost),
+    actualCost: decimal(t.actualCost),
+    estimatedDurationMinutes: t.estimatedDurationMinutes,
+    actualDurationMinutes: t.actualDurationMinutes,
+  }
+}
+
 export function toMaintenanceTask(t: BoatMaintenanceTask) {
   return {
     id: t.id,
@@ -93,6 +116,7 @@ export function toMaintenanceTask(t: BoatMaintenanceTask) {
     recurrenceIntervalMonths: t.recurrenceIntervalMonths,
     recurrenceIntervalEngineHours: t.recurrenceIntervalEngineHours,
     postponedCount: t.postponedCount ?? 0,
+    ...toMaintenanceTaskWorkOrder(t),
     boatIncidentId: t.boatIncidentId,
     createdAt: t.createdAt.toISO(),
     updatedAt: t.updatedAt?.toISO() ?? null,

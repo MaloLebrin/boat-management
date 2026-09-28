@@ -772,6 +772,22 @@
         "title": "Edit task",
         "submit": "Save",
         "recurrenceHint": "A new recurrence interval applies to the next occurrences, created when this one is completed."
+      },
+      "workOrder": {
+        "title": "Work order (optional)",
+        "assignee": "Assignee",
+        "unassigned": "Nobody",
+        "provider": "External provider",
+        "providerPlaceholder": "e.g. Harbour yard, independent mechanic",
+        "estimatedCost": "Estimated cost (€)",
+        "estimatedDuration": "Estimated time (min)",
+        "actualCost": "Actual cost (€)",
+        "actualCostPlaceholder": "Actual cost",
+        "actualDuration": "Actual time (min)",
+        "actualDurationPlaceholder": "Time (min)",
+        "assignedTo": "Assigned to {name}",
+        "providerShort": "Provider: {name}",
+        "estimatedShort": "Estimated: {amount}"
       }
     },
     "operations": {

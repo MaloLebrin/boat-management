@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { PlanningTask, TaskGroup } from '#shared/types/planning'
+import type { MaintenanceAssigneeOption } from '#shared/types/maintenance'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import PlanningCalendar from '~/components/planning/PlanningCalendar.vue'
@@ -9,6 +11,11 @@ import { computed, ref } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
+import {
+  matchesAssigneeFilter,
+  parseAssigneeFilter,
+  type TaskAssigneeFilter,
+} from '~/utils/task_assignee_filter'
 
 const props = defineProps<{
   tasks: PlanningTask[]
@@ -20,11 +27,46 @@ const props = defineProps<{
   doneTasksTotal: number
   groups: TaskGroup[]
   canGroupTasks: boolean
+  maintenanceAssignees: MaintenanceAssigneeOption[]
 }>()
 
 const { t } = useT()
 const page = usePage()
-const { can } = usePermissions()
+const { can, isMechanic } = usePermissions()
+
+// Filtre « Assigné à » (#868). Un mécanicien à qui des tâches sont confiées
+// arrive sur les siennes ; les autres rôles voient toute la flotte.
+const currentUserId = computed(() => (page.props.user as { id: number } | undefined)?.id ?? null)
+const assigneeFilter = ref<TaskAssigneeFilter>(
+  isMechanic.value && props.tasks.some((task) => task.assignee?.id === currentUserId.value)
+    ? 'mine'
+    : 'all'
+)
+const assigneeFilterOptions = computed(() => [
+  { label: t('planning.assigneeFilter.all'), value: 'all' },
+  { label: t('planning.assigneeFilter.mine'), value: 'mine' },
+  { label: t('planning.assigneeFilter.unassigned'), value: 'unassigned' },
+  ...props.maintenanceAssignees.map((a) => ({ label: a.fullName, value: a.id })),
+])
+
+function onlyMatching(tasks: PlanningTask[]): PlanningTask[] {
+  return tasks.filter((task) =>
+    matchesAssigneeFilter(task, assigneeFilter.value, currentUserId.value)
+  )
+}
+
+const filtered = computed(() => ({
+  tasks: onlyMatching(props.tasks),
+  overdueTasks: onlyMatching(props.overdueTasks),
+  soonTasks: onlyMatching(props.soonTasks),
+  plannedTasks: onlyMatching(props.plannedTasks),
+  undatedTasks: onlyMatching(props.undatedTasks),
+  doneTasks: onlyMatching(props.doneTasks),
+  // Un groupe réduit à une tâche n'en est plus un : elle repasse en carte seule.
+  groups: props.groups
+    .map((group) => ({ ...group, tasks: onlyMatching(group.tasks) }))
+    .filter((group) => group.tasks.length > 1),
+}))
 
 /**
  * Tâche ciblée par `/planning?task=<id>` — le dashboard mécanicien y envoie
@@ -67,7 +109,19 @@ function handleUngroup(groupId: string) {
         <p class="mt-1 text-sm text-fg-muted">{{ t('planning.subtitle') }}</p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
+        <div v-if="maintenanceAssignees.length > 0" class="w-48">
+          <label for="planning-assignee-filter" class="sr-only">
+            {{ t('planning.assigneeFilter.label') }}
+          </label>
+          <BaseSelect
+            id="planning-assignee-filter"
+            :options="assigneeFilterOptions"
+            :model-value="assigneeFilter"
+            @update:model-value="assigneeFilter = parseAssigneeFilter($event)"
+          />
+        </div>
+
         <!-- Grouping toggle (Pro+) -->
         <BaseButton
           v-if="canGroupTasks"
@@ -169,19 +223,19 @@ function handleUngroup(groupId: string) {
 
     <PlanningKanban
       v-else-if="viewMode === 'kanban'"
-      :overdue-tasks="overdueTasks"
-      :soon-tasks="soonTasks"
-      :planned-tasks="plannedTasks"
-      :undated-tasks="undatedTasks"
-      :done-tasks="doneTasks"
-      :done-tasks-total="doneTasksTotal"
-      :groups="groups"
+      :overdue-tasks="filtered.overdueTasks"
+      :soon-tasks="filtered.soonTasks"
+      :planned-tasks="filtered.plannedTasks"
+      :undated-tasks="filtered.undatedTasks"
+      :done-tasks="filtered.doneTasks"
+      :done-tasks-total="assigneeFilter === 'all' ? doneTasksTotal : filtered.doneTasks.length"
+      :groups="filtered.groups"
       :grouping-enabled="groupingEnabled"
       :dismissed-group-ids="dismissedGroupIds"
       :highlighted-task-id="highlightedTaskId"
       @ungroup="handleUngroup"
     />
 
-    <PlanningCalendar v-else :tasks="tasks" />
+    <PlanningCalendar v-else :tasks="filtered.tasks" />
   </div>
 </template>

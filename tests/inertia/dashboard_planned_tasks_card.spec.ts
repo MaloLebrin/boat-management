@@ -21,6 +21,7 @@ import DashboardPlannedTasksCard from '../../inertia/components/dashboard/Dashbo
 import type { DashboardPlannedTasks } from '../../shared/types/dashboard'
 
 const planned: DashboardPlannedTasks = {
+  mine: { items: [], total: 0 },
   total: 7,
   items: [
     {
@@ -51,7 +52,9 @@ describe('DashboardPlannedTasksCard', () => {
   })
 
   test('renders the empty state once loaded without tasks', () => {
-    const w = mount(DashboardPlannedTasksCard, { props: { plannedTasks: { items: [], total: 0 } } })
+    const w = mount(DashboardPlannedTasksCard, {
+      props: { plannedTasks: { items: [], total: 0, mine: { items: [], total: 0 } } },
+    })
     expect(w.text()).toContain('dashboard.plannedTasks.empty')
     expect(w.find('[data-testid="dashboard-planned-more"]').exists()).toBe(false)
   })
@@ -71,5 +74,26 @@ describe('DashboardPlannedTasksCard', () => {
       'dashboard.plannedTasks.more(5)'
     )
     expect(w.get('[data-testid="dashboard-planned-view-all"]').attributes('href')).toBe('/planning')
+  })
+
+  test('« Les miennes » (#868) : shown and selected when tasks are assigned to me', async () => {
+    const w = mount(DashboardPlannedTasksCard, {
+      props: {
+        plannedTasks: { ...planned, mine: { items: [planned.items[1]!], total: 1 } },
+      },
+    })
+    let rows = w.findAll('[data-testid="dashboard-planned-row"]')
+    expect(rows.map((r) => r.attributes('href'))).toEqual(['/planning?task=12'])
+    expect(w.find('[data-testid="dashboard-planned-more"]').exists()).toBe(false)
+
+    const all = w.findAll('button').find((b) => b.text() === 'dashboard.plannedTasks.scope.all')!
+    await all.trigger('click')
+    rows = w.findAll('[data-testid="dashboard-planned-row"]')
+    expect(rows).toHaveLength(2)
+  })
+
+  test('no toggle when nothing is assigned to me', () => {
+    const w = mount(DashboardPlannedTasksCard, { props: { plannedTasks: planned } })
+    expect(w.text()).not.toContain('dashboard.plannedTasks.scope.mine')
   })
 })

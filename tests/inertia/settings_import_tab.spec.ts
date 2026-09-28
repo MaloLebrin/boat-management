@@ -132,7 +132,7 @@ describe('SettingsImportTab — flotte mono-bateau (#823)', () => {
     expect(w.text()).not.toContain('settings.import.boatLabel')
 
     const links = exportLinks(w)
-    expect(links).toHaveLength(3)
+    expect(links).toHaveLength(4)
     for (const link of links) {
       expect(link.attributes('href')).toContain('/1/')
       expect(link.classes()).not.toContain('pointer-events-none')

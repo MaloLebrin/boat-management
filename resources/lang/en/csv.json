@@ -32,5 +32,19 @@
     "crewCount": "crew_count",
     "status": "status",
     "notes": "notes"
+  },
+  "maintenanceTasks": {
+    "title": "title",
+    "subject": "subject",
+    "status": "status",
+    "dueAt": "due_at",
+    "dueEngineHours": "due_engine_hours",
+    "doneAt": "done_at",
+    "assignee": "assignee",
+    "provider": "provider",
+    "estimatedCost": "estimated_cost",
+    "actualCost": "actual_cost",
+    "estimatedDurationMinutes": "estimated_duration_min",
+    "actualDurationMinutes": "actual_duration_min"
   }
 }

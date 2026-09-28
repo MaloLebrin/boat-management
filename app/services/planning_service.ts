@@ -3,6 +3,7 @@ import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import Organization from '#models/organization'
 import type User from '#models/user'
 import TaskGroupingService from '#services/task_grouping_service'
+import { toMaintenanceTaskWorkOrder } from '#transformers/maintenance_transformer'
 import { PLAN_LIMITS } from '#shared/types/plan'
 import type { PlanTier } from '#shared/types/plan'
 import type { PlanningResult, PlanningTask } from '#shared/types/planning'
@@ -63,11 +64,13 @@ export default class PlanningService {
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
         .where('status', 'open')
+        .preload('assignee', (q) => q.select('id', 'fullName', 'email'))
         .orderBy('dueAt', 'asc')
         .orderBy('dueEngineHours', 'asc'),
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
         .where('status', 'done')
+        .preload('assignee', (q) => q.select('id', 'fullName', 'email'))
         .orderBy('updatedAt', 'desc')
         .limit(20),
       BoatMaintenanceTask.query()
@@ -99,6 +102,7 @@ export default class PlanningService {
         currentEngineHours,
         status: t.status as 'open' | 'done',
         postponedCount: t.postponedCount ?? 0,
+        ...toMaintenanceTaskWorkOrder(t),
       }
     }
 

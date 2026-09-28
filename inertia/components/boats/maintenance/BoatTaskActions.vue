@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Form } from '@adonisjs/inertia/vue'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BoatMaintenanceTaskEditModal from '~/components/boats/maintenance/BoatMaintenanceTaskEditModal.vue'
@@ -27,6 +27,15 @@ const props = withDefaults(
 const { t } = useT()
 
 const editOpen = ref(false)
+
+// Un ordre de travail chiffré (#868) demande le réalisé à la clôture, face au
+// prévu. Les champs restent facultatifs.
+const asksActuals = computed(
+  () =>
+    props.task.status === 'open' &&
+    ((props.task.estimatedCost ?? null) !== null ||
+      (props.task.estimatedDurationMinutes ?? null) !== null)
+)
 </script>
 
 <template>
@@ -55,6 +64,32 @@ const editOpen = ref(false)
           :placeholder="t('boats.maintenance.tasks.doneHoursPlaceholder')"
         />
       </div>
+      <template v-if="asksActuals">
+        <div class="w-28">
+          <BaseInput
+            :id="`actualCost-${task.id}`"
+            name="actualCost"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="0.01"
+            :aria-label="t('boats.maintenance.tasks.workOrder.actualCost')"
+            :placeholder="t('boats.maintenance.tasks.workOrder.actualCostPlaceholder')"
+          />
+        </div>
+        <div class="w-28">
+          <BaseInput
+            :id="`actualDuration-${task.id}`"
+            name="actualDurationMinutes"
+            type="number"
+            inputmode="numeric"
+            min="0"
+            step="1"
+            :aria-label="t('boats.maintenance.tasks.workOrder.actualDuration')"
+            :placeholder="t('boats.maintenance.tasks.workOrder.actualDurationPlaceholder')"
+          />
+        </div>
+      </template>
       <BaseButton type="submit" :variant="doneVariant" size="sm" :disabled="processing">
         {{ t('boats.maintenance.tasks.markDone') }}
       </BaseButton>

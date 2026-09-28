@@ -34,6 +34,9 @@ router
       .get('boats/:id/export/maintenance.csv', [CsvExportController, 'maintenance'])
       .as('boats.export.maintenance')
     router
+      .get('boats/:id/export/maintenance-tasks.csv', [CsvExportController, 'maintenanceTasks'])
+      .as('boats.export.maintenanceTasks')
+    router
       .get('boats/:id/export/fuel-logs.csv', [CsvExportController, 'fuelLogs'])
       .as('boats.export.fuelLogs')
     router

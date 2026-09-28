@@ -7,6 +7,7 @@ vi.mock('~/composables/use_t', () => ({
 
 vi.mock('@inertiajs/vue3', () => ({
   Head: { template: '<div><slot /></div>' },
+  usePage: () => ({ props: { user: { id: 42 } } }),
 }))
 
 import MechanicDashboard from '../../inertia/pages/dashboard/mechanic.vue'
@@ -24,6 +25,13 @@ function task(id: number, overrides: Partial<PlanningTask> = {}): PlanningTask {
     dueEngineHours: null,
     currentEngineHours: null,
     status: 'open',
+    postponedCount: 0,
+    assignee: null,
+    providerName: null,
+    estimatedCost: null,
+    actualCost: null,
+    estimatedDurationMinutes: null,
+    actualDurationMinutes: null,
     ...overrides,
   }
 }
@@ -92,4 +100,26 @@ test('links to the planning and the maintenance history, not to boats', () => {
   expect(routes).toContain('planning.index')
   expect(routes).toContain('maintenance.history')
   expect(routes).not.toContain('boats.show')
+})
+
+test('« Mes tâches » (#868) : opens on the tasks assigned to me when there are some', async () => {
+  const me = { id: 42, fullName: 'Moi' }
+  const other = { id: 7, fullName: 'Autre' }
+  const w = mountDashboard({
+    overdueTasks: [task(1, { assignee: me }), task(2, { assignee: other })],
+    soonTasks: [task(3), task(4, { assignee: me })],
+  })
+  expect(w.findAll('.row').map((r) => r.text())).toHaveLength(2)
+  expect(w.findAll('.stat').map((s) => s.text())).toContain('dashboard.mechanic.stats.overdue:1')
+
+  const allButton = w.findAll('button').find((b) => b.text() === 'dashboard.mechanic.scope.all')!
+  await allButton.trigger('click')
+  expect(w.findAll('.row')).toHaveLength(4)
+})
+
+test('« Mes tâches » (#868) : without assignment, the whole fleet stays the default', () => {
+  const w = mountDashboard({ overdueTasks: [task(1)], soonTasks: [task(2)] })
+  expect(w.findAll('.row')).toHaveLength(2)
+  const pressed = w.find('button[aria-pressed="true"]')
+  expect(pressed.text()).toBe('dashboard.mechanic.scope.all')
 })

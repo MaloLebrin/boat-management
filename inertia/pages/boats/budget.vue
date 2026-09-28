@@ -11,11 +11,13 @@ import BudgetPortStayForm from '~/components/boats/budget/BudgetPortStayForm.vue
 import BudgetPortStayList from '~/components/boats/budget/BudgetPortStayList.vue'
 import BudgetEntryForm from '~/components/boats/budget/BudgetEntryForm.vue'
 import BudgetEntryList from '~/components/boats/budget/BudgetEntryList.vue'
+import PlannedMaintenanceSummary from '~/components/boats/budget/PlannedMaintenanceSummary.vue'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import { routes } from '~/utils/routes'
 import type { BudgetData, BoatPortStayItem, BoatBudgetEntryItem } from '~/types/budget'
 import type { PortNameOption } from '../../../shared/types/port'
+import type { PlannedMaintenanceSummary as PlannedMaintenance } from '#shared/types/budget'
 
 const props = defineProps<{
   boat: { id: number; name: string }
@@ -27,6 +29,8 @@ const props = defineProps<{
   /** Plan Pro ou Entreprise (`canImportExpenses`) + admin (`import.run`) : affiche le raccourci vers l'import de dépenses. */
   canImport: boolean
   portOptions: PortNameOption[]
+  /** Entretien prévu ce trimestre (#868). */
+  plannedMaintenance: PlannedMaintenance
 }>()
 
 const { t } = useT()
@@ -169,6 +173,8 @@ const categories = computed(() => [
           <span class="font-semibold">{{ formatCurrency(budget.previousYearTotals.total) }}</span>
         </div>
       </div>
+
+      <PlannedMaintenanceSummary :summary="plannedMaintenance" />
 
       <!-- Monthly chart -->
       <BudgetBarChart :monthly="budget.monthly" />

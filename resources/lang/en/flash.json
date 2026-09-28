@@ -52,7 +52,8 @@
     "incidentNotFound": "This incident does not belong to this boat.",
     "updated": "Task updated.",
     "postponed": "Task postponed.",
-    "taskDone": "A completed task is part of the history and can no longer be edited."
+    "taskDone": "A completed task is part of the history and can no longer be edited.",
+    "assigneeNotMember": "The selected member cannot be assigned maintenance tasks."
   },
   "ai": {
     "messagesRequired": "The messages field is required.",

@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BoatMaintenanceTaskModal from '~/components/boats/maintenance/BoatMaintenanceTaskModal.vue'
 import BoatTaskActions from '~/components/boats/maintenance/BoatTaskActions.vue'
+import MaintenanceTaskWorkOrderSummary from '~/components/boats/maintenance/MaintenanceTaskWorkOrderSummary.vue'
 import MaintenanceTaskQuickAdd from '~/components/boats/maintenance/MaintenanceTaskQuickAdd.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
@@ -78,6 +79,7 @@ function isOverdue(task: MaintenanceTaskRow) {
           <div class="min-w-0">
             <p class="font-semibold text-fg">{{ task.title }}</p>
             <p v-if="task.notes" class="mt-1 text-sm text-fg-muted">{{ task.notes }}</p>
+            <MaintenanceTaskWorkOrderSummary :work-order="task" />
           </div>
           <div class="flex flex-wrap items-center gap-3">
             <BaseBadge v-if="task.dueAt" :variant="isOverdue(task) ? 'warning' : 'neutral'">

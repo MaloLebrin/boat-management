@@ -29,6 +29,20 @@ export interface BudgetYearSummary {
   total: number
 }
 
+/**
+ * Entretien prévu (#868) : somme des coûts estimés des tâches ouvertes dues
+ * d'ici la fin du trimestre civil courant, retards compris — ils restent à
+ * payer. `unestimatedCount` : tâches de la même fenêtre sans estimation, que
+ * la somme ne couvre donc pas.
+ */
+export interface PlannedMaintenanceSummary {
+  year: number
+  quarter: number
+  amount: number
+  estimatedCount: number
+  unestimatedCount: number
+}
+
 export interface BudgetData {
   year: number
   monthly: BudgetMonthlyData[]

@@ -164,7 +164,7 @@ export default class HomeController {
       ...(visible.has('planned_tasks')
         ? {
             plannedTasks: inertia.defer(
-              deferJson(() => this.dashboardService.getPlannedTasks(boatIds)),
+              deferJson(() => this.dashboardService.getPlannedTasks(boatIds, { userId: user.id })),
               'plannedTasks'
             ),
           }

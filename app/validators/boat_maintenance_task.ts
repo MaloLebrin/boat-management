@@ -27,6 +27,16 @@ function optionalNonNegativeIntFromForm() {
     })
 }
 
+/** Coût en devise de l'organisation, au centime (#868). */
+function cost() {
+  return vine.number().min(0).max(99_999_999).decimal([0, 2])
+}
+
+/** Durée en minutes (#868) — plafonnée à ~70 jours, au-delà c'est une saisie erronée. */
+function durationMinutes() {
+  return vine.number().withoutDecimals().min(0).max(100_000)
+}
+
 export const createBoatMaintenanceTaskValidator = vine.create(
   vine.object({
     subject: vine.enum(MAINTENANCE_SUBJECTS).optional(),
@@ -47,6 +57,13 @@ export const createBoatMaintenanceTaskValidator = vine.create(
 
     dueEngineHours: optionalNonNegativeIntFromForm(),
     recurrenceIntervalEngineHours: optionalNonNegativeIntFromForm(),
+
+    // Ordre de travail (#868) — un champ vide est converti en `null` par le
+    // bodyparser, que `optional()` écarte : il n'est alors pas renseigné.
+    assigneeId: vine.number().withoutDecimals().min(1).optional(),
+    providerName: vine.string().trim().maxLength(200).optional(),
+    estimatedCost: cost().optional(),
+    estimatedDurationMinutes: durationMinutes().optional(),
   })
 )
 
@@ -64,6 +81,10 @@ export const updateBoatMaintenanceTaskValidator = vine.create(
     recurrenceIntervalMonths: vine.number().withoutDecimals().min(0).nullable().optional(),
     dueEngineHours: vine.number().withoutDecimals().min(0).nullable().optional(),
     recurrenceIntervalEngineHours: vine.number().withoutDecimals().min(0).nullable().optional(),
+    assigneeId: vine.number().withoutDecimals().min(1).nullable().optional(),
+    providerName: vine.string().trim().maxLength(200).nullable().optional(),
+    estimatedCost: cost().nullable().optional(),
+    estimatedDurationMinutes: durationMinutes().nullable().optional(),
   })
 )
 
@@ -74,5 +95,7 @@ export const markBoatMaintenanceTaskDoneValidator = vine.create(
       .parse((v) => (v === '' || v === null || v === undefined ? null : v))
       .optional(),
     doneEngineHours: optionalNonNegativeIntFromForm(),
+    actualCost: cost().optional(),
+    actualDurationMinutes: durationMinutes().optional(),
   })
 )

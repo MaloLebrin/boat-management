@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { Link } from '@adonisjs/inertia/vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseSkeleton from '~/components/base/BaseSkeleton.vue'
+import PlannedMaintenanceSummary from '~/components/boats/budget/PlannedMaintenanceSummary.vue'
 import DashboardSpendBar from '~/components/dashboard/DashboardSpendBar.vue'
 import type { DashboardSpendSummary } from '#shared/types/dashboard'
 import { useNumberFormat } from '~/composables/use_number_format'
@@ -85,6 +86,12 @@ const delta = computed(() => {
           :total="spend.totals.total"
         />
       </div>
+
+      <PlannedMaintenanceSummary
+        v-if="spend.plannedMaintenance"
+        :summary="spend.plannedMaintenance"
+        inline
+      />
     </template>
 
     <template v-if="spend?.singleBoatId" #footer>

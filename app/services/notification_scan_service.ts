@@ -15,7 +15,11 @@ const DUE_SOON_WINDOW_DAYS = 30
 /** Anti-doublon : pas de re-notification d'une même entité avant N jours. */
 const DEDUPE_WINDOW_DAYS = 30
 
-/** Notification agrégée par bateau (une notif par bateau + type, avec compte). */
+/**
+ * Notification agrégée par bateau (une notif par bateau + type, avec compte).
+ * `recipientUserId` : destinataire unique (l'assigné d'une tâche, #868) ; à
+ * défaut, la notification part aux admins de l'organisation.
+ */
 interface ScanGroup {
   type: NotificationType
   severity: NotificationSeverity
@@ -23,6 +27,7 @@ interface ScanGroup {
   boatId: number
   boatName: string
   count: number
+  recipientUserId?: number
 }
 
 /**
@@ -57,24 +62,48 @@ export default class NotificationScanService {
 
     const locale = i18nManager.locale(i18nManager.defaultLocale)
 
-    // Une notification par (groupe × admin), toutes créées en parallèle.
+    // Une notification par (groupe × destinataire). Un même utilisateur ne
+    // reçoit qu'une notification par bateau et par type, même s'il est à la
+    // fois admin et assigné : les groupes admin, qui comptent tout le bateau,
+    // passent en premier (#868).
+    const seen = new Set<string>()
+    const deliveries: Array<{ group: ScanGroup; userId: number }> = []
+    const ordered = [
+      ...groups.filter((group) => group.recipientUserId === undefined),
+      ...groups.filter((group) => group.recipientUserId !== undefined),
+    ]
+    for (const group of ordered) {
+      const recipients =
+        group.recipientUserId !== undefined
+          ? [group.recipientUserId]
+          : (adminsByOrg.get(group.organizationId) ?? []).map((admin) => admin.user.id)
+      for (const userId of recipients) {
+        const key = `${userId}:${group.type}:${group.boatId}`
+        if (seen.has(key)) continue
+        seen.add(key)
+        deliveries.push({ group, userId })
+      }
+    }
+
+    // Toutes créées en parallèle.
     const results = await Promise.all(
-      groups.flatMap((group) => {
+      deliveries.map(({ group, userId }) => {
         const params = { boatName: group.boatName, count: String(group.count) }
-        return (adminsByOrg.get(group.organizationId) ?? []).map((admin) =>
-          this.notificationService.createIfNotRecent(
-            {
-              userId: admin.user.id,
-              organizationId: group.organizationId,
-              type: group.type,
-              severity: group.severity,
-              title: locale.formatMessage(`notifications.messages.${group.type}.title`, params),
-              body: locale.formatMessage(`notifications.messages.${group.type}.body`, params),
-              actionUrl: `/boats/${group.boatId}`,
-              metadata: { boatId: group.boatId, count: group.count },
-            },
-            { metadataKey: 'boatId', withinDays: DEDUPE_WINDOW_DAYS }
-          )
+        return this.notificationService.createIfNotRecent(
+          {
+            userId,
+            organizationId: group.organizationId,
+            type: group.type,
+            severity: group.severity,
+            title: locale.formatMessage(`notifications.messages.${group.type}.title`, params),
+            body: locale.formatMessage(`notifications.messages.${group.type}.body`, params),
+            // Un assigné peut être mécanicien, sans accès à la fiche bateau :
+            // il est envoyé vers le planning, ouvert à tous les rôles de
+            // maintenance.
+            actionUrl: group.recipientUserId !== undefined ? '/planning' : `/boats/${group.boatId}`,
+            metadata: { boatId: group.boatId, count: group.count },
+          },
+          { metadataKey: 'boatId', withinDays: DEDUPE_WINDOW_DAYS }
         )
       })
     )
@@ -101,10 +130,37 @@ export default class NotificationScanService {
         .preload('boat'),
     ])
 
+    // Une échéance proche va à l'assigné plutôt qu'aux admins : c'est lui qui
+    // doit agir. Un retard, lui, remonte aux admins **et** à l'assigné (#868).
+    const unassignedSoon = dueSoon.filter((task) => task.assigneeId === null)
     return [
       ...this.groupByBoat(overdue, 'maintenance.overdue', 'error'),
-      ...this.groupByBoat(dueSoon, 'maintenance.due_soon', 'warning'),
+      ...this.groupByAssignee(overdue, 'maintenance.overdue', 'error'),
+      ...this.groupByBoat(unassignedSoon, 'maintenance.due_soon', 'warning'),
+      ...this.groupByAssignee(dueSoon, 'maintenance.due_soon', 'warning'),
     ]
+  }
+
+  /**
+   * Comme `groupByBoat`, mais une notification par (bateau × assigné), adressée
+   * à l'assigné seul. Les tâches sans assigné sont ignorées.
+   */
+  private groupByAssignee(
+    tasks: BoatMaintenanceTask[],
+    type: NotificationType,
+    severity: NotificationSeverity
+  ): ScanGroup[] {
+    const byAssignee = new Map<number, BoatMaintenanceTask[]>()
+    for (const task of tasks) {
+      if (task.assigneeId === null) continue
+      byAssignee.set(task.assigneeId, [...(byAssignee.get(task.assigneeId) ?? []), task])
+    }
+    return [...byAssignee.entries()].flatMap(([assigneeId, own]) =>
+      this.groupByBoat(own, type, severity).map((group) => ({
+        ...group,
+        recipientUserId: assigneeId,
+      }))
+    )
   }
 
   private async scanDocuments(): Promise<ScanGroup[]> {

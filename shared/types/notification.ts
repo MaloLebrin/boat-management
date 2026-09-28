@@ -15,6 +15,7 @@ export type NotificationType =
   | 'module.deactivated'
   | 'maintenance.overdue'
   | 'maintenance.due_soon'
+  | 'maintenance.assigned'
   | 'document.expiring_soon'
   | 'document.expired'
   | 'safety_equipment.expiring_soon'

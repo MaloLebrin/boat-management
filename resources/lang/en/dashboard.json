@@ -81,7 +81,11 @@
     "dueSoon": "Due soon",
     "openTask": "Open the {title} intervention on {boat}",
     "dueAt": "Due on {date}",
-    "dueAtHours": "Due at {hours}h · current {current}h"
+    "dueAtHours": "Due at {hours}h · current {current}h",
+    "scope": {
+      "mine": "My tasks",
+      "all": "Whole fleet"
+    }
   },
   "attention": {
     "title": "To handle",
@@ -227,7 +231,11 @@
     "empty": "No task planned over the period.",
     "viewAll": "View planning",
     "open": "Open task {title} ({boat})",
-    "more": "{count, plural, one {# more task over the period} other {# more tasks over the period}}"
+    "more": "{count, plural, one {# more task over the period} other {# more tasks over the period}}",
+    "scope": {
+      "mine": "Mine",
+      "all": "All"
+    }
   },
   "notifications": {
     "title": "Notifications",

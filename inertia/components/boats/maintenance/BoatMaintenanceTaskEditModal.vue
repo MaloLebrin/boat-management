@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
+import MaintenanceWorkOrderFields from '~/components/boats/maintenance/MaintenanceWorkOrderFields.vue'
 import { useT } from '~/composables/use_t'
 import type { MaintenanceTaskRow } from '~/types/boat_show'
 
@@ -129,6 +130,12 @@ watch(
       >
         {{ t('boats.maintenance.tasks.edit.recurrenceHint') }}
       </p>
+
+      <MaintenanceWorkOrderFields
+        :id-prefix="`task-edit-${task.id}`"
+        :errors="errors"
+        :initial="task"
+      />
 
       <BaseTextarea
         :id="`task-edit-notes-${task.id}`"

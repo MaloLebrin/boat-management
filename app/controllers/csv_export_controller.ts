@@ -1,6 +1,7 @@
 import BoatPolicy from '#policies/boat_policy'
 import MaintenancePolicy from '#policies/maintenance_policy'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
+import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatFuelLogService from '#services/boat_fuel_log_service'
 import NavigationLogService from '#services/navigation_log_service'
 import BudgetService from '#services/budget_service'
@@ -28,6 +29,7 @@ export default class CsvExportController {
   constructor(
     private boatContext: BoatContextService,
     private maintenanceService: BoatMaintenanceService,
+    private taskService: BoatMaintenanceTaskService,
     private fuelLogService: BoatFuelLogService,
     private navigationLogService: NavigationLogService,
     private budgetService: BudgetService,
@@ -55,6 +57,61 @@ export default class CsvExportController {
 
     await authorize(resolved.boat)
     return { user, boat: resolved.boat }
+  }
+
+  /**
+   * Tâches planifiées du bateau avec leur ordre de travail (#868) : qui, quel
+   * prestataire, combien prévu et combien réalisé. Même garde que l'export de
+   * l'historique.
+   */
+  async maintenanceTasks({ response, auth, bouncer, params, i18n }: HttpContext) {
+    const resolved = await this.resolveExportBoat({ auth, response, params }, (boat) =>
+      bouncer.with(MaintenancePolicy).authorize('view', boat)
+    )
+    if (!resolved) return
+    const { user, boat } = resolved
+
+    const tasks = await this.taskService.listForBoat(user, boat)
+
+    const headers = csvHeaders(i18n, 'maintenanceTasks', [
+      'title',
+      'subject',
+      'status',
+      'dueAt',
+      'dueEngineHours',
+      'doneAt',
+      'assignee',
+      'provider',
+      'estimatedCost',
+      'actualCost',
+      'estimatedDurationMinutes',
+      'actualDurationMinutes',
+    ])
+    const amount = (value: string | null) =>
+      value === null ? '' : Number.parseFloat(value).toFixed(2)
+    const rows = tasks.map((task) => [
+      task.title,
+      task.subject,
+      task.status,
+      task.dueAt?.toISODate() ?? '',
+      task.dueEngineHours === null ? '' : String(task.dueEngineHours),
+      task.doneAt?.toISODate() ?? '',
+      task.assigneeId !== null && task.assignee
+        ? task.assignee.fullName || task.assignee.email
+        : '',
+      task.providerName ?? '',
+      amount(task.estimatedCost),
+      amount(task.actualCost),
+      task.estimatedDurationMinutes === null ? '' : String(task.estimatedDurationMinutes),
+      task.actualDurationMinutes === null ? '' : String(task.actualDurationMinutes),
+    ])
+
+    const buffer = buildCsv(headers, rows)
+    const filename = csvFilename('maintenance-tasks', boat.name)
+    response.header('Content-Type', 'text/csv; charset=utf-8')
+    response.header('Content-Disposition', contentDisposition(filename))
+    response.header('Content-Length', String(buffer.length))
+    return response.send(buffer)
   }
 
   async maintenance({ response, auth, bouncer, params, i18n }: HttpContext) {

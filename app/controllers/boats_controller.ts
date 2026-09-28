@@ -326,6 +326,11 @@ export default class BoatsController {
         ),
         'maintenance'
       ),
+      // Membres à qui confier une tâche (#868) — sélecteur des formulaires.
+      maintenanceAssignees: inertia.defer(
+        deferJson(() => this.taskService.listAssignees(user)),
+        'maintenance'
+      ),
       maintenanceSheets: inertia.defer(
         deferJson(async () =>
           toMaintenanceSheetRows(await this.sheetService.listForBoat(user, boat))
