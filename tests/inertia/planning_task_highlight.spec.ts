@@ -73,6 +73,7 @@ function mountPlanning(url: string, tasks: PlanningTask[]) {
       undatedTasks: [],
       doneTasks: [],
       doneTasksTotal: 0,
+      doneTasksTotalByAssignee: {},
       groups: [],
       canGroupTasks: false,
       maintenanceAssignees: [],

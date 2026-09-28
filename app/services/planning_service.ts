@@ -6,7 +6,9 @@ import TaskGroupingService from '#services/task_grouping_service'
 import { toMaintenanceTaskWorkOrder } from '#transformers/maintenance_transformer'
 import { PLAN_LIMITS } from '#shared/types/plan'
 import type { PlanTier } from '#shared/types/plan'
+import { PLANNING_DONE_TASKS_LIMIT } from '#shared/types/planning'
 import type { PlanningResult, PlanningTask } from '#shared/types/planning'
+import db from '@adonisjs/lucid/services/db'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
@@ -35,6 +37,7 @@ export default class PlanningService {
         undatedTasks: [],
         doneTasks: [],
         doneTasksTotal: 0,
+        doneTasksTotalByAssignee: {},
         groups: [],
         canGroupTasks: false,
       }
@@ -54,12 +57,24 @@ export default class PlanningService {
         undatedTasks: [],
         doneTasks: [],
         doneTasksTotal: 0,
+        doneTasksTotalByAssignee: {},
         groups: [],
         canGroupTasks: false,
       }
     }
 
-    const [org, rawTasks, rawDoneTasks, doneTasksTotalRow] = await Promise.all([
+    // Rang de chaque tâche terminée parmi celles de son assigné : garder les
+    // N premières de chaque assigné couvre aussi le top N de la flotte.
+    const rankedDoneTasks = db
+      .from('boat_maintenance_tasks')
+      .select('id')
+      .select(
+        db.raw('row_number() over (partition by assignee_id order by updated_at desc) as rank')
+      )
+      .whereIn('boat_id', boatIds)
+      .where('status', 'done')
+
+    const [org, rawTasks, rawDoneTasks, doneTotalsRows] = await Promise.all([
       Organization.findOrFail(user.organizationId),
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
@@ -69,19 +84,33 @@ export default class PlanningService {
         .orderBy('dueEngineHours', 'asc'),
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
-        .where('status', 'done')
+        .whereIn(
+          'id',
+          db
+            .from(rankedDoneTasks.as('ranked'))
+            .where('rank', '<=', PLANNING_DONE_TASKS_LIMIT)
+            .select('id')
+        )
         .preload('assignee', (q) => q.select('id', 'fullName', 'email'))
-        .orderBy('updatedAt', 'desc')
-        .limit(20),
+        .orderBy('updatedAt', 'desc'),
       BoatMaintenanceTask.query()
         .whereIn('boatId', boatIds)
         .where('status', 'done')
-        .count('* as total'),
+        .select('assigneeId')
+        .count('* as total')
+        .groupBy('assigneeId'),
     ])
 
     const canGroupTasks = PLAN_LIMITS[org.plan as PlanTier].canGroupTasks
 
-    const doneTasksTotal = Number(doneTasksTotalRow[0].$extras.total)
+    const doneTasksTotalByAssignee: Record<string, number> = {}
+    let doneTasksTotal = 0
+    for (const row of doneTotalsRows) {
+      const total = Number(row.$extras.total)
+      doneTasksTotalByAssignee[row.assigneeId === null ? 'unassigned' : String(row.assigneeId)] =
+        total
+      doneTasksTotal += total
+    }
 
     const today = DateTime.now().startOf('day')
     const soonDateThreshold = today.plus({ days: 30 })
@@ -143,6 +172,7 @@ export default class PlanningService {
       undatedTasks,
       doneTasks,
       doneTasksTotal,
+      doneTasksTotalByAssignee,
       groups,
       canGroupTasks,
     }

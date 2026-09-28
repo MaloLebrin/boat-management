@@ -211,6 +211,21 @@ test.group('Maintenance tasks — work orders (#868)', (group) => {
     ])
   })
 
+  test('an estimated duration of 0 is kept, not cleared', async ({ client, assert }) => {
+    const admin = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const task = await openTask(boat.id, { estimatedDurationMinutes: 60 })
+
+    await client
+      .patch(`/boats/${boat.id}/maintenance-tasks/${task.id}`)
+      .loginAs(admin)
+      .form({ estimatedDurationMinutes: '0' })
+      .redirects(0)
+
+    await task.refresh()
+    assert.strictEqual(task.estimatedDurationMinutes, 0)
+  })
+
   test('a negative or over-precise cost is rejected by validation', async ({ client, assert }) => {
     const admin = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
@@ -323,6 +338,45 @@ test.group('Maintenance tasks — work orders (#868)', (group) => {
       props.maintenanceAssignees.map((a) => a.id),
       [admin.id, mechanic.id]
     )
+  })
+
+  test('the planning keeps each assignee’s latest done tasks and their exact total', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const mechanic = await createMechanicUser(admin.organizationId!)
+    const boat = await BoatFactory.merge({ organizationId: admin.organizationId! }).create()
+    const done = { status: 'done' as const, doneAt: DateTime.now() }
+    const mechanicDone = await Promise.all(
+      [1, 2, 3].map(() => openTask(boat.id, { ...done, assigneeId: mechanic.id }))
+    )
+    // Les tâches du mécanicien sont plus anciennes que les 21 non assignées :
+    // hors du top 20 de la flotte.
+    await BoatMaintenanceTask.query()
+      .whereIn(
+        'id',
+        mechanicDone.map((t) => t.id)
+      )
+      .update({ updatedAt: DateTime.now().minus({ days: 30 }) })
+    for (let index = 0; index < 21; index++) await openTask(boat.id, done)
+
+    const response = await client.get('/planning').loginAs(admin).withInertia()
+
+    response.assertStatus(200)
+    const props = response.inertiaProps as {
+      doneTasks: PlanningTask[]
+      doneTasksTotal: number
+      doneTasksTotalByAssignee: Record<string, number>
+    }
+    const ids = props.doneTasks.map((t) => t.id)
+    for (const task of mechanicDone) assert.include(ids, task.id)
+    assert.lengthOf(props.doneTasks, 23)
+    assert.equal(props.doneTasksTotal, 24)
+    assert.deepEqual(props.doneTasksTotalByAssignee, {
+      unassigned: 21,
+      [String(mechanic.id)]: 3,
+    })
   })
 
   test('the planned-tasks CSV carries the work order columns', async ({ client, assert }) => {

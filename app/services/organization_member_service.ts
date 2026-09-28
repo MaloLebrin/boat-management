@@ -1,6 +1,8 @@
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import User from '#models/user'
+import Boat from '#models/boat'
+import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import OrganizationMemberRemoved from '#events/organization_member_removed'
 import OrganizationMemberRoleChanged from '#events/organization_member_role_changed'
 import {
@@ -10,6 +12,7 @@ import {
   UserNotFoundError,
 } from '#exceptions/organization_errors'
 import type { OrgRole, OrganizationMemberData } from '#shared/types/organization'
+import { ROLE_PERMISSIONS } from '#shared/types/permissions'
 
 export default class OrganizationMemberService {
   async listMembers(orgId: number): Promise<OrganizationMemberData[]> {
@@ -83,6 +86,9 @@ export default class OrganizationMemberService {
 
     membership.role = role
     await membership.save()
+    if (!ROLE_PERMISSIONS[role].has('maintenance.edit')) {
+      await this.unassignOpenTasks(orgId, membership.userId)
+    }
 
     // Dispatch après commit : le listener écrit des notifications.
     const organization = await Organization.findOrFail(orgId)
@@ -113,10 +119,26 @@ export default class OrganizationMemberService {
     const memberName = membership.user.fullName ?? membership.user.email
 
     await membership.delete()
+    await this.unassignOpenTasks(orgId, removedUserId)
 
     // Dispatch après commit : le listener écrit des notifications.
     const organization = await Organization.findOrFail(orgId)
     await OrganizationMemberRemoved.dispatch(organization, removedUserId, memberName)
+  }
+
+  /**
+   * Libère les tâches ouvertes confiées à un membre qui ne peut plus les
+   * traiter (retiré, ou rôle sans `maintenance.edit`) : elles redeviennent
+   * « non assignées », donc les rappels d'échéance repartent vers les admins
+   * au lieu de viser un ex-membre (#868). Les tâches terminées gardent leur
+   * assigné — c'est l'historique de qui a fait le travail.
+   */
+  private async unassignOpenTasks(orgId: number, userId: number): Promise<void> {
+    await BoatMaintenanceTask.query()
+      .where('assigneeId', userId)
+      .where('status', 'open')
+      .whereIn('boatId', Boat.query().where('organizationId', orgId).select('id'))
+      .update({ assigneeId: null, assignedAt: null })
   }
 
   private async ensureNotLastAdmin(orgId: number, excludeUserId: number): Promise<void> {

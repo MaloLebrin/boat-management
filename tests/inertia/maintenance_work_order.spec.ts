@@ -32,6 +32,7 @@ import BoatTaskActions from '../../inertia/components/boats/maintenance/BoatTask
 import PlannedMaintenanceSummary from '../../inertia/components/boats/budget/PlannedMaintenanceSummary.vue'
 import PlanningTaskCard from '../../inertia/components/planning/PlanningTaskCard.vue'
 import {
+  doneTotalForAssigneeFilter,
   matchesAssigneeFilter,
   parseAssigneeFilter,
 } from '../../inertia/utils/task_assignee_filter'
@@ -222,6 +223,15 @@ describe('assignee filter (#868)', () => {
     expect(parseAssigneeFilter('mine')).toBe('mine')
     expect(parseAssigneeFilter('12')).toBe(12)
     expect(parseAssigneeFilter('nope')).toBe('all')
+  })
+
+  test('the done total comes from the server counts, not the truncated list', () => {
+    const totals = { unassigned: 21, 7: 3 }
+    expect(doneTotalForAssigneeFilter(totals, 24, 'all', 7)).toBe(24)
+    expect(doneTotalForAssigneeFilter(totals, 24, 'mine', 7)).toBe(3)
+    expect(doneTotalForAssigneeFilter(totals, 24, 'mine', null)).toBe(0)
+    expect(doneTotalForAssigneeFilter(totals, 24, 'unassigned', 7)).toBe(21)
+    expect(doneTotalForAssigneeFilter(totals, 24, 9, 7)).toBe(0)
   })
 
   test('initials take the first and last names', () => {

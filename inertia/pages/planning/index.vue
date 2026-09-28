@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { PlanningTask, TaskGroup } from '#shared/types/planning'
+import { PLANNING_DONE_TASKS_LIMIT } from '#shared/types/planning'
 import type { MaintenanceAssigneeOption } from '#shared/types/maintenance'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
@@ -12,6 +13,7 @@ import { Head, router, usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
 import {
+  doneTotalForAssigneeFilter,
   matchesAssigneeFilter,
   parseAssigneeFilter,
   type TaskAssigneeFilter,
@@ -25,6 +27,7 @@ const props = defineProps<{
   undatedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
   doneTasksTotal: number
+  doneTasksTotalByAssignee: Record<string, number>
   groups: TaskGroup[]
   canGroupTasks: boolean
   maintenanceAssignees: MaintenanceAssigneeOption[]
@@ -61,7 +64,14 @@ const filtered = computed(() => ({
   soonTasks: onlyMatching(props.soonTasks),
   plannedTasks: onlyMatching(props.plannedTasks),
   undatedTasks: onlyMatching(props.undatedTasks),
-  doneTasks: onlyMatching(props.doneTasks),
+  // Le serveur envoie le top de la flotte et celui de chaque assigné.
+  doneTasks: onlyMatching(props.doneTasks).slice(0, PLANNING_DONE_TASKS_LIMIT),
+  doneTasksTotal: doneTotalForAssigneeFilter(
+    props.doneTasksTotalByAssignee,
+    props.doneTasksTotal,
+    assigneeFilter.value,
+    currentUserId.value
+  ),
   // Un groupe réduit à une tâche n'en est plus un : elle repasse en carte seule.
   groups: props.groups
     .map((group) => ({ ...group, tasks: onlyMatching(group.tasks) }))
@@ -228,7 +238,7 @@ function handleUngroup(groupId: string) {
       :planned-tasks="filtered.plannedTasks"
       :undated-tasks="filtered.undatedTasks"
       :done-tasks="filtered.doneTasks"
-      :done-tasks-total="assigneeFilter === 'all' ? doneTasksTotal : filtered.doneTasks.length"
+      :done-tasks-total="filtered.doneTasksTotal"
       :groups="filtered.groups"
       :grouping-enabled="groupingEnabled"
       :dismissed-group-ids="dismissedGroupIds"

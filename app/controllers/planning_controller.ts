@@ -30,6 +30,7 @@ export default class PlanningController {
       undatedTasks,
       doneTasks,
       doneTasksTotal,
+      doneTasksTotalByAssignee,
       groups,
       canGroupTasks,
     } = await this.planningService.getPlanningForOrg(user)
@@ -44,6 +45,7 @@ export default class PlanningController {
       undatedTasks,
       doneTasks,
       doneTasksTotal,
+      doneTasksTotalByAssignee,
       groups,
       canGroupTasks,
       maintenanceAssignees,

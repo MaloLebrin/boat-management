@@ -24,3 +24,20 @@ export function parseAssigneeFilter(raw: string | number): TaskAssigneeFilter {
   const id = Number(raw)
   return Number.isInteger(id) && id > 0 ? id : 'all'
 }
+
+/**
+ * Total de tâches terminées correspondant au filtre, lu dans les comptes par
+ * assigné du serveur — la liste reçue est tronquée, sa longueur n'est pas le
+ * total (#868).
+ */
+export function doneTotalForAssigneeFilter(
+  totalsByAssignee: Record<string, number>,
+  fleetTotal: number,
+  filter: TaskAssigneeFilter,
+  currentUserId: number | null
+): number {
+  if (filter === 'all') return fleetTotal
+  if (filter === 'mine' && currentUserId === null) return 0
+  const key = filter === 'mine' ? String(currentUserId) : String(filter)
+  return totalsByAssignee[key] ?? 0
+}

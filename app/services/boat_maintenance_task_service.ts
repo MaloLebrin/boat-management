@@ -407,7 +407,7 @@ export default class BoatMaintenanceTaskService {
     }
 
     if (payload.estimatedDurationMinutes !== undefined) {
-      const minutes = payload.estimatedDurationMinutes || null
+      const minutes = payload.estimatedDurationMinutes ?? null
       if (minutes !== task.estimatedDurationMinutes) {
         task.estimatedDurationMinutes = minutes
         changedFields.push('estimatedDurationMinutes')
