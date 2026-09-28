@@ -1,22 +1,25 @@
 <script setup lang="ts">
-import type { PlanningTask, TaskGroup } from '#shared/types/planning'
+import type { PlanningReservation, PlanningTask, TaskGroup } from '#shared/types/planning'
 import { PLANNING_DONE_TASKS_LIMIT } from '#shared/types/planning'
 import type { MaintenanceAssigneeOption } from '#shared/types/maintenance'
-import BaseButton from '~/components/base/BaseButton.vue'
-import BaseSelect from '~/components/base/BaseSelect.vue'
+import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import PlanningCalendar from '~/components/planning/PlanningCalendar.vue'
 import PlanningKanban from '~/components/planning/PlanningKanban.vue'
-import { computed, ref } from 'vue'
+import PlanningToolbar from '~/components/planning/PlanningToolbar.vue'
+import { computed, ref, toRef } from 'vue'
 import { Head, router, usePage } from '@inertiajs/vue3'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
 import { useCurrentUser } from '~/composables/use_current_user'
+import { useDateFormat } from '~/composables/use_date_format'
+import { usePlanningReschedule } from '~/composables/use_planning_reschedule'
+import { todayDateInputValue } from '~/utils/local_datetime'
+import { applyDueAtOverrides } from '~/utils/planning_columns'
 import {
   doneTotalForAssigneeFilter,
   matchesAssigneeFilter,
-  parseAssigneeFilter,
   type TaskAssigneeFilter,
 } from '~/utils/task_assignee_filter'
 
@@ -31,12 +34,15 @@ const props = defineProps<{
   doneTasksTotalByAssignee: Record<string, number>
   groups: TaskGroup[]
   canGroupTasks: boolean
+  /** Réservations superposées (#869) — vide sans module Location. */
+  reservations: PlanningReservation[]
   maintenanceAssignees: MaintenanceAssigneeOption[]
 }>()
 
 const { t } = useT()
 const page = usePage()
 const { can, isMechanic } = usePermissions()
+const { formatDate } = useDateFormat()
 const { currentUserId } = useCurrentUser()
 
 // Filtre « Assigné à » (#868). Un mécanicien à qui des tâches sont confiées
@@ -53,18 +59,54 @@ const assigneeFilterOptions = computed(() => [
   ...props.maintenanceAssignees.map((a) => ({ label: a.fullName, value: a.id })),
 ])
 
+// Filtre bateau et couche réservations (#869).
+const boatFilter = ref<number | 'all'>('all')
+const showReservations = ref(true)
+const boatOptions = computed(() => {
+  const names = new Map<number, string>()
+  for (const item of [...props.tasks, ...props.doneTasks, ...props.reservations]) {
+    names.set(item.boatId, item.boatName)
+  }
+  return [...names.entries()]
+    .map(([id, name]) => ({ id, name }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+})
+
 function onlyMatching(tasks: PlanningTask[]): PlanningTask[] {
-  return tasks.filter((task) =>
-    matchesAssigneeFilter(task, assigneeFilter.value, currentUserId.value)
+  return tasks.filter(
+    (task) =>
+      (boatFilter.value === 'all' || task.boatId === boatFilter.value) &&
+      matchesAssigneeFilter(task, assigneeFilter.value, currentUserId.value)
   )
 }
 
+const visibleReservations = computed(() =>
+  showReservations.value
+    ? props.reservations.filter((r) => boatFilter.value === 'all' || r.boatId === boatFilter.value)
+    : []
+)
+
+// Glisser-déposer (#869) : rendu optimiste, confirmation en cas de conflit.
+const canReschedule = computed(() => can('maintenance.edit'))
+const reschedule = usePlanningReschedule(toRef(props, 'reservations'))
+const { overrides, pending, isPendingOpen } = reschedule
+
+const columns = computed(() =>
+  applyDueAtOverrides(
+    {
+      overdueTasks: onlyMatching(props.overdueTasks),
+      soonTasks: onlyMatching(props.soonTasks),
+      plannedTasks: onlyMatching(props.plannedTasks),
+      undatedTasks: onlyMatching(props.undatedTasks),
+    },
+    overrides.value,
+    todayDateInputValue()
+  )
+)
+
 const filtered = computed(() => ({
-  tasks: onlyMatching(props.tasks),
-  overdueTasks: onlyMatching(props.overdueTasks),
-  soonTasks: onlyMatching(props.soonTasks),
-  plannedTasks: onlyMatching(props.plannedTasks),
-  undatedTasks: onlyMatching(props.undatedTasks),
+  tasks: onlyMatching(props.tasks).map(reschedule.withOverride),
+  ...columns.value,
   // Le serveur envoie le top de la flotte et celui de chaque assigné.
   doneTasks: onlyMatching(props.doneTasks).slice(0, PLANNING_DONE_TASKS_LIMIT),
   doneTasksTotal: doneTotalForAssigneeFilter(
@@ -75,7 +117,10 @@ const filtered = computed(() => ({
   ),
   // Un groupe réduit à une tâche n'en est plus un : elle repasse en carte seule.
   groups: props.groups
-    .map((group) => ({ ...group, tasks: onlyMatching(group.tasks) }))
+    .map((group) => ({
+      ...group,
+      tasks: onlyMatching(group.tasks).filter((task) => !overrides.value.has(task.id)),
+    }))
     .filter((group) => group.tasks.length > 1),
 }))
 
@@ -120,90 +165,18 @@ function handleUngroup(groupId: string) {
         <p class="mt-1 text-sm text-fg-muted">{{ t('planning.subtitle') }}</p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3">
-        <div v-if="maintenanceAssignees.length > 0" class="w-48">
-          <label for="planning-assignee-filter" class="sr-only">
-            {{ t('planning.assigneeFilter.label') }}
-          </label>
-          <BaseSelect
-            id="planning-assignee-filter"
-            :options="assigneeFilterOptions"
-            :model-value="assigneeFilter"
-            @update:model-value="assigneeFilter = parseAssigneeFilter($event)"
-          />
-        </div>
-
-        <!-- Grouping toggle (Pro+) -->
-        <BaseButton
-          v-if="canGroupTasks"
-          variant="ghost"
-          size="sm"
-          :title="t('planning.grouping.toggleTitle')"
-          :class="[
-            'gap-1.5 border transition-colors',
-            groupingEnabled
-              ? 'border-brand bg-brand-soft text-brand'
-              : 'border-border bg-surface text-fg-muted hover:text-fg',
-          ]"
-          @click="groupingEnabled = !groupingEnabled"
-        >
-          <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          {{ t('planning.grouping.toggle') }}
-        </BaseButton>
-
-        <!-- View toggle -->
-        <div class="flex items-center gap-1 rounded-lg border border-border bg-surface-muted p-1">
-          <BaseButton
-            variant="ghost"
-            size="sm"
-            :class="[
-              'gap-2',
-              viewMode === 'kanban'
-                ? 'bg-surface-elevated text-fg shadow-sm'
-                : 'text-fg-muted hover:text-fg',
-            ]"
-            @click="viewMode = 'kanban'"
-          >
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"
-              />
-            </svg>
-            {{ t('planning.viewKanban') }}
-          </BaseButton>
-          <BaseButton
-            variant="ghost"
-            size="sm"
-            :class="[
-              'gap-2',
-              viewMode === 'calendar'
-                ? 'bg-surface-elevated text-fg shadow-sm'
-                : 'text-fg-muted hover:text-fg',
-            ]"
-            @click="viewMode = 'calendar'"
-          >
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            {{ t('planning.viewCalendar') }}
-          </BaseButton>
-        </div>
-      </div>
+      <PlanningToolbar
+        v-model:assignee-filter="assigneeFilter"
+        v-model:boat-filter="boatFilter"
+        v-model:show-reservations="showReservations"
+        v-model:grouping-enabled="groupingEnabled"
+        v-model:view-mode="viewMode"
+        :assignee-filter-options="assigneeFilterOptions"
+        :show-assignee-filter="maintenanceAssignees.length > 0"
+        :boat-options="boatOptions"
+        :can-group-tasks="canGroupTasks"
+        :has-reservations="reservations.length > 0"
+      />
     </div>
 
     <!-- Pro teaser when starter plan -->
@@ -244,9 +217,36 @@ function handleUngroup(groupId: string) {
       :grouping-enabled="groupingEnabled"
       :dismissed-group-ids="dismissedGroupIds"
       :highlighted-task-id="highlightedTaskId"
+      :reservations="visibleReservations"
+      :can-reschedule="canReschedule"
       @ungroup="handleUngroup"
+      @reschedule="reschedule.request"
     />
 
-    <PlanningCalendar v-else :tasks="filtered.tasks" />
+    <PlanningCalendar
+      v-else
+      :tasks="filtered.tasks"
+      :reservations="visibleReservations"
+      :can-reschedule="canReschedule"
+      @reschedule="reschedule.request"
+    />
+
+    <!-- Déplacement sur une réservation confirmée (#869) : on prévient, on ne bloque pas. -->
+    <BaseConfirmModal
+      v-model:open="isPendingOpen"
+      :title="t('planning.drag.conflictTitle')"
+      :message="
+        pending
+          ? t('planning.drag.conflictMessage', {
+              task: pending.task.title,
+              boat: pending.task.boatName,
+              client: pending.conflict.clientName,
+              date: pending.dueAt ? formatDate(pending.dueAt) : '',
+            })
+          : undefined
+      "
+      :confirm-label="t('planning.drag.conflictConfirm')"
+      @confirm="reschedule.confirmPending"
+    />
   </div>
 </template>

@@ -21,6 +21,11 @@ const { currentYear, currentMonth, prevMonth, nextMonth, monthLabel, daysInMonth
 
 const days = computed(() => Array.from({ length: daysInMonth.value }, (_, i) => i + 1))
 
+// Couche « entretien planifié » (#869) : légende affichée seulement si elle sert.
+const hasMaintenance = computed(() =>
+  props.calendarEntries.some((entry) => (entry.maintenance ?? []).length > 0)
+)
+
 const scrollEl = ref<HTMLElement | null>(null)
 const isScrollable = ref(false)
 
@@ -99,6 +104,10 @@ const monthEnd = computed(
           <span class="flex items-center gap-1.5">
             <span class="h-2.5 w-5 rounded-sm bg-lilac-200 opacity-60" />
             {{ t('reservations.status.cancelled') }}
+          </span>
+          <span v-if="hasMaintenance" class="flex items-center gap-1.5">
+            <span class="h-1.5 w-5 rounded-full border-l-2 border-sky-300 bg-sky-100" />
+            {{ t('reservations.calendar.maintenanceLegend') }}
           </span>
         </div>
       </div>

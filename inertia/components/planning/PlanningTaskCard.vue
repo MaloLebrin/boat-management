@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, useTemplateRef } from 'vue'
-import type { PlanningTask } from '#shared/types/planning'
+import type { PlanningReservation, PlanningTask } from '#shared/types/planning'
 import BaseButton from '~/components/base/BaseButton.vue'
 import MaintenanceTaskPostponeMenu from '~/components/boats/maintenance/MaintenanceTaskPostponeMenu.vue'
 import { useT } from '~/composables/use_t'
@@ -16,7 +16,27 @@ const props = defineProps<{
   done?: boolean
   /** Tâche ciblée par `/planning?task=<id>` (#473) : surlignée et amenée à l'écran. */
   highlighted?: boolean
+  /** Glisser-déposer (#869) : la carte porte une poignée de déplacement. */
+  draggable?: boolean
+  /** La carte est en train d'être glissée : elle suit le pointeur. */
+  dragging?: boolean
+  dragOffset?: { x: number; y: number } | null
+  /** Réservation confirmée du bateau pendant l'échéance (#869). */
+  conflict?: PlanningReservation | null
 }>()
+
+const emit = defineEmits<{ dragStart: [event: PointerEvent] }>()
+
+// La carte suit le pointeur ; `pointer-events: none` laisse `elementFromPoint`
+// trouver la colonne *sous* elle, et non la carte elle-même.
+const dragStyle = computed(() =>
+  props.dragging && props.dragOffset
+    ? {
+        transform: `translate(${props.dragOffset.x}px, ${props.dragOffset.y}px)`,
+        pointerEvents: 'none' as const,
+      }
+    : undefined
+)
 
 const root = useTemplateRef<HTMLElement>('root')
 
@@ -26,7 +46,7 @@ onMounted(() => {
 })
 
 const { t } = useT()
-const { formatDate } = useDateFormat()
+const { formatDate, formatDayMonth } = useDateFormat()
 const { can } = usePermissions()
 
 // /boats/:id passe par BoatPolicy.view → capability `boats.view`, que le rôle
@@ -50,14 +70,37 @@ function formatDue(task: PlanningTask): string {
   <div
     :id="`planning-task-${task.id}`"
     ref="root"
-    class="rounded-lg border border-border bg-surface-elevated p-3"
+    class="relative rounded-lg border border-border bg-surface-elevated p-3"
     :class="[
       accentClass ? `border-l-4 ${accentClass}` : '',
       highlighted ? 'ring-2 ring-brand ring-offset-2 ring-offset-surface' : '',
+      dragging ? 'z-50 shadow-lg ring-2 ring-brand' : '',
     ]"
+    :style="dragStyle"
+    :data-testid="`planning-task-card-${task.id}`"
   >
     <div class="flex items-start justify-between gap-2">
-      <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
+      <!--
+        Poignée ≥ 44 px (#494) : seule zone qui capte le glisser, pour que le
+        reste de la carte défile normalement au doigt. Le chemin clavier est le
+        menu « Reporter » : le glisser n'est jamais le seul.
+      -->
+      <span
+        v-if="draggable"
+        class="-my-2 -ml-2 flex h-11 w-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-md text-fg-subtle hover:bg-surface-muted hover:text-fg active:cursor-grabbing"
+        :title="t('planning.drag.handle')"
+        :aria-label="t('planning.drag.handle')"
+        role="img"
+        data-testid="planning-task-drag-handle"
+        @pointerdown="emit('dragStart', $event)"
+      >
+        <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <path
+            d="M7 4a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm6 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM7 11.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm6 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3zM7 19a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm6 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"
+          />
+        </svg>
+      </span>
+      <p class="mr-auto text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
       <!-- Assigné (#868) : pastille d'initiales, nom complet au survol. -->
       <span
         v-if="task.assignee"
@@ -76,6 +119,19 @@ function formatDue(task: PlanningTask): string {
     <p class="mt-1 text-xs text-fg-muted">{{ maintenanceSubjectLabel(t, task.subject) }}</p>
     <p v-if="task.providerName" class="mt-1 text-xs text-fg-subtle">
       {{ t('boats.maintenance.tasks.workOrder.providerShort', { name: task.providerName }) }}
+    </p>
+    <p
+      v-if="conflict"
+      class="mt-1 text-xs font-medium text-danger"
+      data-testid="planning-task-conflict"
+    >
+      {{
+        t('planning.drag.conflictBadge', {
+          client: conflict.clientName,
+          from: formatDayMonth(conflict.startsAt),
+          to: formatDayMonth(conflict.endsAt),
+        })
+      }}
     </p>
     <p v-if="task.postponedCount > 0" class="mt-1 text-xs font-medium text-warning">
       {{ t('planning.postponedCount', { count: String(task.postponedCount) }) }}

@@ -2,6 +2,7 @@ import type BoatReservation from '#models/boat_reservation'
 import type {
   BoatReservationRow,
   FleetBoatCalendarEntry,
+  FleetMaintenanceWindow,
   FleetBoatOption,
 } from '#shared/types/reservation'
 import type { InvoiceLink } from '#shared/types/invoice'
@@ -38,10 +39,19 @@ export function toBoatReservationRow(
  */
 export function toFleetCalendarEntries(
   boats: FleetBoatOption[],
-  rows: BoatReservationRow[]
+  rows: BoatReservationRow[],
+  maintenanceByBoat: Map<number, FleetMaintenanceWindow[]> = new Map()
 ): FleetBoatCalendarEntry[] {
   const entries = new Map<number, FleetBoatCalendarEntry>(
-    boats.map((boat) => [boat.id, { boatId: boat.id, boatName: boat.name, reservations: [] }])
+    boats.map((boat) => [
+      boat.id,
+      {
+        boatId: boat.id,
+        boatName: boat.name,
+        reservations: [],
+        maintenance: maintenanceByBoat.get(boat.id) ?? [],
+      },
+    ])
   )
 
   for (const row of rows) {

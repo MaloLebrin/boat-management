@@ -377,6 +377,38 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'planning.index',
   },
   {
+    id: 'planning-drag-drop',
+    title: {
+      en: 'Rescheduling tasks by drag and drop in the planning',
+      fr: 'Déplacer les tâches par glisser-déposer dans le planning',
+    },
+    body: {
+      en: 'In the planning, a dated open task moves by drag and drop, with the mouse or a finger, using the handle on its card. Dropping it on “Due soon” sets the end of this week, on “Planned” one month later, on “Undated” removes the due date. In the calendar, drag a task to another day. The move shows at once and is undone if saving fails; the Postpone menu remains the keyboard path. With the Charter module, reservations appear as bands in the calendar (Reservations button to hide them); a task during a confirmed charter is flagged and a move onto one asks for confirmation. The fleet reservations timeline shows scheduled maintenance. Requires the right to edit maintenance.',
+      fr: 'Dans le planning, une tâche ouverte datée se déplace par glisser-déposer, à la souris ou au doigt, avec la poignée de sa carte. Déposée sur « Bientôt dû », elle prend la fin de semaine ; sur « Planifiées », un mois plus tard ; sur « Non datées », elle perd son échéance. Dans le calendrier, on la glisse sur un autre jour. Le changement s’affiche aussitôt et s’annule si l’enregistrement échoue ; le menu Reporter reste le chemin clavier. Avec le module Location, les réservations s’affichent en bandes (bouton Réservations pour les masquer) ; une tâche pendant une location confirmée est signalée et un dépôt dessus demande confirmation. La frise des réservations montre les entretiens planifiés.',
+    },
+    keywords: [
+      'glisser',
+      'deposer',
+      'drag',
+      'drop',
+      'deplacer',
+      'move',
+      'kanban',
+      'calendrier',
+      'calendar',
+      'planning',
+      'reservation',
+      'location',
+      'charter',
+      'conflit',
+      'conflict',
+      'indisponibilite',
+      'entretien planifie',
+      'scheduled maintenance',
+    ],
+    navTarget: 'planning.index',
+  },
+  {
     id: 'boat-availability-status',
     title: {
       en: 'Boat availability status (available, in maintenance, out of service, sold)',

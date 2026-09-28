@@ -45,5 +45,24 @@
     "all": "Toutes les tâches",
     "mine": "Mes tâches",
     "unassigned": "Non assignées"
+  },
+  "boatFilter": {
+    "label": "Filtrer par bateau",
+    "all": "Tous les bateaux"
+  },
+  "reservations": {
+    "toggle": "Réservations",
+    "more": "+{count} réservation(s)",
+    "band": {
+      "option": "{boat} — option de {client}, du {from} au {to}",
+      "confirmed": "{boat} — loué à {client}, du {from} au {to}"
+    }
+  },
+  "drag": {
+    "handle": "Glisser pour changer l'échéance",
+    "conflictBadge": "Pendant une location : {client}, du {from} au {to}",
+    "conflictTitle": "Le bateau est loué à cette date",
+    "conflictMessage": "« {task} » tomberait le {date}, pendant la location confirmée de {boat} par {client}. Déplacer quand même ?",
+    "conflictConfirm": "Déplacer quand même"
   }
 }

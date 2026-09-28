@@ -76,6 +76,7 @@ function mountPlanning(url: string, tasks: PlanningTask[]) {
       doneTasksTotalByAssignee: {},
       groups: [],
       canGroupTasks: false,
+      reservations: [],
       maintenanceAssignees: [],
     },
     global: {

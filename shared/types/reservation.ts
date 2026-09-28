@@ -38,6 +38,21 @@ export interface FleetBoatCalendarEntry {
   boatId: number
   boatName: string
   reservations: BoatReservationRow[]
+  /**
+   * Entretiens planifiés du bateau (#869), superposés à la frise. Vide quand
+   * l'appelant n'a pas `maintenance.view`.
+   */
+  maintenance: FleetMaintenanceWindow[]
+}
+
+/** Tâche de maintenance ouverte et datée, vue comme une plage de jours (#869). */
+export interface FleetMaintenanceWindow {
+  taskId: number
+  title: string
+  /** `YYYY-MM-DD`, inclusif. */
+  startsOn: string
+  /** `YYYY-MM-DD`, exclusif. */
+  endsOn: string
 }
 
 export interface FleetBoatOption {

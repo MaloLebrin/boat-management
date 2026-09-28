@@ -53,6 +53,15 @@ Référence: `inertia/app.ts`.
     - Occupation location: `DashboardCharterOccupancyCard.vue` — module Location, taux en grand + barre `bg-brand` (`role="progressbar"`), jours-bateau, confirmées / options / CA confirmé, lien `/reservations`
 - Tests : `dashboard_page_layout.spec.ts` (ordre par défaut, ordre personnalisé, lignes `half`, mode édition), `dashboard_widget_frame`, `dashboard_edit_toolbar`, `dashboard_add_widget_modal`, `use_dashboard_layout`, `dashboard_planned_tasks_card`, `dashboard_notifications_card`, `dashboard_safety_compliance_card`, `dashboard_fuel_card`, `dashboard_low_stock_card`, `dashboard_invoicing_card`, `dashboard_charter_occupancy_card`, `dashboard_attention_card`, `dashboard_stats_grid`, `dashboard_at_sea_card`, `dashboard_upcoming_reservations_card`, `dashboard_activity_card`, `dashboard_spend_card`, `dashboard_ai_panel_analysed_at`, `dashboard_header`, `dashboard_boats_card`, `dashboard_ports_card_plan` ; fonctionnel `tests/functional/dashboard/dashboard_props.spec.ts` (gardes, groupes différés), `dashboard_layout.spec.ts` (PUT/DELETE, assainissement, props omises, `plannedTasks`, widgets de la galerie masqués par défaut puis différés une fois ajoutés) ; navigateur `dashboard_card_links.spec.ts` (KPI, À traiter → planning), `mobile_field.spec.ts` (non-débordement, cartes bateaux), `touch_targets.spec.ts`
 
+### Planning (`/planning`, #869)
+
+- Page `inertia/pages/planning/index.vue` ; barre `PlanningToolbar.vue` (filtres « Assigné à » et bateau, bouton « Réservations », groupement, bascule kanban/calendrier)
+- Kanban : `PlanningKanban.vue` → cinq `PlanningKanbanColumn.vue` (« Bientôt », « Planifiées », « Non datées » portent `data-drop-zone`) ; `PlanningTaskCard.vue` porte la poignée de glisser (`planning-task-drag-handle`, 44 px, `touch-none`, capability `maintenance.edit`) et la mention de conflit « Pendant une location »
+- Calendrier : `PlanningCalendar.vue` (navigation `useMonthNav`, agenda mobile, tâches sans date, `PlanningCalendarHourTasks.vue`) → `PlanningCalendarGrid.vue` (grille desktop, cases `day:YYYY-MM-DD` déposables, bandes de réservations)
+- `AvailabilityBand.vue` : bande d'indisponibilité commune au planning (réservations) et à la frise `/reservations` (entretiens planifiés, `ReservationTimelineRow.vue`)
+- Composables : `use_pointer_drag.ts` (Pointer Events, souris et tactile), `use_planning_reschedule.ts` (PATCH partiel, rendu optimiste, confirmation de conflit) ; utils `planning_columns.ts`, `planning_reservations.ts` ; calculs purs `shared/helpers/planning_schedule.ts`
+- Doc : `docs/domain/planning.md`
+
 ### Boats (liste / création / édition)
 
 - `boats/index`: `inertia/pages/boats/index.vue`

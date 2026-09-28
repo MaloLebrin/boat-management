@@ -1,9 +1,18 @@
 <script setup lang="ts">
-import type { PlanningTask, TaskGroup } from '#shared/types/planning'
+import type { PlanningReservation, PlanningTask, TaskGroup } from '#shared/types/planning'
+import { PLANNING_DROP_COLUMNS, type PlanningDropColumn } from '#shared/types/planning'
+import {
+  columnForDueAt,
+  dueAtForColumn,
+  reservationConflictFor,
+} from '#shared/helpers/planning_schedule'
+import PlanningKanbanColumn from '~/components/planning/PlanningKanbanColumn.vue'
 import PlanningTaskCard from '~/components/planning/PlanningTaskCard.vue'
 import PlanningTaskGroup from '~/components/planning/PlanningTaskGroup.vue'
 import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
+import { usePointerDrag } from '~/composables/use_pointer_drag'
+import { todayDateInputValue } from '~/utils/local_datetime'
 
 const props = defineProps<{
   overdueTasks: PlanningTask[]
@@ -17,9 +26,16 @@ const props = defineProps<{
   dismissedGroupIds: Set<string>
   /** Tâche ciblée par `/planning?task=<id>` (#473). */
   highlightedTaskId?: number | null
+  /** Réservations superposées (#869) : marquent les cartes en conflit. */
+  reservations?: PlanningReservation[]
+  /** `maintenance.edit` : les cartes datées se déplacent entre colonnes (#869). */
+  canReschedule?: boolean
 }>()
 
-const emit = defineEmits<{ ungroup: [groupId: string] }>()
+const emit = defineEmits<{
+  ungroup: [groupId: string]
+  reschedule: [task: PlanningTask, dueAt: string | null]
+}>()
 
 const { t } = useT()
 
@@ -45,28 +61,60 @@ const doneTasksLabel = computed(() => {
     ? t('planning.kanban.completedWithCount', { displayed, total })
     : t('planning.kanban.completed')
 })
+
+// Glisser-déposer (#869) : déposer une carte dans « Bientôt », « Planifiées »
+// ou « Non datées » lui donne l'échéance de la colonne. « En retard » et
+// « Complétées » ne sont pas des cibles : on n'y range pas une tâche à la main.
+function isDropColumn(zone: string): zone is PlanningDropColumn {
+  return (PLANNING_DROP_COLUMNS as readonly string[]).includes(zone)
+}
+
+const { dragged, offset, hoveredZone, start } = usePointerDrag<PlanningTask>({
+  onDrop(task, zone) {
+    if (!isDropColumn(zone)) return
+    const today = todayDateInputValue()
+    if (columnForDueAt(task.dueAt, today) === zone) return
+    emit('reschedule', task, dueAtForColumn(zone, today))
+  },
+})
+
+function isDraggable(task: PlanningTask): boolean {
+  return !!props.canReschedule && task.kind === 'date' && task.status === 'open'
+}
+
+function conflictOf(task: PlanningTask): PlanningReservation | null {
+  return reservationConflictFor(task, props.reservations ?? [])
+}
+
+function cardDrag(task: PlanningTask) {
+  const isDragged = dragged.value?.id === task.id
+  return {
+    draggable: isDraggable(task),
+    dragging: isDragged,
+    dragOffset: isDragged ? offset.value : null,
+    conflict: conflictOf(task),
+  }
+}
+
+function zoneState(zone: PlanningDropColumn) {
+  return {
+    dropZone: zone,
+    dropArmed: dragged.value !== null,
+    dropActive: hoveredZone.value === zone,
+  }
+}
 </script>
 
 <template>
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-    <!-- En retard -->
-    <div class="flex flex-col gap-3">
-      <div
-        class="flex items-center gap-2 rounded-lg border-l-4 border-coral-500 bg-danger-soft px-3 py-2"
-      >
-        <h2 class="text-sm font-semibold text-coral-700">{{ t('planning.kanban.overdue') }}</h2>
-        <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-coral-600 px-1.5 text-xs font-semibold text-white"
-        >
-          {{ overdueTasks.length }}
-        </span>
-      </div>
-      <div
-        v-if="overdueTasks.length === 0"
-        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-      >
-        {{ t('planning.kanban.overdueEmpty') }}
-      </div>
+    <PlanningKanbanColumn
+      :title="t('planning.kanban.overdue')"
+      :count="overdueTasks.length"
+      :empty-label="t('planning.kanban.overdueEmpty')"
+      header-class="border-coral-500 bg-danger-soft"
+      title-class="text-coral-700"
+      count-class="bg-coral-600 text-white"
+    >
       <PlanningTaskCard
         v-for="task in overdueTasks"
         :key="task.id"
@@ -74,27 +122,20 @@ const doneTasksLabel = computed(() => {
         :highlighted="task.id === highlightedTaskId"
         accent-class="border-coral-400"
         badge-class="bg-coral-100 text-coral-700"
+        v-bind="cardDrag(task)"
+        @drag-start="start($event, task)"
       />
-    </div>
+    </PlanningKanbanColumn>
 
-    <!-- À venir bientôt -->
-    <div class="flex flex-col gap-3">
-      <div
-        class="flex items-center gap-2 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-3 py-2"
-      >
-        <h2 class="text-sm font-semibold text-amber-700">{{ t('planning.kanban.soon') }}</h2>
-        <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-600 px-1.5 text-xs font-semibold text-white"
-        >
-          {{ soonTasks.length }}
-        </span>
-      </div>
-      <div
-        v-if="soonTasks.length === 0"
-        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-      >
-        {{ t('planning.kanban.soonEmpty') }}
-      </div>
+    <PlanningKanbanColumn
+      :title="t('planning.kanban.soon')"
+      :count="soonTasks.length"
+      :empty-label="t('planning.kanban.soonEmpty')"
+      header-class="border-amber-400 bg-amber-50"
+      title-class="text-amber-700"
+      count-class="bg-amber-600 text-white"
+      v-bind="zoneState('soon')"
+    >
       <PlanningTaskCard
         v-for="task in soonTasks"
         :key="task.id"
@@ -102,27 +143,20 @@ const doneTasksLabel = computed(() => {
         :highlighted="task.id === highlightedTaskId"
         accent-class="border-amber-400"
         badge-class="bg-amber-100 text-amber-700"
+        v-bind="cardDrag(task)"
+        @drag-start="start($event, task)"
       />
-    </div>
+    </PlanningKanbanColumn>
 
-    <!-- Non datées -->
-    <div class="flex flex-col gap-3">
-      <div
-        class="flex items-center gap-2 rounded-lg border-l-4 border-fg-subtle bg-surface-muted px-3 py-2"
-      >
-        <h2 class="text-sm font-semibold text-fg">{{ t('planning.kanban.undated') }}</h2>
-        <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-fg-subtle px-1.5 text-xs font-semibold text-white"
-        >
-          {{ undatedTasks.length }}
-        </span>
-      </div>
-      <div
-        v-if="undatedTasks.length === 0"
-        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-      >
-        {{ t('planning.kanban.undatedEmpty') }}
-      </div>
+    <PlanningKanbanColumn
+      :title="t('planning.kanban.undated')"
+      :count="undatedTasks.length"
+      :empty-label="t('planning.kanban.undatedEmpty')"
+      header-class="border-fg-subtle bg-surface-muted"
+      title-class="text-fg"
+      count-class="bg-fg-subtle text-white"
+      v-bind="zoneState('undated')"
+    >
       <PlanningTaskCard
         v-for="task in undatedTasks"
         :key="task.id"
@@ -130,36 +164,29 @@ const doneTasksLabel = computed(() => {
         :highlighted="task.id === highlightedTaskId"
         accent-class="border-fg-subtle"
         badge-class="bg-surface-muted text-fg"
+        v-bind="cardDrag(task)"
+        @drag-start="start($event, task)"
       />
-    </div>
+    </PlanningKanbanColumn>
 
-    <!-- Planifiées -->
-    <div class="flex flex-col gap-3">
-      <!--
-        Les quatre autres colonnes teintent leur en-tête avec une palette de
-        marque, dont les paliers `-50`/`-700` s'inversent sous `[data-theme]`.
-        Le navy, lui, est la palette des surfaces *permanentes* (sidebar, bandeaux)
-        et n'est pas réinversée : `bg-navy-25` restait donc un aplat quasi blanc
-        en thème sombre, seul en-tête clair du kanban (#457). Les tokens `brand`
-        portent la même teinte et basculent, `text-on-brand` suivant sur la
-        pastille.
-      -->
-      <div
-        class="flex items-center gap-2 rounded-lg border-l-4 border-brand bg-brand-soft px-3 py-2"
-      >
-        <h2 class="text-sm font-semibold text-brand">{{ t('planning.kanban.planned') }}</h2>
-        <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand px-1.5 text-xs font-semibold text-on-brand"
-        >
-          {{ plannedTasks.length }}
-        </span>
-      </div>
-      <div
-        v-if="plannedTasks.length === 0"
-        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-      >
-        {{ t('planning.kanban.plannedEmpty') }}
-      </div>
+    <!--
+      Les quatre autres colonnes teintent leur en-tête avec une palette de
+      marque, dont les paliers `-50`/`-700` s'inversent sous `[data-theme]`.
+      Le navy, lui, est la palette des surfaces *permanentes* (sidebar, bandeaux)
+      et n'est pas réinversée : `bg-navy-25` restait donc un aplat quasi blanc
+      en thème sombre, seul en-tête clair du kanban (#457). Les tokens `brand`
+      portent la même teinte et basculent, `text-on-brand` suivant sur la
+      pastille.
+    -->
+    <PlanningKanbanColumn
+      :title="t('planning.kanban.planned')"
+      :count="plannedTasks.length"
+      :empty-label="t('planning.kanban.plannedEmpty')"
+      header-class="border-brand bg-brand-soft"
+      title-class="text-brand"
+      count-class="bg-brand text-on-brand"
+      v-bind="zoneState('planned')"
+    >
       <!-- Groupes actifs dans la colonne planifiées -->
       <template v-if="groupingEnabled">
         <PlanningTaskGroup
@@ -175,27 +202,19 @@ const doneTasksLabel = computed(() => {
         :task="task"
         :highlighted="task.id === highlightedTaskId"
         badge-class="bg-surface-muted text-fg-muted"
+        v-bind="cardDrag(task)"
+        @drag-start="start($event, task)"
       />
-    </div>
+    </PlanningKanbanColumn>
 
-    <!-- Complétées -->
-    <div class="flex flex-col gap-3">
-      <div
-        class="flex items-center gap-2 rounded-lg border-l-4 border-mint-600 bg-mint-50 px-3 py-2"
-      >
-        <h2 class="text-sm font-semibold text-mint-700">{{ doneTasksLabel }}</h2>
-        <span
-          class="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mint-600 px-1.5 text-xs font-semibold text-white"
-        >
-          {{ doneTasks.length }}
-        </span>
-      </div>
-      <div
-        v-if="doneTasks.length === 0"
-        class="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-fg-muted"
-      >
-        {{ t('planning.kanban.completedEmpty') }}
-      </div>
+    <PlanningKanbanColumn
+      :title="doneTasksLabel"
+      :count="doneTasks.length"
+      :empty-label="t('planning.kanban.completedEmpty')"
+      header-class="border-mint-600 bg-mint-50"
+      title-class="text-mint-700"
+      count-class="bg-mint-600 text-white"
+    >
       <PlanningTaskCard
         v-for="task in doneTasks"
         :key="task.id"
@@ -205,6 +224,6 @@ const doneTasksLabel = computed(() => {
         badge-class="bg-mint-100 text-mint-700"
         :done="true"
       />
-    </div>
+    </PlanningKanbanColumn>
   </div>
 </template>

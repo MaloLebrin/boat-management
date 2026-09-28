@@ -222,6 +222,12 @@ Réf. routes : `start/routes/boats.ts` (per-boat) et `start/routes/reservations.
 > La **création/édition se fait uniquement depuis le formulaire par bateau**
 > (le `boatId` est fixe) ; la page flotte `/reservations` est en lecture seule.
 
+> **Entretiens planifiés sur la frise (#869)** : chaque `calendarEntries[]`
+> porte `maintenance` (tâches ouvertes datées en plages de jours, pour qui a
+> `maintenance.view`), rendu en liseré sous les locations. À l'inverse,
+> `/planning` superpose les réservations aux tâches — voir
+> [`planning.md`](planning.md).
+
 ### 5.4 Validation (`app/validators/boat_reservation_validator.ts`)
 
 Dates : formats `YYYY-MM-DDTHH:mm` ou `YYYY-MM-DD`. `clientName` requis (1–255).

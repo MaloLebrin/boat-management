@@ -45,5 +45,24 @@
     "all": "All tasks",
     "mine": "My tasks",
     "unassigned": "Unassigned"
+  },
+  "boatFilter": {
+    "label": "Filter by boat",
+    "all": "All boats"
+  },
+  "reservations": {
+    "toggle": "Reservations",
+    "more": "+{count} reservation(s)",
+    "band": {
+      "option": "{boat} — option for {client}, from {from} to {to}",
+      "confirmed": "{boat} — chartered by {client}, from {from} to {to}"
+    }
+  },
+  "drag": {
+    "handle": "Drag to change the due date",
+    "conflictBadge": "During a charter: {client}, from {from} to {to}",
+    "conflictTitle": "The boat is chartered on that date",
+    "conflictMessage": "\"{task}\" would fall on {date}, during {client}'s confirmed charter of {boat}. Move it anyway?",
+    "conflictConfirm": "Move anyway"
   }
 }
