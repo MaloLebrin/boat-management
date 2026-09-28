@@ -73,8 +73,8 @@ export function toBoatTaskEquipment(boat: Boat | null): BoatTaskEquipment {
   }
 }
 
-function decimal(value: string | null): number | null {
-  if (value === null) return null
+function decimal(value: string | null | undefined): number | null {
+  if (value === null || value === undefined) return null
   const n = Number(value)
   return Number.isFinite(n) ? n : null
 }
@@ -84,14 +84,14 @@ function decimal(value: string | null): number | null {
  * relation `assignee` a été préchargée ; sinon `null`.
  */
 export function toMaintenanceTaskWorkOrder(t: BoatMaintenanceTask): MaintenanceTaskWorkOrder {
-  const assignee = t.assigneeId !== null && t.$preloaded.assignee ? t.assignee : null
+  const assignee = t.assigneeId && t.$preloaded?.assignee ? t.assignee : null
   return {
     assignee: assignee ? { id: assignee.id, fullName: assignee.fullName || assignee.email } : null,
-    providerName: t.providerName,
+    providerName: t.providerName ?? null,
     estimatedCost: decimal(t.estimatedCost),
     actualCost: decimal(t.actualCost),
-    estimatedDurationMinutes: t.estimatedDurationMinutes,
-    actualDurationMinutes: t.actualDurationMinutes,
+    estimatedDurationMinutes: t.estimatedDurationMinutes ?? null,
+    actualDurationMinutes: t.actualDurationMinutes ?? null,
   }
 }
 
