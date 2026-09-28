@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import AvailabilityBand from '~/components/planning/AvailabilityBand.vue'
 import { useT } from '~/composables/use_t'
 import type {
   BoatReservationRow,
@@ -50,6 +51,22 @@ const coveredByDay = computed(() => {
     })
   )
 })
+
+// Couche « entretien planifié » (#869) : liseré sous la location du jour.
+const maintenanceByDay = computed(() => {
+  const windows = props.entry.maintenance ?? []
+  return new Map(
+    props.days.map((day) => {
+      const iso = isoForDay(day)
+      return [day, windows.filter((w) => w.startsOn <= iso && iso < w.endsOn)] as const
+    })
+  )
+})
+
+function maintenanceTitle(day: number): string {
+  const titles = (maintenanceByDay.value.get(day) ?? []).map((w) => w.title).join(', ')
+  return t('reservations.calendar.maintenanceBand', { tasks: titles })
+}
 </script>
 
 <template>
@@ -86,6 +103,12 @@ const coveredByDay = computed(() => {
             </span>
           </div>
         </template>
+        <AvailabilityBand
+          v-if="maintenanceByDay.get(day)?.length"
+          kind="maintenance"
+          class="absolute inset-x-0 -bottom-1"
+          :title="maintenanceTitle(day)"
+        />
       </div>
     </div>
   </div>

@@ -64,7 +64,9 @@
     "scrollHint": "Faites défiler pour voir tout le mois",
     "available": "Disponible",
     "noBoatsTitle": "Aucun bateau dans votre flotte",
-    "noBoatsDescription": "Ajoutez un bateau pour planifier ses réservations."
+    "noBoatsDescription": "Ajoutez un bateau pour planifier ses réservations.",
+    "maintenanceBand": "Entretien planifié : {tasks}",
+    "maintenanceLegend": "Entretien planifié"
   },
   "empty": {
     "title": "Aucune réservation",

@@ -39,6 +39,7 @@ function mountEmptyPlanning(capabilities: Capability[]) {
       doneTasksTotalByAssignee: {},
       groups: [],
       canGroupTasks: false,
+      reservations: [],
       maintenanceAssignees: [],
     },
   })

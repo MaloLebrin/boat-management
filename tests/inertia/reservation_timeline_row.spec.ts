@@ -1,5 +1,10 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
+
+vi.mock('~/composables/use_t', () => ({
+  useT: () => ({ t: (k: string, p?: Record<string, string>) => `${k} ${p?.tasks ?? ''}` }),
+}))
+
 import ReservationTimelineRow from '../../inertia/components/reservations/ReservationTimelineRow.vue'
 import type { FleetBoatCalendarEntry } from '../../shared/types/reservation'
 
@@ -27,6 +32,7 @@ const entry: FleetBoatCalendarEntry = {
       createdAt: '2026-05-01',
     },
   ],
+  maintenance: [],
 }
 
 describe('ReservationTimelineRow', () => {
@@ -91,5 +97,25 @@ describe('ReservationTimelineRow', () => {
     // There is exactly one span with the client name
     const spans = wrapper.findAll('span').filter((s) => s.text() === 'Alice')
     expect(spans).toHaveLength(1)
+  })
+
+  test('overlays scheduled maintenance days with a band (#869)', () => {
+    const withMaintenance: FleetBoatCalendarEntry = {
+      ...entry,
+      maintenance: [{ taskId: 5, title: 'Carénage', startsOn: '2026-06-10', endsOn: '2026-06-12' }],
+    }
+    const wrapper = mount(ReservationTimelineRow, {
+      props: { entry: withMaintenance, days, monthStart, monthEnd },
+    })
+    const bands = wrapper.findAll('[data-testid="availability-band-maintenance"]')
+    expect(bands).toHaveLength(2)
+    expect(bands[0].attributes('title')).toContain('Carénage')
+  })
+
+  test('renders no maintenance band without scheduled tasks', () => {
+    const wrapper = mount(ReservationTimelineRow, {
+      props: { entry, days, monthStart, monthEnd },
+    })
+    expect(wrapper.find('[data-testid="availability-band-maintenance"]').exists()).toBe(false)
   })
 })

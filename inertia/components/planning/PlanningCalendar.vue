@@ -1,22 +1,46 @@
 <script setup lang="ts">
-import type { PlanningTask } from '#shared/types/planning'
+import type { PlanningReservation, PlanningTask } from '#shared/types/planning'
+import { reservationCoversDay } from '#shared/helpers/planning_schedule'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import AvailabilityBand from '~/components/planning/AvailabilityBand.vue'
+import PlanningCalendarGrid, {
+  type PlanningCalendarCell,
+} from '~/components/planning/PlanningCalendarGrid.vue'
 import PlanningCalendarHourTasks from '~/components/planning/PlanningCalendarHourTasks.vue'
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { useDateFormat } from '~/composables/use_date_format'
+import { useMonthNav } from '~/composables/use_month_nav'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
+import { todayDateInputValue } from '~/utils/local_datetime'
+import { reservationBandKind, reservationBandTitle } from '~/utils/planning_reservations'
 
 const props = defineProps<{
   tasks: PlanningTask[]
+  /** Réservations superposées en bandes (#869). */
+  reservations?: PlanningReservation[]
+  /** `maintenance.edit` : glisser une tâche sur un autre jour (#869). */
+  canReschedule?: boolean
 }>()
 
+const emit = defineEmits<{ reschedule: [task: PlanningTask, dueAt: string | null] }>()
+
 const { t } = useT()
-const { formatMonthYear, formatWeekdayDay, formatWeekdayShort } = useDateFormat()
+const { formatWeekdayDay, formatDayMonth } = useDateFormat()
 const { can } = usePermissions()
+const {
+  currentYear,
+  currentMonth,
+  prevMonth,
+  nextMonth,
+  monthLabel,
+  daysInMonth,
+  firstWeekday,
+  weekdays,
+} = useMonthNav()
 
 // Voir PlanningTaskCard : /planning est ouvert à tout utilisateur authentifié, mais
 // /boats/:id exige `boats.view` — un mécanicien n'a donc rien à cliquer ici (#473).
@@ -27,51 +51,20 @@ function openBoat(boatId: number) {
   router.visit(`/boats/${boatId}`)
 }
 
-const today = new Date()
-const currentYear = ref(today.getFullYear())
-const currentMonth = ref(today.getMonth())
+const todayIso = todayDateInputValue()
 
-function prevMonth() {
-  if (currentMonth.value === 0) {
-    currentMonth.value = 11
-    currentYear.value--
-  } else {
-    currentMonth.value--
-  }
-}
-
-function nextMonth() {
-  if (currentMonth.value === 11) {
-    currentMonth.value = 0
-    currentYear.value++
-  } else {
-    currentMonth.value++
-  }
-}
-
-const monthLabel = computed(() => formatMonthYear(new Date(currentYear.value, currentMonth.value)))
-
-// January 2024 starts on a Monday: days 1..7 map to Monday..Sunday.
-const weekdays = computed(() =>
-  [1, 2, 3, 4, 5, 6, 0].map((day) => formatWeekdayShort(new Date(2024, 0, day === 0 ? 7 : day)))
-)
-
-const daysInMonth = computed(() => new Date(currentYear.value, currentMonth.value + 1, 0).getDate())
-const firstWeekday = computed(() => {
-  const d = new Date(currentYear.value, currentMonth.value, 1).getDay()
-  return d === 0 ? 6 : d - 1
-})
-
-const calendarDays = computed(() => {
-  const days: Array<{ day: number; tasks: PlanningTask[] }> = []
-  for (let d = 1; d <= daysInMonth.value; d++) {
-    const iso = `${currentYear.value}-${String(currentMonth.value + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    days.push({
-      day: d,
+const calendarDays = computed<PlanningCalendarCell[]>(() => {
+  const month = String(currentMonth.value + 1).padStart(2, '0')
+  const reservations = props.reservations ?? []
+  return Array.from({ length: daysInMonth.value }, (_, i) => {
+    const iso = `${currentYear.value}-${month}-${String(i + 1).padStart(2, '0')}`
+    return {
+      day: i + 1,
+      iso,
       tasks: props.tasks.filter((task) => task.dueAt === iso),
-    })
-  }
-  return days
+      reservations: reservations.filter((r) => reservationCoversDay(r, iso)),
+    }
+  })
 })
 
 const agendaDays = computed(() => calendarDays.value.filter((d) => d.tasks.length > 0))
@@ -83,24 +76,15 @@ const hourTasks = computed(() => props.tasks.filter((task) => task.kind === 'hou
 function taskPillClass(task: PlanningTask): string {
   const dueDate = task.dueAt
   if (!dueDate) return 'bg-navy-600 text-white'
-  const todayIso = today.toISOString().slice(0, 10)
   if (dueDate < todayIso) return 'bg-coral-600 text-white'
-  const soon = new Date(today)
+  const soon = new Date(`${todayIso}T00:00:00`)
   soon.setDate(soon.getDate() + 30)
-  if (new Date(dueDate) <= soon) return 'bg-amber-600 text-white'
+  if (new Date(`${dueDate}T00:00:00`) <= soon) return 'bg-amber-600 text-white'
   return 'bg-navy-600 text-white'
 }
 
 function agendaDayLabel(day: number): string {
   return formatWeekdayDay(new Date(currentYear.value, currentMonth.value, day))
-}
-
-function isToday(day: number): boolean {
-  return (
-    day === today.getDate() &&
-    currentMonth.value === today.getMonth() &&
-    currentYear.value === today.getFullYear()
-  )
 }
 </script>
 
@@ -143,7 +127,7 @@ function isToday(day: number): boolean {
             <div class="w-12 shrink-0 text-center">
               <span
                 class="mx-auto flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold"
-                :class="isToday(cell.day) ? 'bg-navy-500 text-white' : 'text-fg-muted'"
+                :class="cell.iso === todayIso ? 'bg-navy-500 text-white' : 'text-fg-muted'"
               >
                 {{ cell.day }}
               </span>
@@ -163,60 +147,32 @@ function isToday(day: number): boolean {
                 <span class="truncate">{{ task.title }}</span>
                 <span class="ml-auto shrink-0 text-xs opacity-75">{{ task.boatName }}</span>
               </div>
+              <AvailabilityBand
+                v-for="r in cell.reservations"
+                :key="`r-${r.id}`"
+                :kind="reservationBandKind(r)"
+                :label="r.boatName"
+                :title="reservationBandTitle(t, formatDayMonth, r)"
+                :href="canViewBoat ? `/boats/${r.boatId}/reservations` : undefined"
+              />
             </div>
           </div>
         </div>
       </div>
 
       <!-- Desktop: 7-column calendar grid -->
-      <div class="hidden sm:block">
-        <div class="mb-1 grid grid-cols-7 text-center">
-          <div v-for="day in weekdays" :key="day" class="py-1 text-xs font-semibold text-fg-muted">
-            {{ day }}
-          </div>
-        </div>
-        <div class="grid grid-cols-7 gap-px rounded-lg overflow-hidden border border-border">
-          <div
-            v-for="n in firstWeekday"
-            :key="`empty-${n}`"
-            class="min-h-20 bg-surface-muted/40 p-1"
-          />
-          <div
-            v-for="cell in calendarDays"
-            :key="cell.day"
-            class="min-h-20 bg-surface-elevated p-1.5"
-            :class="isToday(cell.day) ? 'ring-2 ring-inset ring-navy-500' : ''"
-          >
-            <span
-              class="mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
-              :class="isToday(cell.day) ? 'bg-navy-500 text-white' : 'text-fg-muted'"
-            >
-              {{ cell.day }}
-            </span>
-            <div class="space-y-0.5">
-              <div
-                v-for="task in cell.tasks.slice(0, 3)"
-                :key="task.id"
-                :class="[
-                  'truncate rounded px-1 py-0.5 text-xs font-medium',
-                  canViewBoat ? 'cursor-pointer hover:opacity-80' : '',
-                  taskPillClass(task),
-                ]"
-                :title="task.boatName + ' · ' + task.title"
-                @click="openBoat(task.boatId)"
-              >
-                {{ task.title }}
-              </div>
-              <div
-                v-if="cell.tasks.length > 3"
-                class="rounded bg-surface-muted px-1 py-0.5 text-xs text-fg-muted"
-              >
-                {{ t('planning.calendar.more', { count: String(cell.tasks.length - 3) }) }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PlanningCalendarGrid
+        class="hidden sm:block"
+        :cells="calendarDays"
+        :leading-blanks="firstWeekday"
+        :weekdays="weekdays"
+        :today-iso="todayIso"
+        :reservations="reservations ?? []"
+        :can-view-boat="canViewBoat"
+        :can-reschedule="!!canReschedule"
+        @open="openBoat"
+        @reschedule="(task, dueAt) => emit('reschedule', task, dueAt)"
+      />
     </BaseCard>
 
     <!-- Tasks without date -->

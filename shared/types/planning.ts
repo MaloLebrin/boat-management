@@ -64,7 +64,42 @@ export interface PlanningResult {
   doneTasksTotalByAssignee: Record<string, number>
   groups: TaskGroup[]
   canGroupTasks: boolean
+  /**
+   * Réservations `option`/`confirmed` de la flotte, rendues en bandes
+   * d'indisponibilité sous les tâches (#869). Vide quand le module Location
+   * est inactif ou que l'appelant ne voit pas les bateaux.
+   */
+  reservations: PlanningReservation[]
 }
+
+/** Réservation superposée au planning (#869) — lecture seule. */
+export interface PlanningReservation {
+  id: number
+  boatId: number
+  boatName: string
+  status: 'option' | 'confirmed'
+  /** Instants ISO — fin exclusive. */
+  startsAt: string
+  endsAt: string
+  clientName: string
+}
+
+/** Colonnes du kanban sur lesquelles une carte peut être déposée (#869). */
+export const PLANNING_DROP_COLUMNS = ['soon', 'planned', 'undated'] as const
+export type PlanningDropColumn = (typeof PLANNING_DROP_COLUMNS)[number]
+
+/**
+ * Seuil « bientôt due » en jours : même borne que le classement serveur
+ * (`PlanningService`). Une tâche déposée en « Planifiées » doit tomber au-delà.
+ */
+export const PLANNING_SOON_DAYS = 30
+
+/**
+ * Fenêtre des réservations chargées pour le planning, autour d'aujourd'hui :
+ * le calendrier se navigue au mois, un an devant suffit.
+ */
+export const PLANNING_RESERVATIONS_PAST_DAYS = 31
+export const PLANNING_RESERVATIONS_FUTURE_DAYS = 366
 
 /**
  * Tâches terminées envoyées au planning : les N plus récentes de la flotte,

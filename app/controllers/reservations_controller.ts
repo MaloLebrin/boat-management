@@ -1,5 +1,6 @@
 import BoatReservationService from '#services/boat_reservation_service'
 import InvoiceService from '#services/invoice_service'
+import PlanningService from '#services/planning_service'
 import QuotaService from '#services/quota_service'
 import {
   toBoatReservationRow,
@@ -7,6 +8,7 @@ import {
 } from '#transformers/boat_reservation_transformer'
 import BoatPolicy from '#policies/boat_policy'
 import InvoicePolicy from '#policies/invoice_policy'
+import MaintenancePolicy from '#policies/maintenance_policy'
 import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -18,7 +20,8 @@ export default class ReservationsController {
   constructor(
     private reservationService: BoatReservationService,
     private invoiceService: InvoiceService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private planningService: PlanningService
   ) {}
 
   async index({ inertia, auth, request, bouncer, response }: HttpContext) {
@@ -69,9 +72,14 @@ export default class ReservationsController {
     // les bateaux ayant une réservation : sinon les disponibilités sont invisibles (#477).
     const calendarBoats = selectedBoatId ? boats.filter((b) => b.id === selectedBoatId) : boats
 
+    // Couche « entretien planifié » sur la frise (#869), pour qui voit la maintenance.
+    const maintenanceByBoat = (await bouncer.with(MaintenancePolicy).allows('view'))
+      ? await this.planningService.maintenanceWindowsForBoats(calendarBoats.map((b) => b.id))
+      : new Map()
+
     return inertia.render('reservations/index', {
       reservations: rows,
-      calendarEntries: toFleetCalendarEntries(calendarBoats, rows),
+      calendarEntries: toFleetCalendarEntries(calendarBoats, rows, maintenanceByBoat),
       boats,
       selectedBoatId,
       selectedType,
