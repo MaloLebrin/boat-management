@@ -130,5 +130,45 @@
     "region": "Notifications",
     "close": "Fermer la notification"
   },
-  "noResults": "Aucun résultat"
+  "noResults": "Aucun résultat",
+  "exports": {
+    "from": "Du",
+    "to": "Au",
+    "download": "Télécharger",
+    "asyncHint": "Les exports de plus de {threshold} lignes sont générés en arrière-plan et vous seront notifiés.",
+    "invoices": {
+      "button": "Exporter",
+      "title": "Export des factures",
+      "salesJournal": "Journal des ventes",
+      "kindLabel": "Type de document",
+      "allKinds": "Tous les types",
+      "statusLabel": "Statut",
+      "allStatuses": "Tous les statuts",
+      "detailLabel": "Niveau de détail",
+      "detailDocuments": "Une ligne par document",
+      "detailLines": "Une ligne par ligne de facture"
+    },
+    "fec": {
+      "title": "FEC (Fichier des Écritures Comptables)",
+      "description": "Le FEC est une aide pour votre comptable, pas un grand livre certifié.",
+      "yearLabel": "Exercice",
+      "download": "Télécharger le FEC"
+    },
+    "reservations": {
+      "button": "Exporter",
+      "title": "Export des réservations",
+      "boatLabel": "Bateau",
+      "allBoats": "Tous les bateaux",
+      "statusLabel": "Statut",
+      "allStatuses": "Tous les statuts",
+      "paymentStatusLabel": "Statut de paiement",
+      "allPaymentStatuses": "Tous les statuts"
+    },
+    "clients": {
+      "button": "Exporter",
+      "title": "Export des clients",
+      "periodHint": "Filtrer sur la date de création des fiches clients.",
+      "anonymizedHint": "Les clients anonymisés sont exclus de l'export."
+    }
+  }
 }

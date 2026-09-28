@@ -46,5 +46,93 @@
     "actualCost": "actual_cost",
     "estimatedDurationMinutes": "estimated_duration_min",
     "actualDurationMinutes": "actual_duration_min"
+  },
+  "invoices": {
+    "number": "number",
+    "kind": "type",
+    "issuedAt": "date",
+    "dueAt": "due_date",
+    "client": "client",
+    "creditedInvoice": "credited_invoice",
+    "subtotal": "amount_excl_tax",
+    "taxRate": "vat_rate",
+    "taxAmount": "vat_amount",
+    "total": "amount_incl_tax",
+    "currency": "currency",
+    "status": "status",
+    "paidAt": "payment_date",
+    "paymentMethod": "payment_method"
+  },
+  "invoiceLines": {
+    "number": "number",
+    "kind": "type",
+    "issuedAt": "date",
+    "client": "client",
+    "label": "label",
+    "quantity": "quantity",
+    "unitPrice": "unit_price_excl_tax",
+    "amount": "amount_excl_tax",
+    "taxRate": "vat_rate",
+    "currency": "currency"
+  },
+  "reservations": {
+    "boat": "boat",
+    "type": "service",
+    "status": "status",
+    "startsAt": "start",
+    "endsAt": "end",
+    "client": "client",
+    "email": "email",
+    "phone": "phone",
+    "totalPrice": "total_price",
+    "depositAmount": "deposit",
+    "paidAmount": "paid",
+    "paymentStatus": "payment_status",
+    "paymentMethod": "payment_method",
+    "depositPaidAt": "deposit_received_on",
+    "balancePaidAt": "balance_received_on",
+    "securityDepositAmount": "security_deposit",
+    "securityDepositStatus": "security_deposit_status"
+  },
+  "clients": {
+    "lastName": "last_name",
+    "firstName": "first_name",
+    "email": "email",
+    "phone": "phone",
+    "address": "address",
+    "permitNumber": "permit_number",
+    "permitType": "permit_type",
+    "status": "status",
+    "gdprConsentAt": "gdpr_consent_on",
+    "createdAt": "created_on"
+  },
+  "maintenanceHistory": {
+    "date": "date",
+    "boat": "boat",
+    "title": "title",
+    "subject": "subject",
+    "notes": "notes",
+    "engineCaption": "engine_caption",
+    "sailCaption": "sail_caption",
+    "parts": "parts",
+    "cost": "total_cost"
+  },
+  "fec": {
+    "journals": {
+      "sales": "Sales",
+      "bank": "Bank"
+    },
+    "accounts": {
+      "sales": "Services rendered",
+      "vat": "Output VAT",
+      "customers": "Customers",
+      "bank": "Bank"
+    },
+    "labels": {
+      "invoice": "Invoice {number} {client}",
+      "creditNote": "Credit note {number} {client}",
+      "payment": "Payment {number} {client}",
+      "refund": "Refund {number} {client}"
+    }
   }
 }

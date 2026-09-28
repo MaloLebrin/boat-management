@@ -23,6 +23,7 @@ type SettingsSection =
   | 'audit-log'
   | 'branding'
   | 'import'
+  | 'exports'
 
 /**
  * `route` porte un nom de route généré (`.adonisjs/server/routes.d.ts`) et non
@@ -102,6 +103,11 @@ const sections = computed(() => {
       key: 'import' as SettingsSection,
       route: 'settings.import',
       label: () => t('settings.sections.import'),
+    })
+    result.push({
+      key: 'exports' as SettingsSection,
+      route: 'settings.exports',
+      label: () => t('settings.sections.exports'),
     })
   }
   if (canUseAI.value && can('ai.configure')) {

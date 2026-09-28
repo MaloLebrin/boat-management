@@ -266,6 +266,8 @@ désormais un `clientId` optionnel.
 
 ## 12. Hors périmètre / évolutions
 
-- Autres lots CRM de l'epic #108 (import/export CSV, etc.).
+- Autres lots CRM de l'epic #108 (import CSV, etc.). L'**export** CSV des fiches
+  existe depuis #879 : `GET /clients/export.csv` (hors anonymisées, journal
+  `client.export_bulk`) — voir `docs/domain/csv-import-export.md`.
 - Documentation exhaustive du CRUD clients de base (#273) — cette page se
   concentre sur le lien réservation ↔ client (#275).

@@ -130,5 +130,45 @@
     "region": "Notifications",
     "close": "Close notification"
   },
-  "noResults": "No results"
+  "noResults": "No results",
+  "exports": {
+    "from": "From",
+    "to": "To",
+    "download": "Download",
+    "asyncHint": "Exports over {threshold} rows are generated in the background and you will be notified.",
+    "invoices": {
+      "button": "Export",
+      "title": "Invoice export",
+      "salesJournal": "Sales journal",
+      "kindLabel": "Document type",
+      "allKinds": "All types",
+      "statusLabel": "Status",
+      "allStatuses": "All statuses",
+      "detailLabel": "Detail level",
+      "detailDocuments": "One row per document",
+      "detailLines": "One row per invoice line"
+    },
+    "fec": {
+      "title": "FEC (Accounting entries file)",
+      "description": "The FEC is an aid for your accountant, not a certified ledger.",
+      "yearLabel": "Fiscal year",
+      "download": "Download FEC"
+    },
+    "reservations": {
+      "button": "Export",
+      "title": "Reservation export",
+      "boatLabel": "Boat",
+      "allBoats": "All boats",
+      "statusLabel": "Status",
+      "allStatuses": "All statuses",
+      "paymentStatusLabel": "Payment status",
+      "allPaymentStatuses": "All statuses"
+    },
+    "clients": {
+      "button": "Export",
+      "title": "Client export",
+      "periodHint": "Filter by client creation date.",
+      "anonymizedHint": "Anonymized clients are excluded from the export."
+    }
+  }
 }

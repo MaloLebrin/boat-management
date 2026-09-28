@@ -131,8 +131,6 @@ test.group('GenerateExport (job à la demande)', () => {
     )
   })
 
-  // ⚠️ `GenerateExport.execute()` ne produit **aucun export** : il logge et
-  // marque sa clé. L'issue #699 le désignait comme « export silencieusement
-  // vide » — c'est exact au sens propre, c'est un placeholder. Rien à tester de
-  // plus tant qu'il n'est pas implémenté ; signalé plutôt que simulé.
+  // Le job produit désormais un vrai export (#879) : son comportement est
+  // couvert de bout en bout par `tests/functional/exports/background_exports.spec.ts`.
 })

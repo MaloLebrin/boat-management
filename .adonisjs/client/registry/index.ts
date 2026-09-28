@@ -1920,6 +1920,12 @@ const routes = {
     tokens: [{"old":"/settings/branding/logo","type":0,"val":"settings","end":""},{"old":"/settings/branding/logo","type":0,"val":"branding","end":""},{"old":"/settings/branding/logo","type":0,"val":"logo","end":""}],
     types: placeholder as Registry['settings.branding.logo.delete']['types'],
   },
+  'settings.exports': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/exports',
+    tokens: [{"old":"/settings/exports","type":0,"val":"settings","end":""},{"old":"/settings/exports","type":0,"val":"exports","end":""}],
+    types: placeholder as Registry['settings.exports']['types'],
+  },
   'settings.import': {
     methods: ["GET","HEAD"],
     pattern: '/settings/import',

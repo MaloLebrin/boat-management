@@ -9,7 +9,8 @@
     "auditLog": "Activity log",
     "branding": "White label",
     "import": "Import / Export",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "exports": "Exports"
   },
   "org": {
     "title": "Organisation profile",
@@ -195,6 +196,24 @@
       "save": "Save",
       "adminOnly": "Only an administrator can change reminder settings.",
       "unavailable": "Available with the CRM & Invoicing module."
+    },
+    "accounting": {
+      "title": "Accounting export (FEC)",
+      "description": "Set up the accounts used to generate the accounting entries file (FEC). This file is an aid for your accountant, not a certified ledger.",
+      "sirenLabel": "SIREN",
+      "sirenPlaceholder": "123456789",
+      "sirenHint": "9 digits, used as prefix of the FEC filename.",
+      "salesLabel": "Sales account",
+      "salesPlaceholder": "706",
+      "vatLabel": "VAT collected account",
+      "vatPlaceholder": "44571",
+      "customersLabel": "Customers account",
+      "customersPlaceholder": "411",
+      "bankLabel": "Bank account",
+      "bankPlaceholder": "512",
+      "fecNote": "The FEC is an aid for your accountant, not a certified ledger.",
+      "save": "Save",
+      "adminOnly": "Only an administrator can change accounting export settings."
     }
   },
   "upgrade": {
@@ -435,7 +454,10 @@
       "invoice_reminder_sent": "Invoice reminder sent",
       "invoice_reminders_disabled": "Invoice reminders turned off",
       "invoice_reminders_enabled": "Invoice reminders turned back on",
-      "invoice_reminders_update": "Reminder settings updated"
+      "invoice_reminders_update": "Reminder settings updated",
+      "export_run": "Export run",
+      "client_export_bulk": "Client records exported",
+      "accounting_settings_update": "Accounting export settings changed"
     },
     "empty": {
       "title": "No activity yet",
@@ -460,6 +482,39 @@
       "lastUsed": "Last notified {date}",
       "remove": "Remove",
       "removeAriaLabel": "Remove device: {device}"
+    }
+  },
+  "exports": {
+    "title": "Exports",
+    "description": "Exports over {threshold} rows are generated in the background and kept for {days} days.",
+    "types": {
+      "invoices": "Sales journal",
+      "invoice_lines": "Sales journal (by line)",
+      "fec": "FEC",
+      "reservations": "Reservations",
+      "clients": "Clients",
+      "maintenance_history": "Maintenance history"
+    },
+    "status": {
+      "pending": "Pending",
+      "ready": "Ready",
+      "failed": "Failed"
+    },
+    "columns": {
+      "type": "Type",
+      "period": "Period",
+      "status": "Status",
+      "rows": "Rows",
+      "createdAt": "Created",
+      "expiresAt": "Expires",
+      "actions": "Actions"
+    },
+    "periodFrom": "From {date}",
+    "periodTo": "Until {date}",
+    "download": "Download",
+    "empty": {
+      "title": "No exports yet",
+      "description": "Large exports will appear here once generated."
     }
   }
 }

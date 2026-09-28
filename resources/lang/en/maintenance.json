@@ -3,6 +3,7 @@
     "title": "Maintenance history",
     "subtitle": "All interventions across your fleet",
     "exportPdf": "Export PDF",
+    "exportCsv": "Export CSV",
     "searchPlaceholder": "Search by title or boat...",
     "filters": {
       "all": "All",

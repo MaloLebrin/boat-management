@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/use_t'
 import { routes } from '~/utils/routes'
@@ -19,6 +21,9 @@ const props = defineProps<{
 
 defineEmits<{ (e: 'update:modelValue', value: string): void }>()
 
+const exportFrom = ref('')
+const exportTo = ref('')
+
 const exportLinks = [
   { key: 'maintenance', label: 'settings.import.exportMaintenance' },
   { key: 'maintenanceTasks', label: 'settings.import.exportMaintenanceTasks' },
@@ -26,16 +31,26 @@ const exportLinks = [
   { key: 'navigationLogs', label: 'settings.import.exportNavigationLogs' },
 ] as const
 
+const baseExportUrls = {
+  maintenance: routes.csv.exportMaintenance,
+  maintenanceTasks: routes.csv.exportMaintenanceTasks,
+  fuelLogs: routes.csv.exportFuelLogs,
+  navigationLogs: routes.csv.exportNavigationLogs,
+}
+
+const exportPeriodParams = computed(() => {
+  const params = new URLSearchParams()
+  if (exportFrom.value) params.set('from', exportFrom.value)
+  if (exportTo.value) params.set('to', exportTo.value)
+  return params.toString()
+})
+
 function getExportHref(key: (typeof exportLinks)[number]['key']) {
   if (!props.modelValue) return undefined
   const id = Number(props.modelValue)
-  const hrefs = {
-    maintenance: routes.csv.exportMaintenance,
-    maintenanceTasks: routes.csv.exportMaintenanceTasks,
-    fuelLogs: routes.csv.exportFuelLogs,
-    navigationLogs: routes.csv.exportNavigationLogs,
-  }
-  return hrefs[key](id)
+  const baseUrl = baseExportUrls[key](id)
+  const qs = exportPeriodParams.value
+  return `${baseUrl}${qs ? `?${qs}` : ''}`
 }
 </script>
 
@@ -54,6 +69,20 @@ function getExportHref(key: (typeof exportLinks)[number]['key']) {
       <p v-if="boats.length === 0" class="mt-2 text-sm text-fg-muted">
         {{ t('settings.import.noBoats') }}
       </p>
+    </div>
+    <div class="mb-4 grid gap-4 sm:grid-cols-2">
+      <BaseInput
+        id="export-period-from"
+        v-model="exportFrom"
+        type="date"
+        :label="t('common.exports.from')"
+      />
+      <BaseInput
+        id="export-period-to"
+        v-model="exportTo"
+        type="date"
+        :label="t('common.exports.to')"
+      />
     </div>
     <div class="flex flex-wrap gap-3">
       <!-- eslint-disable vue/no-restricted-v-bind -- export CSV : pas une navigation -->

@@ -63,6 +63,11 @@ export const AUDIT_ACTIONS = [
   'invoice.reminders_disabled',
   'invoice.reminders_enabled',
   'invoice_reminders.update',
+  // Exports (#879) : chaque export flotte ou comptable (qui, quoi, période,
+  // lignes), l'export groupé des fiches clients, les comptes du FEC.
+  'export.run',
+  'client.export_bulk',
+  'accounting_settings.update',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]

@@ -8,6 +8,8 @@ router
     // du module quand l'organisation possède déjà des fiches (#332) — le
     // contrôleur décide (`loadOrgForRead`), pas la garde de module.
     router.get('clients', [controllers.Clients, 'index']).as('clients.index')
+    // Export CSV des fiches (#879), hors clients anonymisés.
+    router.get('clients/export.csv', [controllers.FleetExports, 'clients']).as('clients.exportCsv')
     router.get('clients/:id', [controllers.Clients, 'show']).as('clients.show')
     router.get('clients/:id/export', [controllers.Clients, 'exportData']).as('clients.export')
 

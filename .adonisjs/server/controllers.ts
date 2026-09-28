@@ -4,6 +4,7 @@
  */
 
 export const controllers = {
+  AccountingSettings: () => import('#controllers/accounting_settings_controller'),
   Ai: () => import('#controllers/ai_controller'),
   Assistant: () => import('#controllers/assistant_controller'),
   AuditLogs: () => import('#controllers/audit_logs_controller'),
@@ -47,6 +48,7 @@ export const controllers = {
   CsvExport: () => import('#controllers/csv_export_controller'),
   CsvImport: () => import('#controllers/csv_import_controller'),
   DashboardLayout: () => import('#controllers/dashboard_layout_controller'),
+  DataExports: () => import('#controllers/data_exports_controller'),
   Demo: () => import('#controllers/demo_controller'),
   dev: {
     MailPreviews: () => import('#controllers/dev/mail_previews_controller'),
@@ -54,6 +56,7 @@ export const controllers = {
   },
   EmailVerification: () => import('#controllers/email_verification_controller'),
   Engines: () => import('#controllers/engines_controller'),
+  FleetExports: () => import('#controllers/fleet_exports_controller'),
   Health: () => import('#controllers/health_controller'),
   Home: () => import('#controllers/home_controller'),
   InvoicePaymentLinks: () => import('#controllers/invoice_payment_links_controller'),

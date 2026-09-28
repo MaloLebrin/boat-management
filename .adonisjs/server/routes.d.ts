@@ -324,6 +324,14 @@ export type ScannedRoutes = {
     'settings.branding.logo.upload': { paramsTuple?: []; params?: {} }
     'settings.branding.logo.delete': { paramsTuple?: []; params?: {} }
     'settings.import': { paramsTuple?: []; params?: {} }
+    'invoices.export': { paramsTuple?: []; params?: {} }
+    'invoices.export.fec': { paramsTuple?: []; params?: {} }
+    'reservations.export': { paramsTuple?: []; params?: {} }
+    'clients.exportCsv': { paramsTuple?: []; params?: {} }
+    'maintenance.history.csv': { paramsTuple?: []; params?: {} }
+    'settings.exports': { paramsTuple?: []; params?: {} }
+    'exports.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.billing.accounting.update': { paramsTuple?: []; params?: {} }
     'settings.import.preview': { paramsTuple?: []; params?: {} }
     'settings.import.confirm': { paramsTuple?: []; params?: {} }
     'settings.import.cancel': { paramsTuple?: []; params?: {} }
@@ -468,6 +476,13 @@ export type ScannedRoutes = {
     'settings.auditLog': { paramsTuple?: []; params?: {} }
     'settings.branding': { paramsTuple?: []; params?: {} }
     'settings.import': { paramsTuple?: []; params?: {} }
+    'invoices.export': { paramsTuple?: []; params?: {} }
+    'invoices.export.fec': { paramsTuple?: []; params?: {} }
+    'reservations.export': { paramsTuple?: []; params?: {} }
+    'clients.exportCsv': { paramsTuple?: []; params?: {} }
+    'maintenance.history.csv': { paramsTuple?: []; params?: {} }
+    'settings.exports': { paramsTuple?: []; params?: {} }
+    'exports.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'spareParts.index': { paramsTuple?: []; params?: {} }
     'spareParts.identify': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'spareParts.assembly': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'assemblySlug': ParamValue} }
@@ -600,6 +615,13 @@ export type ScannedRoutes = {
     'settings.auditLog': { paramsTuple?: []; params?: {} }
     'settings.branding': { paramsTuple?: []; params?: {} }
     'settings.import': { paramsTuple?: []; params?: {} }
+    'invoices.export': { paramsTuple?: []; params?: {} }
+    'invoices.export.fec': { paramsTuple?: []; params?: {} }
+    'reservations.export': { paramsTuple?: []; params?: {} }
+    'clients.exportCsv': { paramsTuple?: []; params?: {} }
+    'maintenance.history.csv': { paramsTuple?: []; params?: {} }
+    'settings.exports': { paramsTuple?: []; params?: {} }
+    'exports.download': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'spareParts.index': { paramsTuple?: []; params?: {} }
     'spareParts.identify': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'spareParts.assembly': { paramsTuple: [ParamValue,ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue,'assemblySlug': ParamValue} }
@@ -787,6 +809,7 @@ export type ScannedRoutes = {
     'push.subscriptions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
+    'settings.billing.accounting.update': { paramsTuple?: []; params?: {} }
     'boats.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boats.pricing.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'boat_equipment.update_engine': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }

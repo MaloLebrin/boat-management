@@ -11,6 +11,10 @@ router
     // quand l'organisation possède déjà des factures (#332) — le contrôleur
     // décide (`loadOrgForRead`), pas la garde de module.
     router.get('invoices', [controllers.Invoices, 'index']).as('invoices.index')
+    // Exports comptables (#879) : journal des ventes et FEC. Déclarés avant
+    // `invoices/:id` par lisibilité — le matcher numérique les distingue déjà.
+    router.get('invoices/export.csv', [controllers.FleetExports, 'invoices']).as('invoices.export')
+    router.get('invoices/export/fec', [controllers.FleetExports, 'fec']).as('invoices.export.fec')
     router.get('invoices/:id', [controllers.Invoices, 'show']).as('invoices.show')
     router.get('invoices/:id/pdf', [controllers.Invoices, 'downloadPdf']).as('invoices.pdf')
 

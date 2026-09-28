@@ -10,6 +10,7 @@ import OrganizationModuleService from '#services/organization_module_service'
 import BoatListService from '#services/boat_list_service'
 import OnlinePaymentService from '#services/online_payment_service'
 import InvoiceReminderService from '#services/invoice_reminder_service'
+import AccountingSettingsService from '#services/accounting_settings_service'
 import { BrandingService } from '#services/branding_service'
 import OrganizationPolicy from '#policies/organization_policy'
 import {
@@ -50,7 +51,8 @@ export default class SettingsController {
     private organizationAiKeyService: OrganizationAiKeyService,
     private passwordResetService: PasswordResetService,
     private onlinePaymentService: OnlinePaymentService,
-    private invoiceReminderService: InvoiceReminderService
+    private invoiceReminderService: InvoiceReminderService,
+    private accountingSettingsService: AccountingSettingsService
   ) {}
   async me({ inertia }: HttpContext) {
     return inertia.render('settings/me', {})
@@ -151,6 +153,8 @@ export default class SettingsController {
       onlinePayments: await this.onlinePaymentService.settingsFor(org, canManageBilling),
       // Relances automatiques des factures en retard (#878).
       invoiceReminders: await this.invoiceReminderService.settingsFor(org, canManageBilling),
+      // Comptes du FEC et SIREN (#879).
+      accounting: this.accountingSettingsService.settingsFor(org, canManageBilling),
     })
   }
 

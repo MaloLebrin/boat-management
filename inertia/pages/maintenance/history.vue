@@ -30,7 +30,7 @@ const isLoading = computed(() => page.props?.processing === true)
 
 const eventRows = computed(() => props.events.data)
 
-const pdfHref = computed(() => {
+function buildExportParams(): string {
   const params = new URLSearchParams()
   if (props.filters.q) params.set('q', props.filters.q)
   if (props.filters.subject) params.set('subject', props.filters.subject)
@@ -38,8 +38,17 @@ const pdfHref = computed(() => {
   if (props.filters.dateFrom) params.set('dateFrom', props.filters.dateFrom)
   if (props.filters.dateTo) params.set('dateTo', props.filters.dateTo)
   params.set('sort', props.filters.sort)
-  const qs = params.toString()
+  return params.toString()
+}
+
+const pdfHref = computed(() => {
+  const qs = buildExportParams()
   return `/maintenance/history.pdf${qs ? `?${qs}` : ''}`
+})
+
+const csvHref = computed(() => {
+  const qs = buildExportParams()
+  return `/maintenance/history.csv${qs ? `?${qs}` : ''}`
 })
 
 function navigate(next: MaintenanceHistoryFilters) {
@@ -84,12 +93,19 @@ function reset() {
           <BaseHeading level="1">{{ t('maintenance.history.title') }}</BaseHeading>
           <p class="mt-2 text-fg-muted">{{ t('maintenance.history.subtitle') }}</p>
         </div>
-        <!-- eslint-disable vue/no-restricted-v-bind -- export PDF : une visite Inertia rendrait le binaire comme une page -->
-        <a v-if="canExport" :href="pdfHref" target="_blank" rel="noopener">
-          <BaseButton variant="secondary" size="sm" type="button">
-            {{ t('maintenance.history.exportPdf') }}
-          </BaseButton>
-        </a>
+        <!-- eslint-disable vue/no-restricted-v-bind -- export PDF/CSV : une visite Inertia rendrait le binaire comme une page -->
+        <div v-if="canExport" class="flex items-center gap-2">
+          <a :href="csvHref">
+            <BaseButton variant="secondary" size="sm" type="button">
+              {{ t('maintenance.history.exportCsv') }}
+            </BaseButton>
+          </a>
+          <a :href="pdfHref" target="_blank" rel="noopener">
+            <BaseButton variant="secondary" size="sm" type="button">
+              {{ t('maintenance.history.exportPdf') }}
+            </BaseButton>
+          </a>
+        </div>
         <!-- eslint-enable vue/no-restricted-v-bind -->
       </div>
     </header>

@@ -101,7 +101,8 @@
     "aiProviderUpdated": "Fournisseur IA mis à jour.",
     "aiProviderKeyMissing": "Ajoutez d’abord une clé API pour ce fournisseur.",
     "passwordUpdatedOtherDevicesSignedOut": "Mot de passe mis à jour. Vos autres appareils ont été déconnectés.",
-    "invoiceRemindersUpdated": "Réglages des relances enregistrés."
+    "invoiceRemindersUpdated": "Réglages des relances enregistrés.",
+    "accountingUpdated": "Réglages de l’export comptable enregistrés."
   },
   "enginePart": {
     "created": "Pièce ajoutée.",
@@ -489,5 +490,8 @@
     "disconnected": "Compte Stripe déconnecté. Les liens de paiement déjà envoyés ne fonctionnent plus.",
     "notPayable": "Cette facture ne peut pas être réglée en ligne.",
     "linkCreated": "Lien de paiement créé."
+  },
+  "exports": {
+    "queued": "Export volumineux : il est en cours de génération. Vous recevrez une notification dès qu'il sera prêt, et le retrouverez dans Paramètres → Exports."
   }
 }

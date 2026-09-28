@@ -89,6 +89,7 @@ declare module '@adonisjs/inertia/types' {
     'settings/audit_log': ExtractProps<(typeof import('../../inertia/pages/settings/audit_log.vue'))['default']>
     'settings/billing': ExtractProps<(typeof import('../../inertia/pages/settings/billing.vue'))['default']>
     'settings/branding': ExtractProps<(typeof import('../../inertia/pages/settings/branding.vue'))['default']>
+    'settings/exports': ExtractProps<(typeof import('../../inertia/pages/settings/exports.vue'))['default']>
     'settings/import': ExtractProps<(typeof import('../../inertia/pages/settings/import.vue'))['default']>
     'settings/index': ExtractProps<(typeof import('../../inertia/pages/settings/index.vue'))['default']>
     'settings/me': ExtractProps<(typeof import('../../inertia/pages/settings/me.vue'))['default']>

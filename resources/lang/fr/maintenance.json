@@ -3,6 +3,7 @@
     "title": "Historique de maintenance",
     "subtitle": "Toutes les interventions de votre flotte",
     "exportPdf": "Exporter PDF",
+    "exportCsv": "Exporter CSV",
     "searchPlaceholder": "Rechercher par titre ou bateau...",
     "filters": {
       "all": "Tous",
