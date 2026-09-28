@@ -29,9 +29,18 @@ async function tmpSnapshot(): Promise<Set<string>> {
   return new Set(await readdir(tmpdir()))
 }
 
+/**
+ * Noms que l'app écrit dans `tmpdir()` : `randomUUID()` pour une partie
+ * acceptée par `LargeMultipartUploadMiddleware`, `<uuid>.pdf` pour la sortie
+ * Ghostscript de `PdfService`. `/tmp` est partagé avec le reste de la
+ * machine — en CI, le runtime conteneur y crée des `runc-process<id>` en plein
+ * test (#919) : on ne compte que ce que la requête a pu y laisser.
+ */
+const APP_TMP_FILE = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}(?:\.pdf)?$/i
+
 async function tmpFilesAddedSince(before: Set<string>): Promise<string[]> {
   const after = await readdir(tmpdir())
-  return after.filter((name) => !before.has(name))
+  return after.filter((name) => !before.has(name) && APP_TMP_FILE.test(name))
 }
 
 const JPEG = Buffer.from('\xff\xd8\xff\xe0 fake jpeg', 'binary')
