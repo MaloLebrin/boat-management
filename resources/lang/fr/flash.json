@@ -52,7 +52,8 @@
     "incidentNotFound": "Cet incident n'appartient pas à ce bateau.",
     "updated": "Tâche mise à jour.",
     "postponed": "Tâche reportée.",
-    "taskDone": "Une tâche terminée fait partie de l'historique : elle ne se modifie plus."
+    "taskDone": "Une tâche terminée fait partie de l'historique : elle ne se modifie plus.",
+    "assigneeNotMember": "Ce membre ne peut pas se voir confier de tâche de maintenance."
   },
   "ai": {
     "messagesRequired": "Le champ messages est obligatoire.",

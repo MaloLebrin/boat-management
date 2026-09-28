@@ -18,7 +18,7 @@ import type {
   EquipmentReferenceType as EquipmentReferenceTypeValue,
 } from '../../shared/types/equipment_action'
 import type { BoatPositionHistoryKind, GenericEquipmentCategory } from '../../shared/types/boat'
-import type { SheetType } from '../../shared/types/maintenance'
+import type { MaintenanceTaskWorkOrder, SheetType } from '../../shared/types/maintenance'
 
 /**
  * Intention de création demandée depuis l'en-tête de la fiche bateau (#358, #365).
@@ -232,7 +232,8 @@ export type MaintenanceEventRow = {
   parts: MaintenancePartRow[]
 }
 
-export type MaintenanceTaskRow = {
+/** Ordre de travail (#868) partiel : absent sur les lignes qui ne l'exposent pas. */
+export type MaintenanceTaskRow = Partial<MaintenanceTaskWorkOrder> & {
   id: number
   subject: string
   title: string

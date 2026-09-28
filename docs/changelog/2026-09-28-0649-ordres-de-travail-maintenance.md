@@ -1,0 +1,45 @@
+# 2026-09-28 — Ordres de travail : assigner une tâche, prestataire, prévu et réel
+
+Issue #868. Une tâche de maintenance appartenait à un bateau, jamais à une personne. Le marketing promettait l'assignation à l'équipe et une vue par membre, mais le mécanicien voyait toutes les tâches de l'organisation sans filtre « les miennes ». Rien ne disait non plus à quel prestataire une tâche était sous-traitée ni combien elle devait coûter.
+
+- **Données.** La migration `1864000000000` ajoute à `boat_maintenance_tasks` :
+  - `assignee_id` : FK `users`, `SET NULL`, indexée ;
+  - `assigned_at` ;
+  - `provider_name` ;
+  - `estimated_cost` et `actual_cost` (decimal 10,2) ;
+  - `estimated_duration_minutes` et `actual_duration_minutes`.
+- **Assignation.**
+  - Elle passe par les routes existantes : `POST …/maintenance-tasks` et `PATCH …/maintenance-tasks/:taskId`, avec les clés `assigneeId`, `providerName`, `estimatedCost` et `estimatedDurationMinutes`.
+  - L'assigné doit être membre de l'organisation avec un rôle qui a `maintenance.edit`. Sinon, la requête est refusée avec `flash.maintenanceTasks.assigneeNotMember`.
+  - Chaque changement de responsable écrit une ligne d'audit `maintenance_task.assign`, avec son libellé dans le journal d'activité.
+  - L'assigné reçoit une notification `maintenance.assigned`, in-app et push, qui pointe vers `/planning?task=<id>`. Il n'en reçoit pas s'il s'est confié la tâche lui-même.
+- **Clôture.**
+  - `PUT …/done` accepte `actualCost` et `actualDurationMinutes`. Ces champs ne sont demandés que pour une tâche chiffrée.
+  - L'occurrence suivante d'une récurrence reprend le responsable, le prestataire et les estimations, mais pas le réel.
+- **Notifications planifiées.**
+  - Une échéance proche assignée va à l'assigné seul, avec un lien vers le planning.
+  - Un retard va aux admins et à l'assigné.
+  - Un utilisateur reçoit au plus une notification par bateau et par type.
+- **UI.**
+  - Formulaire et modale de tâche : section « Ordre de travail » (`MaintenanceWorkOrderFields`).
+  - Résumé sous le titre des tâches (`MaintenanceTaskWorkOrderSummary`).
+  - Planning :
+    - filtre « Assigné à » : toutes, mes tâches, non assignées ou un membre ;
+    - initiales de l'assigné et prestataire affichés sur les cartes ;
+    - un mécanicien à qui des tâches sont confiées arrive sur « Mes tâches ».
+  - Tableau de bord mécanicien : bascule « Mes tâches / Toute la flotte ».
+  - Widget « Tâches planifiées » : vue « Les miennes ».
+- **Budget prévisionnel.** « Entretien prévu — T{n} » additionne les coûts estimés des tâches ouvertes dues d'ici la fin du trimestre, retards compris. Il indique aussi combien de tâches n'ont pas d'estimation. Il apparaît sur `/boats/:id/budget` et sous la carte « Dépenses » du tableau de bord.
+- **Export.** `GET /boats/:id/export/maintenance-tasks.csv` donne le responsable, le prestataire, le prévu et le réel. Le lien est dans Paramètres → Import/Export.
+- **Assistant.** Le digest planning nomme le responsable de chaque tâche et liste celles confiées à l'utilisateur.
+- **Hors périmètre.**
+  - Un annuaire de prestataires.
+  - L'e-mail d'assignation, qui attend les préférences de notification (#888).
+  - Le prévu et le réel sur `boat_maintenance_events` : la clôture d'une tâche ne crée pas d'événement d'historique.
+  - Le filtre « Assigné à » sur `/maintenance/history`, qui liste ces événements et non les tâches.
+- **Tests.**
+  - `tests/functional/maintenance/maintenance_task_work_order.spec.ts` (11 cas) : assignation, auto-assignation, cross-org, propriétaire, désassignation, estimations, validation, création, clôture et récurrence, props du planning, CSV.
+  - `tests/functional/notifications/scan.spec.ts` : routage vers l'assigné.
+  - `tests/integration/services/budget_service.spec.ts` : entretien prévu.
+  - Vitest : `tests/inertia/maintenance_work_order.spec.ts`, ainsi que le tableau de bord mécanicien et le widget « Tâches planifiées ».
+- **Docs.** `docs/domain/maintenance-tasks.md`, `docs/data/schema.md`, `docs/frontend/ui-map.md`, et l'entrée `maintenance-work-orders` dans `product_knowledge.ts`.

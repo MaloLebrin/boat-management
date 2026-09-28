@@ -9,6 +9,7 @@ import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import type {
   DashboardBoatSummary,
+  DashboardPlannedTaskList,
   DashboardPlannedTasks,
   DashboardPortItem,
   DashboardPortStats,
@@ -245,37 +246,50 @@ export default class DashboardService {
    */
   async getPlannedTasks(
     boatIds: number[],
-    opts?: { today?: DateTime; days?: number; limit?: number }
+    opts?: { today?: DateTime; days?: number; limit?: number; userId?: number }
   ): Promise<DashboardPlannedTasks> {
-    if (boatIds.length === 0) return { items: [], total: 0 }
+    const empty = { items: [], total: 0 }
+    if (boatIds.length === 0) return { ...empty, mine: empty }
 
     const today = (opts?.today ?? DateTime.now()).startOf('day')
     const until = today.plus({ days: opts?.days ?? PLANNED_TASKS_DAYS })
+    const limit = opts?.limit ?? PLANNED_TASKS_CAP
 
-    const rows = await BoatMaintenanceTask.query()
-      .whereIn('boatId', boatIds)
-      .where('status', 'open')
-      .whereNotNull('dueAt')
-      .where('dueAt', '>=', today.toISODate()!)
-      .where('dueAt', '<=', until.toISODate()!)
-      .preload('boat', (q) => q.select(['id', 'name']))
-      .select(['id', 'boatId', 'title', 'subject', 'dueAt'])
-      .select(db.raw('count(*) over() as window_total'))
-      .orderBy('dueAt', 'asc')
-      .orderBy('id', 'desc')
-      .limit(opts?.limit ?? PLANNED_TASKS_CAP)
+    const list = async (assigneeId?: number): Promise<DashboardPlannedTaskList> => {
+      const query = BoatMaintenanceTask.query()
+        .whereIn('boatId', boatIds)
+        .where('status', 'open')
+        .whereNotNull('dueAt')
+        .where('dueAt', '>=', today.toISODate()!)
+        .where('dueAt', '<=', until.toISODate()!)
+      if (assigneeId !== undefined) query.where('assigneeId', assigneeId)
+      const rows = await query
+        .preload('boat', (q) => q.select(['id', 'name']))
+        .select(['id', 'boatId', 'title', 'subject', 'dueAt'])
+        .select(db.raw('count(*) over() as window_total'))
+        .orderBy('dueAt', 'asc')
+        .orderBy('id', 'desc')
+        .limit(limit)
 
-    return {
-      total: Number(rows[0]?.$extras.window_total ?? 0),
-      items: rows.map((task) => ({
-        id: task.id,
-        boatId: task.boatId,
-        boatName: task.boat?.name ?? `#${task.boatId}`,
-        title: task.title,
-        subject: task.subject,
-        dueAt: task.dueAt!.toISODate()!,
-      })),
+      return {
+        total: Number(rows[0]?.$extras.window_total ?? 0),
+        items: rows.map((task) => ({
+          id: task.id,
+          boatId: task.boatId,
+          boatName: task.boat?.name ?? `#${task.boatId}`,
+          title: task.title,
+          subject: task.subject,
+          dueAt: task.dueAt!.toISODate()!,
+        })),
+      }
     }
+
+    // « Mes tâches à venir » (#868) : la même fenêtre, limitée à l'assigné.
+    const [all, mine] = await Promise.all([
+      list(),
+      opts?.userId !== undefined ? list(opts.userId) : Promise.resolve(empty),
+    ])
+    return { ...all, mine }
   }
 
   /**

@@ -11,6 +11,7 @@ import OrganizationPolicy from '#policies/organization_policy'
 import { budgetYearValidator } from '#validators/budget_validator'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 
 @inject()
 export default class BudgetController {
@@ -42,18 +43,26 @@ export default class BudgetController {
 
     await user.load('organization')
 
-    const [budget, portStays, entries, canManage, portOptions, allowsRunImport] = await Promise.all(
-      [
-        this.budgetService.getForBoat(boat, year),
-        this.portStayService.listForBoat(boat, year),
-        this.entryService.listForBoat(boat, year),
-        bouncer.with(BoatPolicy).allows('manage', boat),
-        // Assistance à la saisie du nom d'escale (#579) : la colonne reste du
-        // texte libre, la liste ne fait que proposer les ports de l'organisation.
-        this.portService.listNamesForOrg(user),
-        bouncer.with(OrganizationPolicy).allows('runImport'),
-      ]
-    )
+    const [
+      budget,
+      portStays,
+      entries,
+      canManage,
+      portOptions,
+      allowsRunImport,
+      plannedMaintenance,
+    ] = await Promise.all([
+      this.budgetService.getForBoat(boat, year),
+      this.portStayService.listForBoat(boat, year),
+      this.entryService.listForBoat(boat, year),
+      bouncer.with(BoatPolicy).allows('manage', boat),
+      // Assistance à la saisie du nom d'escale (#579) : la colonne reste du
+      // texte libre, la liste ne fait que proposer les ports de l'organisation.
+      this.portService.listNamesForOrg(user),
+      bouncer.with(OrganizationPolicy).allows('runImport'),
+      // Entretien prévu ce trimestre (#868), quelle que soit l'année affichée.
+      this.budgetService.getPlannedMaintenance([boat.id], DateTime.now()),
+    ])
 
     // Raccourci « Importer des dépenses » vers `/settings/import` : même
     // garde que l'import des dépenses lui-même (`canImportExpenses`, dès le
@@ -73,6 +82,7 @@ export default class BudgetController {
       canManage,
       canImport,
       portOptions,
+      plannedMaintenance,
     })
   }
 }

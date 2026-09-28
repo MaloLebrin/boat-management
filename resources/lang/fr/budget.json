@@ -112,5 +112,10 @@
     "10": "Oct",
     "11": "Nov",
     "12": "Déc"
+  },
+  "plannedMaintenance": {
+    "title": "Entretien prévu — T{quarter} {year}",
+    "unestimated": "{count, plural, one {# tâche due d'ici la fin du trimestre n'a pas de coût estimé} other {# tâches dues d'ici la fin du trimestre n'ont pas de coût estimé}}",
+    "empty": "Aucune tâche chiffrée due d'ici la fin du trimestre."
   }
 }

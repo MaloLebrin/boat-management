@@ -1,5 +1,10 @@
 import type Boat from '#models/boat'
-import type { BudgetData, BudgetMonthlyData, BudgetYearSummary } from '#shared/types/budget'
+import type {
+  BudgetData,
+  BudgetMonthlyData,
+  BudgetYearSummary,
+  PlannedMaintenanceSummary,
+} from '#shared/types/budget'
 import type { DashboardSpendSummary } from '#shared/types/dashboard'
 import db from '@adonisjs/lucid/services/db'
 import type { DateTime } from 'luxon'
@@ -230,12 +235,48 @@ export default class BudgetService {
       this.computeMonthly(boatIds, year - 1),
     ])
     const previousYearToDate = this.sumMonths(previousMonthly, throughMonth)
+    const plannedMaintenance = await this.getPlannedMaintenance(boatIds, now)
     return {
       year,
       throughMonth,
       totals: this.sumMonths(monthly, throughMonth),
       previousYearToDate: previousYearToDate.total > 0 ? previousYearToDate : null,
       singleBoatId: boatIds.length === 1 ? boatIds[0]! : null,
+      plannedMaintenance,
+    }
+  }
+
+  /**
+   * Entretien prévu d'ici la fin du trimestre civil de `now` (#868) : les
+   * tâches ouvertes datées jusqu'à cette date, retards compris. Les tâches en
+   * heures moteur, sans date, n'y entrent pas.
+   */
+  async getPlannedMaintenance(
+    boatIds: number[],
+    now: DateTime
+  ): Promise<PlannedMaintenanceSummary> {
+    const summary = { year: now.year, quarter: now.quarter, amount: 0, estimatedCount: 0 }
+    if (boatIds.length === 0) return { ...summary, unestimatedCount: 0 }
+
+    const row = await db
+      .from('boat_maintenance_tasks')
+      .whereIn('boat_id', boatIds)
+      .where('status', 'open')
+      .whereNotNull('due_at')
+      .where('due_at', '<=', now.endOf('quarter').toISODate()!)
+      .select(
+        db.raw('coalesce(sum(estimated_cost), 0) as amount'),
+        db.raw('count(estimated_cost) as estimated'),
+        db.raw('count(*) as total')
+      )
+      .first()
+
+    const estimated = Number(row?.estimated ?? 0)
+    return {
+      ...summary,
+      amount: Number.parseFloat(String(row?.amount ?? 0)),
+      estimatedCount: estimated,
+      unestimatedCount: Number(row?.total ?? 0) - estimated,
     }
   }
 }

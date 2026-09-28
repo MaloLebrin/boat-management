@@ -3,6 +3,7 @@ import { ClockIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 import { computed, ref } from 'vue'
 import BoatMaintenanceTasksPanel from '~/components/boats/maintenance/BoatMaintenanceTasksPanel.vue'
 import BoatTaskActions from '~/components/boats/maintenance/BoatTaskActions.vue'
+import MaintenanceTaskWorkOrderSummary from '~/components/boats/maintenance/MaintenanceTaskWorkOrderSummary.vue'
 import BoatTaskUrgentCard from '~/components/boats/maintenance/BoatTaskUrgentCard.vue'
 import MaintenanceTaskQuickAdd from '~/components/boats/maintenance/MaintenanceTaskQuickAdd.vue'
 import BoatTasksFilterPills, {
@@ -159,6 +160,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
             <p class="font-semibold text-fg">{{ task.title }}</p>
             <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
             <p v-if="task.notes" class="mt-1 text-sm text-fg-muted">{{ task.notes }}</p>
+            <MaintenanceTaskWorkOrderSummary :work-order="task" />
           </div>
           <div class="flex items-center gap-3">
             <span v-if="task.dueAt" class="text-sm text-fg-subtle">{{
@@ -194,6 +196,7 @@ function getTaskComponentLabel(task: MaintenanceTaskRow): string {
             <p class="font-semibold text-fg">{{ task.title }}</p>
             <p class="text-sm text-fg-muted">{{ getTaskComponentLabel(task) }}</p>
             <p v-if="task.notes" class="mt-1 text-sm text-fg-muted">{{ task.notes }}</p>
+            <MaintenanceTaskWorkOrderSummary :work-order="task" />
           </div>
           <div class="flex items-center gap-3">
             <span v-if="task.dueEngineHours !== null" class="text-sm text-fg-subtle">

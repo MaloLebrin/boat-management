@@ -17,6 +17,12 @@ function makeTask(
     currentEngineHours: overrides.currentEngineHours ?? null,
     status: overrides.status ?? 'open',
     postponedCount: overrides.postponedCount ?? 0,
+    assignee: null,
+    providerName: null,
+    estimatedCost: null,
+    actualCost: null,
+    estimatedDurationMinutes: null,
+    actualDurationMinutes: null,
   }
 }
 

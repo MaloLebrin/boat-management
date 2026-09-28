@@ -17,6 +17,7 @@ export const AUDIT_ACTIONS = [
   // l'échéance recule, `update` pour toute autre correction.
   'maintenance_task.update',
   'maintenance_task.postpone',
+  'maintenance_task.assign',
   // Actions confirmées depuis le copilote FleetAi (agent actionnable) : même
   // journal que les créations manuelles correspondantes.
   'engine.add_hours',

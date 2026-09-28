@@ -32,5 +32,19 @@
     "crewCount": "nb_équipiers",
     "status": "statut",
     "notes": "notes"
+  },
+  "maintenanceTasks": {
+    "title": "titre",
+    "subject": "sujet",
+    "status": "statut",
+    "dueAt": "échéance",
+    "dueEngineHours": "échéance_heures_moteur",
+    "doneAt": "terminée_le",
+    "assignee": "responsable",
+    "provider": "prestataire",
+    "estimatedCost": "coût_prévu",
+    "actualCost": "coût_réel",
+    "estimatedDurationMinutes": "durée_prévue_min",
+    "actualDurationMinutes": "durée_réelle_min"
   }
 }

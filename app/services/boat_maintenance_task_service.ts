@@ -9,6 +9,7 @@ import BoatRig from '#models/boat_rig'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
 import Boat from '#models/boat'
+import OrganizationMembership from '#models/organization_membership'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
@@ -20,8 +21,10 @@ import {
   subjectForEquipment,
 } from '#shared/helpers/maintenance_task_equipment'
 import type { GenericEquipmentCategory } from '#shared/types/boat'
+import { ROLE_PERMISSIONS } from '#shared/types/permissions'
 import type {
   CreateMaintenanceTaskPayload,
+  MaintenanceAssigneeOption,
   MaintenanceTaskEditableField,
   MaintenanceTaskSubject,
   MaintenanceTaskUpdateOutcome,
@@ -99,9 +102,44 @@ function equipmentNotFound() {
   )
 }
 
+/**
+ * Membre à qui l'on peut confier une tâche (#868) : il appartient à
+ * l'organisation **et** son rôle peut modifier la maintenance — un
+ * propriétaire de bateau (portail en lecture seule) ne peut pas clôturer ce
+ * qu'on lui assignerait. Un id d'une autre organisation est refusé au même
+ * titre qu'un id inconnu.
+ */
+async function assertAssignable(organizationId: number, userId: number): Promise<void> {
+  const membership = await OrganizationMembership.query()
+    .where('organizationId', organizationId)
+    .where('userId', userId)
+    .select('id', 'role')
+    .first()
+  if (!membership || !ROLE_PERMISSIONS[membership.role].has('maintenance.edit')) {
+    throw new BoatMaintenanceTaskValidationError(
+      'Assignee is not a maintenance member of this organization',
+      'assigneeNotMember'
+    )
+  }
+}
+
+/** Texte libre d'une ligne, `null` quand il est vide. */
+function trimmedOrNull(value: string | null | undefined): string | null {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : null
+}
+
+/** Montant décimal (colonne `decimal`, lue en chaîne) comparable à un nombre. */
+function decimalOrNull(value: string | number | null): number | null {
+  if (value === null) return null
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
 /** Tâches ouvertes d'abord, puis datées avant non datées (NULLS LAST portable PG/SQLite). */
 function orderTasks(query: ModelQueryBuilderContract<typeof BoatMaintenanceTask>) {
   return query
+    .preload('assignee', (q) => q.select('id', 'fullName', 'email'))
     .orderBy('status', 'asc')
     .orderByRaw('CASE WHEN due_at IS NULL THEN 1 ELSE 0 END')
     .orderBy('dueAt', 'asc')
@@ -182,6 +220,9 @@ export default class BoatMaintenanceTaskService {
       )
     }
 
+    const assigneeId = payload.assigneeId ?? null
+    if (assigneeId !== null) await assertAssignable(boat.organizationId, assigneeId)
+
     const equipmentColumns = {
       boatEngineId: null,
       boatSailId: null,
@@ -206,6 +247,14 @@ export default class BoatMaintenanceTaskService {
       recurrenceIntervalEngineHours: recurrenceEngineHours,
       lastDoneEngineHours: null,
       doneEngineHours: null,
+      assigneeId,
+      assignedAt: assigneeId !== null ? DateTime.now() : null,
+      providerName: trimmedOrNull(payload.providerName),
+      estimatedCost:
+        payload.estimatedCost === null || payload.estimatedCost === undefined
+          ? null
+          : String(payload.estimatedCost),
+      estimatedDurationMinutes: payload.estimatedDurationMinutes ?? null,
     })
   }
 
@@ -239,6 +288,7 @@ export default class BoatMaintenanceTaskService {
 
     const changedFields: MaintenanceTaskEditableField[] = []
     let postponed = false
+    let assigneeChanged = false
 
     if (payload.title !== undefined) {
       const title = payload.title.trim()
@@ -330,10 +380,44 @@ export default class BoatMaintenanceTaskService {
       }
     }
 
+    // Ordre de travail (#868).
+    if (payload.assigneeId !== undefined && payload.assigneeId !== task.assigneeId) {
+      if (payload.assigneeId !== null) {
+        await assertAssignable(boat.organizationId, payload.assigneeId)
+      }
+      task.assigneeId = payload.assigneeId
+      task.assignedAt = payload.assigneeId !== null ? DateTime.now() : null
+      changedFields.push('assigneeId')
+      assigneeChanged = true
+    }
+
+    if (payload.providerName !== undefined) {
+      const providerName = trimmedOrNull(payload.providerName)
+      if (providerName !== task.providerName) {
+        task.providerName = providerName
+        changedFields.push('providerName')
+      }
+    }
+
+    if (payload.estimatedCost !== undefined) {
+      if (payload.estimatedCost !== decimalOrNull(task.estimatedCost)) {
+        task.estimatedCost = payload.estimatedCost === null ? null : String(payload.estimatedCost)
+        changedFields.push('estimatedCost')
+      }
+    }
+
+    if (payload.estimatedDurationMinutes !== undefined) {
+      const minutes = payload.estimatedDurationMinutes ?? null
+      if (minutes !== task.estimatedDurationMinutes) {
+        task.estimatedDurationMinutes = minutes
+        changedFields.push('estimatedDurationMinutes')
+      }
+    }
+
     if (postponed) task.postponedCount += 1
     if (changedFields.length > 0) await task.save()
 
-    return { task, changedFields, postponed }
+    return { task, changedFields, postponed, assigneeChanged }
   }
 
   /**
@@ -380,6 +464,13 @@ export default class BoatMaintenanceTaskService {
     task.doneAt = doneAt
     task.doneEngineHours = doneEngineHours
     if (doneEngineHours !== null) task.lastDoneEngineHours = doneEngineHours
+    // Réalisé face au prévu (#868) — seulement s'il est saisi.
+    if (payload.actualCost !== undefined && payload.actualCost !== null) {
+      task.actualCost = String(payload.actualCost)
+    }
+    if (payload.actualDurationMinutes !== undefined && payload.actualDurationMinutes !== null) {
+      task.actualDurationMinutes = payload.actualDurationMinutes
+    }
     await task.save()
 
     // Auto-create next task when recurrence is configured
@@ -417,6 +508,14 @@ export default class BoatMaintenanceTaskService {
         recurrenceIntervalEngineHours: task.recurrenceIntervalEngineHours,
         lastDoneEngineHours: doneEngineHours,
         doneEngineHours: null,
+        // L'occurrence suivante reste le même ordre de travail : même
+        // responsable, même prestataire, même estimation. Le réel, lui, est
+        // propre à chaque clôture.
+        assigneeId: task.assigneeId,
+        assignedAt: task.assigneeId !== null ? DateTime.now() : null,
+        providerName: task.providerName,
+        estimatedCost: task.estimatedCost,
+        estimatedDurationMinutes: task.estimatedDurationMinutes,
       })
     }
 
@@ -465,6 +564,21 @@ export default class BoatMaintenanceTaskService {
       .preload('safetyEquipment')
       .preload('genericEquipment')
       .first()
+  }
+
+  /**
+   * Membres à qui une tâche peut être confiée (#868), triés par nom — le
+   * sélecteur des formulaires de tâche et le filtre « Assigné à » du planning.
+   */
+  async listAssignees(user: User): Promise<MaintenanceAssigneeOption[]> {
+    if (user.organizationId === null) return []
+    const memberships = await OrganizationMembership.query()
+      .where('organizationId', user.organizationId)
+      .preload('user', (q) => q.select('id', 'fullName', 'email'))
+    return memberships
+      .filter((m) => ROLE_PERMISSIONS[m.role].has('maintenance.edit'))
+      .map((m) => ({ id: m.user.id, fullName: m.user.fullName || m.user.email }))
+      .sort((a, b) => a.fullName.localeCompare(b.fullName))
   }
 
   async listForEngine(boatId: number, engineId: number) {

@@ -309,6 +309,7 @@
     "noBoats": "No boats available. Create a boat first.",
     "exportBoatLabel": "Export boat data",
     "exportMaintenance": "Maintenance (.csv)",
+    "exportMaintenanceTasks": "Planned tasks (.csv)",
     "exportFuelLogs": "Fuel logs (.csv)",
     "exportNavigationLogs": "Navigation log (.csv)",
     "help": {
@@ -369,6 +370,7 @@
       "maintenance_task_delete": "Maintenance task deleted",
       "maintenance_task_update": "Maintenance task updated",
       "maintenance_task_postpone": "Maintenance task postponed",
+      "maintenance_task_assign": "Maintenance task assigned",
       "engine_add_hours": "Engine hours added",
       "navigation_log_create": "Trip opened",
       "navigation_log_close": "Trip closed",

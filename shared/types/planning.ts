@@ -1,4 +1,7 @@
-export interface PlanningTask {
+import type { MaintenanceTaskWorkOrder } from '#shared/types/maintenance'
+
+/** Tâche du planning, avec son ordre de travail (#868). */
+export interface PlanningTask extends MaintenanceTaskWorkOrder {
   id: number
   boatId: number
   boatName: string
@@ -53,6 +56,19 @@ export interface PlanningResult {
   undatedTasks: PlanningTask[]
   doneTasks: PlanningTask[]
   doneTasksTotal: number
+  /**
+   * Nombre de tâches terminées par assigné (clé : id du membre en chaîne, ou
+   * `'unassigned'`), pour que le filtre « Assigné à » affiche le vrai total
+   * et non la taille de la liste tronquée (#868).
+   */
+  doneTasksTotalByAssignee: Record<string, number>
   groups: TaskGroup[]
   canGroupTasks: boolean
 }
+
+/**
+ * Tâches terminées envoyées au planning : les N plus récentes de la flotte,
+ * **et** les N plus récentes de chaque assigné — le filtre « Assigné à »
+ * reste ainsi rempli même quand le membre n'est pas dans le top de la flotte.
+ */
+export const PLANNING_DONE_TASKS_LIMIT = 20

@@ -38,5 +38,12 @@
     "ungroup": "Dissocier",
     "proTeaser": "Passez au plan Pro pour regrouper automatiquement les tâches de maintenance proches."
   },
-  "postponedCount": "{count, plural, one {Reportée # fois} other {Reportée # fois}}"
+  "postponedCount": "{count, plural, one {Reportée # fois} other {Reportée # fois}}",
+  "assignedTo": "Confiée à {name}",
+  "assigneeFilter": {
+    "label": "Assigné à",
+    "all": "Toutes les tâches",
+    "mine": "Mes tâches",
+    "unassigned": "Non assignées"
+  }
 }

@@ -62,6 +62,10 @@
       "due_soon": {
         "title": "Upcoming maintenance on {boatName}",
         "body": "{count, plural, one {# maintenance task is due soon} other {# maintenance tasks are due soon}} on {boatName}."
+      },
+      "assigned": {
+        "title": "Task assigned: {taskTitle}",
+        "body": "{assignedBy} assigned “{taskTitle}” on {boatName} to you."
       }
     },
     "document": {
@@ -116,6 +120,7 @@
     "plan.upgraded": "Plan upgraded",
     "maintenance.overdue": "Maintenance overdue",
     "maintenance.due_soon": "Maintenance due soon",
+    "maintenance.assigned": "Task assigned",
     "document.expiring_soon": "Document expiring soon",
     "document.expired": "Document expired",
     "safety_equipment.expiring_soon": "Safety equipment expiring",

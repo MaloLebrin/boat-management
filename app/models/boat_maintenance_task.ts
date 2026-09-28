@@ -5,6 +5,7 @@ import BoatGenericEquipment from '#models/boat_generic_equipment'
 import BoatRig from '#models/boat_rig'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
+import User from '#models/user'
 import { belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
@@ -26,4 +27,8 @@ export default class BoatMaintenanceTask extends BoatMaintenanceTaskSchema {
 
   @belongsTo(() => BoatGenericEquipment, { foreignKey: 'boatGenericEquipmentId' })
   declare genericEquipment: BelongsTo<typeof BoatGenericEquipment>
+
+  /** Membre à qui la tâche est confiée (#868), `null` si personne. */
+  @belongsTo(() => User, { foreignKey: 'assigneeId' })
+  declare assignee: BelongsTo<typeof User>
 }

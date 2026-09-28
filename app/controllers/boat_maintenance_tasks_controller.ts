@@ -3,6 +3,7 @@ import {
   BoatMaintenanceTaskNotFoundError,
   BoatMaintenanceTaskValidationError,
 } from '#exceptions/maintenance_errors'
+import MaintenanceTaskAssigned from '#events/maintenance_task_assigned'
 import AuditLogService from '#services/audit_log_service'
 import BoatHullService from '#services/boat_hull_service'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
@@ -13,6 +14,9 @@ import {
   updateBoatMaintenanceTaskValidator,
 } from '#validators/boat_maintenance_task'
 import { equipmentRefOf } from '#shared/helpers/maintenance_task_equipment'
+import type Boat from '#models/boat'
+import type BoatMaintenanceTask from '#models/boat_maintenance_task'
+import type User from '#models/user'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
@@ -58,6 +62,10 @@ export default class BoatMaintenanceTasksController {
         dueEngineHours: payload.dueEngineHours ?? null,
         recurrenceIntervalEngineHours: payload.recurrenceIntervalEngineHours ?? null,
         boatIncidentId: payload.boatIncidentId ?? null,
+        assigneeId: payload.assigneeId ?? null,
+        providerName: payload.providerName ?? null,
+        estimatedCost: payload.estimatedCost ?? null,
+        estimatedDurationMinutes: payload.estimatedDurationMinutes ?? null,
       })
 
       const equipment = equipmentRefOf(task)
@@ -74,6 +82,7 @@ export default class BoatMaintenanceTasksController {
           ...(task.boatIncidentId ? { incidentId: task.boatIncidentId } : {}),
         },
       })
+      if (task.assigneeId !== null) await this.recordAssignment(user, boat, task)
     } catch (error) {
       if (
         error instanceof BoatMaintenanceTaskValidationError &&
@@ -128,7 +137,7 @@ export default class BoatMaintenanceTasksController {
 
     let postponedOnly = false
     try {
-      const { task, changedFields, postponed } =
+      const { task, changedFields, postponed, assigneeChanged } =
         await this.boatMaintenanceTaskService.updateForBoat(
           user,
           boat,
@@ -136,12 +145,16 @@ export default class BoatMaintenanceTasksController {
           payload
         )
 
+      // Le changement de responsable a sa propre ligne d'audit (#868) ; la
+      // ligne `update` / `postpone` ne couvre que le reste.
+      const otherFields = changedFields.filter((f) => f !== 'assigneeId')
+      if (assigneeChanged) await this.recordAssignment(user, boat, task)
+
       // Un report pur (seule l'échéance recule) est tracé comme tel : c'est le
       // geste que l'on veut compter, distinct d'une correction de la tâche.
-      postponedOnly =
-        postponed && changedFields.every((f) => f === 'dueAt' || f === 'dueEngineHours')
+      postponedOnly = postponed && otherFields.every((f) => f === 'dueAt' || f === 'dueEngineHours')
 
-      if (changedFields.length > 0) {
+      if (otherFields.length > 0) {
         await this.auditLogService.log({
           organizationId: user.organizationId!,
           userId: user.id,
@@ -151,7 +164,7 @@ export default class BoatMaintenanceTasksController {
           metadata: {
             name: task.title,
             boatName: boat.name,
-            fields: changedFields,
+            fields: otherFields,
             ...(postponed ? { postponedCount: task.postponedCount } : {}),
           },
         })
@@ -192,6 +205,30 @@ export default class BoatMaintenanceTasksController {
     response.redirect().back()
   }
 
+  /**
+   * Trace un changement de responsable (#868) et prévient le nouvel assigné.
+   * Une désassignation (`assigneeId` à `null`) est journalisée sans notifier.
+   */
+  private async recordAssignment(user: User, boat: Boat, task: BoatMaintenanceTask) {
+    await this.auditLogService.log({
+      organizationId: user.organizationId!,
+      userId: user.id,
+      action: 'maintenance_task.assign',
+      entityType: 'maintenance_task',
+      entityId: task.id,
+      metadata: { name: task.title, boatName: boat.name, assigneeId: task.assigneeId },
+    })
+
+    if (task.assigneeId === null) return
+    await MaintenanceTaskAssigned.dispatch(
+      boat.organizationId,
+      { id: task.id, title: task.title, boatId: boat.id },
+      boat.name,
+      task.assigneeId,
+      { id: user.id, name: user.fullName || user.email }
+    )
+  }
+
   async markDone({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
     await auth.authenticate()
     const user = auth.getUserOrFail()
@@ -219,6 +256,8 @@ export default class BoatMaintenanceTasksController {
         {
           doneAt: payload.doneAt ?? undefined,
           doneEngineHours: payload.doneEngineHours ?? null,
+          actualCost: payload.actualCost ?? null,
+          actualDurationMinutes: payload.actualDurationMinutes ?? null,
         }
       )
 

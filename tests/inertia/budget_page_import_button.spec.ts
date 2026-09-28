@@ -53,6 +53,13 @@ function mountPage(canImport: boolean) {
       canManage: true,
       canImport,
       portOptions: [],
+      plannedMaintenance: {
+        year: 2026,
+        quarter: 3,
+        amount: 0,
+        estimatedCount: 0,
+        unestimatedCount: 0,
+      },
     },
   })
 }

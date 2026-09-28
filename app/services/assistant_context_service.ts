@@ -96,12 +96,22 @@ export default class AssistantContextService {
           task.kind === 'hours'
             ? `${task.dueEngineHours ?? '?'} h`
             : (task.dueAt ?? (fr ? 'sans date' : 'no date'))
-        lines.push(`- ${task.boatName} : ${task.title} (${due})`.slice(0, MAX_LINE_LENGTH))
+        // Responsable (#868) : l'assistant peut répondre « qui s'en occupe ».
+        const assignee = task.assignee ? ` → ${task.assignee.fullName}` : ''
+        lines.push(
+          `- ${task.boatName} : ${task.title} (${due})${assignee}`.slice(0, MAX_LINE_LENGTH)
+        )
       }
     }
 
     pushTasks(fr ? 'En retard :' : 'Overdue:', planning.overdueTasks)
     pushTasks(fr ? 'Bientôt dues :' : 'Due soon:', planning.soonTasks)
+    // « Qu'est-ce que je dois faire cette semaine ? » (#868) : les tâches
+    // confiées à l'utilisateur qui pose la question, les plus proches d'abord.
+    pushTasks(
+      fr ? "Confiées à l'utilisateur :" : 'Assigned to the user:',
+      planning.tasks.filter((task) => task.assignee?.id === user.id)
+    )
 
     return lines.join('\n')
   }

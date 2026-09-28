@@ -81,6 +81,7 @@ describe('Kanban planning · en-têtes de colonne', () => {
     undatedTasks: [],
     doneTasks: [],
     doneTasksTotal: 0,
+    doneTasksTotalByAssignee: {},
     groups: [],
     groupingEnabled: false,
     dismissedGroupIds: new Set<string>(),

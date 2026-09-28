@@ -350,6 +350,33 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'planning.index',
   },
   {
+    id: 'maintenance-work-orders',
+    title: {
+      en: 'Assigning maintenance tasks (work orders)',
+      fr: 'Assigner une tâche de maintenance (ordres de travail)',
+    },
+    body: {
+      en: 'A maintenance task can be assigned to a member whose role can edit maintenance (admin, member, mechanic), or to an external provider, with an estimated cost and time. Set it in the task form or edit window; the assignee gets a notification. When closing a costed task, enter the actual cost and time. The planning filters by assignee and shows initials; mechanics land on My tasks. The budget page shows planned maintenance for the quarter.',
+      fr: 'Une tâche de maintenance se confie à un membre dont le rôle peut modifier la maintenance (admin, membre, mécanicien) ou à un prestataire externe, avec un coût et une durée prévus. On la règle dans le formulaire ou la fenêtre de modification ; l’assigné est notifié. À la clôture d’une tâche chiffrée, on saisit le réel. Le planning filtre par responsable et affiche ses initiales ; le mécanicien arrive sur Mes tâches. La page budget montre l’entretien prévu du trimestre.',
+    },
+    keywords: [
+      'assigner',
+      'assign',
+      'assignee',
+      'responsable',
+      'mes taches',
+      'my tasks',
+      'prestataire',
+      'provider',
+      'cout prevu',
+      'estimated cost',
+      'ordre de travail',
+      'work order',
+      'mecanicien',
+    ],
+    navTarget: 'planning.index',
+  },
+  {
     id: 'maintenance-operations-catalog',
     title: {
       en: 'Standard maintenance operations catalog',

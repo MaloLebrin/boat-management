@@ -112,5 +112,10 @@
     "10": "Oct",
     "11": "Nov",
     "12": "Dec"
+  },
+  "plannedMaintenance": {
+    "title": "Planned maintenance — Q{quarter} {year}",
+    "unestimated": "{count, plural, one {# task due by the end of the quarter has no estimated cost} other {# tasks due by the end of the quarter have no estimated cost}}",
+    "empty": "No costed task due by the end of the quarter."
   }
 }

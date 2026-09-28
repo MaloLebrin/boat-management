@@ -11,6 +11,7 @@ import OrganizationModuleDeactivated from '#events/organization_module_deactivat
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 import AiKeyUndecryptable from '#events/ai_key_undecryptable'
+import MaintenanceTaskAssigned from '#events/maintenance_task_assigned'
 
 emitter.listen(SimulatorLeadCreated, [() => import('#listeners/on_simulator_lead_created')])
 emitter.listen(ContactMessageReceived, [() => import('#listeners/on_contact_message_received')])
@@ -38,3 +39,4 @@ emitter.listen(AiTokenThresholdCrossed, [
   () => import('#listeners/send_ai_token_quota_notification'),
 ])
 emitter.listen(AiKeyUndecryptable, [() => import('#listeners/log_ai_key_undecryptable')])
+emitter.listen(MaintenanceTaskAssigned, [() => import('#listeners/on_maintenance_task_assigned')])

@@ -1,6 +1,6 @@
 import type { PartWearState } from '#shared/types/boat'
 import type { BoatDocumentType } from '#shared/types/boat_document'
-import type { BudgetYearSummary } from '#shared/types/budget'
+import type { BudgetYearSummary, PlannedMaintenanceSummary } from '#shared/types/budget'
 import type { IncidentType } from '#shared/types/incident'
 import type { ReservationStatus, ReservationType } from '#shared/types/reservation'
 import type { ArmamentZone } from '#shared/types/safety'
@@ -197,6 +197,8 @@ export interface DashboardSpendSummary {
   previousYearToDate: BudgetYearSummary | null
   /** Lien « voir le budget » possible seulement pour une flotte d'un seul bateau. */
   singleBoatId: number | null
+  /** Entretien prévu ce trimestre (#868). */
+  plannedMaintenance: PlannedMaintenanceSummary
 }
 
 interface DashboardActivityBase {
@@ -258,11 +260,16 @@ export interface DashboardPlannedTask {
   dueAt: string
 }
 
-export interface DashboardPlannedTasks {
+export interface DashboardPlannedTaskList {
   /** Plafonnées à `PLANNED_TASKS_CAP`, la plus proche d'abord. */
   items: DashboardPlannedTask[]
   /** Toutes les tâches ouvertes datées de la fenêtre (comptage exact). */
   total: number
+}
+
+export interface DashboardPlannedTasks extends DashboardPlannedTaskList {
+  /** Les mêmes, restreintes à celles confiées à l'utilisateur (#868). */
+  mine: DashboardPlannedTaskList
 }
 
 // --- Widgets de la galerie (masqués par défaut) --------------------------------

@@ -261,6 +261,11 @@ plomberie).
   - `dueAt` (date)
   - `dueEngineHours` (int)
   - `postponedCount` (int, défaut 0) — nombre de reports de l'échéance, incrémenté quand `dueAt` ou `dueEngineHours` recule via `PATCH …/maintenance-tasks/:taskId` (#867)
+- ordre de travail (#868) :
+  - `assigneeId` (FK `users` nullable, SET NULL, indexé) — membre à qui la tâche est confiée ; `assignedAt` (timestamptz)
+  - `providerName` (string 200, nullable) — prestataire externe en texte libre
+  - `estimatedCost` / `actualCost` (decimal 10,2, nullable) — prévu, puis réel saisi à la clôture
+  - `estimatedDurationMinutes` / `actualDurationMinutes` (int, nullable)
 - complétion:
   - `doneAt`
 - index `(boat_id, status)` (`boat_maintenance_tasks_boat_status_idx`, #832) — comptage exact des tâches urgentes et « tâches réalisées 30 j » du tableau de bord

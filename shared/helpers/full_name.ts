@@ -27,3 +27,13 @@ export function joinFullName(firstName: string, lastName: string): string | null
       .join(' ') || null
   )
 }
+
+/**
+ * Initiales d'un nom affiché (#868) — `Jeanne Martin` → `JM`, `Jeanne` → `J`.
+ * Pour les pastilles d'avatar, là où il n'y a pas de photo.
+ */
+export function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  const letters = parts.length > 1 ? [parts[0]!, parts[parts.length - 1]!] : parts.slice(0, 1)
+  return letters.map((part) => part.charAt(0).toUpperCase()).join('')
+}

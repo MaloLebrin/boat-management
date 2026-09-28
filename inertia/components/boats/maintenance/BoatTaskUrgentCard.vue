@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import BoatTaskActions from '~/components/boats/maintenance/BoatTaskActions.vue'
+import MaintenanceTaskWorkOrderSummary from '~/components/boats/maintenance/MaintenanceTaskWorkOrderSummary.vue'
 import type { MaintenanceTaskRow } from '~/types/boat_show'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
@@ -42,6 +43,7 @@ const dueClass = computed(() =>
           {{ t('boats.maintenance.tasks.dueHours', { hours: task.dueEngineHours }) }}
         </p>
         <p v-if="task.notes" class="mt-2 text-sm text-fg-muted">{{ task.notes }}</p>
+        <MaintenanceTaskWorkOrderSummary :work-order="task" />
       </div>
       <BoatTaskActions v-if="canManage" :boat-id="boatId" :task="task" />
     </div>

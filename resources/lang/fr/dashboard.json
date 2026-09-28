@@ -81,7 +81,11 @@
     "dueSoon": "Bientôt dû",
     "openTask": "Ouvrir l'intervention {title} sur {boat}",
     "dueAt": "Dû le {date}",
-    "dueAtHours": "Dû à {hours}h · actuel {current}h"
+    "dueAtHours": "Dû à {hours}h · actuel {current}h",
+    "scope": {
+      "mine": "Mes tâches",
+      "all": "Toute la flotte"
+    }
   },
   "attention": {
     "title": "À traiter",
@@ -227,7 +231,11 @@
     "empty": "Aucune tâche planifiée sur la période.",
     "viewAll": "Voir le planning",
     "open": "Ouvrir la tâche {title} ({boat})",
-    "more": "{count, plural, one {# autre tâche sur la période} other {# autres tâches sur la période}}"
+    "more": "{count, plural, one {# autre tâche sur la période} other {# autres tâches sur la période}}",
+    "scope": {
+      "mine": "Les miennes",
+      "all": "Toutes"
+    }
   },
   "notifications": {
     "title": "Notifications",

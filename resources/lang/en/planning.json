@@ -38,5 +38,12 @@
     "ungroup": "Ungroup",
     "proTeaser": "Upgrade to Pro to automatically group nearby maintenance tasks."
   },
-  "postponedCount": "{count, plural, one {Postponed once} other {Postponed # times}}"
+  "postponedCount": "{count, plural, one {Postponed once} other {Postponed # times}}",
+  "assignedTo": "Assigned to {name}",
+  "assigneeFilter": {
+    "label": "Assigned to",
+    "all": "All tasks",
+    "mine": "My tasks",
+    "unassigned": "Unassigned"
+  }
 }

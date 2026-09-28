@@ -21,6 +21,9 @@ Champs clés:
 - cibles optionnelles: `boat_engine_id`, `boat_sail_id`, `boat_rig_id`, `boat_safety_equipment_id`, `boat_generic_equipment_id`
 - `boat_incident_id` (FK nullable, `SET NULL`) — incident à l'origine de la tâche (#815), voir `docs/domain/incidents.md`
 - `postponed_count` (int, défaut 0) — nombre de reports de l'échéance (#867)
+- ordre de travail (#868) : `assignee_id` (FK `users` nullable, `SET NULL`, indexée), `assigned_at`,
+  `provider_name` (texte libre, 200), `estimated_cost` / `actual_cost` (decimal 10,2),
+  `estimated_duration_minutes` / `actual_duration_minutes` (int)
 
 ## Routes → controllers → services → UI
 
@@ -106,6 +109,50 @@ UI :
   « Reportée N fois ».
 - Hors-ligne : non couvert — la file hors-ligne (`docs/domain/offline-queue.md`) ne rejoue aucune
   mutation de task, clôture comprise.
+
+### Ordres de travail : responsable, prestataire, prévu et réel (#868)
+
+Une task se confie à un **membre** (`assigneeId`) ou à un **prestataire externe** (`providerName`,
+champ libre en attendant un annuaire), avec un coût et une durée prévus.
+
+- Saisie : à la création (`POST …/maintenance-tasks`) et à la modification (`PATCH …/:taskId`),
+  mêmes clés `assigneeId`, `providerName`, `estimatedCost`, `estimatedDurationMinutes`. Composant
+  `MaintenanceWorkOrderFields` dans `BoatMaintenanceTaskForm` et `BoatMaintenanceTaskEditModal`.
+- Assignable : membre de l'organisation **dont le rôle a `maintenance.edit`** (admin, member,
+  mechanic). Un propriétaire de bateau ou un utilisateur d'une autre organisation est refusé
+  (`flash.maintenanceTasks.assigneeNotMember`). Liste : `BoatMaintenanceTaskService.listAssignees`,
+  exposée en prop `maintenanceAssignees` par la fiche bateau (différée, groupe `maintenance`) et le
+  planning ; lue par `useMaintenanceAssignees()`. Sur les autres pages, pas de sélecteur.
+- Coût : `min(0)`, deux décimales au plus. Durée en minutes, plafonnée à 100 000.
+- Changement de responsable : `assigned_at` = maintenant (ou `null` à la désassignation), ligne
+  d'audit **`maintenance_task.assign`** (métadonnée `assigneeId`, `null` pour une désassignation) ;
+  la ligne `update` ne couvre que les autres champs. Événement `MaintenanceTaskAssigned` → listener
+  `on_maintenance_task_assigned` → notification **`maintenance.assigned`** (in-app + push, lien
+  `/planning?task=<id>`) à l'assigné, sauf s'il se l'est confiée lui-même.
+- Clôture : `PUT …/done` accepte `actualCost` et `actualDurationMinutes`. `BoatTaskActions` ne les
+  demande que si la task a une estimation. L'occurrence suivante d'une récurrence reprend
+  responsable, prestataire et estimations, jamais le réel.
+- Scan quotidien (`NotificationScanService`) : une échéance proche **assignée** va à l'assigné
+  seul, lien `/planning` (un mécanicien n'a pas `boats.view`) ; non assignée, aux admins. Un retard
+  va aux admins **et** à l'assigné. Un même utilisateur ne reçoit qu'une notification par bateau et
+  par type.
+- Planning : pastille d'initiales de l'assigné et prestataire sur `PlanningTaskCard`, filtre
+  « Assigné à » (toutes, les miennes, non assignées, un membre — `inertia/utils/task_assignee_filter.ts`).
+  Un mécanicien à qui des tâches sont confiées arrive sur « Mes tâches ».
+- Tableau de bord mécanicien : bascule « Mes tâches / Toute la flotte », sur « Mes tâches » dès
+  qu'une tâche lui est confiée. Widget « Tâches planifiées » : liste `mine` calculée côté serveur,
+  bascule « Les miennes / Toutes » quand elle n'est pas vide.
+- Budget prévisionnel : `BudgetService.getPlannedMaintenance` — somme des `estimated_cost` des
+  tasks ouvertes datées jusqu'à la fin du trimestre civil (retards compris), et nombre de tasks
+  sans estimation. Carte sur `/boats/:id/budget`, ligne sous la carte « Dépenses » du tableau de bord.
+- Export : `GET /boats/:id/export/maintenance-tasks.csv` (`boats.export.maintenanceTasks`), une
+  ligne par task avec responsable, prestataire, prévu et réel ; lien dans Paramètres → Import/Export.
+- Assistant : le digest planning (`AssistantContextService.buildFleetDigestLines`) nomme le
+  responsable de chaque task et liste celles confiées à l'utilisateur qui pose la question.
+
+Hors périmètre : un annuaire de prestataires (table dédiée), l'e-mail d'assignation (attend les
+préférences de notification, #888), le report du prévu/réel sur `boat_maintenance_events` — la
+clôture d'une task ne crée pas d'événement d'historique.
 
 ### Supprimer une task
 

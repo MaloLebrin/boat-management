@@ -414,6 +414,10 @@ test.group('Dashboard — disposition personnalisable', (group) => {
       .withInertia()
       .withInertiaPartialReload('dashboard', ['plannedTasks'])
     reload.assertStatus(200)
-    assert.deepEqual((reload.inertiaProps as DashboardProps).plannedTasks, { items: [], total: 0 })
+    assert.deepEqual((reload.inertiaProps as DashboardProps).plannedTasks, {
+      items: [],
+      total: 0,
+      mine: { items: [], total: 0 },
+    })
   })
 })

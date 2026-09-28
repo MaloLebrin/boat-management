@@ -6,6 +6,7 @@
 import AiKeyUndecryptable from '#events/ai_key_undecryptable'
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 import ContactMessageReceived from '#events/contact_message_received'
+import MaintenanceTaskAssigned from '#events/maintenance_task_assigned'
 import OrganizationInvitationAccepted from '#events/organization_invitation_accepted'
 import OrganizationMemberJoined from '#events/organization_member_joined'
 import OrganizationMemberRemoved from '#events/organization_member_removed'
@@ -20,6 +21,7 @@ export const events = {
   AiKeyUndecryptable: AiKeyUndecryptable,
   AiTokenThresholdCrossed: AiTokenThresholdCrossed,
   ContactMessageReceived: ContactMessageReceived,
+  MaintenanceTaskAssigned: MaintenanceTaskAssigned,
   OrganizationInvitationAccepted: OrganizationInvitationAccepted,
   OrganizationMemberJoined: OrganizationMemberJoined,
   OrganizationMemberRemoved: OrganizationMemberRemoved,

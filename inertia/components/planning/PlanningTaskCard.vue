@@ -7,6 +7,7 @@ import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { usePermissions } from '~/composables/use_permissions'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
+import { initialsOf } from '#shared/helpers/full_name'
 
 const props = defineProps<{
   task: PlanningTask
@@ -55,11 +56,27 @@ function formatDue(task: PlanningTask): string {
       highlighted ? 'ring-2 ring-brand ring-offset-2 ring-offset-surface' : '',
     ]"
   >
-    <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
+    <div class="flex items-start justify-between gap-2">
+      <p class="text-xs font-medium text-fg-muted">{{ task.boatName }}</p>
+      <!-- Assigné (#868) : pastille d'initiales, nom complet au survol. -->
+      <span
+        v-if="task.assignee"
+        role="img"
+        class="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand text-[10px] font-semibold text-on-brand"
+        :title="t('planning.assignedTo', { name: task.assignee.fullName })"
+        :aria-label="t('planning.assignedTo', { name: task.assignee.fullName })"
+        data-testid="planning-task-assignee"
+      >
+        {{ initialsOf(task.assignee.fullName) }}
+      </span>
+    </div>
     <p class="mt-1 text-sm font-semibold text-fg" :class="done ? 'line-through' : ''">
       {{ task.title }}
     </p>
     <p class="mt-1 text-xs text-fg-muted">{{ maintenanceSubjectLabel(t, task.subject) }}</p>
+    <p v-if="task.providerName" class="mt-1 text-xs text-fg-subtle">
+      {{ t('boats.maintenance.tasks.workOrder.providerShort', { name: task.providerName }) }}
+    </p>
     <p v-if="task.postponedCount > 0" class="mt-1 text-xs font-medium text-warning">
       {{ t('planning.postponedCount', { count: String(task.postponedCount) }) }}
     </p>

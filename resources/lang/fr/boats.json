@@ -794,6 +794,22 @@
         "title": "Modifier la tâche",
         "submit": "Enregistrer",
         "recurrenceHint": "Un nouvel intervalle de récurrence s'applique aux prochaines occurrences, créées à la clôture de celle-ci."
+      },
+      "workOrder": {
+        "title": "Ordre de travail (optionnel)",
+        "assignee": "Responsable",
+        "unassigned": "Personne",
+        "provider": "Prestataire externe",
+        "providerPlaceholder": "ex. Chantier du port, mécanicien indépendant",
+        "estimatedCost": "Coût prévu (€)",
+        "estimatedDuration": "Durée prévue (min)",
+        "actualCost": "Coût réel (€)",
+        "actualCostPlaceholder": "Coût réel",
+        "actualDuration": "Durée réelle (min)",
+        "actualDurationPlaceholder": "Durée (min)",
+        "assignedTo": "Confiée à {name}",
+        "providerShort": "Prestataire : {name}",
+        "estimatedShort": "Prévu : {amount}"
       }
     },
     "operations": {

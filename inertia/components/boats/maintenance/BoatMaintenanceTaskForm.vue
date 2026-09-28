@@ -5,6 +5,7 @@ import BaseCombobox from '~/components/base/BaseCombobox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import MaintenanceTaskSubjectFields from '~/components/boats/maintenance/MaintenanceTaskSubjectFields.vue'
+import MaintenanceWorkOrderFields from '~/components/boats/maintenance/MaintenanceWorkOrderFields.vue'
 import { useMaintenanceTaskForm } from '~/composables/use_maintenance_task_form'
 import { useT } from '~/composables/use_t'
 import type { TaskEquipmentSource, TaskFormPrefill } from '#shared/types/maintenance'
@@ -120,6 +121,8 @@ const lockedEquipment = props.lockEquipment ? (props.prefill?.equipment ?? null)
       :errors="errors"
       @select="onOperationSelected"
     />
+
+    <MaintenanceWorkOrderFields id-prefix="task" :errors="errors" />
 
     <BaseTextarea
       id="task-notes"

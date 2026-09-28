@@ -105,7 +105,39 @@ export type MaintenanceHistoryPaginated = {
   meta: { total: number; perPage: number; currentPage: number; lastPage: number }
 }
 
-export type CreateMaintenanceTaskPayload = {
+/**
+ * Champs d'ordre de travail (#868), communs à la création et à la
+ * modification. `assigneeId` : un membre de l'organisation dont le rôle peut
+ * modifier la maintenance ; `providerName` : prestataire externe en texte
+ * libre. Coût en devise de l'organisation, durée en minutes.
+ */
+export interface MaintenanceWorkOrderFields {
+  assigneeId?: number | null
+  providerName?: string | null
+  estimatedCost?: number | null
+  estimatedDurationMinutes?: number | null
+}
+
+/** Membre à qui une tâche peut être confiée (#868). */
+export interface MaintenanceAssigneeOption {
+  id: number
+  fullName: string
+}
+
+/**
+ * Ordre de travail d'une tâche tel qu'affiché (#868). Coûts en nombre (les
+ * colonnes `decimal` sont lues en chaîne côté base), `null` quand non saisis.
+ */
+export interface MaintenanceTaskWorkOrder {
+  assignee: MaintenanceAssigneeOption | null
+  providerName: string | null
+  estimatedCost: number | null
+  actualCost: number | null
+  estimatedDurationMinutes: number | null
+  actualDurationMinutes: number | null
+}
+
+export type CreateMaintenanceTaskPayload = MaintenanceWorkOrderFields & {
   /** Absent : déduit de l'équipement visé, sinon `'boat'`. */
   subject?: MaintenanceTaskSubject | null
   title: string
@@ -184,7 +216,7 @@ export interface TaskFormPrefill {
  * `null` = champ vidé. Le sujet et l'équipement visé ne se modifient pas :
  * changer de cible, c'est une autre tâche.
  */
-export type UpdateMaintenanceTaskPayload = {
+export type UpdateMaintenanceTaskPayload = MaintenanceWorkOrderFields & {
   title?: string
   notes?: string | null
   dueAt?: Date | string | DateTime | null
@@ -198,15 +230,21 @@ export type MaintenanceTaskEditableField = keyof UpdateMaintenanceTaskPayload
 /**
  * Ce qu'une modification a réellement changé. `postponed` : l'échéance (date ou
  * heures moteur) a reculé — le compteur `postponedCount` a été incrémenté.
+ * `assigneeChanged` : la tâche a changé de mains (#868), y compris vers
+ * personne — l'appelant journalise et notifie le nouvel assigné.
  */
 export interface MaintenanceTaskUpdateOutcome {
   changedFields: MaintenanceTaskEditableField[]
   postponed: boolean
+  assigneeChanged: boolean
 }
 
 export type MarkTaskDonePayload = {
   doneAt?: Date | string | DateTime
   doneEngineHours?: number | null
+  /** Réalisé (#868) : reporté sur la tâche close, face au prévu. */
+  actualCost?: number | null
+  actualDurationMinutes?: number | null
 }
 
 export type BoatMaintenanceBadge = {

@@ -21,6 +21,7 @@ defineEmits<{ (e: 'update:modelValue', value: string): void }>()
 
 const exportLinks = [
   { key: 'maintenance', label: 'settings.import.exportMaintenance' },
+  { key: 'maintenanceTasks', label: 'settings.import.exportMaintenanceTasks' },
   { key: 'fuelLogs', label: 'settings.import.exportFuelLogs' },
   { key: 'navigationLogs', label: 'settings.import.exportNavigationLogs' },
 ] as const
@@ -28,11 +29,13 @@ const exportLinks = [
 function getExportHref(key: (typeof exportLinks)[number]['key']) {
   if (!props.modelValue) return undefined
   const id = Number(props.modelValue)
-  return key === 'maintenance'
-    ? routes.csv.exportMaintenance(id)
-    : key === 'fuelLogs'
-      ? routes.csv.exportFuelLogs(id)
-      : routes.csv.exportNavigationLogs(id)
+  const hrefs = {
+    maintenance: routes.csv.exportMaintenance,
+    maintenanceTasks: routes.csv.exportMaintenanceTasks,
+    fuelLogs: routes.csv.exportFuelLogs,
+    navigationLogs: routes.csv.exportNavigationLogs,
+  }
+  return hrefs[key](id)
 }
 </script>
 
