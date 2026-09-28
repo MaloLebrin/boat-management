@@ -5,6 +5,7 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import { useT } from '~/composables/use_t'
+import { confirmed } from '~/utils/native_dialog'
 import type { OnlinePaymentsSettings } from '#shared/types/online_payment'
 
 /**
@@ -29,7 +30,7 @@ function connect() {
 }
 
 function disconnect() {
-  if (!window.confirm(t('settings.billing.onlinePayments.disconnectConfirm'))) return
+  if (!confirmed(t('settings.billing.onlinePayments.disconnectConfirm'))) return
   router.delete('/settings/billing/online-payments', { preserveScroll: true })
 }
 </script>
