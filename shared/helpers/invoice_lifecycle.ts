@@ -17,7 +17,10 @@ import type { InvoiceKind, InvoiceStatus, InvoicePaymentMethod } from '#shared/t
  * « Modifier » et afficher le bloc paiement.
  */
 
-/** Moyens de paiement proposés sur une facture émise. */
+/**
+ * Moyens de paiement proposés à la saisie sur une facture émise. `online` en
+ * est absent : il n'est posé que par un paiement Stripe confirmé (#876).
+ */
 export const INVOICE_PAYMENT_METHODS = [
   'cash',
   'card',
@@ -25,6 +28,8 @@ export const INVOICE_PAYMENT_METHODS = [
   'check',
   'other',
 ] as const satisfies readonly InvoicePaymentMethod[]
+
+export type ManualInvoicePaymentMethod = (typeof INVOICE_PAYMENT_METHODS)[number]
 
 export interface InvoiceLifecycleState {
   kind: InvoiceKind
@@ -51,4 +56,23 @@ export function canEditInvoice(invoice: InvoiceLifecycleState): boolean {
  */
 export function canEditInvoicePayment(invoice: InvoiceLifecycleState): boolean {
   return isIssuedInvoice(invoice) && invoice.status !== 'cancelled'
+}
+
+export interface InvoicePayableState extends InvoiceLifecycleState {
+  paidAt: unknown
+  total: number | string
+}
+
+/**
+ * Vrai si la facture peut être réglée en ligne (#876) : une facture émise,
+ * envoyée ou en retard, pas encore réglée et d'un montant positif. Un devis,
+ * un brouillon, une facture annulée ou déjà payée ne s'encaissent pas.
+ */
+export function isInvoicePayableOnline(invoice: InvoicePayableState): boolean {
+  return (
+    invoice.kind === 'invoice' &&
+    (invoice.status === 'sent' || invoice.status === 'overdue') &&
+    !invoice.paidAt &&
+    Number(invoice.total) > 0
+  )
 }

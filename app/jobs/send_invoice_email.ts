@@ -8,6 +8,7 @@ import type { JobOptions } from '@adonisjs/queue/types'
 import { inject } from '@adonisjs/core'
 import QueueDedupService from '#services/queue_dedup_service'
 import InvoicePdfService from '#services/invoice_pdf_service'
+import OnlinePaymentService from '#services/online_payment_service'
 import Invoice from '#models/invoice'
 import Organization from '#models/organization'
 import env from '#start/env'
@@ -52,8 +53,13 @@ export default class SendInvoiceEmail extends Job<SendInvoiceEmailPayload> {
     // Resolve InvoicePdfService via the container (it uses @inject())
     const pdfService = await app.container.make(InvoicePdfService)
 
+    // Lien « Payer en ligne » (#876) : seulement si la facture est encore
+    // payable et que l'organisation encaisse en ligne au moment de l'envoi.
+    const onlinePaymentService = await app.container.make(OnlinePaymentService)
+    const paymentUrl = await onlinePaymentService.paymentUrlFor(invoice, org)
+
     // Generate PDF
-    const { buffer, filename } = await pdfService.generate(invoice, org, i18n)
+    const { buffer, filename } = await pdfService.generate(invoice, org, i18n, { paymentUrl })
 
     // Contenu de l'email dans la langue du destinataire (sujet, texte, montant) :
     // le gabarit Edge traduit par `t()` via l'`i18n` passé dans son état (#863).
@@ -71,12 +77,17 @@ export default class SendInvoiceEmail extends Job<SendInvoiceEmailPayload> {
       number: invoice.number,
       orgName: org.name,
     })
-    const text = i18n.t('invoices.email.text', {
-      kind: kindLabel,
-      number: invoice.number,
-      total: totalFormatted,
-      orgName: org.name,
-    })
+    const text = [
+      i18n.t('invoices.email.text', {
+        kind: kindLabel,
+        number: invoice.number,
+        total: totalFormatted,
+        orgName: org.name,
+      }),
+      paymentUrl ? i18n.t('invoices.email.payOnlineText', { url: paymentUrl }) : null,
+    ]
+      .filter(Boolean)
+      .join('\n\n')
 
     const html = await edge.render('emails/invoice', {
       i18n,
@@ -85,6 +96,7 @@ export default class SendInvoiceEmail extends Job<SendInvoiceEmailPayload> {
       KindLabel,
       totalFormatted,
       orgName: org.name,
+      paymentUrl,
       appUrl: env.get('APP_URL'),
     })
 

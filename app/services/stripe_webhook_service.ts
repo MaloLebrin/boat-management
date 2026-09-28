@@ -1,4 +1,5 @@
 import ProcessedStripeEvent from '#models/processed_stripe_event'
+import OnlinePaymentService from '#services/online_payment_service'
 import SubscriptionService from '#services/subscription_service'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
@@ -34,7 +35,10 @@ export const PROCESSED_EVENT_RETENTION_DAYS = 30
  */
 @inject()
 export default class StripeWebhookService {
-  constructor(private subscriptionService: SubscriptionService) {}
+  constructor(
+    private subscriptionService: SubscriptionService,
+    private onlinePaymentService: OnlinePaymentService
+  ) {}
 
   /**
    * Traite l'événement s'il ne l'a jamais été. Rend `true` s'il a été traité
@@ -93,6 +97,14 @@ export default class StripeWebhookService {
    * de le rejouer.
    */
   private async dispatch(event: Stripe.Event, trx: TransactionClientContract): Promise<void> {
+    // Événement d'un compte connecté (#876) : `account` désigne le compte du
+    // loueur. Ses sessions Checkout règlent des factures, jamais un abonnement
+    // FleetAi — les deux flux ne doivent pas se croiser.
+    if (event.account) {
+      await this.dispatchConnect(event, event.account, trx)
+      return
+    }
+
     switch (event.type) {
       case 'checkout.session.completed':
         await this.subscriptionService.syncFromCheckoutSession(
@@ -106,6 +118,29 @@ export default class StripeWebhookService {
           event.data.object as Stripe.Subscription,
           trx
         )
+        break
+    }
+  }
+
+  /** Aiguillage des événements des comptes connectés (Stripe Connect, #876). */
+  private async dispatchConnect(
+    event: Stripe.Event,
+    accountId: string,
+    trx: TransactionClientContract
+  ): Promise<void> {
+    switch (event.type) {
+      // Prélèvement SEPA : la session se termine « non payée », le règlement
+      // arrive plus tard par `async_payment_succeeded`.
+      case 'checkout.session.completed':
+      case 'checkout.session.async_payment_succeeded':
+        await this.onlinePaymentService.handleCheckoutCompleted(
+          event.data.object as Stripe.Checkout.Session,
+          accountId,
+          trx
+        )
+        break
+      case 'account.updated':
+        await this.onlinePaymentService.syncAccount(event.data.object as Stripe.Account, trx)
         break
     }
   }

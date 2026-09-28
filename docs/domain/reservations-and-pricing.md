@@ -231,8 +231,9 @@ Réf. routes : `start/routes/boats.ts` (per-boat) et `start/routes/reservations.
 
 ### 5.5 Paiement : acompte, solde et caution (#875)
 
-Suivi **manuel** de l'argent d'une location — le paiement en ligne est une issue
-séparée (#876). Service : `app/services/reservation_payment_service.ts` ; calculs
+Suivi **manuel** de l'argent d'une location. Le paiement en ligne (#876) passe
+par la **facture** de la réservation, qui reçoit un lien `/pay/:token` — voir
+[`invoicing.md`](./invoicing.md) §7 bis. Service : `app/services/reservation_payment_service.ts` ; calculs
 purs : `shared/helpers/reservation_payment.ts` ; types :
 `RESERVATION_PAYMENT_STATUSES`, `RESERVATION_PAYMENT_METHODS`,
 `SECURITY_DEPOSIT_STATUSES` (`shared/types/reservation.ts`).

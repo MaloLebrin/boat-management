@@ -11,6 +11,11 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - profil déclaré à l'inscription, nullables (#448) :
   - `type` (`rental` | `school` | `marina` | `private`)
   - `fleetSize` (`1-4` | `5-20` | `21-50` | `51+`)
+- compte Stripe connecté pour le paiement en ligne des factures (#876) :
+  `stripeConnectAccountId` (nullable, unique), `stripeConnectChargesEnabled`,
+  `stripeConnectDetailsSubmitted` (booléens, défaut `false`, recopiés de Stripe) —
+  les colonnes de facture associées (`payment_token`, `stripe_*`) sont décrites
+  dans [`docs/domain/invoicing.md`](../domain/invoicing.md) §3
 
 ### users
 

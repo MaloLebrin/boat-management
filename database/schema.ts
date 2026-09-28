@@ -1968,9 +1968,12 @@ export class InvoiceSchema extends BaseModel {
     'organizationId',
     'paidAt',
     'paymentMethod',
+    'paymentToken',
     'reservationId',
     'sourceQuoteId',
     'status',
+    'stripeCheckoutSessionId',
+    'stripePaymentIntentId',
     'subtotal',
     'taxAmount',
     'taxRate',
@@ -2005,11 +2008,17 @@ export class InvoiceSchema extends BaseModel {
   @column()
   declare paymentMethod: string | null
   @column()
+  declare paymentToken: string | null
+  @column()
   declare reservationId: number | null
   @column()
   declare sourceQuoteId: number | null
   @column()
   declare status: string
+  @column()
+  declare stripeCheckoutSessionId: string | null
+  @column()
+  declare stripePaymentIntentId: string | null
   @column()
   declare subtotal: string
   @column()
@@ -2408,6 +2417,9 @@ export class OrganizationSchema extends BaseModel {
     'secondaryColor',
     'slug',
     'storageUsedBytes',
+    'stripeConnectAccountId',
+    'stripeConnectChargesEnabled',
+    'stripeConnectDetailsSubmitted',
     'stripeCustomerId',
     'type',
     'updatedAt',
@@ -2443,6 +2455,12 @@ export class OrganizationSchema extends BaseModel {
   declare slug: string
   @column()
   declare storageUsedBytes: bigint | number
+  @column()
+  declare stripeConnectAccountId: string | null
+  @column()
+  declare stripeConnectChargesEnabled: boolean
+  @column()
+  declare stripeConnectDetailsSubmitted: boolean
   @column()
   declare stripeCustomerId: string | null
   @column()

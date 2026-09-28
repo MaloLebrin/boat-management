@@ -10,6 +10,7 @@ const SettingsController = () => import('#controllers/settings_controller')
 const BillingController = () => import('#controllers/billing_controller')
 const AuditLogsController = () => import('#controllers/audit_logs_controller')
 const CsvImportController = () => import('#controllers/csv_import_controller')
+const OnlinePaymentsController = () => import('#controllers/online_payments_controller')
 
 // Préférences pré-auth (switchers de langue et de thème, aussi disponibles
 // sur le marketing et l'écran de login) : persistées sur le profil quand
@@ -56,6 +57,22 @@ router
     router
       .post('settings/billing/addon', [BillingController, 'setAddon'])
       .as('settings.billing.addon.set')
+    // Compte Stripe connecté de l'organisation (#876) : l'argent des clients
+    // y arrive — même exigence d'adresse vérifiée que le passage au paiement.
+    router
+      .post('settings/billing/online-payments', [OnlinePaymentsController, 'connect'])
+      .as('settings.billing.onlinePayments.connect')
+      .use(middleware.requireVerifiedEmail())
+    router
+      .get('settings/billing/online-payments/refresh', [OnlinePaymentsController, 'refresh'])
+      .as('settings.billing.onlinePayments.refresh')
+      .use(middleware.requireVerifiedEmail())
+    router
+      .get('settings/billing/online-payments/return', [OnlinePaymentsController, 'return'])
+      .as('settings.billing.onlinePayments.return')
+    router
+      .delete('settings/billing/online-payments', [OnlinePaymentsController, 'disconnect'])
+      .as('settings.billing.onlinePayments.disconnect')
     router
       .put('settings/profile', [SettingsController, 'updateProfile'])
       .as('settings.profile.update')

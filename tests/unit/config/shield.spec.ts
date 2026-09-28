@@ -16,4 +16,8 @@ test.group('Shield config (unit)', () => {
     assert.isTrue(shieldConfig.csrf.enabled)
     assert.include(shieldConfig.csrf.exceptRoutes as string[], '/webhooks/stripe')
   })
+
+  test('the Stripe Connect webhook route is exempt from CSRF verification (#876)', ({ assert }) => {
+    assert.include(shieldConfig.csrf.exceptRoutes as string[], '/webhooks/stripe/connect')
+  })
 })

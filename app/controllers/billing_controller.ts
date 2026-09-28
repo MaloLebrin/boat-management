@@ -366,4 +366,28 @@ export default class BillingController {
 
     return response.ok({ received: true })
   }
+
+  /**
+   * Endpoint des comptes connectés (Stripe Connect, #876) : même traitement
+   * idempotent que ci-dessus, mais signé par le secret de cet endpoint. Les
+   * événements y portent `account`, que `StripeWebhookService` aiguille vers
+   * le règlement des factures.
+   */
+  async connectWebhook({ request, response }: HttpContext) {
+    const rawBody = request.raw() ?? ''
+    const signature = request.header('stripe-signature') ?? ''
+
+    let event: Stripe.Event
+    try {
+      event = this.stripeService.constructConnectWebhookEvent(rawBody, signature)
+    } catch {
+      return response.badRequest({ error: 'Invalid signature' })
+    }
+
+    // Un événement signé par ce secret mais sans compte n'a rien à faire ici.
+    if (!event.account) return response.ok({ received: true })
+
+    await this.stripeWebhookService.process(event)
+    return response.ok({ received: true })
+  }
 }

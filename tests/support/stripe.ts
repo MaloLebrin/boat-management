@@ -200,3 +200,54 @@ export function postStripeWebhook(
 
   return request.json(options.payload ?? signed.payload)
 }
+
+// ── Stripe Connect : paiement en ligne des factures (#876) ─────────────────
+
+/** Un événement émis par un compte connecté : `account` désigne le loueur. */
+export function stripeConnectEvent<T>(
+  type: string,
+  object: T,
+  account: string,
+  id = 'evt_connect_test'
+): Stripe.Event {
+  return { ...stripeEvent(type, object, id), account } as Stripe.Event
+}
+
+/** Session Checkout d'une facture, telle que le webhook connecté la lit. */
+export function stripeInvoiceCheckoutSession(options: {
+  invoiceId: number
+  organizationId: number
+  paymentStatus?: 'paid' | 'unpaid' | 'no_payment_required'
+  paymentIntent?: string
+}): Stripe.Checkout.Session {
+  return {
+    id: 'cs_invoice_test',
+    object: 'checkout.session',
+    mode: 'payment',
+    payment_status: options.paymentStatus ?? 'paid',
+    payment_intent: options.paymentIntent ?? 'pi_invoice_test',
+    metadata: {
+      invoice_id: String(options.invoiceId),
+      organization_id: String(options.organizationId),
+    },
+  } as unknown as Stripe.Checkout.Session
+}
+
+/**
+ * POST un événement sur `/webhooks/stripe/connect`, signé par le secret de
+ * l'endpoint des comptes connectés (ou par `secret`, pour prouver qu'un autre
+ * secret est refusé).
+ */
+export function postStripeConnectWebhook(
+  client: ApiClient,
+  event: Stripe.Event,
+  options: { secret?: string } = {}
+) {
+  const secret = options.secret ?? env.get('STRIPE_CONNECT_WEBHOOK_SECRET')?.release()
+  if (!secret) throw new Error('STRIPE_CONNECT_WEBHOOK_SECRET manque dans .env.test')
+
+  const payload = JSON.stringify(event)
+  const signature = Stripe.webhooks.generateTestHeaderString({ payload, secret })
+
+  return client.post('/webhooks/stripe/connect').header('stripe-signature', signature).json(payload)
+}

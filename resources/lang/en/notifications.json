@@ -121,6 +121,12 @@
         "title": "Balances to collect on {boatName}",
         "body": "{count, plural, one {# departure within 7 days is not fully paid} other {# departures within 7 days are not fully paid}} on {boatName}."
       }
+    },
+    "invoice": {
+      "paid_online": {
+        "title": "Invoice {number} paid online",
+        "body": "{clientName} paid {amount} via Stripe."
+      }
     }
   },
   "title": "Notifications",
@@ -158,6 +164,7 @@
     "boat.status_changed": "Boat status changed",
     "boat.available_again": "Boat available again",
     "reservation.deposit_due": "Deposit not received",
-    "reservation.balance_due": "Balance to collect"
+    "reservation.balance_due": "Balance to collect",
+    "invoice.paid_online": "Invoice paid online"
   }
 }

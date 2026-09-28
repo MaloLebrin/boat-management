@@ -11,6 +11,7 @@ import InvoicePdfService from '#services/invoice_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import QuotaService from '#services/quota_service'
+import OnlinePaymentService from '#services/online_payment_service'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import InvoicePolicy from '#policies/invoice_policy'
 import {
@@ -33,7 +34,8 @@ export default class InvoicesController {
     private pdfService: InvoicePdfService,
     private emailQueueService: EmailQueueService,
     private reservationService: BoatReservationService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private onlinePaymentService: OnlinePaymentService
   ) {}
 
   /**
@@ -118,10 +120,15 @@ export default class InvoicesController {
       await bouncer.with(InvoicePolicy).authorize('view', invoice)
       const links = await this.invoiceService.getLinks(invoice)
       const canDelete = moduleActive && (await bouncer.with(InvoicePolicy).allows('delete'))
+      const paymentUrl = await this.onlinePaymentService.paymentUrlFor(invoice, org)
       return inertia.render('invoices/show', {
-        invoice: toInvoiceDetail(invoice, links),
+        invoice: toInvoiceDetail(invoice, links, paymentUrl),
         canDelete,
         readOnly: !moduleActive,
+        // Paiement en ligne (#876) : le bouton « Créer le lien » n'a de sens
+        // que si l'organisation encaisse en ligne.
+        canAcceptOnlinePayments:
+          moduleActive && (await this.onlinePaymentService.canAcceptOnlinePayments(org)),
       })
     } catch (error) {
       if (error instanceof InvoiceNotFoundError) {
@@ -323,6 +330,14 @@ export default class InvoicesController {
       return response.redirect().back()
     }
 
+    // Transition draft -> sent — avant l'envoi, pour que la facture soit
+    // payable quand son lien de paiement en ligne est posé (#876).
+    if (invoice.status === 'draft') {
+      invoice.status = 'sent'
+      await invoice.save()
+    }
+    await this.onlinePaymentService.ensurePaymentLink(invoice, org)
+
     // Enqueue the email
     await this.emailQueueService.sendInvoice({
       invoiceId: invoice.id,
@@ -330,12 +345,6 @@ export default class InvoicesController {
       to: invoice.client.email,
       locale: i18n.locale,
     })
-
-    // Transition draft -> sent
-    if (invoice.status === 'draft') {
-      invoice.status = 'sent'
-      await invoice.save()
-    }
 
     session.flash('success', i18n.t('flash.invoices.sent'))
     return response.redirect().back()
@@ -432,6 +441,33 @@ export default class InvoicesController {
     })
 
     session.flash('success', i18n.t('flash.invoices.quoteFromReservation'))
+    return response.redirect(`/invoices/${invoice.id}`)
+  }
+
+  /**
+   * Pose le lien de paiement en ligne d'une facture déjà envoyée (#876) —
+   * typiquement émise avant que l'organisation ne connecte son compte Stripe.
+   */
+  async createPaymentLink({ response, auth, bouncer, params, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const org = await this.loadOrg(auth)
+
+    await bouncer.with(InvoicePolicy).authorize('update')
+
+    let invoice
+    try {
+      invoice = await this.invoiceService.getForOrganizationOrFail(org, Number(params.id))
+    } catch (error) {
+      if (error instanceof InvoiceNotFoundError) {
+        session.flash('error', i18n.t('flash.invoices.notFound'))
+        return response.redirect('/invoices')
+      }
+      throw error
+    }
+
+    const url = await this.onlinePaymentService.ensurePaymentLink(invoice, org)
+    if (url) session.flash('success', i18n.t('flash.onlinePayments.linkCreated'))
+    else session.flash('error', i18n.t('flash.onlinePayments.notPayable'))
     return response.redirect(`/invoices/${invoice.id}`)
   }
 }

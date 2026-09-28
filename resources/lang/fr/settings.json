@@ -161,6 +161,23 @@
       "body": "Votre organisation est sur le plan {plan}, mais aucun abonnement actif n'y est rattaché. Les modules add-ons et les bateaux supplémentaires sont facturés sur cet abonnement — finalisez-le pour pouvoir les activer.",
       "cta": "Finaliser l'abonnement",
       "adminOnly": "Un administrateur doit finaliser l'abonnement."
+    },
+    "onlinePayments": {
+      "title": "Paiement en ligne des factures",
+      "description": "Connectez votre compte Stripe : vos clients règlent leurs factures par carte depuis le lien de l'e-mail, et l'argent arrive directement sur votre compte.",
+      "state": {
+        "none": "Non connecté",
+        "pending": "En attente de Stripe",
+        "active": "Actif"
+      },
+      "unavailable": "Disponible avec le module CRM & Facturation, lorsque Stripe est configuré.",
+      "pendingHint": "Stripe attend encore des informations sur votre entreprise avant d'activer les paiements.",
+      "activeHint": "Les factures envoyées par e-mail contiennent un bouton « Payer en ligne ».",
+      "connect": "Connecter mon compte Stripe",
+      "resume": "Terminer la configuration",
+      "disconnect": "Déconnecter",
+      "disconnectConfirm": "Déconnecter votre compte Stripe ? Les liens de paiement déjà envoyés cesseront de fonctionner.",
+      "adminOnly": "Seul un administrateur peut connecter le compte Stripe de l'organisation."
     }
   },
   "upgrade": {
@@ -393,7 +410,10 @@
       "billing_module_remove": "Module retiré de l'abonnement",
       "billing_module_activate": "Module inclus activé",
       "billing_module_deactivate": "Module inclus désactivé",
-      "billing_addon_set": "Bateaux supplémentaires modifiés"
+      "billing_addon_set": "Bateaux supplémentaires modifiés",
+      "online_payments_connect": "Compte Stripe connecté",
+      "online_payments_disconnect": "Compte Stripe déconnecté",
+      "invoice_paid_online": "Facture réglée en ligne"
     },
     "empty": {
       "title": "Aucune activité",

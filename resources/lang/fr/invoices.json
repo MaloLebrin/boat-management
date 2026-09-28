@@ -26,7 +26,8 @@
     "total": "Total",
     "notes": "Notes",
     "legalMentions": "Ce document a été généré électroniquement. Veuillez le conserver pour vos archives.",
-    "footer": "Page {page} sur {total} - {org}"
+    "footer": "Page {page} sur {total} - {org}",
+    "payOnline": "Payer en ligne"
   },
   "add": "+ Nouvelle facture",
   "addQuote": "+ Nouveau devis",
@@ -144,8 +145,10 @@
     "html": {
       "body": "Veuillez trouver ci-joint {kind} n° {number}.",
       "totalLabel": "Montant total :",
-      "attachment": "Le document PDF est joint à cet e-mail."
-    }
+      "attachment": "Le document PDF est joint à cet e-mail.",
+      "payOnline": "Payer en ligne"
+    },
+    "payOnlineText": "Payer en ligne : {url}"
   },
   "paymentMethods": {
     "cash": "Espèces",
@@ -153,7 +156,8 @@
     "transfer": "Virement",
     "check": "Chèque",
     "other": "Autre",
-    "none": "Non renseigné"
+    "none": "Non renseigné",
+    "online": "En ligne (Stripe)"
   },
   "payment": {
     "title": "Paiement",
@@ -163,5 +167,30 @@
     "method": "Moyen de paiement",
     "submit": "Enregistrer le paiement"
   },
-  "lockedNotice": "Facture émise : elle n'est plus modifiable. Seuls sa date et son moyen de paiement restent corrigeables ; pour toute autre correction, émettez un avoir."
+  "lockedNotice": "Facture émise : elle n'est plus modifiable. Seuls sa date et son moyen de paiement restent corrigeables ; pour toute autre correction, émettez un avoir.",
+  "onlinePayment": {
+    "checkoutProduct": "Facture {number} — {orgName}",
+    "title": "Paiement en ligne",
+    "linkHint": "Votre client règle cette facture par carte depuis ce lien, déjà présent dans l'e-mail et le PDF. La facture passe à « Payée » dès que Stripe confirme le paiement.",
+    "linkLabel": "Lien de paiement",
+    "copy": "Copier le lien",
+    "copied": "Lien copié",
+    "noLinkHint": "Cette facture a été envoyée sans lien de paiement. Créez-le pour que votre client puisse la régler en ligne.",
+    "createLink": "Créer le lien de paiement",
+    "public": {
+      "title": "Paiement de facture",
+      "heading": "Facture {number}",
+      "client": "Client",
+      "issuedAt": "Émise le",
+      "dueAt": "À régler avant le",
+      "total": "Montant à régler",
+      "paid": "Cette facture est réglée. Merci !",
+      "processing": "Paiement reçu : sa confirmation peut prendre quelques instants. Vous recevrez un reçu par e-mail.",
+      "unavailable": "Le paiement en ligne n'est pas disponible pour cette facture. Contactez {orgName} pour la régler.",
+      "pay": "Payer {amount}",
+      "secured": "Paiement sécurisé par Stripe. Vos coordonnées bancaires ne transitent pas par FleetAi.",
+      "invalidTitle": "Lien de paiement invalide",
+      "invalidBody": "Ce lien ne correspond à aucune facture. Vérifiez qu'il a été copié en entier, ou contactez l'entreprise qui vous l'a envoyé."
+    }
+  }
 }

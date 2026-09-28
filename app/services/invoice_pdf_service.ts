@@ -24,7 +24,8 @@ export default class InvoicePdfService {
   async generate(
     invoice: Invoice,
     org: Organization,
-    i18n: I18n
+    i18n: I18n,
+    options: { paymentUrl?: string | null } = {}
   ): Promise<{ buffer: Buffer; filename: string }> {
     const { doc, finish } = createPdfDocument({ bufferPages: true })
 
@@ -42,6 +43,7 @@ export default class InvoicePdfService {
     this.#renderMetadata(doc, invoice, t)
     this.#renderLinesTable(doc, invoice, branding.primaryColor, t, i18n.locale)
     this.#renderTotals(doc, invoice, t, i18n.locale)
+    this.#renderPaymentLink(doc, options.paymentUrl ?? null, t)
     this.#renderNotes(doc, invoice, t)
     this.#renderLegalMentions(doc, t)
     renderPagedFooter(doc, (page, total) =>
@@ -227,6 +229,28 @@ export default class InvoicePdfService {
 
     doc.fillColor('#000')
     doc.text('', MARGIN, y + 30)
+  }
+
+  /** Lien « Payer en ligne » (#876), cliquable dans les lecteurs PDF. */
+  #renderPaymentLink(
+    doc: PDFKit.PDFDocument,
+    paymentUrl: string | null,
+    t: (key: string, data?: Record<string, string>) => string
+  ): void {
+    if (!paymentUrl) return
+
+    if (doc.y > PAGE_H - 80) doc.addPage()
+
+    doc.moveDown(0.5)
+    doc.fontSize(9).font('Helvetica-Bold').fillColor(NAVY).text(t('payOnline'), MARGIN, doc.y)
+    doc.moveDown(0.3)
+    doc
+      .fontSize(8)
+      .font('Helvetica')
+      .fillColor(NAVY)
+      .text(paymentUrl, MARGIN, doc.y, { width: CONTENT_W, link: paymentUrl, underline: true })
+    doc.fillColor('#000')
+    doc.moveDown(0.5)
   }
 
   #renderNotes(

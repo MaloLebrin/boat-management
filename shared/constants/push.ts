@@ -16,6 +16,8 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   // Argent des locations (#875) : à réclamer avant le départ.
   'reservation.deposit_due',
   'reservation.balance_due',
+  // Facture réglée en ligne par le client (#876) : de l'argent arrivé.
+  'invoice.paid_online',
   'document.expiring_soon',
   'document.expired',
   'safety_equipment.expiring_soon',

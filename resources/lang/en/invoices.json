@@ -26,7 +26,8 @@
     "total": "Total",
     "notes": "Notes",
     "legalMentions": "This document was generated electronically. Please retain it for your records.",
-    "footer": "Page {page} of {total} - {org}"
+    "footer": "Page {page} of {total} - {org}",
+    "payOnline": "Pay online"
   },
   "add": "+ New invoice",
   "addQuote": "+ New quote",
@@ -144,8 +145,10 @@
     "html": {
       "body": "Please find attached {kind} no. {number}.",
       "totalLabel": "Total amount:",
-      "attachment": "The PDF document is attached to this email."
-    }
+      "attachment": "The PDF document is attached to this email.",
+      "payOnline": "Pay online"
+    },
+    "payOnlineText": "Pay online: {url}"
   },
   "paymentMethods": {
     "cash": "Cash",
@@ -153,7 +156,8 @@
     "transfer": "Bank transfer",
     "check": "Cheque",
     "other": "Other",
-    "none": "Not specified"
+    "none": "Not specified",
+    "online": "Online (Stripe)"
   },
   "payment": {
     "title": "Payment",
@@ -163,5 +167,30 @@
     "method": "Payment method",
     "submit": "Save payment"
   },
-  "lockedNotice": "Issued invoice: it can no longer be edited. Only its payment date and method can still be corrected; anything else needs a credit note."
+  "lockedNotice": "Issued invoice: it can no longer be edited. Only its payment date and method can still be corrected; anything else needs a credit note.",
+  "onlinePayment": {
+    "checkoutProduct": "Invoice {number} — {orgName}",
+    "title": "Online payment",
+    "linkHint": "Your customer pays this invoice by card from this link, already included in the email and the PDF. The invoice switches to “Paid” as soon as Stripe confirms the payment.",
+    "linkLabel": "Payment link",
+    "copy": "Copy link",
+    "copied": "Link copied",
+    "noLinkHint": "This invoice was sent without a payment link. Create it so your customer can pay online.",
+    "createLink": "Create payment link",
+    "public": {
+      "title": "Invoice payment",
+      "heading": "Invoice {number}",
+      "client": "Customer",
+      "issuedAt": "Issued on",
+      "dueAt": "Due by",
+      "total": "Amount due",
+      "paid": "This invoice has been paid. Thank you!",
+      "processing": "Payment received: confirmation may take a moment. You will receive a receipt by email.",
+      "unavailable": "Online payment is not available for this invoice. Contact {orgName} to pay it.",
+      "pay": "Pay {amount}",
+      "secured": "Payment secured by Stripe. Your card details never go through FleetAi.",
+      "invalidTitle": "Invalid payment link",
+      "invalidBody": "This link does not match any invoice. Check that it was copied in full, or contact the company that sent it."
+    }
+  }
 }

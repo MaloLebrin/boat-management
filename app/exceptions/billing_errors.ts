@@ -37,3 +37,31 @@ export class ModulesRequireEnterprisePlanError extends Error {
     super('Included modules can only be toggled on the Enterprise plan.')
   }
 }
+
+/**
+ * Paiement en ligne indisponible pour l'organisation (#876) : Stripe non
+ * configuré sur l'instance, module Facturation inactif ou compte connecté
+ * absent / pas encore activé par Stripe.
+ */
+export class OnlinePaymentsUnavailableError extends Error {
+  name = 'OnlinePaymentsUnavailableError'
+  constructor() {
+    super('Online payments are not available for this organization.')
+  }
+}
+
+/** La facture n'est pas (ou plus) payable en ligne : réglée, annulée, devis… (#876). */
+export class InvoiceNotPayableError extends Error {
+  name = 'InvoiceNotPayableError'
+  constructor() {
+    super('This invoice cannot be paid online.')
+  }
+}
+
+/** Aucun lien de paiement ne correspond au jeton de `/pay/:token` (#876). */
+export class PaymentLinkNotFoundError extends Error {
+  name = 'PaymentLinkNotFoundError'
+  constructor() {
+    super('Payment link not found.')
+  }
+}

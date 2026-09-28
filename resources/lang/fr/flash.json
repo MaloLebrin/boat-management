@@ -470,5 +470,13 @@
   "dashboard": {
     "layoutSaved": "Disposition du tableau de bord enregistrée.",
     "layoutReset": "Disposition du tableau de bord réinitialisée."
+  },
+  "onlinePayments": {
+    "unavailable": "Le paiement en ligne n'est pas disponible : Stripe n'est pas configuré ou le module Facturation est inactif.",
+    "connected": "Votre compte Stripe est connecté : vos clients peuvent régler leurs factures en ligne.",
+    "pending": "Stripe n'a pas encore activé votre compte. Terminez les étapes demandées pour encaisser en ligne.",
+    "disconnected": "Compte Stripe déconnecté. Les liens de paiement déjà envoyés ne fonctionnent plus.",
+    "notPayable": "Cette facture ne peut pas être réglée en ligne.",
+    "linkCreated": "Lien de paiement créé."
   }
 }

@@ -49,6 +49,20 @@ export default class Invoice extends BaseModel {
   @column()
   declare sourceQuoteId: number | null
 
+  /**
+   * Jeton opaque de la page publique `/pay/:token` (#876) : il suffit à
+   * ouvrir le paiement, il ne sort donc jamais d'une sérialisation — la fiche
+   * n'en expose que l'URL, via le transformer.
+   */
+  @column({ serializeAs: null })
+  declare paymentToken: string | null
+
+  @column()
+  declare stripeCheckoutSessionId: string | null
+
+  @column()
+  declare stripePaymentIntentId: string | null
+
   @column()
   declare subtotal: string
 

@@ -1027,8 +1027,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Paiement d’une réservation : acompte, solde et caution',
     },
     body: {
-      en: 'Each reservation tracks its money from the “Payment” action of the boat’s reservation list. Once confirmed, it expects a 30 % deposit and copies the security deposit from the boat pricing. You record “Deposit received” (amount editable), then “Balance received”, with the method (transfer, card, cash, cheque), or a refund. A badge flags an awaited deposit, or a balance still due within 7 days of departure; admins get a daily reminder. On the return inspection, the security deposit is released or retained with an amount and a reason. Manual tracking only: no online payment.',
-      fr: 'Chaque réservation suit son argent depuis l’action « Paiement » de la liste des réservations du bateau. Une fois confirmée, elle attend un acompte de 30 % et reprend la caution du tarif du bateau. On enregistre « Acompte reçu » (montant modifiable), puis « Solde reçu », avec le moyen (virement, carte, espèces, chèque), ou un remboursement. Un badge signale un acompte attendu, ou un solde dû à moins de 7 jours du départ ; les admins reçoivent un rappel quotidien. À l’état des lieux de retour, la caution est restituée ou retenue avec un montant et un motif. Suivi manuel : pas de paiement en ligne.',
+      en: 'Each reservation tracks its money from the “Payment” action of the boat’s reservation list. Once confirmed, it expects a 30 % deposit and copies the security deposit from the boat pricing. You record “Deposit received” (amount editable), then “Balance received”, with the method (transfer, card, cash, cheque), or a refund. A badge flags an awaited deposit, or a balance still due within 7 days of departure; admins get a daily reminder. On the return inspection, the security deposit is released or retained with an amount and a reason. Manual tracking; to be paid online, invoice the reservation.',
+      fr: 'Chaque réservation suit son argent depuis l’action « Paiement » de la liste des réservations du bateau. Une fois confirmée, elle attend un acompte de 30 % et reprend la caution du tarif du bateau. On enregistre « Acompte reçu » (montant modifiable), puis « Solde reçu », avec le moyen (virement, carte, espèces, chèque), ou un remboursement. Un badge signale un acompte attendu, ou un solde dû à moins de 7 jours du départ ; les admins reçoivent un rappel quotidien. À l’état des lieux de retour, la caution est restituée ou retenue avec un montant et un motif. Suivi manuel ; pour un paiement en ligne, facturez la réservation.',
     },
     keywords: [
       'paiement',
@@ -1276,6 +1276,34 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'draft',
     ],
     navTarget: 'invoices.index',
+    planFlag: 'canManageInvoices',
+  },
+  {
+    id: 'invoice-online-payment',
+    title: {
+      en: 'Online invoice payment with Stripe',
+      fr: 'Paiement en ligne des factures avec Stripe',
+    },
+    body: {
+      en: 'An admin connects the organization’s own Stripe account from Settings → Billing (“Connect my Stripe account”); the money goes straight to that account, never through FleetAi. Once Stripe activates it, every invoice sent by email carries a “Pay online” button, also printed on the PDF. The customer pays by card from a public page, without an account. As soon as Stripe confirms, the invoice switches to paid with the “Online (Stripe)” method, and admins are notified. An invoice sent earlier gets its link from the Online payment block of its page. Refunds are handled in Stripe.',
+      fr: 'Un admin connecte le compte Stripe de l’organisation depuis Paramètres → Facturation (« Connecter mon compte Stripe ») ; l’argent arrive directement sur ce compte, jamais chez FleetAi. Une fois le compte activé par Stripe, chaque facture envoyée par e-mail porte un bouton « Payer en ligne », repris dans le PDF. Le client paie par carte depuis une page publique, sans compte. Dès que Stripe confirme, la facture passe à payée avec le moyen « En ligne (Stripe) » et les admins sont notifiés. Une facture envoyée avant obtient son lien depuis le bloc Paiement en ligne de sa fiche. Les remboursements se font dans Stripe.',
+    },
+    keywords: [
+      'paiement en ligne',
+      'online payment',
+      'payer en ligne',
+      'pay online',
+      'stripe',
+      'stripe connect',
+      'lien de paiement',
+      'payment link',
+      'carte',
+      'card',
+      'encaisser',
+      'facture',
+      'invoice',
+    ],
+    navTarget: 'settings.billing',
     planFlag: 'canManageInvoices',
   },
   {
