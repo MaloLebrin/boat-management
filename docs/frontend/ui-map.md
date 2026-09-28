@@ -56,6 +56,7 @@ Référence: `inertia/app.ts`.
 ### Boats (liste / création / édition)
 
 - `boats/index`: `inertia/pages/boats/index.vue`
+  - disponibilité (#870) : filtre « Statut » dans `BoatListToolbar.vue` (vide = flotte active, hors vendus), colonne « Disponibilité » dans `BoatTable.vue`, badge sur `BoatCards.vue` quand le bateau n'est pas disponible — tous via `inertia/components/boats/BoatStatusBadge.vue` (`boatStatusVariant`)
   - props: `boats[]`
   - backend: `BoatsController.index` → `BoatService.listForUser`
   - filtre catégorie (#571) : `BoatListToolbar` propose les libellés traduits de `BOAT_CATEGORIES`
@@ -85,6 +86,7 @@ Référence: `inertia/app.ts`.
 ### Boat show (équipement + maintenance)
 
 - Page: `inertia/pages/boats/show.vue`
+  - disponibilité (#870) : `inertia/components/boats/show/availability/BoatAvailabilityControl.vue` dans l'en-tête (badge + lien « Changer le statut » → `BoatStatusModal.vue`, statut, motif et historique, `PATCH /boats/:id/status`) ; `BoatAvailabilityBanner.vue` sous l'en-tête (statut immobilisant, tâches datées, incidents ouverts), réutilisé sur `boats/reservations`
 - Composants:
   - photos (#811) : onglet principal « Photos » (`?tab=photos`, groupe `photos` juste après Aperçu dans `inertia/composables/use_boat_show_tabs.ts`) rendu par `BoatShowTabContent.vue` → `inertia/components/boats/show/BoatPhotoGallery.vue` (galerie complète : ajout multiple, caméra, suppression). L'Aperçu n'en garde qu'une rangée : `inertia/components/boats/show/tabs/overview/BoatOverviewPhotoStrip.vue` (4 vignettes max triées par `position`, lien « Voir les N photos → » et tuile « Ajouter des photos » pour les gestionnaires, tous émettant `go-to-tab: 'photos'`). Tri partagé `inertia/utils/boat_photos.ts`. Après upload (`POST /boats/:boatId/photos`) ou suppression (`DELETE /boats/:boatId/media/:mediaId`), `BoatMediaController` redirige vers `?tab=photos` pour une photo et `?tab=documents` pour un document : on reste sur l'onglet courant
   - specs: `inertia/components/boats/hull/BoatShowSpecsCard.vue`
@@ -559,6 +561,7 @@ factures déjà émis (`linkedInvoices`) et le bouton « Créer un devis » sous
 `canCreateQuote`.
 
 - `reservations/index.vue` → `FleetReservationList.vue` (page flotte) ;
+- `boats/reservations.vue` : bandeau `BoatAvailabilityBanner` et, pour un admin (`canForceUnavailable`), champ « motif de forçage » de `ReservationForm.vue` quand le statut est `confirmed` (#870)
 - `boats/reservations.vue` → `ReservationList.vue` (`/boats/:id/reservations`, l'écran
   de l'état des lieux de retour). La colonne y est masquée quand elle n'a rien à
   montrer, pour ne pas ajouter une colonne vide aux orgs sans facturation.
