@@ -260,6 +260,7 @@ plomberie).
 - planification:
   - `dueAt` (date)
   - `dueEngineHours` (int)
+  - `postponedCount` (int, défaut 0) — nombre de reports de l'échéance, incrémenté quand `dueAt` ou `dueEngineHours` recule via `PATCH …/maintenance-tasks/:taskId` (#867)
 - complétion:
   - `doneAt`
 - index `(boat_id, status)` (`boat_maintenance_tasks_boat_status_idx`, #832) — comptage exact des tâches urgentes et « tâches réalisées 30 j » du tableau de bord
