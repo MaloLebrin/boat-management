@@ -98,6 +98,7 @@ export default class PlanningService {
         dueEngineHours: t.dueEngineHours,
         currentEngineHours,
         status: t.status as 'open' | 'done',
+        postponedCount: t.postponedCount ?? 0,
       }
     }
 

@@ -247,6 +247,8 @@ export type MaintenanceTaskRow = {
   boatGenericEquipmentId: number | null
   recurrenceIntervalMonths: number | null
   recurrenceIntervalEngineHours: number | null
+  /** Nombre de reports de l'échéance (#867). Absent sur les lignes qui ne l'exposent pas. */
+  postponedCount?: number
   /** Incident à l'origine de la tâche (#815), `null` sinon. */
   boatIncidentId: number | null
 }

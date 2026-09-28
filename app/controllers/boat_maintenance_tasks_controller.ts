@@ -10,6 +10,7 @@ import MaintenancePolicy from '#policies/maintenance_policy'
 import {
   createBoatMaintenanceTaskValidator,
   markBoatMaintenanceTaskDoneValidator,
+  updateBoatMaintenanceTaskValidator,
 } from '#validators/boat_maintenance_task'
 import { equipmentRefOf } from '#shared/helpers/maintenance_task_equipment'
 import { inject } from '@adonisjs/core'
@@ -98,6 +99,96 @@ export default class BoatMaintenanceTasksController {
     }
 
     session.flash('success', i18n.t('flash.maintenanceTasks.created'))
+    response.redirect().back()
+  }
+
+  /**
+   * Modifie une tâche planifiée (#867) — formulaire complet ou report en un
+   * clic (seule l'échéance est envoyée). Même capability que la clôture : qui
+   * peut terminer une tâche peut la décaler.
+   */
+  async update({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+
+    let boat
+    try {
+      boat = await this.boatService.getForUserOrFail(user, Number(params.boatId))
+    } catch (error) {
+      if (error instanceof BoatNotFoundError) {
+        response.redirect('/boats')
+        return
+      }
+      throw error
+    }
+
+    await bouncer.with(MaintenancePolicy).authorize('edit', boat)
+
+    const payload = await request.validateUsing(updateBoatMaintenanceTaskValidator)
+
+    let postponedOnly = false
+    try {
+      const { task, changedFields, postponed } =
+        await this.boatMaintenanceTaskService.updateForBoat(
+          user,
+          boat,
+          Number(params.taskId),
+          payload
+        )
+
+      // Un report pur (seule l'échéance recule) est tracé comme tel : c'est le
+      // geste que l'on veut compter, distinct d'une correction de la tâche.
+      postponedOnly =
+        postponed && changedFields.every((f) => f === 'dueAt' || f === 'dueEngineHours')
+
+      if (changedFields.length > 0) {
+        await this.auditLogService.log({
+          organizationId: user.organizationId!,
+          userId: user.id,
+          action: postponedOnly ? 'maintenance_task.postpone' : 'maintenance_task.update',
+          entityType: 'maintenance_task',
+          entityId: task.id,
+          metadata: {
+            name: task.title,
+            boatName: boat.name,
+            fields: changedFields,
+            ...(postponed ? { postponedCount: task.postponedCount } : {}),
+          },
+        })
+      }
+    } catch (error) {
+      if (error instanceof BoatMaintenanceTaskNotFoundError) {
+        session.flash('error', i18n.t('flash.maintenanceTasks.notFound'))
+        response.redirect().back()
+        return
+      }
+      if (
+        error instanceof BoatMaintenanceTaskValidationError &&
+        error.errorCode === 'dueEngineHoursNotAboveCurrent'
+      ) {
+        session.flashAll()
+        session.flash('inputErrorsBag', {
+          dueEngineHours: [
+            i18n.t('validator.maintenanceTasks.dueEngineHoursNotAboveCurrent', {
+              current: String(error.details.currentHours ?? 0),
+            }),
+          ],
+        })
+        response.redirect().back()
+        return
+      }
+      if (error instanceof BoatMaintenanceTaskValidationError) {
+        session.flash('error', i18n.t(`flash.maintenanceTasks.${error.errorCode}`))
+        response.redirect().back()
+        return
+      }
+      throw error
+    }
+
+    session.flash(
+      'success',
+      i18n.t(postponedOnly ? 'flash.maintenanceTasks.postponed' : 'flash.maintenanceTasks.updated')
+    )
     response.redirect().back()
   }
 

@@ -37,5 +37,6 @@
     "toggleTitle": "Regrouper automatiquement les tâches proches",
     "ungroup": "Dissocier",
     "proTeaser": "Passez au plan Pro pour regrouper automatiquement les tâches de maintenance proches."
-  }
+  },
+  "postponedCount": "{count, plural, one {Reportée # fois} other {Reportée # fois}}"
 }

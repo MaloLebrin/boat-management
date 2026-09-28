@@ -2,6 +2,7 @@
 import { computed, onMounted, useTemplateRef } from 'vue'
 import type { PlanningTask } from '#shared/types/planning'
 import BaseButton from '~/components/base/BaseButton.vue'
+import MaintenanceTaskPostponeMenu from '~/components/boats/maintenance/MaintenanceTaskPostponeMenu.vue'
 import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { usePermissions } from '~/composables/use_permissions'
@@ -32,6 +33,11 @@ const { can } = usePermissions()
 // carte affiche un lien qui répond 403 (#473).
 const canViewBoat = computed(() => can('boats.view'))
 
+// Report en un clic depuis le planning (#867) : même capability que la clôture.
+const canPostpone = computed(
+  () => !props.done && props.task.kind === 'date' && !!props.task.dueAt && can('maintenance.edit')
+)
+
 function formatDue(task: PlanningTask): string {
   if (task.kind === 'date' && task.dueAt) return formatDate(task.dueAt)
   if (task.kind === 'hours' && task.dueEngineHours !== null) return `${task.dueEngineHours}h`
@@ -54,6 +60,9 @@ function formatDue(task: PlanningTask): string {
       {{ task.title }}
     </p>
     <p class="mt-1 text-xs text-fg-muted">{{ maintenanceSubjectLabel(t, task.subject) }}</p>
+    <p v-if="task.postponedCount > 0" class="mt-1 text-xs font-medium text-warning">
+      {{ t('planning.postponedCount', { count: String(task.postponedCount) }) }}
+    </p>
     <div class="mt-2 flex items-center justify-between">
       <span
         class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
@@ -61,6 +70,12 @@ function formatDue(task: PlanningTask): string {
       >
         {{ formatDue(task) }}
       </span>
+      <MaintenanceTaskPostponeMenu
+        v-if="canPostpone"
+        :boat-id="task.boatId"
+        :task-id="task.id"
+        :due-at="task.dueAt!"
+      />
       <BaseButton
         v-if="canViewBoat"
         variant="ghost"

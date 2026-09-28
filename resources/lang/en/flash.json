@@ -49,7 +49,10 @@
     "engineIdRequired": "An engine is required for engine-hour tasks.",
     "doneEngineHoursRequired": "Engine hours at completion is required.",
     "doneEngineHoursInvalid": "Engine hours at completion must be 0 or more.",
-    "incidentNotFound": "This incident does not belong to this boat."
+    "incidentNotFound": "This incident does not belong to this boat.",
+    "updated": "Task updated.",
+    "postponed": "Task postponed.",
+    "taskDone": "A completed task is part of the history and can no longer be edited."
   },
   "ai": {
     "messagesRequired": "The messages field is required.",

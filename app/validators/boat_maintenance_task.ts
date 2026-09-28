@@ -50,6 +50,23 @@ export const createBoatMaintenanceTaskValidator = vine.create(
   })
 )
 
+/**
+ * Modification d'une tâche planifiée (#867). Tous les champs sont optionnels :
+ * une clé absente laisse le champ intact, une valeur vide (convertie en `null`
+ * par le bodyparser) le vide — d'où `nullable().optional()`, car `optional()`
+ * seul efface les `null` et rendrait un champ impossible à vider.
+ */
+export const updateBoatMaintenanceTaskValidator = vine.create(
+  vine.object({
+    title: vine.string().trim().minLength(1).maxLength(200).optional(),
+    notes: vine.string().trim().nullable().optional(),
+    dueAt: vine.date().nullable().optional(),
+    recurrenceIntervalMonths: vine.number().withoutDecimals().min(0).nullable().optional(),
+    dueEngineHours: vine.number().withoutDecimals().min(0).nullable().optional(),
+    recurrenceIntervalEngineHours: vine.number().withoutDecimals().min(0).nullable().optional(),
+  })
+)
+
 export const markBoatMaintenanceTaskDoneValidator = vine.create(
   vine.object({
     doneAt: vine

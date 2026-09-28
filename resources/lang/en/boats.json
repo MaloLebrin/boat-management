@@ -759,7 +759,20 @@
       "plumbing": "Plumbing",
       "safety": "Safety",
       "deck": "Deck / Fittings",
-      "other": "Other"
+      "other": "Other",
+      "postpone": {
+        "label": "Postpone",
+        "week": "+1 week",
+        "month": "+1 month",
+        "customDate": "Other date",
+        "apply": "Postpone"
+      },
+      "edit": {
+        "open": "Edit task",
+        "title": "Edit task",
+        "submit": "Save",
+        "recurrenceHint": "A new recurrence interval applies to the next occurrences, created when this one is completed."
+      }
     },
     "operations": {
       "hint": "Pick a standard operation from the catalogue, or type your own title.",

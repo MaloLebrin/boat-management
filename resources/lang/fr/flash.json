@@ -49,7 +49,10 @@
     "engineIdRequired": "Un moteur est requis pour les tâches basées sur les heures moteur.",
     "doneEngineHoursRequired": "Les heures moteur à l'achèvement sont requises.",
     "doneEngineHoursInvalid": "Les heures moteur à l'achèvement doivent être supérieures ou égales à 0.",
-    "incidentNotFound": "Cet incident n'appartient pas à ce bateau."
+    "incidentNotFound": "Cet incident n'appartient pas à ce bateau.",
+    "updated": "Tâche mise à jour.",
+    "postponed": "Tâche reportée.",
+    "taskDone": "Une tâche terminée fait partie de l'historique : elle ne se modifie plus."
   },
   "ai": {
     "messagesRequired": "Le champ messages est obligatoire.",
