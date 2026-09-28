@@ -1958,6 +1958,7 @@ export class InvoiceSchema extends BaseModel {
     'clientId',
     'clientName',
     'createdAt',
+    'creditedInvoiceId',
     'currency',
     'dueAt',
     'id',
@@ -1987,6 +1988,8 @@ export class InvoiceSchema extends BaseModel {
   declare clientName: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare creditedInvoiceId: number | null
   @column()
   declare currency: string
   @column.date()

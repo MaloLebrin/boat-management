@@ -413,7 +413,8 @@
       "billing_addon_set": "Bateaux supplémentaires modifiés",
       "online_payments_connect": "Compte Stripe connecté",
       "online_payments_disconnect": "Compte Stripe déconnecté",
-      "invoice_paid_online": "Facture réglée en ligne"
+      "invoice_paid_online": "Facture réglée en ligne",
+      "invoice_credit_note_issued": "Avoir émis"
     },
     "empty": {
       "title": "Aucune activité",

@@ -391,6 +391,37 @@ test.group('Online payments — public payment page (functional)', (group) => {
     assert.equal(invoice.stripeCheckoutSessionId, 'cs_fake_1')
   })
 
+  test('a partially credited invoice is charged its balance only (#877)', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const stripe = swapStripeConnectService()
+    cleanup(() => stripe.restore())
+    const admin = await createEnterpriseAdminUser()
+    await connectedOrg(admin, 'acct_lessor')
+    const invoice = await sentInvoice(admin.organizationId!)
+    await Invoice.create({
+      organizationId: admin.organizationId!,
+      kind: 'credit_note',
+      creditedInvoiceId: invoice.id,
+      number: 'AV-000001',
+      status: 'sent',
+      issuedAt: DateTime.now(),
+      subtotal: '20.50',
+      taxRate: '0',
+      taxAmount: '0',
+      total: '20.50',
+      currency: 'EUR',
+    })
+
+    const page = await client.get('/pay/tok_public_1').withInertia()
+    assert.equal((page.inertiaProps as { payment: { total: number } }).payment.total, 100)
+
+    await client.post('/pay/tok_public_1/checkout').withInertia().redirects(0)
+    assert.equal(stripe.checkoutSessions[0].amountCents, 10000)
+  })
+
   test('a paid invoice cannot open a Checkout session', async ({ client, assert, cleanup }) => {
     const stripe = swapStripeConnectService()
     cleanup(() => stripe.restore())

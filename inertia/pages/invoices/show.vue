@@ -10,7 +10,8 @@ import InvoiceStatusBadge from '~/components/invoices/InvoiceStatusBadge.vue'
 import InvoiceLinesCard from '~/components/invoices/InvoiceLinesCard.vue'
 import InvoicePaymentCard from '~/components/invoices/InvoicePaymentCard.vue'
 import InvoiceOnlinePaymentCard from '~/components/invoices/InvoiceOnlinePaymentCard.vue'
-import { useDateFormat } from '~/composables/use_date_format'
+import InvoiceDetailsCard from '~/components/invoices/InvoiceDetailsCard.vue'
+import InvoiceCreditNotesCard from '~/components/invoices/InvoiceCreditNotesCard.vue'
 import { useDeleteConfirmation } from '~/composables/use_delete_confirmation'
 import { useT } from '~/composables/use_t'
 import { canEditInvoice, canEditInvoicePayment } from '#shared/helpers/invoice_lifecycle'
@@ -19,11 +20,11 @@ import type { InvoiceDetail } from '../../../shared/types/invoice'
 const props = defineProps<{
   invoice: InvoiceDetail
   canDelete: boolean
+  readOnly?: boolean
   canAcceptOnlinePayments?: boolean
 }>()
 
 const { t } = useT()
-const { formatDate } = useDateFormat()
 
 const deletion = useDeleteConfirmation({
   url: () => `/invoices/${props.invoice.id}`,
@@ -37,12 +38,25 @@ const busy = ref(false)
 const canConvert = computed(
   () => props.invoice.kind === 'quote' && props.invoice.convertedInvoice === null
 )
-// A real invoice that is neither paid nor cancelled can be marked as paid.
+// A real invoice that is neither paid, cancelled nor fully credited can be
+// marked as paid.
 const canMarkPaid = computed(
   () =>
     props.invoice.kind === 'invoice' &&
     props.invoice.status !== 'paid' &&
-    props.invoice.status !== 'cancelled'
+    props.invoice.status !== 'cancelled' &&
+    props.invoice.status !== 'credited'
+)
+// Un avoir, et une facture qui en porte, ne se suppriment pas (#877).
+const deletable = computed(
+  () =>
+    props.canDelete &&
+    props.invoice.kind !== 'credit_note' &&
+    props.invoice.creditNotes.length === 0
+)
+// Facture émise : le bloc « Avoirs » est le seul moyen de la corriger (#877).
+const showCreditNotes = computed(
+  () => props.invoice.kind === 'invoice' && props.invoice.status !== 'draft'
 )
 // Une facture émise est figée (#717) : plus de bouton « Modifier », mais un bloc
 // dédié pour corriger son paiement.
@@ -118,11 +132,22 @@ function markPaid() {
       <div>
         <div class="flex items-center gap-3">
           <BaseHeading level="1">{{ invoice.number }}</BaseHeading>
-          <InvoiceStatusBadge :status="invoice.status" />
+          <InvoiceStatusBadge :status="invoice.status" :kind="invoice.kind" />
         </div>
         <p class="mt-1 text-fg-muted">{{ t(`invoices.kind.${invoice.kind}`) }}</p>
         <!-- Facture émise : dire pourquoi le bouton « Modifier » a disparu (#717). -->
-        <p v-if="!canEdit" class="mt-1 text-sm text-fg-muted">{{ t('invoices.lockedNotice') }}</p>
+        <p v-if="!canEdit" class="mt-1 text-sm text-fg-muted">
+          {{
+            invoice.kind === 'credit_note'
+              ? t('invoices.creditNote.lockedNotice')
+              : t('invoices.lockedNotice')
+          }}
+        </p>
+        <p v-if="invoice.creditedInvoice" class="mt-1 text-sm text-fg-muted">
+          <Link :href="`/invoices/${invoice.creditedInvoice.id}`" class="underline hover:text-fg">
+            {{ t('invoices.creditNote.creditFor', { number: invoice.creditedInvoice.number }) }}
+          </Link>
+        </p>
         <p v-if="invoice.sourceQuote" class="mt-1 text-sm text-fg-muted">
           <Link :href="`/invoices/${invoice.sourceQuote.id}`" class="underline hover:text-fg">
             {{ t('invoices.show.convertedFrom', { number: invoice.sourceQuote.number }) }}
@@ -177,7 +202,7 @@ function markPaid() {
           </BaseButton>
         </Link>
         <BaseButton
-          v-if="canDelete"
+          v-if="deletable"
           variant="danger"
           size="sm"
           type="button"
@@ -188,54 +213,16 @@ function markPaid() {
       </div>
     </div>
 
-    <!-- Details -->
-    <BaseCard class="mt-6">
-      <p class="mb-4 text-sm font-semibold text-fg">{{ t('invoices.show.details') }}</p>
-      <dl class="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <dt class="text-fg-muted">{{ t('invoices.show.issuedOn') }}</dt>
-          <dd class="font-medium text-fg">{{ formatDate(invoice.issuedAt) }}</dd>
-        </div>
-        <div>
-          <dt class="text-fg-muted">{{ t('invoices.show.dueOn') }}</dt>
-          <dd class="font-medium text-fg">{{ formatDate(invoice.dueAt) }}</dd>
-        </div>
-        <div v-if="invoice.paidAt">
-          <dt class="text-fg-muted">{{ t('invoices.show.paidOn') }}</dt>
-          <dd class="font-medium text-fg">{{ formatDate(invoice.paidAt) }}</dd>
-        </div>
-        <div v-if="invoice.paidAt">
-          <dt class="text-fg-muted">{{ t('invoices.show.paymentMethod') }}</dt>
-          <dd class="font-medium text-fg">
-            {{
-              invoice.paymentMethod
-                ? t(`invoices.paymentMethods.${invoice.paymentMethod}`)
-                : t('invoices.paymentMethods.none')
-            }}
-          </dd>
-        </div>
-        <div>
-          <dt class="text-fg-muted">{{ t('invoices.show.client') }}</dt>
-          <dd class="font-medium text-fg">{{ invoice.clientName ?? t('invoices.noClient') }}</dd>
-        </div>
-        <div>
-          <dt class="text-fg-muted">{{ t('invoices.show.reservation') }}</dt>
-          <dd class="font-medium text-fg">
-            <Link
-              v-if="invoice.reservationId && invoice.reservationBoatId"
-              :href="`/boats/${invoice.reservationBoatId}/reservations`"
-              class="text-primary underline"
-            >
-              {{ t('invoices.show.viewReservation') }}
-            </Link>
-            <span v-else>{{ invoice.reservationId ?? t('invoices.noReservation') }}</span>
-          </dd>
-        </div>
-      </dl>
-    </BaseCard>
+    <InvoiceDetailsCard :invoice="invoice" class="mt-6" />
 
     <!-- Paiement d'une facture émise (#717) -->
     <InvoicePaymentCard v-if="canEditPayment" :invoice="invoice" class="mt-4" />
+    <InvoiceCreditNotesCard
+      v-if="showCreditNotes"
+      :invoice="invoice"
+      :read-only="readOnly ?? false"
+      class="mt-4"
+    />
     <InvoiceOnlinePaymentCard
       :invoice="invoice"
       :can-accept-online-payments="canAcceptOnlinePayments ?? false"

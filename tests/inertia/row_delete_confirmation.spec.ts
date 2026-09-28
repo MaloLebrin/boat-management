@@ -135,6 +135,7 @@ describe('pages/invoices — confirmation dans l’app', () => {
     dueAt: null,
     paidAt: null,
     sourceQuoteId: null,
+    creditedInvoiceId: null,
     subtotal: 1000,
     taxRate: 20,
     taxAmount: 200,

@@ -41,3 +41,35 @@ export class InvoiceLockedError extends Error {
 export class CannotEditPaymentError extends Error {
   name = 'CannotEditPaymentError'
 }
+
+/**
+ * Raised when issuing a credit note (#877) on a document that cannot carry one:
+ * a quote, a draft, a cancelled invoice or an invoice already fully credited.
+ */
+export class CannotIssueCreditNoteError extends Error {
+  name = 'CannotIssueCreditNoteError'
+}
+
+/**
+ * Raised when a credit note (#877) would credit more than what remains of the
+ * invoice (its total minus the credit notes already issued), or nothing at all.
+ */
+export class CreditNoteAmountError extends Error {
+  name = 'CreditNoteAmountError'
+}
+
+/**
+ * Raised when a credit note is requested without lines on an invoice that
+ * already carries one (#877): the mirror of the invoice would over-credit it.
+ */
+export class CreditNoteLinesRequiredError extends Error {
+  name = 'CreditNoteLinesRequiredError'
+}
+
+/**
+ * Raised when deleting a credit note, or an invoice that carries credit notes
+ * (#877): both are accounting records tied together.
+ */
+export class CreditNoteDeleteError extends Error {
+  name = 'CreditNoteDeleteError'
+}

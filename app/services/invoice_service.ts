@@ -5,6 +5,7 @@ import {
   CannotMarkPaidError,
   InvoiceLockedError,
   CannotEditPaymentError,
+  CreditNoteDeleteError,
 } from '#exceptions/invoice_errors'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
@@ -34,7 +35,7 @@ import type {
 } from '#shared/types/invoice'
 import type { ClientOption } from '#shared/types/client'
 import type { DashboardInvoicingSummary } from '#shared/types/dashboard'
-import { toInvoiceRow } from '#transformers/invoice_transformer'
+import { toInvoiceRow, type InvoiceLinks } from '#transformers/invoice_transformer'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
@@ -64,8 +65,20 @@ interface ServiceUpdatePaymentPayload {
   paymentMethod?: InvoicePaymentMethod | null
 }
 
-const VALID_STATUSES: InvoiceStatus[] = ['draft', 'sent', 'paid', 'overdue', 'cancelled']
-const VALID_KINDS: InvoiceKind[] = ['quote', 'invoice']
+const VALID_STATUSES: InvoiceStatus[] = [
+  'draft',
+  'sent',
+  'paid',
+  'overdue',
+  'cancelled',
+  'credited',
+]
+const VALID_KINDS: InvoiceKind[] = ['quote', 'invoice', 'credit_note']
+const NUMBER_PREFIXES: Record<InvoiceKind, string> = {
+  quote: 'DEV-',
+  invoice: 'FAC-',
+  credit_note: 'AV-',
+}
 const VALID_SORT_FIELDS: InvoiceSortField[] = ['issuedAt', 'number', 'total', 'status']
 const VALID_DIRECTIONS: InvoiceSortDirection[] = ['asc', 'desc']
 
@@ -158,6 +171,10 @@ export default class InvoiceService {
    * « À traiter », le job de bascule ne passant qu'une fois par jour), encaissé
    * depuis le 1er du mois et devis en attente. Un seul agrégat conditionnel.
    * Ne renvoie jamais `null` (#478).
+   *
+   * Net des avoirs (#877) : l'encours et les impayés retranchent les avoirs
+   * émis sur chaque facture, l'encaissé retranche les avoirs remboursés
+   * depuis le 1er du mois.
    */
   async getDashboardSummary(
     org: Organization,
@@ -168,21 +185,34 @@ export default class InvoiceService {
     const overdueWhere =
       "kind = 'invoice' and (status = 'overdue' or (status = 'sent' and due_at < ?))"
     const paidWhere = "kind = 'invoice' and status = 'paid' and paid_at >= ?"
+    const refundedWhere = "kind = 'credit_note' and status = 'paid' and paid_at >= ?"
     const outstandingWhere = "kind = 'invoice' and status in ('sent', 'overdue')"
+    // Montant d'une facture net des avoirs émis sur elle.
+    const netTotal =
+      "(total - (select coalesce(sum(cn.total), 0) from invoices cn where cn.kind = 'credit_note' and cn.credited_invoice_id = invoices.id))"
 
     const row = await db
       .from('invoices')
       .where('organization_id', org.id)
       .select(
-        db.raw(`coalesce(sum(total) filter (where ${outstandingWhere}), 0) as outstanding_total`)
+        db.raw(
+          `coalesce(sum(${netTotal}) filter (where ${outstandingWhere}), 0) as outstanding_total`
+        )
       )
       .select(db.raw(`count(*) filter (where ${outstandingWhere})::int as outstanding_count`))
       .select(
-        db.raw(`coalesce(sum(total) filter (where ${overdueWhere}), 0) as overdue_total`, [today])
+        db.raw(`coalesce(sum(${netTotal}) filter (where ${overdueWhere}), 0) as overdue_total`, [
+          today,
+        ])
       )
       .select(db.raw(`count(*) filter (where ${overdueWhere})::int as overdue_count`, [today]))
       .select(
         db.raw(`coalesce(sum(total) filter (where ${paidWhere}), 0) as paid_total`, [monthStart])
+      )
+      .select(
+        db.raw(`coalesce(sum(total) filter (where ${refundedWhere}), 0) as refunded_total`, [
+          monthStart,
+        ])
       )
       .select(db.raw(`count(*) filter (where ${paidWhere})::int as paid_count`, [monthStart]))
       .select(
@@ -200,7 +230,7 @@ export default class InvoiceService {
       outstandingCount: Number(row?.outstanding_count ?? 0),
       overdueTotal: money(row?.overdue_total),
       overdueCount: Number(row?.overdue_count ?? 0),
-      paidThisMonthTotal: money(row?.paid_total),
+      paidThisMonthTotal: money(money(row?.paid_total) - money(row?.refunded_total)),
       paidThisMonthCount: Number(row?.paid_count ?? 0),
       pendingQuotes: Number(row?.pending_quotes ?? 0),
     }
@@ -257,27 +287,35 @@ export default class InvoiceService {
 
   /**
    * Resolves the linked documents for an invoice: its origin quote (when the
-   * invoice was converted from one) and the invoice it was converted into (when
-   * this document is a quote). `invoices` is self-referential via `sourceQuoteId`
+   * invoice was converted from one), the invoice it was converted into (when
+   * this document is a quote), the invoice a credit note corrects and the
+   * credit notes issued on an invoice (#877). `invoices` is self-referential
    * but Lucid can't type a self-relation for `preload`, so these are fetched
    * explicitly, org-scoped.
    */
-  async getLinks(
-    invoice: Invoice
-  ): Promise<{ sourceQuote: Invoice | null; convertedInvoice: Invoice | null }> {
+  async getLinks(invoice: Invoice): Promise<Required<InvoiceLinks>> {
+    const sameOrg = () => Invoice.query().where('organizationId', invoice.organizationId)
+
     const sourceQuote = invoice.sourceQuoteId
-      ? await Invoice.query()
-          .where('id', invoice.sourceQuoteId)
-          .where('organizationId', invoice.organizationId)
-          .first()
+      ? await sameOrg().where('id', invoice.sourceQuoteId).first()
       : null
 
-    const convertedInvoice = await Invoice.query()
-      .where('sourceQuoteId', invoice.id)
-      .where('organizationId', invoice.organizationId)
-      .first()
+    const convertedInvoice =
+      invoice.kind === 'quote' ? await sameOrg().where('sourceQuoteId', invoice.id).first() : null
 
-    return { sourceQuote, convertedInvoice }
+    const creditedInvoice = invoice.creditedInvoiceId
+      ? await sameOrg().where('id', invoice.creditedInvoiceId).first()
+      : null
+
+    const creditNotes =
+      invoice.kind === 'invoice'
+        ? await sameOrg()
+            .where('kind', 'credit_note')
+            .where('creditedInvoiceId', invoice.id)
+            .orderBy('id', 'asc')
+        : []
+
+    return { sourceQuote, convertedInvoice, creditedInvoice, creditNotes }
   }
 
   async listClientOptions(org: Organization): Promise<ClientOption[]> {
@@ -293,7 +331,7 @@ export default class InvoiceService {
   async create(org: Organization, payload: ServiceCreateInvoicePayload): Promise<Invoice> {
     return db.transaction(async (trx) => {
       // Allocate gap-free number
-      const number = await this.#allocateNumber(trx, org.id, payload.kind)
+      const number = await this.allocateNumber(trx, org.id, payload.kind)
 
       // Compute totals
       const totals = computeInvoiceTotals(payload.lines, payload.taxRate)
@@ -416,7 +454,20 @@ export default class InvoiceService {
     })
   }
 
+  /**
+   * Un avoir, et une facture qui en porte, ne se suppriment pas (#877) : ce
+   * sont deux pièces comptables liées l'une à l'autre.
+   */
   async delete(invoice: Invoice): Promise<void> {
+    if (invoice.kind === 'credit_note') throw new CreditNoteDeleteError()
+    if (invoice.kind === 'invoice') {
+      const creditNote = await Invoice.query()
+        .where('organizationId', invoice.organizationId)
+        .where('creditedInvoiceId', invoice.id)
+        .select('id')
+        .first()
+      if (creditNote) throw new CreditNoteDeleteError()
+    }
     await invoice.delete()
   }
 
@@ -440,7 +491,7 @@ export default class InvoiceService {
     await quote.load('lines', (q) => q.orderBy('position'))
 
     return db.transaction(async (trx) => {
-      const number = await this.#allocateNumber(trx, quote.organizationId, 'invoice')
+      const number = await this.allocateNumber(trx, quote.organizationId, 'invoice')
 
       const invoice = await Invoice.create(
         {
@@ -498,7 +549,7 @@ export default class InvoiceService {
     opts: { lineLabel: string }
   ): Promise<Invoice> {
     return db.transaction(async (trx) => {
-      const number = await this.#allocateNumber(trx, org.id, 'quote')
+      const number = await this.allocateNumber(trx, org.id, 'quote')
 
       // Resolve the client: prefer the reservation's linked client FK (#275),
       // fall back to matching the snapshot email (#288). Keep the free-text name
@@ -569,11 +620,15 @@ export default class InvoiceService {
   }
 
   /**
-   * Marks an invoice as paid, stamping `paidAt`. Only real invoices that are not
-   * cancelled can be marked paid.
+   * Marks an invoice as paid, stamping `paidAt`. Only real invoices that are
+   * neither cancelled nor fully credited (#877) can be marked paid.
    */
   async markAsPaid(invoice: Invoice, paidAt?: DateTime): Promise<Invoice> {
-    if (invoice.kind !== 'invoice' || invoice.status === 'cancelled') {
+    if (
+      invoice.kind !== 'invoice' ||
+      invoice.status === 'cancelled' ||
+      invoice.status === 'credited'
+    ) {
       throw new CannotMarkPaidError()
     }
 
@@ -676,7 +731,12 @@ export default class InvoiceService {
     return reservation ? reservation.id : null
   }
 
-  async #allocateNumber(
+  /**
+   * Numéro suivant, sans trou, de la séquence de l'organisation pour cette
+   * nature de pièce (`DEV-`, `FAC-`, `AV-` pour les avoirs, #877). Public : le
+   * service des avoirs l'appelle dans sa propre transaction.
+   */
+  async allocateNumber(
     trx: TransactionClientContract,
     organizationId: number,
     kind: InvoiceKind
@@ -706,7 +766,6 @@ export default class InvoiceService {
     counter.lastNumber = next
     await counter.save()
 
-    const prefix = kind === 'quote' ? 'DEV-' : 'FAC-'
-    return `${prefix}${String(next).padStart(6, '0')}`
+    return `${NUMBER_PREFIXES[kind]}${String(next).padStart(6, '0')}`
   }
 }

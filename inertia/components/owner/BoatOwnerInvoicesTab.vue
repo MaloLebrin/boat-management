@@ -26,7 +26,7 @@ const { formatDate } = useDateFormat()
         </div>
         <div class="flex items-center gap-3">
           <span class="text-sm font-medium text-fg">{{ invoice.total.toFixed(2) }} €</span>
-          <InvoiceStatusBadge :status="invoice.status" />
+          <InvoiceStatusBadge :status="invoice.status" :kind="invoice.kind" />
         </div>
       </div>
     </BaseCard>

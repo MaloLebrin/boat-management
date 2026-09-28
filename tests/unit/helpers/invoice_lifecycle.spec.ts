@@ -2,6 +2,9 @@ import { test } from '@japa/runner'
 import {
   canEditInvoice,
   canEditInvoicePayment,
+  canIssueCreditNote,
+  creditableRemaining,
+  invoiceBalanceDue,
   isIssuedInvoice,
   INVOICE_PAYMENT_METHODS,
   isInvoicePayableOnline,
@@ -70,5 +73,52 @@ test.group('invoice_lifecycle — paiement en ligne (#876)', () => {
 
   test('« online » ne se saisit pas à la main', ({ assert }) => {
     assert.notInclude(INVOICE_PAYMENT_METHODS as readonly string[], 'online')
+  })
+})
+
+/** Avoirs (#877). */
+test.group('invoice_lifecycle — avoirs', () => {
+  test('un avoir est toujours une pièce émise, figée', ({ assert }) => {
+    for (const status of ['sent', 'paid'] as const) {
+      assert.isTrue(isIssuedInvoice({ kind: 'credit_note', status }), status)
+      assert.isFalse(canEditInvoice({ kind: 'credit_note', status }), status)
+      // Son « paiement » est le remboursement : il se saisit.
+      assert.isTrue(canEditInvoicePayment({ kind: 'credit_note', status }), status)
+    }
+  })
+
+  test('seule une facture envoyée, en retard ou payée accepte un avoir', ({ assert }) => {
+    for (const status of ['sent', 'overdue', 'paid'] as const) {
+      assert.isTrue(canIssueCreditNote({ kind: 'invoice', status }), status)
+    }
+    for (const status of ['draft', 'cancelled', 'credited'] as const) {
+      assert.isFalse(canIssueCreditNote({ kind: 'invoice', status }), status)
+    }
+    assert.isFalse(canIssueCreditNote({ kind: 'quote', status: 'sent' }))
+    assert.isFalse(canIssueCreditNote({ kind: 'credit_note', status: 'sent' }))
+  })
+
+  test('une facture entièrement avoirée n’encaisse plus rien', ({ assert }) => {
+    assert.isFalse(canEditInvoicePayment({ kind: 'invoice', status: 'credited' }))
+    assert.isFalse(
+      isInvoicePayableOnline({ kind: 'invoice', status: 'credited', paidAt: null, total: 120 })
+    )
+  })
+
+  test('le reste créditable ne descend jamais sous zéro, au centime près', ({ assert }) => {
+    assert.equal(creditableRemaining(120, 24), 96)
+    assert.equal(creditableRemaining(100.1, 33.37), 66.73)
+    assert.equal(creditableRemaining(120, 150), 0)
+  })
+
+  test('le reste à régler est net des avoirs, nul une fois payée ou soldée', ({ assert }) => {
+    const sent = { kind: 'invoice', status: 'sent', paidAt: null, total: '120' } as const
+    assert.equal(invoiceBalanceDue(sent, 0), 120)
+    assert.equal(invoiceBalanceDue(sent, 24), 96)
+    assert.equal(invoiceBalanceDue({ ...sent, status: 'overdue' }, 20), 100)
+    assert.equal(invoiceBalanceDue({ ...sent, status: 'paid', paidAt: '2026-08-01' }, 24), 0)
+    assert.equal(invoiceBalanceDue({ ...sent, status: 'credited' }, 120), 0)
+    assert.equal(invoiceBalanceDue({ ...sent, status: 'draft' }, 0), 0)
+    assert.equal(invoiceBalanceDue({ ...sent, kind: 'credit_note' }, 0), 0)
   })
 })

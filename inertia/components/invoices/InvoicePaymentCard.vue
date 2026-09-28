@@ -13,10 +13,16 @@ import type { InvoiceDetail, InvoicePaymentMethod } from '#shared/types/invoice'
  * Bloc « Paiement » d'une facture émise (#717). La pièce est figée : c'est la
  * seule écriture qu'elle accepte encore — sa date et son moyen de règlement.
  * Vider la date annule le paiement enregistré (la facture retourne à `sent`).
+ * Sur un avoir (#877), le même bloc enregistre le remboursement.
  */
 const props = defineProps<{ invoice: InvoiceDetail }>()
 
 const { t } = useT()
+
+// Sur un avoir (#877), le « paiement » est le remboursement du client.
+const copy = computed(() =>
+  props.invoice.kind === 'credit_note' ? 'invoices.creditNote.refund' : 'invoices.payment'
+)
 
 // `YYYY-MM-DD` est le format machine attendu par `<input type="date">` : la
 // date affichée à l'utilisateur passe, elle, par `useDateFormat()`.
@@ -63,8 +69,8 @@ function submit() {
 
 <template>
   <BaseCard>
-    <p class="mb-1 text-sm font-semibold text-fg">{{ t('invoices.payment.title') }}</p>
-    <p class="mb-4 text-sm text-fg-muted">{{ t('invoices.payment.description') }}</p>
+    <p class="mb-1 text-sm font-semibold text-fg">{{ t(`${copy}.title`) }}</p>
+    <p class="mb-4 text-sm text-fg-muted">{{ t(`${copy}.description`) }}</p>
 
     <form class="grid gap-4 sm:grid-cols-2" @submit.prevent="submit">
       <BaseInput
@@ -72,22 +78,22 @@ function submit() {
         v-model="paidAt"
         name="paidAt"
         type="date"
-        :label="t('invoices.payment.paidAt')"
-        :hint="t('invoices.payment.paidAtHint')"
+        :label="t(`${copy}.paidAt`)"
+        :hint="t(`${copy}.paidAtHint`)"
       />
       <BaseSelect
         id="invoice-payment-method"
         v-model="paymentMethod"
         name="paymentMethod"
         allow-empty
-        :label="t('invoices.payment.method')"
+        :label="t(`${copy}.method`)"
         :placeholder="t('invoices.paymentMethods.none')"
         :options="methodOptions"
         :disabled="!paidAt || paidOnline"
       />
       <div class="sm:col-span-2">
         <BaseButton variant="primary" size="sm" type="submit" :disabled="busy">
-          {{ t('invoices.payment.submit') }}
+          {{ t(`${copy}.submit`) }}
         </BaseButton>
       </div>
     </form>

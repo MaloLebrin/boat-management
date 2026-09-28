@@ -1,4 +1,4 @@
-import type Invoice from '#models/invoice'
+import Invoice from '#models/invoice'
 import type Organization from '#models/organization'
 import type { I18n } from '@adonisjs/i18n'
 import { formatCurrency } from '#shared/helpers/number_format'
@@ -14,6 +14,12 @@ import { PDF_COLORS, PDF_PAGE } from '#services/pdf/theme'
 
 const { navy: NAVY, greyM: GREY_M, greyD: GREY_D, white: WHITE, rowAlt: ROW_ALT } = PDF_COLORS
 const { height: PAGE_H, margin: MARGIN, contentWidth: CONTENT_W } = PDF_PAGE
+
+const TITLE_KEYS: Record<Invoice['kind'], string> = {
+  quote: 'titleQuote',
+  invoice: 'titleInvoice',
+  credit_note: 'titleCreditNote',
+}
 
 @inject()
 export default class InvoicePdfService {
@@ -32,14 +38,23 @@ export default class InvoicePdfService {
     const t = (key: string, data?: Record<string, string>) => i18n.t(`invoices.pdf.${key}`, data)
     const branding = resolveBranding(org)
 
-    const titleLabel = invoice.kind === 'quote' ? t('titleQuote') : t('titleInvoice')
+    const titleLabel = t(TITLE_KEYS[invoice.kind])
     const title = `${titleLabel} ${invoice.number}`
+    // Avoir (#877) : la mention de la facture corrigée est obligatoire.
+    const creditedInvoice = invoice.creditedInvoiceId
+      ? await Invoice.query()
+          .where('id', invoice.creditedInvoiceId)
+          .where('organizationId', invoice.organizationId)
+          .select('number', 'issued_at')
+          .first()
+      : null
     await renderBrandedHeader(doc, {
       branding,
       title,
       generatedOn: (date) => t('generatedOn', { date }),
       locale: i18n.locale,
     })
+    this.#renderCreditedInvoice(doc, creditedInvoice, t)
     this.#renderMetadata(doc, invoice, t)
     this.#renderLinesTable(doc, invoice, branding.primaryColor, t, i18n.locale)
     this.#renderTotals(doc, invoice, t, i18n.locale)
@@ -57,6 +72,30 @@ export default class InvoicePdfService {
       buffer,
       filename: `${safeNumber}.pdf`,
     }
+  }
+
+  /** « Avoir sur la facture n° … du … » (#877), sous l'en-tête. */
+  #renderCreditedInvoice(
+    doc: PDFKit.PDFDocument,
+    creditedInvoice: Invoice | null,
+    t: (key: string, data?: Record<string, string>) => string
+  ): void {
+    if (!creditedInvoice) return
+
+    doc
+      .fontSize(10)
+      .font('Helvetica-Bold')
+      .fillColor(NAVY)
+      .text(
+        t('creditNoteFor', {
+          number: creditedInvoice.number,
+          date: creditedInvoice.issuedAt?.toISODate() ?? '-',
+        }),
+        MARGIN,
+        doc.y,
+        { width: CONTENT_W }
+      )
+    doc.moveDown(0.8)
   }
 
   #renderMetadata(
@@ -93,7 +132,15 @@ export default class InvoicePdfService {
       .fontSize(9)
       .font('Helvetica')
       .fillColor(GREY_D)
-      .text(t(`statuses.${invoice.status}`), MARGIN + 90, statusY)
+      .text(
+        t(
+          invoice.kind === 'credit_note'
+            ? `creditNoteStatuses.${invoice.status}`
+            : `statuses.${invoice.status}`
+        ),
+        MARGIN + 90,
+        statusY
+      )
 
     // Right column: client
     const rightX = MARGIN + CONTENT_W / 2
@@ -224,7 +271,7 @@ export default class InvoicePdfService {
       .fontSize(10)
       .font('Helvetica-Bold')
       .fillColor(WHITE)
-      .text(t('total'), labelX, y + 2)
+      .text(invoice.kind === 'credit_note' ? t('totalCreditNote') : t('total'), labelX, y + 2)
     doc.text(money(total), valueX, y + 2, { width: valueW, align: 'right' })
 
     doc.fillColor('#000')
@@ -263,7 +310,9 @@ export default class InvoicePdfService {
     if (doc.y > PAGE_H - 80) doc.addPage()
 
     doc.moveDown(0.5)
-    doc.fontSize(9).font('Helvetica-Bold').fillColor(NAVY).text(t('notes'), MARGIN, doc.y)
+    // Sur un avoir (#877), la note est le motif de l'avoir.
+    const label = invoice.kind === 'credit_note' ? t('creditNoteReason') : t('notes')
+    doc.fontSize(9).font('Helvetica-Bold').fillColor(NAVY).text(label, MARGIN, doc.y)
     doc.moveDown(0.3)
     doc
       .fontSize(8)

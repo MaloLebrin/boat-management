@@ -6,6 +6,7 @@ import {
   CannotMarkPaidError,
   InvoiceLockedError,
   CannotEditPaymentError,
+  CreditNoteDeleteError,
 } from '#exceptions/invoice_errors'
 import InvoicePdfService from '#services/invoice_pdf_service'
 import EmailQueueService from '#services/email_queue_service'
@@ -269,6 +270,12 @@ export default class InvoicesController {
       if (error instanceof InvoiceNotFoundError) {
         session.flash('error', i18n.t('flash.invoices.notFound'))
         response.redirect('/invoices')
+        return
+      }
+      // Avoir, ou facture qui en porte (#877) : pièces liées, indélébiles.
+      if (error instanceof CreditNoteDeleteError) {
+        session.flash('error', i18n.t('flash.invoices.creditNoteDelete'))
+        response.redirect(`/invoices/${params.id}`)
         return
       }
       throw error

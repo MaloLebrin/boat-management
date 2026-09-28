@@ -50,6 +50,7 @@ function makeInvoice(overrides: Partial<InvoiceDetail> = {}): InvoiceDetail {
     paidAt: null,
     paymentMethod: null,
     sourceQuoteId: null,
+    creditedInvoiceId: null,
     subtotal: 100,
     taxRate: 20,
     taxAmount: 20,
@@ -62,6 +63,10 @@ function makeInvoice(overrides: Partial<InvoiceDetail> = {}): InvoiceDetail {
     convertedInvoice: null,
     reservationBoatId: null,
     onlinePaymentUrl: null,
+    creditedInvoice: null,
+    creditNotes: [],
+    creditedTotal: 0,
+    balanceDue: 0,
     ...overrides,
   }
 }

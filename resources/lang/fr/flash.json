@@ -269,7 +269,12 @@
     "quoteFromReservation": "Devis créé depuis la réservation.",
     "locked": "Cette facture est émise : elle n'est plus modifiable. Seul son paiement peut être corrigé.",
     "paymentUpdated": "Paiement mis à jour.",
-    "cannotEditPayment": "Le paiement de ce document ne peut pas être modifié."
+    "cannotEditPayment": "Le paiement de ce document ne peut pas être modifié.",
+    "cannotIssueCreditNote": "Un avoir ne s'émet que sur une facture envoyée, en retard ou payée, qui n'est pas déjà entièrement annulée par avoir.",
+    "creditNoteIssued": "Avoir émis.",
+    "creditNoteAmount": "Le montant de l'avoir doit être positif et ne pas dépasser ce qui reste à créditer sur la facture.",
+    "creditNoteLinesRequired": "Un avoir a déjà été émis sur cette facture : indiquez les lignes du nouvel avoir.",
+    "creditNoteDelete": "Un avoir, ou une facture qui porte des avoirs, ne se supprime pas."
   },
   "rentalContracts": {
     "created": "Contrat de location créé.",

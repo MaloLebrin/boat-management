@@ -8,10 +8,11 @@ import Invoice from '#models/invoice'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import AuditLogService from '#services/audit_log_service'
+import CreditNoteService from '#services/credit_note_service'
 import NotificationService from '#services/notification_service'
 import QuotaService from '#services/quota_service'
 import StripeService from '#services/stripe_service'
-import { isInvoicePayableOnline } from '#shared/helpers/invoice_lifecycle'
+import { invoiceBalanceDue, isInvoicePayableOnline } from '#shared/helpers/invoice_lifecycle'
 import { formatCurrency } from '#shared/helpers/number_format'
 import { toCents } from '#shared/helpers/reservation_payment'
 import type {
@@ -46,7 +47,8 @@ export default class OnlinePaymentService {
     private stripeService: StripeService,
     private quotaService: QuotaService,
     private auditLogService: AuditLogService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private creditNoteService: CreditNoteService
   ) {}
 
   // ── Compte connecté ──────────────────────────────────────────────────────
@@ -183,6 +185,11 @@ export default class OnlinePaymentService {
     return this.paymentUrl(invoice.paymentToken)
   }
 
+  /** Reste à régler d'une facture, net des avoirs émis sur elle (#877). */
+  async #amountDue(invoice: Invoice): Promise<number> {
+    return invoiceBalanceDue(invoice, await this.creditNoteService.creditedTotal(invoice))
+  }
+
   private async findByToken(token: string): Promise<{ invoice: Invoice; org: Organization }> {
     const invoice = await Invoice.query()
       .where('paymentToken', token)
@@ -209,7 +216,9 @@ export default class OnlinePaymentService {
       organizationName: org.name,
       number: invoice.number,
       clientName: invoice.clientName,
-      total: Number.parseFloat(invoice.total),
+      // Payable : le reste à régler, net des avoirs déjà émis (#877).
+      total:
+        state === 'payable' ? await this.#amountDue(invoice) : Number.parseFloat(invoice.total),
       currency: invoice.currency,
       issuedAt: invoice.issuedAt?.toISODate() ?? null,
       dueAt: invoice.dueAt?.toISODate() ?? null,
@@ -218,8 +227,9 @@ export default class OnlinePaymentService {
   }
 
   /**
-   * Ouvre une session Checkout sur le compte connecté pour le montant de la
-   * facture, et rend l'URL Stripe vers laquelle rediriger le client.
+   * Ouvre une session Checkout sur le compte connecté pour le reste à régler
+   * de la facture (net des avoirs, #877), et rend l'URL Stripe vers laquelle
+   * rediriger le client.
    */
   async createCheckout(token: string): Promise<string> {
     const { invoice, org } = await this.findByToken(token)
@@ -238,7 +248,7 @@ export default class OnlinePaymentService {
 
     const session = await this.stripeService.createInvoiceCheckoutSession({
       accountId: org.stripeConnectAccountId,
-      amountCents: toCents(invoice.total) ?? 0,
+      amountCents: toCents(await this.#amountDue(invoice)) ?? 0,
       currency: invoice.currency,
       productName: i18n.t('invoices.onlinePayment.checkoutProduct', {
         number: invoice.number,
@@ -296,9 +306,13 @@ export default class OnlinePaymentService {
     }
 
     // Déjà réglée (rejeu, ou paiement saisi à la main entre-temps) : rien à
-    // écrire. Annulée : l'argent est chez le loueur, qui rembourse depuis
-    // Stripe — la facture, elle, ne revit pas.
-    if (invoice.status === 'paid' || invoice.status === 'cancelled') {
+    // écrire. Annulée ou entièrement avoirée (#877) : l'argent est chez le
+    // loueur, qui rembourse depuis Stripe — la facture, elle, ne revit pas.
+    if (
+      invoice.status === 'paid' ||
+      invoice.status === 'cancelled' ||
+      invoice.status === 'credited'
+    ) {
       logger.warn(
         { invoiceId, status: invoice.status, sessionId: session.id },
         'Online payment received for an invoice that is not payable'

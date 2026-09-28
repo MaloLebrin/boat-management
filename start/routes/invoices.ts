@@ -41,6 +41,13 @@ router
         router
           .post('invoices/:id/payment-link', [controllers.Invoices, 'createPaymentLink'])
           .as('invoices.paymentLink')
+        // Avoirs (#877) : une facture émise ne se corrige pas, elle s'avoire.
+        router
+          .get('invoices/:id/credit-note', [controllers.CreditNotes, 'create'])
+          .as('invoices.creditNotes.create')
+        router
+          .post('invoices/:id/credit-notes', [controllers.CreditNotes, 'store'])
+          .as('invoices.creditNotes.store')
         // Facture émise : seule écriture encore permise (#717).
         router
           .patch('invoices/:id/payment', [controllers.Invoices, 'updatePayment'])

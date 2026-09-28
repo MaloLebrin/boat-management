@@ -56,3 +56,15 @@ export const updateInvoicePaymentValidator = vine.compile(
     paymentMethod: vine.enum(INVOICE_PAYMENT_METHODS).nullable().optional(),
   })
 )
+
+/**
+ * Émission d'un avoir (#877) : un motif, et les lignes à créditer. Sans
+ * lignes, avoir total — les lignes de la facture en miroir. Le taux de TVA,
+ * le client et la devise viennent de la facture, jamais du formulaire.
+ */
+export const createCreditNoteValidator = vine.compile(
+  vine.object({
+    reason: vine.string().trim().minLength(1).maxLength(1000),
+    lines: vine.array(invoiceLineSchema).minLength(1).optional(),
+  })
+)
