@@ -14,6 +14,7 @@ Références: `app/models/boat_maintenance_event.ts`, `app/models/boat_maintenan
 
 - `boat_maintenance_events`
   - `boat_id`
+  - `organization_id` (NOT NULL, FK `organizations`, indexée) — dénormalisé depuis le bateau à l'écriture (#855)
   - `subject`: une des 10 valeurs de `MAINTENANCE_SUBJECTS` (`boat | hull | engine | sail | rig | electrical | plumbing | safety | deck | other`), source unique dans `shared/constants/maintenance/maintenance_subjects.ts`
   - `performed_at` (date)
   - `title`, `notes`

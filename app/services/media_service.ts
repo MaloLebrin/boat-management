@@ -71,6 +71,7 @@ export default class MediaService {
     const media = await Media.create({
       entityType: payload.entityType,
       entityId: payload.entityId,
+      organizationId: org?.id ?? user.organizationId,
       kind: payload.kind,
       cloudinaryPublicId: uploaded.publicId,
       secureUrl: uploaded.secureUrl,
@@ -140,6 +141,7 @@ export default class MediaService {
     const media = await Media.create({
       entityType: payload.entityType,
       entityId: payload.entityId,
+      organizationId: org.id,
       kind: 'document',
       cloudinaryPublicId: uploaded.publicId,
       secureUrl: uploaded.secureUrl,
@@ -283,6 +285,7 @@ export default class MediaService {
         {
           entityType: 'user',
           entityId: user.id,
+          organizationId: user.organizationId,
           kind: 'photo',
           cloudinaryPublicId: uploaded.publicId,
           secureUrl: uploaded.secureUrl,

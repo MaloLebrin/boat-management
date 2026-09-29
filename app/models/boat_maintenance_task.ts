@@ -6,10 +6,16 @@ import BoatRig from '#models/boat_rig'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
 import User from '#models/user'
-import { belongsTo } from '@adonisjs/lucid/orm'
+import { assignOrganizationFromBoat } from '#models/assign_organization_from_boat'
+import { beforeCreate, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 export default class BoatMaintenanceTask extends BoatMaintenanceTaskSchema {
+  @beforeCreate()
+  static async fillOrganizationId(row: BoatMaintenanceTask) {
+    await assignOrganizationFromBoat(row)
+  }
+
   @belongsTo(() => Boat)
   declare boat: BelongsTo<typeof Boat>
 

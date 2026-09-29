@@ -833,6 +833,7 @@ export class BoatMaintenanceEventSchema extends BaseModel {
     'engineCaption',
     'id',
     'notes',
+    'organizationId',
     'performedAt',
     'sailCaption',
     'subject',
@@ -860,6 +861,8 @@ export class BoatMaintenanceEventSchema extends BaseModel {
   declare id: number
   @column()
   declare notes: string | null
+  @column()
+  declare organizationId: number
   @column.date()
   declare performedAt: DateTime
   @column()
@@ -994,6 +997,7 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
     'id',
     'lastDoneEngineHours',
     'notes',
+    'organizationId',
     'postponedCount',
     'providerName',
     'recurrenceIntervalEngineHours',
@@ -1046,6 +1050,8 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare lastDoneEngineHours: number | null
   @column()
   declare notes: string | null
+  @column()
+  declare organizationId: number
   @column()
   declare postponedCount: number
   @column()
@@ -2308,6 +2314,7 @@ export class MediaSchema extends BaseModel {
     'id',
     'kind',
     'originalFilename',
+    'organizationId',
     'position',
     'secureUrl',
     'updatedAt',
@@ -2337,6 +2344,8 @@ export class MediaSchema extends BaseModel {
   declare kind: string
   @column()
   declare originalFilename: string
+  @column()
+  declare organizationId: number | null
   @column()
   declare position: number
   @column()

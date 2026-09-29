@@ -27,6 +27,7 @@ test.group('importMaintenanceRows (integration)', () => {
     await event.load('parts')
 
     assert.equal(event.parts[0]!.name, 'Coût total')
+    assert.equal(event.organizationId, boat.organizationId)
   })
 
   test('nomme la pièce de coût selon la locale anglaise', async ({ assert }) => {
