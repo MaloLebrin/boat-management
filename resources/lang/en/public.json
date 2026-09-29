@@ -42,5 +42,109 @@
     "fleet": "Planning & fleet",
     "aiAssistant": "AI assistant",
     "help": "Help & support"
+  },
+  "booking": {
+    "poweredBy": "Online booking powered by FleetAi",
+    "submitted": "Your request has been sent. {orgName} will get back to you by email to confirm it — an acknowledgement is on its way.",
+    "fleet": {
+      "title": "Book with {orgName}",
+      "heading": "Book a boat with {orgName}",
+      "intro": "Pick a boat to see its availability and send a booking request.",
+      "emptyTitle": "No boat bookable online",
+      "emptyDescription": "This company hasn't opened any boat to online booking yet. Please contact them directly."
+    },
+    "show": {
+      "title": "{boatName} — {orgName}",
+      "heading": "Your dates"
+    },
+    "boat": {
+      "maxPersons": "{count, plural, one {# person} other {# people}}",
+      "fromPrice": "From {price} / day",
+      "photo": "Photo {index}"
+    },
+    "pricing": {
+      "title": "Rates",
+      "daily": "Per day",
+      "weekly": "Per week",
+      "securityDeposit": "Security deposit",
+      "minDays": "Minimum rental",
+      "nights": "{count, plural, one {# day} other {# days}}",
+      "seasons": "Rates vary by season: the quote alongside takes your dates into account."
+    },
+    "calendar": {
+      "previous": "Previous month",
+      "next": "Next month",
+      "legendFree": "Available",
+      "legendBusy": "Unavailable",
+      "legendSelected": "Your selection"
+    },
+    "quote": {
+      "arrival": "Arrival",
+      "departure": "Departure",
+      "pickArrival": "Pick your arrival date in the calendar.",
+      "pickDeparture": "Pick your departure",
+      "loading": "Calculating the quote…",
+      "unavailable": "These dates are no longer available. Please pick others.",
+      "invalid": "These dates can't be booked online.",
+      "onRequest": "Price on request: the company will give you its price when confirming.",
+      "belowMin": "This boat is rented for at least {count, plural, one {# day} other {# days}}.",
+      "aboveMax": "This boat is rented for at most {count, plural, one {# day} other {# days}}.",
+      "base": "Base rate",
+      "weekly": "Weekly rate",
+      "total": "Estimated total ({count, plural, one {# day} other {# days}})",
+      "advance": "{percent}% down payment on confirmation: {amount}",
+      "securityDeposit": "Security deposit at check-in: {amount}",
+      "disclaimer": "Indicative estimate: the final price is the one the company confirms."
+    },
+    "form": {
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message to the company",
+      "messagePlaceholder": "Number of guests, sailing experience, questions…",
+      "honeypot": "Leave this field empty",
+      "consent": "I agree that {orgName} uses this information to handle my request. It is deleted within {days} days if the booking doesn't go ahead.",
+      "datesError": "The selected dates aren't valid. Please pick them again in the calendar.",
+      "submit": "Send my request",
+      "pickDates": "Pick your dates",
+      "noCommitment": "No commitment, no payment: the company confirms your request before anything is booked."
+    },
+    "emails": {
+      "labels": {
+        "boat": "Boat",
+        "arrival": "Arrival",
+        "departure": "Departure",
+        "estimate": "Estimate",
+        "name": "Name",
+        "email": "Email",
+        "phone": "Phone"
+      },
+      "footer": "This email is sent by {orgName} following your online booking request.",
+      "footerStaff": "Request received through the online booking page of {boatName}. Without an answer within 30 days, it is deleted.",
+      "alert": {
+        "subject": "Booking request: {boatName} — {clientName}",
+        "heading": "New request for {boatName}",
+        "intro": "{clientName} requested {boatName} from your online booking page. An option now holds these dates: confirm or decline it, the customer is notified by email.",
+        "cta": "View the request"
+      },
+      "ack": {
+        "subject": "Your booking request — {boatName}",
+        "heading": "Request received, {clientName}",
+        "intro": "Thank you for your request to book {boatName} with {orgName}. The dates are on hold while the company reviews it.",
+        "next": "You'll get an email as soon as it is confirmed, or if it can't be. No payment has been taken."
+      },
+      "confirmed": {
+        "subject": "Booking confirmed — {boatName}",
+        "heading": "Your booking is confirmed",
+        "intro": "Good news, {clientName}: {orgName} confirms your booking of {boatName}.",
+        "next": "{orgName} will contact you about the rental contract and the down payment."
+      },
+      "declined": {
+        "subject": "Your booking request — {boatName}",
+        "heading": "Your request couldn't be confirmed",
+        "intro": "{clientName}, unfortunately {orgName} can't confirm your request for {boatName} on these dates.",
+        "next": "Other dates may suit you: the online calendar shows up-to-date availability. No payment has been taken."
+      }
+    }
   }
 }

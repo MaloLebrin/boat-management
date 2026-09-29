@@ -483,6 +483,10 @@ router
             [controllers.BoatInspections, 'destroyEquipmentAction']
           )
           .as('boats.reservations.inspections.equipmentActions.destroy')
+        // Page publique de réservation du bateau (#881) : ouverture / fermeture.
+        router
+          .patch('boats/:boatId/public-booking', [controllers.BoatPublicBooking, 'update'])
+          .as('boats.publicBooking.update')
         // Synchronisation iCal (#880) : flux exporté du bateau (créer ou
         // régénérer, contenu, révoquer) et calendriers externes importés.
         router

@@ -1216,10 +1216,12 @@ export class BoatReservationSchema extends BaseModel {
     'paidAmount',
     'paymentMethod',
     'paymentStatus',
+    'requestLocale',
     'securityDepositAmount',
     'securityDepositNote',
     'securityDepositRetainedAmount',
     'securityDepositStatus',
+    'source',
     'startsAt',
     'status',
     'totalPrice',
@@ -1262,6 +1264,8 @@ export class BoatReservationSchema extends BaseModel {
   @column()
   declare paymentStatus: string
   @column()
+  declare requestLocale: string | null
+  @column()
   declare securityDepositAmount: string | null
   @column()
   declare securityDepositNote: string | null
@@ -1269,6 +1273,8 @@ export class BoatReservationSchema extends BaseModel {
   declare securityDepositRetainedAmount: string | null
   @column()
   declare securityDepositStatus: string
+  @column()
+  declare source: string
   @column.dateTime()
   declare startsAt: DateTime
   @column()
@@ -1462,6 +1468,8 @@ export class BoatSchema extends BaseModel {
     'navigationCategory',
     'organizationId',
     'propulsionType',
+    'publicBookingEnabled',
+    'publicBookingSlug',
     'registrationNumber',
     'spotId',
     'status',
@@ -1518,6 +1526,10 @@ export class BoatSchema extends BaseModel {
   declare organizationId: number
   @column()
   declare propulsionType: string | null
+  @column()
+  declare publicBookingEnabled: boolean
+  @column()
+  declare publicBookingSlug: string | null
   @column()
   declare registrationNumber: string | null
   @column()

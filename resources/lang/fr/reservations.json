@@ -219,5 +219,17 @@
     },
     "blockTitle": "{calendar} — réservé sur une autre plateforme",
     "blockLegend": "Réservé ailleurs (calendrier importé)"
+  },
+  "publicBooking": {
+    "title": "Réservation en ligne",
+    "intro": "Ouvrez une page publique où vos clients voient les disponibilités de ce bateau et envoient une demande. Chaque demande arrive en option, à confirmer ou refuser ici.",
+    "toggle": "Page ouverte",
+    "copy": "Copier le lien",
+    "copied": "Copié !",
+    "open": "Voir la page",
+    "fleetHint": "Page de toute votre flotte réservable : {url}",
+    "requestsHint": "Les dates occupées (réservations, calendriers importés, entretiens planifiés) sont indisponibles sur la page, sans aucun détail.",
+    "closed": "La page est fermée : son lien répond « introuvable ».",
+    "badge": "Demande en ligne"
   }
 }

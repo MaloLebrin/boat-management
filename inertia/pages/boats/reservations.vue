@@ -7,6 +7,7 @@ import ReservationCalendar from '~/components/reservations/ReservationCalendar.v
 import ReservationForm from '~/components/reservations/ReservationForm.vue'
 import ReservationList from '~/components/reservations/ReservationList.vue'
 import BoatCalendarSyncCard from '~/components/reservations/calendar_sync/BoatCalendarSyncCard.vue'
+import BoatPublicBookingCard from '~/components/reservations/public_booking/BoatPublicBookingCard.vue'
 import BoatAvailabilityBanner from '~/components/boats/show/availability/BoatAvailabilityBanner.vue'
 import type { BoatAvailabilitySummary } from '#shared/types/boat_status'
 import { useT } from '~/composables/use_t'
@@ -15,6 +16,7 @@ import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { ClientOption } from '#shared/types/client'
 import type { BoatReservationRow } from '~/types/reservation'
 import type { BoatCalendarSyncProps, ExternalBlockRow } from '#shared/types/calendar_sync'
+import type { BoatPublicBookingSettings } from '#shared/types/public_booking'
 
 const props = defineProps<{
   boat: { id: number; name: string }
@@ -30,6 +32,8 @@ const props = defineProps<{
   /** Synchronisation iCal (#880) : flux exporté, calendriers importés et leurs créneaux. */
   calendarSync: BoatCalendarSyncProps
   externalBlocks: ExternalBlockRow[]
+  /** Page publique de réservation (#881). */
+  publicBooking: BoatPublicBookingSettings
 }>()
 
 const { t } = useT()
@@ -133,6 +137,8 @@ onMounted(() => {
         :can-force-unavailable="canForceUnavailable && availability.status !== 'sold'"
       />
     </div>
+
+    <BoatPublicBookingCard class="mt-6" :boat-id="boat.id" :settings="publicBooking" />
 
     <BoatCalendarSyncCard class="mt-6" :boat-id="boat.id" :sync="calendarSync" />
 

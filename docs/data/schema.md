@@ -65,6 +65,9 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - armement: `armamentZone` (`basic | coastal | semi_offshore | offshore`, nullable — cf. #582)
 - disponibilité (#870): `status` (`available | in_maintenance | out_of_service | sold`, défaut
   `available`, CHECK, indexé), `statusReason` (text nullable), `statusChangedAt` (timestamptz nullable)
+- réservation en ligne (#881): `publicBookingEnabled` (bool, défaut `false`), `publicBookingSlug`
+  (varchar 80 nullable, unique avec `organizationId`) — segment d'URL de `/book/:orgSlug/:boatSlug`,
+  dérivé du nom à la première ouverture puis figé
 
 `category` ne doit pas être confondue avec `navigationCategory` (catégorie CE A/B/C/D).
 
@@ -532,6 +535,8 @@ Fiches CRM (module `crm_invoicing`).
 - paiement (#875) : `depositAmount` (acompte attendu, nullable), `depositPaidAt`, `balancePaidAt`, `paidAmount` (decimal, défaut 0), `paymentStatus` (`unpaid` | `deposit_paid` | `paid` | `refunded`, CHECK, défaut `unpaid`), `paymentMethod` (`transfer` | `card` | `cash` | `check`, nullable, CHECK)
 - caution (#875) : `securityDepositAmount` (copiée de `boat_pricing.depositAmount` à la confirmation), `securityDepositStatus` (`none` | `held` | `released` | `retained`, CHECK, défaut `none`), `securityDepositRetainedAmount`, `securityDepositNote`
 - `icalSequence` (int, défaut 0) : `SEQUENCE` du `VEVENT` exporté (#880), incrémenté quand les dates, le statut ou le nom du client changent
+- `source` (varchar 20, défaut `internal`) : `internal` (saisie par l'équipe) ou `public` (demande de la page de réservation en ligne, #881) ; index `(source, status, created_at)` pour la purge des demandes non abouties à 30 jours
+- `requestLocale` (varchar 5, nullable) : langue de la demande publique, celle des e-mails envoyés au client (#881)
 - `createdAt`, `updatedAt`
 
 ### boat_inspections

@@ -219,5 +219,17 @@
     },
     "blockTitle": "{calendar} — booked on another platform",
     "blockLegend": "Booked elsewhere (imported calendar)"
+  },
+  "publicBooking": {
+    "title": "Online booking",
+    "intro": "Open a public page where your customers see this boat's availability and send a request. Each request arrives as an option, to confirm or decline here.",
+    "toggle": "Page open",
+    "copy": "Copy link",
+    "copied": "Copied!",
+    "open": "View page",
+    "fleetHint": "Page listing your whole bookable fleet: {url}",
+    "requestsHint": "Busy dates (bookings, imported calendars, planned maintenance) show as unavailable on the page, without any detail.",
+    "closed": "The page is closed: its link answers \"not found\".",
+    "badge": "Online request"
   }
 }

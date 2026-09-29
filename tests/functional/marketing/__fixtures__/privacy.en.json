@@ -58,7 +58,8 @@
           "Messages sent through the contact form: 24 months after we receive them.",
           "Contact details left on the cost simulator: 24 months after your latest simulation.",
           "Estimate sharing links: 6 months after they are created, after which the link stops working.",
-          "Password reset links and unaccepted invitations: one week after they expire."
+          "Password reset links and unaccepted invitations: one week after they expire.",
+          "Booking requests sent from a rental company's online page and never confirmed: 30 days after they are sent."
         ]
       },
       {

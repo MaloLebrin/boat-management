@@ -16,6 +16,8 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   // Argent des locations (#875) : à réclamer avant le départ.
   'reservation.deposit_due',
   'reservation.balance_due',
+  // Demande en ligne d'un client (#881) : un client attend une réponse.
+  'reservation.requested',
   // Facture réglée en ligne par le client (#876) : de l'argent arrivé.
   'invoice.paid_online',
   // Facture passée en retard (#878) : de l'argent qui n'est pas arrivé. Les

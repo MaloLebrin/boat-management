@@ -506,5 +506,14 @@
     "unsafeUrl": "Adresse refusée : seul un flux https public (port 443) peut être importé.",
     "limitReached": "Un bateau accepte au plus {limit} calendriers externes.",
     "conflicts": "{count} créneau(x) importé(s) chevauchent une réservation FleetAi : vérifiez les doubles réservations."
+  },
+  "publicBooking": {
+    "enabled": "La page de réservation en ligne est ouverte.",
+    "disabled": "La page de réservation en ligne est fermée.",
+    "unavailable": "Ces dates ne sont plus disponibles. Choisissez-en d'autres dans le calendrier.",
+    "invalidDates": "Ces dates ne peuvent pas être réservées en ligne. Choisissez une arrivée et un départ dans le calendrier.",
+    "tooShort": "Cette durée est inférieure au minimum de location du bateau.",
+    "tooLong": "Cette durée dépasse le maximum de location du bateau.",
+    "rateLimit": "Trop de demandes envoyées depuis cette connexion. Réessayez dans quelques minutes."
   }
 }

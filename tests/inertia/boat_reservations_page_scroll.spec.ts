@@ -19,6 +19,9 @@ vi.mock('~/components/reservations/ReservationList.vue', () => ({
 vi.mock('~/components/reservations/calendar_sync/BoatCalendarSyncCard.vue', () => ({
   default: { template: '<div />' },
 }))
+vi.mock('~/components/reservations/public_booking/BoatPublicBookingCard.vue', () => ({
+  default: { template: '<div />' },
+}))
 
 import BoatReservations from '../../inertia/pages/boats/reservations.vue'
 
@@ -33,6 +36,7 @@ const baseProps = {
   canForceUnavailable: false,
   calendarSync: { feed: null, externalCalendars: [], canManage: false },
   externalBlocks: [],
+  publicBooking: { enabled: false, url: null, fleetUrl: '/book/acme', canManage: true },
 }
 
 let scrollIntoView: ReturnType<typeof vi.fn>

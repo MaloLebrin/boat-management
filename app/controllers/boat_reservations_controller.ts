@@ -20,6 +20,7 @@ import InvoiceService from '#services/invoice_service'
 import QuotaService from '#services/quota_service'
 import CalendarFeedService from '#services/calendar_feed_service'
 import ExternalCalendarService from '#services/external_calendar_service'
+import PublicBookingService from '#services/public_booking_service'
 import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import BoatPolicy from '#policies/boat_policy'
 import InvoicePolicy from '#policies/invoice_policy'
@@ -47,7 +48,8 @@ export default class BoatReservationsController {
     private availabilityService: BoatAvailabilityService,
     private auditLogService: AuditLogService,
     private calendarFeedService: CalendarFeedService,
-    private externalCalendarService: ExternalCalendarService
+    private externalCalendarService: ExternalCalendarService,
+    private publicBookingService: PublicBookingService
   ) {}
 
   /**
@@ -190,6 +192,8 @@ export default class BoatReservationsController {
         canManage,
       },
       externalBlocks,
+      // Page publique de réservation (#881) : ouverte ou non, et son adresse.
+      publicBooking: this.publicBookingService.settingsFor(user.organization!, boat, canManage),
     })
   }
 

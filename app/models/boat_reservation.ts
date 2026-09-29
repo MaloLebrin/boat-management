@@ -6,6 +6,7 @@ import Organization from '#models/organization'
 import type {
   ReservationPaymentMethod,
   ReservationPaymentStatus,
+  ReservationSource,
   ReservationStatus,
   ReservationType,
   SecurityDepositStatus,
@@ -96,6 +97,15 @@ export default class BoatReservation extends BaseModel {
   // événement que si ce numéro augmente — voir `bumpIcalSequence`.
   @column()
   declare icalSequence: number
+
+  // Origine (#881) : `public` pour une demande du client final depuis la page
+  // de réservation — e-mails au client et purge des demandes non confirmées.
+  @column()
+  declare source: ReservationSource
+
+  /** Langue de la demande publique (#881), celle des e-mails au client. */
+  @column()
+  declare requestLocale: string | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

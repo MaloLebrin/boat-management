@@ -1083,6 +1083,7 @@
     "s6_b2": "Contact details left on the cost simulator: 24 months after your latest simulation.",
     "s6_b3": "Estimate sharing links: 6 months after they are created, after which the link stops working.",
     "s6_b4": "Password reset links and unaccepted invitations: one week after they expire.",
+    "s6_b5": "Booking requests sent from a rental company's online page and never confirmed: 30 days after they are sent.",
     "s7_title": "Security",
     "s7_body": "We implement appropriate technical and organizational measures: password encryption, secure connections (HTTPS), access control and regular backups.",
     "s8_title": "Your rights",

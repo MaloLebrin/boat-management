@@ -21,6 +21,7 @@ export function toBoatReservationRow(
     clientId: reservation.clientId,
     status: reservation.status,
     type: reservation.type,
+    source: reservation.source ?? 'internal',
     startsAt: reservation.startsAt.toISO()!,
     endsAt: reservation.endsAt.toISO()!,
     clientName: reservation.clientName,
