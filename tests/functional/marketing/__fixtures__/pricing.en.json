@@ -310,7 +310,8 @@
               ["Insurance expiry reminders", false, true, true],
               ["PDF / CSV export", false, true, true],
               ["CSV import (history migration)", false, false, true],
-              ["Expense import (CSV / Excel)", false, true, true]
+              ["Expense import (CSV / Excel)", false, true, true],
+              ["Fleet financial reporting (margin, occupancy, cost per boat)", false, true, true]
             ]
           },
           {

@@ -49,6 +49,13 @@ export interface PlanQuotas {
    * (`shared/types/csv.ts`).
    */
   canImportExpenses: boolean
+  /**
+   * Reporting financier de flotte (`/reports`, #887) — dès le plan **Pro**.
+   * Starter voit un aperçu figé de la page, sans données. Capacité de tier
+   * pure : aucun module ne l'accorde (les revenus de location n'y
+   * apparaissent qu'avec le module Location, mais les coûts se lisent sans).
+   */
+  canViewReports: boolean
 }
 
 export interface QuotaUsage {
@@ -98,6 +105,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManagePorts: false,
     canImport: false,
     canImportExpenses: false,
+    canViewReports: false,
   },
   pro: {
     maxBoats: 8,
@@ -117,6 +125,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManagePorts: false,
     canImport: false,
     canImportExpenses: true,
+    canViewReports: true,
   },
   enterprise: {
     maxBoats: null,
@@ -136,6 +145,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canManagePorts: true,
     canImport: true,
     canImportExpenses: true,
+    canViewReports: true,
   },
 }
 

@@ -60,6 +60,7 @@ export type Capability =
   | 'pricing_seasons.create'
   | 'pricing_seasons.update'
   | 'pricing_seasons.delete'
+  | 'reports.view'
   | 'rentalContracts.view'
   | 'rentalContracts.create'
   | 'rentalContracts.edit'
@@ -108,6 +109,10 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'ports.delete',
   'pricing_seasons.delete',
   'rentalContracts.delete',
+  // Reporting financier de flotte (#887) : marge, revenus et coûts de toute
+  // la flotte — même périmètre que la carte « Dépenses » du tableau de bord,
+  // réservée à l'admin (#832). Les membres gardent le budget par bateau.
+  'reports.view',
   'simulator.manage_leads',
   'spots.delete',
   'subscription.manage',

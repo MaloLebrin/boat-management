@@ -235,6 +235,18 @@ la nav est masquée via `effectiveQuotas.canManagePorts` ; la carte ports du das
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
 
+### Reporting (`/reports`, #887)
+
+- Page : `inertia/pages/reports/index.vue` (GET `/reports?period=&from=&to=&boat=`), entrée « Reporting » de la section Business de la nav (`reports.view`, icône `chart`), quel que soit le plan.
+- Composants `inertia/components/reports/` :
+  - `ReportFilters.vue` — période (préréglage → rechargement immédiat ; « Personnalisée » → deux dates + « Appliquer »), bateau, export CSV (`external-href`, mêmes paramètres)
+  - `ReportKpiGrid.vue` — `BaseStatCard` : coûts, revenus, marge, occupation, coût/jour loué (module Location), encaissé (module Facturation), coût/heure moteur, coût/mille, entretien prévu ; variation vs période précédente
+  - `ReportCostChart.vue` (barres empilées par poste et par mois), `ReportRevenueCostChart.vue` (revenus vs coûts par bateau), `ReportOccupancyChart.vue` (ligne), `ReportTopCosts.vue` (postes triés), habillés par `ReportChartCard.vue`
+  - `ReportBoatTable.vue` — une ligne par bateau (lien vers son budget) + total flotte, marge négative en `text-danger`
+  - `ReportLockedPreview.vue` — Starter : silhouettes floutées, aucune donnée, `UpgradePlanModal` (`feature: 'reports'`)
+- Couleurs des graphiques : `use_chart_palette.ts` lit les tokens CSS (`--color-amber-600`, `--color-success`…) et se recalcule quand `data-theme` bascule — aucune couleur en dur.
+- Props : `ReportsPageProps` (`shared/types/reporting.ts`). Source : `ReportsController.index`.
+
 ### Diagnostic de panne (#515, #516, #576)
 
 - Pages (GET `/diagnostic`, `/boats/:boatId/engines/:engineId/diagnostic[/sheets/:sheetSlug]`) :

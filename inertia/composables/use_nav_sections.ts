@@ -103,6 +103,12 @@ export function useNavSections() {
       })
     }
 
+    // Reporting financier (#887) : visible par l'admin quel que soit le plan —
+    // en Starter la page montre un aperçu figé et l'invitation à passer Pro.
+    if (can('reports.view')) {
+      businessItems.push({ name: t('nav.reports'), path: '/reports', route: null, icon: 'chart' })
+    }
+
     if (canManagePricing.value && can('pricing_seasons.create')) {
       businessItems.push({
         name: t('nav.pricingSeasons'),

@@ -959,6 +959,7 @@ export default class MarketingContentService {
                 this.pricingTable.flagRow(t, 'table_g5_r4', 'canExport'),
                 this.pricingTable.flagRow(t, 'table_g5_r5', 'canImport'),
                 this.pricingTable.flagRow(t, 'table_g5_r6', 'canImportExpenses'),
+                this.pricingTable.flagRow(t, 'table_g5_r7', 'canViewReports'),
               ] as PricingTableRow[],
             },
             {

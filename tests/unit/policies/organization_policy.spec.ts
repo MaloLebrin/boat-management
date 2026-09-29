@@ -55,6 +55,14 @@ testPolicyMatrix('OrganizationPolicy (unit)', () => new OrganizationPolicy(), [
     allowedRoles: ['admin', 'member'],
     deniedRoles: ['mechanic', 'boat_owner'],
   },
+  // Reporting financier de flotte (#887) : marge et revenus de toute la
+  // flotte, même périmètre que la carte « Dépenses » réservée à l'admin.
+  {
+    name: 'viewReports',
+    capability: 'reports.view',
+    allowedRoles: ['admin'],
+    deniedRoles: ['member', 'mechanic', 'boat_owner'],
+  },
   // Facturation : personne d'autre que l'admin ne change le plan.
   {
     name: 'manageBilling',

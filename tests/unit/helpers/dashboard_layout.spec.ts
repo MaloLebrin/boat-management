@@ -67,7 +67,13 @@ test.group('resolveDashboardLayout', () => {
           main: [...DEFAULT_DASHBOARD_ORDER.main],
           side: ['fuel', 'ai_panel', 'spend', 'ports', 'planned_tasks', 'notifications'],
         },
-        hidden: ['safety_compliance', 'low_stock', 'invoicing', 'charter_occupancy'],
+        hidden: [
+          'safety_compliance',
+          'low_stock',
+          'invoicing',
+          'charter_occupancy',
+          'fleet_margin',
+        ],
       }),
       ALL_WIDGETS_AVAILABLE
     )

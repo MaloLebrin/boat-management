@@ -13,6 +13,7 @@ import BoatSafetyComplianceService from '#services/boat_safety_compliance_servic
 import BudgetService from '#services/budget_service'
 import ClientService from '#services/client_service'
 import DashboardService from '#services/dashboard_service'
+import FleetReportingService from '#services/fleet_reporting_service'
 import InvoiceService from '#services/invoice_service'
 import NavigationService from '#services/navigation_service'
 import OrganizationModuleService from '#services/organization_module_service'
@@ -114,7 +115,8 @@ export default class AssistantToolsService {
     private reservationService: BoatReservationService,
     private safetyComplianceService: BoatSafetyComplianceService,
     private subscriptionService: SubscriptionService,
-    private availabilityService: BoatAvailabilityService
+    private availabilityService: BoatAvailabilityService,
+    private reportingService: FleetReportingService
   ) {}
 
   /** Outils proposés au modèle pour cet utilisateur (rôle + plan). */
@@ -410,6 +412,49 @@ export default class AssistantToolsService {
             boats: dashboard.boats.slice(0, 20),
             urgentMaintenance: dashboard.urgentMaintenance.slice(0, 10),
             portStats: dashboard.portStats,
+          }
+        },
+      },
+      {
+        name: 'fleet_financial_report',
+        description:
+          'Fleet financial report (#887) for a period: costs by category, rental revenue (confirmed reservations pro-rated to the period), margin, occupancy, cost per engine hour, per rental day and per nautical mile — fleet totals and one row per boat sorted by total cost. Use it for "which boat costs me the most", "what is my margin", "cost per mile".',
+        parameters: {
+          type: 'object',
+          properties: {
+            period: {
+              type: 'string',
+              enum: ['month', 'quarter', 'year', 'rolling12'],
+              description: 'Current month, quarter, calendar year, or last 12 months (default)',
+            },
+            boatId: { type: 'number', description: 'Restrict to one boat' },
+          },
+        },
+        capability: 'reports.view',
+        planFlags: ['canViewReports'],
+        execute: async (user, args) => {
+          if (user.organizationId === null) return { error: 'No organization' }
+          const preset =
+            toEnum(args.period, ['month', 'quarter', 'year', 'rolling12'] as const) ?? 'rolling12'
+          const boats = await this.boatListService.listNamesForOrg(user)
+          const report = await this.reportingService.getReport(user.organizationId, boats, {
+            preset,
+            boatId: toInt(args.boatId),
+          })
+          return {
+            period: report.period,
+            totals: report.totals,
+            boats: report.boats.slice(0, 15).map((row) => ({
+              boatId: row.boatId,
+              boatName: row.boatName,
+              costs: row.costs.total,
+              rentalRevenue: row.rentalRevenue,
+              margin: row.margin,
+              occupancyRate: row.occupancyRate,
+              costPerEngineHour: row.costPerEngineHour,
+              costPerRentalDay: row.costPerRentalDay,
+              costPerNauticalMile: row.costPerNauticalMile,
+            })),
           }
         },
       },

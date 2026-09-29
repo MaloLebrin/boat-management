@@ -91,6 +91,7 @@ export const controllers = {
   PublicPartSearch: () => import('#controllers/public_part_search_controller'),
   PushSubscriptions: () => import('#controllers/push_subscriptions_controller'),
   RentalContracts: () => import('#controllers/rental_contracts_controller'),
+  Reports: () => import('#controllers/reports_controller'),
   ReservationPayments: () => import('#controllers/reservation_payments_controller'),
   Reservations: () => import('#controllers/reservations_controller'),
   Session: () => import('#controllers/session_controller'),

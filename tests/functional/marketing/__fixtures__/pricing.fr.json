@@ -310,7 +310,13 @@
               ["Rappels expiration assurances", false, true, true],
               ["Export PDF / CSV", false, true, true],
               ["Import CSV (reprise d'historique)", false, false, true],
-              ["Import de dépenses (CSV / Excel)", false, true, true]
+              ["Import de dépenses (CSV / Excel)", false, true, true],
+              [
+                "Reporting financier de flotte (marge, occupation, coût par bateau)",
+                false,
+                true,
+                true
+              ]
             ]
           },
           {

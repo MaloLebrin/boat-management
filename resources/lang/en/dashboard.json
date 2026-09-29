@@ -205,7 +205,8 @@
     "fuel": "Fuel",
     "low_stock": "Missing parts",
     "invoicing": "Invoicing",
-    "charter_occupancy": "Charter occupancy"
+    "charter_occupancy": "Charter occupancy",
+    "fleet_margin": "Monthly margin"
   },
   "widgetDescriptions": {
     "kpis": "Boats, trips and tasks over 30 days, open incidents.",
@@ -223,7 +224,8 @@
     "fuel": "Litres, cost and average price of fill-ups over 30 days.",
     "low_stock": "Engine parts below their alert threshold or to replace, fleet-wide.",
     "invoicing": "Outstanding, overdue, collected this month and pending quotes (Invoicing module).",
-    "charter_occupancy": "Confirmed occupancy rate over 30 days, options and revenue (Charter module)."
+    "charter_occupancy": "Confirmed occupancy rate over 30 days, options and revenue (Charter module).",
+    "fleet_margin": "Rental revenue, costs and margin this month, and the most expensive boat (Reporting)."
   },
   "plannedTasks": {
     "title": "Planned tasks",
@@ -304,5 +306,15 @@
     "confirmed": "Confirmed",
     "options": "Options",
     "revenue": "Confirmed revenue"
+  },
+  "fleetMargin": {
+    "title": "Monthly margin",
+    "viewAll": "Reporting",
+    "margin": "Margin",
+    "revenue": "Rental revenue",
+    "costs": "Costs",
+    "previous": "Previous month: {amount}",
+    "topBoat": "Most expensive: {name} ({amount})",
+    "empty": "No costs or revenue this month."
   }
 }

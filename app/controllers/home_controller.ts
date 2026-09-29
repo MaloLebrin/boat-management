@@ -7,6 +7,7 @@ import DashboardAttentionService from '#services/dashboard_attention_service'
 import DashboardFleetActivityService from '#services/dashboard_fleet_activity_service'
 import DashboardLayoutService from '#services/dashboard_layout_service'
 import DashboardService from '#services/dashboard_service'
+import FleetReportingService from '#services/fleet_reporting_service'
 import InvoiceService from '#services/invoice_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
@@ -35,7 +36,8 @@ export default class HomeController {
     private budgetService: BudgetService,
     private layoutService: DashboardLayoutService,
     private invoiceService: InvoiceService,
-    private enginePartService: BoatEnginePartService
+    private enginePartService: BoatEnginePartService,
+    private reportingService: FleetReportingService
   ) {}
 
   async index({ inertia, auth, request, response, i18n }: HttpContext) {
@@ -208,6 +210,14 @@ export default class HomeController {
             charterOccupancy: inertia.defer(
               deferJson(() => this.reservationService.getOccupancyForOrg(user, boatIds.length)),
               'charterOccupancy'
+            ),
+          }
+        : {}),
+      ...(visible.has('fleet_margin')
+        ? {
+            fleetMargin: inertia.defer(
+              deferJson(() => this.reportingService.getMonthMarginForUser(user)),
+              'fleetMargin'
             ),
           }
         : {}),

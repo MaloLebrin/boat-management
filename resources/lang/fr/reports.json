@@ -1,0 +1,90 @@
+{
+  "title": "Reporting",
+  "subtitle": "Ce que chaque bateau vous rapporte et vous coûte",
+  "filters": {
+    "period": "Période",
+    "boat": "Bateau",
+    "allBoats": "Toute la flotte",
+    "from": "Du",
+    "to": "Au",
+    "apply": "Appliquer",
+    "export": "Exporter CSV"
+  },
+  "presets": {
+    "month": "Mois en cours",
+    "quarter": "Trimestre en cours",
+    "year": "Année en cours",
+    "rolling12": "12 derniers mois",
+    "custom": "Personnalisée"
+  },
+  "periodRange": "Du {from} au {to}",
+  "kpi": {
+    "costs": "Coûts",
+    "rentalRevenue": "Revenus de location",
+    "margin": "Marge",
+    "occupancy": "Taux d'occupation",
+    "invoicedPaid": "Encaissé (factures)",
+    "costPerRentalDay": "Coût par jour loué",
+    "costPerEngineHour": "Coût par heure moteur",
+    "costPerNauticalMile": "Coût par mille",
+    "plannedMaintenance": "Entretien prévu ce trimestre",
+    "delta": "{delta} % vs période précédente",
+    "noDelta": "Pas de base de comparaison",
+    "rentalDays": "{days} jours-bateau loués",
+    "unestimated": "{count} tâche(s) sans estimation"
+  },
+  "charts": {
+    "costsTitle": "Dépenses par poste et par mois",
+    "revenueVsCostsTitle": "Revenus et coûts par bateau",
+    "occupancyTitle": "Occupation par mois",
+    "topCostsTitle": "Principaux postes de coût",
+    "revenue": "Revenus de location",
+    "costs": "Coûts",
+    "occupancy": "Occupation (%)",
+    "noData": "Aucune donnée sur cette période."
+  },
+  "table": {
+    "title": "Détail par bateau",
+    "boat": "Bateau",
+    "costs": "Coûts",
+    "revenue": "Revenus",
+    "margin": "Marge",
+    "occupancy": "Occupation",
+    "engineHours": "Heures moteur",
+    "costPerEngineHour": "€ / h moteur",
+    "costPerRentalDay": "€ / jour loué",
+    "invoicedPaid": "Encaissé",
+    "fleetTotal": "Total flotte",
+    "empty": "Aucun bateau dans la flotte."
+  },
+  "notes": {
+    "revenue": "Revenus : réservations confirmées, au prorata des jours loués dans la période. Coûts : mêmes postes que le budget de chaque bateau. Les factures encaissées sont indiquées à part et n'entrent pas dans la marge.",
+    "noCharter": "Les revenus de location et l'occupation s'affichent avec le module Location."
+  },
+  "locked": {
+    "title": "Le reporting financier est inclus dès le plan Pro",
+    "body": "Comparez revenus de location et coûts d'entretien bateau par bateau, suivez l'occupation et la marge de votre flotte, et exportez le détail en CSV.",
+    "cta": "Voir les plans"
+  },
+  "csv": {
+    "boat": "bateau",
+    "maintenance": "maintenance",
+    "fuel": "carburant",
+    "documents": "documents",
+    "port": "port",
+    "equipment": "equipements",
+    "entries": "depenses_libres",
+    "costTotal": "couts_total",
+    "rentalRevenue": "revenus_location",
+    "invoicedPaid": "encaisse_factures",
+    "margin": "marge",
+    "rentalDays": "jours_loues",
+    "occupancyRate": "occupation_pct",
+    "engineHours": "heures_moteur",
+    "distanceNm": "milles",
+    "costPerEngineHour": "cout_par_heure_moteur",
+    "costPerRentalDay": "cout_par_jour_loue",
+    "costPerNauticalMile": "cout_par_mille",
+    "fleetTotal": "TOTAL FLOTTE"
+  }
+}

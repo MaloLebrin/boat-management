@@ -1,0 +1,90 @@
+{
+  "title": "Reporting",
+  "subtitle": "What each boat earns and costs you",
+  "filters": {
+    "period": "Period",
+    "boat": "Boat",
+    "allBoats": "Whole fleet",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply",
+    "export": "Export CSV"
+  },
+  "presets": {
+    "month": "This month",
+    "quarter": "This quarter",
+    "year": "This year",
+    "rolling12": "Last 12 months",
+    "custom": "Custom"
+  },
+  "periodRange": "From {from} to {to}",
+  "kpi": {
+    "costs": "Costs",
+    "rentalRevenue": "Rental revenue",
+    "margin": "Margin",
+    "occupancy": "Occupancy rate",
+    "invoicedPaid": "Collected (invoices)",
+    "costPerRentalDay": "Cost per rental day",
+    "costPerEngineHour": "Cost per engine hour",
+    "costPerNauticalMile": "Cost per nautical mile",
+    "plannedMaintenance": "Planned maintenance this quarter",
+    "delta": "{delta}% vs previous period",
+    "noDelta": "No baseline to compare",
+    "rentalDays": "{days} boat-days rented",
+    "unestimated": "{count} task(s) without estimate"
+  },
+  "charts": {
+    "costsTitle": "Expenses by category and month",
+    "revenueVsCostsTitle": "Revenue and costs per boat",
+    "occupancyTitle": "Occupancy by month",
+    "topCostsTitle": "Top cost categories",
+    "revenue": "Rental revenue",
+    "costs": "Costs",
+    "occupancy": "Occupancy (%)",
+    "noData": "No data for this period."
+  },
+  "table": {
+    "title": "Breakdown by boat",
+    "boat": "Boat",
+    "costs": "Costs",
+    "revenue": "Revenue",
+    "margin": "Margin",
+    "occupancy": "Occupancy",
+    "engineHours": "Engine hours",
+    "costPerEngineHour": "€ / engine h",
+    "costPerRentalDay": "€ / rental day",
+    "invoicedPaid": "Collected",
+    "fleetTotal": "Fleet total",
+    "empty": "No boats in the fleet."
+  },
+  "notes": {
+    "revenue": "Revenue: confirmed reservations, pro-rated to the days rented within the period. Costs: the same categories as each boat's budget. Paid invoices are shown separately and are not part of the margin.",
+    "noCharter": "Rental revenue and occupancy appear with the Charter module."
+  },
+  "locked": {
+    "title": "Financial reporting is included from the Pro plan",
+    "body": "Compare rental revenue with upkeep costs boat by boat, track your fleet's occupancy and margin, and export the breakdown as CSV.",
+    "cta": "See plans"
+  },
+  "csv": {
+    "boat": "boat",
+    "maintenance": "maintenance",
+    "fuel": "fuel",
+    "documents": "documents",
+    "port": "port",
+    "equipment": "equipment",
+    "entries": "other_expenses",
+    "costTotal": "total_costs",
+    "rentalRevenue": "rental_revenue",
+    "invoicedPaid": "collected_invoices",
+    "margin": "margin",
+    "rentalDays": "rental_days",
+    "occupancyRate": "occupancy_pct",
+    "engineHours": "engine_hours",
+    "distanceNm": "nautical_miles",
+    "costPerEngineHour": "cost_per_engine_hour",
+    "costPerRentalDay": "cost_per_rental_day",
+    "costPerNauticalMile": "cost_per_nautical_mile",
+    "fleetTotal": "FLEET TOTAL"
+  }
+}

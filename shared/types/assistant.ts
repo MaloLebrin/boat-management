@@ -144,6 +144,11 @@ export const ASSISTANT_NAV_TARGETS = {
     i18nKey: 'assistant.navTargets.invoices',
     promptLabel: { fr: 'Factures et devis', en: 'Invoices and quotes' },
   },
+  'reports.index': {
+    path: '/reports',
+    i18nKey: 'assistant.navTargets.reports',
+    promptLabel: { fr: 'Reporting financier de flotte', en: 'Fleet financial reporting' },
+  },
   'crew.index': {
     path: '/crew',
     i18nKey: 'assistant.navTargets.crew',

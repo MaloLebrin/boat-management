@@ -151,6 +151,20 @@ defineProps<{ name: string }>()
     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10h4" />
   </svg>
   <svg
+    v-else-if="name === 'chart'"
+    class="w-5 h-5 shrink-0"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M4 20h16M7 16v-5m5 5V8m5 8v-9"
+    />
+  </svg>
+  <svg
     v-else-if="name === 'calendar-check'"
     class="w-5 h-5 shrink-0"
     fill="none"

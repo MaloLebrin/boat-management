@@ -136,6 +136,12 @@ export default class QuotaService {
     }
   }
 
+  /** Reporting financier de flotte (#887) — capacité de tier pure, dès Pro. */
+  canViewReports(org: Organization | null): boolean {
+    this.#assertOrganization(org)
+    return PLAN_LIMITS[org.plan].canViewReports
+  }
+
   // Les capacités clients/pricing/invoices peuvent venir du tier OU d'un
   // module add-on (épic #327) : elles passent par les quotas effectifs.
   // Les autres checks restent tier-only tant qu'aucun module ne les accorde.
