@@ -85,6 +85,31 @@ test.group('Boats — bateau invisible (functional)', (group) => {
     assert.equal(boat.name, nameBefore)
   })
 
+  test('POST /boats/:id/owners redirige vers la liste', async ({ client }) => {
+    const { intruder, boat } = await foreignBoat()
+
+    const response = await client
+      .post(`/boats/${boat.id}/owners`)
+      .json({ userId: intruder.id })
+      .loginAs(intruder)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/boats')
+  })
+
+  test('DELETE /boats/:id/owners/:userId redirige vers la liste', async ({ client }) => {
+    const { intruder, boat } = await foreignBoat()
+
+    const response = await client
+      .delete(`/boats/${boat.id}/owners/${intruder.id}`)
+      .loginAs(intruder)
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/boats')
+  })
+
   test('un utilisateur sans organisation ne voit aucun bateau', async ({ client }) => {
     const owner = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: owner.organizationId! }).create()

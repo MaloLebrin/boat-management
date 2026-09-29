@@ -16,6 +16,10 @@ export default class Media extends BaseModel {
   @column()
   declare entityId: number
 
+  /** Dénormalisé depuis l'entité parente (#855). Nul pour un avatar sans organisation. */
+  @column()
+  declare organizationId: number | null
+
   @column()
   declare kind: MediaKind
 

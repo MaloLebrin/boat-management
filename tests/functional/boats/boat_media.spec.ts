@@ -183,6 +183,7 @@ test.group('Boat Media — POST photos (functional)', (group) => {
       const medias = await Media.query().where('entityType', 'boat').where('entityId', boat.id)
       assert.lengthOf(medias, 1)
       assert.equal(medias[0].kind, 'photo')
+      assert.equal(medias[0].organizationId, user.organizationId)
       assert.lengthOf(fake.uploaded, 1)
     } finally {
       restoreCloudinary()

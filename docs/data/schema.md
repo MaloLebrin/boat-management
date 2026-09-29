@@ -265,6 +265,7 @@ plomberie).
 ### boat_maintenance_events (historique)
 
 - `id`, `boatId`
+- `organizationId` (NOT NULL, FK, indexé) — dénormalisé depuis le bateau (#855)
 - `subject`: `boat | engine | sail | rig`
 - `performedAt`
 - `title`, `notes`
@@ -282,6 +283,7 @@ plomberie).
 ### boat_maintenance_tasks (planifié)
 
 - `id`, `boatId`
+- `organizationId` (NOT NULL, FK, indexé) — dénormalisé depuis le bateau (#855)
 - `subject`: `boat | engine | sail | rig`
 - `status`: `open | done`
 - cibles optionnelles:
@@ -359,6 +361,12 @@ Papiers d'un bateau (assurance, francisation, permis…) — onglet « Documents
 - `mediaId` (FK `media` nullable, SET NULL) — le PDF joint
 - index composite `(organization_id, expires_at)` (`boat_documents_org_expires_idx`, #832) pour les documents à échéance du tableau de bord
 - `createdAt`, `updatedAt`
+
+### media
+
+Fichiers Cloudinary polymorphes (`entity_type`, `entity_id`).
+
+- `organizationId` (nullable, FK, indexé) — dénormalisé depuis l'entité pointée (#855). Reste nul si l'entité n'a pas d'organisation (avatar d'un compte sans org).
 
 ### boat_port_stays
 

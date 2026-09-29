@@ -199,6 +199,7 @@ export default class BoatMaintenanceService {
       const event = await BoatMaintenanceEvent.create(
         {
           boatId: boat.id,
+          organizationId: boat.organizationId,
           subject: payload.subject,
           boatEngineId,
           boatSailId,

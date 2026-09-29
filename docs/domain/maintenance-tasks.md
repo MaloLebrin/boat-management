@@ -13,6 +13,7 @@ Planifier de la maintenance à faire (“open tasks”), puis:
 Référence: `database/schema.ts` (`BoatMaintenanceTaskSchema`).
 Champs clés:
 
+- `organization_id` (NOT NULL, FK `organizations`, indexée) — dénormalisé depuis le bateau à l'écriture et recopié sur l'occurrence suivante (#855)
 - `status`: `open | done`
 - `due_at` (date) et/ou `due_engine_hours` (int)
 - `done_at` (date), `done_engine_hours` (int) pour les tasks engine-hours

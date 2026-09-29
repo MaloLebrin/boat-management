@@ -11,6 +11,7 @@ import type {
   ParsedTable,
 } from '#shared/types/csv'
 import { MAINTENANCE_CSV_HEADERS } from '#shared/types/csv'
+import Boat from '#models/boat'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
 import {
@@ -200,12 +201,15 @@ export async function importMaintenanceRows(
   const totalCostLabel = i18n.t('maintenance.history.timeline.totalCost')
 
   return await db.transaction(async (trx) => {
+    const boat = await Boat.query({ client: trx }).where('id', boatId).firstOrFail()
+
     for (let start = 0; start < rows.length; start += CSV_IMPORT_INSERT_CHUNK) {
       const chunk = rows.slice(start, start + CSV_IMPORT_INSERT_CHUNK)
 
       const events = await BoatMaintenanceEvent.createMany(
         chunk.map((row) => ({
           boatId,
+          organizationId: boat.organizationId,
           subject: row.subject,
           performedAt: DateTime.fromISO(row.performedAt),
           title: row.title,

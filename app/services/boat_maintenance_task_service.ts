@@ -228,6 +228,7 @@ export default class BoatMaintenanceTaskService {
 
     return await BoatMaintenanceTask.create({
       boatId: boat.id,
+      organizationId: boat.organizationId,
       subject,
       ...equipmentColumns,
       boatIncidentId,
@@ -483,6 +484,7 @@ export default class BoatMaintenanceTaskService {
     if (nextDueAt || nextDueEngineHours !== null) {
       await BoatMaintenanceTask.create({
         boatId: task.boatId,
+        organizationId: task.organizationId,
         subject: task.subject,
         boatEngineId: task.boatEngineId,
         boatSailId: task.boatSailId,
