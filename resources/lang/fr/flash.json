@@ -190,7 +190,13 @@
     "deleted": "État des lieux supprimé.",
     "notFound": "État des lieux introuvable.",
     "kindAlreadyExists": "Un état des lieux existe déjà pour ce type (départ/retour).",
-    "itemNotFound": "Point de contrôle inconnu."
+    "itemNotFound": "Point de contrôle inconnu.",
+    "locked": "Cet état des lieux est signé : il ne peut plus être modifié.",
+    "notSigned": "Faites d'abord signer l'état des lieux : seul le PDF signé est envoyé au client.",
+    "noClientEmail": "Aucune adresse e-mail pour ce client : renseignez-la sur la réservation.",
+    "signatureInvalid": "Signature illisible : effacez-la et signez à nouveau.",
+    "signed": "État des lieux signé. Le PDF signé est archivé sur la réservation.",
+    "sent": "État des lieux envoyé à {email}."
   },
   "fuelLog": {
     "created": "Avitaillement enregistré.",

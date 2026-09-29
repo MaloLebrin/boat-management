@@ -274,6 +274,13 @@ export default class BoatMediaController {
       throw error
     }
 
+    // État des lieux signé (#889) : ses photos sont celles du PDF, figées.
+    if (inspection.lockedAt) {
+      session.flash('error', i18n.t('flash.inspections.locked'))
+      response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
+      return
+    }
+
     const payload = await request.validateUsing(storeBoatPhotosValidator)
     const org = await this.organizationService.findOrFail(boat.organizationId)
 
@@ -335,7 +342,17 @@ export default class BoatMediaController {
 
     const inspectionId = Number(params.inspectionId)
     try {
-      await this.inspectionService.findForReservation(user, reservation, inspectionId)
+      const inspection = await this.inspectionService.findForReservation(
+        user,
+        reservation,
+        inspectionId
+      )
+      // Photos d'un état des lieux signé — et son PDF archivé — restent (#889).
+      if (inspection.lockedAt) {
+        session.flash('error', i18n.t('flash.inspections.locked'))
+        response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
+        return
+      }
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
         session.flash('error', i18n.t('flash.inspections.notFound'))

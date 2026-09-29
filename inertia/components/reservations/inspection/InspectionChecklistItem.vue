@@ -4,6 +4,7 @@ import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
+import { isInspectionItemDegraded } from '#shared/helpers/inspection_report'
 import type { InspectionChecklistItem, InspectionItemState } from '#shared/types/inspection'
 import type { BoatInspectionItemRow } from '~/types/inspection'
 
@@ -67,13 +68,10 @@ function saveNote() {
   )
 }
 
-const STATE_RANK: Record<InspectionItemState, number> = { ok: 0, remark: 1, damage: 2 }
-
 /** Le point s'est dégradé entre le départ et le retour — c'est ce qui doit sauter aux yeux. */
-const degraded = computed(() => {
-  if (!props.row || !props.counterpart) return false
-  return STATE_RANK[props.row.state] > STATE_RANK[props.counterpart.state]
-})
+const degraded = computed(() =>
+  isInspectionItemDegraded(props.counterpart?.state ?? null, props.row?.state ?? null)
+)
 
 const checkoutStateLabel = computed(() => {
   if (props.counterpart === undefined) return null

@@ -483,6 +483,28 @@ router
             [controllers.BoatInspections, 'destroyEquipmentAction']
           )
           .as('boats.reservations.inspections.equipmentActions.destroy')
+        // État des lieux signé (#889) : PDF (brouillon ou archive signée),
+        // signature sur place qui fige l'inspection, envoi au client.
+        router
+          .get('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf', [
+            controllers.InspectionDocuments,
+            'pdf',
+          ])
+          .as('boats.reservations.inspections.pdf')
+        router
+          .post('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign', [
+            controllers.InspectionDocuments,
+            'sign',
+          ])
+          .as('boats.reservations.inspections.sign')
+        router
+          .post('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send', [
+            controllers.InspectionDocuments,
+            'send',
+          ])
+          .as('boats.reservations.inspections.send')
+          // Du courrier à notre nom dans la boîte d'un client (#768).
+          .use(middleware.requireVerifiedEmail())
         // Page publique de réservation du bateau (#881) : ouverture / fermeture.
         router
           .patch('boats/:boatId/public-booking', [controllers.BoatPublicBooking, 'update'])

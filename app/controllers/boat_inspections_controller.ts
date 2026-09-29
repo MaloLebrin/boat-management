@@ -1,5 +1,6 @@
 import {
   BoatInspectionConflictError,
+  BoatInspectionLockedError,
   BoatInspectionNotFoundError,
   BoatInspectionValidationError,
 } from '#exceptions/inspection_errors'
@@ -7,7 +8,7 @@ import {
   BoatEquipmentActionNotFoundError,
   BoatEquipmentActionValidationError,
 } from '#exceptions/equipment_action_errors'
-import BoatInspectionService from '#services/boat_inspection_service'
+import BoatInspectionService, { assertInspectionUnlocked } from '#services/boat_inspection_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
@@ -83,9 +84,11 @@ export default class BoatInspectionsController {
       inspections.map(async (inspection) => {
         const actions = await this.equipmentActionService.listForInspection(user, boat, inspection)
         const items = await this.inspectionService.listItems(user, reservation, inspection.id)
+        // Le PDF signé archivé (#889) est un média de l'inspection, pas une photo.
+        const media = await this.mediaService.listForEntity('inspection', inspection.id)
         return {
           ...toBoatInspectionRow(inspection),
-          photos: await this.mediaService.listForEntity('inspection', inspection.id),
+          photos: media.filter((entry) => entry.kind === 'photo'),
           actions: actions.map(toBoatEquipmentActionRow),
           items: items.map(toBoatInspectionItemRow),
         }
@@ -182,6 +185,11 @@ export default class BoatInspectionsController {
         session.flash('rejectedType', UPDATE_INSPECTION_ACTION)
         return response.redirect().back()
       }
+      if (error instanceof BoatInspectionLockedError) {
+        session.flash('error', i18n.t('flash.inspections.locked'))
+        session.flash('rejectedType', UPDATE_INSPECTION_ACTION)
+        return response.redirect().back()
+      }
       // Le PUT rejoué vise une inspection modifiée entre-temps (#622) : la
       // modale de résolution tranche côté client, pas un last-write-wins.
       if (error instanceof BoatInspectionConflictError) {
@@ -220,6 +228,10 @@ export default class BoatInspectionsController {
         session.flash('error', i18n.t('flash.inspections.notFound'))
         return response.redirect().back()
       }
+      if (error instanceof BoatInspectionLockedError) {
+        session.flash('error', i18n.t('flash.inspections.locked'))
+        return response.redirect().back()
+      }
       throw error
     }
 
@@ -248,6 +260,10 @@ export default class BoatInspectionsController {
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
         session.flash('error', i18n.t('flash.inspections.notFound'))
+        return response.redirect().back()
+      }
+      if (error instanceof BoatInspectionLockedError) {
+        session.flash('error', i18n.t('flash.inspections.locked'))
         return response.redirect().back()
       }
       if (error instanceof BoatInspectionValidationError) {
@@ -283,6 +299,10 @@ export default class BoatInspectionsController {
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
         session.flash('error', i18n.t('flash.inspections.notFound'))
+        return response.redirect().back()
+      }
+      if (error instanceof BoatInspectionLockedError) {
+        session.flash('error', i18n.t('flash.inspections.locked'))
         return response.redirect().back()
       }
       throw error
@@ -331,6 +351,13 @@ export default class BoatInspectionsController {
       throw error
     }
 
+    // Un état des lieux signé ne reçoit plus de défaut (#889).
+    if (inspection.lockedAt) {
+      session.flash('error', i18n.t('flash.inspections.locked'))
+      session.flash('rejectedType', CREATE_INSPECTION_DEFECT_ACTION)
+      return response.redirect().back()
+    }
+
     const payload = await request.validateUsing(createBoatEquipmentActionValidator)
 
     try {
@@ -363,6 +390,27 @@ export default class BoatInspectionsController {
     const { boat, reservation } = loaded
     await bouncer.with(InspectionPolicy).authorize('view', reservation)
     await bouncer.with(EquipmentActionPolicy).authorize('delete', boat)
+
+    // Le défaut figure sur l'état des lieux signé (#889) : il y reste.
+    try {
+      assertInspectionUnlocked(
+        await this.inspectionService.findForReservation(
+          user,
+          reservation,
+          Number(params.inspectionId)
+        )
+      )
+    } catch (error) {
+      if (error instanceof BoatInspectionNotFoundError) {
+        session.flash('error', i18n.t('flash.inspections.notFound'))
+        return response.redirect().back()
+      }
+      if (error instanceof BoatInspectionLockedError) {
+        session.flash('error', i18n.t('flash.inspections.locked'))
+        return response.redirect().back()
+      }
+      throw error
+    }
 
     try {
       await this.equipmentActionService.deleteForBoat(user, boat, Number(params.actionId))

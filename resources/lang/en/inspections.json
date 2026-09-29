@@ -124,5 +124,58 @@
         }
       }
     }
+  },
+  "pdf": {
+    "title": "Inspection report — {kind} #{id}",
+    "generatedOn": "Generated on {date}",
+    "signedOn": "Signed on {date}",
+    "draft": "DRAFT — not signed, not binding",
+    "boat": "Boat",
+    "period": "Rental period",
+    "periodRange": "From {start} to {end}",
+    "client": "Client",
+    "readings": "Readings",
+    "readingsValue": "Fuel: {fuel} · Engine hours: {hours}",
+    "notes": "Notes",
+    "tally": "{ok} OK · {remark} remark(s) · {damage} damage(s) · {notInspected} not inspected",
+    "noChanges": "No difference from the checkout inspection.",
+    "change": "{item}: {before} → {after}",
+    "defects": "Reported defects",
+    "noDefects": "No defect reported.",
+    "photos": "Photos",
+    "noPhotos": "No photos.",
+    "morePhotos": "+ {count} photo(s) not reproduced here, kept in the reservation file.",
+    "footer": "Page {page} of {total} - {org}"
+  },
+  "signature": {
+    "title": "Signatures",
+    "roles": {
+      "client": "The client",
+      "staff": "For the rental company"
+    },
+    "clear": "Clear",
+    "modalTitle": "Have the inspection signed",
+    "statement": "By signing, the client and you confirm this inspection is accurate. Once signed it is locked: findings, photos and defects can no longer be changed.",
+    "clientName": "Client name",
+    "staffHint": "You sign on behalf of your account.",
+    "submit": "Sign and lock",
+    "offline": "Signing needs a connection: the signed PDF is produced and archived by the server.",
+    "signedOn": "Signed on {date}",
+    "draft": "Draft: not signed yet.",
+    "signer": "{role}: {name}",
+    "sentOn": "Sent to the client on {date}",
+    "pdfDraft": "PDF (draft)",
+    "pdfSigned": "Signed PDF",
+    "sign": "Have it signed",
+    "send": "Send to client",
+    "resend": "Send again"
+  },
+  "email": {
+    "subject": "Inspection report ({kind}) — {boatName} — {orgName}",
+    "greeting": "Hello,",
+    "heading": "Inspection report — {boatName}",
+    "body": "Please find attached the inspection report ({kind}) for {boatName}, signed by both parties.",
+    "attachment": "The signed PDF is attached to this email. Please keep it: it is the reference in case of dispute.",
+    "signature": "Kind regards,\n{orgName}"
   }
 }

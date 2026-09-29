@@ -772,4 +772,28 @@ export default class EmailQueueService {
       },
     })
   }
+
+  /** PDF d'état des lieux signé envoyé au client (#889) — renvoi possible. */
+  async sendInspection(params: {
+    inspectionId: number
+    organizationId: number
+    to: string
+    locale: string
+  }) {
+    const dedupKey = `inspection:${params.organizationId}:${params.inspectionId}:${Date.now()}`
+
+    const payload = { ...params, dedupKey }
+
+    const { default: SendInspectionEmail } = await import('#jobs/send_inspection_email')
+
+    await this.dedup.enqueueUnique({
+      key: dedupKey,
+      jobName: SendInspectionEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendInspectionEmail.dispatch(p)
+      },
+    })
+  }
 }

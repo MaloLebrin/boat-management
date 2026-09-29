@@ -1,0 +1,12 @@
+{
+  "key": "inspection:42:12:<ts>",
+  "jobName": "SendInspectionEmail",
+  "queue": "emails",
+  "payload": {
+    "inspectionId": 12,
+    "organizationId": 42,
+    "to": "client@example.com",
+    "locale": "fr",
+    "dedupKey": "inspection:42:12:<ts>"
+  }
+}

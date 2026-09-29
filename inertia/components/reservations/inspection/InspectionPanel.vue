@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import InspectionChecklist from '~/components/reservations/inspection/InspectionChecklist.vue'
 import InspectionForm from '~/components/reservations/inspection/InspectionForm.vue'
 import InspectionPhotos from '~/components/reservations/inspection/InspectionPhotos.vue'
 import InspectionDefects from '~/components/reservations/inspection/InspectionDefects.vue'
+import InspectionDocumentBar from '~/components/reservations/inspection/InspectionDocumentBar.vue'
 import { usePendingInspection } from '~/composables/use_pending_inspection'
 import { useT } from '~/composables/use_t'
 import type { BoatCategory } from '#shared/types/boat_catalog'
@@ -20,6 +22,8 @@ const props = defineProps<{
   category: BoatCategory | null
   /** Inspection de check-out affichée en regard sur le panneau check-in (#584). */
   counterpart: InspectionWithPhotos | null
+  /** Nom proposé au client dans la modale de signature (#889). */
+  clientName: string
   canEdit: boolean
   canDelete: boolean
   canManageActions: boolean
@@ -29,6 +33,13 @@ const props = defineProps<{
 const { t } = useT()
 
 const basePath = `/boats/${props.boatId}/reservations/${props.reservationId}`
+
+/**
+ * Signé (#889), l'état des lieux est figé : plus de saisie, de photo, de
+ * défaut ni de suppression — le serveur le refuse, l'écran ne le propose pas.
+ */
+const locked = computed(() => Boolean(props.inspection?.lockedAt))
+const editable = computed(() => props.canEdit && !locked.value)
 
 /**
  * État des lieux saisi hors-ligne et pas encore synchronisé (#622) : dérivé de
@@ -52,7 +63,7 @@ function deleteInspection() {
     <div class="flex items-center justify-between">
       <h3 class="font-semibold text-fg">{{ t(`inspections.kind.${kind}`) }}</h3>
       <BaseButton
-        v-if="inspection && canDelete"
+        v-if="inspection && canDelete && !locked"
         variant="danger"
         size="sm"
         type="button"
@@ -72,7 +83,7 @@ function deleteInspection() {
     </div>
 
     <InspectionForm
-      v-if="canEdit"
+      v-if="editable"
       :boat-id="boatId"
       :reservation-id="reservationId"
       :kind="kind"
@@ -85,6 +96,13 @@ function deleteInspection() {
     </p>
 
     <template v-if="inspection">
+      <InspectionDocumentBar
+        :base-path="basePath"
+        :inspection="inspection"
+        :client-name="clientName"
+        :can-edit="canEdit"
+      />
+
       <InspectionChecklist
         :boat-id="boatId"
         :reservation-id="reservationId"
@@ -92,8 +110,8 @@ function deleteInspection() {
         :category="category"
         :items="inspection.items"
         :counterpart-items="counterpart ? counterpart.items : null"
-        :can-edit="canEdit"
-        :can-manage-actions="canManageActions"
+        :can-edit="editable"
+        :can-manage-actions="canManageActions && !locked"
       />
 
       <InspectionPhotos
@@ -102,8 +120,8 @@ function deleteInspection() {
           (mediaId: number) => `${basePath}/inspections/${inspection!.id}/photos/${mediaId}`
         "
         :photos="inspection.photos"
-        :can-upload="canEdit"
-        :can-delete="canDelete"
+        :can-upload="editable"
+        :can-delete="canDelete && !locked"
       />
 
       <InspectionDefects
@@ -111,8 +129,8 @@ function deleteInspection() {
         :reservation-id="reservationId"
         :inspection-id="inspection.id"
         :actions="inspection.actions"
-        :can-manage="canManageActions"
-        :can-delete="canDeleteActions"
+        :can-manage="canManageActions && !locked"
+        :can-delete="canDeleteActions && !locked"
       />
     </template>
 

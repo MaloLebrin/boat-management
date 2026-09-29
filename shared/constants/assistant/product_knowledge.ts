@@ -1163,6 +1163,31 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageReservations',
   },
   {
+    id: 'inspection-signed-pdf',
+    title: {
+      en: 'Signed inspection report (PDF)',
+      fr: 'État des lieux signé (PDF)',
+    },
+    body: {
+      en: 'Each check-out or check-in inspection produces a PDF: boat, period, client, readings, checklist by zone with notes, changes since check-out for a return, defects, up to 12 photos and two signature boxes. Before signing it is a draft. “Have it signed” opens two pads on your screen: the client signs, then you (under your account name). Signing locks the inspection — findings, readings, photos and defects can no longer be changed, nor can it be deleted — and archives the signed PDF. “Send to client” emails that PDF to the reservation or client address. Signing needs a connection; remote signing is not available.',
+      fr: 'Chaque état des lieux de départ ou de retour produit un PDF : bateau, période, client, relevés, checklist par zone avec les notes, écarts avec le départ pour un retour, défauts, jusqu’à 12 photos et deux cadres de signature. Avant signature, c’est un brouillon. « Faire signer » ouvre deux pads sur votre écran : le client signe, puis vous (au nom de votre compte). La signature fige l’état des lieux — constats, relevés, photos et défauts ne se modifient plus, et il ne se supprime plus — et archive le PDF signé. « Envoyer au client » l’envoie par e-mail à l’adresse de la réservation ou de la fiche client. La signature demande une connexion ; la signature à distance n’existe pas encore.',
+    },
+    keywords: [
+      'etat des lieux',
+      'signature',
+      'signer',
+      'signe',
+      'pdf',
+      'caution',
+      'litige',
+      'envoyer',
+      'client',
+      'inspection',
+    ],
+    navTarget: 'reservations.index',
+    planFlag: 'canManageReservations',
+  },
+  {
     id: 'rental-contracts',
     title: {
       en: 'Rental contracts',

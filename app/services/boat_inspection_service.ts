@@ -1,5 +1,6 @@
 import {
   BoatInspectionConflictError,
+  BoatInspectionLockedError,
   BoatInspectionNotFoundError,
   BoatInspectionValidationError,
 } from '#exceptions/inspection_errors'
@@ -49,6 +50,14 @@ function isKindConflict(error: unknown): boolean {
   return err.code === '23505'
 }
 
+/**
+ * Un état des lieux signé est figé (#889) : aucune écriture ne passe plus —
+ * constats, relevés, photos, défauts, suppression.
+ */
+export function assertInspectionUnlocked(inspection: BoatInspection) {
+  if (inspection.lockedAt) throw new BoatInspectionLockedError()
+}
+
 @inject()
 export default class BoatInspectionService {
   constructor(private mediaService: MediaService) {}
@@ -58,6 +67,9 @@ export default class BoatInspectionService {
 
     return await BoatInspection.query()
       .where('reservationId', reservation.id)
+      .preload('signatures', (query) =>
+        query.select('id', 'boatInspectionId', 'role', 'signerName', 'signedAt')
+      )
       .orderBy('kind', 'asc')
   }
 
@@ -121,6 +133,7 @@ export default class BoatInspectionService {
       .first()
 
     if (!inspection) throw new BoatInspectionNotFoundError()
+    assertInspectionUnlocked(inspection)
 
     // Rejeu hors-ligne (#622) : l'inspection a bougé depuis la saisie — la
     // modale de résolution tranche plutôt qu'un last-write-wins silencieux.
@@ -164,6 +177,7 @@ export default class BoatInspectionService {
     payload: SetInspectionItemPayload
   ) {
     const inspection = await this.findForReservation(user, reservation, inspectionId)
+    assertInspectionUnlocked(inspection)
 
     if (!ALL_INSPECTION_ITEM_KEYS.has(payload.itemKey)) {
       throw new BoatInspectionValidationError('unknown checklist item', 'itemNotFound')
@@ -181,6 +195,7 @@ export default class BoatInspectionService {
   /** Repasse un point de contrôle à « non contrôlé » en supprimant sa ligne. */
   async clearItem(user: User, reservation: BoatReservation, inspectionId: number, itemKey: string) {
     const inspection = await this.findForReservation(user, reservation, inspectionId)
+    assertInspectionUnlocked(inspection)
 
     await BoatInspectionItem.query()
       .where('boatInspectionId', inspection.id)
@@ -202,6 +217,7 @@ export default class BoatInspectionService {
       .first()
 
     if (!inspection) throw new BoatInspectionNotFoundError()
+    assertInspectionUnlocked(inspection)
 
     if (org) {
       await this.mediaService.deleteAllForEntity(

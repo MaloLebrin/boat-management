@@ -21,3 +21,30 @@ export class BoatInspectionConflictError extends Error {
     super('Conflict detected')
   }
 }
+
+/**
+ * L'état des lieux est signé (#889) : constats, photos, défauts et relevés sont
+ * figés — comme une facture émise.
+ */
+export class BoatInspectionLockedError extends Error {
+  name = 'BoatInspectionLockedError'
+  constructor() {
+    super('inspection is signed and locked')
+  }
+}
+
+/** Envoi demandé avant signature : on n'envoie au client que le PDF signé (#889). */
+export class BoatInspectionNotSignedError extends Error {
+  name = 'BoatInspectionNotSignedError'
+  constructor() {
+    super('inspection is not signed yet')
+  }
+}
+
+/** Ni la réservation ni la fiche client ne portent d'e-mail (#889). */
+export class BoatInspectionNoClientEmailError extends Error {
+  name = 'BoatInspectionNoClientEmailError'
+  constructor() {
+    super('no client email for this inspection')
+  }
+}

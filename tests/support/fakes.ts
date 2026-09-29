@@ -48,6 +48,11 @@ export interface FakeCloudinaryOptions {
    * pendant un nettoyage (#859). L'appel n'est pas enregistré.
    */
   failDeleteFor?: string[]
+  /**
+   * Réponse de `fetchThumbnail` (vignette d'une photo pour un PDF, #889). Par
+   * défaut `null` : la photo est omise, comme quand Cloudinary ne répond pas.
+   */
+  thumbnail?: Buffer | null
 }
 
 export interface FakeCloudinary {
@@ -68,6 +73,8 @@ export interface FakeCloudinary {
    * `assertStatus(200)` laisse passer (#692).
    */
   downloaded: Array<{ publicId: string; resourceType: 'image' | 'raw'; format: string }>
+  /** Tampons passés à `uploadBuffer` (PDF produits par l'app, #889), dans l'ordre. */
+  uploadedBuffers: Array<{ filename: string; folder: string; buffer: Buffer }>
   restore(): void
 }
 
@@ -111,6 +118,7 @@ export function swapFakeCloudinary(options: FakeCloudinaryOptions = {}): FakeClo
     deletedFiles: [],
     deletedFolders: [],
     downloaded: [],
+    uploadedBuffers: [],
     restore: restoreCloudinary,
   }
   const download = options.download ?? {
@@ -136,6 +144,12 @@ export function swapFakeCloudinary(options: FakeCloudinaryOptions = {}): FakeClo
       ({
         uploadImage: async (_file: unknown, folder: string) => upload(folder, 'image'),
         uploadDocument: async (_file: unknown, folder: string) => upload(folder, 'document'),
+        uploadBuffer: async (buffer: Buffer, filename: string, folder: string) => {
+          const result = upload(folder, 'document')
+          state.uploadedBuffers.push({ filename, folder, buffer })
+          return { ...result, bytes: buffer.length }
+        },
+        fetchThumbnail: async () => options.thumbnail ?? null,
         deleteFile: async (publicId: string, resourceType: 'image' | 'raw' = 'image') => {
           if (options.failDeleteFor?.includes(publicId)) {
             throw new Error('Cloudinary delete failed')

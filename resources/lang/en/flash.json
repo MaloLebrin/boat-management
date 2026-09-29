@@ -190,7 +190,13 @@
     "deleted": "Inspection deleted.",
     "notFound": "Inspection not found.",
     "kindAlreadyExists": "An inspection already exists for this type (checkout/checkin).",
-    "itemNotFound": "Unknown checklist item."
+    "itemNotFound": "Unknown checklist item.",
+    "locked": "This inspection is signed: it can no longer be changed.",
+    "notSigned": "Have the inspection signed first: only the signed PDF is sent to the client.",
+    "noClientEmail": "No email address for this client: add one on the reservation.",
+    "signatureInvalid": "Unreadable signature: clear it and sign again.",
+    "signed": "Inspection signed. The signed PDF is archived on the reservation.",
+    "sent": "Inspection sent to {email}."
   },
   "fuelLog": {
     "created": "Fuel log recorded.",
