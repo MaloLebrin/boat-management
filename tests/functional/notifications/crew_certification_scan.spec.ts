@@ -127,7 +127,8 @@ test.group('NotificationScanService — certifications d’équipage (#882)', (g
     await makeService().run()
     await makeService().run()
 
-    const keys = (await crewNotifications(admin.id)).map((n) => n.metadata!.crewAlertKey)
+    const notifications = await crewNotifications(admin.id)
+    const keys = notifications.map((n) => n.metadata!.crewAlertKey)
     assert.deepEqual(keys, [`${crew.id}:60`, `${crew.id}:30`, `${crew.id}:7`])
   })
 
