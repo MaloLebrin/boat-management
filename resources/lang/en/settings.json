@@ -457,7 +457,11 @@
       "invoice_reminders_update": "Reminder settings updated",
       "export_run": "Export run",
       "client_export_bulk": "Client records exported",
-      "accounting_settings_update": "Accounting export settings changed"
+      "accounting_settings_update": "Accounting export settings changed",
+      "calendar_token_created": "iCal feed created or regenerated",
+      "calendar_token_revoked": "iCal feed revoked",
+      "external_calendar_added": "External calendar added",
+      "external_calendar_removed": "External calendar removed"
     },
     "empty": {
       "title": "No activity yet",

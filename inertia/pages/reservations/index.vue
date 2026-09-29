@@ -6,11 +6,14 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import FleetReservationList from '~/components/reservations/FleetReservationList.vue'
 import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
 import ReservationsExportDialog from '~/components/reservations/ReservationsExportDialog.vue'
+import CalendarFeedPanel from '~/components/reservations/calendar_sync/CalendarFeedPanel.vue'
+import BaseCard from '~/components/base/BaseCard.vue'
 import ReservationTimeline from '~/components/reservations/ReservationTimeline.vue'
 import { useCanExport } from '~/composables/use_can_export'
 import { useSingleBoat } from '~/composables/use_single_boat'
 import { useT } from '~/composables/use_t'
 import { RESERVATION_TYPES } from '#shared/types/reservation'
+import type { CalendarFeedRow } from '#shared/types/calendar_sync'
 import type {
   BoatReservationRow,
   FleetBoatCalendarEntry,
@@ -25,6 +28,9 @@ const props = defineProps<{
   selectedBoatId: number | null
   selectedType: ReservationType | null
   canCreateQuote: boolean
+  /** Flux iCal de toute la flotte (#880), pour qui gère les réservations. */
+  fleetCalendarFeed: CalendarFeedRow | null
+  canManageFleetCalendar: boolean
 }>()
 
 const { t } = useT()
@@ -153,5 +159,15 @@ function applyFilters(next: { boatId?: string | number; type?: string | number }
         :can-create-quote="canCreateQuote"
       />
     </div>
+
+    <BaseCard v-if="canManageFleetCalendar" class="mt-6" data-testid="fleet-calendar-feed">
+      <p class="text-base font-semibold text-fg">{{ t('reservations.calendarSync.fleetTitle') }}</p>
+      <p class="mb-4 mt-1 text-sm text-fg-muted">{{ t('reservations.calendarSync.fleetIntro') }}</p>
+      <CalendarFeedPanel
+        :feed="fleetCalendarFeed"
+        endpoint="/reservations/calendar-feed"
+        :can-manage="canManageFleetCalendar"
+      />
+    </BaseCard>
   </div>
 </template>

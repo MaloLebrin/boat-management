@@ -427,7 +427,8 @@
         "retainedAboveDeposit": "The retained amount cannot exceed the security deposit.",
         "noteRequired": "Enter the reason for retaining the deposit."
       }
-    }
+    },
+    "externalConflict": "This boat is already booked on “{calendar}” during this period (imported calendar)."
   },
   "ports": {
     "hasBoats": "Cannot delete this port: boats are assigned to it.",
@@ -493,5 +494,17 @@
   },
   "exports": {
     "queued": "Large export: it is being generated. You will be notified as soon as it is ready, and will find it under Settings → Exports."
+  },
+  "calendarSync": {
+    "feedCreated": "iCal feed created. Copy its address into your calendar or the platform.",
+    "feedUpdated": "iCal feed content updated.",
+    "feedRevoked": "iCal feed revoked: its address no longer responds.",
+    "added": "External calendar added: {count} slot(s) imported.",
+    "synced": "Calendar synced: {count} slot(s) imported.",
+    "removed": "External calendar removed; its slots no longer block the boat.",
+    "syncFailed": "Sync failed: {reason}",
+    "unsafeUrl": "Address refused: only a public https feed (port 443) can be imported.",
+    "limitReached": "A boat accepts at most {limit} external calendars.",
+    "conflicts": "{count} imported slot(s) overlap a FleetAi reservation: check for double bookings."
   }
 }

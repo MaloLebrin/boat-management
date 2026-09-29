@@ -1,4 +1,4 @@
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeSave, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import Boat from '#models/boat'
@@ -92,11 +92,31 @@ export default class BoatReservation extends BaseModel {
   @column()
   declare securityDepositNote: string | null
 
+  // `SEQUENCE` du VEVENT exporté (#880) : un agenda abonné ne remplace un
+  // événement que si ce numéro augmente — voir `bumpIcalSequence`.
+  @column()
+  declare icalSequence: number
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+
+  /**
+   * Les champs publiés dans un flux iCal (#880) ont changé : l'événement doit
+   * être relu par les agendas abonnés. Une mise à jour en masse
+   * (`query().update`) contourne ce hook : l'anonymisation d'un client
+   * (`ClientService`) incrémente la colonne elle-même.
+   */
+  @beforeSave()
+  static bumpIcalSequence(reservation: BoatReservation) {
+    if (!reservation.$isPersisted) return
+    const dirty = reservation.$dirty
+    if ('startsAt' in dirty || 'endsAt' in dirty || 'status' in dirty || 'clientName' in dirty) {
+      reservation.icalSequence = (reservation.icalSequence ?? 0) + 1
+    }
+  }
 
   @belongsTo(() => Boat)
   declare boat: BelongsTo<typeof Boat>

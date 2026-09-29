@@ -10,6 +10,18 @@ export class ReservationConflictError extends Error {
   }
 }
 
+/**
+ * La période chevauche un créneau importé d'un calendrier externe (#880) : le
+ * bateau est déjà loué sur une autre plateforme.
+ */
+export class ReservationExternalConflictError extends Error {
+  name = 'ReservationExternalConflictError'
+
+  constructor(readonly calendarName: string) {
+    super(`Reservation period overlaps a booking imported from ${calendarName}`)
+  }
+}
+
 export class ReservationValidationError extends Error {
   name = 'ReservationValidationError'
 

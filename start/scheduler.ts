@@ -11,6 +11,7 @@ import SendInvoiceReminders from '#jobs/send_invoice_reminders'
 import ScanFleetNotifications from '#jobs/scan_fleet_notifications'
 import GenerateAiSuggestions from '#jobs/generate_ai_suggestions'
 import ReconcileMedia from '#jobs/reconcile_media'
+import SyncExternalCalendars from '#jobs/sync_external_calendars'
 
 await SendReminderEmails.schedule({})
   .cron('0 8 * * *')
@@ -103,4 +104,12 @@ await ReconcileMedia.schedule({})
   .cron('30 3 * * 0')
   .timezone('Europe/Paris')
   .id('weekly-reconcile-media')
+  .run()
+
+// Toutes les 30 minutes : les calendriers externes importés (#880) bloquent
+// les dates d'une location prise sur une autre plateforme.
+await SyncExternalCalendars.schedule({})
+  .cron('*/30 * * * *')
+  .timezone('Europe/Paris')
+  .id('sync-external-calendars')
   .run()

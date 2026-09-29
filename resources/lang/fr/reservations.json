@@ -162,5 +162,62 @@
       "retainedSummary": "{amount} retenus : {note}",
       "inspectionHint": "Au retour, restituez la caution ou retenez un montant au vu des défauts constatés."
     }
+  },
+  "calendarSync": {
+    "title": "Synchroniser avec un calendrier externe",
+    "intro": "Publiez les réservations de ce bateau dans un agenda ou sur une plateforme de location, et importez les calendriers de ces plateformes pour bloquer les dates.",
+    "fleetTitle": "Flux iCal de la flotte",
+    "fleetIntro": "Une seule adresse pour suivre les réservations de tous les bateaux dans votre agenda (Google, Apple, Outlook).",
+    "export": {
+      "title": "Exporter vers un agenda ou une plateforme",
+      "empty": "Aucune adresse iCal publiée.",
+      "create": "Créer l’adresse iCal",
+      "copy": "Copier l’adresse",
+      "copied": "Adresse copiée",
+      "subscribe": "S’abonner",
+      "regenerate": "Régénérer",
+      "regenerateConfirm": "L’adresse actuelle cessera aussitôt de fonctionner : il faudra coller la nouvelle partout où elle est utilisée. Continuer ?",
+      "revoke": "Révoquer",
+      "revokeConfirm": "L’adresse cessera de fonctionner et les agendas abonnés ne recevront plus rien. Continuer ?",
+      "includeClientName": "Inclure le nom du client",
+      "includeClientNameHint": "Désactivé par défaut : l’adresse est lue par des tiers.",
+      "includeMaintenance": "Inclure les entretiens planifiés",
+      "save": "Enregistrer",
+      "secretHint": "Toute personne qui connaît cette adresse voit les dates réservées. Régénérez-la si elle a circulé."
+    },
+    "import": {
+      "title": "Importer les calendriers des plateformes",
+      "empty": "Aucun calendrier importé.",
+      "name": "Nom",
+      "namePlaceholder": "Samboat, Click&Boat…",
+      "url": "Adresse du flux iCal",
+      "urlPlaceholder": "https://…/calendar.ics",
+      "add": "Importer",
+      "sync": "Synchroniser",
+      "remove": "Retirer",
+      "removeConfirm": "Les créneaux de ce calendrier ne bloqueront plus le bateau. Continuer ?",
+      "lastSynced": "Synchronisé le {date}",
+      "neverSynced": "Jamais synchronisé",
+      "events": "{count} créneau(x)",
+      "conflicts": "{count} double(s) réservation(s)",
+      "readOnlyHint": "Les créneaux importés bloquent les dates et ne se modifient que sur la plateforme d’origine. Synchronisation automatique toutes les 30 minutes."
+    },
+    "errors": {
+      "unsafe_url": "adresse refusée (https public uniquement).",
+      "timeout": "le calendrier n’a pas répondu à temps.",
+      "too_large": "le calendrier dépasse 2 Mo.",
+      "http_error": "la plateforme a répondu par une erreur.",
+      "network": "la plateforme est injoignable.",
+      "invalid_ics": "l’adresse ne renvoie pas un calendrier iCal."
+    },
+    "feed": {
+      "boatCalendarName": "FleetAi — {boat}",
+      "fleetCalendarName": "FleetAi — {org}",
+      "confirmed": "Réservé",
+      "option": "Option",
+      "maintenance": "Entretien : {title}"
+    },
+    "blockTitle": "{calendar} — réservé sur une autre plateforme",
+    "blockLegend": "Réservé ailleurs (calendrier importé)"
   }
 }

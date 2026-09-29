@@ -483,6 +483,32 @@ router
             [controllers.BoatInspections, 'destroyEquipmentAction']
           )
           .as('boats.reservations.inspections.equipmentActions.destroy')
+        // Synchronisation iCal (#880) : flux exporté du bateau (créer ou
+        // régénérer, contenu, révoquer) et calendriers externes importés.
+        router
+          .post('boats/:boatId/calendar-feed', [controllers.CalendarFeeds, 'regenerateForBoat'])
+          .as('boats.calendarFeed.regenerate')
+        router
+          .patch('boats/:boatId/calendar-feed', [controllers.CalendarFeeds, 'updateForBoat'])
+          .as('boats.calendarFeed.update')
+        router
+          .delete('boats/:boatId/calendar-feed', [controllers.CalendarFeeds, 'revokeForBoat'])
+          .as('boats.calendarFeed.revoke')
+        router
+          .post('boats/:boatId/external-calendars', [controllers.ExternalCalendars, 'store'])
+          .as('boats.externalCalendars.store')
+        router
+          .post('boats/:boatId/external-calendars/:calendarId/sync', [
+            controllers.ExternalCalendars,
+            'sync',
+          ])
+          .as('boats.externalCalendars.sync')
+        router
+          .delete('boats/:boatId/external-calendars/:calendarId', [
+            controllers.ExternalCalendars,
+            'destroy',
+          ])
+          .as('boats.externalCalendars.destroy')
         router
           .post('boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos', [
             controllers.BoatMedia,

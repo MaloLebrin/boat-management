@@ -6,6 +6,7 @@ import type {
   FleetBoatOption,
 } from '#shared/types/reservation'
 import type { InvoiceLink } from '#shared/types/invoice'
+import type { ExternalBlockRow } from '#shared/types/calendar_sync'
 
 export function toBoatReservationRow(
   reservation: BoatReservation,
@@ -51,7 +52,8 @@ export function toBoatReservationRow(
 export function toFleetCalendarEntries(
   boats: FleetBoatOption[],
   rows: BoatReservationRow[],
-  maintenanceByBoat: Map<number, FleetMaintenanceWindow[]> = new Map()
+  maintenanceByBoat: Map<number, FleetMaintenanceWindow[]> = new Map(),
+  externalBlocks: ExternalBlockRow[] = []
 ): FleetBoatCalendarEntry[] {
   const entries = new Map<number, FleetBoatCalendarEntry>(
     boats.map((boat) => [
@@ -61,6 +63,7 @@ export function toFleetCalendarEntries(
         boatName: boat.name,
         reservations: [],
         maintenance: maintenanceByBoat.get(boat.id) ?? [],
+        external: [],
       },
     ])
   )
@@ -68,6 +71,9 @@ export function toFleetCalendarEntries(
   for (const row of rows) {
     const entry = entries.get(row.boatId)
     if (entry) entry.reservations.push(row)
+  }
+  for (const block of externalBlocks) {
+    entries.get(block.boatId)?.external.push(block)
   }
 
   return Array.from(entries.values())

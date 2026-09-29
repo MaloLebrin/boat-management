@@ -593,6 +593,7 @@ factures déjà émis (`linkedInvoices`) et le bouton « Créer un devis » sous
 `canCreateQuote`.
 
 - `reservations/index.vue` → `FleetReservationList.vue` (page flotte) ;
+- synchronisation iCal (#880) : `components/reservations/calendar_sync/` — `BoatCalendarSyncCard.vue` sur `boats/reservations.vue` (export `CalendarFeedPanel.vue` + import `ExternalCalendarList.vue`), `CalendarFeedPanel` dans la carte « Flux iCal de la flotte » de `reservations/index.vue` ; créneaux importés en violet pointillé dans `ReservationCalendar.vue` (prop `externalBlocks`) et `ReservationTimelineRow.vue` (`entry.external`), légende dans `ReservationTimeline.vue` — test `tests/inertia/calendar_sync.spec.ts`
 - `boats/reservations.vue` : bandeau `BoatAvailabilityBanner` et, pour un admin (`canForceUnavailable`), champ « motif de forçage » de `ReservationForm.vue` quand le statut est `confirmed` (#870)
 - `boats/reservations.vue` → `ReservationList.vue` (`/boats/:id/reservations`, l'écran
   de l'état des lieux de retour). La colonne y est masquée quand elle n'a rien à

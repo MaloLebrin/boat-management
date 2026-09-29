@@ -68,6 +68,12 @@ export const AUDIT_ACTIONS = [
   'export.run',
   'client.export_bulk',
   'accounting_settings.update',
+  // Synchronisation iCal (#880) : flux publié par jeton (création,
+  // régénération, révocation) et calendriers externes importés.
+  'calendar.token_created',
+  'calendar.token_revoked',
+  'external_calendar.added',
+  'external_calendar.removed',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]

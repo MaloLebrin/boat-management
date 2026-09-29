@@ -56,8 +56,8 @@ const reservation = {
 } satisfies FleetBoatCalendarEntry['reservations'][number]
 
 const entries: FleetBoatCalendarEntry[] = [
-  { boatId: 1, boatName: 'Mistral', reservations: [], maintenance: [] },
-  { boatId: 2, boatName: 'Bora Bora', reservations: [], maintenance: [] },
+  { boatId: 1, boatName: 'Mistral', reservations: [], maintenance: [], external: [] },
+  { boatId: 2, boatName: 'Bora Bora', reservations: [], maintenance: [], external: [] },
 ]
 
 describe('ReservationTimeline', () => {
@@ -72,9 +72,15 @@ describe('ReservationTimeline', () => {
     const wrapper = mount(ReservationTimeline, {
       props: {
         calendarEntries: [
-          { boatId: 1, boatName: 'Mistral', reservations: [reservation], maintenance: [] },
-          { boatId: 2, boatName: 'Bora Bora', reservations: [], maintenance: [] },
-          { boatId: 3, boatName: 'Cyclone', reservations: [], maintenance: [] },
+          {
+            boatId: 1,
+            boatName: 'Mistral',
+            reservations: [reservation],
+            maintenance: [],
+            external: [],
+          },
+          { boatId: 2, boatName: 'Bora Bora', reservations: [], maintenance: [], external: [] },
+          { boatId: 3, boatName: 'Cyclone', reservations: [], maintenance: [], external: [] },
         ],
         boats,
         selectedBoatId: null,

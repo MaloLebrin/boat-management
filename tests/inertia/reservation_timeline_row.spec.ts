@@ -35,6 +35,7 @@ const entry: FleetBoatCalendarEntry = {
     },
   ],
   maintenance: [],
+  external: [],
 }
 
 describe('ReservationTimelineRow', () => {

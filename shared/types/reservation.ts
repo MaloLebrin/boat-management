@@ -1,5 +1,6 @@
 import type { DateTime } from 'luxon'
 import type { InvoiceLink } from './invoice.js'
+import type { ExternalBlockRow } from '#shared/types/calendar_sync'
 
 export const RESERVATION_STATUSES = ['option', 'confirmed', 'cancelled'] as const
 export type ReservationStatus = (typeof RESERVATION_STATUSES)[number]
@@ -99,6 +100,8 @@ export interface FleetBoatCalendarEntry {
    * l'appelant n'a pas `maintenance.view`.
    */
   maintenance: FleetMaintenanceWindow[]
+  /** Créneaux importés de calendriers externes (#880), non modifiables. */
+  external: ExternalBlockRow[]
 }
 
 /** Tâche de maintenance ouverte et datée, vue comme une plage de jours (#869). */

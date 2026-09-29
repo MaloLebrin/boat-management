@@ -166,6 +166,31 @@ test.group('toFleetCalendarEntries', () => {
     assert.lengthOf(entries[0].reservations, 1)
   })
 
+  test('attaches the imported external blocks to their boat (#880)', ({ assert }) => {
+    const block = {
+      id: 5,
+      boatId: 2,
+      calendarName: 'Samboat',
+      summary: 'Reserved',
+      startsAt: '2026-07-01T00:00:00.000Z',
+      endsAt: '2026-07-08T00:00:00.000Z',
+      startsOn: '2026-07-01',
+      endsOn: '2026-07-08',
+    }
+    const entries = toFleetCalendarEntries(
+      [
+        { id: 1, name: 'Alizé' },
+        { id: 2, name: 'Bora' },
+      ],
+      [],
+      new Map(),
+      [block, { ...block, id: 6, boatId: 99 }]
+    )
+
+    assert.isEmpty(entries[0].external)
+    assert.deepEqual(entries[1].external, [block])
+  })
+
   test('returns an empty list when the fleet has no boat', ({ assert }) => {
     assert.isEmpty(toFleetCalendarEntries([], [makeRow()]))
   })

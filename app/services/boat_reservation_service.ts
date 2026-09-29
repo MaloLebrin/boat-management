@@ -4,6 +4,7 @@ import {
   ReservationValidationError,
   ReservationDurationError,
   ReservationBlacklistedClientError,
+  ReservationExternalConflictError,
 } from '#exceptions/reservation_errors'
 import { BoatUnavailableError } from '#exceptions/boat_errors'
 import type { BoatUnavailabilityWindow } from '#shared/types/boat_status'
@@ -31,6 +32,7 @@ import BoatAvailabilityService from '#services/boat_availability_service'
 import BoatPricingService from '#services/boat_pricing_service'
 import ReservationQuoteService from '#services/reservation_quote_service'
 import ReservationPaymentService from '#services/reservation_payment_service'
+import ExternalCalendarService from '#services/external_calendar_service'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
@@ -55,7 +57,8 @@ export default class BoatReservationService {
     private pricingService: BoatPricingService,
     private quoteService: ReservationQuoteService,
     private availabilityService: BoatAvailabilityService,
-    private paymentService: ReservationPaymentService
+    private paymentService: ReservationPaymentService,
+    private externalCalendarService: ExternalCalendarService
   ) {}
 
   async listForBoat(user: User, boat: Boat): Promise<BoatReservation[]> {
@@ -249,6 +252,7 @@ export default class BoatReservationService {
 
     return db.transaction(async (trx) => {
       await this.checkConflict(boat.id, startsAt, endsAt, null, status, trx)
+      await this.checkExternalConflict(boat.id, startsAt, endsAt, status, trx)
       const forcedOver = await this.assertBoatAvailable(
         boat,
         startsAt,
@@ -352,6 +356,16 @@ export default class BoatReservationService {
 
     return db.transaction(async (trx) => {
       await this.checkConflict(boat.id, startsAt, endsAt, reservationId, effectiveStatus, trx)
+
+      // Un créneau importé après coup ne doit pas figer une réservation déjà
+      // posée : seuls un déplacement ou une confirmation le consultent (#880).
+      const datesChanged =
+        startsAt.toMillis() !== reservation.startsAt.toMillis() ||
+        endsAt.toMillis() !== reservation.endsAt.toMillis()
+      const statusChanged = payload.status !== undefined && payload.status !== reservation.status
+      if (datesChanged || statusChanged) {
+        await this.checkExternalConflict(boat.id, startsAt, endsAt, effectiveStatus, trx)
+      }
 
       // Une réservation déjà posée reste modifiable (notes, client…) même si le
       // bateau est devenu indisponible depuis : seuls un déplacement ou un
@@ -504,6 +518,24 @@ export default class BoatReservationService {
     if (conflict) {
       throw new ReservationConflictError()
     }
+  }
+
+  /**
+   * Créneaux importés d'un calendrier externe (#880) : le bateau est loué
+   * ailleurs, une option comme une confirmation sont refusées. Pas de
+   * forçage — un flux périmé se corrige en le resynchronisant ou en le
+   * retirant.
+   */
+  private async checkExternalConflict(
+    boatId: number,
+    startsAt: DateTime,
+    endsAt: DateTime,
+    incomingStatus: ReservationStatus,
+    trx: TransactionClientContract
+  ): Promise<void> {
+    if (incomingStatus === 'cancelled') return
+    const conflict = await this.externalCalendarService.conflictFor(boatId, startsAt, endsAt, trx)
+    if (conflict) throw new ReservationExternalConflictError(conflict.calendarName)
   }
 
   /**
