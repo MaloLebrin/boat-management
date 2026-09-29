@@ -24,6 +24,13 @@ export default await Env.create(new URL('../', import.meta.url), {
   DB_USER: Env.schema.string(),
   DB_PASSWORD: Env.schema.secret(),
   DB_DATABASE: Env.schema.string(),
+  // Pool et timeouts de session (#854) — défauts dans config/database.ts
+  DB_POOL_MAX: Env.schema.number.optional(),
+  DB_STATEMENT_TIMEOUT_MS: Env.schema.number.optional(),
+  DB_IDLE_IN_TRANSACTION_TIMEOUT_MS: Env.schema.number.optional(),
+  // SSL pour Postgres managé (PaaS) — désactivé par défaut (réseau Docker interne)
+  DB_SSL: Env.schema.boolean.optional(),
+  DB_SSL_REJECT_UNAUTHORIZED: Env.schema.boolean.optional(),
 
   // App
   APP_NAME: Env.schema.string(),

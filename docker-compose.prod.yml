@@ -60,6 +60,8 @@ services:
     environment:
       NODE_ENV: production
       DB_HOST: postgres
+      # DDL long : pas de statement_timeout (0 = illimité, #854)
+      DB_STATEMENT_TIMEOUT_MS: 0
     command:
       - sh
       - -c
@@ -87,12 +89,26 @@ services:
   # sans `--queue` ne traite que `default`.
   worker:
     <<: *app
+    # Imports/exports : timeouts plus longs que le web (30s / 60s) — #854
+    # (un `environment:` local remplace celui de `x-app`, d'où la reprise des clés.)
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      HOST: 0.0.0.0
+      DB_STATEMENT_TIMEOUT_MS: 300000
+      DB_IDLE_IN_TRANSACTION_TIMEOUT_MS: 120000
     command: ['node', 'ace', 'queue:work', '--queue=default,emails,media,exports,maintenance,push']
 
   # Queue `ai` isolée : les jobs Mistral durent des dizaines de secondes et
   # monopoliseraient la concurrence du worker principal.
   worker-ai:
     <<: *app
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      HOST: 0.0.0.0
+      DB_STATEMENT_TIMEOUT_MS: 300000
+      DB_IDLE_IN_TRANSACTION_TIMEOUT_MS: 120000
     command: ['node', 'ace', 'queue:work', '--queue=ai']
 
   # Sauvegardes PostgreSQL (#847) — procédure complète : docs/dev/runbook.md.

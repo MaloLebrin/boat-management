@@ -36,6 +36,30 @@ l'application de démarrer. Le point de départ est toujours `.env.example`
 | `ENCRYPTION_KEY` | secret 32 octets, ≠ `APP_KEY` | Chiffrement au repos des clés BYOK (#786) : `openssl rand -base64 32` — voir `docs/dev/encryption-keys.md`    |
 | `QUEUE_DRIVER`   | `database`                    | Les workers lisent la file en base                                                                            |
 
+### Pool Postgres et timeouts de session (#854)
+
+`config/database.ts` pose explicitement le pool Knex et des timeouts de session
+sur chaque connexion :
+
+| Variable                            | Défaut  | Rôle                                           |
+| ----------------------------------- | ------- | ---------------------------------------------- |
+| `DB_POOL_MAX`                       | `10`    | Connexions max par processus Node              |
+| `DB_STATEMENT_TIMEOUT_MS`           | `30000` | Coupe une requête trop longue (`0` = illimité) |
+| `DB_IDLE_IN_TRANSACTION_TIMEOUT_MS` | `60000` | Coupe une transaction idle (`0` = illimité)    |
+| `DB_SSL`                            | `false` | Active SSL (Postgres managé)                   |
+| `DB_SSL_REJECT_UNAUTHORIZED`        | `true`  | Vérifie la CA du serveur                       |
+
+**Dimensionnement.** Trois processus (`web`, `worker`, `worker-ai`) ×
+`DB_POOL_MAX` (10) = **30** connexions, sous les 100 de Postgres par défaut.
+La marge couvre `pg_dump` (service `backup`), le `migrator` one-shot et un
+client admin. Monter le pool impose de monter `max_connections` côté Postgres
+(ou de baisser `DB_POOL_MAX` sur un des process).
+
+Dans `docker-compose.prod.yml`, les workers ont des timeouts plus longs
+(statement 5 min, idle 2 min) pour les imports/exports ; le `migrator` pose
+`DB_STATEMENT_TIMEOUT_MS=0` pour ne pas tuer un DDL long. Le `web` garde
+30 s / 60 s.
+
 ### Proxy de confiance et IP du visiteur (#844)
 
 Toute la limitation de débit par IP (`start/limiter.ts` : login, inscription,
@@ -159,11 +183,12 @@ service `worker`.
 
 ### Une seule instance `web`
 
-`config/transmit.ts` utilise le transport `null` : les événements SSE ne sont
-pas partagés entre processus. Avec deux réplicas `web`, une notification émise
-par l'un n'atteint pas les navigateurs connectés à l'autre. **Ne pas scaler
-`web`** tant qu'un transport (Redis) n'est pas configuré. Les workers, eux, se
-scalent librement.
+**Choix volontaire** : `config/transmit.ts` garde `transport: null` — les
+événements SSE ne sont diffusés qu'aux clients connectés **à ce processus**.
+Avec deux réplicas `web`, une notification émise par l'un n'atteint pas les
+navigateurs connectés à l'autre. **Ne pas scaler `web`** tant qu'un transport
+partagé (Redis) n'est pas configuré — hors périmètre pour l'instant. Les
+workers, eux, se scalent librement.
 
 C'est aussi le conteneur `web` qui met en file les jobs planifiés :
 `start/scheduler.ts` n'est préchargé que dans l'environnement `web`
@@ -191,8 +216,10 @@ L'image GHCR fonctionne telle quelle. À configurer :
   acceptant que les jobs IA retardent les mails ;
 - **Postgres** : managé par la plateforme, `DB_*` fournis par elle. Activez
   ses sauvegardes et vérifiez leur rétention
-  ([`docs/dev/runbook.md`](runbook.md) § 3) ;
-- **Une seule instance web** (voir ci-dessus).
+  ([`docs/dev/runbook.md`](runbook.md) § 3). Posez `DB_SSL=true` si le
+  Postgres managé l'exige ; `DB_SSL_REJECT_UNAUTHORIZED=false` seulement si
+  la CA n'est pas dans le trust store de l'image ;
+- **Une seule instance web** (choix volontaire — voir ci-dessus).
 
 ## 6. Healthcheck `/up`
 
