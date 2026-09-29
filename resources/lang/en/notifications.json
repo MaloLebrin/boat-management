@@ -153,6 +153,16 @@
         "title": "Export failed: {type}",
         "body": "The export could not be generated. Run it again, or narrow the period."
       }
+    },
+    "crew_certification": {
+      "expiring_soon": {
+        "title": "Certification to renew: {crewMemberName}",
+        "body": "{count, plural, one {A certification held by {crewMemberName} expires in {days, plural, one {# day} other {# days}}.} other {# certifications held by {crewMemberName} expire, the first in {days, plural, one {# day} other {# days}}.}}"
+      },
+      "expired": {
+        "title": "Certification expired: {crewMemberName}",
+        "body": "{count, plural, one {A certification held by {crewMemberName} has expired: do not sign them on before it is renewed.} other {# certifications held by {crewMemberName} have expired: do not sign them on before they are renewed.}}"
+      }
     }
   },
   "title": "Notifications",
@@ -197,6 +207,8 @@
     "invoice.reminder_sent": "Invoice reminder sent",
     "invoice.reminder_skipped": "Invoice reminder not sent",
     "export.ready": "Export ready",
-    "export.failed": "Export failed"
+    "export.failed": "Export failed",
+    "crew_certification.expiring_soon": "Crew certification to renew",
+    "crew_certification.expired": "Crew certification expired"
   }
 }

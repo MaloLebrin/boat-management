@@ -6,13 +6,19 @@ import BoatDocument from '#models/boat_document'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import BoatReservation from '#models/boat_reservation'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
+import CrewCertification from '#models/crew_certification'
 import OrganizationMembership from '#models/organization_membership'
 import NotificationService from '#services/notification_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import QuotaService from '#services/quota_service'
 import Organization from '#models/organization'
 import { resolveEffectiveExpiry } from '#shared/helpers/safety_compliance'
+import { toAppLocale } from '#shared/helpers/locale_path'
 import { paymentAttention } from '#shared/helpers/reservation_payment'
+import {
+  CREW_CERT_EXPIRING_SOON_DAYS,
+  crewCertificationAlertWindow,
+} from '#shared/helpers/crew_certification'
 import type { NotificationSeverity, NotificationType } from '#shared/types/notification'
 
 /** Fenêtre « bientôt » (jours) pour les échéances/expirations à venir. */
@@ -24,6 +30,13 @@ const DEDUPE_WINDOW_DAYS = 30
  * relance par bateau et par mois en laisserait passer. Une par semaine.
  */
 const PAYMENT_DEDUPE_WINDOW_DAYS = 7
+/**
+ * Certifications d'équipage (#882) : l'anti-doublon porte sur la fenêtre
+ * (60/30/7 jours), pas sur un délai fixe — la clé change en entrant dans la
+ * fenêtre suivante. Couvrir la plus large évite qu'une alerte « 60 jours » se
+ * répète avant que l'échéance n'entre dans celle des 30 jours.
+ */
+const CREW_CERT_DEDUPE_WINDOW_DAYS = CREW_CERT_EXPIRING_SOON_DAYS
 
 /**
  * Notification agrégée par bateau (une notif par bateau + type, avec compte).
@@ -45,9 +58,28 @@ interface ScanGroup {
 }
 
 /**
+ * Alerte d'un équipier (#882) : ses certifications d'un même état, agrégées.
+ * Pas de bateau : l'équipage est rattaché à l'organisation.
+ */
+interface CrewCertificationGroup {
+  type: 'crew_certification.expiring_soon' | 'crew_certification.expired'
+  severity: NotificationSeverity
+  organizationId: number
+  crewMemberId: number
+  crewMemberName: string
+  crewMemberEmail: string | null
+  count: number
+  /** Échéance la plus proche (jours), pour le texte « expire dans N jours ». */
+  days: number
+  /** Clé anti-doublon : `<équipier>:<fenêtre>` ou `<équipier>:expired`. */
+  alertKey: string
+}
+
+/**
  * Scanne la flotte pour créer des notifications planifiées : tâches de
  * maintenance en retard / à venir, documents et équipements de sécurité expirés
- * ou expirant bientôt, acomptes et soldes de location à encaisser (#875). Les
+ * ou expirant bientôt, acomptes et soldes de location à encaisser (#875),
+ * certifications d'équipage à renouveler (#882, par équipier et non par bateau). Les
  * notifications sont agrégées par bateau (une notif par bateau + type, avec un
  * compte) et destinées aux admins de l'organisation.
  * L'anti-doublon (`NotificationService.createIfNotRecent`) évite le spam d'un
@@ -70,8 +102,9 @@ export default class NotificationScanService {
       this.scanReservationPayments(),
     ])
     const groups = scanned.flat()
+    const crewCreated = await this.notifyCrewCertifications()
 
-    if (groups.length === 0) return { created: 0 }
+    if (groups.length === 0) return { created: crewCreated }
 
     // Résout les admins de chaque organisation concernée en une seule passe
     // parallèle (une requête par org distincte), plutôt qu'au fil d'une boucle.
@@ -131,7 +164,130 @@ export default class NotificationScanService {
     )
 
     const created = results.filter((notification) => notification !== null).length
-    return { created }
+    return { created: created + crewCreated }
+  }
+
+  /**
+   * Certifications d'équipage échues ou qui expirent dans les 60 jours (#882),
+   * une notification par équipier et par état. Destinataires : les admins et
+   * l'équipier lui-même quand son e-mail est celui d'un membre de
+   * l'organisation. Une échéance n'alerte qu'une fois par fenêtre (60, 30,
+   * 7 jours) ; une certification échue, une fois par mois.
+   */
+  private async notifyCrewCertifications(): Promise<number> {
+    const groups = await this.scanCrewCertifications()
+    if (groups.length === 0) return 0
+
+    const orgIds = [...new Set(groups.map((group) => group.organizationId))]
+    const membershipsByOrg = new Map(
+      await Promise.all(
+        orgIds.map(async (orgId) => [orgId, await this.membershipsFor(orgId)] as const)
+      )
+    )
+    const deliveries: Array<{
+      group: CrewCertificationGroup
+      membership: OrganizationMembership
+      actionUrl: string | null
+    }> = []
+    for (const group of groups) {
+      const memberships = membershipsByOrg.get(group.organizationId) ?? []
+      const recipients = new Map<number, OrganizationMembership>()
+      for (const membership of memberships) {
+        if (membership.role === 'admin') recipients.set(membership.user.id, membership)
+      }
+      const email = group.crewMemberEmail?.toLowerCase()
+      const self = email
+        ? memberships.find((membership) => membership.user.email.toLowerCase() === email)
+        : undefined
+      if (self) recipients.set(self.user.id, self)
+
+      for (const membership of recipients.values()) {
+        // La liste d'équipage est ouverte à `crew.create` : un équipier qui n'y
+        // a pas accès reçoit l'alerte sans lien plutôt qu'un lien vers un refus.
+        const canOpen = await membership.user.hasPermission(group.organizationId, 'crew.create')
+        deliveries.push({ group, membership, actionUrl: canOpen ? '/crew' : null })
+      }
+    }
+
+    const results = await Promise.all(
+      deliveries.map(({ group, membership, actionUrl }) => {
+        // Rédigée dans la langue du destinataire (#414), à défaut celle de l'app.
+        const locale = i18nManager.locale(toAppLocale(membership.user.locale))
+        const params = {
+          crewMemberName: group.crewMemberName,
+          count: String(group.count),
+          days: String(group.days),
+        }
+        return this.notificationService.createIfNotRecent(
+          {
+            userId: membership.user.id,
+            organizationId: group.organizationId,
+            type: group.type,
+            severity: group.severity,
+            title: locale.formatMessage(`notifications.messages.${group.type}.title`, params),
+            body: locale.formatMessage(`notifications.messages.${group.type}.body`, params),
+            actionUrl,
+            metadata: {
+              crewMemberId: group.crewMemberId,
+              count: group.count,
+              crewAlertKey: group.alertKey,
+            },
+          },
+          {
+            metadataKey: 'crewAlertKey',
+            withinDays:
+              group.type === 'crew_certification.expired'
+                ? DEDUPE_WINDOW_DAYS
+                : CREW_CERT_DEDUPE_WINDOW_DAYS,
+          }
+        )
+      })
+    )
+    return results.filter((notification) => notification !== null).length
+  }
+
+  private async scanCrewCertifications(): Promise<CrewCertificationGroup[]> {
+    const horizon = DateTime.now().startOf('day').plus({ days: CREW_CERT_EXPIRING_SOON_DAYS })
+    const certifications = await CrewCertification.query()
+      .whereNotNull('expires_at')
+      .where('expires_at', '<=', horizon.toISODate()!)
+      .preload('crewMember')
+
+    const byKey = new Map<string, CrewCertificationGroup>()
+    for (const cert of certifications) {
+      const days = cert.expiresInDays!
+      const expired = days < 0
+      const type = expired ? 'crew_certification.expired' : 'crew_certification.expiring_soon'
+      const key = `${cert.crewMemberId}:${type}`
+      const member = cert.crewMember
+      const existing = byKey.get(key)
+      if (existing) {
+        existing.count++
+        existing.days = Math.min(existing.days, days)
+        continue
+      }
+      byKey.set(key, {
+        type,
+        severity: expired ? 'error' : 'warning',
+        organizationId: member.organizationId,
+        crewMemberId: member.id,
+        crewMemberName: member.fullName,
+        crewMemberEmail: member.email,
+        count: 1,
+        days,
+        alertKey: '',
+      })
+    }
+
+    // La fenêtre dépend de l'échéance la plus proche du lot : fixée après
+    // l'agrégation (l'ordre de lecture des certifications est libre).
+    return [...byKey.values()].map((group) => ({
+      ...group,
+      alertKey:
+        group.type === 'crew_certification.expired'
+          ? `${group.crewMemberId}:expired`
+          : `${group.crewMemberId}:${crewCertificationAlertWindow(group.days)}`,
+    }))
   }
 
   private async scanMaintenance(): Promise<ScanGroup[]> {
@@ -360,6 +516,10 @@ export default class NotificationScanService {
    * @param organizationId organisation ciblée
    * @returns les memberships de rôle `admin`, relation `user` préchargée
    */
+  private async membershipsFor(organizationId: number): Promise<OrganizationMembership[]> {
+    return OrganizationMembership.query().where('organizationId', organizationId).preload('user')
+  }
+
   private async adminsFor(organizationId: number): Promise<OrganizationMembership[]> {
     return OrganizationMembership.query()
       .where('organizationId', organizationId)

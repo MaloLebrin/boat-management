@@ -11,9 +11,20 @@ import type {
   CrewCertificationRow,
   NavigationLogCrewRow,
   CrewMemberOption,
+  CrewCertificationAlert,
+  DashboardCrewCertifications,
 } from '#shared/types/crew'
 import type Organization from '#models/organization'
 import { toDateTime } from '#shared/helpers/date'
+import {
+  CREW_CERT_EXPIRING_SOON_DAYS,
+  crewCertificationStatus,
+  worstCrewCertificationStatus,
+} from '#shared/helpers/crew_certification'
+import { DateTime } from 'luxon'
+
+/** Lignes affichées par le widget du tableau de bord. */
+const DASHBOARD_CREW_CERT_LIMIT = 5
 
 export default class CrewService {
   async listForOrganization(organization: Organization): Promise<CrewMemberRow[]> {
@@ -32,8 +43,59 @@ export default class CrewService {
       .orderBy('last_name', 'asc')
       .orderBy('first_name', 'asc')
       .select('id', 'first_name', 'last_name')
+      .preload('certifications', (q) => q.select('id', 'crew_member_id', 'expires_at'))
 
-    return members.map((m) => ({ id: m.id, fullName: m.fullName }))
+    return members.map((m) => ({
+      id: m.id,
+      fullName: m.fullName,
+      certificationStatus: this.#memberStatus(m),
+    }))
+  }
+
+  /**
+   * Certifications échues ou qui expirent dans les 60 jours (#882), les plus
+   * urgentes d'abord. Source du widget « Certifications à renouveler » et du
+   * contexte de l'assistant.
+   */
+  async listCertificationAlerts(organizationId: number): Promise<CrewCertificationAlert[]> {
+    const horizon = DateTime.now().startOf('day').plus({ days: CREW_CERT_EXPIRING_SOON_DAYS })
+    const certifications = await CrewCertification.query()
+      .select('id', 'crew_member_id', 'type', 'expires_at')
+      .whereNotNull('expires_at')
+      .where('expires_at', '<=', horizon.toISODate()!)
+      .whereHas('crewMember', (q) => q.where('organization_id', organizationId))
+      .preload('crewMember', (q) => q.select('id', 'first_name', 'last_name'))
+      .orderBy('expires_at', 'asc')
+      .orderBy('id', 'asc')
+
+    return certifications.map((cert) => CrewService.toAlert(cert))
+  }
+
+  /**
+   * Widget « Certifications à renouveler » (#882) : les comptes par état et
+   * les cinq certifications les plus urgentes.
+   */
+  async getDashboardCertifications(organizationId: number): Promise<DashboardCrewCertifications> {
+    const alerts = await this.listCertificationAlerts(organizationId)
+    return {
+      expiredCount: alerts.filter((alert) => alert.status === 'expired').length,
+      expiringSoonCount: alerts.filter((alert) => alert.status === 'expiring_soon').length,
+      items: alerts.slice(0, DASHBOARD_CREW_CERT_LIMIT),
+    }
+  }
+
+  /** Ligne d'alerte d'une certification datée, `crewMember` préchargé. */
+  static toAlert(cert: CrewCertification): CrewCertificationAlert {
+    const expiresInDays = cert.expiresInDays!
+    return {
+      crewMemberId: cert.crewMemberId,
+      crewMemberName: cert.crewMember.fullName,
+      certificationId: cert.id,
+      type: cert.type,
+      expiresAt: cert.expiresAt!.toISODate()!,
+      expiresInDays,
+      status: expiresInDays < 0 ? 'expired' : 'expiring_soon',
+    }
   }
 
   async getForOrganizationOrFail(organization: Organization, id: number): Promise<CrewMember> {
@@ -148,7 +210,14 @@ export default class CrewService {
       phone: member.phone,
       notes: member.notes,
       certifications: member.certifications.map((c) => this.#toCertRow(c)),
+      certificationStatus: this.#memberStatus(member),
     }
+  }
+
+  #memberStatus(member: CrewMember) {
+    return worstCrewCertificationStatus(
+      member.certifications.map((c) => crewCertificationStatus(c.expiresInDays))
+    )
   }
 
   #toCertRow(cert: CrewCertification): CrewCertificationRow {
@@ -159,6 +228,7 @@ export default class CrewService {
       expiresAt: cert.expiresAt ? cert.expiresAt.toISODate() : null,
       isExpired: cert.isExpired,
       expiresInDays: cert.expiresInDays,
+      status: crewCertificationStatus(cert.expiresInDays),
     }
   }
 }

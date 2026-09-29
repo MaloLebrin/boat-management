@@ -25,7 +25,8 @@
   "certStatus": {
     "valid": "Valide",
     "expired": "Expirée",
-    "expiresSoon": "Expire dans {days} j"
+    "expiresSoon": "Expire dans {days, plural, one {# jour} other {# jours}}",
+    "expiredSince": "Expirée depuis {days, plural, one {# jour} other {# jours}}"
   },
   "form": {
     "createTitle": "Ajouter un équipier",
@@ -42,7 +43,11 @@
     "role": "Rôle",
     "member": "Équipier",
     "downloadPdf": "Rôle d'équipage (PDF)",
-    "removeLastConfirm": "C'est le dernier équipier de la sortie. Le retirer et laisser la sortie sans aucun équipage ?"
+    "removeLastConfirm": "C'est le dernier équipier de la sortie. Le retirer et laisser la sortie sans aucun équipage ?",
+    "optionExpired": "{name} — certification expirée",
+    "optionExpiringSoon": "{name} — certification à renouveler",
+    "expiredWarning": "{count, plural, one {Un membre de cet équipage a une certification expirée} other {# membres de cet équipage ont une certification expirée}} : vérifiez-la avant d'appareiller.",
+    "expiredBadge": "Certification expirée"
   },
   "pdf": {
     "title": "Rôle d'équipage",
@@ -58,6 +63,24 @@
       "skipper": "Skipper",
       "crew": "Équipier",
       "passenger": "Passager"
+    }
+  },
+  "memberStatus": {
+    "expired": "Certification expirée",
+    "expiring_soon": "À renouveler"
+  },
+  "emails": {
+    "reminder": {
+      "subject": "{count, plural, one {Une certification d'équipage à renouveler} other {# certifications d'équipage à renouveler}}",
+      "greeting": "Bonjour {name},",
+      "intro": "{count, plural, one {Une certification de votre équipage arrive à échéance. Anticipez son renouvellement : un équipier au certificat expiré ne peut pas embarquer.} other {# certifications de votre équipage arrivent à échéance. Anticipez leur renouvellement : un équipier au certificat expiré ne peut pas embarquer.}}",
+      "columns": {
+        "member": "Équipier",
+        "certification": "Certification",
+        "expiresAt": "Expiration"
+      },
+      "inDays": "dans {days, plural, one {# jour} other {# jours}}",
+      "cta": "Voir l'équipage"
     }
   }
 }

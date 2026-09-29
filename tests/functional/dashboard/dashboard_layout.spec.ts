@@ -22,6 +22,7 @@ import type {
 } from '#shared/types/dashboard'
 import type { ResolvedDashboardLayout } from '#shared/types/dashboard_layout'
 import type { DashboardFleetMargin } from '#shared/types/reporting'
+import type { DashboardCrewCertifications } from '#shared/types/crew'
 
 interface DashboardProps {
   layout: ResolvedDashboardLayout
@@ -36,10 +37,11 @@ interface DashboardProps {
   invoicing?: DashboardInvoicingSummary
   charterOccupancy?: DashboardCharterOccupancy
   fleetMargin?: DashboardFleetMargin
+  crewCertifications?: DashboardCrewCertifications
 }
 
 /** Widgets de la galerie disponibles sans module (masqués par défaut). */
-const GALLERY_BASE = ['safety_compliance', 'fuel', 'low_stock'] as const
+const GALLERY_BASE = ['safety_compliance', 'fuel', 'low_stock', 'crew_certifications'] as const
 const GALLERY_PROPS = [
   'safetyCompliance',
   'fuel',
@@ -47,6 +49,7 @@ const GALLERY_PROPS = [
   'invoicing',
   'charterOccupancy',
   'fleetMargin',
+  'crewCertifications',
 ]
 
 test.group('Dashboard — disposition personnalisable', (group) => {
@@ -246,6 +249,7 @@ test.group('Dashboard — disposition personnalisable', (group) => {
           'invoicing',
           'charter_occupancy',
           'fleet_margin',
+          'crew_certifications',
           'ai_panel',
           'spend',
           'ports',
@@ -262,7 +266,7 @@ test.group('Dashboard — disposition personnalisable', (group) => {
     page.assertStatus(200)
     assert.deepEqual((page.inertiaProps as DashboardProps).layout.hidden, [])
 
-    // Rechargement partiel des six groupes différés (la prop `layout` n'en fait pas partie).
+    // Rechargement partiel des sept groupes différés (la prop `layout` n'en fait pas partie).
     const response = await client
       .get('/dashboard')
       .loginAs(admin)
@@ -289,6 +293,12 @@ test.group('Dashboard — disposition personnalisable', (group) => {
     // Marge du mois (#887) : un mois sans coût ni location, jamais `null`.
     assert.equal(props.fleetMargin!.margin, 0)
     assert.isNull(props.fleetMargin!.topCostBoat)
+    // Certifications à renouveler (#882) : un équipage vide, jamais `null`.
+    assert.deepEqual(props.crewCertifications, {
+      expiredCount: 0,
+      expiringSoonCount: 0,
+      items: [],
+    })
     assert.equal(boat.organizationId, admin.organizationId)
   })
 

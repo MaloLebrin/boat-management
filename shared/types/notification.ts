@@ -20,6 +20,8 @@ export type NotificationType =
   | 'document.expired'
   | 'safety_equipment.expiring_soon'
   | 'safety_equipment.expired'
+  | 'crew_certification.expiring_soon'
+  | 'crew_certification.expired'
   | 'invitation.accepted'
   | 'ai.suggestions_ready'
   | 'boat.status_changed'

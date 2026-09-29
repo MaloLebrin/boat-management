@@ -96,7 +96,7 @@ Les notifications sont produites par des **listeners** branchés sur des events 
 
 ¹ `error` dès que `percent >= 100`, sinon `warning`.
 
-Les listeners quota destinent la notification aux **admins** de l'organisation, et envoient en parallèle un email (`EmailQueueService`). D'autres `NotificationType` sont déjà déclarés dans le type (`maintenance.*`, `document.*`, `safety_equipment.*`, `member.removed`, `plan.upgraded`, `invitation.accepted`) en prévision de futurs producteurs.
+Les listeners quota destinent la notification aux **admins** de l'organisation, et envoient en parallèle un email (`EmailQueueService`). Le scan quotidien (`NotificationScanService`) produit aussi les alertes de flotte (`maintenance.*`, `document.*`, `safety_equipment.*`, `reservation.*`) et, depuis #882, `crew_certification.expiring_soon` / `crew_certification.expired` — une notification par **équipier** (et non par bateau), anti-doublon par fenêtre 60/30/7 jours via `metadata.crewAlertKey`, aussi adressée à l'équipier quand son e-mail est celui d'un membre de l'organisation (détail : `docs/domain/crew.md`). D'autres `NotificationType` sont déjà déclarés dans le type (`maintenance.*`, `document.*`, `safety_equipment.*`, `member.removed`, `plan.upgraded`, `invitation.accepted`) en prévision de futurs producteurs.
 
 ## Exposition au frontend (shared props)
 

@@ -10,6 +10,13 @@ export type CrewCertificationType = NavigationTitle
 
 export type NavigationLogCrewRole = 'skipper' | 'crew' | 'passenger'
 
+/**
+ * État d'une certification (#882) : `expiring_soon` dans les 60 jours,
+ * `undated` sans date d'expiration (permis à vie, date non saisie).
+ * Calculé par `crewCertificationStatus` (`shared/helpers/crew_certification.ts`).
+ */
+export type CrewCertificationStatus = 'valid' | 'expiring_soon' | 'expired' | 'undated'
+
 export interface CreateCrewMemberPayload {
   firstName: string
   lastName: string
@@ -46,6 +53,7 @@ export interface CrewCertificationRow {
   expiresAt: string | null
   isExpired: boolean
   expiresInDays: number | null
+  status: CrewCertificationStatus
 }
 
 export interface CrewMemberRow {
@@ -57,6 +65,8 @@ export interface CrewMemberRow {
   phone: string | null
   notes: string | null
   certifications: CrewCertificationRow[]
+  /** État le plus grave de ses certifications, `null` s'il n'en a aucune (#882). */
+  certificationStatus: CrewCertificationStatus | null
 }
 
 export interface NavigationLogCrewRow {
@@ -68,4 +78,31 @@ export interface NavigationLogCrewRow {
 export interface CrewMemberOption {
   id: number
   fullName: string
+  /**
+   * État le plus grave de ses certifications (#882) : le sélecteur d'équipage
+   * du journal de bord avertit — sans bloquer — quand on embarque un équipier
+   * au certificat échu.
+   */
+  certificationStatus: CrewCertificationStatus | null
+}
+
+/** Une certification à renouveler, telle que listée par le widget, l'assistant et l'e-mail. */
+export interface CrewCertificationAlert {
+  crewMemberId: number
+  crewMemberName: string
+  certificationId: number
+  type: CrewCertificationType
+  /** `YYYY-MM-DD`. */
+  expiresAt: string
+  /** Négatif une fois échue. */
+  expiresInDays: number
+  status: 'expiring_soon' | 'expired'
+}
+
+/** Widget « Certifications à renouveler » du tableau de bord (#882). */
+export interface DashboardCrewCertifications {
+  expiredCount: number
+  expiringSoonCount: number
+  /** Les plus urgentes d'abord (échues, puis par échéance), plafonnées. */
+  items: CrewCertificationAlert[]
 }

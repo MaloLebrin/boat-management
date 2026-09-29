@@ -206,7 +206,8 @@
     "low_stock": "Missing parts",
     "invoicing": "Invoicing",
     "charter_occupancy": "Charter occupancy",
-    "fleet_margin": "Monthly margin"
+    "fleet_margin": "Monthly margin",
+    "crew_certifications": "Certifications to renew"
   },
   "widgetDescriptions": {
     "kpis": "Boats, trips and tasks over 30 days, open incidents.",
@@ -225,7 +226,8 @@
     "low_stock": "Engine parts below their alert threshold or to replace, fleet-wide.",
     "invoicing": "Outstanding, overdue, collected this month and pending quotes (Invoicing module).",
     "charter_occupancy": "Confirmed occupancy rate over 30 days, options and revenue (Charter module).",
-    "fleet_margin": "Rental revenue, costs and margin this month, and the most expensive boat (Reporting)."
+    "fleet_margin": "Rental revenue, costs and margin this month, and the most expensive boat (Reporting).",
+    "crew_certifications": "Crew certifications that have expired or expire within 60 days."
   },
   "plannedTasks": {
     "title": "Planned tasks",
@@ -316,5 +318,11 @@
     "previous": "Previous month: {amount}",
     "topBoat": "Most expensive: {name} ({amount})",
     "empty": "No costs or revenue this month."
+  },
+  "crewCertifications": {
+    "title": "Certifications to renew",
+    "viewAll": "Crew",
+    "summary": "{expired, plural, =0 {None expired} one {# expired} other {# expired}} · {soon, plural, =0 {none within 60 days} one {# within 60 days} other {# within 60 days}}",
+    "empty": "All crew certifications are up to date."
   }
 }

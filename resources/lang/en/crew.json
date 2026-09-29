@@ -25,7 +25,8 @@
   "certStatus": {
     "valid": "Valid",
     "expired": "Expired",
-    "expiresSoon": "Expires in {days} d"
+    "expiresSoon": "Expires in {days, plural, one {# day} other {# days}}",
+    "expiredSince": "Expired {days, plural, one {# day} other {# days}} ago"
   },
   "form": {
     "createTitle": "Add a crew member",
@@ -42,7 +43,11 @@
     "role": "Role",
     "member": "Crew member",
     "downloadPdf": "Crew list (PDF)",
-    "removeLastConfirm": "This is the last crew member of the trip. Remove them and leave the trip without any crew?"
+    "removeLastConfirm": "This is the last crew member of the trip. Remove them and leave the trip without any crew?",
+    "optionExpired": "{name} — certification expired",
+    "optionExpiringSoon": "{name} — certification to renew",
+    "expiredWarning": "{count, plural, one {One crew member has an expired certification} other {# crew members have an expired certification}}: check it before casting off.",
+    "expiredBadge": "Certification expired"
   },
   "pdf": {
     "title": "Crew list",
@@ -58,6 +63,24 @@
       "skipper": "Skipper",
       "crew": "Crew",
       "passenger": "Passenger"
+    }
+  },
+  "memberStatus": {
+    "expired": "Certification expired",
+    "expiring_soon": "To renew"
+  },
+  "emails": {
+    "reminder": {
+      "subject": "{count, plural, one {One crew certification to renew} other {# crew certifications to renew}}",
+      "greeting": "Hello {name},",
+      "intro": "{count, plural, one {A certification held by your crew is about to expire. Plan its renewal: a crew member with an expired certificate cannot sign on.} other {# certifications held by your crew are about to expire. Plan their renewal: a crew member with an expired certificate cannot sign on.}}",
+      "columns": {
+        "member": "Crew member",
+        "certification": "Certification",
+        "expiresAt": "Expiry"
+      },
+      "inDays": "in {days, plural, one {# day} other {# days}}",
+      "cta": "View crew"
     }
   }
 }

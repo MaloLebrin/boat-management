@@ -30,7 +30,9 @@ export default class DashboardLayoutService {
    * - `invoicing` : module CRM/Facturation actif **et** `invoices.view` ;
    * - `charter_occupancy` : même garde que `upcoming_reservations` ;
    * - `fleet_margin` : reporting de flotte (#887) — `reports.view`, plan
-   *   `canViewReports` et module Location (sans revenus, pas de marge).
+   *   `canViewReports` et module Location (sans revenus, pas de marge) ;
+   * - `crew_certifications` : certifications d'équipage à renouveler (#882) —
+   *   même garde que la page `/crew` (`crew.create`).
    */
   async availabilityFor(user: User, role: OrgRole | null): Promise<DashboardWidgetAvailability> {
     const org = user.organizationId ? user.organization : null
@@ -55,6 +57,10 @@ export default class DashboardLayoutService {
           (await user.hasPermission(user.organizationId, 'reports.view'))
         : false
 
+    const canViewCrew = user.organizationId
+      ? await user.hasPermission(user.organizationId, 'crew.create')
+      : false
+
     return {
       kpis: true,
       attention: true,
@@ -73,6 +79,7 @@ export default class DashboardLayoutService {
       invoicing: canViewInvoices,
       charter_occupancy: canViewReservations,
       fleet_margin: canViewMargin,
+      crew_certifications: canViewCrew,
     }
   }
 

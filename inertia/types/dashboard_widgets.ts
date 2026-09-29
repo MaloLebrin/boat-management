@@ -19,6 +19,7 @@ import type {
 } from '#shared/types/dashboard'
 import type { ResolvedDashboardLayout } from '#shared/types/dashboard_layout'
 import type { DashboardFleetMargin } from '#shared/types/reporting'
+import type { DashboardCrewCertifications } from '#shared/types/crew'
 import type { BoatTaskEquipment } from '#shared/types/maintenance'
 import type { QuotaUsage } from '#shared/types/plan'
 import type { AiSuggestion, NavigationLogPortOption } from '~/types/boat_show'
@@ -48,6 +49,7 @@ export interface DashboardWidgetData {
   invoicing?: DashboardInvoicingSummary
   charterOccupancy?: DashboardCharterOccupancy
   fleetMargin?: DashboardFleetMargin
+  crewCertifications?: DashboardCrewCertifications
   aiFleetAnalysisAt: string | null
   aiFleetAnalysis: AiSuggestion[] | null
   ports: DashboardPortItem[]

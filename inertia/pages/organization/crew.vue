@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
@@ -56,7 +57,19 @@ function deleteCertification(memberId: number, certId: number) {
         <template v-else>
           <div class="flex items-start justify-between gap-4">
             <div class="flex-1 min-w-0">
-              <p class="font-semibold text-fg">{{ member.fullName }}</p>
+              <div class="flex flex-wrap items-center gap-2">
+                <p class="font-semibold text-fg">{{ member.fullName }}</p>
+                <BaseBadge
+                  v-if="
+                    member.certificationStatus === 'expired' ||
+                    member.certificationStatus === 'expiring_soon'
+                  "
+                  :variant="member.certificationStatus === 'expired' ? 'danger' : 'warning'"
+                  data-testid="crew-member-status"
+                >
+                  {{ t(`crew.memberStatus.${member.certificationStatus}`) }}
+                </BaseBadge>
+              </div>
               <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
                 <span v-if="member.email">{{ member.email }}</span>
                 <span v-if="member.phone">{{ member.phone }}</span>
