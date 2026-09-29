@@ -306,7 +306,7 @@
     "title": "Marque blanche",
     "description": "Personnalisez l'apparence de l'application pour votre organisation.",
     "logoLabel": "Logo de l'organisation",
-    "logoHint": "Formats acceptés : JPG, PNG, SVG, WebP. Taille max : 2 Mo.",
+    "logoHint": "Formats acceptés : JPG, PNG, WebP. Taille max : 2 Mo.",
     "uploadLogo": "Téléverser un logo",
     "deleteLogo": "Supprimer le logo",
     "primaryColorLabel": "Couleur principale",
