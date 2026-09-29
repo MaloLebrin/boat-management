@@ -235,7 +235,7 @@ export default class InspectionDocumentService {
     if (!media) return null
 
     try {
-      const { buffer } = await this.cloudinary.downloadAsBuffer(
+      const buffer = await this.cloudinary.downloadAsBuffer(
         media.cloudinaryPublicId,
         'raw',
         media.format

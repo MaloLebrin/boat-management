@@ -12,7 +12,7 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
 import { contentDisposition } from '#shared/helpers/content_disposition'
-import type { MediaKind } from '#shared/constants/media'
+import { contentTypeForMediaFormat, type MediaKind } from '#shared/constants/media'
 
 @inject()
 export default class BoatMediaController {
@@ -402,13 +402,16 @@ export default class BoatMediaController {
     }
 
     const resourceType = media.format === 'pdf' ? 'raw' : 'image'
-    const { buffer, contentType } = await this.cloudinaryService.downloadAsBuffer(
+    const buffer = await this.cloudinaryService.downloadAsBuffer(
       media.cloudinaryPublicId,
       resourceType,
       media.format
     )
 
-    response.header('Content-Type', contentType)
+    // `attachment` (défaut, pas d'`inline`) fait partie de la garde (#784).
+    // Le type vient de l'allowlist sur `media.format`, jamais de Cloudinary.
+    // Avant un aperçu dans le navigateur, revoir `contentTypeForMediaFormat`.
+    response.header('Content-Type', contentTypeForMediaFormat(media.format))
     response.header(
       'Content-Disposition',
       contentDisposition(`${media.originalFilename}.${media.format}`)
@@ -441,13 +444,16 @@ export default class BoatMediaController {
     }
 
     const resourceType = media.format === 'pdf' ? 'raw' : 'image'
-    const { buffer, contentType } = await this.cloudinaryService.downloadAsBuffer(
+    const buffer = await this.cloudinaryService.downloadAsBuffer(
       media.cloudinaryPublicId,
       resourceType,
       media.format
     )
 
-    response.header('Content-Type', contentType)
+    // `attachment` (défaut, pas d'`inline`) fait partie de la garde (#784).
+    // Le type vient de l'allowlist sur `media.format`, jamais de Cloudinary.
+    // Avant un aperçu dans le navigateur, revoir `contentTypeForMediaFormat`.
+    response.header('Content-Type', contentTypeForMediaFormat(media.format))
     response.header(
       'Content-Disposition',
       contentDisposition(`${media.originalFilename}.${media.format}`)

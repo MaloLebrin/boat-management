@@ -31,8 +31,59 @@ export type MediaKind = (typeof MEDIA_KINDS)[number]
  * couches lisent désormais les mêmes valeurs.
  */
 
-export const PHOTO_EXTNAMES = ['jpg', 'jpeg', 'png', 'heic', 'webp', 'gif'] as const
-export const DOCUMENT_EXTNAMES = ['pdf', 'csv', 'xlsx', 'docx', 'doc'] as const
+/**
+ * Formats acceptés et le `Content-Type` qu'on a le droit de leur associer (#784).
+ *
+ * Source unique : `PHOTO_EXTNAMES` et `DOCUMENT_EXTNAMES` en sont dérivés, et
+ * les validateurs d'upload lisent ces listes. Un format absent de la table —
+ * y compris `html` ou `svg` — ne reçoit jamais un type que le navigateur
+ * interpréterait : `contentTypeForMediaFormat` retombe sur
+ * `application/octet-stream`.
+ *
+ * Les téléchargements de média servent ce type, jamais l'en-tête annoncé par
+ * Cloudinary. `Content-Disposition` reste `attachment` (défaut de
+ * `contentDisposition`) : c'est une partie de la garde. Un aperçu
+ * `{ inline: true }` ne doit être ajouté qu'après avoir revu cette table.
+ */
+export const PHOTO_CONTENT_TYPES = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  heic: 'image/heic',
+  webp: 'image/webp',
+  gif: 'image/gif',
+} as const
+
+export const DOCUMENT_CONTENT_TYPES = {
+  pdf: 'application/pdf',
+  csv: 'text/csv',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  doc: 'application/msword',
+} as const
+
+export const MEDIA_CONTENT_TYPES = {
+  ...PHOTO_CONTENT_TYPES,
+  ...DOCUMENT_CONTENT_TYPES,
+} as const
+
+export type PhotoExtname = keyof typeof PHOTO_CONTENT_TYPES
+export type DocumentExtname = keyof typeof DOCUMENT_CONTENT_TYPES
+export type MediaFormat = keyof typeof MEDIA_CONTENT_TYPES
+
+export const PHOTO_EXTNAMES = Object.keys(PHOTO_CONTENT_TYPES) as PhotoExtname[]
+export const DOCUMENT_EXTNAMES = Object.keys(DOCUMENT_CONTENT_TYPES) as DocumentExtname[]
+
+const OCTET_STREAM = 'application/octet-stream'
+
+/** Type sûr pour un `media.format` stocké. Inconnu → octet-stream, jamais le type Cloudinary. */
+export function contentTypeForMediaFormat(format: string): string {
+  const key = format.trim().toLowerCase()
+  if (Object.hasOwn(MEDIA_CONTENT_TYPES, key)) {
+    return MEDIA_CONTENT_TYPES[key as MediaFormat]
+  }
+  return OCTET_STREAM
+}
 
 export const PHOTO_MAX_SIZE_MB = 10
 export const DOCUMENT_MAX_SIZE_MB = 20

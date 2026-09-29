@@ -95,8 +95,10 @@ test.group('Boat media download — GET /boats/:boatId/media/:mediaId/download',
   })
 
   test("une image passe en resourceType 'image', pas 'raw'", async ({ client, assert }) => {
+    // Le tampon n'est pas un JPEG : le `Content-Type` doit suivre `format`,
+    // pas ce que Cloudinary aurait annoncé en sniffant ces octets (#784).
     const cloud = swapFakeCloudinary({
-      download: { buffer: Buffer.from('\xff\xd8\xff fake'), contentType: 'image/jpeg' },
+      download: Buffer.from('<html>not a jpeg</html>'),
     })
     const { user, boat, media } = await seedBoatMedia({
       kind: 'photo',
@@ -111,6 +113,42 @@ test.group('Boat media download — GET /boats/:boatId/media/:mediaId/download',
     assert.deepEqual(cloud.downloaded, [
       { publicId: media.cloudinaryPublicId, resourceType: 'image', format: 'jpg' },
     ])
+  })
+
+  test('le Content-Type suit le format en base, pas le contenu renvoyé (#784)', async ({
+    client,
+    assert,
+  }) => {
+    // HTML servi tel quel : si la route relayait un type sniffé ou annoncé
+    // par Cloudinary, le navigateur recevrait `text/html` depuis notre origine.
+    swapFakeCloudinary({
+      download: Buffer.from('<html><script>alert(1)</script></html>'),
+    })
+    const { user, boat, media } = await seedBoatMedia({ format: 'pdf' })
+
+    const response = await client.get(`/boats/${boat.id}/media/${media.id}/download`).loginAs(user)
+
+    response.assertStatus(200)
+    response.assertHeader('content-type', 'application/pdf')
+    assert.include(response.header('content-disposition'), 'attachment;')
+    assert.notInclude(response.header('content-type'), 'html')
+  })
+
+  test('un format hors allowlist est servi en octet-stream (#784)', async ({ client, assert }) => {
+    swapFakeCloudinary({
+      download: Buffer.from('<html><script>alert(1)</script></html>'),
+    })
+    const { user, boat, media } = await seedBoatMedia({
+      format: 'html',
+      originalFilename: 'page',
+    })
+
+    const response = await client.get(`/boats/${boat.id}/media/${media.id}/download`).loginAs(user)
+
+    response.assertStatus(200)
+    response.assertHeader('content-type', 'application/octet-stream')
+    assert.include(response.header('content-disposition'), 'attachment;')
+    assert.include(response.header('content-disposition'), 'filename="page.html"')
   })
 
   test("un nom de fichier hostile ne coupe pas l'en-tête", async ({ client, assert }) => {

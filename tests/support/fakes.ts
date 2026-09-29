@@ -38,11 +38,13 @@ export interface FakeCloudinaryOptions {
    */
   failUploadAt?: number
   /**
-   * Réponse de `downloadAsBuffer`. Par défaut un PDF minimal — la branche
-   * `format === 'pdf' → resourceType 'raw'` des contrôleurs de téléchargement.
-   * Passer une image permet de couvrir l'autre branche (#692).
+   * Octets renvoyés par `downloadAsBuffer`. Par défaut un PDF minimal — la
+   * branche `format === 'pdf' → resourceType 'raw'` des contrôleurs de
+   * téléchargement. Le faux ne fournit **pas** de `Content-Type` : les routes
+   * le déduisent de `media.format` (#784). Passer un buffer qui n'est pas un
+   * PDF (du HTML, par exemple) prouve que l'en-tête ne suit pas le contenu.
    */
-  download?: { buffer: Buffer; contentType: string }
+  download?: Buffer
   /**
    * `publicId` dont la suppression doit échouer — simule une panne Cloudinary
    * pendant un nettoyage (#859). L'appel n'est pas enregistré.
@@ -107,7 +109,8 @@ function fakeUploadResult(publicId: string, kind: 'image' | 'document'): Cloudin
  * Remplace `CloudinaryService` par un fake en mémoire. Aucun appel réseau :
  * les uploads renvoient un résultat plausible, les suppressions et les
  * téléchargements sont enregistrés, et `downloadAsBuffer` renvoie un PDF
- * minimal — ou ce que `options.download` lui dicte.
+ * minimal — ou le tampon que `options.download` lui dicte. Pas de
+ * `Content-Type` : c'est `media.format` qui le décide (#784).
  */
 export function swapFakeCloudinary(options: FakeCloudinaryOptions = {}): FakeCloudinary {
   const prefix = options.prefix ?? 'fake-upload'
@@ -121,10 +124,7 @@ export function swapFakeCloudinary(options: FakeCloudinaryOptions = {}): FakeClo
     uploadedBuffers: [],
     restore: restoreCloudinary,
   }
-  const download = options.download ?? {
-    buffer: Buffer.from('%PDF-1.4 fake'),
-    contentType: 'application/pdf',
-  }
+  const download = options.download ?? Buffer.from('%PDF-1.4 fake')
   let attempts = 0
 
   const upload = (folder: string, kind: 'image' | 'document') => {
