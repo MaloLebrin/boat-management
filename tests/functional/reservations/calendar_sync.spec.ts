@@ -261,7 +261,7 @@ test.group('Calendar sync — exported feed (#880)', (group) => {
     assert.lengthOf(await AuditLog.query().where('action', 'calendar.token_revoked'), 2)
   })
 
-  test('an unknown, malformed or downgraded token answers 404', async ({ client }) => {
+  test('an unknown, malformed or downgraded token answers 404', async ({ client, assert }) => {
     assert.equal(await statusOf(client, `/calendar/${'a'.repeat(43)}.ics`), 404)
     assert.equal(await statusOf(client, '/calendar/short.ics'), 404)
     assert.equal(await statusOf(client, `/calendar/${'a'.repeat(43)}`), 404)
