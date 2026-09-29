@@ -120,6 +120,10 @@
       "balance_due": {
         "title": "Soldes à encaisser sur {boatName}",
         "body": "{count, plural, one {# départ dans moins de 7 jours n'est pas soldé} other {# départs dans moins de 7 jours ne sont pas soldés}} sur {boatName}."
+      },
+      "requested": {
+        "title": "Demande de réservation sur {boatName}",
+        "body": "{clientName} demande {boatName} en ligne. L'option est posée : confirmez-la ou refusez-la."
       }
     },
     "invoice": {
@@ -187,6 +191,7 @@
     "boat.available_again": "Bateau de nouveau disponible",
     "reservation.deposit_due": "Acompte non reçu",
     "reservation.balance_due": "Solde à encaisser",
+    "reservation.requested": "Demande de réservation en ligne",
     "invoice.paid_online": "Facture réglée en ligne",
     "invoice.overdue": "Facture en retard",
     "invoice.reminder_sent": "Relance de facture envoyée",

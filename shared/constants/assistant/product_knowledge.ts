@@ -1054,6 +1054,37 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageReservations',
   },
   {
+    id: 'public-booking-page',
+    title: {
+      en: 'Online booking page for your customers',
+      fr: 'Page de réservation en ligne pour vos clients',
+    },
+    body: {
+      en: 'In a boat’s Reservations tab, the “Online booking” box opens a public page to share on your website or social networks. Your customers see the photos, rates and an availability calendar, get a quote for their dates and send a request, without an account. Busy dates show without any detail. Each request arrives as an option marked “Online request”: you are notified, and confirming or cancelling it emails the customer. Unconfirmed requests are deleted after 30 days.',
+      fr: 'Dans l’onglet Réservations d’un bateau, l’encart « Réservation en ligne » ouvre une page publique à mettre sur votre site ou vos réseaux. Vos clients y voient les photos, les tarifs et un calendrier des disponibilités, obtiennent un devis pour leurs dates et envoient une demande, sans compte. Les dates occupées s’affichent sans aucun détail. Chaque demande arrive en option marquée « Demande en ligne » : vous êtes notifié, et la confirmer ou l’annuler prévient le client par e-mail. Une demande non confirmée est supprimée au bout de 30 jours.',
+    },
+    keywords: [
+      'reservation en ligne',
+      'online booking',
+      'page publique',
+      'public page',
+      'lien de reservation',
+      'booking link',
+      'demande de reservation',
+      'booking request',
+      'widget',
+      'site web',
+      'website',
+      'reseaux sociaux',
+      'disponibilites',
+      'availability',
+      'client final',
+      'sans commission',
+    ],
+    navTarget: 'reservations.index',
+    planFlag: 'canManageReservations',
+  },
+  {
     id: 'reservation-payment',
     title: {
       en: 'Reservation payment: deposit, balance and security deposit',

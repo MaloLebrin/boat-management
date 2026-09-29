@@ -1,6 +1,7 @@
 import ContactMessageService from '#services/contact_message_service'
 import SimulatorLeadService from '#services/simulator_lead_service'
 import SimulatorShareService from '#services/simulator_share_service'
+import PublicBookingService from '#services/public_booking_service'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { Job } from '@adonisjs/queue'
@@ -9,9 +10,9 @@ import type { JobOptions } from '@adonisjs/queue/types'
 /**
  * Purge des données collectées sur les pages publiques (#775).
  *
- * Messages de contact, leads du simulateur et liens de partage sont écrits
- * **sans authentification**. Les throttles de `start/limiter.ts` bornent le
- * débit — 5/10 min pour le contact et les leads, 6/min pour les partages —
+ * Messages de contact, leads du simulateur, liens de partage et demandes de
+ * réservation en ligne (#881) sont écrits **sans authentification**. Les
+ * throttles de `start/limiter.ts` bornent le débit — 5/10 min pour le contact et les leads, 6/min pour les partages —
  * mais pas le cumul : rien n'empêchait la croissance sur la durée, et les deux
  * premières tables portent des adresses e-mail.
  *
@@ -28,7 +29,8 @@ export default class PurgePublicFormData extends Job<Record<string, never>> {
   constructor(
     private contactMessageService: ContactMessageService,
     private simulatorLeadService: SimulatorLeadService,
-    private simulatorShareService: SimulatorShareService
+    private simulatorShareService: SimulatorShareService,
+    private publicBookingService: PublicBookingService
   ) {
     super()
   }
@@ -39,9 +41,11 @@ export default class PurgePublicFormData extends Job<Record<string, never>> {
     const contactMessages = await this.contactMessageService.purgeExpired()
     const simulatorLeads = await this.simulatorLeadService.purgeExpired()
     const simulatorShares = await this.simulatorShareService.purgeExpired()
+    // Demandes de réservation en ligne jamais abouties (#881).
+    const bookingRequests = await this.publicBookingService.purgeExpiredRequests()
 
     logger.info(
-      { contactMessages, simulatorLeads, simulatorShares },
+      { contactMessages, simulatorLeads, simulatorShares, bookingRequests },
       'PurgePublicFormData: purge complete'
     )
   }

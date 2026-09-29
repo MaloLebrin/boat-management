@@ -1,0 +1,57 @@
+{{--
+  Demandes de la page publique de réservation (#881) : un seul gabarit pour
+  les quatre messages — alerte au loueur, accusé de réception, confirmation
+  et refus au client. Les textes arrivent déjà traduits.
+--}}
+@component('emails/_layout', { branding })
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">{{ heading }}</h2>
+    @each(paragraph in paragraphs)
+      <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">{{ paragraph }}</p>
+    @end
+    @if(details.length)
+      <table
+        role="presentation"
+        width="100%"
+        cellspacing="0"
+        cellpadding="0"
+        style="margin:10px 0 20px;padding:16px;background-color:#f4f4f7;border-radius:6px;"
+      >
+        @each(detail in details)
+          <tr>
+            <td style="padding:4px 8px;color:#888888;font-size:14px;white-space:nowrap;">
+              {{ detail.label }}
+            </td>
+            <td style="padding:4px 8px;color:#333333;font-size:14px;">{{ detail.value }}</td>
+          </tr>
+        @end
+      </table>
+    @end
+    @if(messageLines.length)
+      <div
+        style="margin:0 0 20px;padding:16px;background-color:#f4f4f7;border-radius:6px;color:#333333;font-size:15px;line-height:1.6;"
+      >
+        @each(line in messageLines)
+          <p style="margin:0 0 6px;">{{ line }}</p>
+        @end
+      </div>
+    @end
+    @if(ctaUrl)
+      <table role="presentation" cellspacing="0" cellpadding="0" style="margin:25px auto 0;">
+        <tr>
+          <td style="border-radius:6px;background-color:#1e3a5f;">
+            <a
+              href="{{ ctaUrl }}"
+              style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+            >
+              {{ ctaLabel }}
+            </a>
+          </td>
+        </tr>
+      </table>
+    @end
+
+    <hr style="border:none;border-top:1px solid #e0e0e0;margin:25px 0;" />
+    <p style="margin:0;color:#888888;font-size:12px;">{{ footer }}</p>
+  @end
+@end

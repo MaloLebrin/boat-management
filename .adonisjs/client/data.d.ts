@@ -27,6 +27,7 @@ import type NotificationTransformer from '#transformers/notification_transformer
 import type OrganizationTransformer from '#transformers/organization_transformer'
 import type PontoonTransformer from '#transformers/pontoon_transformer'
 import type PortTransformer from '#transformers/port_transformer'
+import type PublicBookingTransformer from '#transformers/public_booking_transformer'
 import type PublicDiagnosisTransformer from '#transformers/public_diagnosis_transformer'
 import type PushSubscriptionTransformer from '#transformers/push_subscription_transformer'
 import type RentalContractTransformer from '#transformers/rental_contract_transformer'
@@ -122,6 +123,10 @@ export namespace Data {
   export type Port = InferData<PortTransformer>
   export namespace Port {
     export type Variants = InferVariants<PortTransformer>
+  }
+  export type PublicBooking = InferData<PublicBookingTransformer>
+  export namespace PublicBooking {
+    export type Variants = InferVariants<PublicBookingTransformer>
   }
   export type PublicDiagnosis = InferData<PublicDiagnosisTransformer>
   export namespace PublicDiagnosis {

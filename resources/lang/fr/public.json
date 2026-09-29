@@ -42,5 +42,109 @@
     "fleet": "Planning & flotte",
     "aiAssistant": "Assistant IA",
     "help": "Aide & support"
+  },
+  "booking": {
+    "poweredBy": "Réservation en ligne propulsée par FleetAi",
+    "submitted": "Votre demande est envoyée. {orgName} revient vers vous par e-mail pour la confirmer — un accusé de réception vient de partir.",
+    "fleet": {
+      "title": "Réserver chez {orgName}",
+      "heading": "Réserver un bateau chez {orgName}",
+      "intro": "Choisissez un bateau pour voir ses disponibilités et envoyer une demande de réservation.",
+      "emptyTitle": "Aucun bateau réservable en ligne",
+      "emptyDescription": "Ce loueur n'a pas encore ouvert de bateau à la réservation en ligne. Contactez-le directement."
+    },
+    "show": {
+      "title": "{boatName} — {orgName}",
+      "heading": "Vos dates"
+    },
+    "boat": {
+      "maxPersons": "{count, plural, one {# personne} other {# personnes}}",
+      "fromPrice": "À partir de {price} / jour",
+      "photo": "Photo {index}"
+    },
+    "pricing": {
+      "title": "Tarifs",
+      "daily": "Par jour",
+      "weekly": "Par semaine",
+      "securityDeposit": "Caution",
+      "minDays": "Durée minimale",
+      "nights": "{count, plural, one {# jour} other {# jours}}",
+      "seasons": "Les tarifs varient selon la saison : le devis ci-contre tient compte de vos dates."
+    },
+    "calendar": {
+      "previous": "Mois précédent",
+      "next": "Mois suivant",
+      "legendFree": "Disponible",
+      "legendBusy": "Indisponible",
+      "legendSelected": "Votre sélection"
+    },
+    "quote": {
+      "arrival": "Arrivée",
+      "departure": "Départ",
+      "pickArrival": "Choisissez votre date d'arrivée dans le calendrier.",
+      "pickDeparture": "Choisissez le départ",
+      "loading": "Calcul du devis…",
+      "unavailable": "Ces dates ne sont plus disponibles. Choisissez-en d'autres.",
+      "invalid": "Ces dates ne peuvent pas être réservées en ligne.",
+      "onRequest": "Tarif sur demande : le loueur vous communiquera son prix en confirmant.",
+      "belowMin": "Ce bateau se loue au minimum {count, plural, one {# jour} other {# jours}}.",
+      "aboveMax": "Ce bateau se loue au maximum {count, plural, one {# jour} other {# jours}}.",
+      "base": "Tarif de base",
+      "weekly": "Tarif à la semaine",
+      "total": "Total estimé ({count, plural, one {# jour} other {# jours}})",
+      "advance": "Acompte de {percent} % à la confirmation : {amount}",
+      "securityDeposit": "Caution demandée au départ : {amount}",
+      "disclaimer": "Estimation indicative : le prix définitif est celui que confirme le loueur."
+    },
+    "form": {
+      "name": "Nom et prénom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "message": "Message au loueur",
+      "messagePlaceholder": "Nombre de personnes, expérience de navigation, questions…",
+      "honeypot": "Ne pas remplir ce champ",
+      "consent": "J'accepte que {orgName} utilise ces informations pour traiter ma demande. Elles sont supprimées sous {days} jours si la réservation n'aboutit pas.",
+      "datesError": "Les dates choisies ne sont pas valides. Choisissez-les à nouveau dans le calendrier.",
+      "submit": "Envoyer ma demande",
+      "pickDates": "Choisissez vos dates",
+      "noCommitment": "Sans engagement ni paiement : le loueur confirme votre demande avant toute réservation."
+    },
+    "emails": {
+      "labels": {
+        "boat": "Bateau",
+        "arrival": "Arrivée",
+        "departure": "Départ",
+        "estimate": "Estimation",
+        "name": "Nom",
+        "email": "E-mail",
+        "phone": "Téléphone"
+      },
+      "footer": "Cet e-mail vous est envoyé par {orgName} suite à votre demande de réservation en ligne.",
+      "footerStaff": "Demande reçue par la page de réservation en ligne de {boatName}. Sans réponse sous 30 jours, elle est supprimée.",
+      "alert": {
+        "subject": "Demande de réservation : {boatName} — {clientName}",
+        "heading": "Nouvelle demande pour {boatName}",
+        "intro": "{clientName} demande {boatName} depuis votre page de réservation en ligne. Une option est posée sur ces dates : confirmez-la ou refusez-la, le client est prévenu par e-mail.",
+        "cta": "Voir la demande"
+      },
+      "ack": {
+        "subject": "Votre demande de réservation — {boatName}",
+        "heading": "Demande bien reçue, {clientName}",
+        "intro": "Merci pour votre demande de réservation de {boatName} auprès de {orgName}. Les dates sont mises de côté le temps que le loueur l'examine.",
+        "next": "Vous recevrez un e-mail dès qu'elle sera confirmée ou si elle ne peut pas l'être. Aucun paiement n'a été effectué."
+      },
+      "confirmed": {
+        "subject": "Réservation confirmée — {boatName}",
+        "heading": "Votre réservation est confirmée",
+        "intro": "Bonne nouvelle, {clientName} : {orgName} confirme votre réservation de {boatName}.",
+        "next": "{orgName} vous contacte pour le contrat de location et le versement de l'acompte."
+      },
+      "declined": {
+        "subject": "Votre demande de réservation — {boatName}",
+        "heading": "Votre demande n'a pas pu être confirmée",
+        "intro": "{clientName}, {orgName} ne peut malheureusement pas confirmer votre demande pour {boatName} sur ces dates.",
+        "next": "D'autres dates vous conviendraient peut-être : le calendrier en ligne montre les disponibilités à jour. Aucun paiement n'a été effectué."
+      }
+    }
   }
 }

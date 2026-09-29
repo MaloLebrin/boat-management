@@ -58,7 +58,8 @@
           "Messages envoyés depuis le formulaire de contact : 24 mois après leur réception.",
           "Coordonnées laissées sur le simulateur de coûts : 24 mois après votre dernière simulation.",
           "Liens de partage d'une estimation : 6 mois après leur création, au terme desquels le lien cesse de fonctionner.",
-          "Liens de réinitialisation de mot de passe et invitations non acceptées : une semaine après leur expiration."
+          "Liens de réinitialisation de mot de passe et invitations non acceptées : une semaine après leur expiration.",
+          "Demandes de réservation envoyées depuis la page en ligne d'un loueur et jamais confirmées : 30 jours après leur envoi."
         ]
       },
       {

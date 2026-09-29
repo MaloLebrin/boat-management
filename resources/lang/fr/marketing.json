@@ -1083,6 +1083,7 @@
     "s6_b2": "Coordonnées laissées sur le simulateur de coûts : 24 mois après votre dernière simulation.",
     "s6_b3": "Liens de partage d'une estimation : 6 mois après leur création, au terme desquels le lien cesse de fonctionner.",
     "s6_b4": "Liens de réinitialisation de mot de passe et invitations non acceptées : une semaine après leur expiration.",
+    "s6_b5": "Demandes de réservation envoyées depuis la page en ligne d'un loueur et jamais confirmées : 30 jours après leur envoi.",
     "s7_title": "Sécurité",
     "s7_body": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées : chiffrement des mots de passe, connexions sécurisées (HTTPS), contrôle d'accès et sauvegardes régulières.",
     "s8_title": "Vos droits",

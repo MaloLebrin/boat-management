@@ -34,6 +34,8 @@ declare module '@adonisjs/inertia/types' {
     'boats/sail_show': ExtractProps<(typeof import('../../inertia/pages/boats/sail_show.vue'))['default']>
     'boats/show': ExtractProps<(typeof import('../../inertia/pages/boats/show.vue'))['default']>
     'boats/simulator': ExtractProps<(typeof import('../../inertia/pages/boats/simulator.vue'))['default']>
+    'book/fleet': ExtractProps<(typeof import('../../inertia/pages/book/fleet.vue'))['default']>
+    'book/show': ExtractProps<(typeof import('../../inertia/pages/book/show.vue'))['default']>
     'clients/index': ExtractProps<(typeof import('../../inertia/pages/clients/index.vue'))['default']>
     'clients/show': ExtractProps<(typeof import('../../inertia/pages/clients/show.vue'))['default']>
     'dashboard': ExtractProps<(typeof import('../../inertia/pages/dashboard.vue'))['default']>

@@ -305,6 +305,123 @@ Paris, pour qu'une journée entière importée ne déborde pas sur la veille.
 Guide utilisateur :
 [`docs/user-guide/ical-synchronisation.md`](../user-guide/ical-synchronisation.md).
 
+### 5.2 quater Page publique de réservation (#881)
+
+Un loueur publie un lien « voir les disponibilités et réserver » sur son site
+et ses réseaux, sans passer par une plateforme à commission. Le client final
+n'a pas de compte : sa demande devient une **option** que le loueur confirme
+ou refuse.
+
+**Routes (sans session).** Dans `start/routes/reservations.ts` :
+
+| Route                                   | Nom            | Rôle                                 |
+| --------------------------------------- | -------------- | ------------------------------------ |
+| `GET /book/:orgSlug`                    | `book.fleet`   | page flotte : les bateaux ouverts    |
+| `GET /book/:orgSlug/:boatSlug`          | `book.show`    | fiche, calendrier, devis, formulaire |
+| `POST /book/:orgSlug/:boatSlug/request` | `book.request` | la demande                           |
+
+- `orgSlug` = `organizations.slug` (existant). `boatSlug` =
+  `boats.public_booking_slug`, dérivé du nom à la première ouverture
+  (`Bélouga II` → `belouga-ii`, suffixe `-2`, `-3`… en cas de doublon dans
+  l'organisation) puis **figé** : renommer le bateau ou fermer puis rouvrir
+  la page garde le même lien ;
+- 404 (page `errors/not_found`) pour une organisation inconnue, sans le module
+  Location (`QuotaService.canManageReservations`), un bateau fermé ou vendu —
+  sans dire lequel ;
+- `X-Robots-Tag: noindex` et `<meta name="robots" content="noindex">` : la
+  page n'est pas indexée (l'option « indexable » de l'issue est reportée) ;
+- throttles : `publicBookingThrottle` (60/min/IP) sur les deux GET — chaque
+  choix de dates est une visite partielle — et `publicBookingRequestThrottle`
+  (5/10 min/IP) sur le POST, qui rend un flash
+  (`flash.publicBooking.rateLimit`, via `RATE_LIMIT_FLASH_ROUTES`) plutôt
+  qu'une 429 brute.
+
+**Jours occupés, sans donnée personnelle.** `PublicBookingService.busyRanges`
+renvoie des plages de jours `[startsOn, endsOn[` à l'heure de Paris, fusionnées,
+sur la fenêtre réservable (de J+1 à 12 mois) :
+
+- réservations `option` et `confirmed` (une demande en attente tient le créneau) ;
+- créneaux importés (#880) ;
+- fenêtres d'indisponibilité (#870) : statut, tâche datée, incident
+  immobilisant.
+
+Aucun nom, e-mail, nom de calendrier ou titre de tâche ne sort : la page ne
+sait que « indisponible ». Le jour du départ reste libre : une arrivée peut le
+suivre le même jour.
+
+**Dates et devis.** Le client choisit une arrivée puis un départ (au moins une
+nuit). Les règles de sélection sont partagées front/back
+(`shared/helpers/public_booking.ts` : `canPickDay`, `nextDraft`,
+`selectionOverlapsBusy`). Chaque sélection complète recharge la seule prop
+`quote` (`router.get(..., { only: ['quote'] })`, dates en query string) : le
+devis est calculé côté serveur par `ReservationQuoteService` (tarif de base +
+saisons, #294). La page n'a donc pas besoin d'endpoint JSON. `quote.state`
+vaut `ok`, `unavailable` (jour occupé) ou `invalid` (dates incohérentes, hors
+fenêtre). La page affiche aussi l'acompte de 30 % demandé à la confirmation
+(#875) et la caution du tarif.
+
+**Demande.** `POST …/request` (validator `publicBookingRequestValidator` :
+nom, e-mail, téléphone, message, consentement obligatoire, champ piège
+`website`) → `BoatReservationService.createPublicRequest` :
+
+- réservation `status: 'option'`, `source: 'public'` (nouvelle colonne,
+  `internal` par défaut), `request_locale` = langue de la page, message du
+  client dans `notes`, `total_price` = devis ;
+- les dates sont minuit → minuit à l'heure de Paris ;
+- la transaction revérifie tout : conflit de réservation, créneau importé,
+  **et** fenêtre d'indisponibilité. C'est plus strict qu'une option saisie
+  par l'équipe : le client ne peut pas savoir qu'un entretien est planifié ;
+- durée hors des bornes du tarif → flash `tooShort` / `tooLong` ; dates
+  prises entre l'affichage et l'envoi → flash `unavailable` ;
+- champ piège rempli → réponse identique à un succès, rien n'est écrit ni
+  envoyé.
+
+Le client n'est pas rattaché au CRM : les champs `client_name/email/phone` de
+la réservation suffisent. Le loueur le lie à une fiche client depuis la
+réservation s'il le souhaite.
+
+**Notifications.** Événement `PublicBookingRequested` →
+`OnPublicBookingRequested` :
+
+- chaque admin de l'organisation reçoit une notification
+  `reservation.requested` (in-app + push, lien vers l'onglet Réservations du
+  bateau) et un e-mail dans sa langue ;
+- le client reçoit un accusé de réception aux couleurs du loueur (marque
+  blanche, plan Entreprise).
+
+Le loueur tranche depuis l'onglet Réservations ou `/reservations`, avec les
+actions existantes. Passer l'option en `confirmed` ou `cancelled` émet
+`PublicBookingDecided`, et le client reçoit « confirmée » ou « pas pu être
+confirmée ». Une option publique annulée d'office par une confirmation sur le
+même créneau (`cancelOverlappingOptions`) est traitée comme un refus. Une
+réservation `internal` n'envoie jamais rien à son client. Les quatre e-mails
+partagent le gabarit `resources/views/emails/public_booking.edge` et
+`EmailQueueService.sendPublicBookingEmail`.
+
+Le contrat n'est **pas** envoyé automatiquement à la confirmation : il exige
+une fiche client (#275). Le loueur le génère depuis la réservation, comme
+pour une saisie interne. L'e-mail de confirmation l'annonce.
+
+**Purge (RGPD).** `PurgePublicFormData` (quotidien, #775) appelle
+`PublicBookingService.purgeExpiredRequests` : sont supprimées les demandes
+`source: 'public'` créées il y a plus de 30 jours
+(`PUBLIC_BOOKING_REQUEST_RETENTION_DAYS`), encore en `option` ou annulées, **sans**
+encaissement, contrat, facture ni état des lieux. Une location confirmée,
+payée ou documentée reste dans l'historique.
+
+**Ouverture.** Encart « Réservation en ligne »
+(`BoatPublicBookingCard.vue`) sur l'onglet Réservations du bateau : bascule,
+lien à copier, lien de la page flotte. `PATCH /boats/:boatId/public-booking`
+(`boats.publicBooking.update`, `{ enabled }`), dans le groupe
+`requireModulePlan({ feature: 'reservations' })`, avec `BoatPolicy.manage`.
+Un mécanicien ne peut pas ouvrir la page. Dans les listes, une demande en
+ligne porte le badge « Demande en ligne » (`ReservationSourceBadge`).
+
+**Marque blanche.** L'en-tête de la page (`inertia/layouts/booking.vue`)
+montre le nom de l'organisation. En plan Entreprise (`canWhiteLabel`), il
+montre aussi son logo et son `appName`. Les couleurs de la marque ne sont
+pas appliquées à la page, qui reste sur les tokens du thème.
+
 ### 5.3 Routes → controllers → pages
 
 Réf. routes : `start/routes/boats.ts` (per-boat) et `start/routes/reservations.ts` (flotte).
@@ -616,3 +733,8 @@ Toutes les clés existent en **`en` et `fr`**.
   tarif les définit ; le formulaire affiche l'avertissement en amont.
 - **Total modifiable** : l'auto-remplissage ne s'applique qu'au `create` et
   seulement si le champ est vide ; l'utilisateur garde toujours la main.
+- **Page publique (#881), V1** : pas de paiement en ligne à la demande (l'acompte
+  est réclamé à la confirmation, hors page) ; `noindex` sans option
+  d'indexation ; pas de quota de demandes par mois ; couleurs de la marque
+  blanche non appliquées à la page (logo et nom seulement) ; le contrat n'est
+  pas envoyé automatiquement à la confirmation (il exige une fiche client).

@@ -506,5 +506,14 @@
     "unsafeUrl": "Address refused: only a public https feed (port 443) can be imported.",
     "limitReached": "A boat accepts at most {limit} external calendars.",
     "conflicts": "{count} imported slot(s) overlap a FleetAi reservation: check for double bookings."
+  },
+  "publicBooking": {
+    "enabled": "The online booking page is open.",
+    "disabled": "The online booking page is closed.",
+    "unavailable": "These dates are no longer available. Pick others in the calendar.",
+    "invalidDates": "These dates can't be booked online. Pick an arrival and a departure in the calendar.",
+    "tooShort": "This is shorter than the boat's minimum rental.",
+    "tooLong": "This is longer than the boat's maximum rental.",
+    "rateLimit": "Too many requests sent from this connection. Please try again in a few minutes."
   }
 }

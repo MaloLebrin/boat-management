@@ -389,6 +389,14 @@ note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll
 
 - Page : `inertia/pages/pay/show.vue` (layout `auth`, sans login), prop `payment: PublicInvoicePayment | null`. Carte émetteur, numéro, client, dates, montant ; bouton « Payer {montant} » (`useForm().post('/pay/:token/checkout')` → Stripe Checkout) si `state === 'payable'`, sinon alerte « réglée », « paiement en cours de confirmation » (retour `?status=success`) ou « indisponible ». `payment === null` : carte « lien invalide ».
 
+### Réservation en ligne (`/book/:orgSlug`, `/book/:orgSlug/:boatSlug`, #881)
+
+- Layout `inertia/layouts/booking.vue` (sans login) : en-tête au nom de l'organisation (logo de la marque blanche en Entreprise, prop `organization`), pied « propulsé par FleetAi », toasts flash. `noindex` (`<meta name="robots">` + `X-Robots-Tag`).
+- `pages/book/fleet.vue` : grille de `PublicBoatCard.vue` (photo, `PublicBoatSpecs.vue`, « à partir de »), état vide.
+- `pages/book/show.vue` : `PublicBoatGallery.vue`, caractéristiques, carte tarifs ; colonne de droite : `PublicBookingCalendar.vue` (grille mensuelle `useMonthNav`, jours occupés grisés et non cliquables, arrivée puis départ via `canPickDay`/`nextDraft` de `shared/helpers/public_booking.ts`), `PublicBookingQuotePanel.vue` (devis serveur, acompte 30 %, caution) et `PublicBookingRequestForm.vue` (`useForm().post('…/request')`, champ piège `website` hors écran, consentement). Chaque sélection complète recharge la seule prop `quote` : `router.get(url, { startsOn, endsOn }, { only: ['quote'], preserveState: true, replace: true })`. Après l'envoi, prop `submitted` → alerte de succès.
+- Côté app : encart `components/reservations/public_booking/BoatPublicBookingCard.vue` sur `boats/reservations.vue` (bascule `BaseToggle` → `router.patch('/boats/:id/public-booking')`, lien à copier, lien « Voir la page » en nouvel onglet) ; badge `ReservationSourceBadge.vue` (« Demande en ligne ») dans `ReservationList.vue` et `FleetReservationList.vue`.
+- Tests : `tests/inertia/public_booking_calendar.spec.ts`, `public_booking_request_form.spec.ts`, `boat_public_booking_card.spec.ts` ; fonctionnel `tests/functional/reservations/public_booking.spec.ts`.
+
 ### Settings — facturation (`/settings/billing`)
 
 - Page : `inertia/pages/settings/billing.vue` → `components/settings/tabs/SettingsBillingTab.vue` (props `plan`, `quotaUsage`, `subscription`, `orgModules`, `orgAddons`, servies par `SettingsController.billing`)

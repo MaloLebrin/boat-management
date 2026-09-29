@@ -11,6 +11,9 @@ import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import i18nManager from '@adonisjs/i18n/services/main'
 import { toAppLocale } from '#shared/helpers/locale_path'
+import { formatDateLong } from '#shared/helpers/date_format'
+import { formatCurrency } from '#shared/helpers/number_format'
+import type { PublicBookingEmailParams } from '#shared/types/public_booking'
 
 @inject()
 export default class EmailQueueService {
@@ -581,6 +584,97 @@ export default class EmailQueueService {
       text,
       html,
       correlationId: `contact-message-ack:${params.messageId}`,
+    })
+  }
+
+  /**
+   * Demande de la page publique de réservation (#881) — quatre messages sur
+   * un même gabarit : `alert` au loueur, `ack` (accusé de réception),
+   * `confirmed` et `declined` au client. Les messages au client portent la
+   * marque blanche du loueur quand son plan la permet.
+   */
+  async sendPublicBookingEmail(params: PublicBookingEmailParams) {
+    const i18n = i18nManager.locale(toAppLocale(params.locale, 'fr'))
+    const prefix = `public.booking.emails.${params.kind}`
+    const vars = {
+      orgName: params.orgName,
+      boatName: params.boatName,
+      clientName: params.clientName,
+    }
+    const heading = i18n.t(`${prefix}.heading`, vars)
+    const paragraphs = [i18n.t(`${prefix}.intro`, vars)]
+    if (params.kind !== 'alert') paragraphs.push(i18n.t(`${prefix}.next`, vars))
+
+    const details: { label: string; value: string }[] = [
+      { label: i18n.t('public.booking.emails.labels.boat'), value: params.boatName },
+      {
+        label: i18n.t('public.booking.emails.labels.arrival'),
+        value: formatDateLong(params.startsOn, i18n.locale),
+      },
+      {
+        label: i18n.t('public.booking.emails.labels.departure'),
+        value: formatDateLong(params.endsOn, i18n.locale),
+      },
+    ]
+    if (params.total !== null) {
+      details.push({
+        label: i18n.t('public.booking.emails.labels.estimate'),
+        value: formatCurrency(params.total, i18n.locale, { currency: params.currency }),
+      })
+    }
+    if (params.kind === 'alert') {
+      details.push(
+        { label: i18n.t('public.booking.emails.labels.name'), value: params.clientName },
+        { label: i18n.t('public.booking.emails.labels.email'), value: params.clientEmail }
+      )
+      if (params.clientPhone) {
+        details.push({
+          label: i18n.t('public.booking.emails.labels.phone'),
+          value: params.clientPhone,
+        })
+      }
+    }
+
+    const messageLines =
+      params.kind === 'alert' || params.kind === 'ack'
+        ? (params.message ?? '').split('\n').filter((line) => line.trim() !== '')
+        : []
+    const ctaUrl = params.kind === 'alert' ? `${env.get('APP_URL')}${params.actionPath}` : null
+    const footer = i18n.t(
+      `public.booking.emails.footer${params.kind === 'alert' ? 'Staff' : ''}`,
+      vars
+    )
+
+    const subject = i18n.t(`${prefix}.subject`, vars)
+    const text = [
+      heading,
+      ...paragraphs,
+      details.map((d) => `${d.label} : ${d.value}`).join('\n'),
+      messageLines.join('\n'),
+      ctaUrl ?? '',
+      footer,
+    ]
+      .filter((part) => part !== '')
+      .join('\n\n')
+
+    const html = await edge.render('emails/public_booking', {
+      i18n,
+      branding: params.kind === 'alert' ? null : params.branding,
+      heading,
+      paragraphs,
+      details,
+      messageLines,
+      ctaUrl,
+      ctaLabel: i18n.t('public.booking.emails.alert.cta'),
+      footer,
+    })
+
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `public-booking:${params.kind}:${params.reservationId}`,
     })
   }
 

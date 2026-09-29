@@ -26,6 +26,7 @@ export type NotificationType =
   | 'boat.available_again'
   | 'reservation.deposit_due'
   | 'reservation.balance_due'
+  | 'reservation.requested'
   | 'invoice.paid_online'
   | 'invoice.overdue'
   | 'invoice.reminder_sent'

@@ -27,6 +27,8 @@ const FORM_SUBMISSION_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
 const RATE_LIMIT_FLASH_ROUTES: Record<string, string> = {
   'demo.login': 'flash.demo.rateLimitError',
   'signup.store': 'flash.auth.signupRateLimit',
+  // Formulaire de demande de la page publique de réservation (#881).
+  'book.request': 'flash.publicBooking.rateLimit',
 }
 
 export default class HttpExceptionHandler extends ExceptionHandler {

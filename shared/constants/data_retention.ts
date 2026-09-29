@@ -47,6 +47,17 @@ export const SIMULATOR_LEAD_RETENTION_DAYS = 730
 export const SIMULATOR_SHARE_LIFETIME_DAYS = 180
 
 /**
+ * Demandes de la page publique de réservation jamais abouties (#881) : 30
+ * jours après leur envoi.
+ *
+ * Une demande porte le nom, l'e-mail, le téléphone et le message du client
+ * final d'un loueur. Confirmée, elle devient une location et reste dans
+ * l'historique ; restée en option ou refusée, elle n'a plus d'objet au-delà
+ * du mois, et la politique de confidentialité l'annonce ainsi.
+ */
+export const PUBLIC_BOOKING_REQUEST_RETENTION_DAYS = 30
+
+/**
  * Délai de grâce avant de supprimer un jeton déjà expiré (reset de mot de
  * passe, invitation).
  *

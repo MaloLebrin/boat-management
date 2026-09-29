@@ -9,6 +9,7 @@ import {
 import { BoatUnavailableError } from '#exceptions/boat_errors'
 import type { BoatUnavailabilityWindow } from '#shared/types/boat_status'
 import BoatReservation from '#models/boat_reservation'
+import PublicBookingDecided from '#events/public_booking_decided'
 import BoatModel from '#models/boat'
 import Client from '#models/client'
 import type Boat from '#models/boat'
@@ -250,7 +251,7 @@ export default class BoatReservationService {
     // Resolve the optional CRM client (org-scoped) and block blacklisted ones.
     const clientId = await this.#resolveClientId(boat.organizationId, payload.clientId)
 
-    return db.transaction(async (trx) => {
+    const result = await db.transaction(async (trx) => {
       await this.checkConflict(boat.id, startsAt, endsAt, null, status, trx)
       await this.checkExternalConflict(boat.id, startsAt, endsAt, status, trx)
       const forcedOver = await this.assertBoatAvailable(
@@ -262,10 +263,10 @@ export default class BoatReservationService {
         trx
       )
 
-      const cancelledOptions =
+      const cancelled =
         status === 'confirmed'
           ? await this.cancelOverlappingOptions(boat.id, startsAt, endsAt, null, trx)
-          : 0
+          : []
 
       const reservation = new BoatReservation().merge({
         boatId: boat.id,
@@ -285,7 +286,85 @@ export default class BoatReservationService {
       this.paymentService.applyDefaults(reservation, pricing?.depositAmount ?? null)
       await reservation.useTransaction(trx).save()
 
-      return { reservation, cancelledOptions, forcedOver }
+      return { reservation, cancelled, forcedOver }
+    })
+
+    await this.notifyDeclinedPublicRequests(result.cancelled)
+    return {
+      reservation: result.reservation,
+      cancelledOptions: result.cancelled.length,
+      forcedOver: result.forcedOver,
+    }
+  }
+
+  /**
+   * Demande du client final depuis la page publique (#881) : une `option`
+   * `source: 'public'`, jamais une confirmation. Les dates sont des jours à
+   * l'heure de Paris, de minuit à minuit — le jour du départ reste libre pour
+   * l'arrivée suivante. La page a déjà filtré les jours occupés ; la
+   * transaction les revérifie (réservation, créneau importé, indisponibilité)
+   * parce que deux demandes peuvent viser le même créneau au même instant.
+   */
+  async createPublicRequest(
+    boat: Boat,
+    input: {
+      startsAt: DateTime
+      endsAt: DateTime
+      clientName: string
+      clientEmail: string
+      clientPhone: string | null
+      notes: string | null
+      locale: string
+    }
+  ): Promise<BoatReservation> {
+    const { startsAt, endsAt } = input
+    if (endsAt <= startsAt) {
+      throw new ReservationValidationError('endsAt must be after startsAt', 'endBeforeStart')
+    }
+
+    const pricing = await this.pricingService.getForBoat(boat)
+    if (pricing) {
+      const nights = countBilledNights(startsAt.toISO()!, endsAt.toISO()!)
+      if (pricing.minDays !== null && nights < pricing.minDays) {
+        throw new ReservationDurationError('below_min')
+      }
+      if (pricing.maxDays !== null && nights > pricing.maxDays) {
+        throw new ReservationDurationError('above_max')
+      }
+    }
+
+    const quote = await this.quoteService.quoteForBoat(boat, startsAt.toISO()!, endsAt.toISO()!)
+
+    return db.transaction(async (trx) => {
+      await this.checkConflict(boat.id, startsAt, endsAt, null, 'option', trx)
+      await this.checkExternalConflict(boat.id, startsAt, endsAt, 'option', trx)
+      // Plus strict qu'une option saisie par l'équipe : le client ne peut pas
+      // savoir qu'une tâche d'entretien est planifiée, il ne doit pas pouvoir
+      // la chevaucher (#881).
+      const windows = await this.availabilityService.conflictsFor(boat, startsAt, endsAt, trx)
+      if (boat.status === 'sold' || windows.length > 0) {
+        throw new BoatUnavailableError(windows, false)
+      }
+
+      const reservation = new BoatReservation().merge({
+        boatId: boat.id,
+        organizationId: boat.organizationId,
+        status: 'option',
+        source: 'public',
+        requestLocale: input.locale,
+        type: null,
+        startsAt,
+        endsAt,
+        clientId: null,
+        clientName: input.clientName.trim(),
+        clientEmail: input.clientEmail.trim(),
+        clientPhone: input.clientPhone?.trim() || null,
+        notes: input.notes?.trim() || null,
+        totalPrice: quote.hasPricing ? String(quote.total) : null,
+      })
+      this.paymentService.applyDefaults(reservation, pricing?.depositAmount ?? null)
+      await reservation.useTransaction(trx).save()
+      return reservation
     })
   }
 
@@ -354,7 +433,8 @@ export default class BoatReservationService {
       }
     }
 
-    return db.transaction(async (trx) => {
+    const previousStatus = reservation.status
+    const result = await db.transaction(async (trx) => {
       await this.checkConflict(boat.id, startsAt, endsAt, reservationId, effectiveStatus, trx)
 
       // Un créneau importé après coup ne doit pas figer une réservation déjà
@@ -385,10 +465,10 @@ export default class BoatReservationService {
           )
         : []
 
-      const cancelledOptions =
+      const cancelled =
         effectiveStatus === 'confirmed'
           ? await this.cancelOverlappingOptions(boat.id, startsAt, endsAt, reservationId, trx)
-          : 0
+          : []
 
       if (payload.startsAt !== undefined) reservation.startsAt = startsAt
       if (payload.endsAt !== undefined) reservation.endsAt = endsAt
@@ -410,8 +490,38 @@ export default class BoatReservationService {
       reservation.useTransaction(trx)
       await reservation.save()
 
-      return { reservation, cancelledOptions, forcedOver }
+      return { reservation, cancelled, forcedOver }
     })
+
+    // Demande en ligne tranchée par le loueur (#881) : le client, qui n'a pas
+    // de compte, l'apprend par e-mail. Après le commit — un e-mail parti pour
+    // une transaction annulée ne se rattrape pas.
+    const decided = result.reservation.status
+    if (
+      result.reservation.source === 'public' &&
+      previousStatus === 'option' &&
+      (decided === 'confirmed' || decided === 'cancelled')
+    ) {
+      await PublicBookingDecided.dispatch(result.reservation.id, decided)
+    }
+    await this.notifyDeclinedPublicRequests(result.cancelled)
+
+    return {
+      reservation: result.reservation,
+      cancelledOptions: result.cancelled.length,
+      forcedOver: result.forcedOver,
+    }
+  }
+
+  /**
+   * Options annulées d'office par une confirmation sur le même créneau : une
+   * demande en ligne parmi elles est une demande refusée, et son auteur doit
+   * l'apprendre (#881).
+   */
+  private async notifyDeclinedPublicRequests(cancelled: BoatReservation[]): Promise<void> {
+    for (const option of cancelled) {
+      if (option.source === 'public') await PublicBookingDecided.dispatch(option.id, 'cancelled')
+    }
   }
 
   async findForBoat(
@@ -576,7 +686,7 @@ export default class BoatReservationService {
   /**
    * Cancels every overlapping `option` on the same boat, so a `confirmed`
    * booking takes over the slot without leaving a stale conflicting hold.
-   * Returns the number of options cancelled.
+   * Returns the options cancelled.
    */
   private async cancelOverlappingOptions(
     boatId: number,
@@ -584,7 +694,7 @@ export default class BoatReservationService {
     endsAt: DateTime,
     excludeId: number | null,
     trx: TransactionClientContract
-  ): Promise<number> {
+  ): Promise<BoatReservation[]> {
     const query = BoatReservation.query({ client: trx })
       .where('boatId', boatId)
       .where('status', 'option')
@@ -601,6 +711,6 @@ export default class BoatReservationService {
       await option.useTransaction(trx).save()
     }
 
-    return options.length
+    return options
   }
 }

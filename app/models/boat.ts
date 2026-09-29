@@ -121,6 +121,14 @@ export default class Boat extends BaseModel {
   @column.dateTime()
   declare statusChangedAt: DateTime | null
 
+  /** Page publique de réservation ouverte (#881). */
+  @column()
+  declare publicBookingEnabled: boolean
+
+  /** Segment d'URL de la page publique (#881) — figé à la première activation. */
+  @column()
+  declare publicBookingSlug: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

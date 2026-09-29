@@ -120,6 +120,10 @@
       "balance_due": {
         "title": "Balances to collect on {boatName}",
         "body": "{count, plural, one {# departure within 7 days is not fully paid} other {# departures within 7 days are not fully paid}} on {boatName}."
+      },
+      "requested": {
+        "title": "Booking request for {boatName}",
+        "body": "{clientName} requested {boatName} online. The option is on hold: confirm or decline it."
       }
     },
     "invoice": {
@@ -187,6 +191,7 @@
     "boat.available_again": "Boat available again",
     "reservation.deposit_due": "Deposit not received",
     "reservation.balance_due": "Balance to collect",
+    "reservation.requested": "Online booking request",
     "invoice.paid_online": "Invoice paid online",
     "invoice.overdue": "Overdue invoice",
     "invoice.reminder_sent": "Invoice reminder sent",

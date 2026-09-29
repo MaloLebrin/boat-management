@@ -16,6 +16,13 @@ export const RESERVATION_TYPES = ['bareboat', 'skippered', 'day_charter', 'cabin
 export type ReservationType = (typeof RESERVATION_TYPES)[number]
 
 /**
+ * Origine d'une réservation (#881) : saisie par l'équipe, ou demande du client
+ * final depuis la page publique de réservation.
+ */
+export const RESERVATION_SOURCES = ['internal', 'public'] as const
+export type ReservationSource = (typeof RESERVATION_SOURCES)[number]
+
+/**
  * Suivi de l'argent d'une location (#875). `unpaid` → `deposit_paid` (acompte
  * reçu) → `paid` (solde reçu) ; `refunded` quand l'encaissé a été rendu.
  */
@@ -68,6 +75,8 @@ export interface BoatReservationRow {
   clientId: number | null
   status: ReservationStatus
   type: ReservationType | null
+  /** Origine (#881) — `public` : demande en ligne du client final. */
+  source: ReservationSource
   startsAt: string
   endsAt: string
   clientName: string

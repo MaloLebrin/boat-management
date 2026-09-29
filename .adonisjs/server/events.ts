@@ -15,6 +15,8 @@ import OrganizationMemberRoleChanged from '#events/organization_member_role_chan
 import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
+import PublicBookingDecided from '#events/public_booking_decided'
+import PublicBookingRequested from '#events/public_booking_requested'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 
@@ -31,6 +33,8 @@ export const events = {
   OrganizationModuleDeactivated: OrganizationModuleDeactivated,
   OrganizationPlanDowngraded: OrganizationPlanDowngraded,
   OrganizationPlanUpgraded: OrganizationPlanUpgraded,
+  PublicBookingDecided: PublicBookingDecided,
+  PublicBookingRequested: PublicBookingRequested,
   SimulatorLeadCreated: SimulatorLeadCreated,
   StorageThresholdCrossed: StorageThresholdCrossed,
 }

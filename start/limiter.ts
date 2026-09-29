@@ -164,6 +164,24 @@ export const calendarFeedThrottle = limiter.define('calendar_feed', (ctx) => {
   return limiter.allowRequests(30).every('1 minute').usingKey(`calendar_feed_${ctx.request.ip()}`)
 })
 
+// Page publique de réservation (#881) : la page et ses visites partielles de
+// devis (chaque choix de dates en est une). Généreux : un client qui compare
+// plusieurs semaines clique vite, et le compteur protège surtout du balayage
+// des slugs.
+export const publicBookingThrottle = limiter.define('public_booking', (ctx) => {
+  return limiter.allowRequests(60).every('1 minute').usingKey(`public_booking_${ctx.request.ip()}`)
+})
+
+// Envoi d'une demande (#881) : écrit une option et envoie des e-mails au loueur
+// et au client — même budget que les autres formulaires publics qui écrivent
+// et envoient du courrier (contact, leads du simulateur).
+export const publicBookingRequestThrottle = limiter.define('public_booking_request', (ctx) => {
+  return limiter
+    .allowRequests(5)
+    .every('10 minutes')
+    .usingKey(`public_booking_request_${ctx.request.ip()}`)
+})
+
 // Abonnements Web Push (#497) : le navigateur ne (ré)abonne qu'à l'activation
 // ou au chargement — au-delà, c'est un script.
 export const pushThrottle = limiter.define('push', (ctx) => {

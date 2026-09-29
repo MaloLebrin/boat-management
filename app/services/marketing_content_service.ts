@@ -1429,7 +1429,7 @@ export default class MarketingContentService {
             // annonce un « délai raisonnable » sans purge derrière ne valait
             // rien côté conformité. Les deux se modifient ensemble.
             body: t('s6_body'),
-            bullets: [t('s6_b1'), t('s6_b2'), t('s6_b3'), t('s6_b4')],
+            bullets: [t('s6_b1'), t('s6_b2'), t('s6_b3'), t('s6_b4'), t('s6_b5')],
           },
           { title: t('s7_title'), body: t('s7_body') },
           {

@@ -7,6 +7,7 @@ import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import ReservationCreateButton from '~/components/reservations/ReservationCreateButton.vue'
 import ReservationStatusBadge from '~/components/reservations/ReservationStatusBadge.vue'
 import ReservationTypeBadge from '~/components/reservations/ReservationTypeBadge.vue'
+import ReservationSourceBadge from '~/components/reservations/ReservationSourceBadge.vue'
 import ReservationPaymentBadge from '~/components/reservations/payment/ReservationPaymentBadge.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
@@ -85,7 +86,10 @@ function createQuote(reservationId: number) {
             </td>
             <td class="px-4 py-3 text-fg">{{ row.clientName }}</td>
             <td class="px-4 py-3">
-              <ReservationStatusBadge :status="row.status" />
+              <div class="flex flex-wrap items-center gap-1">
+                <ReservationStatusBadge :status="row.status" />
+                <ReservationSourceBadge :source="row.source" />
+              </div>
             </td>
             <td class="px-4 py-3">
               <ReservationTypeBadge :type="row.type" />
