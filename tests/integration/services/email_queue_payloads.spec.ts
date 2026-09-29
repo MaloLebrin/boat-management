@@ -222,6 +222,13 @@ const SCENARIOS: Record<string, (service: EmailQueueService) => Promise<unknown>
       to: 'client@example.com',
       locale: 'en',
     }),
+  inspection: (s) =>
+    s.sendInspection({
+      inspectionId: 12,
+      organizationId: 42,
+      to: 'client@example.com',
+      locale: 'fr',
+    }),
 }
 
 /** Neutralise l'horodatage des clés « à la demande » et le port aléatoire d'APP_URL en test. */

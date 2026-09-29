@@ -746,6 +746,33 @@ export class BoatInspectionItemSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatInspectionSignatureSchema extends BaseModel {
+  static $columns = [
+    'boatInspectionId',
+    'createdAt',
+    'id',
+    'image',
+    'role',
+    'signedAt',
+    'signerName',
+  ] as const
+  $columns = BoatInspectionSignatureSchema.$columns
+  @column()
+  declare boatInspectionId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare image: Buffer
+  @column()
+  declare role: string
+  @column.dateTime()
+  declare signedAt: DateTime
+  @column()
+  declare signerName: string
+}
+
 export class BoatInspectionSchema extends BaseModel {
   static $columns = [
     'createdAt',
@@ -753,10 +780,14 @@ export class BoatInspectionSchema extends BaseModel {
     'fuelLevel',
     'id',
     'kind',
+    'lockedAt',
+    'lockedById',
     'notes',
     'organizationId',
+    'pdfMediaId',
     'performedAt',
     'reservationId',
+    'sentAt',
     'updatedAt',
   ] as const
   $columns = BoatInspectionSchema.$columns
@@ -770,14 +801,22 @@ export class BoatInspectionSchema extends BaseModel {
   declare id: number
   @column()
   declare kind: string
+  @column.dateTime()
+  declare lockedAt: DateTime | null
+  @column()
+  declare lockedById: number | null
   @column()
   declare notes: string | null
   @column()
   declare organizationId: number
+  @column()
+  declare pdfMediaId: number | null
   @column.dateTime()
   declare performedAt: DateTime
   @column()
   declare reservationId: number
+  @column.dateTime()
+  declare sentAt: DateTime | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

@@ -1,5 +1,9 @@
 import { INSPECTION_ITEM_STATES } from '#shared/types/inspection'
 import vine from '@vinejs/vine'
+import {
+  SIGNATURE_DATA_URL_MAX_LENGTH,
+  SIGNATURE_DATA_URL_PREFIX,
+} from '#shared/constants/inspection_signature'
 
 const inspectionKindChoices = ['checkout', 'checkin'] as const
 
@@ -49,5 +53,21 @@ export const setBoatInspectionItemValidator = vine.create(
 export const clearBoatInspectionItemValidator = vine.create(
   vine.object({
     itemKey: vine.string().trim().maxLength(64),
+  })
+)
+
+const signatureDataUrl = () =>
+  vine.string().startsWith(SIGNATURE_DATA_URL_PREFIX).maxLength(SIGNATURE_DATA_URL_MAX_LENGTH)
+
+/**
+ * Signature de l'état des lieux (#889) : le nom du client et un tracé PNG par
+ * partie. Le nom de l'agent est celui du compte connecté. Que les octets
+ * soient bien un PNG, c'est le service qui le vérifie.
+ */
+export const signBoatInspectionValidator = vine.create(
+  vine.object({
+    clientName: vine.string().trim().minLength(2).maxLength(120),
+    clientSignature: signatureDataUrl(),
+    staffSignature: signatureDataUrl(),
   })
 )

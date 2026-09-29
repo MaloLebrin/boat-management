@@ -122,6 +122,41 @@ export default class MediaService {
     return { uploaded, failed }
   }
 
+  /**
+   * Archive un document produit par l'app (PDF d'état des lieux signé, #889).
+   * Il compte dans le stockage de l'organisation, mais un quota plein ne
+   * bloque pas la signature : le document fait foi, il doit exister.
+   */
+  async storeGeneratedDocument(
+    user: User,
+    buffer: Buffer,
+    filename: string,
+    payload: Omit<UploadMediaPayload, 'kind'>,
+    org: Organization
+  ): Promise<Media> {
+    const uploaded = await this.cloudinary.uploadBuffer(buffer, filename, payload.folder)
+    const position = await this.nextPosition(payload.entityType, payload.entityId)
+
+    const media = await Media.create({
+      entityType: payload.entityType,
+      entityId: payload.entityId,
+      kind: 'document',
+      cloudinaryPublicId: uploaded.publicId,
+      secureUrl: uploaded.secureUrl,
+      originalFilename: uploaded.originalFilename,
+      format: uploaded.format,
+      bytes: uploaded.bytes,
+      width: null,
+      height: null,
+      position,
+      caption: payload.caption?.trim() || null,
+      uploadedById: user.id,
+    })
+
+    await this.quotaService.updateStorageUsed(org, uploaded.bytes)
+    return media
+  }
+
   async listForEntity(entityType: MediaEntityType, entityId: number): Promise<Media[]> {
     return await Media.query()
       .where('entityType', entityType)

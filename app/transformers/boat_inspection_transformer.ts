@@ -5,6 +5,8 @@ import type {
   BoatInspectionRow,
   InspectionItemState,
   InspectionKind,
+  InspectionSignatureRole,
+  InspectionSignatureSummary,
 } from '#shared/types/inspection'
 
 export function toBoatInspectionRow(inspection: BoatInspection): BoatInspectionRow {
@@ -18,6 +20,17 @@ export function toBoatInspectionRow(inspection: BoatInspection): BoatInspectionR
     notes: inspection.notes,
     createdAt: inspection.createdAt.toISO()!,
     updatedAt: inspection.updatedAt?.toISO() ?? inspection.createdAt.toISO()!,
+    lockedAt: inspection.lockedAt?.toISO() ?? null,
+    sentAt: inspection.sentAt?.toISO() ?? null,
+    // Relation préchargée par `listForReservation` (sans le tracé) ; absente
+    // ailleurs, la liste reste vide.
+    signatures: (inspection.$preloaded.signatures ? inspection.signatures : []).map(
+      (signature): InspectionSignatureSummary => ({
+        role: signature.role as InspectionSignatureRole,
+        signerName: signature.signerName,
+        signedAt: signature.signedAt.toISO()!,
+      })
+    ),
   }
 }
 

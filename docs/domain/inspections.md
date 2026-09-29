@@ -1,4 +1,4 @@
-# Domaine — États des lieux (#311, #491, #495, #584)
+# Domaine — États des lieux (#311, #491, #495, #584, #889)
 
 ## Objectif fonctionnel
 
@@ -113,6 +113,14 @@ n'est pas `ok` (validator `requiredWhen` + garde UI) et effacée au retour à
 | `inertia/components/reservations/inspection/InspectionPhotos.vue`        | Galerie et ajout de clichés                                |
 | `inertia/components/reservations/inspection/InspectionComparison.vue`    | Confrontation départ / retour                              |
 | `inertia/components/reservations/inspection/InspectionPanel.vue`         | Un panneau (un `kind`) avec son formulaire                 |
+| `shared/helpers/inspection_report.ts`                                    | Contenu imprimé : sections, décompte, écarts départ/retour |
+| `app/services/inspection_pdf_service.ts`                                 | Mise en page pdfkit de l'état des lieux (#889)             |
+| `app/services/inspection_document_service.ts`                            | PDF à servir, signature + verrou, envoi au client (#889)   |
+| `app/controllers/inspection_documents_controller.ts`                     | `pdf`, `sign`, `send` (#889)                               |
+| `app/jobs/send_inspection_email.ts`                                      | E-mail au client, PDF signé en pièce jointe (#889)         |
+| `inertia/components/reservations/inspection/InspectionDocumentBar.vue`   | Statut, PDF, « Faire signer », « Envoyer au client »       |
+| `inertia/components/reservations/inspection/InspectionSignModal.vue`     | Nom du client + deux pads de signature                     |
+| `inertia/components/reservations/inspection/SignaturePad.vue`            | Pad canvas (doigt, stylet, souris) → PNG                   |
 
 ## Routes
 
@@ -125,6 +133,9 @@ n'est pas `ok` (validator `requiredWhen` + garde UI) et effacée au retour à
 | DELETE        | `.../inspections/:inspectionId/items`                   | repasser un point en « non contrôlé »            |
 | POST / DELETE | `.../inspections/:inspectionId/equipment-actions[...]`  | défauts → actions (#311)                         |
 | POST / DELETE | `.../inspections/:inspectionId/photos[...]`             | photos (pipeline média)                          |
+| GET           | `.../inspections/:inspectionId/pdf[?inline=1]`          | PDF : archive signée, sinon brouillon (#889)     |
+| POST          | `.../inspections/:inspectionId/sign`                    | signature des deux parties → verrou (#889)       |
+| POST          | `.../inspections/:inspectionId/send`                    | e-mail du PDF signé au client (#889)             |
 
 Toutes les mutations répondent par redirection Inertia (`redirect().back()` pour
 les items — `preserveScroll` côté client), jamais par du JSON.
@@ -166,6 +177,11 @@ dans la foulée le référencent, et la synchro rejoue la création puis réécr
 défauts avec l'ID réel. Modifier un état des lieux déjà en base fonctionne aussi
 hors-ligne (`update-inspection`), avec détection de conflit `_expectedUpdatedAt`.
 
+La **signature** (#889) n'a pas de chemin hors-ligne : le PDF signé est
+produit et archivé par le serveur au moment où l'on signe, et un tracé mis en
+file pourrait arriver sur une inspection modifiée depuis. La modale le dit et
+désactive « Signer et figer » tant que le réseau manque.
+
 Restent indisponibles tant que l'état des lieux n'est pas synchronisé, avec un
 message explicite : la **checklist** (les constats `PATCH .../items` n'ont pas de
 chemin hors-ligne) et l'**ajout de photos** (#621). Mécanique détaillée dans
@@ -173,9 +189,9 @@ chemin hors-ligne) et l'**ajout de photos** (#621). Mécanique détaillée dans
 
 ## Hors périmètre (#584)
 
-PDF d'état des lieux signable, facturation des dommages, checklists
-personnalisables par organisation, checklist et photos hors-ligne (voir
-ci-dessus).
+Facturation des dommages, checklists personnalisables par organisation,
+checklist et photos hors-ligne (voir ci-dessus). Le PDF d'état des lieux
+signable, aussi listé ici à l'origine, est livré par #889 (section suivante).
 
 ## Caution au retour (#875)
 
@@ -186,3 +202,85 @@ bloquée, motif obligatoire). Le bloc lit la prop `reservation` et ne recharge
 qu'elle ; ses gestes sont réservés à `boats.manage` (prop `canManagePayment`).
 Règles et routes : `docs/domain/reservations-and-pricing.md`, section 5.5.
 Retenir une caution ne crée pas encore de facture de dommages.
+
+## État des lieux signé (#889)
+
+L'état des lieux est la pièce qu'on oppose à une contestation de caution : ce
+qui a été constaté, quand, avec quelles photos, **signé par les deux
+parties**. Chaque inspection produit donc un PDF, se signe sur place et part
+chez le client.
+
+### PDF
+
+`InspectionPdfService` (pdfkit, kit commun `app/services/pdf/`, marque blanche
+Entreprise) met en page un `InspectionPdfData` déjà résolu — ni base ni réseau
+dans le service :
+
+- en-tête de marque, statut (**brouillon** non signé, ou « Signé le … ») ;
+- bateau, période de la réservation, date du relevé, client, carburant et
+  heures moteur, notes libres ;
+- checklist par zone, chaque point avec son constat (« Non contrôlé » en
+  l'absence de ligne) et sa note, précédée d'un décompte ;
+- pour un **retour**, les écarts avec le départ : relevés et points dont le
+  constat a changé, les dégradations en évidence ;
+- défauts levés depuis l'inspection (actions d'équipement) ;
+- vignettes photos en grille, 12 au plus (`INSPECTION_PDF_MAX_PHOTOS`), en JPEG
+  redimensionné par Cloudinary (`fetchThumbnail`) — pdfkit ne lit ni HEIC ni
+  WebP. Une photo qui ne vient pas est omise et comptée dans la mention
+  « + N photo(s) non reproduite(s) » ;
+- deux cadres de signature, client puis loueur.
+
+Le contenu (sections applicables, points hors catégorie conservés, écarts) est
+calculé par `shared/helpers/inspection_report.ts`, testé en unitaire.
+
+### Signature et verrou
+
+`POST …/sign` reçoit le nom du client et deux tracés PNG (`data:image/png;base64,…`,
+300 000 caractères au plus). Le service vérifie que les octets sont bien un
+PNG, puis :
+
+1. produit le PDF **signé** et l'archive (`media`, `entity_type = 'inspection'`,
+   `kind = 'document'`, dossier `…/inspections/<kind>/signed`) — avant toute
+   écriture en base : un échec Cloudinary laisse l'inspection modifiable ;
+2. dans une transaction (`FOR UPDATE`), crée les deux lignes de
+   `boat_inspection_signatures` et pose `locked_at`, `locked_by_id`,
+   `pdf_media_id`. Deux signatures simultanées : la seconde voit le verrou et
+   son PDF archivé est retiré.
+
+Le nom de l'agent est celui du compte connecté. Les tracés vivent **en base**
+(bytea, quelques dizaines de Ko) plutôt qu'en média : ils disparaissent avec
+l'inspection et ne dépendent d'aucun service externe. Ils ne transitent jamais
+par les props Inertia — seuls rôle, nom et date remontent (`signatures`).
+
+Une inspection signée est **figée**, comme une facture émise (#717) : constats,
+relevés, photos, défauts levés depuis elle et suppression répondent
+`flash.inspections.locked`. L'écran masque ces gestes. Il n'y a pas de
+déverrouillage.
+
+`GET …/pdf` sert l'**archive** signée ; sans archive (ou Cloudinary
+injoignable), il recalcule le PDF depuis les données figées. Avant signature,
+c'est un brouillon produit à la demande. `?inline=1` l'ouvre dans le
+navigateur.
+
+### Envoi au client
+
+`POST …/send` (e-mail vérifié exigé, #768) n'accepte qu'une inspection signée
+(`flash.inspections.notSigned` sinon) et une adresse : celle de la réservation,
+sinon celle de la fiche client (`flash.inspections.noClientEmail`). Le job
+`SendInspectionEmail` joint le PDF archivé ; `sent_at` date le dernier envoi,
+et l'on peut renvoyer.
+
+### Caution
+
+Au retour, l'état des lieux signé est le justificatif d'une retenue sur caution
+(section « Caution au retour » ci-dessous) : le bloc Caution reste sous la
+comparaison, le PDF signé est sur la même page.
+
+### Limites
+
+- Pas de signature **à distance** (lien par e-mail vers une page de
+  signature) : les deux parties signent sur l'écran de l'agent.
+- Signature électronique qualifiée (eIDAS) hors périmètre : tracé manuscrit,
+  horodatage et PDF figé suffisent à l'usage.
+- Le PDF signé n'apparaît pas encore dans les documents de la fiche client
+  (CRM) : il se télécharge depuis l'écran d'état des lieux de la réservation.

@@ -124,5 +124,58 @@
         }
       }
     }
+  },
+  "pdf": {
+    "title": "État des lieux — {kind} n° {id}",
+    "generatedOn": "Généré le {date}",
+    "signedOn": "Signé le {date}",
+    "draft": "BROUILLON — non signé, sans valeur d'engagement",
+    "boat": "Bateau",
+    "period": "Période de location",
+    "periodRange": "Du {start} au {end}",
+    "client": "Client",
+    "readings": "Relevés",
+    "readingsValue": "Carburant : {fuel} · Heures moteur : {hours}",
+    "notes": "Notes",
+    "tally": "{ok} OK · {remark} remarque(s) · {damage} dommage(s) · {notInspected} non contrôlé(s)",
+    "noChanges": "Aucun écart avec l'état des lieux de départ.",
+    "change": "{item} : {before} → {after}",
+    "defects": "Défauts constatés",
+    "noDefects": "Aucun défaut signalé.",
+    "photos": "Photos",
+    "noPhotos": "Aucune photo.",
+    "morePhotos": "+ {count} photo(s) non reproduite(s) ici, conservée(s) dans le dossier de la réservation.",
+    "footer": "Page {page} sur {total} - {org}"
+  },
+  "signature": {
+    "title": "Signatures",
+    "roles": {
+      "client": "Le client",
+      "staff": "Pour le loueur"
+    },
+    "clear": "Effacer",
+    "modalTitle": "Faire signer l'état des lieux",
+    "statement": "En signant, le client et vous reconnaissez que cet état des lieux est exact. Une fois signé, il est figé : constats, photos et défauts ne pourront plus être modifiés.",
+    "clientName": "Nom du client",
+    "staffHint": "Vous signez au nom de votre compte.",
+    "submit": "Signer et figer",
+    "offline": "La signature nécessite une connexion : le PDF signé est produit et archivé par le serveur.",
+    "signedOn": "Signé le {date}",
+    "draft": "Brouillon : pas encore signé.",
+    "signer": "{role} : {name}",
+    "sentOn": "Envoyé au client le {date}",
+    "pdfDraft": "PDF (brouillon)",
+    "pdfSigned": "PDF signé",
+    "sign": "Faire signer",
+    "send": "Envoyer au client",
+    "resend": "Renvoyer au client"
+  },
+  "email": {
+    "subject": "État des lieux ({kind}) — {boatName} — {orgName}",
+    "greeting": "Bonjour,",
+    "heading": "État des lieux — {boatName}",
+    "body": "Veuillez trouver ci-joint l'état des lieux ({kind}) de {boatName}, signé par les deux parties.",
+    "attachment": "Le document PDF signé est joint à cet e-mail. Conservez-le : il fait foi en cas de contestation.",
+    "signature": "Cordialement,\n{orgName}"
   }
 }

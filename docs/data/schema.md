@@ -548,7 +548,23 @@ Fiches CRM (module `crm_invoicing`).
 - `performedAt` (timestamp)
 - `fuelLevel` (int 0–100, nullable), `engineHours` (decimal 6,2, nullable)
 - `notes` (text nullable) — le constat hors-checklist
+- `lockedAt` (timestamptz nullable) — signature des deux parties (#889) : l'inspection est figée
+- `lockedById` (FK `users` nullable, SET NULL, indexée) — l'agent qui a fait signer
+- `pdfMediaId` (FK `media` nullable, SET NULL, indexée) — PDF signé archivé au moment de la signature
+- `sentAt` (timestamptz nullable) — dernier envoi du PDF signé au client
 - `createdAt`, `updatedAt`
+
+### boat_inspection_signatures
+
+Tracés manuscrits de l'état des lieux signé (#889). Voir `docs/domain/inspections.md`, section « État des lieux signé ».
+
+- `id`
+- `boatInspectionId` (FK `boat_inspections` cascade)
+- `role` (string 10) : `client | staff`
+- `signerName` (string 120) — nom saisi pour le client, nom du compte pour l'agent
+- `image` (bytea) — PNG du tracé ; jamais envoyé au frontend
+- `signedAt`, `createdAt`
+- unique `(boat_inspection_id, role)`
 
 ### boat_inspection_items
 

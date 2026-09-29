@@ -63,6 +63,37 @@ export type BoatInspectionRow = {
   createdAt: string
   /** Base de la détection de conflit sur un PUT rejoué hors-ligne (#622). */
   updatedAt: string
+  /** Signature (#889) : l'inspection est figée, plus aucune modification. */
+  lockedAt: string | null
+  /** Dernier envoi du PDF signé au client (#889). */
+  sentAt: string | null
+  /** Signataires, sans le tracé — il n'a rien à faire dans les props (#889). */
+  signatures: InspectionSignatureSummary[]
+}
+
+/** Partie qui signe l'état des lieux (#889). */
+export const INSPECTION_SIGNATURE_ROLES = ['client', 'staff'] as const
+export type InspectionSignatureRole = (typeof INSPECTION_SIGNATURE_ROLES)[number]
+
+export interface InspectionSignatureSummary {
+  role: InspectionSignatureRole
+  signerName: string
+  signedAt: string
+}
+
+/** Charge utile de `POST …/inspections/:id/sign` : un PNG par partie (#889). */
+export interface SignInspectionPayload {
+  clientName: string
+  /** `data:image/png;base64,…` produit par le pad de signature. */
+  clientSignature: string
+  staffSignature: string
+}
+
+/** Tracé décodé, prêt pour la base et le PDF. */
+export interface InspectionSignatureInput {
+  role: InspectionSignatureRole
+  signerName: string
+  image: Uint8Array
 }
 
 export type SetInspectionItemPayload = {
@@ -91,4 +122,70 @@ export interface ConflictInspectionSnapshot {
   fuelLevel: number | null
   engineHours: string | null
   notes: string | null
+}
+
+/** Ligne de checklist d'un état des lieux imprimé (#889) — `state: null` = non contrôlé. */
+export interface InspectionReportRow {
+  itemKey: string
+  labelKey: string
+  state: InspectionItemState | null
+  note: string | null
+}
+
+export interface InspectionReportSection {
+  key: string
+  titleKey: string
+  rows: InspectionReportRow[]
+}
+
+/** Point dont le constat a changé entre le départ et le retour (#889). */
+export interface InspectionReportChange {
+  itemKey: string
+  labelKey: string
+  before: InspectionItemState | null
+  after: InspectionItemState | null
+  note: string | null
+  degraded: boolean
+}
+
+export interface InspectionReportTally {
+  ok: number
+  remark: number
+  damage: number
+  notInspected: number
+}
+
+/**
+ * Tout ce qu'imprime un état des lieux (#889), déjà résolu : le service PDF ne
+ * touche ni à la base ni au réseau. Les dates sont en ISO.
+ */
+export interface InspectionPdfData {
+  inspectionId: number
+  kind: InspectionKind
+  performedAt: string
+  fuelLevel: number | null
+  engineHours: string | null
+  notes: string | null
+  lockedAt: string | null
+  boat: { name: string; category: BoatCategory | null }
+  reservation: { id: number; startsAt: string; endsAt: string }
+  client: { name: string; email: string | null; phone: string | null }
+  items: Array<{ itemKey: string; state: InspectionItemState; note: string | null }>
+  /** Vignettes JPEG récupérées ; `photoCount` compte toutes les photos de l'inspection. */
+  photos: Uint8Array[]
+  photoCount: number
+  defects: Array<{ label: string; notes: string | null }>
+  /** Départ en regard d'un retour — `null` pour un départ, ou un retour sans départ. */
+  counterpart: {
+    performedAt: string
+    fuelLevel: number | null
+    engineHours: string | null
+    items: Array<{ itemKey: string; state: InspectionItemState; note: string | null }>
+  } | null
+  signatures: Array<{
+    role: InspectionSignatureRole
+    signerName: string
+    signedAt: string
+    image: Uint8Array
+  }>
 }

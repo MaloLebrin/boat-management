@@ -322,6 +322,19 @@ point en `damage` ouvre `InspectionDefectModal` **pré-remplie** (prop `prefill`
 note du constat). Mutations via `router.patch`/`router.delete` + `preserveScroll` sur
 `.../inspections/:inspectionId/items`. Voir `docs/domain/inspections.md`.
 
+### État des lieux signé (#889)
+
+En tête de chaque panneau d'inspection existante, `InspectionDocumentBar.vue` affiche le statut
+(brouillon, ou « Signé le … » avec les signataires et la date d'envoi) et trois gestes : **PDF**
+(ancre `target="_blank"`, `?inline=1`), **Faire signer** (ouvre `InspectionSignModal.vue`) tant que
+l'inspection n'est pas signée, **Envoyer / Renvoyer au client** (`router.post` + `preserveScroll`)
+une fois signée. La modale réunit le nom du client et deux `SignaturePad.vue` (canvas, pointer
+events, PNG dans le modèle) ; « Signer et figer » reste désactivé tant qu'il manque un tracé ou le
+réseau. Le pad reste clair dans les deux thèmes (`bg-navy-25`, qui ne s'inverse pas) : il figure le
+papier du PDF, encre `SIGNATURE_INK_COLOR`. Signée, l'inspection masque formulaire, saisie de
+checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`locked` dans
+`InspectionPanel.vue`).
+
 ### Liens et navigation (#533)
 
 - **Navigation interne = `<Link>` (`@adonisjs/inertia/vue`)**, jamais `<a href="/…">` : une ancre brute recharge l'app entière. Deux règles ESLint le tiennent (`vue/no-restricted-static-attribute`, `vue/no-restricted-v-bind` sur `inertia/**/*.vue`).

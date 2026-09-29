@@ -62,6 +62,7 @@ export const controllers = {
   FleetExports: () => import('#controllers/fleet_exports_controller'),
   Health: () => import('#controllers/health_controller'),
   Home: () => import('#controllers/home_controller'),
+  InspectionDocuments: () => import('#controllers/inspection_documents_controller'),
   InvoicePaymentLinks: () => import('#controllers/invoice_payment_links_controller'),
   InvoiceReminders: () => import('#controllers/invoice_reminders_controller'),
   Invoices: () => import('#controllers/invoices_controller'),

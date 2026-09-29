@@ -7,6 +7,7 @@ import {
 import { PdfService } from '#services/pdf_service'
 import type { CloudinaryUploadOptions } from '#shared/types/media'
 import { inject } from '@adonisjs/core'
+import type { UploadApiResponse } from 'cloudinary'
 import type { MultipartFile } from '@adonisjs/core/bodyparser'
 import app from '@adonisjs/core/services/app'
 import logger from '@adonisjs/core/services/logger'
@@ -102,6 +103,10 @@ export const CloudinaryFolders = {
 
   inspectionPhotos: (orgSlug: string, boatId: number, reservationId: number, kind: string) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/reservations/${reservationId}/inspections/${kind}`,
+
+  /** PDF d'état des lieux signé (#889), sous le dossier des photos du même `kind`. */
+  inspectionSignedPdf: (orgSlug: string, boatId: number, reservationId: number, kind: string) =>
+    `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/reservations/${reservationId}/inspections/${kind}/signed`,
 
   rentalContractSignedDocument: (orgSlug: string, boatId: number, reservationId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}/reservations/${reservationId}/contract/signed`,
@@ -226,6 +231,59 @@ export class CloudinaryService {
     const buffer = Buffer.from(await fetchResponse.arrayBuffer())
     const contentType = fetchResponse.headers.get('content-type') ?? 'application/octet-stream'
     return { buffer, contentType }
+  }
+
+  /**
+   * Envoie un document produit par l'app (PDF d'état des lieux signé, #889) :
+   * pas de fichier temporaire, le tampon part tel quel en `raw`.
+   */
+  async uploadBuffer(
+    buffer: Buffer,
+    filename: string,
+    folder: string
+  ): Promise<CloudinaryUploadResult> {
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder, resource_type: 'raw', public_id: filename, unique_filename: true },
+        (error, response) => {
+          if (error || !response) return reject(error ?? new Error('Cloudinary upload failed'))
+          resolve(response)
+        }
+      )
+      stream.end(buffer)
+    })
+
+    return {
+      publicId: result.public_id,
+      url: result.url,
+      secureUrl: result.secure_url,
+      format: result.format || 'pdf',
+      resourceType: result.resource_type,
+      bytes: result.bytes,
+      originalFilename: filename.replace(/\.[^.]+$/, ''),
+    }
+  }
+
+  /**
+   * Vignette JPEG d'une photo, redimensionnée par Cloudinary (#889) — pdfkit ne
+   * lit ni le HEIC ni le WebP. `null` si elle ne vient pas : le PDF l'omet
+   * plutôt que d'échouer.
+   */
+  async fetchThumbnail(publicId: string): Promise<Buffer | null> {
+    const url = cloudinary.url(publicId, {
+      secure: true,
+      resource_type: 'image',
+      format: 'jpg',
+      transformation: [{ width: 480, height: 480, crop: 'limit', quality: 'auto' }],
+    })
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(8000) })
+      if (!response.ok) return null
+      return Buffer.from(await response.arrayBuffer())
+    } catch (error) {
+      logger.warn({ err: error, publicId }, 'inspection photo thumbnail unavailable')
+      return null
+    }
   }
 
   async deleteFile(publicId: string, resourceType: 'image' | 'raw' = 'image'): Promise<void> {
