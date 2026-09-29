@@ -158,6 +158,18 @@ const EXCEPTIONS: Component[] = [
       { pattern: 'stroke="#5D4037"', count: 1, reason: MARINA_MAP },
     ],
   },
+  // Pad de signature d'état des lieux (#889) : il figure la feuille du PDF où
+  // finit le tracé, encre sombre fixe — il reste clair dans les deux thèmes.
+  {
+    path: 'components/reservations/inspection/SignaturePad.vue',
+    allow: [
+      {
+        pattern: 'bg-navy-25',
+        count: 1,
+        reason: 'fond papier du pad de signature, encre sombre fixe du PNG imprimé',
+      },
+    ],
+  },
   // Marketing : bandeaux navy et illustrations autonomes.
   {
     path: 'components/marketing/about/AboutNumbersSection.vue',
