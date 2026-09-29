@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import app from '@adonisjs/core/services/app'
 import shieldConfig from '#config/shield'
 
 /**
@@ -19,5 +20,28 @@ test.group('Shield config (unit)', () => {
 
   test('the Stripe Connect webhook route is exempt from CSRF verification (#876)', ({ assert }) => {
     assert.include(shieldConfig.csrf.exceptRoutes as string[], '/webhooks/stripe/connect')
+  })
+
+  test('CSP declares frame-ancestors none and form-action self (#779)', ({ assert }) => {
+    const directives = shieldConfig.csp.directives as Record<string, string[] | undefined>
+    assert.deepEqual(directives.frameAncestors, ["'none'"])
+    assert.deepEqual(directives.formAction, ["'self'"])
+    assert.deepEqual(directives.connectSrc, ["'self'"])
+  })
+
+  test('X-Frame-Options remains DENY alongside frame-ancestors (#779)', ({ assert }) => {
+    assert.isTrue(shieldConfig.xFrame.enabled)
+    assert.equal(shieldConfig.xFrame.action, 'DENY')
+  })
+
+  test('CSP is report-only outside production (#779)', ({ assert }) => {
+    assert.equal(shieldConfig.csp.reportOnly, !app.inProduction)
+  })
+
+  test('HSTS omits includeSubDomains and preload (#779)', ({ assert }) => {
+    assert.isTrue(shieldConfig.hsts.enabled)
+    assert.equal(shieldConfig.hsts.maxAge, '180 days')
+    assert.notEqual(shieldConfig.hsts.includeSubDomains, true)
+    assert.notEqual(shieldConfig.hsts.preload, true)
   })
 })
