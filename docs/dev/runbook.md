@@ -197,6 +197,5 @@ restauration échoue donc en CI, et non le jour de l'incident.
 
 ## Hors périmètre
 
-- La corbeille applicative (#858), pour récupérer un objet sans restaurer toute
-  la base.
-- La sauvegarde des médias Cloudinary, qui a sa propre option de backup.
+- La sauvegarde des médias Cloudinary, qui a sa propre option de backup. Un bateau
+  supprimé reste récupérable 30 jours via la corbeille (#858), sans restaurer la base.

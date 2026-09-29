@@ -383,6 +383,8 @@ export default class PublicBookingService {
       .where('organization_id', boat.organizationId)
       .whereNot('id', boat.id)
       .where('public_booking_slug', 'like', `${base}%`)
+      // Les slugs des bateaux en corbeille restent pris : la restauration ne
+      // doit pas entrer en collision (#858).
       .select('public_booking_slug')
     const taken = new Set(rows.map((row) => row.public_booking_slug))
     if (!taken.has(base)) return base

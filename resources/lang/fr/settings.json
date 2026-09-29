@@ -413,6 +413,8 @@
       "boat_create": "Bateau créé",
       "boat_update": "Bateau modifié",
       "boat_delete": "Bateau supprimé",
+      "boat_restore": "Bateau restauré",
+      "boat_force_delete": "Bateau supprimé définitivement",
       "boat_status_change": "Statut du bateau modifié",
       "reservation_force_unavailable": "Réservation forcée sur un bateau indisponible",
       "reservation_payment_recorded": "Encaissement enregistré sur une réservation",

@@ -13,6 +13,7 @@ export type BoatListFilters = {
   direction: BoatListDirection
   page: number
   perPage: number
+  trashed?: boolean
 }
 
 export type BoatListMeta = {
@@ -36,6 +37,7 @@ export type BoatListItem = {
   propulsionType: string | null
   status: BoatStatus
   updatedAt: string | null
+  purgeAt: string | null
   maintenance: BoatMaintenanceBadge
 }
 

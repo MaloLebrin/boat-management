@@ -12,6 +12,16 @@ export class RegistrationNumberTakenError extends Error {
   name = 'RegistrationNumberTakenError'
 }
 
+/** Nom encore porté par un bateau en corbeille (#858). */
+export class TrashedBoatNameHeldError extends Error {
+  name = 'TrashedBoatNameHeldError'
+}
+
+/** Immatriculation encore portée par un bateau en corbeille (#858). */
+export class TrashedBoatRegistrationHeldError extends Error {
+  name = 'TrashedBoatRegistrationHeldError'
+}
+
 export class InvalidBoatHullError extends Error {
   constructor(message: string) {
     super(message)

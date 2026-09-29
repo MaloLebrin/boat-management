@@ -12,7 +12,7 @@
     "cancel": "Annuler",
     "deleteConfirm": {
       "title": "Supprimer ce bateau ?",
-      "message": "Cette action supprimera définitivement « {name} » ainsi que tout son historique (maintenance, documents, équipements). Cette action est irréversible."
+      "message": "« {name} » sera placé dans la corbeille pendant 30 jours. Son historique est conservé et vous pouvez le restaurer. Passé ce délai, le bateau et son historique sont supprimés définitivement."
     }
   },
   "owners": {
@@ -311,6 +311,24 @@
       "comfort": "Confort et vie à bord",
       "plumbing": "Plomberie et circuit d'eau",
       "other": "Autre équipement"
+    }
+  },
+  "trash": {
+    "title": "Corbeille",
+    "subtitle": "Les bateaux supprimés restent ici 30 jours, avec leur historique. Ensuite ils sont effacés définitivement.",
+    "open": "Corbeille",
+    "back": "Retour à la flotte",
+    "restore": "Restaurer",
+    "forceDelete": "Supprimer définitivement",
+    "purgeAt": "Suppression le {date}",
+    "purgeColumn": "Suppression",
+    "empty": {
+      "title": "La corbeille est vide",
+      "description": "Les bateaux que vous supprimez apparaissent ici pendant 30 jours."
+    },
+    "forceConfirm": {
+      "title": "Supprimer définitivement ?",
+      "message": "« {name} » et tout son historique seront effacés. Cette action est irréversible."
     }
   },
   "index": {

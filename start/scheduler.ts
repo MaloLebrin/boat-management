@@ -12,6 +12,7 @@ import ScanFleetNotifications from '#jobs/scan_fleet_notifications'
 import GenerateAiSuggestions from '#jobs/generate_ai_suggestions'
 import ReconcileMedia from '#jobs/reconcile_media'
 import SyncExternalCalendars from '#jobs/sync_external_calendars'
+import PurgeTrashedBoats from '#jobs/purge_trashed_boats'
 
 await SendReminderEmails.schedule({})
   .cron('0 8 * * *')
@@ -112,4 +113,12 @@ await SyncExternalCalendars.schedule({})
   .cron('*/30 * * * *')
   .timezone('Europe/Paris')
   .id('sync-external-calendars')
+  .run()
+
+// À 04:15, après la remise à zéro de la démo de 04:00 : la purge physique des
+// bateaux en corbeille depuis 30 jours (#858) ne croise pas ce reset.
+await PurgeTrashedBoats.schedule({})
+  .cron('15 4 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-purge-trashed-boats')
   .run()

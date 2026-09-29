@@ -3,15 +3,19 @@ import { Link } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BoatStatusBadge from '~/components/boats/BoatStatusBadge.vue'
+import BoatTrashActions from '~/components/boats/list/BoatTrashActions.vue'
 import type { BoatListItem } from './types'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import { maintenanceVariant } from '~/utils/status_variants'
 import { boatCategoryLabel, propulsionLabel } from '~/utils/boat_enum_labels'
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 defineProps<{
   boats: BoatListItem[]
+  trashed?: boolean
 }>()
 
 function maintenanceLabel(b: BoatListItem) {
@@ -25,12 +29,13 @@ function maintenanceLabel(b: BoatListItem) {
 
 <template>
   <TransitionGroup name="list" tag="div" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <Link
+    <component
+      :is="trashed ? 'div' : Link"
       v-for="(boat, i) in boats"
       :key="boat.id"
       :style="{ '--i': i }"
-      :href="`/boats/${boat.id}`"
-      class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 rounded-(--radius-card)"
+      v-bind="trashed ? {} : { href: `/boats/${boat.id}` }"
+      class="block rounded-(--radius-card) focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/30"
     >
       <BaseCard padded>
         <template #header>
@@ -63,7 +68,13 @@ function maintenanceLabel(b: BoatListItem) {
             {{ propulsionLabel(t, boat.propulsionType) ?? t('boats.list.cards.unknownPropulsion') }}
           </span>
         </div>
+        <div v-if="trashed" class="mt-4 space-y-3">
+          <p class="text-xs text-fg-muted">
+            {{ t('boats.trash.purgeAt', { date: formatDate(boat.purgeAt) }) }}
+          </p>
+          <BoatTrashActions :boat-id="boat.id" :name="boat.name" />
+        </div>
       </BaseCard>
-    </Link>
+    </component>
   </TransitionGroup>
 </template>

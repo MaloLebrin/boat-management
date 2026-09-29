@@ -40,8 +40,8 @@ const PROTOCOL_KEYS = [
   'createdResourceId',
 ] as const
 
-/** Les quatre clés de toast, partagées par le même objet `flash`. */
-const TOAST_KEYS = ['error', 'errorAction', 'success', 'info'] as const
+/** Les clés de toast, partagées par le même objet `flash`. */
+const TOAST_KEYS = ['error', 'errorAction', 'success', 'successAction', 'info'] as const
 
 function makeMiddleware() {
   const stub = {} as never
@@ -141,6 +141,7 @@ test.group('Protocole hors-ligne — les cinq clés traversent le middleware', (
       error: undefined,
       errorAction: undefined,
       success: undefined,
+      successAction: undefined,
       info: undefined,
       conflictData: '{"windForceBeaufort":7}',
       conflictType: 'update-navigation-log',

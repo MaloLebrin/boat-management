@@ -211,6 +211,7 @@ export type BoatSerializedRow = {
   category: string | null
   propulsionType: string | null
   status: string
+  deletedAt: string | null
   updatedAt: string | null
 }
 
@@ -233,6 +234,8 @@ export type BoatListQuery = {
   direction?: BoatListDirection
   page?: number
   perPage?: number
+  /** Corbeille (#858). Réservé à `boats.delete` — le contrôleur ignore le flag sinon. */
+  trashed?: boolean
 }
 
 export type BoatListItem = {
@@ -243,6 +246,8 @@ export type BoatListItem = {
   propulsionType: string | null
   status: BoatStatus
   updatedAt: string | null
+  /** Date ISO de purge physique, présente en corbeille (#858). */
+  purgeAt: string | null
   maintenance: {
     urgentCount: number
     upcomingCount: number

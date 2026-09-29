@@ -66,6 +66,7 @@ Référence: `inertia/app.ts`.
 
 - `boats/index`: `inertia/pages/boats/index.vue`
   - disponibilité (#870) : filtre « Statut » dans `BoatListToolbar.vue` (vide = flotte active, hors vendus), colonne « Disponibilité » dans `BoatTable.vue`, badge sur `BoatCards.vue` quand le bateau n'est pas disponible — tous via `inertia/components/boats/BoatStatusBadge.vue` (`boatStatusVariant`)
+  - corbeille (#858) : lien « Corbeille » (capacité `boats.delete`) vers `?trashed=1`. Le nom n'est plus un lien. `BoatTrashActions.vue` restaure (`POST /boats/:id/restore`) et purge (`DELETE /boats/:id/force`, confirmation). Le toast de suppression porte « Annuler » (`flash.successAction`)
   - props: `boats[]`
   - backend: `BoatsController.index` → `BoatService.listForUser`
   - filtre catégorie (#571) : `BoatListToolbar` propose les libellés traduits de `BOAT_CATEGORIES`

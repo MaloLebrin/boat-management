@@ -38,9 +38,12 @@ import BoatHullService from '#services/boat_hull_service'
 import BoatAvailabilityService from '#services/boat_availability_service'
 import BoatStatusService from '#services/boat_status_service'
 import { toBoatStatusChangeRow } from '#transformers/boat_status_transformer'
-import { RegistrationNumberTakenError } from '#exceptions/boat_errors'
+import {
+  RegistrationNumberTakenError,
+  TrashedBoatNameHeldError,
+  TrashedBoatRegistrationHeldError,
+} from '#exceptions/boat_errors'
 import MediaService from '#services/media_service'
-import OrganizationService from '#services/organization_service'
 import PortService from '#services/port_service'
 import QuotaService from '#services/quota_service'
 import SpotService from '#services/spot_service'
@@ -73,7 +76,6 @@ export default class BoatsController {
     private portService: PortService,
     private spotService: SpotService,
     private quotaService: QuotaService,
-    private organizationService: OrganizationService,
     private auditLogService: AuditLogService,
     private documentService: BoatDocumentService,
     private crewService: CrewService,
@@ -100,8 +102,12 @@ export default class BoatsController {
 
     await bouncer.with(BoatPolicy).authorize('view')
 
+    const rawQuery = { ...request.qs() }
+    const canManageTrash = await bouncer.with(BoatPolicy).allows('manageTrash')
+    if (!canManageTrash) rawQuery.trashed = undefined
+
     const [{ boats, filters }, boatQuota] = await Promise.all([
-      this.boatListService.listForUser(user, request.qs()),
+      this.boatListService.listForUser(user, rawQuery),
       user.organization
         ? this.quotaService.getBoatUsage(user.organization)
         : Promise.resolve({ used: 0, limit: 0 }),
@@ -202,6 +208,14 @@ export default class BoatsController {
       }
       if (error instanceof RegistrationNumberTakenError) {
         session.flash('error', i18n.t('flash.boat.registrationTaken'))
+        return response.redirect().back()
+      }
+      if (error instanceof TrashedBoatNameHeldError) {
+        session.flash('error', i18n.t('flash.boat.nameHeldByTrash'))
+        return response.redirect().back()
+      }
+      if (error instanceof TrashedBoatRegistrationHeldError) {
+        session.flash('error', i18n.t('flash.boat.registrationHeldByTrash'))
         return response.redirect().back()
       }
       throw error
@@ -476,33 +490,16 @@ export default class BoatsController {
         session.flash('error', i18n.t('flash.boat.registrationTaken'))
         return response.redirect().back()
       }
+      if (error instanceof TrashedBoatNameHeldError) {
+        session.flash('error', i18n.t('flash.boat.nameHeldByTrash'))
+        return response.redirect().back()
+      }
+      if (error instanceof TrashedBoatRegistrationHeldError) {
+        session.flash('error', i18n.t('flash.boat.registrationHeldByTrash'))
+        return response.redirect().back()
+      }
       throw error
     }
-  }
-
-  async destroy({ params, auth, response, bouncer }: HttpContext) {
-    await auth.authenticate()
-    const resolved = await this.boatContext.resolveBoat({ auth, response, params }, 'id')
-    if (!resolved) return
-    const { user, boat } = resolved
-
-    await bouncer.with(BoatPolicy).authorize('delete', boat)
-
-    const org = await this.organizationService.findOrFail(boat.organizationId)
-    const boatName = boat.name
-    const boatId = boat.id
-    await this.boatService.deleteForUser(user, boat, org)
-
-    await this.auditLogService.log({
-      organizationId: user.organizationId!,
-      userId: user.id,
-      action: 'boat.delete',
-      entityType: 'boat',
-      entityId: boatId,
-      metadata: { name: boatName },
-    })
-
-    response.redirect('/boats')
   }
 
   async assign({ request, params, auth, response, bouncer, session, i18n }: HttpContext) {

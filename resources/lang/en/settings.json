@@ -413,6 +413,8 @@
       "boat_create": "Boat created",
       "boat_update": "Boat updated",
       "boat_delete": "Boat deleted",
+      "boat_restore": "Boat restored",
+      "boat_force_delete": "Boat permanently deleted",
       "boat_status_change": "Boat status changed",
       "reservation_force_unavailable": "Reservation forced on an unavailable boat",
       "reservation_payment_recorded": "Reservation payment recorded",

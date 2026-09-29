@@ -65,6 +65,9 @@ Source: `database/schema.ts` (généré automatiquement via migrations).
 - armement: `armamentZone` (`basic | coastal | semi_offshore | offshore`, nullable — cf. #582)
 - disponibilité (#870): `status` (`available | in_maintenance | out_of_service | sold`, défaut
   `available`, CHECK, indexé), `statusReason` (text nullable), `statusChangedAt` (timestamptz nullable)
+- corbeille (#858): `deletedAt` (timestamptz nullable, index partiel `WHERE deleted_at IS NOT NULL`).
+  `NULL` = bateau actif. Le scope Lucid exclut les lignes renseignées ; la purge physique attend
+  30 jours (`BOAT_TRASH_RETENTION_DAYS`)
 - réservation en ligne (#881): `publicBookingEnabled` (bool, défaut `false`), `publicBookingSlug`
   (varchar 80 nullable, unique avec `organizationId`) — segment d'URL de `/book/:orgSlug/:boatSlug`,
   dérivé du nom à la première ouverture puis figé

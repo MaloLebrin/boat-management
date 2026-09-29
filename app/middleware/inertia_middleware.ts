@@ -130,6 +130,8 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
     // Cible facultative d'un CTA sur le toast d'erreur (upsell quota, issue #418).
     const errorAction = session?.flashMessages.get('errorAction') as string | undefined
     const success = session?.flashMessages.get('success') as string
+    // Cible d'un POST sur le toast de succès (annuler une mise en corbeille, #858).
+    const successAction = session?.flashMessages.get('successAction') as string | undefined
     const info = session?.flashMessages.get('info') as string
 
     // Protocole de la file hors-ligne (#490, #622) : `drainQueue` lit ces
@@ -201,6 +203,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
         error,
         errorAction,
         success,
+        successAction,
         info,
         conflictData,
         conflictType,
