@@ -212,11 +212,18 @@ export class CloudinaryService {
     }
   }
 
+  /**
+   * Ramène les octets, rien d'autre. Le `Content-Type` annoncé par Cloudinary
+   * n'est pas renvoyé : un en-tête venu de l'extérieur ne doit pas décider
+   * comment le navigateur interprète un contenu servi depuis notre origine
+   * (#784). L'appelant déduit le type de `media.format` via
+   * `contentTypeForMediaFormat`.
+   */
   async downloadAsBuffer(
     publicId: string,
     resourceType: 'image' | 'raw',
     format: string
-  ): Promise<{ buffer: Buffer; contentType: string }> {
+  ): Promise<Buffer> {
     const downloadUrl = cloudinary.utils.private_download_url(publicId, format, {
       resource_type: resourceType,
       type: 'upload',
@@ -228,9 +235,7 @@ export class CloudinaryService {
       throw new CloudinaryDownloadError(fetchResponse.status, fetchResponse.statusText)
     }
 
-    const buffer = Buffer.from(await fetchResponse.arrayBuffer())
-    const contentType = fetchResponse.headers.get('content-type') ?? 'application/octet-stream'
-    return { buffer, contentType }
+    return Buffer.from(await fetchResponse.arrayBuffer())
   }
 
   /**

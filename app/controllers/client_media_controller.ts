@@ -14,6 +14,7 @@ import type Organization from '#models/organization'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 import type User from '#models/user'
 import { contentDisposition } from '#shared/helpers/content_disposition'
+import { contentTypeForMediaFormat } from '#shared/constants/media'
 
 @inject()
 export default class ClientMediaController {
@@ -142,13 +143,16 @@ export default class ClientMediaController {
     }
 
     const resourceType = media.format === 'pdf' ? 'raw' : 'image'
-    const { buffer, contentType } = await this.cloudinaryService.downloadAsBuffer(
+    const buffer = await this.cloudinaryService.downloadAsBuffer(
       media.cloudinaryPublicId,
       resourceType,
       media.format
     )
 
-    response.header('Content-Type', contentType)
+    // `attachment` (défaut, pas d'`inline`) fait partie de la garde (#784).
+    // Le type vient de l'allowlist sur `media.format`, jamais de Cloudinary.
+    // Avant un aperçu dans le navigateur, revoir `contentTypeForMediaFormat`.
+    response.header('Content-Type', contentTypeForMediaFormat(media.format))
     response.header(
       'Content-Disposition',
       contentDisposition(`${media.originalFilename}.${media.format}`)

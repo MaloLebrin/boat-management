@@ -38,6 +38,14 @@ moteur, pièce moteur) passent par `bouncer.with(BoatPolicy).authorize('view', b
 seuil que la fiche bateau : un `mechanic` ou un `boat_owner` reçoit un 403, sans que Cloudinary
 soit appelé (#846).
 
+Le `Content-Type` de ces téléchargements (et de celui des documents client, et du
+document signé d'un contrat) est déduit de `media.format` par
+`contentTypeForMediaFormat` (`shared/constants/media.ts`), jamais recopié depuis
+la réponse Cloudinary (#784). Un format absent de l'allowlist — la même table
+que les `extnames` des validateurs — sort en `application/octet-stream`.
+`Content-Disposition` reste `attachment` : c'est une partie de la garde, à
+revoir avant d'ajouter un aperçu `inline`.
+
 ## Défense IDOR (deux couches)
 
 1. **Chaîne de propriété** : `auth.authenticate()` → `boatService.getForUserOrFail(user, boatId)`

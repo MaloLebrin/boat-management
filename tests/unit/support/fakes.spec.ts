@@ -63,9 +63,8 @@ test.group('tests/support/fakes — swapFakeCloudinary', (group) => {
     swapFakeCloudinary()
     const service = await app.container.make(CloudinaryService)
 
-    const { buffer, contentType } = await service.downloadAsBuffer('pid', 'raw', 'pdf')
+    const buffer = await service.downloadAsBuffer('pid', 'raw', 'pdf')
 
-    assert.equal(contentType, 'application/pdf')
     assert.isTrue(buffer.toString().startsWith('%PDF-'))
   })
 

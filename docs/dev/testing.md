@@ -312,6 +312,12 @@ distinguer un vrai document d'une réponse vide, via `Content-Length` — et enc
 renvoie 13 octets, donc un seuil de taille n'a de sens que sur un PDF réellement généré
 (`crew_role_pdf.spec.ts`), pas sur un média servi par le fake.
 
+Le `Content-Type` d'un média stocké vient de `media.format`
+(`contentTypeForMediaFormat`), pas du fake : `downloadAsBuffer` ne renvoie qu'un
+tampon (#784). Pour le prouver, passer un tampon HTML alors que `format` vaut
+`pdf` (ou `jpg`) et affirmer le type de l'allowlist — un format hors table
+(`html`) doit sortir en `application/octet-stream`.
+
 ### Le nom de fichier vient de l'utilisateur
 
 Tout endpoint qui écrit `attachment; filename="${…}"` à partir d'une donnée stockée expose un

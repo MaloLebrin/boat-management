@@ -125,7 +125,9 @@ Réutilise le sous-système média polymorphe (`entity_type='client'`).
   (`storeDocument` / `destroy` / `downloadMedia`), org-scopé et gaté Enterprise.
   ACL : `ClientPolicy.update` pour l'upload et la suppression, `ClientPolicy.view`
   pour le téléchargement — le même seuil que la fiche (#846). Réutilise `MediaService` et
-  `storeBoatDocumentValidator` (PDF/DOCX/XLSX/CSV, 20 Mo).
+  `storeBoatDocumentValidator` (PDF/DOCX/XLSX/CSV, 20 Mo). Le `Content-Type` du
+  téléchargement suit `media.format` (`contentTypeForMediaFormat`), pas l'en-tête
+  Cloudinary (#784).
 - **Dossier Cloudinary** : `CloudinaryFolders.clientDocuments(orgSlug, clientId)`.
 - **Cleanup** : `ClientService.delete(org, client)` supprime les médias
   (`deleteAllForEntity`, décrément quota) avant la suppression de la ligne.
