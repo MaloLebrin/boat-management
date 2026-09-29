@@ -531,6 +531,7 @@ Fiches CRM (module `crm_invoicing`).
 - `notes`, `totalPrice`
 - paiement (#875) : `depositAmount` (acompte attendu, nullable), `depositPaidAt`, `balancePaidAt`, `paidAmount` (decimal, défaut 0), `paymentStatus` (`unpaid` | `deposit_paid` | `paid` | `refunded`, CHECK, défaut `unpaid`), `paymentMethod` (`transfer` | `card` | `cash` | `check`, nullable, CHECK)
 - caution (#875) : `securityDepositAmount` (copiée de `boat_pricing.depositAmount` à la confirmation), `securityDepositStatus` (`none` | `held` | `released` | `retained`, CHECK, défaut `none`), `securityDepositRetainedAmount`, `securityDepositNote`
+- `icalSequence` (int, défaut 0) : `SEQUENCE` du `VEVENT` exporté (#880), incrémenté quand les dates, le statut ou le nom du client changent
 - `createdAt`, `updatedAt`
 
 ### boat_inspections
@@ -662,6 +663,41 @@ Une ligne = un **export généré en arrière-plan** (#879), au-delà de
 
 Purgée à `expires_at` par `PurgeExpiredExports` (01:30). Ne jamais charger
 `content` dans une liste : `DataExportService` sélectionne ses colonnes.
+
+### calendar_feeds
+
+Flux iCal publiés par jeton (#880) — doc de domaine :
+`docs/domain/reservations-and-pricing.md` §5.2 ter.
+
+- `id`, `organizationId` (CASCADE), `boatId` (CASCADE, **nul = flux de la flotte**)
+- `token` (unique, 43 caractères base64url) : seul secret de l'URL
+  `/calendar/<token>.ics`. Supprimer la ligne révoque le flux
+- `locale` (langue des libellés du flux), `includeClientName`, `includeMaintenance`
+- `createdByUserId` (SET NULL), `createdAt`, `updatedAt`
+- index `(organization_id, boat_id)`
+
+### external_calendars
+
+Flux iCal d'une plateforme importé sur un bateau (#880).
+
+- `id`, `organizationId` (CASCADE), `boatId` (CASCADE)
+- `name`, `url` (texte ; l'écran n'en montre que l'hôte)
+- `lastSyncedAt` (dernière synchro **réussie**), `lastError` (code :
+  `unsafe_url`, `timeout`, `too_large`, `http_error`, `network`, `invalid_ics`)
+- `eventCount`, `conflictCount` (créneaux qui chevauchent une réservation
+  FleetAi non annulée)
+- `createdByUserId` (SET NULL), `createdAt`, `updatedAt`
+
+### external_calendar_events
+
+Créneaux importés (#880) : bloquent les dates, hors chiffre d'affaires,
+occupation, facturation et exports.
+
+- `id`, `externalCalendarId` (CASCADE), `boatId` (CASCADE)
+- `uid` (unique par calendrier ; `<UID>#<RECURRENCE-ID>` pour une occurrence
+  modifiée), `summary` (200 car. max)
+- `startsAt`, `endsAt` (timestamptz, fin exclusive)
+- index `(boat_id, starts_at, ends_at)` pour la règle de conflit
 
 ### public_ai_usages
 

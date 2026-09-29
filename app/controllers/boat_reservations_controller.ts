@@ -4,6 +4,7 @@ import {
   ReservationValidationError,
   ReservationDurationError,
   ReservationBlacklistedClientError,
+  ReservationExternalConflictError,
 } from '#exceptions/reservation_errors'
 import { BoatNotFoundError, BoatUnavailableError } from '#exceptions/boat_errors'
 import AuditLogService from '#services/audit_log_service'
@@ -17,6 +18,8 @@ import PricingSeasonService from '#services/pricing_season_service'
 import ClientService from '#services/client_service'
 import InvoiceService from '#services/invoice_service'
 import QuotaService from '#services/quota_service'
+import CalendarFeedService from '#services/calendar_feed_service'
+import ExternalCalendarService from '#services/external_calendar_service'
 import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import BoatPolicy from '#policies/boat_policy'
 import InvoicePolicy from '#policies/invoice_policy'
@@ -42,7 +45,9 @@ export default class BoatReservationsController {
     private invoiceService: InvoiceService,
     private quotaService: QuotaService,
     private availabilityService: BoatAvailabilityService,
-    private auditLogService: AuditLogService
+    private auditLogService: AuditLogService,
+    private calendarFeedService: CalendarFeedService,
+    private externalCalendarService: ExternalCalendarService
   ) {}
 
   /**
@@ -129,6 +134,9 @@ export default class BoatReservationsController {
       mayCreateInvoice,
       availability,
       canForceUnavailable,
+      feed,
+      externalCalendars,
+      externalBlocks,
     ] = await Promise.all([
       this.reservationService.listForBoat(user, boat),
       bouncer.with(BoatPolicy).allows('manage', boat),
@@ -138,6 +146,9 @@ export default class BoatReservationsController {
       bouncer.with(InvoicePolicy).allows('create'),
       this.availabilityService.summaryForBoat(boat),
       bouncer.with(BoatPolicy).allows('forceReservation', boat),
+      this.calendarFeedService.feedFor(boat.organizationId, boat.id),
+      this.externalCalendarService.listForBoat(boat.id),
+      this.externalCalendarService.blocksForBoats([boat.id]),
     ])
 
     const boatPricing = pricingModel ? toBoatPricingRow(pricingModel) : null
@@ -171,6 +182,14 @@ export default class BoatReservationsController {
       clientOptions,
       availability,
       canForceUnavailable,
+      // Synchronisation iCal (#880) : flux exporté, calendriers importés et
+      // leurs créneaux, affichés sur le calendrier.
+      calendarSync: {
+        feed: feed ? this.calendarFeedService.toRow(feed) : null,
+        externalCalendars: externalCalendars.map((c) => this.externalCalendarService.toRow(c)),
+        canManage,
+      },
+      externalBlocks,
     })
   }
 
@@ -209,6 +228,13 @@ export default class BoatReservationsController {
       }
       if (error instanceof ReservationConflictError) {
         session.flash('error', i18n.t('flash.reservation.conflict'))
+        return response.redirect().back()
+      }
+      if (error instanceof ReservationExternalConflictError) {
+        session.flash(
+          'error',
+          i18n.t('flash.reservation.externalConflict', { calendar: error.calendarName })
+        )
         return response.redirect().back()
       }
       if (error instanceof ReservationBlacklistedClientError) {
@@ -288,6 +314,13 @@ export default class BoatReservationsController {
       }
       if (error instanceof ReservationConflictError) {
         session.flash('error', i18n.t('flash.reservation.conflict'))
+        return response.redirect().back()
+      }
+      if (error instanceof ReservationExternalConflictError) {
+        session.flash(
+          'error',
+          i18n.t('flash.reservation.externalConflict', { calendar: error.calendarName })
+        )
         return response.redirect().back()
       }
       if (error instanceof ReservationBlacklistedClientError) {

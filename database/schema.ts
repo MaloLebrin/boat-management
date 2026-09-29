@@ -1209,6 +1209,7 @@ export class BoatReservationSchema extends BaseModel {
     'depositAmount',
     'depositPaidAt',
     'endsAt',
+    'icalSequence',
     'id',
     'notes',
     'organizationId',
@@ -1246,6 +1247,8 @@ export class BoatReservationSchema extends BaseModel {
   declare depositPaidAt: DateTime | null
   @column.dateTime()
   declare endsAt: DateTime
+  @column()
+  declare icalSequence: number
   @column({ isPrimary: true })
   declare id: number
   @column()
@@ -1531,6 +1534,42 @@ export class BoatSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare yearBuilt: number | null
+}
+
+export class CalendarFeedSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'createdByUserId',
+    'id',
+    'includeClientName',
+    'includeMaintenance',
+    'locale',
+    'organizationId',
+    'token',
+    'updatedAt',
+  ] as const
+  $columns = CalendarFeedSchema.$columns
+  @column()
+  declare boatId: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdByUserId: number | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare includeClientName: boolean
+  @column()
+  declare includeMaintenance: boolean
+  @column()
+  declare locale: string
+  @column()
+  declare organizationId: number
+  @column()
+  declare token: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class ClientSchema extends BaseModel {
@@ -1945,6 +1984,81 @@ export class EquipmentModelSchema extends BaseModel {
   declare slug: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+}
+
+export class ExternalCalendarEventSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'endsAt',
+    'externalCalendarId',
+    'id',
+    'startsAt',
+    'summary',
+    'uid',
+    'updatedAt',
+  ] as const
+  $columns = ExternalCalendarEventSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare endsAt: DateTime
+  @column()
+  declare externalCalendarId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column.dateTime()
+  declare startsAt: DateTime
+  @column()
+  declare summary: string | null
+  @column()
+  declare uid: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ExternalCalendarSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'conflictCount',
+    'createdAt',
+    'createdByUserId',
+    'eventCount',
+    'id',
+    'lastError',
+    'lastSyncedAt',
+    'name',
+    'organizationId',
+    'updatedAt',
+    'url',
+  ] as const
+  $columns = ExternalCalendarSchema.$columns
+  @column()
+  declare boatId: number
+  @column()
+  declare conflictCount: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdByUserId: number | null
+  @column()
+  declare eventCount: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare lastError: string | null
+  @column.dateTime()
+  declare lastSyncedAt: DateTime | null
+  @column()
+  declare name: string
+  @column()
+  declare organizationId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare url: string
 }
 
 export class InvoiceCounterSchema extends BaseModel {

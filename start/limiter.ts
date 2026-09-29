@@ -158,6 +158,12 @@ export const invoicePaymentThrottle = limiter.define('invoice_payment', (ctx) =>
   return limiter.allowRequests(10).every('1 minute').usingKey(`invoice_payment_${ctx.request.ip()}`)
 })
 
+// Flux iCal publics (#880) : un agenda relit l'URL toutes les heures au plus ;
+// au-delà de quelques lectures par minute, c'est quelqu'un qui devine des jetons.
+export const calendarFeedThrottle = limiter.define('calendar_feed', (ctx) => {
+  return limiter.allowRequests(30).every('1 minute').usingKey(`calendar_feed_${ctx.request.ip()}`)
+})
+
 // Abonnements Web Push (#497) : le navigateur ne (ré)abonne qu'à l'activation
 // ou au chargement — au-delà, c'est un script.
 export const pushThrottle = limiter.define('push', (ctx) => {

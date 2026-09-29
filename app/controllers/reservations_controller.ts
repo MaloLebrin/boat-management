@@ -2,6 +2,8 @@ import BoatReservationService from '#services/boat_reservation_service'
 import InvoiceService from '#services/invoice_service'
 import PlanningService from '#services/planning_service'
 import QuotaService from '#services/quota_service'
+import CalendarFeedService from '#services/calendar_feed_service'
+import ExternalCalendarService from '#services/external_calendar_service'
 import {
   toBoatReservationRow,
   toFleetCalendarEntries,
@@ -21,7 +23,9 @@ export default class ReservationsController {
     private reservationService: BoatReservationService,
     private invoiceService: InvoiceService,
     private quotaService: QuotaService,
-    private planningService: PlanningService
+    private planningService: PlanningService,
+    private calendarFeedService: CalendarFeedService,
+    private externalCalendarService: ExternalCalendarService
   ) {}
 
   async index({ inertia, auth, request, bouncer, response }: HttpContext) {
@@ -77,9 +81,27 @@ export default class ReservationsController {
       ? await this.planningService.maintenanceWindowsForBoats(calendarBoats.map((b) => b.id))
       : new Map()
 
+    // Synchronisation iCal (#880) : créneaux importés sur la frise, flux de
+    // la flotte pour qui gère les réservations.
+    const externalBlocks = await this.externalCalendarService.blocksForBoats(
+      calendarBoats.map((b) => b.id)
+    )
+    const canManageFleetCalendar = await bouncer.with(BoatPolicy).allows('manageFleetCalendar')
+    const fleetFeed =
+      canManageFleetCalendar && user.organizationId !== null
+        ? await this.calendarFeedService.feedFor(user.organizationId, null)
+        : null
+
     return inertia.render('reservations/index', {
       reservations: rows,
-      calendarEntries: toFleetCalendarEntries(calendarBoats, rows, maintenanceByBoat),
+      calendarEntries: toFleetCalendarEntries(
+        calendarBoats,
+        rows,
+        maintenanceByBoat,
+        externalBlocks
+      ),
+      fleetCalendarFeed: fleetFeed ? this.calendarFeedService.toRow(fleetFeed) : null,
+      canManageFleetCalendar,
       boats,
       selectedBoatId,
       selectedType,

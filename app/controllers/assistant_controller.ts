@@ -22,6 +22,7 @@ import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import {
   ReservationBlacklistedClientError,
   ReservationConflictError,
+  ReservationExternalConflictError,
   ReservationDurationError,
   ReservationValidationError,
 } from '#exceptions/reservation_errors'
@@ -207,6 +208,7 @@ export default class AssistantController {
       error instanceof BoatIncidentValidationError ||
       error instanceof ReservationValidationError ||
       error instanceof ReservationConflictError ||
+      error instanceof ReservationExternalConflictError ||
       error instanceof ReservationDurationError ||
       error instanceof ReservationBlacklistedClientError ||
       error instanceof BoatUnavailableError ||

@@ -27,6 +27,14 @@ export default class BoatPolicy extends OrgScopedPolicy {
   }
 
   /**
+   * Publier le flux iCal de toute la flotte (#880) : même droit que gérer les
+   * réservations d'un bateau, à l'échelle de l'organisation.
+   */
+  async manageFleetCalendar(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'boats.manage')
+  }
+
+  /**
    * Poser une réservation confirmée sur un bateau indisponible (#870), avec un
    * motif tracé au journal d'audit.
    */

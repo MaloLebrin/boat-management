@@ -208,17 +208,118 @@ d'indisponibilité de `BoatAvailabilityService`. Les règles :
 La page `boats/reservations` reçoit `availability` (bandeau) et `canForceUnavailable`. Ce dernier
 affiche le champ « motif de forçage » du formulaire quand le statut choisi est `confirmed`.
 
+### 5.2 ter Synchronisation iCal (#880)
+
+Un loueur publie ses bateaux sur plusieurs plateformes (Click&Boat, Samboat,
+Airbnb…). Le flux iCal (`.ics`, RFC 5545) est le standard de synchronisation
+entre elles. FleetAi en publie et en importe.
+
+**Export : flux publié par jeton.** `GET /calendar/<jeton>.ics` (route
+`calendar.feed`, sans session, limitée à 30 lectures/min/IP) :
+
+- un flux par bateau (onglet Réservations du bateau) et un pour la flotte
+  (`/reservations`), table `calendar_feeds` ;
+- jeton de 32 octets aléatoires (base64url, 43 caractères), gardé en clair
+  pour que l'écran puisse réafficher l'URL, comme l'« adresse secrète » d'un
+  agenda Google. **Régénérer** crée un nouveau jeton et supprime l'ancien.
+  **Révoquer** supprime la ligne. L'ancienne URL répond alors 404, comme un
+  jeton inconnu ou une organisation qui a perdu le module Location ;
+- contenu : réservations `confirmed` (`STATUS:CONFIRMED`) et `option`
+  (`STATUS:TENTATIVE`) terminées depuis moins d'un an. Une annulation sort du
+  flux, ce qui la retire des agendas abonnés ;
+- `UID` stable (`reservation-<id>@<hôte APP_URL>`). `SEQUENCE` =
+  `boat_reservations.ical_sequence`, incrémenté par le hook `beforeSave`
+  quand les dates, le statut ou le nom du client changent. L'anonymisation
+  d'un client l'incrémente à la main, parce que c'est une mise à jour en masse ;
+- `SUMMARY` = « <bateau> — Réservé / Option ». Le nom du client n'y figure
+  que si l'option « Inclure le nom du client » est cochée (désactivée par
+  défaut, puisque l'URL est lue par des tiers). « Inclure les entretiens
+  planifiés » ajoute les tâches ouvertes datées en journées entières ;
+- **jamais** les créneaux importés : ils reviendraient en écho sur la
+  plateforme d'où ils viennent ;
+- `Cache-Control: private, max-age=300`, `X-Robots-Tag: noindex`, textes
+  dans la locale de qui a créé le flux (`calendar_feeds.locale`).
+
+**Import : calendriers externes.** Sur un bateau, `POST
+/boats/:boatId/external-calendars` (nom + URL) enregistre le flux d'une
+plateforme (`external_calendars`) et le synchronise aussitôt. Ensuite, une
+synchronisation a lieu toutes les 30 minutes (job `SyncExternalCalendars`) et
+à la demande (bouton « Synchroniser »).
+
+- Les créneaux vivent dans `external_calendar_events`, **pas** dans
+  `boat_reservations` (écart assumé avec la piste « réservation de type
+  `external` » de l'issue) : ils bloquent les dates sans entrer dans le
+  chiffre d'affaires, l'occupation, la facturation, les paiements ni les
+  exports. La location est facturée par la plateforme ;
+- **idempotent par `UID`** : un créneau déplacé est mis à jour, un créneau
+  disparu du flux est supprimé. Un échec (`last_error` : `unsafe_url`,
+  `timeout`, `too_large`, `http_error`, `network`, `invalid_ics`) garde les
+  créneaux de la dernière synchronisation réussie ;
+- parseur maison (`app/services/ical_service.ts`) : dates entières (heure
+  de Paris), UTC, `TZID` (un nom Windows inconnu retombe sur Paris), heures
+  flottantes, `DURATION`. `STATUS:CANCELLED` et `TRANSP:TRANSPARENT` sont
+  écartés. Une `RRULE` n'est pas déroulée, seule la première occurrence
+  compte : les plateformes publient une réservation par événement. Les
+  créneaux terminés depuis plus de 30 jours sont ignorés, et un flux est
+  plafonné à 2 000 créneaux ;
+- **règle de conflit** : un créneau importé bloque une `option` comme une
+  `confirmed` (`ReservationExternalConflictError`, flash
+  `flash.reservation.externalConflict` qui nomme le calendrier). Il n'y a
+  pas de forçage : un flux périmé se corrige en le resynchronisant ou en le
+  retirant. À la modification, la règle ne rejoue que si les dates ou le
+  statut changent. Une réservation posée avant l'import reste éditable ;
+- `conflict_count` compte les créneaux importés qui chevauchent déjà une
+  réservation FleetAi non annulée (double réservation). Il est affiché sur
+  l'encart et signalé par un flash après la synchronisation.
+
+**Sécurité de l'import (SSRF, `app/services/calendar_fetcher.ts`).** L'URL
+est saisie par un utilisateur et téléchargée par le serveur :
+
+- `https` seulement (`webcal://` est lu en `https`), port 443, pas
+  d'identifiants dans l'URL, ni `localhost`, `*.localhost` ou `*.internal` ;
+- chaque adresse résolue est vérifiée **au moment de la connexion**
+  (option `lookup` de `https.request`). Sont refusées les IP privées, de
+  boucle locale, de lien local (dont `169.254.169.254`), CGNAT, de
+  documentation, multicast, et leurs formes IPv6 (IPv4 mappée, NAT64). Un
+  nom public qui résout vers le réseau interne est donc coupé, sans fenêtre
+  de DNS rebinding ;
+- redirections suivies à la main, 3 au plus, chacune revérifiée. Délai de
+  10 s, taille maximale de 2 Mo ;
+- l'écran n'affiche que l'hôte de l'URL importée, jamais l'URL complète :
+  elle porte souvent le jeton de la plateforme.
+
+**Droits et gating.** Routes dans le groupe `requireModulePlan({ feature:
+'reservations' })`. Les actions sur un bateau demandent `BoatPolicy.manage`,
+le flux de flotte `BoatPolicy.manageFleetCalendar` (`boats.manage`). Un
+mécanicien voit les calendriers, mais ne peut ni publier ni importer. Audit :
+`calendar.token_created`, `calendar.token_revoked`,
+`external_calendar.added`, `external_calendar.removed`.
+
+**Écran.** `BoatCalendarSyncCard.vue` sur `boats/reservations`
+(`CalendarFeedPanel.vue` pour l'export, `ExternalCalendarList.vue` pour
+l'import), et `CalendarFeedPanel` dans une carte de `/reservations`. Les
+créneaux importés s'affichent en violet pointillé, non modifiables : prop
+`externalBlocks` du calendrier mensuel, et `calendarEntries[].external` sur
+la frise. Leurs jours (`startsOn`/`endsOn`) sont calculés à l'heure de
+Paris, pour qu'une journée entière importée ne déborde pas sur la veille.
+Guide utilisateur :
+[`docs/user-guide/ical-synchronisation.md`](../user-guide/ical-synchronisation.md).
+
 ### 5.3 Routes → controllers → pages
 
 Réf. routes : `start/routes/boats.ts` (per-boat) et `start/routes/reservations.ts` (flotte).
 
-| Route                                               | Controller                                   | Effet                                                                                                         |
-| --------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `GET /boats/:boatId/reservations`                   | `BoatReservationsController.index`           | Page `boats/reservations` (calendrier, liste, formulaire). **Expose `boatPricing` + `pricingSeasons`** (#294) |
-| `POST /boats/:boatId/reservations`                  | `.store` (`createBoatReservationValidator`)  | Crée la réservation                                                                                           |
-| `PATCH /boats/:boatId/reservations/:reservationId`  | `.update` (`updateBoatReservationValidator`) | Modifie                                                                                                       |
-| `DELETE /boats/:boatId/reservations/:reservationId` | `.destroy`                                   | Supprime — **jamais une `confirmed`** (voir ACL ci-dessus)                                                    |
-| `GET /reservations` (`reservations.index`)          | `ReservationsController.index`               | Vue flotte **lecture seule** (timeline + filtre `?boatId=`)                                                   |
+| Route                                                                                   | Controller                                   | Effet                                                                                                         |
+| --------------------------------------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `GET /boats/:boatId/reservations`                                                       | `BoatReservationsController.index`           | Page `boats/reservations` (calendrier, liste, formulaire). **Expose `boatPricing` + `pricingSeasons`** (#294) |
+| `POST /boats/:boatId/reservations`                                                      | `.store` (`createBoatReservationValidator`)  | Crée la réservation                                                                                           |
+| `PATCH /boats/:boatId/reservations/:reservationId`                                      | `.update` (`updateBoatReservationValidator`) | Modifie                                                                                                       |
+| `DELETE /boats/:boatId/reservations/:reservationId`                                     | `.destroy`                                   | Supprime — **jamais une `confirmed`** (voir ACL ci-dessus)                                                    |
+| `GET /reservations` (`reservations.index`)                                              | `ReservationsController.index`               | Vue flotte **lecture seule** (timeline + filtre `?boatId=`)                                                   |
+| `POST/PATCH/DELETE /boats/:boatId/calendar-feed`                                        | `CalendarFeedsController`                    | Flux iCal du bateau : créer ou régénérer, contenu, révoquer (#880)                                            |
+| `POST/PATCH/DELETE /reservations/calendar-feed`                                         | `CalendarFeedsController`                    | Flux iCal de la flotte (#880)                                                                                 |
+| `GET /calendar/:jeton.ics` (`calendar.feed`)                                            | `CalendarFeedsController.show`               | Flux publié, **sans session** (#880)                                                                          |
+| `POST /boats/:boatId/external-calendars` (+ `/:calendarId/sync`, `DELETE /:calendarId`) | `ExternalCalendarsController`                | Calendriers externes importés (#880)                                                                          |
 
 > La **création/édition se fait uniquement depuis le formulaire par bateau**
 > (le `boatId` est fixe) ; la page flotte `/reservations` est en lecture seule.

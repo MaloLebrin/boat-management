@@ -115,3 +115,11 @@ test.group('BoatPolicy — forceReservation (#870) (unit)', () => {
     assert.isFalse(await policy.forceReservation(allowed, orgResource(OTHER_ORG_ID) as never))
   })
 })
+
+test.group('BoatPolicy — manageFleetCalendar (#880) (unit)', () => {
+  test('requires boats.manage', async ({ assert }) => {
+    const policy = new BoatPolicy()
+    assert.isTrue(await policy.manageFleetCalendar(userWithCapabilities(ORG_ID, ['boats.manage'])))
+    assert.isFalse(await policy.manageFleetCalendar(userWithCapabilities(ORG_ID, ['boats.view'])))
+  })
+})

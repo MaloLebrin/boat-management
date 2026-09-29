@@ -6,10 +6,16 @@ import { useMonthNav } from '~/composables/use_month_nav'
 import { useT } from '~/composables/use_t'
 import { paymentAttention } from '#shared/helpers/reservation_payment'
 import type { BoatReservationRow, ReservationStatus } from '~/types/reservation'
+import type { ExternalBlockRow } from '#shared/types/calendar_sync'
 
-const props = defineProps<{
-  reservations: BoatReservationRow[]
-}>()
+const props = withDefaults(
+  defineProps<{
+    reservations: BoatReservationRow[]
+    /** Créneaux importés d'autres plateformes (#880) : affichés, non modifiables. */
+    externalBlocks?: ExternalBlockRow[]
+  }>(),
+  { externalBlocks: () => [] }
+)
 
 const { t } = useT()
 const {
@@ -46,10 +52,27 @@ const reservationsByDay = computed(() => {
   return map
 })
 
+// Créneaux importés : jours à l'heure de Paris calculés par le serveur — une
+// journée entière importée ne déborde pas sur la veille.
+const blocksByDay = computed(() => {
+  const map = new Map<number, ExternalBlockRow[]>()
+  const month = String(currentMonth.value + 1).padStart(2, '0')
+  for (const block of props.externalBlocks) {
+    const bStart = block.startsOn
+    const bEnd = block.endsOn
+    for (let d = 1; d <= daysInMonth.value; d++) {
+      const iso = `${currentYear.value}-${month}-${String(d).padStart(2, '0')}`
+      if (bStart <= iso && iso < bEnd) map.set(d, [...(map.get(d) ?? []), block])
+    }
+  }
+  return map
+})
+
 const calendarDays = computed(() =>
   Array.from({ length: daysInMonth.value }, (_, i) => ({
     day: i + 1,
     reservations: reservationsByDay.value.get(i + 1) ?? [],
+    blocks: blocksByDay.value.get(i + 1) ?? [],
   }))
 )
 
@@ -102,7 +125,7 @@ const pillClass: Record<ReservationStatus, string> = {
     </template>
 
     <div
-      v-if="calendarDays.every((d) => d.reservations.length === 0)"
+      v-if="calendarDays.every((d) => d.reservations.length === 0 && d.blocks.length === 0)"
       class="py-6 text-center text-sm text-fg-muted"
     >
       {{ t('reservations.calendar.noReservations') }}
@@ -144,6 +167,15 @@ const pillClass: Record<ReservationStatus, string> = {
                 data-testid="payment-attention-dot"
               />
               {{ res.clientName }}
+            </div>
+            <div
+              v-for="block in cell.blocks.slice(0, 1)"
+              :key="`block-${block.id}`"
+              class="truncate rounded border border-dashed border-violet-300 bg-violet-50 px-1 py-0.5 text-xs font-medium text-violet-800"
+              :title="t('reservations.calendarSync.blockTitle', { calendar: block.calendarName })"
+              data-testid="external-block"
+            >
+              {{ block.calendarName }}
             </div>
             <div
               v-if="cell.reservations.length > 2"

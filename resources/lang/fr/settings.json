@@ -457,7 +457,11 @@
       "invoice_reminders_update": "Réglages des relances modifiés",
       "export_run": "Export réalisé",
       "client_export_bulk": "Fiches clients exportées",
-      "accounting_settings_update": "Réglages de l’export comptable modifiés"
+      "accounting_settings_update": "Réglages de l’export comptable modifiés",
+      "calendar_token_created": "Flux iCal créé ou régénéré",
+      "calendar_token_revoked": "Flux iCal révoqué",
+      "external_calendar_added": "Calendrier externe ajouté",
+      "external_calendar_removed": "Calendrier externe retiré"
     },
     "empty": {
       "title": "Aucune activité",

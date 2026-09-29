@@ -233,10 +233,17 @@ export default class ClientService {
 
       // Anonymize the denormalized text snapshot on linked reservations; keep
       // the FK so history remains attributable to a (now anonymized) record.
+      // `SEQUENCE` bumped by hand (#880): a bulk update skips the model hook,
+      // and a calendar feed showing client names must drop the real one.
       await BoatReservation.query({ client: trx })
         .where('organizationId', org.id)
         .where('clientId', client.id)
-        .update({ clientName: 'Client anonymisé', clientEmail: null, clientPhone: null })
+        .update({
+          clientName: 'Client anonymisé',
+          clientEmail: null,
+          clientPhone: null,
+          icalSequence: db.raw('ical_sequence + 1'),
+        })
     })
 
     return client

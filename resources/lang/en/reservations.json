@@ -162,5 +162,62 @@
       "retainedSummary": "{amount} retained: {note}",
       "inspectionHint": "On return, release the security deposit or retain an amount based on the defects found."
     }
+  },
+  "calendarSync": {
+    "title": "Sync with an external calendar",
+    "intro": "Publish this boat’s reservations to a calendar or a rental platform, and import those platforms’ calendars to block the dates.",
+    "fleetTitle": "Fleet iCal feed",
+    "fleetIntro": "One address to follow every boat’s reservations in your calendar (Google, Apple, Outlook).",
+    "export": {
+      "title": "Export to a calendar or a platform",
+      "empty": "No iCal address published.",
+      "create": "Create the iCal address",
+      "copy": "Copy address",
+      "copied": "Address copied",
+      "subscribe": "Subscribe",
+      "regenerate": "Regenerate",
+      "regenerateConfirm": "The current address will stop working at once: you will have to paste the new one wherever it is used. Continue?",
+      "revoke": "Revoke",
+      "revokeConfirm": "The address will stop working and subscribed calendars will receive nothing more. Continue?",
+      "includeClientName": "Include the client name",
+      "includeClientNameHint": "Off by default: the address is read by third parties.",
+      "includeMaintenance": "Include planned maintenance",
+      "save": "Save",
+      "secretHint": "Anyone who knows this address sees the booked dates. Regenerate it if it has been shared."
+    },
+    "import": {
+      "title": "Import the platforms’ calendars",
+      "empty": "No imported calendar.",
+      "name": "Name",
+      "namePlaceholder": "Samboat, Click&Boat…",
+      "url": "iCal feed address",
+      "urlPlaceholder": "https://…/calendar.ics",
+      "add": "Import",
+      "sync": "Sync",
+      "remove": "Remove",
+      "removeConfirm": "This calendar’s slots will no longer block the boat. Continue?",
+      "lastSynced": "Synced on {date}",
+      "neverSynced": "Never synced",
+      "events": "{count} slot(s)",
+      "conflicts": "{count} double booking(s)",
+      "readOnlyHint": "Imported slots block the dates and can only be changed on the original platform. Synced automatically every 30 minutes."
+    },
+    "errors": {
+      "unsafe_url": "address refused (public https only).",
+      "timeout": "the calendar did not answer in time.",
+      "too_large": "the calendar exceeds 2 MB.",
+      "http_error": "the platform answered with an error.",
+      "network": "the platform cannot be reached.",
+      "invalid_ics": "the address does not return an iCal calendar."
+    },
+    "feed": {
+      "boatCalendarName": "FleetAi — {boat}",
+      "fleetCalendarName": "FleetAi — {org}",
+      "confirmed": "Booked",
+      "option": "Option",
+      "maintenance": "Maintenance: {title}"
+    },
+    "blockTitle": "{calendar} — booked on another platform",
+    "blockLegend": "Booked elsewhere (imported calendar)"
   }
 }

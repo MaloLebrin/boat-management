@@ -6,6 +6,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import ReservationCalendar from '~/components/reservations/ReservationCalendar.vue'
 import ReservationForm from '~/components/reservations/ReservationForm.vue'
 import ReservationList from '~/components/reservations/ReservationList.vue'
+import BoatCalendarSyncCard from '~/components/reservations/calendar_sync/BoatCalendarSyncCard.vue'
 import BoatAvailabilityBanner from '~/components/boats/show/availability/BoatAvailabilityBanner.vue'
 import type { BoatAvailabilitySummary } from '#shared/types/boat_status'
 import { useT } from '~/composables/use_t'
@@ -13,6 +14,7 @@ import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { PricingSeasonRow } from '#shared/types/pricing_season'
 import type { ClientOption } from '#shared/types/client'
 import type { BoatReservationRow } from '~/types/reservation'
+import type { BoatCalendarSyncProps, ExternalBlockRow } from '#shared/types/calendar_sync'
 
 const props = defineProps<{
   boat: { id: number; name: string }
@@ -25,6 +27,9 @@ const props = defineProps<{
   /** Disponibilité du bateau (#870) et droit de forcer une confirmation. */
   availability: BoatAvailabilitySummary
   canForceUnavailable: boolean
+  /** Synchronisation iCal (#880) : flux exporté, calendriers importés et leurs créneaux. */
+  calendarSync: BoatCalendarSyncProps
+  externalBlocks: ExternalBlockRow[]
 }>()
 
 const { t } = useT()
@@ -115,7 +120,7 @@ onMounted(() => {
     <BoatAvailabilityBanner class="mt-6" :availability="availability" />
 
     <div class="mt-6">
-      <ReservationCalendar :reservations="reservations" />
+      <ReservationCalendar :reservations="reservations" :external-blocks="externalBlocks" />
     </div>
 
     <div id="reservation-form" class="mt-6">
@@ -128,6 +133,8 @@ onMounted(() => {
         :can-force-unavailable="canForceUnavailable && availability.status !== 'sold'"
       />
     </div>
+
+    <BoatCalendarSyncCard class="mt-6" :boat-id="boat.id" :sync="calendarSync" />
 
     <div class="mt-6">
       <ReservationList

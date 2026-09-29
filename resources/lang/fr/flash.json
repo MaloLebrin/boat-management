@@ -427,7 +427,8 @@
         "retainedAboveDeposit": "Le montant retenu ne peut pas dépasser la caution.",
         "noteRequired": "Indiquez le motif de la retenue."
       }
-    }
+    },
+    "externalConflict": "Ce bateau est déjà loué sur « {calendar} » pendant cette période (calendrier importé)."
   },
   "ports": {
     "hasBoats": "Impossible de supprimer ce port : des bateaux y sont assignés.",
@@ -493,5 +494,17 @@
   },
   "exports": {
     "queued": "Export volumineux : il est en cours de génération. Vous recevrez une notification dès qu'il sera prêt, et le retrouverez dans Paramètres → Exports."
+  },
+  "calendarSync": {
+    "feedCreated": "Flux iCal créé. Copiez son adresse dans votre agenda ou sur la plateforme.",
+    "feedUpdated": "Contenu du flux iCal mis à jour.",
+    "feedRevoked": "Flux iCal révoqué : son adresse ne répond plus.",
+    "added": "Calendrier externe ajouté : {count} créneau(x) importé(s).",
+    "synced": "Calendrier synchronisé : {count} créneau(x) importé(s).",
+    "removed": "Calendrier externe retiré, ses créneaux ne bloquent plus le bateau.",
+    "syncFailed": "La synchronisation a échoué : {reason}",
+    "unsafeUrl": "Adresse refusée : seul un flux https public (port 443) peut être importé.",
+    "limitReached": "Un bateau accepte au plus {limit} calendriers externes.",
+    "conflicts": "{count} créneau(x) importé(s) chevauchent une réservation FleetAi : vérifiez les doubles réservations."
   }
 }

@@ -52,6 +52,18 @@ const coveredByDay = computed(() => {
   )
 })
 
+// Créneaux importés d'autres plateformes (#880) : affichés quand aucune
+// réservation FleetAi n'occupe déjà la case.
+const externalByDay = computed(() => {
+  const blocks = props.entry.external ?? []
+  return new Map(
+    props.days.map((day) => {
+      const iso = isoForDay(day)
+      return [day, blocks.find((b) => b.startsOn <= iso && iso < b.endsOn) ?? null] as const
+    })
+  )
+})
+
 // Couche « entretien planifié » (#869) : liseré sous la location du jour.
 const maintenanceByDay = computed(() => {
   const windows = props.entry.maintenance ?? []
@@ -103,6 +115,16 @@ function maintenanceTitle(day: number): string {
             </span>
           </div>
         </template>
+        <div
+          v-else-if="externalByDay.get(day)"
+          class="absolute inset-y-0.5 left-0 right-0 border-y border-dashed border-violet-300 bg-violet-50"
+          :title="
+            t('reservations.calendarSync.blockTitle', {
+              calendar: externalByDay.get(day)!.calendarName,
+            })
+          "
+          data-testid="timeline-external-block"
+        />
         <AvailabilityBand
           v-if="maintenanceByDay.get(day)?.length"
           kind="maintenance"

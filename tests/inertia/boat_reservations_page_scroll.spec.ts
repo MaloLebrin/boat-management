@@ -16,6 +16,9 @@ vi.mock('~/components/reservations/ReservationForm.vue', () => ({
 vi.mock('~/components/reservations/ReservationList.vue', () => ({
   default: { template: '<div />' },
 }))
+vi.mock('~/components/reservations/calendar_sync/BoatCalendarSyncCard.vue', () => ({
+  default: { template: '<div />' },
+}))
 
 import BoatReservations from '../../inertia/pages/boats/reservations.vue'
 
@@ -28,6 +31,8 @@ const baseProps = {
   clientOptions: [],
   availability: { status: 'available', statusReason: null, statusChangedAt: null, windows: [] },
   canForceUnavailable: false,
+  calendarSync: { feed: null, externalCalendars: [], canManage: false },
+  externalBlocks: [],
 }
 
 let scrollIntoView: ReturnType<typeof vi.fn>

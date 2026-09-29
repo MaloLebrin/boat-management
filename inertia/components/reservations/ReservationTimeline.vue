@@ -25,6 +25,9 @@ const days = computed(() => Array.from({ length: daysInMonth.value }, (_, i) => 
 const hasMaintenance = computed(() =>
   props.calendarEntries.some((entry) => (entry.maintenance ?? []).length > 0)
 )
+const hasExternal = computed(() =>
+  props.calendarEntries.some((entry) => (entry.external ?? []).length > 0)
+)
 
 const scrollEl = ref<HTMLElement | null>(null)
 const isScrollable = ref(false)
@@ -108,6 +111,12 @@ const monthEnd = computed(
           <span v-if="hasMaintenance" class="flex items-center gap-1.5">
             <span class="h-1.5 w-5 rounded-full border-l-2 border-sky-300 bg-sky-100" />
             {{ t('reservations.calendar.maintenanceLegend') }}
+          </span>
+          <span v-if="hasExternal" class="flex items-center gap-1.5">
+            <span
+              class="h-2.5 w-5 rounded-sm border border-dashed border-violet-300 bg-violet-50"
+            />
+            {{ t('reservations.calendarSync.blockLegend') }}
           </span>
         </div>
       </div>
