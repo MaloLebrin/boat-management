@@ -50,7 +50,7 @@ test.group('Assistant FleetAi — cibles de navigation (#642)', () => {
 test.group('Assistant FleetAi — registre d’outils (functional)', (group) => {
   group.each.setup(() => truncateDb())
 
-  test('un admin Entreprise voit les dix outils', async ({ assert }) => {
+  test('un admin Entreprise voit les onze outils', async ({ assert }) => {
     const user = await createEnterpriseAdmin()
     const service = await makeService()
 
@@ -62,6 +62,7 @@ test.group('Assistant FleetAi — registre d’outils (functional)', (group) => 
       'get_engine',
       'list_maintenance',
       'fleet_overview',
+      'fleet_financial_report',
       'list_ports',
       'list_operations',
       'list_commercial',

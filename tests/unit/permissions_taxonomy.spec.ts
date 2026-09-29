@@ -29,6 +29,7 @@ const ADMIN_ONLY: Capability[] = [
   'ports.delete',
   'pricing_seasons.delete',
   'rentalContracts.delete',
+  'reports.view',
   'simulator.manage_leads',
   'spots.delete',
   'subscription.manage',

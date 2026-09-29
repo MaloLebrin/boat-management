@@ -21,6 +21,7 @@ import type {
   DashboardSafetyCompliance,
 } from '#shared/types/dashboard'
 import type { ResolvedDashboardLayout } from '#shared/types/dashboard_layout'
+import type { DashboardFleetMargin } from '#shared/types/reporting'
 
 interface DashboardProps {
   layout: ResolvedDashboardLayout
@@ -34,11 +35,19 @@ interface DashboardProps {
   lowStock?: DashboardLowStockParts
   invoicing?: DashboardInvoicingSummary
   charterOccupancy?: DashboardCharterOccupancy
+  fleetMargin?: DashboardFleetMargin
 }
 
 /** Widgets de la galerie disponibles sans module (masqués par défaut). */
 const GALLERY_BASE = ['safety_compliance', 'fuel', 'low_stock'] as const
-const GALLERY_PROPS = ['safetyCompliance', 'fuel', 'lowStock', 'invoicing', 'charterOccupancy']
+const GALLERY_PROPS = [
+  'safetyCompliance',
+  'fuel',
+  'lowStock',
+  'invoicing',
+  'charterOccupancy',
+  'fleetMargin',
+]
 
 test.group('Dashboard — disposition personnalisable', (group) => {
   group.each.setup(() => truncateDb())
@@ -211,6 +220,9 @@ test.group('Dashboard — disposition personnalisable', (group) => {
     assert.include(charterProps.layout.order.main, 'upcoming_reservations')
     assert.include(charterProps.layout.order.side, 'charter_occupancy')
     assert.notInclude(charterProps.layout.order.side, 'invoicing')
+    // Marge du mois (#887) : Pro + module Location + admin.
+    assert.include(charterProps.layout.order.side, 'fleet_margin')
+    assert.notInclude(memberProps.layout.order.side, 'fleet_margin')
   })
 
   test('the gallery widgets are deferred once the stored layout shows them', async ({
@@ -233,6 +245,7 @@ test.group('Dashboard — disposition personnalisable', (group) => {
           'low_stock',
           'invoicing',
           'charter_occupancy',
+          'fleet_margin',
           'ai_panel',
           'spend',
           'ports',
@@ -249,7 +262,7 @@ test.group('Dashboard — disposition personnalisable', (group) => {
     page.assertStatus(200)
     assert.deepEqual((page.inertiaProps as DashboardProps).layout.hidden, [])
 
-    // Rechargement partiel des cinq groupes différés (la prop `layout` n'en fait pas partie).
+    // Rechargement partiel des six groupes différés (la prop `layout` n'en fait pas partie).
     const response = await client
       .get('/dashboard')
       .loginAs(admin)
@@ -273,6 +286,9 @@ test.group('Dashboard — disposition personnalisable', (group) => {
     assert.equal(props.invoicing!.outstandingCount, 1)
     assert.equal(props.charterOccupancy!.boats, 1)
     assert.equal(props.charterOccupancy!.occupancyRate, 0)
+    // Marge du mois (#887) : un mois sans coût ni location, jamais `null`.
+    assert.equal(props.fleetMargin!.margin, 0)
+    assert.isNull(props.fleetMargin!.topCostBoat)
     assert.equal(boat.organizationId, admin.organizationId)
   })
 

@@ -27,6 +27,7 @@ export const DASHBOARD_WIDGET_IDS = [
   'low_stock',
   'invoicing',
   'charter_occupancy',
+  'fleet_margin',
 ] as const
 
 export type DashboardWidgetId = (typeof DASHBOARD_WIDGET_IDS)[number]
@@ -75,6 +76,7 @@ export const DASHBOARD_WIDGETS: Record<DashboardWidgetId, DashboardWidgetDefinit
   low_stock: { zone: 'side', size: 'full', defaultHidden: true },
   invoicing: { zone: 'side', size: 'full', defaultHidden: true },
   charter_occupancy: { zone: 'side', size: 'full', defaultHidden: true },
+  fleet_margin: { zone: 'side', size: 'full', defaultHidden: true },
 }
 
 /**
@@ -98,6 +100,7 @@ export const DEFAULT_DASHBOARD_ORDER: Record<DashboardWidgetZone, readonly Dashb
     'low_stock',
     'invoicing',
     'charter_occupancy',
+    'fleet_margin',
   ],
 }
 

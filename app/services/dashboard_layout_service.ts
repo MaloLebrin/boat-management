@@ -28,7 +28,9 @@ export default class DashboardLayoutService {
    * - `upcoming_reservations` : module Location actif **et** `boats.view` ;
    * - `ports` : plans avec cartographie de port (#604), hors profil particulier ;
    * - `invoicing` : module CRM/Facturation actif **et** `invoices.view` ;
-   * - `charter_occupancy` : même garde que `upcoming_reservations`.
+   * - `charter_occupancy` : même garde que `upcoming_reservations` ;
+   * - `fleet_margin` : reporting de flotte (#887) — `reports.view`, plan
+   *   `canViewReports` et module Location (sans revenus, pas de marge).
    */
   async availabilityFor(user: User, role: OrgRole | null): Promise<DashboardWidgetAvailability> {
     const org = user.organizationId ? user.organization : null
@@ -44,6 +46,13 @@ export default class DashboardLayoutService {
       org && user.organizationId
         ? (await this.quotaService.canManageInvoices(org)) &&
           (await user.hasPermission(user.organizationId, 'invoices.view'))
+        : false
+
+    const canViewMargin =
+      org && user.organizationId
+        ? canViewReservations &&
+          this.quotaService.canViewReports(org) &&
+          (await user.hasPermission(user.organizationId, 'reports.view'))
         : false
 
     return {
@@ -63,6 +72,7 @@ export default class DashboardLayoutService {
       low_stock: true,
       invoicing: canViewInvoices,
       charter_occupancy: canViewReservations,
+      fleet_margin: canViewMargin,
     }
   }
 

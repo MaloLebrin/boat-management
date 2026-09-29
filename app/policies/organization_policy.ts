@@ -45,6 +45,11 @@ export default class OrganizationPolicy extends OrgScopedPolicy {
     return this.can(user, 'audit_log.view')
   }
 
+  /** Reporting financier de flotte (`/reports`, #887) — admin seul. */
+  async viewReports(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'reports.view')
+  }
+
   async manageBilling(user: User): Promise<AuthorizerResponse> {
     return this.can(user, 'subscription.manage')
   }

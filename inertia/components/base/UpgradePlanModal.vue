@@ -11,7 +11,7 @@ import type { BillingInterval } from '../../../shared/types/billing'
 
 const props = defineProps<{
   open: boolean
-  feature: 'boats' | 'members' | 'ai' | 'export'
+  feature: 'boats' | 'members' | 'ai' | 'export' | 'reports'
 }>()
 
 const emit = defineEmits<{ 'update:open': [boolean] }>()

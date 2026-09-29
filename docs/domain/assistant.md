@@ -40,7 +40,7 @@ AiAssistantConversation (blob messages)      ← un seul save par tour
 
 Tolérance au petit modèle (`mistral-small-latest` par défaut) : arguments coercés (`"22"` → `22`), JSON d'arguments invalide dégradé en `{}`, nom d'outil inconnu → liste des noms valides, appel accompagné de texte traité comme un appel.
 
-## 3. Les dix outils (`AssistantToolsService`)
+## 3. Les onze outils (`AssistantToolsService`)
 
 | Outil                     | Enveloppe                                                                           | Garde                                      |
 | ------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------ |
@@ -49,6 +49,7 @@ Tolérance au petit modèle (`mistral-small-latest` par défaut) : arguments coe
 | `get_engine`              | moteur résolu borné org + pièces (`listForEngine`, `listLowStock`)                  | `boats.view`                               |
 | `list_maintenance`        | planning (`PlanningService`) ou historique (`BoatMaintenanceService`) selon `scope` | `maintenance.view`                         |
 | `fleet_overview`          | `DashboardService.getForUser`                                                       | `boats.view`                               |
+| `fleet_financial_report`  | `FleetReportingService.getReport` (#887) : totaux + 15 bateaux, tri par coût        | `reports.view` + `canViewReports`          |
 | `list_ports`              | `PortService.listWithSpotsForOrg`                                                   | `ports.view` + `canManagePorts`            |
 | `list_operations`         | journal / carburant / incidents selon `kind`                                        | `boats.view`                               |
 | `list_commercial`         | réservations / clients / factures selon `kind`                                      | `invoices.view` + un flag commercial actif |

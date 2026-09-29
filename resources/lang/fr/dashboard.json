@@ -205,7 +205,8 @@
     "fuel": "Carburant",
     "low_stock": "Pièces manquantes",
     "invoicing": "Facturation",
-    "charter_occupancy": "Occupation location"
+    "charter_occupancy": "Occupation location",
+    "fleet_margin": "Marge du mois"
   },
   "widgetDescriptions": {
     "kpis": "Bateaux, sorties et tâches sur 30 jours, incidents ouverts.",
@@ -223,7 +224,8 @@
     "fuel": "Litres, coût et prix moyen des pleins sur 30 jours.",
     "low_stock": "Pièces moteur sous leur seuil d’alerte ou à remplacer, toute la flotte.",
     "invoicing": "Encours, impayées, encaissé ce mois et devis en attente (module Facturation).",
-    "charter_occupancy": "Taux d’occupation confirmé sur 30 jours, options et CA (module Location)."
+    "charter_occupancy": "Taux d’occupation confirmé sur 30 jours, options et CA (module Location).",
+    "fleet_margin": "Revenus de location, coûts et marge du mois, et le bateau le plus coûteux (Reporting)."
   },
   "plannedTasks": {
     "title": "Tâches planifiées",
@@ -304,5 +306,15 @@
     "confirmed": "Confirmées",
     "options": "Options",
     "revenue": "CA confirmé"
+  },
+  "fleetMargin": {
+    "title": "Marge du mois",
+    "viewAll": "Reporting",
+    "margin": "Marge",
+    "revenue": "Revenus de location",
+    "costs": "Coûts",
+    "previous": "Mois précédent : {amount}",
+    "topBoat": "Plus coûteux : {name} ({amount})",
+    "empty": "Aucun coût ni revenu ce mois-ci."
   }
 }

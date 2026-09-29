@@ -386,3 +386,15 @@ test('boat_owner still gets the dedicated portal-only section regardless of capa
     { name: 'nav.myBoats', path: '/owner/boats', route: null, icon: 'boat' },
   ])
 })
+
+// Reporting financier (#887) : piloté par la capability admin `reports.view`,
+// quel que soit le plan — en Starter, la page montre l'aperçu figé.
+
+test('an admin sees the reports item on every plan, a member never', () => {
+  for (const plan of ['starter', 'pro', 'enterprise']) {
+    const admin = mountWithPlan(plan, [], [...MEMBER_CAPABILITIES, 'reports.view'], 'admin')
+    expect(businessNames(admin.navSections)).toContain('nav.reports')
+  }
+  const member = mountWithPlan('enterprise')
+  expect(businessNames(member.navSections)).not.toContain('nav.reports')
+})

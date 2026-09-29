@@ -1188,6 +1188,31 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageReservations',
   },
   {
+    id: 'fleet-financial-reporting',
+    title: {
+      en: 'Fleet financial reporting',
+      fr: 'Reporting financier de flotte',
+    },
+    body: {
+      en: 'Reporting (admins, Pro and Enterprise plans) crosses costs and revenue for the whole fleet or one boat, over this month, quarter, year, the last 12 months or custom dates. Costs use the same categories as each boat’s budget. Rental revenue counts confirmed reservations, pro-rated to the days rented in the period; the margin is revenue minus costs. You also get occupancy, cost per rental day, per engine hour and per nautical mile (from the logbook), planned maintenance, a comparison with the previous period, charts and a per-boat table exportable to CSV. Paid invoices are shown apart.',
+      fr: 'Le reporting (admins, plans Pro et Entreprise) croise coûts et revenus de toute la flotte ou d’un bateau, sur le mois, le trimestre, l’année, les 12 derniers mois ou des dates choisies. Les coûts reprennent les postes du budget de chaque bateau. Les revenus de location comptent les réservations confirmées, au prorata des jours loués dans la période ; la marge est revenus moins coûts. S’y ajoutent l’occupation, le coût par jour loué, par heure moteur et par mille (journal de bord), l’entretien prévu, la comparaison avec la période précédente, des graphiques et un tableau par bateau exportable en CSV. Les factures encaissées sont indiquées à part.',
+    },
+    keywords: [
+      'reporting',
+      'rentabilite',
+      'marge',
+      'revenus',
+      'couts',
+      'occupation',
+      'cout par mille',
+      'heure moteur',
+      'statistiques',
+      'profit',
+    ],
+    navTarget: 'reports.index',
+    planFlag: 'canViewReports',
+  },
+  {
     id: 'rental-contracts',
     title: {
       en: 'Rental contracts',
