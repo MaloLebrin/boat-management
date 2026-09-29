@@ -247,6 +247,13 @@ la nav est masquée via `effectiveQuotas.canManagePorts` ; la carte ports du das
 - Couleurs des graphiques : `use_chart_palette.ts` lit les tokens CSS (`--color-amber-600`, `--color-success`…) et se recalcule quand `data-theme` bascule — aucune couleur en dur.
 - Props : `ReportsPageProps` (`shared/types/reporting.ts`). Source : `ReportsController.index`.
 
+### Équipage (`/crew`) et alertes de certifications (#882)
+
+- Page : `inertia/pages/organization/crew.vue` (props `crewMembers: CrewMemberRow[]`, `canDelete`). À côté du nom, badge d'équipier `danger` « Certification expirée » ou `warning` « À renouveler » (`certificationStatus`, état le plus grave).
+- `inertia/components/crew/CrewCertificationBadge.vue` — lit `status` (calculé côté serveur par `crewCertificationStatus`, fenêtre 60 jours) : « Expirée depuis N jours », « Expire dans N jours », « Valide » ; rien sans date.
+- `inertia/components/boats/show/tabs/NavigationLogCrewPanel.vue` — options du select suffixées « certification expirée / à renouveler » (`CrewMemberOption.certificationStatus`), badge sur un membre embarqué au certificat expiré, avertissement `role="status"` : jamais bloquant.
+- Widget du tableau de bord `inertia/components/dashboard/DashboardCrewCertificationsCard.vue` (`crew_certifications`, galerie, prop différée `crewCertifications`) : comptes, cinq lignes les plus urgentes, lien `/crew`.
+
 ### Diagnostic de panne (#515, #516, #576)
 
 - Pages (GET `/diagnostic`, `/boats/:boatId/engines/:engineId/diagnostic[/sheets/:sheetSlug]`) :

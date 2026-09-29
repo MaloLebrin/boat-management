@@ -1,5 +1,6 @@
 import Boat from '#models/boat'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
+import CrewCertification from '#models/crew_certification'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import Port from '#models/port'
@@ -7,6 +8,9 @@ import User from '#models/user'
 import EmailQueueService from '#services/email_queue_service'
 import { BrandingService } from '#services/branding_service'
 import BoatDocumentService from '#services/boat_document_service'
+import CrewService from '#services/crew_service'
+import { CREW_CERT_ALERT_WINDOWS } from '#shared/helpers/crew_certification'
+import type { CrewCertificationAlert } from '#shared/types/crew'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
 import type { ReminderDocumentItem } from '#shared/types/boat_document'
 import { inject } from '@adonisjs/core'
@@ -393,6 +397,59 @@ export default class ReminderEmailService {
       { sent },
       `ReminderEmailService.sendDocumentExpirationReminders(${fromDaysAhead}–${toDaysAhead}): done`
     )
+  }
+
+  /**
+   * Certifications d'équipage qui atteignent aujourd'hui une fenêtre d'alerte
+   * (#882) : expiration dans exactement 60, 30 ou 7 jours. Le job étant
+   * quotidien, chaque certification donne au plus trois e-mails, sans table
+   * d'historique. Un e-mail par admin, dans sa langue.
+   */
+  async sendCrewCertificationReminders(): Promise<void> {
+    const today = DateTime.now().startOf('day')
+    const dates = CREW_CERT_ALERT_WINDOWS.map((days) => today.plus({ days }).toISODate()!)
+
+    const certifications = await CrewCertification.query()
+      .select('id', 'crew_member_id', 'type', 'expires_at')
+      .whereIn('expires_at', dates)
+      .preload('crewMember', (q) => q.select('id', 'organization_id', 'first_name', 'last_name'))
+      .orderBy('expires_at', 'asc')
+      .orderBy('id', 'asc')
+
+    if (certifications.length === 0) {
+      logger.info('ReminderEmailService.sendCrewCertificationReminders: no targets')
+      return
+    }
+
+    const byOrg = new Map<number, CrewCertificationAlert[]>()
+    for (const cert of certifications) {
+      const orgId = cert.crewMember.organizationId
+      byOrg.set(orgId, [...(byOrg.get(orgId) ?? []), CrewService.toAlert(cert)])
+    }
+
+    const orgMap = await this.orgMapForIds([...byOrg.keys()])
+    let sent = 0
+    for (const [orgId, alerts] of byOrg) {
+      const org = orgMap.get(orgId)
+      const admins = await OrganizationMembership.query()
+        .where('organizationId', orgId)
+        .where('role', 'admin')
+        .preload('user')
+      const branding = org ? this.brandingService.toEmailParams(org) : null
+
+      for (const membership of admins) {
+        await this.emailQueueService.sendReminderCrewCertificationExpiry({
+          to: membership.user.email,
+          name: membership.user.fullName,
+          locale: membership.user.locale,
+          certifications: alerts,
+          branding,
+        })
+        sent++
+      }
+    }
+
+    logger.info({ sent }, 'ReminderEmailService.sendCrewCertificationReminders: done')
   }
 
   private async orgMapForIds(ids: number[]): Promise<Map<number, Organization>> {

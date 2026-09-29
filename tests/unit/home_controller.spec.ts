@@ -43,6 +43,7 @@ test.group('HomeController (unit)', () => {
       } as any,
       {} as any,
       {} as any,
+      {} as any,
       {} as any
     )
 
@@ -143,6 +144,7 @@ test.group('HomeController (unit)', () => {
           throw new Error('default-hidden widget: should not be called')
         },
       } as any,
+      {} as any,
       {} as any
     )
 
@@ -199,6 +201,7 @@ test.group('HomeController (unit)', () => {
       'invoicing',
       'charter_occupancy',
       'fleet_margin',
+      'crew_certifications',
     ])
     // Widgets de la galerie : masqués par défaut, donc ni calculés ni envoyés.
     assert.deepEqual(rendered[0]!.props.layout.hidden, [
@@ -208,6 +211,7 @@ test.group('HomeController (unit)', () => {
       'invoicing',
       'charter_occupancy',
       'fleet_margin',
+      'crew_certifications',
     ])
     for (const prop of [
       'safetyCompliance',
@@ -216,6 +220,7 @@ test.group('HomeController (unit)', () => {
       'invoicing',
       'charterOccupancy',
       'fleetMargin',
+      'crewCertifications',
     ]) {
       assert.notProperty(rendered[0]!.props, prop)
     }
@@ -233,6 +238,7 @@ test.group('HomeController (unit)', () => {
           'invoicing',
           'charter_occupancy',
           'fleet_margin',
+          'crew_certifications',
           'ai_panel',
           'planned_tasks',
           'notifications',
@@ -291,7 +297,8 @@ test.group('HomeController (unit)', () => {
         } as any,
         { getDashboardSummary: async () => ({ pendingQuotes: 0 }) } as any,
         { listAlertsForBoats: async () => ({ items: [], total: 0 }) } as any,
-        { getMonthMarginForUser: async () => ({ margin: 0 }) } as any
+        { getMonthMarginForUser: async () => ({ margin: 0 }) } as any,
+        { getDashboardCertifications: async () => ({ items: [] }) } as any
       )
 
       const rendered: Array<{ component: string; props: any }> = []
@@ -328,6 +335,7 @@ test.group('HomeController (unit)', () => {
       assert.equal(props.invoicing.deferred, 'invoicing')
       assert.equal(props.charterOccupancy.deferred, 'charterOccupancy')
       assert.equal(props.fleetMargin.deferred, 'fleetMargin')
+      assert.equal(props.crewCertifications.deferred, 'crewCertifications')
       // Les callbacks différés délèguent bien aux services (jamais `null`, #478).
       assert.deepEqual(await props.fuel.fn(), { liters: 0 })
       assert.deepEqual(await props.invoicing.fn(), { pendingQuotes: 0 })
@@ -408,6 +416,7 @@ test.group('HomeController (unit)', () => {
         } as any,
         {} as any,
         {} as any,
+        {} as any,
         {} as any
       )
 
@@ -451,6 +460,7 @@ test.group('HomeController (unit)', () => {
         'invoicing',
         'charter_occupancy',
         'fleet_margin',
+        'crew_certifications',
       ])
       // Sans module Location, `upcoming_reservations` n'est pas dans la disposition servie.
       assert.deepEqual(props.layout.order.main, ['boats', 'attention', 'at_sea', 'activity'])
@@ -493,6 +503,7 @@ test.group('HomeController (unit)', () => {
           throw new Error('should not be called')
         },
       } as any,
+      {} as any,
       {} as any,
       {} as any,
       {} as any

@@ -996,6 +996,29 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'crew.index',
   },
   {
+    id: 'crew-certification-alerts',
+    title: {
+      en: 'Crew certification expiry alerts',
+      fr: 'Alertes d’expiration des certifications d’équipage',
+    },
+    body: {
+      en: 'FleetAi warns before a crew certification expires: an in-app notification when it enters the 60, 30 and 7-day windows, then once a month while it stays expired, sent to admins and to the crew member when their email matches a user of the organization. Admins also get an email 60, 30 and 7 days before the expiry. The Crew page shows a status badge per certification and per crew member, the logbook crew picker flags a crew member whose certification has expired (a warning, never a block), and the “Certifications to renew” dashboard widget lists the most urgent ones.',
+      fr: 'FleetAi prévient avant qu’une certification d’équipage n’expire : une notification dans l’app à l’entrée des fenêtres de 60, 30 et 7 jours, puis une fois par mois tant qu’elle reste expirée, adressée aux admins et à l’équipier lui-même quand son e-mail est celui d’un utilisateur de l’organisation. Les admins reçoivent aussi un e-mail 60, 30 et 7 jours avant l’échéance. La page Équipiers affiche un badge d’état par certification et par équipier, le sélecteur d’équipage du journal de bord signale un équipier au certificat expiré (un avertissement, jamais un blocage) et le widget « Certifications à renouveler » du tableau de bord liste les plus urgentes.',
+    },
+    keywords: [
+      'certification expiree',
+      'expiration certification',
+      'renouveler',
+      'certificat medical',
+      'alerte equipage',
+      'stcw',
+      'qui peut skipper',
+      'crew expiry',
+      'expired certificate',
+    ],
+    navTarget: 'crew.index',
+  },
+  {
     id: 'reservations',
     title: {
       en: 'Boat reservations',

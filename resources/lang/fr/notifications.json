@@ -153,6 +153,16 @@
         "title": "Export impossible : {type}",
         "body": "La génération de l'export a échoué. Relancez-le, ou réduisez la période."
       }
+    },
+    "crew_certification": {
+      "expiring_soon": {
+        "title": "Certification à renouveler : {crewMemberName}",
+        "body": "{count, plural, one {Une certification de {crewMemberName} expire dans {days, plural, one {# jour} other {# jours}}.} other {# certifications de {crewMemberName} expirent, la première dans {days, plural, one {# jour} other {# jours}}.}}"
+      },
+      "expired": {
+        "title": "Certification expirée : {crewMemberName}",
+        "body": "{count, plural, one {Une certification de {crewMemberName} est expirée : ne l'embarquez pas sans l'avoir renouvelée.} other {# certifications de {crewMemberName} sont expirées : ne l'embarquez pas sans les avoir renouvelées.}}"
+      }
     }
   },
   "title": "Notifications",
@@ -197,6 +207,8 @@
     "invoice.reminder_sent": "Relance de facture envoyée",
     "invoice.reminder_skipped": "Relance de facture non envoyée",
     "export.ready": "Export prêt",
-    "export.failed": "Export en échec"
+    "export.failed": "Export en échec",
+    "crew_certification.expiring_soon": "Certification d'équipage à renouveler",
+    "crew_certification.expired": "Certification d'équipage expirée"
   }
 }

@@ -3,6 +3,7 @@ import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
 import BoatReservationService from '#services/boat_reservation_service'
 import BudgetService from '#services/budget_service'
+import CrewService from '#services/crew_service'
 import DashboardAttentionService from '#services/dashboard_attention_service'
 import DashboardFleetActivityService from '#services/dashboard_fleet_activity_service'
 import DashboardLayoutService from '#services/dashboard_layout_service'
@@ -37,7 +38,8 @@ export default class HomeController {
     private layoutService: DashboardLayoutService,
     private invoiceService: InvoiceService,
     private enginePartService: BoatEnginePartService,
-    private reportingService: FleetReportingService
+    private reportingService: FleetReportingService,
+    private crewService: CrewService
   ) {}
 
   async index({ inertia, auth, request, response, i18n }: HttpContext) {
@@ -218,6 +220,14 @@ export default class HomeController {
             fleetMargin: inertia.defer(
               deferJson(() => this.reportingService.getMonthMarginForUser(user)),
               'fleetMargin'
+            ),
+          }
+        : {}),
+      ...(visible.has('crew_certifications') && user.organizationId
+        ? {
+            crewCertifications: inertia.defer(
+              deferJson(() => this.crewService.getDashboardCertifications(user.organizationId!)),
+              'crewCertifications'
             ),
           }
         : {}),

@@ -14,6 +14,7 @@ import { toAppLocale } from '#shared/helpers/locale_path'
 import { formatDateLong } from '#shared/helpers/date_format'
 import { formatCurrency } from '#shared/helpers/number_format'
 import type { PublicBookingEmailParams } from '#shared/types/public_booking'
+import type { CrewCertificationAlert } from '#shared/types/crew'
 
 @inject()
 export default class EmailQueueService {
@@ -442,6 +443,56 @@ export default class EmailQueueService {
       text,
       html,
       correlationId,
+    })
+  }
+
+  /**
+   * Rappel des certifications d'équipage à renouveler (#882), rédigé dans la
+   * langue de l'admin. Une ligne par certification, la plus urgente d'abord.
+   */
+  async sendReminderCrewCertificationExpiry(params: {
+    to: string
+    name: string | null
+    locale: string | null
+    certifications: CrewCertificationAlert[]
+    branding?: BrandingEmailParams | null
+  }) {
+    const i18n = i18nManager.locale(toAppLocale(params.locale))
+    const displayName = params.name ?? params.to
+    const count = String(params.certifications.length)
+    const subject = i18n.t('crew.emails.reminder.subject', { count })
+    const rows = params.certifications.map((cert) => ({
+      crewMemberName: cert.crewMemberName,
+      type: i18n.t(`common.navigationTitles.${cert.type}`),
+      expiresAt: formatDateLong(cert.expiresAt, i18n.locale),
+      delay: i18n.t('crew.emails.reminder.inDays', { days: String(cert.expiresInDays) }),
+    }))
+    const intro = i18n.t('crew.emails.reminder.intro', { count })
+    const text = [
+      i18n.t('crew.emails.reminder.greeting', { name: displayName }),
+      intro,
+      rows
+        .map((row) => `- ${row.crewMemberName} — ${row.type} — ${row.expiresAt} (${row.delay})`)
+        .join('\n'),
+      `${env.get('APP_URL')}/crew`,
+    ].join('\n\n')
+
+    const html = await edge.render('emails/reminder_crew_certification_expiry', {
+      i18n,
+      displayName,
+      intro,
+      rows,
+      appUrl: env.get('APP_URL'),
+      branding: params.branding ?? null,
+    })
+
+    const ids = params.certifications.map((cert) => cert.certificationId).join(',')
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `crew-cert-expiry:${params.to}:${ids}:${DateTime.now().toISODate()}`,
     })
   }
 

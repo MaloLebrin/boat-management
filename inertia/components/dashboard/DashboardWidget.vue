@@ -6,6 +6,7 @@ import DashboardAtSeaCard from '~/components/dashboard/DashboardAtSeaCard.vue'
 import DashboardAttentionCard from '~/components/dashboard/DashboardAttentionCard.vue'
 import DashboardBoatsCard from '~/components/dashboard/DashboardBoatsCard.vue'
 import DashboardCharterOccupancyCard from '~/components/dashboard/DashboardCharterOccupancyCard.vue'
+import DashboardCrewCertificationsCard from '~/components/dashboard/DashboardCrewCertificationsCard.vue'
 import DashboardFleetMarginCard from '~/components/dashboard/DashboardFleetMarginCard.vue'
 import DashboardFuelCard from '~/components/dashboard/DashboardFuelCard.vue'
 import DashboardInvoicingCard from '~/components/dashboard/DashboardInvoicingCard.vue'
@@ -60,6 +61,8 @@ const awaitingData = computed(() => {
       return props.data.charterOccupancy === undefined
     case 'fleet_margin':
       return props.data.fleetMargin === undefined
+    case 'crew_certifications':
+      return props.data.crewCertifications === undefined
     default:
       return false
   }
@@ -107,4 +110,8 @@ const awaitingData = computed(() => {
     :charter-occupancy="data.charterOccupancy"
   />
   <DashboardFleetMarginCard v-else-if="id === 'fleet_margin'" :fleet-margin="data.fleetMargin" />
+  <DashboardCrewCertificationsCard
+    v-else-if="id === 'crew_certifications'"
+    :crew-certifications="data.crewCertifications"
+  />
 </template>

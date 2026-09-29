@@ -6,7 +6,7 @@ import ReminderEmailService from '#services/reminder_email_service'
 /**
  * Campagnes de rappel — cron quotidien 08:00 (#699).
  *
- * Ce job n'a pas de logique propre : il enchaîne neuf appels à
+ * Ce job n'a pas de logique propre : il enchaîne dix appels à
  * `ReminderEmailService`. Son contrat est donc **la liste et l'ordre de ces
  * appels**, et c'est exactement ce qui se perd en silence — retirer une ligne
  * arrête une campagne entière sans qu'aucun test ne bronche, et sans qu'aucun
@@ -15,7 +15,7 @@ import ReminderEmailService from '#services/reminder_email_service'
  * Les campagnes elles-mêmes (qui reçoit quoi, à quel seuil) appartiennent au
  * service ; on ne les rejoue pas ici.
  *
- * ⚠️ Ce que ces tests **mettent au jour** : les neuf appels sont enchaînés sans
+ * ⚠️ Ce que ces tests **mettent au jour** : les dix appels sont enchaînés sans
  * `try/catch`. Une campagne qui lève arrête donc toutes les suivantes, et le
  * `failed()` du job se contente de logger. C'est figé tel quel ci-dessous —
  * comportement actuel, pas comportement souhaitable.
@@ -31,6 +31,7 @@ const CAMPAIGNS = [
   'sendBoatCheckReminders',
   'sendDocumentExpirationReminders',
   'sendDocumentExpirationReminders',
+  'sendCrewCertificationReminders',
 ] as const
 
 type Call = { name: string; args: unknown[] }
@@ -58,7 +59,7 @@ test.group('SendReminderEmails (cron 08:00)', (group) => {
     app.container.restore(ReminderEmailService)
   })
 
-  test('runs the nine campaigns, in order', async ({ assert }) => {
+  test('runs the ten campaigns, in order', async ({ assert }) => {
     const calls = swapReminderService()
     const job = await app.container.make(SendReminderEmails)
 
@@ -90,7 +91,7 @@ test.group('SendReminderEmails (cron 08:00)', (group) => {
 
   test('a failing campaign stops every campaign after it', async ({ assert }) => {
     // Comportement **actuel**, figé délibérément : aucun `try/catch` n'isole les
-    // campagnes. Les six qui suivent `sendIncompletePortReminders` ne partent
+    // campagnes. Les sept qui suivent `sendIncompletePortReminders` ne partent
     // pas, et seul un log en témoigne. Si cette isolation est ajoutée un jour,
     // ce test doit tomber — c'est le but.
     const calls = swapReminderService('sendIncompletePortReminders')

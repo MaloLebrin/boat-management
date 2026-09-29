@@ -1,6 +1,7 @@
 import BoatEngine from '#models/boat_engine'
 import type User from '#models/user'
 import BoatListService from '#services/boat_list_service'
+import CrewService from '#services/crew_service'
 import PlanningService from '#services/planning_service'
 import { engineLabelWithStroke } from '#shared/helpers/engine_stroke'
 import {
@@ -22,13 +23,15 @@ const MAX_LINE_LENGTH = 120
  * Deux blocs, tous deux bornés pour tenir le budget de tokens :
  * - le roster (bateaux + moteurs avec leurs ids) — il sert aussi de référentiel
  *   de validation des ids rendus par le modèle (anti-hallucination) ;
- * - le digest planning (tâches en retard / bientôt dues).
+ * - le digest planning (tâches en retard / bientôt dues) et les certifications
+ *   d'équipage à renouveler (#882).
  */
 @inject()
 export default class AssistantContextService {
   constructor(
     private boatListService: BoatListService,
-    private planningService: PlanningService
+    private planningService: PlanningService,
+    private crewService: CrewService
   ) {}
 
   /** Roster complet de l'org — la troncature ne s'applique qu'à l'affichage prompt. */
@@ -112,6 +115,32 @@ export default class AssistantContextService {
       fr ? "Confiées à l'utilisateur :" : 'Assigned to the user:',
       planning.tasks.filter((task) => task.assignee?.id === user.id)
     )
+
+    // « Qui peut skipper samedi ? » (#882) : les certifications échues ou qui
+    // expirent dans les 60 jours, pour qui a accès à la liste d'équipage.
+    if (user.organizationId && (await user.hasPermission(user.organizationId, 'crew.create'))) {
+      const alerts = await this.crewService.listCertificationAlerts(user.organizationId)
+      if (alerts.length > 0) {
+        lines.push(
+          fr
+            ? "Certifications d'équipage expirées ou à renouveler sous 60 jours :"
+            : 'Crew certifications expired or expiring within 60 days:'
+        )
+        for (const alert of alerts.slice(0, ASSISTANT_DIGEST_MAX_TASKS)) {
+          const state =
+            alert.status === 'expired'
+              ? fr
+                ? `expirée depuis le ${alert.expiresAt}`
+                : `expired since ${alert.expiresAt}`
+              : fr
+                ? `expire le ${alert.expiresAt}`
+                : `expires on ${alert.expiresAt}`
+          lines.push(
+            `- ${alert.crewMemberName} : ${alert.type} (${state})`.slice(0, MAX_LINE_LENGTH)
+          )
+        }
+      }
+    }
 
     return lines.join('\n')
   }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useForm } from '@inertiajs/vue3'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useT } from '~/composables/use_t'
@@ -30,12 +31,28 @@ const roleOptions = [
   { label: t('crew.roles.passenger'), value: 'passenger' },
 ]
 
+// État des certifications de chaque équipier (#882) : averti, jamais bloqué —
+// le loueur peut avoir le certificat renouvelé en main sans l'avoir saisi.
+const statusById = computed(
+  () => new Map(props.crewMemberOptions.map((m) => [m.id, m.certificationStatus]))
+)
+
+function optionLabel(fullName: string, status: CrewMemberOption['certificationStatus']) {
+  if (status === 'expired') return t('crew.logCrew.optionExpired', { name: fullName })
+  if (status === 'expiring_soon') return t('crew.logCrew.optionExpiringSoon', { name: fullName })
+  return fullName
+}
+
 const availableMemberOptions = () => {
   const assignedIds = new Set(props.crew.map((c) => c.crewMemberId))
   return props.crewMemberOptions
     .filter((m) => !assignedIds.has(m.id))
-    .map((m) => ({ label: m.fullName, value: m.id }))
+    .map((m) => ({ label: optionLabel(m.fullName, m.certificationStatus), value: m.id }))
 }
+
+const expiredCount = computed(
+  () => props.crew.filter((c) => statusById.value.get(c.crewMemberId) === 'expired').length
+)
 
 function addCrewMember() {
   if (!addForm.crewMemberId) return
@@ -83,7 +100,16 @@ function removeCrewMember(crewMemberId: number) {
         :key="member.crewMemberId"
         class="flex items-center justify-between gap-2 text-sm"
       >
-        <span class="text-fg">{{ member.fullName }}</span>
+        <span class="flex flex-wrap items-center gap-2 text-fg">
+          {{ member.fullName }}
+          <BaseBadge
+            v-if="statusById.get(member.crewMemberId) === 'expired'"
+            variant="danger"
+            data-testid="log-crew-expired"
+          >
+            {{ t('crew.logCrew.expiredBadge') }}
+          </BaseBadge>
+        </span>
         <span class="text-fg-muted">{{ t(`crew.roles.${member.role}`) }}</span>
         <BaseButton
           v-if="canUpdate"
@@ -97,6 +123,14 @@ function removeCrewMember(crewMemberId: number) {
       </div>
     </div>
     <p v-else class="text-xs text-fg-muted">{{ t('crew.logCrew.empty') }}</p>
+    <p
+      v-if="expiredCount > 0"
+      role="status"
+      class="rounded-md bg-coral-50 px-3 py-2 text-xs text-coral-700"
+      data-testid="log-crew-expired-warning"
+    >
+      {{ t('crew.logCrew.expiredWarning', { count: String(expiredCount) }) }}
+    </p>
 
     <template v-if="canUpdate">
       <div v-if="showAddForm" class="flex items-end gap-2">

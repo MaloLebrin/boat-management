@@ -8,6 +8,7 @@ Gérer les équipiers d'une organisation et leur présence à bord lors des sort
 - Certifications par équipier (type réglementaire, numéro de référence, date d'expiration)
 - Rattachement d'équipiers à une sortie (navigation log) avec un rôle (skipper / équipier / passager)
 - Génération du rôle d'équipage en PDF (format réglementaire DCSM)
+- Alertes d'expiration des certifications : notifications, e-mail, badges, widget (#882)
 
 ## Modèle de données
 
@@ -142,17 +143,19 @@ Références routes : `start/routes/crew.ts`, `start/routes/boats.ts`.
 
 Référence : `app/services/crew_service.ts`.
 
-| Méthode                                  | Description                                                |
-| ---------------------------------------- | ---------------------------------------------------------- |
-| `listForOrganization(org)`               | Liste complète avec certifications preloadées              |
-| `listOptionsForOrganization(org)`        | Liste allégée `{ id, fullName }` pour les selects          |
-| `getForOrganizationOrFail(org, id)`      | Lookup avec vérification organisation                      |
-| `create(org, payload)`                   | Crée un équipier                                           |
-| `update(member, payload)`                | Met à jour un équipier                                     |
-| `delete(member)`                         | Supprime un équipier (cascade sur certifications et pivot) |
-| `addCertification(member, payload)`      | Ajoute une certification                                   |
-| `deleteCertification(member, certId)`    | Supprime une certification                                 |
-| `syncCrewForNavigationLog(log, payload)` | Sync pivotTable équipage d'une sortie                      |
+| Méthode                                  | Description                                                    |
+| ---------------------------------------- | -------------------------------------------------------------- |
+| `listForOrganization(org)`               | Liste complète avec certifications preloadées                  |
+| `listOptionsForOrganization(org)`        | Liste allégée `{ id, fullName, certificationStatus }`          |
+| `listCertificationAlerts(orgId)`         | Certifications échues ou à 60 jours, les plus urgentes d'abord |
+| `getDashboardCertifications(orgId)`      | Widget : comptes par état + 5 lignes (#882)                    |
+| `getForOrganizationOrFail(org, id)`      | Lookup avec vérification organisation                          |
+| `create(org, payload)`                   | Crée un équipier                                               |
+| `update(member, payload)`                | Met à jour un équipier                                         |
+| `delete(member)`                         | Supprime un équipier (cascade sur certifications et pivot)     |
+| `addCertification(member, payload)`      | Ajoute une certification                                       |
+| `deleteCertification(member, certId)`    | Supprime une certification                                     |
+| `syncCrewForNavigationLog(log, payload)` | Sync pivotTable équipage d'une sortie                          |
 
 ## UI
 
@@ -170,7 +173,8 @@ Fonctionnalités inline :
 - Formulaire de création (`CrewMemberForm.vue`) affiché à la demande
 - Édition inline par membre (`CrewMemberForm.vue` avec les données existantes)
 - Ajout de certification par membre (`CrewCertificationForm.vue`)
-- Badge statut certification (`CrewCertificationBadge.vue`) : valide / expire dans N jours / expirée
+- Badge statut certification (`CrewCertificationBadge.vue`) : valide / expire dans N jours / expirée depuis N jours, d'après `status` (fenêtre de 60 jours, #882)
+- Badge d'équipier à côté du nom : « Certification expirée » ou « À renouveler » (état le plus grave, `certificationStatus`)
 
 ### Onglet navigation logs — panel équipage
 
@@ -187,7 +191,8 @@ Props :
 
 Fonctionnalités :
 
-- Ajout d'un membre avec sélection du rôle
+- Ajout d'un membre avec sélection du rôle — l'option d'un équipier au certificat expiré ou à renouveler porte la mention (#882)
+- Badge « Certification expirée » sur un membre embarqué et avertissement `role="status"` au-dessus du formulaire : **jamais bloquant** (le certificat renouvelé peut ne pas encore être saisi)
 - Suppression d'un membre (sync immédiat via `PATCH`)
 - Lien de téléchargement PDF du rôle d'équipage
 
@@ -205,10 +210,14 @@ Référence : `shared/types/crew.ts`.
 type CrewCertificationType = 'coastal_permit' | 'offshore_permit' | 'vhf' | 'stcw_basic' | 'stcw_proficiency' | 'other'
 type NavigationLogCrewRole = 'skipper' | 'crew' | 'passenger'
 
-interface CrewMemberRow { id, firstName, lastName, fullName, email, phone, notes, certifications[] }
-interface CrewCertificationRow { id, type, referenceNumber, expiresAt, isExpired, expiresInDays }
+type CrewCertificationStatus = 'valid' | 'expiring_soon' | 'expired' | 'undated'
+
+interface CrewMemberRow { …, certifications[], certificationStatus: CrewCertificationStatus | null }
+interface CrewCertificationRow { id, type, referenceNumber, expiresAt, isExpired, expiresInDays, status }
 interface NavigationLogCrewRow { crewMemberId, fullName, role }
-interface CrewMemberOption { id, fullName }
+interface CrewMemberOption { id, fullName, certificationStatus }
+interface CrewCertificationAlert { crewMemberId, crewMemberName, certificationId, type, expiresAt, expiresInDays, status }
+interface DashboardCrewCertifications { expiredCount, expiringSoonCount, items: CrewCertificationAlert[] }
 ```
 
 `NavigationLogRow` (dans `shared/types/navigation_log.ts`) inclut le champ `crew: NavigationLogCrewRow[]`.
@@ -230,3 +239,47 @@ Contenu du document :
 - Pied de page : mention "document à valider par le capitaine"
 
 Nom du fichier généré : `role-equipage-YYYY-MM-DD.pdf`.
+
+## Alertes d'expiration des certifications (#882)
+
+**Règle d'état** — `shared/helpers/crew_certification.ts`, sans luxon (importée
+côté Inertia) : `crewCertificationStatus(expiresInDays)` rend `expired` (échue),
+`expiring_soon` (≤ 60 jours), `valid` ou `undated` (sans date : permis à vie,
+date non saisie). Un équipier prend l'état le plus grave de ses certifications
+(`worstCrewCertificationStatus`, `null` sans certification). La même règle sert
+aux badges, au sélecteur du journal de bord, au widget et aux alertes.
+
+**Notifications** — `NotificationScanService.scanCrewCertifications` (job
+quotidien `scan_fleet_notifications`) :
+
+- types `crew_certification.expiring_soon` (`warning`) et
+  `crew_certification.expired` (`error`, poussable) ;
+- **une notification par équipier et par état**, `count` = nombre de
+  certifications, `days` = échéance la plus proche ;
+- destinataires : les admins **et** l'équipier lui-même quand son e-mail
+  (insensible à la casse) est celui d'un membre de **la même** organisation ;
+  lien `/crew` si le destinataire a `crew.create`, sinon aucun lien ;
+- anti-doublon par fenêtre : clé `metadata.crewAlertKey` = `<équipier>:60`,
+  `:30`, `:7` (plus petite fenêtre qui contient l'échéance) ou `:expired`.
+  Une échéance n'alerte qu'une fois par fenêtre ; une certification échue, une
+  fois par mois (30 jours) ;
+- titre et corps rédigés dans la langue du destinataire (`users.locale`).
+
+**E-mail** — `ReminderEmailService.sendCrewCertificationReminders` (job
+quotidien `SendReminderEmails`, 08:00) : les certifications qui expirent dans
+**exactement** 60, 30 ou 7 jours, un e-mail par admin de l'organisation, dans
+sa langue (`crew.emails.reminder.*`, gabarit
+`reminder_crew_certification_expiry.edge`). Le job étant quotidien, une
+certification donne au plus trois e-mails, sans table d'historique.
+
+**Widget** — « Certifications à renouveler » (`crew_certifications`, galerie,
+masqué par défaut, dispo avec `crew.create`) : comptes échues / à 60 jours et
+les cinq plus urgentes, via `CrewService.getDashboardCertifications`.
+
+**Assistant** — `AssistantContextService.buildFleetDigestLines` ajoute au
+digest les certifications échues ou à 60 jours (pour qui a `crew.create`) : le
+copilote peut répondre « qui peut skipper samedi ? ».
+
+**Hors périmètre** : le rôle d'équipage PDF ne filtre ni ne signale les
+certificats (document réglementaire, à valider par le capitaine) ; planning
+d'équipage (#883) ; préférences de notification par type (#888).

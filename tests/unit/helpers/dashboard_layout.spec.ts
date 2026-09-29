@@ -73,6 +73,7 @@ test.group('resolveDashboardLayout', () => {
           'invoicing',
           'charter_occupancy',
           'fleet_margin',
+          'crew_certifications',
         ],
       }),
       ALL_WIDGETS_AVAILABLE

@@ -154,6 +154,50 @@ const SCENARIOS: Record<string, (service: EmailQueueService) => Promise<unknown>
       daysLabel: '7',
       branding,
     }),
+  reminderCrewCertificationExpiry: (s) =>
+    s.sendReminderCrewCertificationExpiry({
+      to: 'alice@example.com',
+      name: 'Alice',
+      locale: 'fr',
+      certifications: [
+        {
+          crewMemberId: 3,
+          crewMemberName: 'Jeanne Barret',
+          certificationId: 11,
+          type: 'medical_certificate',
+          expiresAt: '2026-07-08',
+          expiresInDays: 7,
+          status: 'expiring_soon',
+        },
+        {
+          crewMemberId: 4,
+          crewMemberName: 'Éric Tabarly',
+          certificationId: 12,
+          type: 'stcw_basic',
+          expiresAt: '2026-08-31',
+          expiresInDays: 60,
+          status: 'expiring_soon',
+        },
+      ],
+      branding,
+    }),
+  reminderCrewCertificationExpiryEn: (s) =>
+    s.sendReminderCrewCertificationExpiry({
+      to: 'bob@example.com',
+      name: null,
+      locale: 'en',
+      certifications: [
+        {
+          crewMemberId: 3,
+          crewMemberName: 'Jeanne Barret',
+          certificationId: 11,
+          type: 'medical_certificate',
+          expiresAt: '2026-07-31',
+          expiresInDays: 30,
+          status: 'expiring_soon',
+        },
+      ],
+    }),
   planDowngrade: (s) =>
     s.sendPlanDowngradeNotification({
       to: 'alice@example.com',

@@ -27,6 +27,9 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   'document.expired',
   'safety_equipment.expiring_soon',
   'safety_equipment.expired',
+  // Certification d'équipage échue (#882) : un équipier qu'on ne peut plus
+  // embarquer. L'échéance à venir reste in-app, comme les autres rappels.
+  'crew_certification.expired',
 ] as const
 
 export function isPushableNotificationType(type: NotificationType): boolean {
