@@ -35,12 +35,24 @@ const shieldConfig = defineConfig({
       imgSrc: ["'self'", 'data:', 'res.cloudinary.com'],
       // Polices bundlées localement via Fontsource, pas de CDN externe
       fontSrc: ["'self'"],
+      // Transmit SSE (`use_notifications.ts`) ouvre EventSource sur
+      // `window.location.origin` — même origine, `'self'` suffit en mode
+      // bloquant (#779).
       connectSrc: ["'self'"],
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
+      // Complète `xFrame: DENY` pour les navigateurs qui privilégient CSP
+      // (#779). Les deux coexistent volontairement.
+      frameAncestors: ["'none'"],
+      // Empêche un formulaire injecté de poster hors origine. Les `<Form>` /
+      // `useForm` Inertia restent same-origin ; Stripe est une redirection
+      // serveur après un POST interne, pas un `action` externe (#779).
+      formAction: ["'self'"],
     },
 
+    // Prod : CSP appliquée. Dev : report-only — la console Chromium a fait
+    // sortir #830 / #831. Pas de collecteur `report-uri` pour l'instant (#779).
     reportOnly: !app.inProduction,
   },
 
@@ -89,6 +101,10 @@ const shieldConfig = defineConfig({
 
   /**
    * Force browser to always use HTTPS.
+   *
+   * Pas de `includeSubDomains` ni `preload` (#779) : `www.fleetai.app` est
+   * déjà en HTTPS, mais la couverture HTTPS de tous les sous-domaines n'est
+   * pas confirmée, et l'en-tête est mis en cache 180 jours.
    */
   hsts: {
     /**
