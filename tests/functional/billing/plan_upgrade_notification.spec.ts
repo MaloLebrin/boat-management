@@ -5,6 +5,7 @@ import emitter from '@adonisjs/core/services/emitter'
 import StripeService from '#services/stripe_service'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
+import AuditLogService from '#services/audit_log_service'
 import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
 import OnOrganizationPlanUpgraded from '#listeners/on_organization_plan_upgraded'
 import Notification from '#models/notification'
@@ -38,7 +39,11 @@ test.group('Plan upgrade — event dispatch (functional)', (group) => {
       plan: 'starter',
     }).create()
 
-    const service = new SubscriptionService(new StripeService(), new OrganizationModuleService())
+    const service = new SubscriptionService(
+      new StripeService(),
+      new OrganizationModuleService(),
+      new AuditLogService()
+    )
     await service.syncFromSubscriptionEvent(fakeSub('cus_upgrade', PRO_MONTH) as any)
 
     await org.refresh()
