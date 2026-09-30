@@ -127,8 +127,8 @@ survit à la suppression.
 
 Appelé par : `boat_engine_service.delete` (moteur + ses pièces), `boat_engine_part_service.delete`,
 `boat_sail_service.delete`, `boat_rig_service.delete`, `boat_generic_equipment_service.delete`,
-`boat_safety_equipment_service.delete`, et `boat_hull_service.deleteForUser` (toutes les entités du
-bateau). Le paramètre `org` est optionnel : sans lui, le nettoyage est ignoré (le quota ne peut pas
+`boat_safety_equipment_service.delete`, et `boat_hull_service.purgePhysically` (toutes les entités du
+bateau, à la purge de la corbeille). Le paramètre `org` est optionnel : sans lui, le nettoyage est ignoré (le quota ne peut pas
 être décrémenté).
 
 ## Réconciliation des orphelins (#859)

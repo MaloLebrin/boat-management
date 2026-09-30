@@ -78,8 +78,17 @@ export function useFlashToasts() {
       )
     }
     if (flashMessages.success) {
+      const successAction = flashMessages.successAction
       scheduleHardDismiss(
-        toast.success(flashMessages.success, { duration: FLASH_TOAST_DURATION_MS })
+        toast.success(flashMessages.success, {
+          duration: successAction ? FLASH_TOAST_MAX_LIFETIME_MS : FLASH_TOAST_DURATION_MS,
+          action: successAction
+            ? {
+                label: t('common.undo'),
+                onClick: () => router.post(successAction),
+              }
+            : undefined,
+        })
       )
     }
     if (flashMessages.info) {

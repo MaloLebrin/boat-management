@@ -22,6 +22,11 @@ export default class BoatPolicy extends OrgScopedPolicy {
     return this.sameOrg(user, boat) && (await this.can(user, 'boats.delete'))
   }
 
+  /** Corbeille de la flotte (#858) : même capacité que supprimer un bateau, sans cible. */
+  async manageTrash(user: User): Promise<AuthorizerResponse> {
+    return this.can(user, 'boats.delete')
+  }
+
   async manage(user: User, boat: Boat): Promise<AuthorizerResponse> {
     return this.sameOrg(user, boat) && (await this.can(user, 'boats.manage'))
   }

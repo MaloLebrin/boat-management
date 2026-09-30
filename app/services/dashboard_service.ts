@@ -104,7 +104,9 @@ export default class DashboardService {
 
     const openTasks = await BoatMaintenanceTask.query()
       .where('status', 'open')
-      .whereHas('boat', (q) => q.where('organizationId', user.organizationId!))
+      .whereHas('boat', (q) =>
+        q.where('organizationId', user.organizationId!).whereNull('deletedAt')
+      )
       .where((q) => {
         q.where((q2) => q2.whereNotNull('dueAt').where('dueAt', '<=', thresholdDate.toISODate()!))
         q.orWhereNotNull('dueEngineHours')

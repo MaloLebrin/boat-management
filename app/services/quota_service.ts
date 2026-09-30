@@ -33,7 +33,8 @@ export default class QuotaService {
     this.#assertOrganization(org)
     // Un bateau vendu (#870) sort de la flotte active : il ne consomme plus de
     // place dans le quota. Le remettre en service repasse par ce plafond
-    // (`BoatStatusService.change`).
+    // (`BoatStatusService.change`). Un bateau en corbeille (#858) est déjà
+    // exclu par le scope du modèle.
     const rows = await Boat.query()
       .where('organizationId', org.id)
       .whereNot('status', 'sold')

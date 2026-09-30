@@ -14,13 +14,58 @@ import BoatStatusChange from '#models/boat_status_change'
 import NavigationLog from '#models/navigation_log'
 import Spot from '#models/spot'
 import User from '#models/user'
-import { BaseModel, belongsTo, column, hasMany, hasOne, manyToMany } from '@adonisjs/lucid/orm'
+import { applyDefaultScope } from '#models/mixins/soft_deletes'
+import {
+  BaseModel,
+  beforeFetch,
+  beforeFind,
+  beforePaginate,
+  belongsTo,
+  column,
+  hasMany,
+  hasOne,
+  manyToMany,
+} from '@adonisjs/lucid/orm'
+import type {
+  LucidModel,
+  ModelAdapterOptions,
+  ModelQueryBuilderContract,
+} from '@adonisjs/lucid/types/model'
 import type { BelongsTo, HasMany, HasOne, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import type { BoatStatus } from '#shared/types/boat_status'
 
 export default class Boat extends BaseModel {
   static table = 'boats'
+
+  /** Exclut la corbeille. Les hooks couvrent les préchargements, qui ne passent pas par `query()`. */
+  static query<Model extends LucidModel, Result = InstanceType<Model>>(
+    this: Model,
+    options?: ModelAdapterOptions
+  ): ModelQueryBuilderContract<Model, Result> {
+    const query = super.query(options)
+    applyDefaultScope(query)
+    return query as unknown as ModelQueryBuilderContract<Model, Result>
+  }
+
+  @beforeFind()
+  static softDeleteOnFind(query: ModelQueryBuilderContract<typeof Boat>) {
+    applyDefaultScope(query)
+  }
+
+  @beforeFetch()
+  static softDeleteOnFetch(query: ModelQueryBuilderContract<typeof Boat>) {
+    applyDefaultScope(query)
+  }
+
+  @beforePaginate()
+  static softDeleteOnPaginate([countQuery, query]: [
+    ModelQueryBuilderContract<typeof Boat>,
+    ModelQueryBuilderContract<typeof Boat>,
+  ]) {
+    applyDefaultScope(countQuery)
+    applyDefaultScope(query)
+  }
 
   @column({ isPrimary: true })
   declare id: number
@@ -134,6 +179,9 @@ export default class Boat extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+
+  @column.dateTime()
+  declare deletedAt: DateTime | null
 
   @belongsTo(() => Organization)
   declare organization: BelongsTo<typeof Organization>

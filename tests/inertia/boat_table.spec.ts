@@ -5,12 +5,24 @@ import type { BoatListItem } from '../../inertia/components/boats/list/types'
 
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({
-    t: (key: string) => key,
+    t: (key: string, params?: Record<string, unknown>) =>
+      params ? `${key} ${Object.values(params).join(' ')}` : key,
   }),
 }))
 
 vi.mock('~/components/base/BaseBadge.vue', () => ({
   default: { template: '<span><slot /></span>' },
+}))
+
+vi.mock('~/composables/use_date_format', () => ({
+  useDateFormat: () => ({ formatDate: () => '15/07/2026' }),
+}))
+
+vi.mock('~/components/boats/list/BoatTrashActions.vue', () => ({
+  default: {
+    props: ['boatId', 'name'],
+    template: '<div data-trash-actions />',
+  },
 }))
 
 function makeBoat(overrides: Partial<BoatListItem> = {}): BoatListItem {
@@ -22,6 +34,7 @@ function makeBoat(overrides: Partial<BoatListItem> = {}): BoatListItem {
     propulsionType: 'sailboat',
     status: 'available',
     updatedAt: null,
+    purgeAt: null,
     maintenance: { urgentCount: 0, upcomingCount: 0, nextDueAt: null },
     ...overrides,
   }
@@ -59,4 +72,16 @@ test('shows the availability status of each boat (#870)', () => {
   expect(w.text()).toContain('boats.list.table.status')
   expect(w.text()).toContain('boats.availability.status.available')
   expect(w.text()).toContain('boats.availability.status.out_of_service')
+})
+
+test('trash mode does not link to the boat and shows when it will be purged', () => {
+  const w = mount(BoatTable, {
+    props: {
+      trashed: true,
+      boats: [makeBoat({ purgeAt: '2026-10-29T00:00:00.000Z' })],
+    },
+  })
+  expect(w.find('a').exists()).toBe(false)
+  expect(w.find('[data-trash-actions]').exists()).toBe(true)
+  expect(w.text()).toContain('15/07/2026')
 })

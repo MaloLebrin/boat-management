@@ -1,6 +1,7 @@
 import { test } from '@japa/runner'
 import { truncateDb } from '#tests/utils/db'
 import Boat from '#models/boat'
+import { withTrashed } from '#models/mixins/soft_deletes'
 import { UserFactory } from '#database/factories/user_factory'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { PortFactory } from '#database/factories/port_factory'
@@ -132,16 +133,23 @@ test.group('Boats (functional)', (group) => {
     response.assertRedirectsTo(`/boats/${boat!.id}`)
   })
 
-  test('DELETE /boats/:id deletes the boat and redirects to /boats', async ({ client, assert }) => {
+  test('DELETE /boats/:id moves the boat to the trash and redirects to /boats', async ({
+    client,
+    assert,
+  }) => {
     const user = await createAdminUser()
     const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
 
-    const response = await client.delete(`/boats/${boat.id}`).loginAs(user)
+    const response = await client.delete(`/boats/${boat.id}`).loginAs(user).redirects(0)
 
-    response.assertRedirectsTo('/boats')
+    response.assertStatus(302)
+    response.assertHeader('location', '/boats')
+    response.assertFlashMessage('successAction', `/boats/${boat.id}/restore`)
 
-    const found = await Boat.find(boat.id)
-    assert.isNull(found)
+    assert.isNull(await Boat.find(boat.id))
+    const trashed = await withTrashed(Boat.query().where('id', boat.id)).first()
+    assert.isNotNull(trashed)
+    assert.isNotNull(trashed!.deletedAt)
   })
 
   test('DELETE /boats/:id from another org returns error (boat not visible)', async ({

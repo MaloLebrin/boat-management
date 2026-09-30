@@ -1,4 +1,5 @@
 import Boat from '#models/boat'
+import { withTrashed } from '#models/mixins/soft_deletes'
 import BoatEngine from '#models/boat_engine'
 import BoatRig from '#models/boat_rig'
 import BoatSail from '#models/boat_sail'
@@ -35,7 +36,9 @@ export default class DemoService {
 
       const org = await Organization.query({ client: trx }).where('slug', DEMO_ORG_SLUG).first()
       if (org) {
-        const boats = await Boat.query({ client: trx }).where('organizationId', org.id).select('id')
+        const boats = await withTrashed(
+          Boat.query({ client: trx }).where('organizationId', org.id).select('id')
+        )
         if (boats.length > 0) {
           const ids = boats.map((b) => b.id)
           // boat_engines/sails/rigs have no FK CASCADE — must delete before boats
@@ -44,7 +47,7 @@ export default class DemoService {
           await BoatEngine.query({ client: trx }).whereIn('boatId', ids).delete()
         }
         // maintenance events/tasks/sheets cascade via FK
-        await Boat.query({ client: trx }).where('organizationId', org.id).delete()
+        await withTrashed(Boat.query({ client: trx }).where('organizationId', org.id)).delete()
         await org.delete()
       }
     })

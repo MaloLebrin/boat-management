@@ -1494,6 +1494,7 @@ export class BoatSchema extends BaseModel {
     'beamM',
     'category',
     'createdAt',
+    'deletedAt',
     'draftM',
     'flagCountry',
     'francisationNumber',
@@ -1533,6 +1534,8 @@ export class BoatSchema extends BaseModel {
   declare category: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column.dateTime()
+  declare deletedAt: DateTime | null
   @column()
   declare draftM: number | null
   @column()

@@ -587,7 +587,7 @@ test.group('Equipment photos — cleanup on delete (functional)', (group) => {
     }
   })
 
-  test('deleting the boat purges generic and safety equipment photos', async ({
+  test('trashing the boat keeps equipment photos until a permanent delete', async ({
     client,
     assert,
   }) => {
@@ -608,6 +608,12 @@ test.group('Equipment photos — cleanup on delete (functional)', (group) => {
       }).create()
 
       await client.delete(`/boats/${seed.boat.id}`).loginAs(user).redirects(0)
+
+      assert.isNotNull(await Media.find(genericMedia.id))
+      assert.isNotNull(await Media.find(safetyMedia.id))
+      assert.isEmpty(fake.deletedFolders)
+
+      await client.delete(`/boats/${seed.boat.id}/force`).loginAs(user).redirects(0)
 
       assert.isNull(await Media.find(genericMedia.id))
       assert.isNull(await Media.find(safetyMedia.id))

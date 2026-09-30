@@ -226,6 +226,11 @@
   },
   "boat": {
     "registrationTaken": "Un bateau avec ce numéro d'immatriculation existe déjà dans votre organisation.",
+    "nameHeldByTrash": "Ce nom est encore réservé par un bateau dans la corbeille. Restaurez-le ou supprimez-le définitivement.",
+    "registrationHeldByTrash": "Cette immatriculation est encore réservée par un bateau dans la corbeille. Restaurez-le ou supprimez-le définitivement.",
+    "trashed": "« {name} » a été placé dans la corbeille.",
+    "restored": "« {name} » a été restauré.",
+    "purged": "« {name} » a été supprimé définitivement.",
     "statusChanged": "Statut du bateau mis à jour.",
     "statusUnchanged": "Le bateau a déjà ce statut."
   },

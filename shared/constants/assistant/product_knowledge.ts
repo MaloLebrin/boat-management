@@ -440,6 +440,34 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'boats.index',
   },
   {
+    id: 'boat-trash',
+    title: {
+      en: 'Boat trash: delete without losing the history',
+      fr: 'Corbeille des bateaux : supprimer sans perdre l’historique',
+    },
+    body: {
+      en: 'Deleting a boat moves it to the trash for 30 days instead of erasing its history. Engines, tasks, documents, fuel logs, reservations and photos stay until a daily job permanently deletes boats that have spent 30 days in the trash. Admins open the trash from the boat list, restore a boat, or delete it for good. The confirmation toast offers Undo for a few seconds. A trashed boat leaves the fleet list, the dashboard, exports and the assistant, and it no longer counts toward the boat quota, but its name and registration stay reserved until the purge. Restoring a boat that is not marked sold checks the quota again. Selling a boat is separate: set its status to sold to keep the history readable, off the active list and off the quota, without using the trash.',
+      fr: 'Supprimer un bateau le place dans la corbeille 30 jours, sans effacer son historique. Moteurs, tâches, documents, pleins, réservations et photos restent jusqu’au traitement quotidien qui efface les bateaux restés 30 jours en corbeille. Les administrateurs ouvrent la corbeille depuis la liste, restaurent un bateau ou le suppriment pour de bon. Le message de confirmation propose Annuler quelques secondes. Un bateau en corbeille quitte la liste, le tableau de bord, les exports et l’assistant, et ne compte plus dans le quota : son nom et son immatriculation restent réservés jusqu’à la purge. Le restaurer, s’il n’est pas vendu, revérifie le quota. Le statut vendu est distinct : l’historique reste lisible, hors liste active et hors quota, sans corbeille.',
+    },
+    keywords: [
+      'corbeille',
+      'trash',
+      'supprimer',
+      'delete',
+      'restaurer',
+      'restore',
+      'purge',
+      'annuler',
+      'undo',
+      'historique',
+      'history',
+      'quota',
+      'immatriculation',
+      'registration',
+    ],
+    navTarget: 'boats.index',
+  },
+  {
     id: 'maintenance-operations-catalog',
     title: {
       en: 'Standard maintenance operations catalog',

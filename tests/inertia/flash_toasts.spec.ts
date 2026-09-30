@@ -7,7 +7,13 @@ import {
   useFlashToasts,
 } from '../../inertia/composables/use_flash_toasts'
 
-type Flash = { success?: string; error?: string; info?: string; errorAction?: string }
+type Flash = {
+  success?: string
+  error?: string
+  info?: string
+  errorAction?: string
+  successAction?: string
+}
 
 const s = vi.hoisted(() => ({
   page: undefined as unknown as {
@@ -15,11 +21,12 @@ const s = vi.hoisted(() => ({
     props: { flash: Flash; appT: Record<string, string> }
   },
   visit: vi.fn(),
+  post: vi.fn(),
 }))
 
 vi.mock('@inertiajs/vue3', () => ({
   usePage: () => s.page,
-  router: { visit: s.visit },
+  router: { visit: s.visit, post: s.post },
 }))
 
 const Host = defineComponent({
@@ -35,7 +42,7 @@ function mountHost(flash: Flash = {}) {
     url: '/boats/1',
     props: {
       flash,
-      appT: { 'common.viewPlans': 'View plans' },
+      appT: { 'common.viewPlans': 'View plans', 'common.undo': 'Undo' },
     },
   })
   return mount(Host, { attachTo: document.body })
@@ -129,6 +136,20 @@ describe('useFlashToasts', () => {
     await vi.advanceTimersByTimeAsync(100)
 
     expect(w.findAll('button').some((b) => b.text() === 'View plans')).toBe(false)
+  })
+
+  test('a success flash carrying successAction posts Undo to the target', async () => {
+    const w = mountHost({
+      success: 'Boat moved to the trash.',
+      successAction: '/boats/4/restore',
+    })
+    await vi.advanceTimersByTimeAsync(100)
+
+    const cta = w.findAll('button').find((b) => b.text() === 'Undo')
+    expect(cta).toBeDefined()
+
+    await cta!.trigger('click')
+    expect(s.post).toHaveBeenCalledWith('/boats/4/restore')
   })
 
   test('dismissAll clears visible toasts', async () => {

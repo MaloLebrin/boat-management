@@ -17,8 +17,11 @@ import type {
 } from '#shared/types/boat'
 import { BOAT_CATEGORIES, type BoatCategory } from '#shared/types/boat_catalog'
 import { isBoatStatus } from '#shared/types/boat_status'
+import { BOAT_TRASH_RETENTION_DAYS } from '#shared/constants/boat_trash'
+import { onlyTrashed } from '#models/mixins/soft_deletes'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
+import { DateTime } from 'luxon'
 
 export type { BoatListDirection, BoatListItem, BoatListQuery, BoatListSort }
 
@@ -52,6 +55,7 @@ export default class BoatListService {
 
     const page = clampInt(toIntegerOrUndefined(raw.page) ?? 1, 1, 10_000)
     const perPage = clampInt(toIntegerOrUndefined(raw.perPage) ?? 20, 5, 100)
+    const trashed = toBooleanFlag(raw.trashed)
 
     return {
       q,
@@ -65,6 +69,7 @@ export default class BoatListService {
       direction,
       page,
       perPage,
+      trashed,
     }
   }
 
@@ -100,7 +105,10 @@ export default class BoatListService {
         'propulsionType',
         'status',
         'updatedAt',
+        'deletedAt',
       ])
+
+    if (filters.trashed) onlyTrashed(query)
 
     if (filters.q) {
       const needle = `%${escapeLike(filters.q)}%`
@@ -112,9 +120,10 @@ export default class BoatListService {
     if (filters.category) query.where('category', filters.category)
     if (filters.propulsionType) query.where('propulsionType', filters.propulsionType)
     // Flotte active par défaut (#870) : un bateau vendu garde son historique
-    // mais ne revient que si on le demande.
+    // mais ne revient que si on le demande. La corbeille (#858) montre tous
+    // les statuts, vendus compris.
     if (filters.status) query.where('status', filters.status)
-    else query.whereNot('status', 'sold')
+    else if (!filters.trashed) query.whereNot('status', 'sold')
 
     // Filtres de présence d'équipement (cartes du tableau de bord) : on cible
     // les bateaux qui possèdent réellement l'équipement, pas un type de propulsion.
@@ -146,6 +155,7 @@ export default class BoatListService {
           propulsionType: b.propulsionType ?? null,
           status: isBoatStatus(b.status) ? b.status : 'available',
           updatedAt: b.updatedAt ?? null,
+          purgeAt: filters.trashed ? purgeAtFrom(b.deletedAt) : null,
           maintenance: badges.get(Number(b.id)) ?? {
             urgentCount: 0,
             upcomingCount: 0,
@@ -157,4 +167,11 @@ export default class BoatListService {
       filters,
     }
   }
+}
+
+function purgeAtFrom(deletedAt: string | null): string | null {
+  if (!deletedAt) return null
+  const parsed = DateTime.fromISO(deletedAt)
+  if (!parsed.isValid) return null
+  return parsed.plus({ days: BOAT_TRASH_RETENTION_DAYS }).toISO()
 }

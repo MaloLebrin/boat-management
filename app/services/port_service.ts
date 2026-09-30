@@ -64,6 +64,7 @@ export default class PortService {
       // Boats via pontoon spots
       const pontoonBoatRows: PortAggRow[] = await db
         .from('boats')
+        .whereNull('boats.deleted_at')
         .join('spots', 'boats.spot_id', 'spots.id')
         .join('pontoons', 'spots.pontoon_id', 'pontoons.id')
         .whereIn('pontoons.port_id', portIds)
@@ -78,6 +79,7 @@ export default class PortService {
       // Boats via mouillage spots
       const mouillageBoatRows: PortAggRow[] = await db
         .from('boats')
+        .whereNull('boats.deleted_at')
         .join('spots', 'boats.spot_id', 'spots.id')
         .join('mouillages', 'spots.mouillage_id', 'mouillages.id')
         .whereIn('mouillages.port_id', portIds)

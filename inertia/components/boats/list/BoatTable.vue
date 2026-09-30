@@ -3,15 +3,19 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BoatStatusBadge from '~/components/boats/BoatStatusBadge.vue'
+import BoatTrashActions from '~/components/boats/list/BoatTrashActions.vue'
 import type { BoatListItem } from './types'
+import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import { maintenanceVariant } from '~/utils/status_variants'
 import { boatCategoryLabel, propulsionLabel } from '~/utils/boat_enum_labels'
 
 const { t } = useT()
+const { formatDate } = useDateFormat()
 
 const props = defineProps<{
   boats: BoatListItem[]
+  trashed?: boolean
 }>()
 
 // Colonnes masquées quand aucun bateau affiché ne renseigne la donnée,
@@ -44,7 +48,10 @@ function maintenanceLabel(b: BoatListItem) {
           </th>
           <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.propulsion') }}</th>
           <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.status') }}</th>
-          <th class="px-4 py-3 font-semibold">{{ t('boats.list.table.maintenance') }}</th>
+          <th v-if="!trashed" class="px-4 py-3 font-semibold">
+            {{ t('boats.list.table.maintenance') }}
+          </th>
+          <th v-else class="px-4 py-3 font-semibold">{{ t('boats.trash.purgeColumn') }}</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-border">
@@ -54,9 +61,14 @@ function maintenanceLabel(b: BoatListItem) {
           class="transition-colors duration-(--motion-fast) ease-premium hover:bg-lilac-50/60"
         >
           <td class="px-4 py-3">
-            <Link :href="`/boats/${boat.id}`" class="font-semibold text-fg hover:underline">
+            <Link
+              v-if="!trashed"
+              :href="`/boats/${boat.id}`"
+              class="font-semibold text-fg hover:underline"
+            >
               {{ boat.name }}
             </Link>
+            <span v-else class="font-semibold text-fg">{{ boat.name }}</span>
           </td>
           <td v-if="showRegistration" class="px-4 py-3 text-fg-muted">
             {{ boat.registrationNumber ?? '—' }}
@@ -70,10 +82,16 @@ function maintenanceLabel(b: BoatListItem) {
           <td class="px-4 py-3">
             <BoatStatusBadge :status="boat.status" />
           </td>
-          <td class="px-4 py-3">
+          <td v-if="!trashed" class="px-4 py-3">
             <BaseBadge :variant="maintenanceVariant(boat.maintenance)">
               {{ maintenanceLabel(boat) }}
             </BaseBadge>
+          </td>
+          <td v-else class="px-4 py-3">
+            <p class="text-fg-muted">
+              {{ t('boats.trash.purgeAt', { date: formatDate(boat.purgeAt) }) }}
+            </p>
+            <BoatTrashActions class="mt-2" :boat-id="boat.id" :name="boat.name" />
           </td>
         </tr>
       </tbody>

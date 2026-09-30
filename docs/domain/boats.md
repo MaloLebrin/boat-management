@@ -36,9 +36,11 @@ C'est le même contrat que pour les contrôleurs « sous » un bateau
   - Service: `app/services/boat_service.ts` → `listForUser`
   - Page: `inertia/pages/boats/index.vue`
   - Filtres: `?q=`, `?category=` (vocabulaire fermé `BOAT_CATEGORIES`, #571 — remplace `?type=`),
-    `?propulsionType=`, `?status=` (#870), `?sort=`, `?direction=`. Une `category` hors enum est ignorée.
+    `?propulsionType=`, `?status=` (#870), `?trashed=1` (#858, admin `boats.delete` seulement),
+    `?sort=`, `?direction=`. Une `category` hors enum est ignorée.
   - Sans `?status=`, la liste montre la **flotte active** : les bateaux `sold` n'y reviennent
-    qu'avec `?status=sold`.
+    qu'avec `?status=sold`. `?trashed=1` liste la corbeille (tous statuts) avec restauration
+    et suppression définitive.
 - `GET /boats/new` (`boats.create`)
   - Controller: `BoatsController.create`
   - ACL: `bouncer.authorize('boatCreate')`
@@ -83,9 +85,19 @@ C'est le même contrat que pour les contrôleurs « sous » un bateau
   - Service: `BoatService.updateForUser`
   - Redirect: `/boats/:id`
 - `DELETE /boats/:id` (`boats.destroy`)
-  - Controller: `BoatsController.destroy`
-  - Service: `BoatService.deleteForUser`
+  - Controller: `BoatTrashController.destroy`
+  - Service: `BoatTrashService.trash` — soft delete (`deleted_at`), la place est libérée,
+    l'historique reste. Flash succès avec action « Annuler » (`POST /boats/:id/restore`).
   - Redirect: `/boats`
+- `POST /boats/:id/restore` (`boats.restore`)
+  - Controller: `BoatTrashController.restore`
+  - Un bateau non vendu repasse par le quota. Redirect: `/boats/:id`
+- `DELETE /boats/:id/force` (`boats.forceDestroy`)
+  - Suppression physique (médias Cloudinary compris), uniquement depuis la corbeille.
+  - Redirect: `/boats?trashed=1`
+- Purge: job `PurgeTrashedBoats` à 04:15 Europe/Paris, 30 jours après `deleted_at`
+  (`BOAT_TRASH_RETENTION_DAYS`). Le statut `sold` (#870) n'est pas la corbeille :
+  l'historique d'un bateau vendu reste lisible.
 
 ### Equipment (engines/sails/rig)
 

@@ -31,7 +31,10 @@ export default class ReminderEmailService {
     const orgs = await Organization.query()
       .where('createdAt', '<', sevenDaysAgo.toISO())
       .whereNotExists((query) => {
-        query.from('boats').whereColumn('boats.organization_id', 'organizations.id')
+        query
+          .from('boats')
+          .whereNull('boats.deleted_at')
+          .whereColumn('boats.organization_id', 'organizations.id')
       })
 
     if (orgs.length === 0) {

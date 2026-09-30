@@ -36,6 +36,7 @@ export default class BoatMaintenanceBadgeService {
       .whereNotNull('due_at')
       .whereExists((q) => {
         q.from('boats')
+          .whereNull('boats.deleted_at')
           .whereColumn('boats.id', 'boat_maintenance_tasks.boat_id')
           .where('boats.organization_id', organizationId)
       })
@@ -50,7 +51,7 @@ export default class BoatMaintenanceBadgeService {
       .where('status', 'open')
       .whereIn('boatId', boatIds)
       .whereNotNull('dueAt')
-      .whereHas('boat', (q) => q.where('organizationId', organizationId))
+      .whereHas('boat', (q) => q.where('organizationId', organizationId).whereNull('deletedAt'))
       .select(['boatId', 'dueAt'])
 
     for (const row of dateRows as MaintenanceDateBadgeRow[]) {
@@ -82,7 +83,7 @@ export default class BoatMaintenanceBadgeService {
       .whereIn('boatId', boatIds)
       .whereNotNull('dueEngineHours')
       .whereNotNull('boatEngineId')
-      .whereHas('boat', (q) => q.where('organizationId', organizationId))
+      .whereHas('boat', (q) => q.where('organizationId', organizationId).whereNull('deletedAt'))
       .select(['boatId', 'boatEngineId', 'dueEngineHours'])
 
     const engineIds = Array.from(

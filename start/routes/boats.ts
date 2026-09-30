@@ -13,6 +13,7 @@ const BoatPricingController = () => import('#controllers/boat_pricing_controller
 const BoatEquipmentMediaController = () => import('#controllers/boat_equipment_media_controller')
 const BoatIncidentMediaController = () => import('#controllers/boat_incident_media_controller')
 const BoatOwnersController = () => import('#controllers/boat_owners_controller')
+const BoatTrashController = () => import('#controllers/boat_trash_controller')
 const BoatStatusController = () => import('#controllers/boat_status_controller')
 
 router
@@ -67,7 +68,9 @@ router
       .as('boats.budget.entries.destroy')
     router.get('boats/:id/edit', [controllers.Boats, 'edit']).as('boats.edit')
     router.put('boats/:id', [controllers.Boats, 'update']).as('boats.update')
-    router.delete('boats/:id', [controllers.Boats, 'destroy']).as('boats.destroy')
+    router.delete('boats/:id', [BoatTrashController, 'destroy']).as('boats.destroy')
+    router.post('boats/:id/restore', [BoatTrashController, 'restore']).as('boats.restore')
+    router.delete('boats/:id/force', [BoatTrashController, 'forceDestroy']).as('boats.forceDestroy')
     // Statut de disponibilité (#870).
     router.patch('boats/:id/status', [BoatStatusController, 'update']).as('boats.status.update')
 

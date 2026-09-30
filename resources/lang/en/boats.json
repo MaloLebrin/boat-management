@@ -12,7 +12,7 @@
     "cancel": "Cancel",
     "deleteConfirm": {
       "title": "Delete this boat?",
-      "message": "This will permanently delete \"{name}\" and all of its history (maintenance, documents, equipment). This action cannot be undone."
+      "message": "This will move \"{name}\" to the trash for 30 days. Its history is kept and you can restore it. After that, the boat and its history are permanently deleted."
     }
   },
   "owners": {
@@ -311,6 +311,24 @@
       "comfort": "Comfort and living",
       "plumbing": "Plumbing and water systems",
       "other": "Other equipment"
+    }
+  },
+  "trash": {
+    "title": "Trash",
+    "subtitle": "Deleted boats stay here for 30 days, with their history. After that they are permanently erased.",
+    "open": "Trash",
+    "back": "Back to the fleet",
+    "restore": "Restore",
+    "forceDelete": "Delete permanently",
+    "purgeAt": "Deleted on {date}",
+    "purgeColumn": "Deletion",
+    "empty": {
+      "title": "The trash is empty",
+      "description": "Boats you delete show up here for 30 days."
+    },
+    "forceConfirm": {
+      "title": "Delete permanently?",
+      "message": "\"{name}\" and all of its history will be erased. This cannot be undone."
     }
   },
   "index": {
