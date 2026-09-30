@@ -9,6 +9,9 @@ import type {
 /** Disposition stockée injectée dans le test « authenticated » ; `null` = défaut. */
 let storedLayout: StoredDashboardLayout | null = null
 
+/** Compteur PWA (#865) : no-op, les tests unitaires n'ouvrent pas `?source=pwa`. */
+const pwaLaunchCounter = { increment: async () => {}, countFor: async () => 0 }
+
 test.group('HomeController (unit)', () => {
   test('renders dashboard when authenticated', async ({ assert }) => {
     const controller = new HomeController(
@@ -89,7 +92,8 @@ test.group('HomeController (unit)', () => {
         },
       } as any,
       {} as any,
-      {} as any
+      {} as any,
+      pwaLaunchCounter as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []
@@ -104,6 +108,7 @@ test.group('HomeController (unit)', () => {
         defer: (fn: unknown, group: string) => ({ deferred: group, fn }),
       },
       request: { qs: () => ({}) },
+      session: { get: () => undefined, put: () => {} },
       auth: {
         isAuthenticated: true,
         check: async () => {},
@@ -242,7 +247,8 @@ test.group('HomeController (unit)', () => {
         { getDashboardSummary: async () => ({ pendingQuotes: 0 }) } as any,
         { listAlertsForBoats: async () => ({ items: [], total: 0 }) } as any,
         { getMonthMarginForUser: async () => ({ margin: 0 }) } as any,
-        { getDashboardCertifications: async () => ({ items: [] }) } as any
+        { getDashboardCertifications: async () => ({ items: [] }) } as any,
+        pwaLaunchCounter as any
       )
 
       const rendered: Array<{ component: string; props: any }> = []
@@ -256,6 +262,7 @@ test.group('HomeController (unit)', () => {
           defer: (fn: unknown, group: string) => ({ deferred: group, fn }),
         },
         request: { qs: () => ({}) },
+        session: { get: () => undefined, put: () => {} },
         auth: {
           isAuthenticated: true,
           check: async () => {},
@@ -361,7 +368,8 @@ test.group('HomeController (unit)', () => {
         {} as any,
         {} as any,
         {} as any,
-        {} as any
+        {} as any,
+        pwaLaunchCounter as any
       )
 
       const rendered: Array<{ component: string; props: any }> = []
@@ -375,6 +383,7 @@ test.group('HomeController (unit)', () => {
           defer: (fn: unknown, group: string) => ({ deferred: group, fn }),
         },
         request: { qs: () => ({}) },
+        session: { get: () => undefined, put: () => {} },
         auth: {
           isAuthenticated: true,
           check: async () => {},
@@ -450,7 +459,8 @@ test.group('HomeController (unit)', () => {
       {} as any,
       {} as any,
       {} as any,
-      {} as any
+      {} as any,
+      pwaLaunchCounter as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []
@@ -462,6 +472,8 @@ test.group('HomeController (unit)', () => {
           return { component, props }
         },
       },
+      request: { qs: () => ({}) },
+      session: { get: () => undefined, put: () => {} },
       auth: {
         isAuthenticated: true,
         check: async () => {},
@@ -479,6 +491,7 @@ test.group('HomeController (unit)', () => {
     assert.deepEqual(rendered[0]!.props, {
       overdueTasks: [{ id: 1 }],
       soonTasks: [{ id: 2 }],
+      launchedFromPwa: false,
     })
   })
 })
