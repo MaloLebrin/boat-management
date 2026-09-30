@@ -3,7 +3,7 @@ import { usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 
 /**
- * Lien de sortie des pages d'erreur (403/404/500).
+ * Lien de sortie des pages d'erreur (403/404/419/429/500).
  *
  * Un utilisateur connecté repart vers son tableau de bord — chaque rôle y a une
  * vue dédiée (`HomeController#index` route le mécanicien et le propriétaire).

@@ -240,7 +240,37 @@ Docker/PaaS :
 curl -f https://<domaine>/up
 ```
 
-## 7. Dépendances système
+## 7. Mode maintenance (#864)
+
+Deux bascules, l'une ou l'autre suffit. Le middleware
+(`app/middleware/maintenance_mode_middleware.ts`) est le **premier** du
+routeur, avant le body parser et la session : la page ne lit pas la base.
+C'est un HTML statique (les deux langues, style de `public/offline.html`),
+statut **503**, en-tête `Retry-After: 300`.
+
+| Bascule                   | Effet               | Redémarrage |
+| ------------------------- | ------------------- | ----------- |
+| `MAINTENANCE_MODE=true`   | lu au boot          | oui         |
+| fichier `tmp/maintenance` | lu à chaque requête | non         |
+
+`/up` **n'est pas** concerné. Pendant une maintenance planifiée la probe reste
+verte, et la plateforme ne recycle pas le process. Si Postgres est tombé,
+`/up` répond déjà 503 de lui-même : on ne masque pas cet état.
+
+Self-host, bascule immédiate (le process tourne sous `adonisjs`, `tmp/` est
+`/app/tmp`) :
+
+```bash
+docker compose -f docker-compose.prod.yml exec web touch tmp/maintenance
+# … migration, incident …
+docker compose -f docker-compose.prod.yml exec web rm tmp/maintenance
+```
+
+Sur un PaaS, préférez `MAINTENANCE_MODE=true` puis un redéploiement, ou le
+même fichier si le disque du process est accessible. Retirez la variable (ou
+passez-la à `false`) et redéployez pour rouvrir.
+
+## 8. Dépendances système
 
 Ghostscript est installé dans l'image (compression des PDFs uploadés, voir
 `app/services/pdf_service.ts`). Sans lui, le PDF original part sans compression

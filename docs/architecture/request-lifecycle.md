@@ -14,6 +14,7 @@ Référence: `start/kernel.ts`.
 
 ### Router middleware
 
+- `#middleware/maintenance_mode_middleware` (503 statique si `MAINTENANCE_MODE` ou `tmp/maintenance`, sauf `/up`)
 - `@adonisjs/core/bodyparser_middleware`
 - `@adonisjs/session/session_middleware`
 - `@adonisjs/shield/shield_middleware` (désactivé en test)

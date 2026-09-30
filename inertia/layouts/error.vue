@@ -6,7 +6,7 @@ import DefaultLayout from '~/layouts/default.vue'
 import PublicLayout from '~/layouts/public.vue'
 
 /**
- * Layout des pages d'erreur (403/404/500).
+ * Layout des pages d'erreur (403/404/419/429/500).
  *
  * Un utilisateur connecté qui tombe sur une erreur doit garder la coquille de
  * l'app (sidebar, notifications) : sinon il « perd » toute l'application et se

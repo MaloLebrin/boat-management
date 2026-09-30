@@ -26,4 +26,35 @@ test.group('HttpExceptionHandler statusPages', () => {
     assert.equal(renderedView, 'errors/forbidden')
     assert.equal(result, 'rendered')
   })
+
+  test('maps 419 and 429 to their Inertia pages (#864)', async ({ assert }) => {
+    const handler = new HttpExceptionHandler()
+    const statusPages = (
+      handler as unknown as {
+        statusPages: Record<string, (error: null, ctx: unknown) => Promise<void>>
+      }
+    ).statusPages
+
+    assert.isTrue(Object.hasOwn(statusPages, '419'))
+    assert.isTrue(Object.hasOwn(statusPages, '429'))
+
+    let renderedView: string | undefined
+    let renderedProps: unknown
+    const ctx = {
+      inertia: {
+        render: (view: string, props: unknown) => {
+          renderedView = view
+          renderedProps = props
+          return 'rendered'
+        },
+      },
+    }
+
+    await statusPages['419'](null, ctx)
+    assert.equal(renderedView, 'errors/session_expired')
+
+    await statusPages['429'](null, ctx)
+    assert.equal(renderedView, 'errors/too_many_requests')
+    assert.deepEqual(renderedProps, { retryAfter: 0, offerSignup: false })
+  })
 })

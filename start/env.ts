@@ -39,6 +39,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   // Proxies dont on honore `X-Forwarded-*` (#844) — vide = `loopback, uniquelocal`
   // (voir config/app.ts). Mal réglée, tous les throttles par IP sont globaux.
   TRUST_PROXY: Env.schema.string.optional(),
+  // Page 503 statique (#864). `true` exige un redémarrage du process ; le
+  // fichier `tmp/maintenance` bascule sans redémarrage. Absent = ouvert.
+  MAINTENANCE_MODE: Env.schema.boolean.optional(),
   // Chiffrement au repos (#786) — distinct d'APP_KEY (cookies, sessions) pour
   // que l'une puisse tourner sans casser l'autre. `_PREVIOUS` n'est posée que
   // le temps d'une rotation (`node ace encryption:rotate`) — voir
