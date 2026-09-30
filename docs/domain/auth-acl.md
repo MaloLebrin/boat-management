@@ -236,12 +236,13 @@ explicitement, sinon la bannière suit la session navigateur sur les comptes ré
 
 Couverture : `tests/functional/auth/demo_session_leak.spec.ts`.
 
-## Home vs dashboard
+## Dashboard
 
 Référence: `app/controllers/home_controller.ts`.
 
-- non-auth → render Inertia `home`
-- auth → render Inertia `dashboard` avec data du `DashboardService`
+`GET /dashboard` est derrière `middleware.auth()`. Le contrôleur rend `dashboard`
+(ou `dashboard/mechanic`, ou redirige un `boat_owner` vers `/owner/boats`).
+L'accueil public est `marketing/home`.
 
 ## ACL (Bouncer + Policies)
 
@@ -251,7 +252,7 @@ Références:
 - Base class partagée: `app/utils/org_scoped_policy.ts`
 - Taxonomie de capacités: `shared/types/permissions.ts`
 - Middleware d'enregistrement: `app/middleware/initialize_bouncer_middleware.ts` (instancie un `Bouncer` par requête à partir de `#generated/policies`, auto-découvertes via `indexPolicies()` dans `adonisrc.ts`)
-- `app/abilities/main.ts` est un placeholder vide, conservé uniquement pour ne pas casser un import historique — toute l'autorisation passe par les Policies, pas par des abilities fonction.
+- `app/abilities/main.ts` est un module vide : toute l'autorisation passe par les Policies, pas par des abilities.
 
 ### Modèle de rôles
 

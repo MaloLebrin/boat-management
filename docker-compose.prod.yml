@@ -84,8 +84,8 @@ services:
       retries: 5
       start_period: 30s
 
-  # Toutes les queues sauf `ai` : sans ce worker, mails, médias, exports,
-  # imports de maintenance et notifications push ne partent jamais — `queue:work`
+  # Toutes les queues sauf `ai` : sans ce worker, mails, médias, exports
+  # et notifications push ne partent jamais — `queue:work`
   # sans `--queue` ne traite que `default`.
   worker:
     <<: *app
@@ -97,7 +97,7 @@ services:
       HOST: 0.0.0.0
       DB_STATEMENT_TIMEOUT_MS: 300000
       DB_IDLE_IN_TRANSACTION_TIMEOUT_MS: 120000
-    command: ['node', 'ace', 'queue:work', '--queue=default,emails,media,exports,maintenance,push']
+    command: ['node', 'ace', 'queue:work', '--queue=default,emails,media,exports,push']
 
   # Queue `ai` isolée : les jobs Mistral durent des dizaines de secondes et
   # monopoliseraient la concurrence du worker principal.

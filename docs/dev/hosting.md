@@ -156,7 +156,7 @@ Les services :
 | `postgres`  | `postgres:18-alpine`, volume `pg_data`, healthcheck `pg_isready`           |
 | `migrator`  | One-shot `migration:run --force` + seeders de catalogue, bloque le reste   |
 | `web`       | `node bin/server.js`, healthcheck sur `/up`, exposé au seul réseau Compose |
-| `worker`    | `queue:work --queue=default,emails,media,exports,maintenance,push`         |
+| `worker`    | `queue:work --queue=default,emails,media,exports,push`                     |
 | `worker-ai` | `queue:work --queue=ai`, isolé (jobs Mistral longs)                        |
 | `backup`    | Dump quotidien de la base, rotation 7 j / 4 sem. / 6 mois (#847)           |
 | `caddy`     | HTTPS automatique (Let's Encrypt), reverse proxy vers `web`                |
@@ -171,12 +171,13 @@ restauration, test trimestriel.
 
 ### Pourquoi deux workers, et pas `pnpm queue:work`
 
-Les 16 jobs de `app/jobs/` sont répartis sur **7 queues** : `default`, `emails`,
-`ai`, `media`, `exports`, `maintenance`, `push`. Or `node ace queue:work` sans
-`--queue` ne traite que `default` — lancé tel quel en production, **aucun mail,
-média, export, import de maintenance ni notification push ne part jamais**. Le
-service `worker` couvre donc explicitement les six queues courtes, et
-`worker-ai` isole la queue `ai` dont les jobs durent des dizaines de secondes.
+Les jobs de `app/jobs/` sont répartis sur **6 queues** : `default`, `emails`,
+`ai`, `media`, `exports`, `push`. Or `node ace queue:work` sans `--queue` ne
+traite que `default` — lancé tel quel en production, **aucun mail, média,
+export ni notification push ne part jamais**. Le service `worker` couvre donc
+explicitement les cinq queues courtes, et `worker-ai` isole la queue `ai` dont
+les jobs durent des dizaines de secondes. La queue `maintenance` n'existe plus :
+elle ne servait que le stub `ProcessBoatMaintenanceImport`, retiré (#862).
 
 Ajouter un job sur une nouvelle queue ⇒ ajouter cette queue au `--queue=` du
 service `worker`.
@@ -212,7 +213,7 @@ L'image GHCR fonctionne telle quelle. À configurer :
 - **Process web** : `node bin/server.js` (le `CMD` par défaut) ;
 - **Process workers** : deux workers séparés, mêmes commandes que le compose.
   Une plateforme qui ne permet qu'un seul process type ⇒ fusionner en
-  `queue:work --queue=default,emails,media,exports,maintenance,push,ai`, en
+  `queue:work --queue=default,emails,media,exports,push,ai`, en
   acceptant que les jobs IA retardent les mails ;
 - **Postgres** : managé par la plateforme, `DB_*` fournis par elle. Activez
   ses sauvegardes et vérifiez leur rétention

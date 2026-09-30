@@ -358,4 +358,4 @@ un champ de notes. C'est la sortie vers un format évalué qui doit être
 ## Extension future
 
 - Ajouter les types `fuel_logs` et `navigation_logs` à l'import (`CSV_IMPORT_TYPES`, un service de validation dédié, une branche dans `prepareImportPreview()` / `runImport()`, les colonnes d'aperçu dans `ImportPreviewPanel`)
-- Brancher le job `ProcessBoatMaintenanceImport` pour les imports volumineux (> 500 lignes) : stocker le fichier CSV sur Cloudinary, passer son URL dans le payload du job, implémenter `execute()` qui parse + persiste en background
+- Import d'entretien volumineux (> 500 lignes) en arrière-plan : le stub `ProcessBoatMaintenanceImport` a été retiré (#862). Suivi dans [#934](https://github.com/MaloLebrin/boat-management/issues/934). Tant qu'il n'est pas livré, l'import reste synchrone dans la requête.

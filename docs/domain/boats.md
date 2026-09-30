@@ -12,10 +12,10 @@ Gérer une flotte de bateaux au sein d’une **organisation**:
 
 ## ACL (qui a le droit ?)
 
-Référence: `app/abilities/main.ts`.
+Référence: `app/policies/boat_policy.ts`.
 
-- `boatCreate`: user doit appartenir à une org (`organizationId != null`)
-- `boatView`, `boatUpdate`, `boatDelete`: user et boat dans la **même org**
+- `create` : capability `boats.create`
+- `view`, `edit`, `delete` : même organisation et la capability correspondante (`boats.view`, `boats.edit`, `boats.delete`)
 
 ## Routes → controllers → pages (Inertia)
 

@@ -528,7 +528,7 @@ checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`
      variantes de `BaseBadge`, les 6 catégories de budget…).
   3. `tests/browser/dark_mode.spec.ts` — les **vraies couleurs**, seul niveau où le CSS est appliqué :
      luminance du fond dans les deux thèmes, contraste AA sur des sondes `data-theme-probe` de
-     `/design-system`, et préférence forcée qui survit à un rechargement complet (donc rendue par le
+     `/design-system` (route absente en production, #862), et préférence forcée qui survit à un rechargement complet (donc rendue par le
      serveur, sans flash). Nécessite `PLAYWRIGHT_CHROMIUM_EXECUTABLE` si le Chromium de Playwright
      n'est pas installé.
 - **Illustrations autonomes non basculées** (palette interne cohérente) : carte marina

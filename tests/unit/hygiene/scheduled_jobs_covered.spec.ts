@@ -28,9 +28,7 @@ const SCHEDULER = join(ROOT, 'start/scheduler.ts')
  * Une exemption sans raison écrite est une régression déguisée.
  */
 /**
- * Vide depuis #693 : les deux placeholders qui y figuraient (`process_media`,
- * `process_boat_maintenance_import`) ont désormais leur spec. Toute nouvelle
- * entrée doit porter son motif, et ce motif doit être vérifiable.
+ * Vide. Toute nouvelle entrée doit porter son motif, et ce motif doit être vérifiable.
  */
 const EXEMPT = new Map<string, string>()
 

@@ -2,8 +2,17 @@
 
 > Épic : [#481](https://github.com/MaloLebrin/boat-management/issues/481) — service worker, hors-ligne, Web Push et UX mobile.
 > **18 issues / 18 livrées**, en 16 PRs (une par issue) + 1 PR annexe. Ce document résume ce qui a
-> été construit, les décisions structurantes, puis donne le **plan de merge** — le repo mergeant en
-> squash, l'ordre et les rebases comptent.
+> été construit, les décisions structurantes, puis l'historique du **plan de merge** — le repo
+> merge en squash, l'ordre et les rebases ont compté.
+>
+> **Merge terminé.** La checklist locale `MERGE_PLAN.md` a été retirée (#862) : elle annonçait
+> encore #559 non mergée alors que la bottom tab bar est livrée.
+
+## Encore ouvert
+
+- [ ] Clés VAPID en production (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` optionnel). Sans elles le push reste désactivé.
+- [ ] `pnpm test:e2e` complet sur `main` (dont `mobile_field.spec.ts`).
+- [ ] Fermer l'épic [#481](https://github.com/MaloLebrin/boat-management/issues/481).
 
 ## Vue d'ensemble des livraisons
 
@@ -70,7 +79,7 @@ La file couvre désormais **9 formulaires** (tableau dans `docs/frontend/pwa.md`
 - **Tests** : la suite `integration` tourne sous **transaction globale** — jamais de `truncate()` par test ; jamais deux `node ace test` concurrents (voir `docs/dev/testing.md` et `docs/changelog/`).
 - **Tailwind** : les classes `pointer-coarse:` doivent être écrites en littéral complet (le scanner ne voit pas la concaténation) ; le viewport mobile des tests navigateur ne les active pas (pointeur émulé `fine`).
 
-## Plan de merge
+## Plan de merge (historique)
 
 Le repo merge en **squash** : après chaque merge d'une base de pile, GitHub rebase la cible de la
 PR enfant sur `main` automatiquement, mais **la branche enfant garde les commits d'origine du

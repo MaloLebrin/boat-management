@@ -45,10 +45,6 @@ export default class HomeController {
   async index({ inertia, auth, request, response, i18n }: HttpContext) {
     await auth.check()
 
-    if (!auth.isAuthenticated) {
-      return inertia.render('home', {})
-    }
-
     const user = auth.getUserOrFail()
 
     const role = user.organizationId ? await user.getEffectiveRoleInOrg(user.organizationId) : null
