@@ -1,6 +1,25 @@
+import app from '@adonisjs/core/services/app'
 import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
+import pushConfig from '#config/push'
 import type { HealthReport } from '#shared/types/health'
+
+let vapidMissingWarned = false
+
+/**
+ * Rapport de `/up`. Seule la base fait échouer la probe : des clés VAPID
+ * absentes désactivent le push, elles ne rendent pas l'app incapable de
+ * servir (#865). Un 503 recyclerait le conteneur.
+ */
+export function buildHealthReport(databaseOk: boolean, vapidEnabled: boolean): HealthReport {
+  return {
+    status: databaseOk ? 'ok' : 'error',
+    checks: {
+      database: databaseOk ? 'ok' : 'error',
+      vapid: vapidEnabled ? 'ok' : 'missing',
+    },
+  }
+}
 
 /**
  * Vérifie que l'app peut servir du trafic (issue #541).
@@ -11,14 +30,23 @@ import type { HealthReport } from '#shared/types/health'
  */
 export default class HealthService {
   async check(): Promise<HealthReport> {
+    this.warnIfVapidMissingInProduction()
+
     try {
       await db.rawQuery('select 1')
 
-      return { status: 'ok', checks: { database: 'ok' } }
+      return buildHealthReport(true, pushConfig.enabled)
     } catch (error) {
       logger.error({ err: error }, 'Healthcheck: la base de données ne répond pas')
 
-      return { status: 'error', checks: { database: 'error' } }
+      return buildHealthReport(false, pushConfig.enabled)
     }
+  }
+
+  private warnIfVapidMissingInProduction() {
+    if (!app.inProduction || pushConfig.enabled || vapidMissingWarned) return
+
+    vapidMissingWarned = true
+    logger.warn('Web Push désactivé : VAPID_PUBLIC_KEY et VAPID_PRIVATE_KEY manquent en production')
   }
 }

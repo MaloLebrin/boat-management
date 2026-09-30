@@ -878,3 +878,11 @@ Trace des webhooks Stripe déjà traités (#703). Stripe livre **au moins une fo
 - `processedAt` (timestamp)
 
 Purgée au-delà de 30 jours par le cron `daily-purge-processed-stripe-events` (02:00). Aucune clé étrangère : la ligne n'appartient à aucune organisation, elle décrit une livraison.
+
+### pwa_launch_counters
+
+Compteur de lancements de l'app installée (#865). Une ligne par organisation, incrémentée quand `/dashboard` est ouvert avec `?source=pwa` (une fois par session).
+
+- `organization_id` — FK unique vers `organizations`, `ON DELETE CASCADE` (l'unicité indexe la colonne)
+- `launches` — entier, défaut 0
+- `created_at`, `updated_at`

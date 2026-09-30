@@ -10,9 +10,9 @@
 
 ## Encore ouvert
 
-- [ ] Clés VAPID en production (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` optionnel). Sans elles le push reste désactivé.
+- [x] Clés VAPID : documentées comme obligatoires en production et signalées par `checks.vapid` sur `GET /up` (#865). Le secret reste à poser sur l'hôte (`npx web-push generate-vapid-keys`) — la probe le confirme sans faire échouer le conteneur.
 - [ ] `pnpm test:e2e` complet sur `main` (dont `mobile_field.spec.ts`).
-- [ ] Fermer l'épic [#481](https://github.com/MaloLebrin/boat-management/issues/481).
+- [ ] Fermer l'épic [#481](https://github.com/MaloLebrin/boat-management/issues/481) une fois l'e2e vert et les clés posées en production.
 
 ## Vue d'ensemble des livraisons
 

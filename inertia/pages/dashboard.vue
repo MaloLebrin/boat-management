@@ -68,7 +68,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeyDown))
        qu'il y a à faire, puis la flotte) + colonne latérale (assistant IA,
        ports…). Sous xl tout s'empile dans cet ordre. Chaque utilisateur peut
        retirer, réajouter et réordonner les widgets en place (« Personnaliser »). -->
-  <div class="w-full max-w-7xl px-4 py-6 sm:px-8 sm:py-10">
+  <div
+    class="w-full max-w-7xl px-4 py-6 sm:px-8 sm:py-10"
+    :data-launched-from-pwa="props.launchedFromPwa ? 'true' : undefined"
+  >
     <DashboardHeader>
       <template #actions>
         <DashboardEditToolbar

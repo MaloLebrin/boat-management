@@ -2,8 +2,9 @@ import env from '#start/env'
 
 /**
  * Web Push (#497). Désactivé tant que les clés VAPID ne sont pas fournies :
- * les environnements existants (test, CI, local) démarrent sans configuration
- * et le job d'envoi devient un no-op.
+ * test, CI et local démarrent sans configuration et le job d'envoi devient un
+ * no-op. En production les clés sont obligatoires (#865) : `/up` signale
+ * `checks.vapid: missing` sans faire échouer la probe.
  */
 const pushConfig = {
   enabled: Boolean(env.get('VAPID_PUBLIC_KEY') && env.get('VAPID_PRIVATE_KEY')),

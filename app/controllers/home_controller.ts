@@ -12,8 +12,10 @@ import FleetReportingService from '#services/fleet_reporting_service'
 import InvoiceService from '#services/invoice_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
+import PwaLaunchCounterService from '#services/pwa_launch_counter_service'
 import QuotaService from '#services/quota_service'
 import { toBoatTaskEquipment } from '#transformers/maintenance_transformer'
+import { PWA_LAUNCH_SESSION_KEY, PWA_SOURCE } from '#shared/constants/pwa'
 import { visibleWidgetSet } from '#shared/helpers/dashboard_layout'
 import { toAppLocale } from '#shared/helpers/locale_path'
 import type { AiSuggestion } from '#shared/types/ai'
@@ -39,13 +41,15 @@ export default class HomeController {
     private invoiceService: InvoiceService,
     private enginePartService: BoatEnginePartService,
     private reportingService: FleetReportingService,
-    private crewService: CrewService
+    private crewService: CrewService,
+    private pwaLaunchCounter: PwaLaunchCounterService
   ) {}
 
-  async index({ inertia, auth, request, response, i18n }: HttpContext) {
+  async index({ inertia, auth, request, response, session, i18n }: HttpContext) {
     await auth.check()
 
     const user = auth.getUserOrFail()
+    const launchedFromPwa = await this.recordPwaLaunch(user.organizationId, request, session)
 
     const role = user.organizationId ? await user.getEffectiveRoleInOrg(user.organizationId) : null
 
@@ -57,7 +61,7 @@ export default class HomeController {
       // KPIs flotte ni aux CTA hors périmètre : dashboard dédié « mes interventions ».
       if (role === 'mechanic') {
         const { overdueTasks, soonTasks } = await this.planningService.getPlanningForOrg(user)
-        return inertia.render('dashboard/mechanic', { overdueTasks, soonTasks })
+        return inertia.render('dashboard/mechanic', { overdueTasks, soonTasks, launchedFromPwa })
       }
     }
 
@@ -246,6 +250,25 @@ export default class HomeController {
       ),
       canAddBoat,
       boatQuota,
+      launchedFromPwa,
     })
+  }
+
+  /**
+   * `?source=pwa` est le `start_url` du manifeste. On compte un lancement par
+   * session et on expose le booléen au tableau de bord (#865).
+   */
+  private async recordPwaLaunch(
+    organizationId: number | null,
+    request: HttpContext['request'],
+    session: HttpContext['session']
+  ): Promise<boolean> {
+    const launchedFromPwa = request.qs().source === PWA_SOURCE
+    if (!launchedFromPwa || !organizationId) return launchedFromPwa
+    if (session.get(PWA_LAUNCH_SESSION_KEY) === true) return true
+
+    await this.pwaLaunchCounter.increment(organizationId)
+    session.put(PWA_LAUNCH_SESSION_KEY, true)
+    return true
   }
 }

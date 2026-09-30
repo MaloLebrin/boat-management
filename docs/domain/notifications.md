@@ -145,11 +145,12 @@ terrain (maintenance, documents, équipements de sécurité) sont poussés, la v
   l'abonnement (endpoint révoqué à l'insu du serveur, ex. PWA retirée de l'écran d'accueil) ;
   429/5xx → l'erreur remonte pour le retry du job, jamais de purge. `failure_count` trace les
   échecs consécutifs, remis à zéro au succès.
-- **Configuration** : clés VAPID (`VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`,
-  optionnelles — sans elles le push est désactivé et tous les environnements démarrent). La clé
-  publique est exposée en **shared prop Inertia** (`vapidPublicKey`) plutôt qu'en `VITE_*` : une
-  rotation ne demande pas de rebuild du front. Générer une paire :
-  `npx web-push generate-vapid-keys`.
+- **Configuration** : clés VAPID (`VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY`/`VAPID_SUBJECT`).
+  Obligatoires en production (#865, `docs/dev/hosting.md`) ; optionnelles au boot pour que
+  test, CI et local démarrent — sans elles le push est désactivé et `GET /up` renvoie
+  `checks.vapid: "missing"` sans passer la probe en 503. La clé publique est exposée en
+  **shared prop Inertia** (`vapidPublicKey`) plutôt qu'en `VITE_*` : une rotation ne demande
+  pas de rebuild du front. Générer une paire : `npx web-push generate-vapid-keys`.
 - **Routes** (`start/routes/push.ts`, auth + `pushThrottle`, réponses en redirection) :
   `POST /push/subscriptions` (upsert), `DELETE /push/subscriptions` (par endpoint, depuis le
   navigateur), `DELETE /push/subscriptions/:id` (depuis l'écran de gestion #498, scopé à

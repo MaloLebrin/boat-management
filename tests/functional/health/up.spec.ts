@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import app from '@adonisjs/core/services/app'
+import pushConfig from '#config/push'
 import HealthService from '#services/health_service'
 
 test.group('Healthcheck GET /up (functional)', (group) => {
@@ -11,7 +12,10 @@ test.group('Healthcheck GET /up (functional)', (group) => {
     const response = await client.get('/up')
 
     response.assertStatus(200)
-    assert.deepEqual(response.body(), { status: 'ok', checks: { database: 'ok' } })
+    assert.deepEqual(response.body(), {
+      status: 'ok',
+      checks: { database: 'ok', vapid: pushConfig.enabled ? 'ok' : 'missing' },
+    })
   })
 
   test('returns 503 when the database is unreachable', async ({ client, assert }) => {

@@ -25,16 +25,19 @@ l'application de démarrer. Le point de départ est toujours `.env.example`
 
 À régler spécifiquement en production :
 
-| Variable         | Valeur                        | Pourquoi                                                                                                      |
-| ---------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `NODE_ENV`       | `production`                  | Active les optimisations et désactive les routes `/dev/*`                                                     |
-| `HOST`           | `0.0.0.0`                     | Écoute sur toutes les interfaces (forcé par le compose)                                                       |
-| `APP_URL`        | `https://<domaine>`           | URLs absolues des mails, PDFs, SEO/JSON-LD                                                                    |
-| `TRUST_PROXY`    | vide (défaut) en self-host    | Proxies dont l'app croit `X-Forwarded-*` — **sans elle, la limitation de débit par IP est inopérante** (#844) |
-| `DB_HOST`        | `postgres` en compose         | Nom du service Postgres (forcé par le compose)                                                                |
-| `APP_KEY`        | secret 32 octets              | `node ace generate:key`                                                                                       |
-| `ENCRYPTION_KEY` | secret 32 octets, ≠ `APP_KEY` | Chiffrement au repos des clés BYOK (#786) : `openssl rand -base64 32` — voir `docs/dev/encryption-keys.md`    |
-| `QUEUE_DRIVER`   | `database`                    | Les workers lisent la file en base                                                                            |
+| Variable            | Valeur                        | Pourquoi                                                                                                      |
+| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`          | `production`                  | Active les optimisations et désactive les routes `/dev/*`                                                     |
+| `HOST`              | `0.0.0.0`                     | Écoute sur toutes les interfaces (forcé par le compose)                                                       |
+| `APP_URL`           | `https://<domaine>`           | URLs absolues des mails, PDFs, SEO/JSON-LD                                                                    |
+| `TRUST_PROXY`       | vide (défaut) en self-host    | Proxies dont l'app croit `X-Forwarded-*` — **sans elle, la limitation de débit par IP est inopérante** (#844) |
+| `DB_HOST`           | `postgres` en compose         | Nom du service Postgres (forcé par le compose)                                                                |
+| `APP_KEY`           | secret 32 octets              | `node ace generate:key`                                                                                       |
+| `ENCRYPTION_KEY`    | secret 32 octets, ≠ `APP_KEY` | Chiffrement au repos des clés BYOK (#786) : `openssl rand -base64 32` — voir `docs/dev/encryption-keys.md`    |
+| `QUEUE_DRIVER`      | `database`                    | Les workers lisent la file en base                                                                            |
+| `VAPID_PUBLIC_KEY`  | clé publique                  | Web Push — **obligatoire en production** (#865)                                                               |
+| `VAPID_PRIVATE_KEY` | secret                        | Paire de `VAPID_PUBLIC_KEY`. Sans les deux, le push est désactivé                                             |
+| `VAPID_SUBJECT`     | `mailto:…` (optionnel)        | Contact VAPID. Défaut : `mailto:` + `MAIL_FROM_ADDRESS`                                                       |
 
 ### Pool Postgres et timeouts de session (#854)
 
@@ -228,11 +231,18 @@ L'image GHCR fonctionne telle quelle. À configurer :
 répond :
 
 ```json
-{ "status": "ok", "checks": { "database": "ok" } }
+{ "status": "ok", "checks": { "database": "ok", "vapid": "ok" } }
 ```
 
-200 si la base répond, **503** sinon — le corps garde alors la même forme avec
-`"error"`. La route est hors authentification, hors throttle, et exclue du
+200 si la base répond, **503** sinon — `checks.database` passe à `"error"`.
+`checks.vapid` vaut `"ok"` ou `"missing"` (#865). Une valeur `"missing"` ne
+change pas le statut : l'app sert le trafic, le Web Push est désactivé, et un
+503 recyclerait le conteneur. En production le premier `/up` dans cet état
+écrit un warning. Les clés sont **obligatoires en production** (tableau § 2) ;
+elles restent absentes du schéma de boot pour que test, CI et local démarrent.
+Générer une paire : `npx web-push generate-vapid-keys`.
+
+La route est hors authentification, hors throttle, et exclue du
 service worker (`inertia/sw.ts`), donc utilisable directement comme probe
 Docker/PaaS :
 

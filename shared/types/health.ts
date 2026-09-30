@@ -7,12 +7,16 @@
  */
 export type HealthStatus = 'ok' | 'error'
 
-/** Détail par dépendance vérifiée — pour l'instant la seule base de données. */
+/** Clés VAPID présentes. `missing` ne fait pas échouer la probe (#865). */
+export type VapidCheckStatus = 'ok' | 'missing'
+
+/** Détail par dépendance vérifiée. */
 export interface HealthChecks {
   database: HealthStatus
+  vapid: VapidCheckStatus
 }
 
-/** Corps de la réponse `/up`. `status` vaut `error` dès qu'un check échoue. */
+/** Corps de la réponse `/up`. `status` suit la base ; `checks.vapid` est informatif. */
 export interface HealthReport {
   status: HealthStatus
   checks: HealthChecks
