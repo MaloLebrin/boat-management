@@ -2,6 +2,15 @@
 
 Source: `database/schema.ts` (généré automatiquement via migrations).
 
+**Index des clés étrangères (#857).** PostgreSQL ne crée pas d'index sur la
+colonne référençante d'une FK. Toute FK du schéma `public` a un index btree
+(simple ou composite qui la couvre) — règle dans `docs/dev/contributing.md`,
+verrouillée par `tests/integration/db/fk_indexes.spec.ts`. Les tables sans
+fiche détaillée ci-dessous (`remember_me_tokens`, `organization_invitations`,
+`rental_contracts`, `audit_logs`, `invoice_reminders`, `push_subscriptions`,
+`crew_members`, `boat_safety_equipment`, `boat_engine_parts`) suivent la même
+règle ; leurs index FK sont nommés `{table}_{column}_idx`.
+
 ## Entités
 
 ### organizations
@@ -215,7 +224,7 @@ Référentiel global des voileries (#578), sans `organizationId` : alimenté par
 Équipements génériques d'un bateau (électronique, électricité, mouillage, pont, énergie, confort,
 plomberie).
 
-- `id`, `boatId` (FK `boats`, `onDelete cascade`)
+- `id`, `boatId` (FK `boats`, `onDelete cascade`, indexé)
 - `category` — `GENERIC_EQUIPMENT_CATEGORIES` (#577 : `navigation`, `electrical`, `anchoring`,
   `deck`, `energy`, `comfort`, `plumbing` ; #893 : `other`, catégorie fourre-tout de la tuile
   « Autre »). Colonne `string` sans contrainte CHECK : la liste est tenue par le validator
@@ -267,20 +276,20 @@ plomberie).
 
 ### boat_maintenance_events (historique)
 
-- `id`, `boatId`
+- `id`, `boatId` (indexé)
 - `organizationId` (NOT NULL, FK, indexé) — dénormalisé depuis le bateau (#855)
 - `subject`: `boat | engine | sail | rig`
 - `performedAt`
 - `title`, `notes`
 - cibles optionnelles:
-  - `boatEngineId`, `engineCaption`
-  - `boatSailId`, `sailCaption`
-  - `boatRigId`
+  - `boatEngineId` (indexé), `engineCaption`
+  - `boatSailId` (indexé), `sailCaption`
+  - `boatRigId` (indexé)
 - `dueAt` (présent au schéma; usage fonctionnel à confirmer par l’historique de migrations)
 
 ### boat_maintenance_parts
 
-- `id`, `maintenanceEventId`
+- `id`, `maintenanceEventId` (indexé)
 - `name`, `quantity`, `notes`
 
 ### boat_maintenance_tasks (planifié)
@@ -290,7 +299,7 @@ plomberie).
 - `subject`: `boat | engine | sail | rig`
 - `status`: `open | done`
 - cibles optionnelles:
-  - `boatEngineId`, `boatSailId`, `boatRigId`, `boatSafetyEquipmentId`, `boatGenericEquipmentId`
+  - `boatEngineId` (indexé), `boatSailId` (indexé), `boatRigId` (indexé), `boatSafetyEquipmentId`, `boatGenericEquipmentId`
 - `boatIncidentId` (FK `boat_incidents` nullable, SET NULL, indexé) — incident à l'origine de la tâche (#815) ; supprimer l'incident conserve la tâche
 - contenu: `title`, `notes`
 - planification:
@@ -313,7 +322,7 @@ plomberie).
 
 ### boat_maintenance_sheets (fiches guidées)
 
-- `id`, `boatId`
+- `id`, `boatId` (indexé)
 - `type` (contrainte CHECK) : `entretien | montage | hivernage | dehivernage | atelier | moteur_saison | carenage | catamaran | semi_rigide` — les quatre derniers ajoutés par #583
 - `status`: `in_progress | completed`
 - `title`, `notes`
@@ -321,7 +330,7 @@ plomberie).
 
 ### boat_maintenance_sheet_items
 
-- `id`, `boatMaintenanceSheetId`
+- `id`, `boatMaintenanceSheetId` (indexé)
 - `label` — texte copié du corpus dans la locale de l'utilisateur à l'instanciation (#583)
 - `templateKey` (**nullable**, varchar 64) — clé stable du corpus (`hivernage.drain_engine`…, cf. `shared/constants/maintenance/maintenance_sheet_content.ts`) ; `null` pour les fiches antérieures à #583 (pas de backfill)
 - `position` (ordre d'affichage)
@@ -329,21 +338,21 @@ plomberie).
 
 ### boat_equipment_actions
 
-- `id`, `boatId`, `organizationId`
+- `id`, `boatId`, `organizationId` (indexé)
 - `actionType`: `to_buy | to_replace | to_repair`
 - `status`: `pending | ordered | done | cancelled`
 - `label` (requis)
 - `notes` (nullable)
 - `estimatedCost`, `actualCost` (decimal 10,2, nullable)
 - référence polymorphe: `equipmentType` (`generic | safety | engine | sail | rig`), `equipmentId`
-- `inspectionId` (FK `boat_inspections` nullable, SET NULL) — renseigné quand l'action a été levée depuis un état des lieux (#311) ; supprimer l'inspection ne détruit pas l'action
+- `inspectionId` (FK `boat_inspections` nullable, SET NULL, indexé) — renseigné quand l'action a été levée depuis un état des lieux (#311) ; supprimer l'inspection ne détruit pas l'action
 - `boatIncidentId` (FK `boat_incidents` nullable, SET NULL, indexé) — renseigné quand l'action a été levée depuis un incident (#815) ; supprimer l'incident ne détruit pas l'action
-- `createdBy` (FK users)
+- `createdBy` (FK users, indexé)
 - `resolvedAt` (timestamp nullable, auto-positionné au passage à `done`)
 
 ### boat_incidents
 
-- `id`, `boatId`, `organizationId`
+- `id`, `boatId` (indexé), `organizationId`
 - `occurredAt` (timestamp, indexé), `type` (CHECK : `grounding | flooding | rigging_failure | engine_failure | collision | fire | theft_vandalism | other`), `location` (nullable), `description`
 - `insuranceClaimed` (bool), `insuranceClaimRef` (nullable)
 - `status` (CHECK : `open | in_progress | closed`, indexé), `closedAt` (nullable) ; index composite `(organization_id, status)` (`boat_incidents_org_status_idx`, #832) pour la liste « À traiter » du tableau de bord
@@ -356,12 +365,12 @@ plomberie).
 
 Papiers d'un bateau (assurance, francisation, permis…) — onglet « Documents » de la fiche bateau, ligne « À traiter » du tableau de bord quand l'échéance approche.
 
-- `id`, `boatId` (CASCADE), `organizationId` (CASCADE)
+- `id`, `boatId` (CASCADE, indexé), `organizationId` (CASCADE)
 - `type` (enum : `francisation | insurance | navigation_permit | radio_license | safety_inspection | tonnage | ce_certificate | crew_role | other`), `customTypeLabel` (nullable, pour `other`)
 - `referenceNumber`, `issuer`, `notes` (nullables)
 - `issuedAt` (date, nullable), `expiresAt` (date, nullable, indexée) — statut `valid | expiring_soon | expired` dérivé par `shared/helpers/boat_document.ts` (`documentStatusFor`, fenêtre `BOAT_DOCUMENT_EXPIRY_WARNING_DAYS` = 30 j)
 - `cost` (decimal 10,2, nullable) — poste « documents » du budget
-- `mediaId` (FK `media` nullable, SET NULL) — le PDF joint
+- `mediaId` (FK `media` nullable, SET NULL, indexé) — le PDF joint
 - index composite `(organization_id, expires_at)` (`boat_documents_org_expires_idx`, #832) pour les documents à échéance du tableau de bord
 - `createdAt`, `updatedAt`
 
@@ -370,10 +379,11 @@ Papiers d'un bateau (assurance, francisation, permis…) — onglet « Documents
 Fichiers Cloudinary polymorphes (`entity_type`, `entity_id`).
 
 - `organizationId` (nullable, FK, indexé) — dénormalisé depuis l'entité pointée (#855). Reste nul si l'entité n'a pas d'organisation (avatar d'un compte sans org).
+- `uploadedById` (nullable, FK `users` SET NULL, indexé)
 
 ### boat_port_stays
 
-- `id`, `boatId`
+- `id`, `boatId` (indexé)
 - `portName`
 - `startedAt` (date), `endedAt` (date, nullable)
 - `cost` (decimal 10,2, nullable)
@@ -399,7 +409,7 @@ source de vérité de l'amarrage — détail dans `docs/domain/ports-and-marina.
 
 ### boat_budget_entries
 
-- `id`, `boatId`
+- `id`, `boatId` (indexé)
 - `amount` (decimal 10,2)
 - `date` (date)
 - `label`
@@ -464,7 +474,7 @@ Conversations du chat IA public de diagnostic de panne (#602), le tunnel d'acqui
 
 - `id`
 - `token` (12 hex, unique — identifiant opaque exposé dans les routes, pattern `simulator_shares`)
-- `userId` (nullable, FK `users` SET NULL)
+- `userId` (nullable, FK `users` SET NULL, indexé)
 - `organizationId` (nullable, FK `organizations` SET NULL, indexé)
 - `locale`
 - `status` : `active | completed` (une conversation `completed` est verrouillée)
@@ -485,10 +495,10 @@ La table sert **deux entrées** qui se distinguent par `boat_engine_id` :
 
 - `id`
 - `token` (12 hex, unique — identifiant opaque exposé dans les routes)
-- `userId` (nullable, FK `users` SET NULL)
+- `userId` (nullable, FK `users` SET NULL, indexé)
 - `organizationId` (nullable, FK `organizations` SET NULL, indexé)
 - `boatEngineId` (nullable, FK `boat_engines` SET NULL, indexé)
-- `identifiedEngineModelId` (nullable, FK `engine_models` SET NULL) — modèle du catalogue identifié, au court-circuit (moteur déjà résolu, #573) ou au fil de la conversation (numéro de série interprété)
+- `identifiedEngineModelId` (nullable, FK `engine_models` SET NULL, indexé) — modèle du catalogue identifié, au court-circuit (moteur déjà résolu, #573) ou au fil de la conversation (numéro de série interprété)
 - `locale`
 - `status` : `active | completed` (une conversation `completed` est verrouillée)
 - `phase` : `engine | part` — l'aiguillage du prompt système à chaque tour (identification du modèle, puis choix de la pièce)
@@ -517,7 +527,7 @@ Liste de réparation du parcours « identification des pièces détachées » (#
 Titres de navigation d'un équipier (`crew_members`). Le vocabulaire de `type` est **partagé** avec les permis clients — source unique `shared/types/navigation_title.ts` (#585).
 
 - `id`
-- `crewMemberId` (FK `crew_members` cascade)
+- `crewMemberId` (FK `crew_members` cascade, indexé)
 - `type` — `coastal_permit` | `offshore_permit` | `inland_permit` | `captain_200` | `vhf` | `crr` | `stcw_basic` | `stcw_proficiency` | `medical_certificate` | `first_aid` | `other` (contrainte CHECK)
 - `referenceNumber` (nullable)
 - `expiresAt` (nullable, indexé) — le formulaire propose une date d'après `shared/helpers/navigation_title.ts` (médical 2 ans, STCW 5 ans) sans jamais écraser une saisie
@@ -554,7 +564,7 @@ Fiches CRM (module `crm_invoicing`).
 
 États des lieux d'une réservation (check-out au départ, check-in au retour). Voir `docs/domain/inspections.md`.
 
-- `id`, `reservationId` (FK `boat_reservations` cascade), `organizationId` (FK cascade)
+- `id`, `reservationId` (FK `boat_reservations` cascade), `organizationId` (FK cascade, indexé)
 - `kind` : `checkout | checkin` (contrainte CHECK) — unique `(reservation_id, kind)` : un seul état des lieux de chaque type par réservation
 - `performedAt` (timestamp)
 - `fuelLevel` (int 0–100, nullable), `engineHours` (decimal 6,2, nullable)
@@ -591,7 +601,7 @@ Constats structurés de la checklist d'état des lieux (#584). Le contenu des po
 
 ### boat_fuel_logs
 
-- `id`, `boatId`, `organizationId`, `boatEngineId` (nullable, SET NULL)
+- `id`, `boatId` (indexé), `organizationId` (indexé), `boatEngineId` (nullable, SET NULL, indexé)
 - `fueledAt` (indexé), `quantityLiters`, `pricePerLiter`, `totalCost`, `engineHoursAtFueling`
 - `fuelType` (**nullable**, contrainte CHECK) — `diesel` | `essence` | `electric` | `other`, même vocabulaire que `boat_engines.fuel` (#585). Pré-rempli d'après le moteur choisi, modifiable — indispensable en bi-motorisation (in-bord diesel + hors-bord essence). Exporté en CSV (colonne `carburant`, vide pour l'historique)
 - `supplier`, `notes`
@@ -604,7 +614,7 @@ Une ligne = une **sortie** (trip) du journal de bord — doc de domaine : `docs/
 - `id`, `boatId` (CASCADE), `organizationId` (CASCADE)
 - `status` — `in_progress` | `completed` ; **index partiel `one_in_progress_per_boat`** (#182) : une seule sortie en cours par bateau, garanti côté base ; index composite `(organization_id, status)` (`navigation_logs_org_status_idx`, #832) pour « En mer maintenant » et les KPI 30 j du tableau de bord
 - `departedAt` (indexé), `arrivedAt` (nullable)
-- `departurePortId` / `arrivalPortId` (FK → ports, SET NULL) + `departurePortName` / `arrivalPortName` (nom libre)
+- `departurePortId` / `arrivalPortId` (FK → ports, SET NULL, indexés) + `departurePortName` / `arrivalPortName` (nom libre)
 - `distanceNm`, `engineHoursStart`, `engineHoursEnd`, `fuelConsumedLiters`
 - `windForceBeaufort` (0–12), `seaState` (`calm`…`very_rough`), `crewCount`, `notes`
 - `createdAt`, `updatedAt`
@@ -620,7 +630,7 @@ Pivot équipage d'une sortie (#101, IDOR scellé en #157).
 
 Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap → COG/SOG).
 
-- `id`, `navigationLogId` (CASCADE), `organizationId` (CASCADE)
+- `id`, `navigationLogId` (CASCADE), `organizationId` (CASCADE, indexé)
 - `recordedAt` (index composite `(navigationLogId, recordedAt)`)
 - `latitude` / `longitude` (nullables — point sans GPS possible, toujours fournis ensemble), `gpsAccuracyM`
 - `cogDeg` (0–359, **null si vitesse quasi nulle** — mouillage), `sogKn`
@@ -658,7 +668,7 @@ une garde qu'ils n'ont jamais eu l'occasion de franchir.
 Une ligne = l'**import CSV en attente de confirmation** d'un utilisateur (#774)
 — doc de domaine : `docs/domain/csv-import-export.md`.
 
-- `id`, `userId` (CASCADE, **unique**), `boatId` (CASCADE)
+- `id`, `userId` (CASCADE, **unique**), `boatId` (CASCADE, indexé)
 - `type` — varchar(32), le type d'import : `maintenance` ou `expenses`
   (`CSV_IMPORT_TYPES`)
 - `rows` (jsonb) — les lignes validées, `MaintenanceImportRow[]` ou
@@ -705,7 +715,7 @@ Flux iCal publiés par jeton (#880) — doc de domaine :
 - `token` (unique, 43 caractères base64url) : seul secret de l'URL
   `/calendar/<token>.ics`. Supprimer la ligne révoque le flux
 - `locale` (langue des libellés du flux), `includeClientName`, `includeMaintenance`
-- `createdByUserId` (SET NULL), `createdAt`, `updatedAt`
+- `createdByUserId` (SET NULL, indexé), `createdAt`, `updatedAt`
 - index `(organization_id, boat_id)`
 
 ### external_calendars
@@ -718,7 +728,7 @@ Flux iCal d'une plateforme importé sur un bateau (#880).
   `unsafe_url`, `timeout`, `too_large`, `http_error`, `network`, `invalid_ics`)
 - `eventCount`, `conflictCount` (créneaux qui chevauchent une réservation
   FleetAi non annulée)
-- `createdByUserId` (SET NULL), `createdAt`, `updatedAt`
+- `createdByUserId` (SET NULL, indexé), `createdAt`, `updatedAt`
 
 ### external_calendar_events
 

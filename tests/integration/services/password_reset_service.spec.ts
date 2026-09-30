@@ -2,11 +2,17 @@ import { test } from '@japa/runner'
 import { createHash } from 'node:crypto'
 import { DateTime } from 'luxon'
 import PasswordResetService from '#services/password_reset_service'
+import AuditLogService from '#services/audit_log_service'
 import PasswordResetToken from '#models/password_reset_token'
+import AuditLog from '#models/audit_log'
 import { UserFactory } from '#database/factories/user_factory'
 
 function sha256(value: string) {
   return createHash('sha256').update(value).digest('hex')
+}
+
+function service() {
+  return new PasswordResetService(new AuditLogService())
 }
 
 test.group('PasswordResetService (unit)', () => {
@@ -15,7 +21,7 @@ test.group('PasswordResetService (unit)', () => {
   test('createToken returns a token for an existing user', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
 
-    const svc = new PasswordResetService()
+    const svc = service()
     const token = await svc.createToken(user.email)
 
     assert.isString(token)
@@ -25,10 +31,18 @@ test.group('PasswordResetService (unit)', () => {
     assert.isNotNull(record)
     assert.equal(record!.token, sha256(token!))
     assert.isTrue(record!.expiresAt > DateTime.now())
+
+    const audit = await AuditLog.query()
+      .where('organizationId', user.organizationId!)
+      .where('action', 'auth.reset_requested')
+      .where('entityType', 'user')
+      .where('entityId', user.id)
+      .first()
+    assert.isNotNull(audit)
   })
 
   test('createToken returns null for an unknown email', async ({ assert }) => {
-    const svc = new PasswordResetService()
+    const svc = service()
     const token = await svc.createToken('nobody@example.com')
     assert.isNull(token)
   })
@@ -36,7 +50,7 @@ test.group('PasswordResetService (unit)', () => {
   test('createToken replaces a previous token for the same email', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
 
-    const svc = new PasswordResetService()
+    const svc = service()
     const first = await svc.createToken(user.email)
     const second = await svc.createToken(user.email)
 
@@ -51,7 +65,7 @@ test.group('PasswordResetService (unit)', () => {
   test('verifyToken returns the record for a valid token', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
 
-    const svc = new PasswordResetService()
+    const svc = service()
     const token = await svc.createToken(user.email)
     const record = await svc.verifyToken(token!)
 
@@ -60,7 +74,7 @@ test.group('PasswordResetService (unit)', () => {
   })
 
   test('verifyToken returns null for an invalid token', async ({ assert }) => {
-    const svc = new PasswordResetService()
+    const svc = service()
     const record = await svc.verifyToken('a'.repeat(128))
     assert.isNull(record)
   })
@@ -75,7 +89,7 @@ test.group('PasswordResetService (unit)', () => {
       expiresAt: DateTime.now().minus({ hours: 2 }),
     })
 
-    const svc = new PasswordResetService()
+    const svc = service()
     const record = await svc.verifyToken(rawToken)
     assert.isNull(record)
   })
@@ -85,7 +99,7 @@ test.group('PasswordResetService (unit)', () => {
   test('invalidateTokensForEmail removes all tokens for an email', async ({ assert }) => {
     const user = await UserFactory.with('organization').create()
 
-    const svc = new PasswordResetService()
+    const svc = service()
     await svc.createToken(user.email)
     await svc.createToken(user.email) // second call replaces, but let's also add manually
     await PasswordResetToken.create({
@@ -106,16 +120,24 @@ test.group('PasswordResetService (unit)', () => {
     const user = await UserFactory.with('organization').create()
     const oldHash = user.password
 
-    const svc = new PasswordResetService()
+    const svc = service()
     const result = await svc.updatePassword(user.email, 'NewPassword2!')
 
     assert.isTrue(result)
     await user.refresh()
     assert.notEqual(user.password, oldHash)
+
+    const audit = await AuditLog.query()
+      .where('organizationId', user.organizationId!)
+      .where('action', 'auth.reset_completed')
+      .where('entityType', 'user')
+      .where('entityId', user.id)
+      .first()
+    assert.isNotNull(audit)
   })
 
   test('updatePassword returns false for an unknown email', async ({ assert }) => {
-    const svc = new PasswordResetService()
+    const svc = service()
     const result = await svc.updatePassword('ghost@example.com', 'NewPassword2!')
     assert.isFalse(result)
   })

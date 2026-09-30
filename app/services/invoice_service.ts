@@ -33,6 +33,7 @@ import type {
   InvoiceLineInput,
   InvoiceLink,
 } from '#shared/types/invoice'
+import type { AuditAction } from '#shared/types/audit_log'
 import type { ClientOption } from '#shared/types/client'
 import type { DashboardInvoicingSummary } from '#shared/types/dashboard'
 import { toInvoiceRow, type InvoiceLinks } from '#transformers/invoice_transformer'
@@ -753,6 +754,30 @@ export default class InvoiceService {
         invoice.status = 'overdue'
         return invoice
       })
+  }
+
+  /**
+   * Trace une action facture dans le journal d'audit (#856). `actorUserId`
+   * peut être absent (job, synchro) — la ligne reste avec `userId` nul.
+   */
+  async #logInvoiceAction(
+    invoice: Invoice,
+    action: Extract<AuditAction, `invoice.${string}`>,
+    actorUserId?: number | null,
+    metadata?: Record<string, unknown>
+  ) {
+    await this.auditLogService.log({
+      organizationId: invoice.organizationId,
+      userId: actorUserId ?? null,
+      action,
+      entityType: 'invoice',
+      entityId: invoice.id,
+      metadata: {
+        number: invoice.number,
+        kind: invoice.kind,
+        ...metadata,
+      },
+    })
   }
 
   /**

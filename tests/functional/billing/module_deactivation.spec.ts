@@ -5,6 +5,7 @@ import emitter from '@adonisjs/core/services/emitter'
 import StripeService from '#services/stripe_service'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
+import AuditLogService from '#services/audit_log_service'
 import EmailQueueService from '#services/email_queue_service'
 import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import OnOrganizationModuleDeactivated from '#listeners/on_organization_module_deactivated'
@@ -27,7 +28,11 @@ function fakeSub(customerId: string, items: ReturnType<typeof item>[]) {
 }
 
 function makeService() {
-  return new SubscriptionService(new StripeService(), new OrganizationModuleService())
+  return new SubscriptionService(
+    new StripeService(),
+    new OrganizationModuleService(),
+    new AuditLogService()
+  )
 }
 
 test.group('Module deactivation — event dispatch (functional)', (group) => {
