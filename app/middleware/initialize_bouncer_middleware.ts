@@ -6,7 +6,7 @@ import type { NextFn } from '@adonisjs/core/types/http'
 
 /**
  * Creates a Bouncer instance per request.
- * We currently rely on abilities only (no generated policies yet).
+ * Authorization lives in the generated policies. Abilities stay an empty module.
  */
 export default class InitializeBouncerMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {

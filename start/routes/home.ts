@@ -1,4 +1,5 @@
 import { middleware } from '#start/kernel'
+import app from '@adonisjs/core/services/app'
 import router from '@adonisjs/core/services/router'
 import { marketingPath, SITE_URL, type MarketingPage } from '#shared/helpers/locale_path'
 
@@ -17,16 +18,20 @@ router
   .as('dashboard.layout.destroy')
   .use(middleware.auth())
 
-router
-  .on('/design-system')
-  .renderInertia('design_system', {
-    meta: {
-      title: 'Design System – FleetAi',
-      description:
-        'Foundations, components and patterns of the FleetAi design system. Built on Tailwind CSS v4, Vue 3 and Instrument Serif.',
-    },
-  })
-  .as('design_system')
+// Banc d'essai interne. En production la route n'est pas enregistrée (#862) :
+// l'inventaire des composants et des tokens ne doit pas être public.
+if (!app.inProduction) {
+  router
+    .on('/design-system')
+    .renderInertia('design_system', {
+      meta: {
+        title: 'Design System – FleetAi',
+        description:
+          'Foundations, components and patterns of the FleetAi design system. Built on Tailwind CSS v4, Vue 3 and Instrument Serif.',
+      },
+    })
+    .as('design_system')
+}
 
 /**
  * Pages marketing localisées (en/fr) : chaque entrée génère une URL par locale,
@@ -56,8 +61,8 @@ const LOCALIZED_PAGES = [
 
 /**
  * Pages servies sur une URL unique (pas d'alternate hreflang).
- * `/design-system` est volontairement exclu : page interne accessible par URL
- * directe uniquement, jamais exposée au SEO ni à la nav publique.
+ * `/design-system` est volontairement exclu : banc d'essai non enregistré en
+ * production (#862), jamais exposé au SEO ni à la nav publique.
  */
 const STANDALONE_PAGES: readonly { loc: string; priority: string; changefreq: string }[] = []
 

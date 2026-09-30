@@ -48,4 +48,4 @@ Le filet qui attrape une route nouvelle oubliant ce filtre est `tests/functional
 - **Controllers fins**: orchestrent auth/acl/validation, délèguent la logique métier aux services.
 - **Services**: contiennent la logique métier réutilisable, testable unitairement.
 - **Validation**: VineJS dans `app/validators/**`.
-- **ACL**: Bouncer abilities dans `app/abilities/main.ts` + middleware `initialize_bouncer_middleware`.
+- **ACL**: policies Bouncer dans `app/policies/**` + middleware `initialize_bouncer_middleware`. `app/abilities/main.ts` ne déclare aucune ability.

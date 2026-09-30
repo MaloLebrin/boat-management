@@ -35,13 +35,6 @@ const TESTS_DIR = join(ROOT, 'tests')
  */
 const EXEMPT = new Map<string, string>([
   [
-    'home',
-    'branche morte : `HomeController#index` rend `home` quand `auth.isAuthenticated` est faux, ' +
-      'mais sa seule route est `/dashboard`, derrière `middleware.auth()` — la condition ne peut ' +
-      "jamais être vraie. L'accueil public est servi par `marketing/home`. À supprimer côté " +
-      'production, hors du périmètre de #689 qui ne touche pas au comportement.',
-  ],
-  [
     'errors/not_found',
     'inatteignable en test : les `statusPages` du handler ne sont montées que si ' +
       '`app.inProduction`. Vérifié — un GET sur une route inconnue rend du HTML nu, sans ' +

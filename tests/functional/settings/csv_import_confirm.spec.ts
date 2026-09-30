@@ -20,8 +20,8 @@ import {
  *
  * `POST /settings/import/confirm` est le **seul** chemin qui écrit réellement
  * en base, et il n'avait aucun test : la couverture existante s'arrêtait à
- * `/preview`. Le job `ProcessBoatMaintenanceImport` ne fait rien — l'import est
- * intégralement synchrone, dans la requête.
+ * `/preview`. L'import est intégralement synchrone, dans la requête
+ * (le stub `ProcessBoatMaintenanceImport` a été retiré, #862 / #934).
  *
  * ⚠️ Depuis #715, l'import exige le plan Entreprise **et** la capability
  * `import.run` (admin seul) : tous les cas nominaux passent donc par

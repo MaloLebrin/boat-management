@@ -10,62 +10,6 @@ import type {
 let storedLayout: StoredDashboardLayout | null = null
 
 test.group('HomeController (unit)', () => {
-  test('renders home when unauthenticated', async ({ assert }) => {
-    const controller = new HomeController(
-      {
-        getForUser: async () => {
-          throw new Error('should not be called')
-        },
-      } as any,
-      {
-        getLatestFleetAnalysis: async (_userId: number, _orgId: number, _locale: string) => null,
-      } as any,
-      {
-        listNamesForOrg: async () => [],
-      } as any,
-      {
-        getPlanningForOrg: async () => {
-          throw new Error('should not be called')
-        },
-      } as any,
-      {
-        getBoatUsage: async () => ({ used: 0, limit: 2 }),
-      } as any,
-      {} as any,
-      {} as any,
-      {} as any,
-      {} as any,
-      {} as any,
-      {
-        availabilityFor: async () => {
-          throw new Error('should not be called')
-        },
-      } as any,
-      {} as any,
-      {} as any,
-      {} as any,
-      {} as any
-    )
-
-    const rendered: Array<{ component: string; props: any }> = []
-
-    await controller.index({
-      inertia: {
-        render: (component: string, props: any) => {
-          rendered.push({ component, props })
-          return { component, props }
-        },
-      },
-      auth: {
-        isAuthenticated: false,
-        check: async () => {},
-      },
-      i18n: { locale: 'en' },
-    } as any)
-
-    assert.equal(rendered[0]!.component, 'home')
-  })
-
   test('renders dashboard when authenticated', async ({ assert }) => {
     const controller = new HomeController(
       {

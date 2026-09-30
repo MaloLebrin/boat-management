@@ -30,10 +30,10 @@ Référence: `start/kernel.ts` (middleware nommés) et `start/routes/auth.ts`.
 
 ## ACL (Bouncer)
 
-Référence: `app/abilities/main.ts`.
+Référence: `app/policies/` et `app/middleware/initialize_bouncer_middleware.ts`.
 
-- Abilities déclarées: `boatView`, `boatCreate`, `boatUpdate`, `boatDelete`
-- Règle principale: **même organisation** (user.organizationId == boat.organizationId)
+- L'autorisation passe par les policies (même organisation + capabilities).
+- `app/abilities/main.ts` ne déclare aucune ability.
 
 ## Inertia
 

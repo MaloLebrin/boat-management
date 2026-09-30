@@ -23,6 +23,8 @@ public/workbox-*.js.map
 # Build tools specific
 npm-debug.log
 yarn-error.log
+# Sortie de `tsc -b` : change à chaque typecheck
+*.tsbuildinfo
 
 # Editors specific
 .fleet
