@@ -1,5 +1,6 @@
 import EmailVerificationToken from '#models/email_verification_token'
 import User from '#models/user'
+import AuditLogService from '#services/audit_log_service'
 import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS } from '#shared/constants/email_verification'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
@@ -18,6 +19,8 @@ function sha256(value: string): string {
  */
 @inject()
 export default class EmailVerificationService {
+  constructor(private auditLogService: AuditLogService) {}
+
   /**
    * Émet un jeton pour cette adresse et rend sa valeur **en clair** — la
    * seule fois où elle existe. Rend `null` si l'adresse est déjà vérifiée ou
@@ -75,9 +78,21 @@ export default class EmailVerificationService {
     const user = await User.findBy('email', email.toLowerCase())
     if (!user) return false
 
-    if (user.emailVerifiedAt === null) {
+    const wasUnverified = user.emailVerifiedAt === null
+    if (wasUnverified) {
       user.emailVerifiedAt = DateTime.now()
       await user.save()
+
+      if (user.organizationId) {
+        await this.auditLogService.log({
+          organizationId: user.organizationId,
+          userId: user.id,
+          action: 'auth.email_verified',
+          entityType: 'user',
+          entityId: user.id,
+          metadata: { email: user.email },
+        })
+      }
     }
 
     return true

@@ -1,6 +1,7 @@
 import { stampAuthSession } from '#utils/auth_session'
 import AuditLogService from '#services/audit_log_service'
 import DemoService from '#services/demo_service'
+import User from '#models/user'
 import UserService from '#services/user_service'
 import { loginValidator } from '#validators/user'
 import { loginAccountKey, loginAccountLimiter } from '#start/limiter'
@@ -33,6 +34,11 @@ export default class SessionController {
     )
 
     if (attempt[0] !== null) {
+      // Échec de connexion (#856) : on journalise uniquement si l'e-mail
+      // normalisé correspond à un compte rattaché à une organisation. `userId`
+      // reste null — la ligne ne doit pas révéler l'existence du compte via
+      // l'UI (pas d'auteur), et on n'écrit jamais le mot de passe.
+      await this.#logLoginFailed(email)
       // Message volontairement identique quelle que soit l'origine du blocage
       // — compteur par IP ou par compte. Le distinguer ferait du refus un
       // signal sur l'activité visant ce compte.
@@ -59,6 +65,23 @@ export default class SessionController {
     }
 
     response.redirect().toRoute('dashboard')
+  }
+
+  async #logLoginFailed(email: string): Promise<void> {
+    const normalized = email.trim().toLowerCase()
+    const existing = await User.query()
+      .where('email', normalized)
+      .whereNotNull('organizationId')
+      .select(['id', 'organizationId', 'email'])
+      .first()
+    if (!existing?.organizationId) return
+
+    await this.auditLogService.log({
+      organizationId: existing.organizationId,
+      userId: null,
+      action: 'auth.login_failed',
+      metadata: { email: existing.email },
+    })
   }
 
   async destroy({ auth, response, session }: HttpContext) {

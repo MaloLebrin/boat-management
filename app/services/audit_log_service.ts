@@ -7,10 +7,12 @@ import type {
   AuditLogFilters,
   AuditLogPage,
 } from '#shared/types/audit_log'
+import { AUDIT_ACTIONS_BY_FAMILY } from '#shared/types/audit_log'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
 const PER_PAGE = 25
+const EXPORT_CHUNK = 500
 
 @inject()
 export default class AuditLogService {
@@ -33,15 +35,9 @@ export default class AuditLogService {
   }
 
   async list(organizationId: number, filters: AuditLogFilters): Promise<AuditLogPage> {
-    const query = AuditLog.query()
-      .where('organizationId', organizationId)
+    const query = this.#filteredQuery(organizationId, filters)
       .preload('user')
       .orderBy('createdAt', 'desc')
-
-    if (filters.userId) query.where('userId', filters.userId)
-    if (filters.action) query.where('action', filters.action)
-    if (filters.from) query.where('createdAt', '>=', filters.from)
-    if (filters.to) query.where('createdAt', '<=', filters.to)
 
     const page = filters.page ?? 1
     const paginated = await query.paginate(page, PER_PAGE)
@@ -54,6 +50,30 @@ export default class AuditLogService {
         currentPage: paginated.currentPage,
         lastPage: paginated.lastPage,
       },
+    }
+  }
+
+  /**
+   * Export CSV du journal (#856) — lecture par paquets pour ne pas charger
+   * toute la rétention illimitée d'une organisation Entreprise d'un coup.
+   */
+  async *iterateForExport(
+    organizationId: number,
+    filters: Omit<AuditLogFilters, 'page'>
+  ): AsyncGenerator<AuditLogEntry> {
+    let page = 1
+    for (;;) {
+      const query = this.#filteredQuery(organizationId, filters)
+        .preload('user')
+        .orderBy('createdAt', 'desc')
+      const paginated = await query.paginate(page, EXPORT_CHUNK)
+      const rows = paginated.all()
+      if (rows.length === 0) return
+      for (const log of rows) {
+        yield this.toEntry(log)
+      }
+      if (page >= paginated.lastPage) return
+      page += 1
     }
   }
 
@@ -79,6 +99,26 @@ export default class AuditLogService {
 
   canAccessAuditLog(org: Organization): boolean {
     return PLAN_LIMITS[org.plan].auditLogRetentionDays !== 0
+  }
+
+  /** Export CSV réservé à la rétention illimitée (plan Entreprise). */
+  canExportAuditLog(org: Organization): boolean {
+    return PLAN_LIMITS[org.plan].auditLogRetentionDays === null
+  }
+
+  #filteredQuery(organizationId: number, filters: AuditLogFilters) {
+    const query = AuditLog.query().where('organizationId', organizationId)
+
+    if (filters.userId) query.where('userId', filters.userId)
+    if (filters.action) {
+      query.where('action', filters.action)
+    } else if (filters.family) {
+      query.whereIn('action', [...AUDIT_ACTIONS_BY_FAMILY[filters.family]])
+    }
+    if (filters.from) query.where('createdAt', '>=', filters.from)
+    if (filters.to) query.where('createdAt', '<=', filters.to)
+
+    return query
   }
 
   private toEntry(log: AuditLog): AuditLogEntry {

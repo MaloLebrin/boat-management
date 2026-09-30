@@ -6,6 +6,7 @@ import type { PlanAddon, PlanModule, PlanTier } from '#shared/types/plan'
 import StripeService from '#services/stripe_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import type { DesiredSubscriptionModule } from '#services/organization_module_service'
+import AuditLogService from '#services/audit_log_service'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
 import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
@@ -23,7 +24,8 @@ const PLAN_ORDER: Record<PlanTier, number> = { starter: 0, pro: 1, enterprise: 2
 export default class SubscriptionService {
   constructor(
     private stripeService: StripeService,
-    private organizationModuleService: OrganizationModuleService
+    private organizationModuleService: OrganizationModuleService,
+    private auditLogService: AuditLogService
   ) {}
   async getActive(organizationId: number): Promise<Subscription | null> {
     return Subscription.query()
@@ -380,6 +382,20 @@ export default class SubscriptionService {
     toPlan: PlanTier
   ): Promise<void> {
     if (!planChange) return
+
+    await this.auditLogService.log({
+      organizationId: org.id,
+      userId: null,
+      action: 'billing.plan_changed',
+      entityType: 'organization',
+      entityId: org.id,
+      metadata: {
+        from: planChange.fromPlan,
+        to: toPlan,
+        direction: planChange.direction,
+      },
+    })
+
     if (planChange.direction === 'down') {
       await OrganizationPlanDowngraded.dispatch(org, planChange.fromPlan, toPlan)
     } else {

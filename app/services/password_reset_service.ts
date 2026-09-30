@@ -1,5 +1,6 @@
 import PasswordResetToken from '#models/password_reset_token'
 import User from '#models/user'
+import AuditLogService from '#services/audit_log_service'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
@@ -11,6 +12,8 @@ function sha256(value: string): string {
 
 @inject()
 export default class PasswordResetService {
+  constructor(private auditLogService: AuditLogService) {}
+
   async createToken(email: string): Promise<string | null> {
     const user = await User.findBy('email', email)
     if (!user) return null
@@ -23,6 +26,17 @@ export default class PasswordResetService {
       token: sha256(token),
       expiresAt: DateTime.now().plus({ hours: 1 }),
     })
+
+    if (user.organizationId) {
+      await this.auditLogService.log({
+        organizationId: user.organizationId,
+        userId: user.id,
+        action: 'auth.reset_requested',
+        entityType: 'user',
+        entityId: user.id,
+        metadata: { email: user.email },
+      })
+    }
 
     return token
   }
@@ -129,6 +143,41 @@ export default class PasswordResetService {
 
     user.password = newPassword
     await user.save()
+
+    if (user.organizationId) {
+      await this.auditLogService.log({
+        organizationId: user.organizationId,
+        userId: user.id,
+        action: 'auth.reset_completed',
+        entityType: 'user',
+        entityId: user.id,
+        metadata: { email: user.email },
+      })
+    }
+
     return true
+  }
+
+  /**
+   * Changement de mot de passe depuis les réglages (#856) — même révocation
+   * d'accès que le reset, plus une ligne d'audit dédiée.
+   */
+  async changePasswordForUser(user: User, newPassword: string): Promise<DateTime> {
+    user.password = newPassword
+    await user.save()
+
+    const validAfter = await this.revokeAllAccess(user)
+
+    if (user.organizationId) {
+      await this.auditLogService.log({
+        organizationId: user.organizationId,
+        userId: user.id,
+        action: 'auth.password_changed',
+        entityType: 'user',
+        entityId: user.id,
+      })
+    }
+
+    return validAfter
   }
 }

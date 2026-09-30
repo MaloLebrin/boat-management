@@ -182,14 +182,10 @@ export default class SettingsController {
       return response.redirect().back()
     }
 
-    user.password = password
-    await user.save()
-
-    // Même révocation qu'à la réinitialisation (#763), à une exception près :
-    // on réestampille la session courante pour ne pas déconnecter celui qui
-    // vient d'agir. La comparaison du middleware est stricte (`<`), donc une
-    // estampille égale à `validAfter` survit.
-    const validAfter = await this.passwordResetService.revokeAllAccess(user)
+    // Révocation des autres sessions (#763) + journal d'audit (#856). On
+    // réestampille la session courante pour ne pas déconnecter celui qui
+    // vient d'agir — la comparaison du middleware est stricte (`<`).
+    const validAfter = await this.passwordResetService.changePasswordForUser(user, password)
     session.put(AUTH_SESSION_STARTED_AT_KEY, validAfter.toISO() ?? '')
 
     session.flash('success', i18n.t('flash.settings.passwordUpdatedOtherDevicesSignedOut'))

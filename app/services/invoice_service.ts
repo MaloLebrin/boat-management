@@ -36,6 +36,7 @@ import type {
 import type { ClientOption } from '#shared/types/client'
 import type { DashboardInvoicingSummary } from '#shared/types/dashboard'
 import { toInvoiceRow, type InvoiceLinks } from '#transformers/invoice_transformer'
+import AuditLogService from '#services/audit_log_service'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
 import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
@@ -105,6 +106,8 @@ function mapSortColumn(sort: InvoiceSortField): string {
 
 @inject()
 export default class InvoiceService {
+  constructor(private auditLogService: AuditLogService) {}
+
   normalizeFilters(qs: Record<string, unknown>): InvoiceListFilters {
     const q = toTrimmedStringOrUndefined(qs.q) ?? ''
     const status = normalizeEnum(qs.status, VALID_STATUSES, '' as const)
@@ -328,8 +331,12 @@ export default class InvoiceService {
     return clients.map((c) => ({ id: c.id, fullName: c.fullName, status: c.status }))
   }
 
-  async create(org: Organization, payload: ServiceCreateInvoicePayload): Promise<Invoice> {
-    return db.transaction(async (trx) => {
+  async create(
+    org: Organization,
+    payload: ServiceCreateInvoicePayload,
+    actorUserId?: number | null
+  ): Promise<Invoice> {
+    const invoice = await db.transaction(async (trx) => {
       // Allocate gap-free number
       const number = await this.allocateNumber(trx, org.id, payload.kind)
 
@@ -341,7 +348,7 @@ export default class InvoiceService {
       const { clientId, clientName } = await this.#resolveClient(trx, org.id, payload.clientId)
       const reservationId = await this.#resolveReservationId(trx, org.id, payload.reservationId)
 
-      const invoice = await Invoice.create(
+      const created = await Invoice.create(
         {
           organizationId: org.id,
           clientId,
@@ -364,7 +371,7 @@ export default class InvoiceService {
 
       await InvoiceLine.createMany(
         payload.lines.map((line, index) => ({
-          invoiceId: invoice.id,
+          invoiceId: created.id,
           label: line.label.trim(),
           quantity: String(line.quantity),
           unitPrice: String(line.unitPrice),
@@ -374,11 +381,14 @@ export default class InvoiceService {
         { client: trx }
       )
 
-      await invoice.load('lines')
-      await invoice.load('client')
+      await created.load('lines')
+      await created.load('client')
 
-      return invoice
+      return created
     })
+
+    await this.#logInvoiceAction(invoice, 'invoice.create', actorUserId)
+    return invoice
   }
 
   /**
@@ -458,7 +468,7 @@ export default class InvoiceService {
    * Un avoir, et une facture qui en porte, ne se suppriment pas (#877) : ce
    * sont deux pièces comptables liées l'une à l'autre.
    */
-  async delete(invoice: Invoice): Promise<void> {
+  async delete(invoice: Invoice, actorUserId?: number | null): Promise<void> {
     if (invoice.kind === 'credit_note') throw new CreditNoteDeleteError()
     if (invoice.kind === 'invoice') {
       const creditNote = await Invoice.query()
@@ -468,6 +478,7 @@ export default class InvoiceService {
         .first()
       if (creditNote) throw new CreditNoteDeleteError()
     }
+    await this.#logInvoiceAction(invoice, 'invoice.delete', actorUserId)
     await invoice.delete()
   }
 
@@ -479,7 +490,7 @@ export default class InvoiceService {
    * A quote can only be converted once. Guards against converting a document that
    * is not a quote, or one that already has a converted invoice.
    */
-  async convertToInvoice(quote: Invoice): Promise<Invoice> {
+  async convertToInvoice(quote: Invoice, actorUserId?: number | null): Promise<Invoice> {
     if (quote.kind !== 'quote') throw new NotAQuoteError()
 
     const existing = await Invoice.query()
@@ -490,10 +501,10 @@ export default class InvoiceService {
 
     await quote.load('lines', (q) => q.orderBy('position'))
 
-    return db.transaction(async (trx) => {
+    const invoice = await db.transaction(async (trx) => {
       const number = await this.allocateNumber(trx, quote.organizationId, 'invoice')
 
-      const invoice = await Invoice.create(
+      const created = await Invoice.create(
         {
           organizationId: quote.organizationId,
           clientId: quote.clientId,
@@ -518,7 +529,7 @@ export default class InvoiceService {
 
       await InvoiceLine.createMany(
         quote.lines.map((line, index) => ({
-          invoiceId: invoice.id,
+          invoiceId: created.id,
           label: line.label,
           quantity: line.quantity,
           unitPrice: line.unitPrice,
@@ -528,11 +539,17 @@ export default class InvoiceService {
         { client: trx }
       )
 
-      await invoice.load('lines')
-      await invoice.load('client')
+      await created.load('lines')
+      await created.load('client')
 
-      return invoice
+      return created
     })
+
+    await this.#logInvoiceAction(invoice, 'invoice.converted', actorUserId, {
+      sourceQuoteId: quote.id,
+      sourceQuoteNumber: quote.number,
+    })
+    return invoice
   }
 
   /**
@@ -546,9 +563,10 @@ export default class InvoiceService {
   async createQuoteFromReservation(
     org: Organization,
     reservation: BoatReservation,
-    opts: { lineLabel: string }
+    opts: { lineLabel: string },
+    actorUserId?: number | null
   ): Promise<Invoice> {
-    return db.transaction(async (trx) => {
+    const invoice = await db.transaction(async (trx) => {
       const number = await this.allocateNumber(trx, org.id, 'quote')
 
       // Resolve the client: prefer the reservation's linked client FK (#275),
@@ -578,7 +596,7 @@ export default class InvoiceService {
       const lines: InvoiceLineInput[] = [{ label: opts.lineLabel, quantity: 1, unitPrice }]
       const totals = computeInvoiceTotals(lines, 0)
 
-      const invoice = await Invoice.create(
+      const created = await Invoice.create(
         {
           organizationId: org.id,
           clientId,
@@ -602,7 +620,7 @@ export default class InvoiceService {
 
       await InvoiceLine.createMany(
         lines.map((line, index) => ({
-          invoiceId: invoice.id,
+          invoiceId: created.id,
           label: line.label,
           quantity: String(line.quantity),
           unitPrice: String(line.unitPrice),
@@ -612,18 +630,25 @@ export default class InvoiceService {
         { client: trx }
       )
 
-      await invoice.load('lines')
-      await invoice.load('client')
+      await created.load('lines')
+      await created.load('client')
 
-      return invoice
+      return created
     })
+
+    await this.#logInvoiceAction(invoice, 'invoice.create', actorUserId)
+    return invoice
   }
 
   /**
    * Marks an invoice as paid, stamping `paidAt`. Only real invoices that are
    * neither cancelled nor fully credited (#877) can be marked paid.
    */
-  async markAsPaid(invoice: Invoice, paidAt?: DateTime): Promise<Invoice> {
+  async markAsPaid(
+    invoice: Invoice,
+    paidAt?: DateTime,
+    actorUserId?: number | null
+  ): Promise<Invoice> {
     if (
       invoice.kind !== 'invoice' ||
       invoice.status === 'cancelled' ||
@@ -635,6 +660,20 @@ export default class InvoiceService {
     invoice.status = 'paid'
     invoice.paidAt = paidAt ?? DateTime.now()
     await invoice.save()
+    await this.#logInvoiceAction(invoice, 'invoice.mark_paid', actorUserId)
+    return invoice
+  }
+
+  /**
+   * Passage brouillon → envoyé (#856). L'e-mail reste enfilé par le contrôleur ;
+   * ici seul le statut et le journal d'audit.
+   */
+  async markSent(invoice: Invoice, actorUserId?: number | null): Promise<Invoice> {
+    if (invoice.status === 'draft') {
+      invoice.status = 'sent'
+      await invoice.save()
+    }
+    await this.#logInvoiceAction(invoice, 'invoice.send', actorUserId)
     return invoice
   }
 
