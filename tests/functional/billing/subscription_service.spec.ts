@@ -5,6 +5,7 @@ import emitter from '@adonisjs/core/services/emitter'
 import Subscription from '#models/subscription'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
+import AuditLogService from '#services/audit_log_service'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 import { stripeSubscription } from '#tests/support/stripe'
@@ -36,7 +37,11 @@ test.group('SubscriptionService period bounds (functional)', (group) => {
     // le passé (2020) et une période annoncée par Stripe en 2030. L'ancienne
     // logique de boucle sur l'anchor aurait avancé la période jusqu'à encadrer
     // "maintenant" : asserter les bornes 2030 prouve qu'on lit Stripe verbatim.
-    const service = new SubscriptionService({} as any, new OrganizationModuleService())
+    const service = new SubscriptionService(
+      {} as any,
+      new OrganizationModuleService(),
+      new AuditLogService()
+    )
     await service.syncFromSubscriptionEvent(fakeStripeSubscription('cus_period_test'))
 
     const sub = await Subscription.query().where('organizationId', org.id).firstOrFail()
@@ -60,7 +65,11 @@ test.group('SubscriptionService sync atomicity (functional)', (group) => {
       plan: 'enterprise',
     }).create()
 
-    const service = new SubscriptionService({} as any, new OrganizationModuleService())
+    const service = new SubscriptionService(
+      {} as any,
+      new OrganizationModuleService(),
+      new AuditLogService()
+    )
     await service.syncFromSubscriptionEvent(
       fakeStripeSubscription('cus_downgrade', { status: 'canceled' })
     )
@@ -87,7 +96,11 @@ test.group('SubscriptionService sync atomicity (functional)', (group) => {
       plan: 'enterprise',
     }).create()
 
-    const service = new SubscriptionService({} as any, new OrganizationModuleService())
+    const service = new SubscriptionService(
+      {} as any,
+      new OrganizationModuleService(),
+      new AuditLogService()
+    )
     // Force the second write (plan update) to fail after the subscription upsert
     // has already run inside the transaction.
     ;(service as any).applyOrgPlan = async () => {

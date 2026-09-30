@@ -5,6 +5,7 @@ import OrganizationModule from '#models/organization_module'
 import StripeService from '#services/stripe_service'
 import SubscriptionService from '#services/subscription_service'
 import OrganizationModuleService from '#services/organization_module_service'
+import AuditLogService from '#services/audit_log_service'
 import { OrganizationFactory } from '#database/factories/organization_factory'
 import { PRICE_IDS, stripeSubscription, stripeSubscriptionItem } from '#tests/support/stripe'
 
@@ -28,7 +29,11 @@ function fakeSub(
 }
 
 function makeService() {
-  return new SubscriptionService(new StripeService(), new OrganizationModuleService())
+  return new SubscriptionService(
+    new StripeService(),
+    new OrganizationModuleService(),
+    new AuditLogService()
+  )
 }
 
 async function extraBoatsRow(organizationId: number) {
