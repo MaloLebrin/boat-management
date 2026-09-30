@@ -6,6 +6,7 @@
 - **Services**: la logique métier vit dans `app/services/**`.
 - **Validation**: VineJS dans `app/validators/**`.
 - **Migrations**: créer de nouvelles migrations, ne pas “réécrire l’historique”.
+- **Index sur les FK** (#857) : toute colonne de clé étrangère doit avoir un index btree (simple ou composite qui la couvre), sauf justification écrite dans la migration. PostgreSQL n’indexe pas les FK automatiquement ; sans index, jointures et `ON DELETE CASCADE` / `SET NULL` font un scan séquentiel de la table enfant. Le test d’intégration `tests/integration/db/fk_indexes.spec.ts` échoue si une FK publique reste sans index.
 - **Tests**: ajouter des unit tests pour toute logique métier nouvelle ou modifiée.
 
 ## Où mettre quoi
