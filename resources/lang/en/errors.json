@@ -16,5 +16,25 @@
     "title": "Access denied",
     "description": "You don't have permission to access this page.",
     "action": "Back to dashboard"
+  },
+  "sessionExpired": {
+    "title": "Your session has expired",
+    "description": "This page stayed open too long, or its security token expired. Reload it, then submit the form again.",
+    "action": "Reload",
+    "home": "Back to dashboard"
+  },
+  "tooManyRequests": {
+    "title": "Too many requests",
+    "description": "You have sent too many requests from this connection.",
+    "retryIn": "You can try again in {seconds} s.",
+    "retryNow": "You can try again now.",
+    "signup": "Create an account",
+    "signupHint": "Create an account to continue without this limit.",
+    "home": "Back to dashboard"
+  },
+  "maintenance": {
+    "title": "We will be back in a few minutes",
+    "description": "FleetAi is temporarily unavailable while an update finishes.",
+    "action": "Try again"
   }
 }

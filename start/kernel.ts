@@ -25,6 +25,9 @@ server.use([
 ])
 
 router.use([
+  // #864 — avant le body parser, la session et Inertia partagée : une base
+  // indisponible ne doit pas empêcher la page 503. `/up` reste traversé.
+  () => import('#middleware/maintenance_mode_middleware'),
   () => import('@adonisjs/core/bodyparser_middleware'),
   () => import('#middleware/large_multipart_upload_middleware'),
   () => import('@adonisjs/session/session_middleware'),

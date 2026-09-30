@@ -195,6 +195,31 @@ Le job CI `backup-restore` (`.github/workflows/ci.yml`) rejoue la même chaîne
 Une montée de version de l'image, de PostgreSQL ou du script qui casserait la
 restauration échoue donc en CI, et non le jour de l'incident.
 
+## 6. Mettre le site en maintenance
+
+Avant une migration longue ou le temps d'un incident Postgres, les humains
+doivent voir « nous revenons dans quelques minutes », pas une 500 générique.
+La procédure est dans [`docs/dev/hosting.md`](hosting.md) § 7. En bref :
+
+```bash
+docker compose -f docker-compose.prod.yml exec web touch tmp/maintenance
+```
+
+La page est un 503 statique (`Retry-After: 300`). **`/up` continue de
+répondre** : un orchestrateur qui recycle les instances maladives ne doit pas
+tuer le process pendant que vous migrez. Quand la base est vraiment injoignable,
+`/up` passe tout seul à 503 — c'est le signal pour la plateforme, distinct de
+la page montrée aux visiteurs.
+
+Pour rouvrir :
+
+```bash
+docker compose -f docker-compose.prod.yml exec web rm -f tmp/maintenance
+```
+
+La variable `MAINTENANCE_MODE=true` fait la même chose, mais seulement après
+un redémarrage du process web.
+
 ## Hors périmètre
 
 - La sauvegarde des médias Cloudinary, qui a sa propre option de backup. Un bateau

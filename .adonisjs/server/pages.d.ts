@@ -47,8 +47,11 @@ declare module '@adonisjs/inertia/types' {
     'diagnostic/sheet': ExtractProps<(typeof import('../../inertia/pages/diagnostic/sheet.vue'))['default']>
     'engines/index': ExtractProps<(typeof import('../../inertia/pages/engines/index.vue'))['default']>
     'errors/forbidden': ExtractProps<(typeof import('../../inertia/pages/errors/forbidden.vue'))['default']>
+    'errors/maintenance': ExtractProps<(typeof import('../../inertia/pages/errors/maintenance.vue'))['default']>
     'errors/not_found': ExtractProps<(typeof import('../../inertia/pages/errors/not_found.vue'))['default']>
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
+    'errors/session_expired': ExtractProps<(typeof import('../../inertia/pages/errors/session_expired.vue'))['default']>
+    'errors/too_many_requests': ExtractProps<(typeof import('../../inertia/pages/errors/too_many_requests.vue'))['default']>
     'invitations/accept': ExtractProps<(typeof import('../../inertia/pages/invitations/accept.vue'))['default']>
     'invoices/credit_note': ExtractProps<(typeof import('../../inertia/pages/invoices/credit_note.vue'))['default']>
     'invoices/form': ExtractProps<(typeof import('../../inertia/pages/invoices/form.vue'))['default']>

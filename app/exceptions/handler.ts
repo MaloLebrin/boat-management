@@ -5,6 +5,7 @@ import { QuotaExceededError, quotaFlashKey } from '#exceptions/quota_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
 import { errors as limiterErrors } from '@adonisjs/limiter'
 import { errors as bouncerErrors } from '@adonisjs/bouncer'
+import { errors as shieldErrors } from '@adonisjs/shield'
 
 /**
  * Méthodes pour lesquelles Bouncer redirige déjà en arrière avec un flash
@@ -24,6 +25,14 @@ const FORM_SUBMISSION_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE'])
  * signaler. Ici, ce sont des écrans de formulaire pleine page : une 429 brute
  * y est un cul-de-sac (#766).
  */
+const PUBLIC_AI_ROUTE_PREFIXES = ['public_diagnosis.', 'public_part_search.'] as const
+
+/** Chats IA publics (#602, #634) : la page 429 propose l'inscription. */
+function offersPublicAiSignup(routeName: string | undefined): boolean {
+  if (!routeName) return false
+  return PUBLIC_AI_ROUTE_PREFIXES.some((prefix) => routeName.startsWith(prefix))
+}
+
 const RATE_LIMIT_FLASH_ROUTES: Record<string, string> = {
   'demo.login': 'flash.demo.rateLimitError',
   'signup.store': 'flash.auth.signupRateLimit',
@@ -51,6 +60,12 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   protected statusPages: Record<StatusPageRange, StatusPageRenderer> = {
     '401..403': (_, { inertia }) => inertia.render('errors/forbidden', {}),
+    // `E_BAD_CSRF_TOKEN` et `E_TOO_MANY_REQUESTS` portent leur propre `handle()`
+    // et n'atteignent pas ces entrées. Le `handle()` ci-dessous les rend
+    // explicitement — même raison que le 403 Bouncer (#458).
+    '419': (_, { inertia }) => inertia.render('errors/session_expired', {}),
+    '429': (_, { inertia }) =>
+      inertia.render('errors/too_many_requests', { retryAfter: 0, offerSignup: false }),
     '404': (_, { inertia }) => inertia.render('errors/not_found', {}),
     '500..599': (_, { inertia }) => inertia.render('errors/server_error', {}),
   }
@@ -76,6 +91,21 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       ctx.session.flash('error', ctx.i18n.t('flash.auth.loginRateLimit'))
       return ctx.response.redirect().back()
     }
+    // Les routes ci-dessus ont déjà répondu par un flash. Pour le reste, un
+    // HTML (visite Inertia comprise) reçoit la page ; le JSON garde le corps
+    // du limiteur, en-tête `Retry-After` inclus.
+    if (error instanceof limiterErrors.E_TOO_MANY_REQUESTS && this.rendersHtmlErrorPage(ctx)) {
+      const headers = error.getDefaultHeaders()
+      for (const [name, value] of Object.entries(headers)) {
+        ctx.response.header(name, String(value))
+      }
+      ctx.response.header('Cache-Control', 'no-store')
+      const page = await ctx.inertia.render('errors/too_many_requests', {
+        retryAfter: error.response.availableIn,
+        offerSignup: offersPublicAiSignup(ctx.route?.name),
+      })
+      return ctx.response.status(429).send(page)
+    }
     if (error instanceof QuotaExceededError) {
       ctx.session.flash('error', ctx.i18n.t(quotaFlashKey(error)))
       // Upsell (issue #418) : le toast d'erreur quota expose une action « Voir les
@@ -88,6 +118,17 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     if (error instanceof UserNotInOrganizationError) {
       ctx.session.flash('error', ctx.i18n.t('flash.organization.required'))
       return ctx.response.redirect('/')
+    }
+    // `E_BAD_CSRF_TOKEN` est auto-gérée : son `handle()` flashe et redirige
+    // (statut 403 sur la classe). Inertia 2.3 ne rejoue pas un 419 — seul le
+    // 409 accompagné de `x-inertia-location` est spécial. On rend donc la page
+    // nous-mêmes, en 419, pour qu'elle ne tombe pas dans la plage 401..403.
+    // Le brouillon n'est pas restauré : Shield ne réinjecte les anciennes
+    // valeurs que hors visite Inertia, et cette page remplace le formulaire.
+    if (error instanceof shieldErrors.E_BAD_CSRF_TOKEN && this.rendersHtmlErrorPage(ctx)) {
+      ctx.response.header('Cache-Control', 'no-store')
+      const page = await ctx.inertia.render('errors/session_expired', {})
+      return ctx.response.status(419).send(page)
     }
     // ACL refusée sur une navigation (#458) : `E_AUTHORIZATION_FAILURE` porte sa
     // propre méthode `handle()`, que le handler de base appelle *avant* les
@@ -105,6 +146,18 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       return ctx.response.status(403).send(page)
     }
     return super.handle(error, ctx)
+  }
+
+  /**
+   * Vrai pour une réponse HTML, y compris une visite Inertia et une requête
+   * sans en-tête `Accept` (le limiteur traite ce dernier cas comme du HTML).
+   * Contrairement au 403, les soumissions de formulaire sont incluses : c'est
+   * précisément un POST qui expire ou qui dépasse un quota.
+   */
+  private rendersHtmlErrorPage(ctx: HttpContext): boolean {
+    if (!('inertia' in ctx)) return false
+    const accepted = ctx.request.accepts(['html', 'application/vnd.api+json', 'json'])
+    return accepted === 'html' || accepted === null
   }
 
   /**

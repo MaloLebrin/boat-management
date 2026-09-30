@@ -16,5 +16,25 @@
     "title": "Accès refusé",
     "description": "Vous n'avez pas la permission d'accéder à cette page.",
     "action": "Retour au tableau de bord"
+  },
+  "sessionExpired": {
+    "title": "Votre session a expiré",
+    "description": "Cette page est restée ouverte trop longtemps, ou son jeton de sécurité a expiré. Rechargez-la, puis renvoyez le formulaire.",
+    "action": "Recharger",
+    "home": "Retour au tableau de bord"
+  },
+  "tooManyRequests": {
+    "title": "Trop de requêtes",
+    "description": "Vous avez envoyé trop de requêtes depuis cette connexion.",
+    "retryIn": "Vous pourrez réessayer dans {seconds} s.",
+    "retryNow": "Vous pouvez réessayer maintenant.",
+    "signup": "Créer un compte",
+    "signupHint": "Créez un compte pour continuer sans cette limite.",
+    "home": "Retour au tableau de bord"
+  },
+  "maintenance": {
+    "title": "Nous revenons dans quelques minutes",
+    "description": "FleetAi est momentanément indisponible, le temps de terminer une mise à jour.",
+    "action": "Réessayer"
   }
 }
