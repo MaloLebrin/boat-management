@@ -40,6 +40,12 @@ testPolicyMatrix('BoatPolicy (unit)', () => new BoatPolicy(), [
     allowedRoles: ['admin'],
     deniedRoles: ['member', 'mechanic', 'boat_owner'],
   },
+  {
+    name: 'manageTrash',
+    capability: 'boats.delete',
+    allowedRoles: ['admin'],
+    deniedRoles: ['member', 'mechanic', 'boat_owner'],
+  },
 ])
 
 test.group('BoatPolicy — optional boat on view (unit)', () => {
