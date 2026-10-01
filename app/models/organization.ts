@@ -29,6 +29,13 @@ export default class Organization extends OrganizationSchema {
   // tokens. Les clés elles-mêmes vivent dans `organization_ai_keys`.
   declare aiProvider: AiProvider | null
 
+  /**
+   * Politique 2FA (#884) : les membres sans second facteur sont renvoyés vers
+   * l'activation une fois `twoFactorGraceEndsAt` passé (`null` = immédiat).
+   */
+  @column()
+  declare requireTwoFactor: boolean
+
   @hasMany(() => OrganizationAiKey)
   declare aiKeys: HasMany<typeof OrganizationAiKey>
 

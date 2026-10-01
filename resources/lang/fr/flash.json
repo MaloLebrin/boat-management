@@ -538,5 +538,20 @@
     "tooShort": "Cette durée est inférieure au minimum de location du bateau.",
     "tooLong": "Cette durée dépasse le maximum de location du bateau.",
     "rateLimit": "Trop de demandes envoyées depuis cette connexion. Réessayez dans quelques minutes."
+  },
+  "twoFactor": {
+    "requiredNow": "Votre organisation impose la double authentification : activez-la pour continuer.",
+    "requiredBy": "Votre organisation impose la double authentification : activez-la avant le {date}.",
+    "challengeExpired": "La vérification a expiré : reconnectez-vous.",
+    "rateLimited": "Trop de codes refusés : reconnectez-vous dans quelques minutes.",
+    "recoveryUsed": "Code de secours utilisé : il ne servira plus. Pensez à en régénérer depuis vos réglages.",
+    "alreadyEnabled": "La double authentification est déjà active.",
+    "notEnabled": "La double authentification n'est pas active.",
+    "setupMissing": "Aucune activation en cours : recommencez depuis le bouton « Activer ».",
+    "enabled": "Double authentification activée. Vos autres sessions ont été déconnectées.",
+    "disabled": "Double authentification désactivée.",
+    "recoveryRegenerated": "Nouveaux codes de secours générés.",
+    "policyEnabled": "Double authentification désormais obligatoire pour les membres.",
+    "policyDisabled": "La double authentification n'est plus obligatoire."
   }
 }

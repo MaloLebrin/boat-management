@@ -2132,4 +2132,27 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     ],
     navTarget: null,
   },
+  {
+    id: 'two-factor-authentication',
+    title: {
+      en: 'Two-factor authentication (2FA)',
+      fr: 'Double authentification (2FA)',
+    },
+    body: {
+      en: 'In Settings → My account, each user can enable two-factor authentication: scan a QR code with an authenticator app (Google Authenticator, 1Password, Bitwarden…), confirm with a 6-digit code, and keep the 8 single-use recovery codes shown once. Sign-in then asks for a code after the password. Disabling requires the password and a code. An admin can require 2FA for every member in Settings → Organization, with a grace period; the members list shows who has it.',
+      fr: 'Dans Réglages → Mon compte, chaque utilisateur peut activer la double authentification : scanner un QR code avec une application d’authentification (Google Authenticator, 1Password, Bitwarden…), confirmer avec un code à 6 chiffres et garder les 8 codes de secours à usage unique, affichés une seule fois. La connexion demande ensuite un code après le mot de passe. La désactivation exige le mot de passe et un code. Un admin peut l’imposer à tous les membres dans Réglages → Organisation, avec un délai de grâce ; la liste des membres indique qui l’a activée.',
+    },
+    keywords: [
+      '2fa',
+      'double authentification',
+      'authentification a deux facteurs',
+      'two factor',
+      'totp',
+      'code de secours',
+      'recovery code',
+      'authenticator',
+      'securite du compte',
+    ],
+    navTarget: 'settings.me',
+  },
 ]

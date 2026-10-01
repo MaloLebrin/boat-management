@@ -14,6 +14,7 @@ const OnlinePaymentsController = () => import('#controllers/online_payments_cont
 const InvoiceRemindersController = () => import('#controllers/invoice_reminders_controller')
 const AccountingSettingsController = () => import('#controllers/accounting_settings_controller')
 const DataExportsController = () => import('#controllers/data_exports_controller')
+const TwoFactorSettingsController = () => import('#controllers/two_factor_settings_controller')
 
 // Préférences pré-auth (switchers de langue et de thème, aussi disponibles
 // sur le marketing et l'écran de login) : persistées sur le profil quand
@@ -25,6 +26,28 @@ router
   .group(() => {
     router.get('settings', ({ response }) => response.redirect('/settings/me')).as('settings.index')
     router.get('settings/me', [SettingsController, 'me']).as('settings.me')
+    // Double authentification (#884).
+    router
+      .post('settings/two-factor', [TwoFactorSettingsController, 'store'])
+      .as('settings.two_factor.store')
+    router
+      .post('settings/two-factor/confirm', [TwoFactorSettingsController, 'confirm'])
+      .as('settings.two_factor.confirm')
+    router
+      .delete('settings/two-factor/setup', [TwoFactorSettingsController, 'cancel'])
+      .as('settings.two_factor.cancel')
+    router
+      .delete('settings/two-factor', [TwoFactorSettingsController, 'destroy'])
+      .as('settings.two_factor.destroy')
+    router
+      .post('settings/two-factor/recovery-codes', [
+        TwoFactorSettingsController,
+        'regenerateRecoveryCodes',
+      ])
+      .as('settings.two_factor.recovery_codes')
+    router
+      .put('settings/org/two-factor', [TwoFactorSettingsController, 'updateOrganizationPolicy'])
+      .as('settings.org.two_factor')
     router
       .get('settings/notifications', [SettingsController, 'notifications'])
       .as('settings.notifications')

@@ -29,6 +29,8 @@ export default class OrganizationMemberService {
       fullName: m.user.fullName,
       email: m.user.email,
       role: m.role,
+      // Colonne « 2FA » de l'annuaire (#884).
+      twoFactorEnabled: m.user.hasTwoFactorEnabled,
     }))
   }
 

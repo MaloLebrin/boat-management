@@ -43,5 +43,8 @@
     "organization": "organisation",
     "message": "message",
     "consent": "consent"
+  },
+  "twoFactor": {
+    "invalidCode": "Invalid or already used code."
   }
 }

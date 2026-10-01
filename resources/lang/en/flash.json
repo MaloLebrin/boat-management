@@ -538,5 +538,20 @@
     "tooShort": "This is shorter than the boat's minimum rental.",
     "tooLong": "This is longer than the boat's maximum rental.",
     "rateLimit": "Too many requests sent from this connection. Please try again in a few minutes."
+  },
+  "twoFactor": {
+    "requiredNow": "Your organization requires two-factor authentication: enable it to continue.",
+    "requiredBy": "Your organization requires two-factor authentication: enable it before {date}.",
+    "challengeExpired": "Verification expired: please sign in again.",
+    "rateLimited": "Too many rejected codes: sign in again in a few minutes.",
+    "recoveryUsed": "Recovery code used: it will not work again. Consider regenerating them from your settings.",
+    "alreadyEnabled": "Two-factor authentication is already enabled.",
+    "notEnabled": "Two-factor authentication is not enabled.",
+    "setupMissing": "No setup in progress: start again from the “Enable” button.",
+    "enabled": "Two-factor authentication enabled. Your other sessions have been signed out.",
+    "disabled": "Two-factor authentication disabled.",
+    "recoveryRegenerated": "New recovery codes generated.",
+    "policyEnabled": "Two-factor authentication is now required for members.",
+    "policyDisabled": "Two-factor authentication is no longer required."
   }
 }

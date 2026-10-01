@@ -105,4 +105,6 @@ export const controllers = {
   SimulatorShare: () => import('#controllers/simulator_share_controller'),
   SparePartChat: () => import('#controllers/spare_part_chat_controller'),
   Spots: () => import('#controllers/spots_controller'),
+  TwoFactorChallenge: () => import('#controllers/two_factor_challenge_controller'),
+  TwoFactorSettings: () => import('#controllers/two_factor_settings_controller'),
 }

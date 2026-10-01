@@ -35,6 +35,9 @@ import type { BooleanQuotaKey } from '#shared/types/plan'
 import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 import { AUTH_SESSION_STARTED_AT_KEY } from '#shared/constants/auth'
 import PasswordResetService from '#services/password_reset_service'
+import TwoFactorService from '#services/two_factor_service'
+import { TWO_FACTOR_RECOVERY_CODES_FLASH_KEY } from '#shared/constants/two_factor'
+import type { TwoFactorSettingsProps } from '#shared/types/two_factor'
 
 @inject()
 export default class SettingsController {
@@ -52,10 +55,34 @@ export default class SettingsController {
     private passwordResetService: PasswordResetService,
     private onlinePaymentService: OnlinePaymentService,
     private invoiceReminderService: InvoiceReminderService,
-    private accountingSettingsService: AccountingSettingsService
+    private accountingSettingsService: AccountingSettingsService,
+    private twoFactorService: TwoFactorService
   ) {}
-  async me({ inertia }: HttpContext) {
-    return inertia.render('settings/me', {})
+  async me({ inertia, auth, session }: HttpContext) {
+    const user = await auth.authenticate()
+
+    // Double authentification (#884). Les codes de secours en clair ne
+    // transitent que par le flash qui suit leur génération : affichés une
+    // fois, introuvables ensuite.
+    const flashedCodes: unknown = session.flashMessages.get(TWO_FACTOR_RECOVERY_CODES_FLASH_KEY)
+    const [pendingSetup, recoveryCodesRemaining, enforcement] = await Promise.all([
+      this.twoFactorService.pendingSetup(user),
+      user.hasTwoFactorEnabled ? this.twoFactorService.recoveryCodesRemaining(user.id) : 0,
+      this.twoFactorService.enforcementFor(user),
+    ])
+    const twoFactor: TwoFactorSettingsProps = {
+      enabled: user.hasTwoFactorEnabled,
+      recoveryCodesRemaining,
+      pendingSetup,
+      recoveryCodes:
+        Array.isArray(flashedCodes) && flashedCodes.every((code) => typeof code === 'string')
+          ? flashedCodes
+          : null,
+      requiredByOrganization: enforcement.required,
+      graceEndsAt: enforcement.graceEndsAt,
+    }
+
+    return inertia.render('settings/me', { twoFactor })
   }
 
   /** Gestion des notifications push et des appareils abonnés (#498). */
@@ -80,6 +107,8 @@ export default class SettingsController {
         id: user.organization.id,
         name: user.organization.name,
       },
+      // Politique 2FA (#884) : éditée par `organization.manage`, lue par tous.
+      twoFactorPolicy: await this.twoFactorService.organizationPolicy(user.organization),
     })
   }
 

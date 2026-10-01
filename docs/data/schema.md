@@ -39,6 +39,9 @@ règle ; leurs index FK sont nommés `{table}_{column}_idx`.
   `accountingVatAccount` (`44571`), `accountingCustomerAccount` (`411`),
   `accountingBankAccount` (`512`) — voir
   [`docs/domain/invoicing.md`](../domain/invoicing.md) §7 quinquies
+- politique de double authentification (#884) : `requireTwoFactor` (booléen,
+  défaut `false`) et `twoFactorGraceEndsAt` (nullable — fin du délai de grâce,
+  `null` = immédiat). Voir [`docs/domain/auth-acl.md`](../domain/auth-acl.md)
 
 ### users
 
@@ -54,6 +57,14 @@ règle ; leurs index FK sont nommés `{table}_{column}_idx`.
   `null` = aucune révocation, l'état de tous les comptes avant la migration.
   Avec `SESSION_DRIVER=cookie` les sessions ne sont pas listables côté
   serveur : le discriminant doit être porté par l'utilisateur
+- double authentification (#884), toutes non sérialisées :
+  - `twoFactorSecret` (texte nullable) — secret TOTP **chiffré** avec
+    `ENCRYPTION_KEY` (`DataEncryptionService`, comme les clés BYOK #786). Posé
+    dès le début de l'activation
+  - `twoFactorConfirmedAt` (nullable) — la 2FA n'est active qu'une fois
+    renseigné (`User.hasTwoFactorEnabled`)
+  - `twoFactorLastUsedStep` (bigint nullable) — dernier pas TOTP accepté ; un
+    code d'un pas inférieur ou égal est refusé (anti-rejeu)
 - préférences d'interface, nullables — retombent sur le cookie puis sur un défaut :
   - `locale` (`en` | `fr`, #414)
   - `theme` (`system` | `light` | `dark`, #416)
@@ -683,6 +694,22 @@ moment le moins cher pour le faire sans cron.
 antérieurs à #768 sont marqués vérifiés par la migration : pas une preuve
 rétroactive, mais le seul choix qui ne casse pas des comptes en service derrière
 une garde qu'ils n'ont jamais eu l'occasion de franchir.
+
+### two_factor_recovery_codes
+
+Codes de secours de la double authentification (#884) — doc de domaine :
+`docs/domain/auth-acl.md`.
+
+- `id`
+- `userId` (FK `users`, `CASCADE`, indexé)
+- `codeHash` (SHA-256 du code normalisé — minuscules, sans tiret ni espace ;
+  `serializeAs: null`)
+- `usedAt` (nullable) — usage unique : la consommation est un `UPDATE`
+  conditionnel sur `used_at IS NULL`
+- `createdAt`
+
+Huit codes par utilisateur, remplacés en bloc à chaque régénération et
+supprimés à la désactivation. Le code en clair n'est montré qu'une fois.
 
 ### pending_imports
 

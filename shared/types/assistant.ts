@@ -160,6 +160,15 @@ export const ASSISTANT_NAV_TARGETS = {
     i18nKey: 'assistant.navTargets.crewPlanning',
     promptLabel: { fr: 'Planning d’équipage', en: 'Crew planning' },
   },
+  // Compte (#884) : profil, mot de passe, double authentification.
+  'settings.me': {
+    path: '/settings/me',
+    i18nKey: 'assistant.navTargets.settingsMe',
+    promptLabel: {
+      fr: 'Réglages — mon compte et sécurité',
+      en: 'Settings — my account and security',
+    },
+  },
   'settings.billing': {
     path: '/settings/billing',
     i18nKey: 'assistant.navTargets.settingsBilling',

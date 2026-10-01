@@ -31,6 +31,32 @@ export default class User extends compose(
   declare sessionsValidAfter: DateTime | null
 
   /**
+   * Secret TOTP **chiffré** (`DataEncryptionService`, #884). Posé dès le
+   * début de l'activation : la 2FA n'est active que si
+   * `twoFactorConfirmedAt` est renseigné. Jamais sérialisé.
+   */
+  @column({ serializeAs: null })
+  declare twoFactorSecret: string | null
+
+  @column.dateTime({ serializeAs: null })
+  declare twoFactorConfirmedAt: DateTime | null
+
+  /** Dernier pas TOTP accepté (anti-rejeu). `bigint` rendu en chaîne par pg. */
+  @column({
+    serializeAs: null,
+    consume: (value: unknown) => (value === null || value === undefined ? null : Number(value)),
+  })
+  declare twoFactorLastUsedStep: number | null
+
+  /**
+   * 2FA active (#884). Testé en vérité et non contre `null` : sur une instance
+   * fraîchement créée, les colonnes non fournies valent `undefined`.
+   */
+  get hasTwoFactorEnabled(): boolean {
+    return Boolean(this.twoFactorConfirmedAt) && Boolean(this.twoFactorSecret)
+  }
+
+  /**
    * Disposition personnalisée du tableau de bord (ordre des widgets par
    * colonne, widgets masqués). `null` = disposition par défaut. Un blob
    * illisible (version inconnue, ids retirés) est lu comme `null` plutôt que

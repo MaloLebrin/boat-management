@@ -133,7 +133,9 @@ extraire explicitement avec `.withQs(false)`.
 - `POST /login` (guest-only)
   - Controller: `SessionController.store`
   - `User.verifyCredentials(email, password)`
-  - `auth.use('web').login(user)`
+  - si la 2FA est active : état pré-authentifié, redirection vers `/login/2fa`
+    — voir « Double authentification » ci-dessous
+  - sinon `SessionLoginService.complete()` : `auth.use('web').login(user)`
   - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `home`
 
@@ -211,6 +213,70 @@ révocation, puis **réestampille la session courante** avec la valeur même de
 `sessions_valid_after` : la comparaison du middleware étant stricte (`<`), une
 estampille égale survit. Celui qui agit reste connecté, ses autres appareils
 non — ce que dit le message de succès.
+
+### Double authentification TOTP (#884)
+
+Second facteur optionnel par utilisateur, imposable par l'organisation.
+
+**Activation** (`/settings/me`, carte « Double authentification ») —
+`TwoFactorSettingsController` + `TwoFactorService` :
+
+| Route                                      | Effet                                             |
+| ------------------------------------------ | ------------------------------------------------- |
+| `POST /settings/two-factor`                | nouveau secret (chiffré), QR code au rechargement |
+| `DELETE /settings/two-factor/setup`        | abandonne une activation non confirmée            |
+| `POST /settings/two-factor/confirm`        | premier code → active, 8 codes de secours flashés |
+| `POST /settings/two-factor/recovery-codes` | second facteur → nouveau jeu de codes             |
+| `DELETE /settings/two-factor`              | mot de passe **et** second facteur → désactive    |
+
+- TOTP RFC 6238 (SHA-1, 6 chiffres, 30 s) implémenté dans `app/utils/totp.ts`
+  sur `node:crypto`, testé contre les vecteurs de la RFC. Fenêtre ±1 pas.
+- QR code `otpauth://` rendu côté serveur en SVG data-URI (`qrcode`) — la CSP
+  autorise `data:` en `imgSrc`. La clé est aussi affichée pour saisie manuelle.
+- Secret chiffré avec `ENCRYPTION_KEY` ; codes de secours hachés (SHA-256),
+  usage unique. Les codes en clair ne passent que par le flash
+  `twoFactorRecoveryCodes`, lu une fois par `SettingsController.me`.
+- **Anti-rejeu** : `users.two_factor_last_used_step` ; un code n'est accepté
+  que si son pas est strictement postérieur. L'écriture est un `UPDATE`
+  conditionnel, comme la consommation d'un code de secours : deux requêtes
+  concurrentes avec le même code ne passent pas toutes les deux.
+- Activer la 2FA appelle `revokeAllAccess()` (#763) : autres sessions et
+  remember-me coupés, session courante réestampillée.
+
+**Connexion.** Après un mot de passe valide, `SessionController.store` ne
+connecte rien : il pose en session `twoFactorPending` (`userId`, `remember`,
+échéance à 5 min) et redirige vers `GET /login/2fa`
+(`TwoFactorChallengeController`, groupe `guest()`). `POST /login/2fa` accepte
+un code TOTP (6 chiffres) ou un code de secours (`xxxxx-xxxxx`, casse et
+tirets ignorés), puis appelle `SessionLoginService.complete()` — le même
+chemin que la connexion sans 2FA. **Le remember-me n'est posé qu'après le
+second facteur.** Un état absent ou expiré renvoie à `/login`.
+
+| Compteur                     | Clé  | Débit    | Où                                                     |
+| ---------------------------- | ---- | -------- | ------------------------------------------------------ |
+| `twoFactorChallengeThrottle` | IP   | 10/min   | middleware de `POST /login/2fa`                        |
+| `twoFactorAccountLimiter`    | user | 5/15 min | `TwoFactorChallengeController.store`, via `penalize()` |
+
+Au plafond, l'état pré-authentifié est effacé : il faut repasser par le mot de
+passe. La réinitialisation du mot de passe **ne** désactive **pas** la 2FA.
+
+**Politique d'organisation** (`/settings/org`, `organization.manage`) :
+`PUT /settings/org/two-factor` (`requireTwoFactor`, `graceDays` 0–30). Pendant
+le délai de grâce, la connexion flashe un avertissement daté. Ensuite,
+`AuthMiddleware` (donc toutes les routes authentifiées) renvoie un membre sans
+2FA vers `/settings/me` ; restent ouverts `/settings/me`,
+`/settings/two-factor/*`, `/verify-email*` et `/logout`. L'annuaire
+`/settings/members` a une colonne « 2FA ».
+
+**Audit et e-mails.** `auth.2fa_enabled`, `auth.2fa_disabled`,
+`auth.2fa_recovery_used`, `auth.2fa_recovery_regenerated`, `auth.2fa_failed`
+(code refusé au login, sans le code) et `organization.2fa_required`
+(métadonnées `required`, `graceDays`). Chaque changement côté utilisateur
+envoie un e-mail à son titulaire (`EmailQueueService.sendTwoFactorChanged`,
+gabarit `emails/two_factor_changed`, dans sa langue).
+
+**Hors périmètre** : passkeys/WebAuthn (étape 2, même infrastructure de
+second facteur), SSO/SAML, liste des sessions actives.
 
 ### Logout
 
