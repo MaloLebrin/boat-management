@@ -47,6 +47,8 @@ export interface ApiDefinition {
     edit: typeof routes['boats.edit']
     update: typeof routes['boats.update']
     destroy: typeof routes['boats.destroy']
+    restore: typeof routes['boats.restore']
+    forceDestroy: typeof routes['boats.forceDestroy']
     status: {
       update: typeof routes['boats.status.update']
     }
@@ -185,10 +187,19 @@ export interface ApiDefinition {
           store: typeof routes['boats.reservations.inspections.equipmentActions.store']
           destroy: typeof routes['boats.reservations.inspections.equipmentActions.destroy']
         }
+        pdf: typeof routes['boats.reservations.inspections.pdf']
+        sign: typeof routes['boats.reservations.inspections.sign']
+        send: typeof routes['boats.reservations.inspections.send']
         photos: {
           store: typeof routes['boats.reservations.inspections.photos.store']
           destroy: typeof routes['boats.reservations.inspections.photos.destroy']
         }
+      }
+      crew: {
+        show: typeof routes['boats.reservations.crew.show']
+        store: typeof routes['boats.reservations.crew.store']
+        destroy: typeof routes['boats.reservations.crew.destroy']
+        pdf: typeof routes['boats.reservations.crew.pdf']
       }
       contract: {
         show: typeof routes['boats.reservations.contract.show']
@@ -199,6 +210,9 @@ export interface ApiDefinition {
         sign: typeof routes['boats.reservations.contract.sign']
         destroy: typeof routes['boats.reservations.contract.destroy']
       }
+    }
+    publicBooking: {
+      update: typeof routes['boats.publicBooking.update']
     }
     calendarFeed: {
       regenerate: typeof routes['boats.calendarFeed.regenerate']
@@ -357,11 +371,19 @@ export interface ApiDefinition {
   crew: {
     index: typeof routes['crew.index']
     store: typeof routes['crew.store']
+    show: typeof routes['crew.show']
     update: typeof routes['crew.update']
     destroy: typeof routes['crew.destroy']
     certifications: {
       store: typeof routes['crew.certifications.store']
       destroy: typeof routes['crew.certifications.destroy']
+    }
+    planning: {
+      index: typeof routes['crew.planning.index']
+    }
+    unavailabilities: {
+      store: typeof routes['crew.unavailabilities.store']
+      destroy: typeof routes['crew.unavailabilities.destroy']
     }
   }
   navigation: {
@@ -391,6 +413,13 @@ export interface ApiDefinition {
     store: typeof routes['pricingSeasons.store']
     update: typeof routes['pricingSeasons.update']
     destroy: typeof routes['pricingSeasons.destroy']
+  }
+  pwa: {
+    manifest: typeof routes['pwa.manifest']
+  }
+  reports: {
+    index: typeof routes['reports.index']
+    export: typeof routes['reports.export']
   }
   newAccount: {
     create: typeof routes['new_account.create']
@@ -599,6 +628,11 @@ export interface ApiDefinition {
   }
   calendar: {
     feed: typeof routes['calendar.feed']
+  }
+  book: {
+    fleet: typeof routes['book.fleet']
+    show: typeof routes['book.show']
+    request: typeof routes['book.request']
   }
   reservations: {
     index: typeof routes['reservations.index']

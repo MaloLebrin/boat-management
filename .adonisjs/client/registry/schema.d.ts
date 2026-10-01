@@ -363,8 +363,32 @@ export interface Registry {
       paramsTuple: [ParamValue]
       params: { id: ParamValue }
       query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['destroy']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boats_controller').default['destroy']>>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_trash_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_trash_controller').default['destroy']>>>
+    }
+  }
+  'boats.restore': {
+    methods: ["POST"]
+    pattern: '/boats/:id/restore'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_trash_controller').default['restore']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_trash_controller').default['restore']>>>
+    }
+  }
+  'boats.forceDestroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:id/force'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_trash_controller').default['forceDestroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_trash_controller').default['forceDestroy']>>>
     }
   }
   'boats.status.update': {
@@ -1627,6 +1651,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_inspections_controller').default['destroyEquipmentAction']>>>
     }
   }
+  'boats.reservations.inspections.pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inspection_documents_controller').default['pdf']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inspection_documents_controller').default['pdf']>>>
+    }
+  }
+  'boats.reservations.inspections.sign': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_inspection').signBoatInspectionValidator)>>
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_inspection').signBoatInspectionValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inspection_documents_controller').default['sign']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inspection_documents_controller').default['sign']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.reservations.inspections.send': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; inspectionId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inspection_documents_controller').default['send']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inspection_documents_controller').default['send']>>>
+    }
+  }
+  'boats.publicBooking.update': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/public-booking'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/public_booking').publicBookingSettingsValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/public_booking').publicBookingSettingsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_public_booking_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_public_booking_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'boats.calendarFeed.regenerate': {
     methods: ["POST"]
     pattern: '/boats/:boatId/calendar-feed'
@@ -1721,6 +1793,54 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyInspectionMedia']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_media_controller').default['destroyInspectionMedia']>>>
+    }
+  }
+  'boats.reservations.crew.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/reservations/:reservationId/crew'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reservation_crew_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reservation_crew_controller').default['show']>>>
+    }
+  }
+  'boats.reservations.crew.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/reservations/:reservationId/crew'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/crew').assignReservationCrewValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/crew').assignReservationCrewValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reservation_crew_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reservation_crew_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.reservations.crew.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/reservations/:reservationId/crew/:assignmentId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue; assignmentId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reservation_crew_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reservation_crew_controller').default['destroy']>>>
+    }
+  }
+  'boats.reservations.crew.pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/boats/:boatId/reservations/:reservationId/crew/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; reservationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reservation_crew_controller').default['pdf']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reservation_crew_controller').default['pdf']>>>
     }
   }
   'boats.reservations.contract.show': {
@@ -2455,6 +2575,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'crew.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/crew/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_members_controller').default['show']>>>
+    }
+  }
   'crew.update': {
     methods: ["PUT"]
     pattern: '/crew/:id'
@@ -2501,6 +2633,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_certifications_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_certifications_controller').default['destroy']>>>
+    }
+  }
+  'crew.planning.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/crew/planning'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/crew').crewPlanningQueryValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_planning_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_planning_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'crew.unavailabilities.store': {
+    methods: ["POST"]
+    pattern: '/crew/:id/unavailabilities'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/crew').createCrewUnavailabilityValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/crew').createCrewUnavailabilityValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_planning_controller').default['storeUnavailability']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_planning_controller').default['storeUnavailability']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'crew.unavailabilities.destroy': {
+    methods: ["DELETE"]
+    pattern: '/crew/:id/unavailabilities/:unavailabilityId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; unavailabilityId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/crew_planning_controller').default['destroyUnavailability']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/crew_planning_controller').default['destroyUnavailability']>>>
     }
   }
   'navigation.logbook': {
@@ -2717,6 +2885,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pricing_seasons_controller').default['destroy']>>>
+    }
+  }
+  'pwa.manifest': {
+    methods: ["GET","HEAD"]
+    pattern: '/site.webmanifest'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/pwa_manifest_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/pwa_manifest_controller').default['show']>>>
+    }
+  }
+  'reports.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/reports'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reports_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reports_controller').default['index']>>>
+    }
+  }
+  'reports.export': {
+    methods: ["GET","HEAD"]
+    pattern: '/reports/export.csv'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reports_controller').default['export']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reports_controller').default['export']>>>
     }
   }
   'new_account.create': {
@@ -4181,6 +4385,42 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/calendar_feeds_controller').default['show']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/calendar_feeds_controller').default['show']>>>
+    }
+  }
+  'book.fleet': {
+    methods: ["GET","HEAD"]
+    pattern: '/book/:orgSlug'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { orgSlug: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/public_bookings_controller').default['fleet']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/public_bookings_controller').default['fleet']>>>
+    }
+  }
+  'book.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/book/:orgSlug/:boatSlug'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { orgSlug: ParamValue; boatSlug: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/public_bookings_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/public_bookings_controller').default['show']>>>
+    }
+  }
+  'book.request': {
+    methods: ["POST"]
+    pattern: '/book/:orgSlug/:boatSlug/request'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/public_booking').publicBookingRequestValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { orgSlug: ParamValue; boatSlug: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/public_booking').publicBookingRequestValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/public_bookings_controller').default['request']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/public_bookings_controller').default['request']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'reservations.index': {
