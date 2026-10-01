@@ -16,6 +16,7 @@ import { formatCurrency } from '#shared/helpers/number_format'
 import type { PublicBookingEmailParams } from '#shared/types/public_booking'
 import type { CrewCertificationAlert } from '#shared/types/crew'
 import type { TwoFactorEvent } from '#shared/types/two_factor'
+import type { DeviceInfo } from '#shared/types/user_session'
 
 @inject()
 export default class EmailQueueService {
@@ -143,6 +144,59 @@ export default class EmailQueueService {
       text,
       html,
       correlationId: `two-factor:${params.event}:${params.to}:${Date.now()}`,
+    })
+  }
+
+  /**
+   * Connexion depuis un appareil jamais vu sur le compte (#885). Désactivable
+   * depuis `/settings/me` (`users.notify_new_login`).
+   */
+  async sendNewLogin(params: {
+    to: string
+    name: string | null
+    locale: string | null
+    device: DeviceInfo
+    ipAddress: string | null
+  }) {
+    const i18n = i18nManager.locale(toAppLocale(params.locale))
+    const displayName = params.name ?? params.to
+    const unknown = i18n.t('auth.newLogin.unknown')
+    const device = i18n.t('auth.newLogin.device', {
+      browser: params.device.browser ?? unknown,
+      os: params.device.os ?? unknown,
+    })
+    const subject = i18n.t('auth.newLogin.subject')
+    const body = i18n.t('auth.newLogin.body')
+    const details = [
+      `${i18n.t('auth.newLogin.deviceLabel')} ${device}`,
+      `${i18n.t('auth.newLogin.ipLabel')} ${params.ipAddress ?? unknown}`,
+      `${i18n.t('auth.newLogin.dateLabel')} ${formatDateLong(DateTime.now().toISO()!, i18n.locale)}`,
+    ]
+    const notYou = i18n.t('auth.newLogin.notYou')
+    const securityUrl = `${env.get('APP_URL')}/settings/me`
+    const text = [
+      i18n.t('auth.newLogin.greeting', { name: displayName }),
+      body,
+      details.join('\n'),
+      notYou,
+      securityUrl,
+    ].join('\n\n')
+
+    const html = await edge.render('emails/new_login', {
+      i18n,
+      displayName,
+      body,
+      details,
+      notYou,
+      securityUrl,
+    })
+
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `new-login:${params.to}:${Date.now()}`,
     })
   }
 

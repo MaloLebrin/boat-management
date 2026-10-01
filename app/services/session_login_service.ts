@@ -1,6 +1,7 @@
 import type User from '#models/user'
 import AuditLogService from '#services/audit_log_service'
 import TwoFactorService from '#services/two_factor_service'
+import UserSessionService from '#services/user_session_service'
 import { formatDateLong } from '#shared/helpers/date_format'
 import { TWO_FACTOR_SETUP_PATH } from '#shared/constants/two_factor'
 import { stampAuthSession } from '#utils/auth_session'
@@ -17,7 +18,8 @@ import { DateTime } from 'luxon'
 export default class SessionLoginService {
   constructor(
     private auditLogService: AuditLogService,
-    private twoFactorService: TwoFactorService
+    private twoFactorService: TwoFactorService,
+    private userSessionService: UserSessionService
   ) {}
 
   /**
@@ -25,12 +27,14 @@ export default class SessionLoginService {
    * l'activation de la 2FA si la politique de son organisation l'impose déjà.
    */
   async complete(
-    ctx: Pick<HttpContext, 'auth' | 'session' | 'i18n'>,
+    ctx: Pick<HttpContext, 'auth' | 'session' | 'i18n' | 'request'>,
     user: User,
     remember: boolean
   ): Promise<string | null> {
     await ctx.auth.use('web').login(user, remember)
     stampAuthSession(ctx.session)
+    // Registre des appareils (#885), avec l'alerte « nouvel appareil ».
+    await this.userSessionService.open(ctx, user, { notify: true })
     // #451 — filet de sécurité : une session navigateur qui traîne encore un
     // `demoSessionStartedAt` (session démo antérieure) ne doit pas le transmettre
     // au compte réel qui vient de s'authentifier.

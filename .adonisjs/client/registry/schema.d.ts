@@ -3871,6 +3871,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['regenerateRecoveryCodes']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'settings.sessions.destroy_others': {
+    methods: ["DELETE"]
+    pattern: '/settings/sessions/others'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['destroyOthers']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['destroyOthers']>>>
+    }
+  }
+  'settings.sessions.destroy_remembered': {
+    methods: ["DELETE"]
+    pattern: '/settings/sessions/remembered'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['destroyRemembered']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['destroyRemembered']>>>
+    }
+  }
+  'settings.sessions.notifications': {
+    methods: ["PUT"]
+    pattern: '/settings/sessions/notifications'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/user_session').newLoginNotificationValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/user_session').newLoginNotificationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['updateNotifications']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['updateNotifications']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.sessions.destroy': {
+    methods: ["DELETE"]
+    pattern: '/settings/sessions/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['destroy']>>>
+    }
+  }
   'settings.org.two_factor': {
     methods: ["PUT"]
     pattern: '/settings/org/two-factor'

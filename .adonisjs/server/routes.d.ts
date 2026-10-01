@@ -326,6 +326,10 @@ export type ScannedRoutes = {
     'settings.two_factor.cancel': { paramsTuple?: []; params?: {} }
     'settings.two_factor.destroy': { paramsTuple?: []; params?: {} }
     'settings.two_factor.recovery_codes': { paramsTuple?: []; params?: {} }
+    'settings.sessions.destroy_others': { paramsTuple?: []; params?: {} }
+    'settings.sessions.destroy_remembered': { paramsTuple?: []; params?: {} }
+    'settings.sessions.notifications': { paramsTuple?: []; params?: {} }
+    'settings.sessions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.org.two_factor': { paramsTuple?: []; params?: {} }
     'settings.notifications': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
@@ -873,6 +877,7 @@ export type ScannedRoutes = {
     'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'pricingSeasons.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.sessions.notifications': { paramsTuple?: []; params?: {} }
     'settings.org.two_factor': { paramsTuple?: []; params?: {} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
     'settings.password.update': { paramsTuple?: []; params?: {} }
@@ -943,6 +948,9 @@ export type ScannedRoutes = {
     'pricingSeasons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.two_factor.cancel': { paramsTuple?: []; params?: {} }
     'settings.two_factor.destroy': { paramsTuple?: []; params?: {} }
+    'settings.sessions.destroy_others': { paramsTuple?: []; params?: {} }
+    'settings.sessions.destroy_remembered': { paramsTuple?: []; params?: {} }
+    'settings.sessions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
     'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
     'settings.billing.onlinePayments.disconnect': { paramsTuple?: []; params?: {} }

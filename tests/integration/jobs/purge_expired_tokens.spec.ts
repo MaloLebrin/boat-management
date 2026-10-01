@@ -10,6 +10,9 @@ import PurgeExpiredTokens from '#jobs/purge_expired_tokens'
 import PasswordResetService from '#services/password_reset_service'
 import OrganizationInvitationService from '#services/organization_invitation_service'
 import { EXPIRED_TOKEN_GRACE_DAYS } from '#shared/constants/data_retention'
+import UserSession from '#models/user_session'
+import { UserFactory } from '#database/factories/user_factory'
+import { SESSION_RETENTION_DAYS } from '#shared/constants/auth'
 
 /**
  * Purge des jetons morts — cron quotidien 00:00 (#775).
@@ -80,6 +83,33 @@ async function remainingInvitationEmails(prefix: string): Promise<string[]> {
 }
 
 test.group('PurgeExpiredTokens (cron 00:00)', () => {
+  test('supprime les sessions recensées inactives au-delà de la rétention (#885)', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.create()
+    const seed = (daysAgo: number) =>
+      UserSession.create({
+        id: randomUUID(),
+        userId: user.id,
+        rememberMeTokenId: null,
+        ipAddress: null,
+        userAgent: null,
+        lastSeenAt: DateTime.now().minus({ days: daysAgo }),
+        revokedAt: null,
+      })
+    const recent = await seed(SESSION_RETENTION_DAYS - 1)
+    await seed(SESSION_RETENTION_DAYS + 1)
+
+    const job = await app.container.make(PurgeExpiredTokens)
+    await job.execute()
+
+    const remaining = await UserSession.query().where('userId', user.id)
+    assert.deepEqual(
+      remaining.map((row) => row.id),
+      [recent.id]
+    )
+  })
+
   test('supprime les jetons de reset expirés au-delà du délai de grâce', async ({ assert }) => {
     // Encore valide : expire dans une heure.
     await PasswordResetToken.create({

@@ -13,6 +13,10 @@ export const AUDIT_ACTIONS = [
   'auth.2fa_recovery_used',
   'auth.2fa_recovery_regenerated',
   'auth.2fa_failed',
+  // Sessions et appareils (#885) : une session coupée depuis la liste, ou
+  // « déconnecter partout sauf ici ».
+  'auth.session_revoked',
+  'auth.logout_all',
   'organization.2fa_required',
   'boat.create',
   'boat.update',
@@ -162,6 +166,8 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'auth.2fa_recovery_used',
     'auth.2fa_recovery_regenerated',
     'auth.2fa_failed',
+    'auth.session_revoked',
+    'auth.logout_all',
   ],
   boat: [
     'boat.create',

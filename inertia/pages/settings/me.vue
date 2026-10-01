@@ -9,8 +9,9 @@ import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsMeTab from '~/components/settings/tabs/SettingsMeTab.vue'
 import { useT } from '~/composables/use_t'
 import type { TwoFactorSettingsProps } from '#shared/types/two_factor'
+import type { UserSessionsSettingsProps } from '#shared/types/user_session'
 
-defineProps<{ twoFactor: TwoFactorSettingsProps }>()
+defineProps<{ twoFactor: TwoFactorSettingsProps; sessions: UserSessionsSettingsProps }>()
 
 const { t } = useT()
 </script>
@@ -18,6 +19,6 @@ const { t } = useT()
 <template>
   <Head :title="t('settings.me.title')" />
   <SettingsShell>
-    <SettingsMeTab :two-factor="twoFactor" />
+    <SettingsMeTab :two-factor="twoFactor" :sessions="sessions" />
   </SettingsShell>
 </template>

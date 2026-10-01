@@ -1,5 +1,6 @@
 import OrganizationPolicy from '#policies/organization_policy'
 import TwoFactorService from '#services/two_factor_service'
+import UserSessionService from '#services/user_session_service'
 import {
   TwoFactorAlreadyEnabledError,
   TwoFactorNotEnabledError,
@@ -26,7 +27,10 @@ import type { HttpContext } from '@adonisjs/core/http'
  */
 @inject()
 export default class TwoFactorSettingsController {
-  constructor(private twoFactorService: TwoFactorService) {}
+  constructor(
+    private twoFactorService: TwoFactorService,
+    private userSessionService: UserSessionService
+  ) {}
 
   /** Démarre l'activation : le QR code apparaît au rechargement. */
   async store({ auth, response, session, i18n }: HttpContext) {
@@ -47,7 +51,11 @@ export default class TwoFactorSettingsController {
 
     let result: Awaited<ReturnType<TwoFactorService['confirmSetup']>>
     try {
-      result = await this.twoFactorService.confirmSetup(user, code)
+      result = await this.twoFactorService.confirmSetup(
+        user,
+        code,
+        this.userSessionService.currentId(session)
+      )
     } catch (error) {
       if (error instanceof TwoFactorAlreadyEnabledError) {
         session.flash('error', i18n.t('flash.twoFactor.alreadyEnabled'))

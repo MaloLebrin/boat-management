@@ -3441,6 +3441,36 @@ export class TwoFactorRecoveryCodeSchema extends BaseModel {
   declare userId: number
 }
 
+export class UserSessionSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'id',
+    'ipAddress',
+    'lastSeenAt',
+    'rememberMeTokenId',
+    'revokedAt',
+    'userAgent',
+    'userId',
+  ] as const
+  $columns = UserSessionSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare ipAddress: string | null
+  @column.dateTime()
+  declare lastSeenAt: DateTime
+  @column()
+  declare rememberMeTokenId: number | null
+  @column.dateTime()
+  declare revokedAt: DateTime | null
+  @column()
+  declare userAgent: string | null
+  @column()
+  declare userId: number
+}
+
 export class UserSchema extends BaseModel {
   static $columns = [
     'createdAt',
@@ -3451,6 +3481,7 @@ export class UserSchema extends BaseModel {
     'id',
     'lastLoginAt',
     'locale',
+    'notifyNewLogin',
     'organizationId',
     'password',
     'sessionsValidAfter',
@@ -3477,6 +3508,8 @@ export class UserSchema extends BaseModel {
   declare lastLoginAt: DateTime | null
   @column()
   declare locale: string | null
+  @column()
+  declare notifyNewLogin: boolean
   @column()
   declare organizationId: number | null
   @column({ serializeAs: null })

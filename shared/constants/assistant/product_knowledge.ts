@@ -2155,4 +2155,27 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     ],
     navTarget: 'settings.me',
   },
+  {
+    id: 'devices-and-sessions',
+    title: {
+      en: 'Signed-in devices and sessions',
+      fr: 'Appareils et sessions connectés',
+    },
+    body: {
+      en: 'Settings → My account lists every browser where the account is signed in: device, IP address, last activity, and whether the sign-in is remembered. Each other session can be signed out on its own, which also revokes its “remember me”, and “Sign out everywhere else” closes all of them except the current one. An email warns when the account is opened from a device never seen before; it can be turned off there.',
+      fr: 'Réglages → Mon compte liste les navigateurs où le compte est ouvert : appareil, adresse IP, dernière activité, connexion mémorisée ou non. Chaque autre session se déconnecte seule, ce qui révoque aussi son « se souvenir de moi », et « Déconnecter partout sauf ici » les ferme toutes sauf la session courante. Un e-mail prévient quand le compte est ouvert depuis un appareil jamais vu ; l’alerte se désactive au même endroit.',
+    },
+    keywords: [
+      'sessions',
+      'appareils connectes',
+      'deconnecter partout',
+      'deconnexion a distance',
+      'se souvenir de moi',
+      'nouvelle connexion',
+      'signed in devices',
+      'sign out everywhere',
+      'securite du compte',
+    ],
+    navTarget: 'settings.me',
+  },
 ]

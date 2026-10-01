@@ -49,6 +49,10 @@ router.use([
   // `ctx.i18n` (posé par `detect_user_locale_middleware`) pour flasher son
   // message avant de rediriger.
   () => import('#middleware/revoked_session_middleware'),
+  // #885 — registre des sessions : APRÈS le middleware ci-dessus (une session
+  // déjà révoquée globalement ne doit pas être recensée) et pour les mêmes
+  // raisons d'ordre (`ctx.auth.user`, `ctx.i18n`).
+  () => import('#middleware/session_registry_middleware'),
 ])
 
 export const middleware = router.named({

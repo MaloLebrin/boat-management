@@ -1938,6 +1938,30 @@ const routes = {
     tokens: [{"old":"/settings/two-factor/recovery-codes","type":0,"val":"settings","end":""},{"old":"/settings/two-factor/recovery-codes","type":0,"val":"two-factor","end":""},{"old":"/settings/two-factor/recovery-codes","type":0,"val":"recovery-codes","end":""}],
     types: placeholder as Registry['settings.two_factor.recovery_codes']['types'],
   },
+  'settings.sessions.destroy_others': {
+    methods: ["DELETE"],
+    pattern: '/settings/sessions/others',
+    tokens: [{"old":"/settings/sessions/others","type":0,"val":"settings","end":""},{"old":"/settings/sessions/others","type":0,"val":"sessions","end":""},{"old":"/settings/sessions/others","type":0,"val":"others","end":""}],
+    types: placeholder as Registry['settings.sessions.destroy_others']['types'],
+  },
+  'settings.sessions.destroy_remembered': {
+    methods: ["DELETE"],
+    pattern: '/settings/sessions/remembered',
+    tokens: [{"old":"/settings/sessions/remembered","type":0,"val":"settings","end":""},{"old":"/settings/sessions/remembered","type":0,"val":"sessions","end":""},{"old":"/settings/sessions/remembered","type":0,"val":"remembered","end":""}],
+    types: placeholder as Registry['settings.sessions.destroy_remembered']['types'],
+  },
+  'settings.sessions.notifications': {
+    methods: ["PUT"],
+    pattern: '/settings/sessions/notifications',
+    tokens: [{"old":"/settings/sessions/notifications","type":0,"val":"settings","end":""},{"old":"/settings/sessions/notifications","type":0,"val":"sessions","end":""},{"old":"/settings/sessions/notifications","type":0,"val":"notifications","end":""}],
+    types: placeholder as Registry['settings.sessions.notifications']['types'],
+  },
+  'settings.sessions.destroy': {
+    methods: ["DELETE"],
+    pattern: '/settings/sessions/:id',
+    tokens: [{"old":"/settings/sessions/:id","type":0,"val":"settings","end":""},{"old":"/settings/sessions/:id","type":0,"val":"sessions","end":""},{"old":"/settings/sessions/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['settings.sessions.destroy']['types'],
+  },
   'settings.org.two_factor': {
     methods: ["PUT"],
     pattern: '/settings/org/two-factor',

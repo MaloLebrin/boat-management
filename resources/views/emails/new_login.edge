@@ -1,0 +1,31 @@
+{{--
+  Nouvelle connexion depuis un appareil inconnu (#885) : envoyé au titulaire
+  du compte, désactivable depuis ses réglages. Textes traduits dans la langue
+  du destinataire.
+--}}
+@component('emails/_layout')
+  @slot('content')
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">
+      {{ i18n.t('auth.newLogin.greeting', { name: displayName }) }}
+    </h2>
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">{{ body }}</p>
+    <ul style="margin:0 0 15px;padding-left:20px;color:#555555;font-size:15px;line-height:1.6;">
+      @each(line in details)
+        <li>{{ line }}</li>
+      @end
+    </ul>
+    <p style="margin:0 0 25px;color:#555555;font-size:16px;line-height:1.5;">{{ notYou }}</p>
+    <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto;">
+      <tr>
+        <td style="border-radius:6px;background-color:#1e3a5f;">
+          <a
+            href="{{ securityUrl }}"
+            style="display:inline-block;padding:14px 30px;color:#ffffff;text-decoration:none;font-size:16px;font-weight:bold;"
+          >
+            {{ i18n.t('auth.newLogin.cta') }}
+          </a>
+        </td>
+      </tr>
+    </table>
+  @end
+@end

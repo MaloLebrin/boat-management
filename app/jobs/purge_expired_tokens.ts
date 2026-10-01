@@ -1,5 +1,6 @@
 import OrganizationInvitationService from '#services/organization_invitation_service'
 import PasswordResetService from '#services/password_reset_service'
+import UserSessionService from '#services/user_session_service'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { Job } from '@adonisjs/queue'
@@ -26,7 +27,8 @@ export default class PurgeExpiredTokens extends Job<Record<string, never>> {
 
   constructor(
     private passwordResetService: PasswordResetService,
-    private invitationService: OrganizationInvitationService
+    private invitationService: OrganizationInvitationService,
+    private userSessionService: UserSessionService
   ) {
     super()
   }
@@ -36,8 +38,13 @@ export default class PurgeExpiredTokens extends Job<Record<string, never>> {
 
     const passwordResetTokens = await this.passwordResetService.purgeExpired()
     const invitations = await this.invitationService.purgeExpired()
+    // Registre des appareils (#885) : lignes inactives au-delà de la rétention.
+    const userSessions = await this.userSessionService.purgeStale()
 
-    logger.info({ passwordResetTokens, invitations }, 'PurgeExpiredTokens: purge complete')
+    logger.info(
+      { passwordResetTokens, invitations, userSessions },
+      'PurgeExpiredTokens: purge complete'
+    )
   }
 
   async failed(error: Error) {

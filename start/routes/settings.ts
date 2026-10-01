@@ -15,6 +15,7 @@ const InvoiceRemindersController = () => import('#controllers/invoice_reminders_
 const AccountingSettingsController = () => import('#controllers/accounting_settings_controller')
 const DataExportsController = () => import('#controllers/data_exports_controller')
 const TwoFactorSettingsController = () => import('#controllers/two_factor_settings_controller')
+const UserSessionsController = () => import('#controllers/user_sessions_controller')
 
 // Préférences pré-auth (switchers de langue et de thème, aussi disponibles
 // sur le marketing et l'écran de login) : persistées sur le profil quand
@@ -45,6 +46,21 @@ router
         'regenerateRecoveryCodes',
       ])
       .as('settings.two_factor.recovery_codes')
+    // Appareils et sessions connectés (#885). `others` et `remembered` avant
+    // `:id` : sinon ils seraient lus comme un identifiant de session.
+    router
+      .delete('settings/sessions/others', [UserSessionsController, 'destroyOthers'])
+      .as('settings.sessions.destroy_others')
+    router
+      .delete('settings/sessions/remembered', [UserSessionsController, 'destroyRemembered'])
+      .as('settings.sessions.destroy_remembered')
+    router
+      .put('settings/sessions/notifications', [UserSessionsController, 'updateNotifications'])
+      .as('settings.sessions.notifications')
+    router
+      .delete('settings/sessions/:id', [UserSessionsController, 'destroy'])
+      .where('id', router.matchers.uuid())
+      .as('settings.sessions.destroy')
     router
       .put('settings/org/two-factor', [TwoFactorSettingsController, 'updateOrganizationPolicy'])
       .as('settings.org.two_factor')

@@ -72,7 +72,7 @@ export default class TwoFactorChallengeController {
 
     clearTwoFactorChallenge(session)
     const redirectTo = await this.sessionLoginService.complete(
-      { auth, session, i18n },
+      { auth, session, i18n, request },
       user,
       pending.remember
     )
