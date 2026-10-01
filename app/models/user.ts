@@ -1,8 +1,8 @@
 import { UserSchema } from '#database/schema'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { DbRememberMeTokensProvider } from '@adonisjs/auth/session'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
+import { TrackedRememberMeTokensProvider } from '#utils/tracked_remember_me_tokens_provider'
 import Organization from '#models/organization'
 import OrganizationMembership from '#models/organization_membership'
 import Boat from '#models/boat'
@@ -18,7 +18,8 @@ export default class User extends compose(
   UserSchema,
   withAuthFinder(() => hash.use())
 ) {
-  static rememberMeTokens = DbRememberMeTokensProvider.forModel(User)
+  /** Remember-me reliés au registre des sessions (#885). */
+  static rememberMeTokens = new TrackedRememberMeTokensProvider({ tokenableModel: User })
 
   /**
    * Toute session ouverte **avant** cet instant est révoquée (#763).

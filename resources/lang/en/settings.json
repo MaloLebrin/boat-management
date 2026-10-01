@@ -574,7 +574,9 @@
       "auth_2fa_recovery_used": "Recovery code used",
       "auth_2fa_recovery_regenerated": "Recovery codes regenerated",
       "auth_2fa_failed": "Two-factor code rejected",
-      "organization_2fa_required": "Two-factor policy changed"
+      "organization_2fa_required": "Two-factor policy changed",
+      "auth_session_revoked": "Session signed out remotely",
+      "auth_logout_all": "Signed out of every other session"
     },
     "empty": {
       "title": "No activity yet",
@@ -633,5 +635,26 @@
       "title": "No exports yet",
       "description": "Large exports will appear here once generated."
     }
+  },
+  "sessions": {
+    "title": "Devices and sessions",
+    "subtitle": "The browsers where your account is signed in. Sign out the ones you don't recognise.",
+    "device": "{browser} on {os}",
+    "unknownBrowser": "Unknown browser",
+    "unknownOs": "unknown system",
+    "current": "This session",
+    "remembered": "Remembered sign-in",
+    "lastSeen": "Last active: {date}",
+    "openedAt": "Opened on {date}",
+    "ip": "IP {ip}",
+    "revoke": "Sign out",
+    "revokeFor": "Sign out {device}",
+    "revokeConfirm": "Sign out this session? The device will have to sign in again.",
+    "revokeOthers": "Sign out everywhere else",
+    "revokeOthersConfirm": "Sign out every other session and remembered sign-in?",
+    "empty": "No other open session.",
+    "orphanRemembered": "{count, plural, one {# older remembered sign-in is not tied to any listed session.} other {# older remembered sign-ins are not tied to any listed session.}}",
+    "revokeOrphans": "Revoke them",
+    "notifyNewLogin": "Email me when my account is signed in from a new device"
   }
 }

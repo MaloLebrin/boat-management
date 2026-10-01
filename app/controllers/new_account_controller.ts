@@ -7,6 +7,7 @@ import env from '#start/env'
 import BoatHullService from '#services/boat_hull_service'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import UserSessionService from '#services/user_session_service'
 import type { SimulatorBoatInput } from '#shared/types/simulator'
 import { DateTime } from 'luxon'
 
@@ -16,7 +17,8 @@ export default class NewAccountController {
     private userService: UserService,
     private emailQueueService: EmailQueueService,
     private emailVerificationService: EmailVerificationService,
-    private boatHullService: BoatHullService
+    private boatHullService: BoatHullService,
+    private userSessionService: UserSessionService
   ) {}
 
   async create({ inertia, request }: HttpContext) {
@@ -32,6 +34,7 @@ export default class NewAccountController {
 
     await auth.use('web').login(user)
     stampAuthSession(session)
+    await this.userSessionService.open({ request, session }, user, { notify: false })
     user.lastLoginAt = DateTime.now()
     await user.save()
 

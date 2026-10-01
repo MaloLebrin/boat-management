@@ -93,6 +93,22 @@ test.group('RevokedSessionMiddleware (unit)', () => {
     assert.deepEqual(redirects, ['/login'])
   })
 
+  test('stamps and lets through a session just restored by a remember-me', async ({ assert }) => {
+    // #885 — la restauration ouvre une session neuve, sans estampille. Son
+    // jeton a survécu à la révocation (chacune supprime les remember-me) :
+    // la refuser rendait le remember-me inutilisable à vie après un reset.
+    const ctx = makeCtx({ authenticated: true, user: userWith(NOW), viaRemember: true })
+    let nextCalled = 0
+
+    await new RevokedSessionMiddleware().handle(ctx.ctx, async () => {
+      nextCalled += 1
+    })
+
+    assert.equal(nextCalled, 1)
+    assert.deepEqual(ctx.redirects, [])
+    assert.isString(ctx.sessionStore[AUTH_SESSION_STARTED_AT_KEY])
+  })
+
   test('cuts a session whose stamp is unparseable', async ({ assert }) => {
     const ctx = makeCtx({
       authenticated: true,

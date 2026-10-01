@@ -276,12 +276,81 @@ envoie un e-mail à son titulaire (`EmailQueueService.sendTwoFactorChanged`,
 gabarit `emails/two_factor_changed`, dans sa langue).
 
 **Hors périmètre** : passkeys/WebAuthn (étape 2, même infrastructure de
-second facteur), SSO/SAML, liste des sessions actives.
+second facteur), SSO/SAML.
+
+### Appareils et sessions connectés (#885)
+
+`/settings/me` liste les sessions ouvertes du compte, permet d'en couper une,
+de « déconnecter partout sauf ici », et prévient par e-mail d'une connexion
+depuis un appareil inconnu.
+
+**Un registre, pas un changement de store.** Le store de session reste celui
+de `SESSION_DRIVER` (cookie en production) : passer au store `database`
+aurait déconnecté tout le monde au déploiement et imposé un changement
+d'environnement. La table `user_sessions` **recense** les sessions à la
+place ; la session porte l'identifiant de sa ligne (`authSessionRecordId`).
+
+- **Ouverture** — `UserSessionService.open()` sur les points d'entrée
+  (`SessionLoginService.complete`, `NewAccountController.store`) : IP,
+  user-agent, remember-me émis.
+- **Contrôle** — `SessionRegistryMiddleware`, monté juste après
+  `RevokedSessionMiddleware` : une ligne révoquée, absente ou d'un autre
+  compte déconnecte la session vers `/login` dès la requête suivante. Une
+  lecture par clé primaire par requête authentifiée ; `last_seen_at` n'est
+  réécrit qu'au plus toutes les 15 minutes.
+- **Adoption** — une session authentifiée sans ligne (restaurée par un
+  remember-me, ou ouverte avant le déploiement) est recensée à sa première
+  requête. Restaurée par un remember-me, elle reprend la ligne de ce jeton.
+- **Compte démo** hors registre : partagé par tous les visiteurs, il listerait
+  leurs IP les uns aux autres.
+
+**Le lien avec le remember-me.** Couper une session sans son remember-me ne
+sert à rien : le cookie la rouvre aussitôt. Or le guard n'expose jamais le
+jeton qu'il émet, et le **recycle** (nouvel identifiant) à chaque
+restauration. `User.rememberMeTokens` est donc un
+`TrackedRememberMeTokensProvider` : `create()` mémorise l'identifiant émis
+pour la requête (`takeIssuedRememberMeTokenId`), `recycle()` crée le nouveau
+jeton **avant** de supprimer l'ancien et reporte le lien — dans l'ordre
+d'origine, la FK `ON DELETE SET NULL` l'aurait effacé.
+
+Corollaire sur #763 : une session restaurée par un remember-me est
+désormais estampillée par `RevokedSessionMiddleware` (`viaRemember`). Son
+jeton a survécu à toute révocation — chacune supprime les remember-me —, et
+sans estampille un compte qui avait déjà révoqué ne pouvait plus jamais être
+restauré.
+
+| Route                                  | Effet                                                                |
+| -------------------------------------- | -------------------------------------------------------------------- |
+| `DELETE /settings/sessions/:id`        | coupe une autre session et son remember-me (pas la session courante) |
+| `DELETE /settings/sessions/others`     | toutes les autres lignes et remember-me, `sessions_valid_after` daté |
+| `DELETE /settings/sessions/remembered` | remember-me antérieurs au registre, rattachés à aucune session       |
+| `PUT /settings/sessions/notifications` | `enabled` : alerte e-mail « nouvel appareil »                        |
+
+« Déconnecter partout sauf ici » date aussi `sessions_valid_after` pour les
+sessions ouvertes avant le registre, puis réestampille la session courante,
+comme le changement de mot de passe. `revokeAllAccess()` (#763 : reset,
+changement de mot de passe, activation 2FA) clôt aussi toutes les lignes sauf
+celle de la session qui agit.
+
+**Nouvel appareil.** Un appareil est l'empreinte navigateur + système lue
+dans le user-agent (`shared/helpers/user_agent.ts`). Si aucune ligne du compte
+(révoquées comprises, sur les 90 jours de rétention) n'a la même, la connexion
+envoie `EmailQueueService.sendNewLogin` (gabarit `emails/new_login`). La toute
+première connexion recensée n'envoie rien. Désactivable
+(`users.notify_new_login`).
+
+**Audit.** `auth.session_revoked` (métadonnée `device`, ou
+`rememberMeTokens` pour les remember-me orphelins) et `auth.logout_all`
+(`sessions` : nombre coupé).
+
+**Hors périmètre** : lieu approximatif par IP (aucune base de géolocalisation
+embarquée).
 
 ### Logout
 
 - `POST /logout` (auth-only)
   - Controller: `SessionController.destroy`
+  - clôt la ligne `user_sessions` de la session (#885)
   - `auth.use('web').logout()`
   - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `session.create`

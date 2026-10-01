@@ -107,4 +107,5 @@ export const controllers = {
   Spots: () => import('#controllers/spots_controller'),
   TwoFactorChallenge: () => import('#controllers/two_factor_challenge_controller'),
   TwoFactorSettings: () => import('#controllers/two_factor_settings_controller'),
+  UserSessions: () => import('#controllers/user_sessions_controller'),
 }

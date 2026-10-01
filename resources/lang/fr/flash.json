@@ -81,7 +81,8 @@
     "emailVerified": "Votre adresse e-mail est confirmée. Vous pouvez vous connecter.",
     "signupRateLimit": "Trop d'inscriptions depuis ce réseau. Veuillez réessayer dans une heure.",
     "loginRateLimit": "Trop de tentatives de connexion. Veuillez réessayer plus tard.",
-    "sessionRevoked": "Votre mot de passe a été changé. Veuillez vous reconnecter."
+    "sessionRevoked": "Votre mot de passe a été changé. Veuillez vous reconnecter.",
+    "sessionEnded": "Cette session a été déconnectée depuis un autre appareil. Veuillez vous reconnecter."
   },
   "settings": {
     "profileUpdated": "Profil mis à jour.",
@@ -553,5 +554,13 @@
     "recoveryRegenerated": "Nouveaux codes de secours générés.",
     "policyEnabled": "Double authentification désormais obligatoire pour les membres.",
     "policyDisabled": "La double authentification n'est plus obligatoire."
+  },
+  "sessions": {
+    "revoked": "Session déconnectée.",
+    "notFound": "Session introuvable ou déjà déconnectée.",
+    "cannotRevokeCurrent": "Pour fermer cette session, utilisez « Se déconnecter ».",
+    "othersRevoked": "Toutes les autres sessions ont été déconnectées.",
+    "orphansRevoked": "Connexions mémorisées révoquées.",
+    "notifyUpdated": "Préférence d'alerte enregistrée."
   }
 }

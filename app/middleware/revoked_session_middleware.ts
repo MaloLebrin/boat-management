@@ -1,4 +1,5 @@
 import { AUTH_SESSION_STARTED_AT_KEY } from '#shared/constants/auth'
+import { stampAuthSession } from '#utils/auth_session'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import { DateTime } from 'luxon'
@@ -34,6 +35,12 @@ import { DateTime } from 'luxon'
 export default class RevokedSessionMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
     const user = ctx.auth.user
+
+    // Session rouverte à l'instant par un remember-me (#885) : elle est neuve,
+    // et son jeton a survécu à toute révocation — chacune supprime les
+    // remember-me. Sans cette estampille, un compte qui avait déjà révoqué
+    // ses sessions ne pouvait plus jamais être restauré par son remember-me.
+    if (user && ctx.auth.use('web').viaRemember) stampAuthSession(ctx.session)
 
     if (user && user.sessionsValidAfter !== null) {
       const startedAtRaw = ctx.session.get(AUTH_SESSION_STARTED_AT_KEY)

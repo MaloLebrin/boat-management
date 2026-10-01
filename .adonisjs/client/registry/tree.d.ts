@@ -546,6 +546,12 @@ export interface ApiDefinition {
       destroy: typeof routes['settings.two_factor.destroy']
       recoveryCodes: typeof routes['settings.two_factor.recovery_codes']
     }
+    sessions: {
+      destroyOthers: typeof routes['settings.sessions.destroy_others']
+      destroyRemembered: typeof routes['settings.sessions.destroy_remembered']
+      notifications: typeof routes['settings.sessions.notifications']
+      destroy: typeof routes['settings.sessions.destroy']
+    }
     org: typeof routes['settings.org'] & {
       twoFactor: typeof routes['settings.org.two_factor']
       update: typeof routes['settings.org.update']

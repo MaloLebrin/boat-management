@@ -435,6 +435,12 @@ checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`
 - Alerte `requiredBy`/`requiredNow` quand la politique d'organisation l'impose et que la 2FA n'est pas active.
 - L'annuaire `/settings/members` (`SettingsMembersTab.vue`) a une colonne « 2FA » (`member.twoFactorEnabled`).
 
+### Settings — appareils et sessions (`/settings/me`, #885)
+
+- `components/settings/me/SessionsCard.vue`, juste après `TwoFactorCard`, alimentée par la prop de page `sessions` (`UserSessionsSettingsProps`, servie par `SettingsController.me`). Une ligne par session active (`sessions/SessionRow.vue`) : appareil (« Chrome sur macOS », lu par `shared/helpers/user_agent.ts`), dernière activité, ouverture, IP, badges « Cette session » et « Connexion mémorisée ». La session courante n'a pas de bouton.
+- « Déconnecter » (`router.delete('/settings/sessions/:id')`) et « Déconnecter partout sauf ici » (`router.delete('/settings/sessions/others')`) passent par un `BaseConfirmModal`. Les remember-me antérieurs au registre s'affichent en une ligne avec « Les révoquer » (`router.delete('/settings/sessions/remembered')`), seulement s'il y en a.
+- `BaseToggle` « M'avertir par e-mail… » → `router.put('/settings/sessions/notifications', { enabled })`. Clés `settings.sessions.*`.
+
 ### Paiement public d'une facture (`/pay/:token`, #876)
 
 - Page : `inertia/pages/pay/show.vue` (layout `auth`, sans login), prop `payment: PublicInvoicePayment | null`. Carte émetteur, numéro, client, dates, montant ; bouton « Payer {montant} » (`useForm().post('/pay/:token/checkout')` → Stripe Checkout) si `state === 'payable'`, sinon alerte « réglée », « paiement en cours de confirmation » (retour `?status=success`) ou « indisponible ». `payment === null` : carte « lien invalide ».

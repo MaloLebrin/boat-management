@@ -39,6 +39,8 @@ export interface FakeCtxOptions {
   authenticateError?: Error
   /** Valeurs initiales de `ctx.session`. */
   session?: Record<string, unknown>
+  /** `auth.use(guard).viaRemember` : session rouverte par un remember-me (#885). */
+  viaRemember?: boolean
 }
 
 export interface FakeCtx {
@@ -81,6 +83,7 @@ export function makeCtx(options: FakeCtxOptions = {}): FakeCtx {
         checkedGuards.push(guard)
         return {
           check: async () => options.authenticated ?? false,
+          viaRemember: options.viaRemember ?? false,
           logout: async () => {
             logoutCalls.push(guard ?? options.defaultGuard ?? 'web')
           },

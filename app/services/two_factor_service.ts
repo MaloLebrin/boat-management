@@ -113,7 +113,8 @@ export default class TwoFactorService {
    */
   async confirmSetup(
     user: User,
-    code: string
+    code: string,
+    keepSessionId: string | null = null
   ): Promise<{ recoveryCodes: string[]; validAfter: DateTime } | null> {
     if (user.hasTwoFactorEnabled) throw new TwoFactorAlreadyEnabledError()
     const secret = !user.twoFactorSecret ? null : this.#decryptSecret(user)
@@ -127,7 +128,7 @@ export default class TwoFactorService {
     await user.save()
 
     const recoveryCodes = await this.#replaceRecoveryCodes(user)
-    const validAfter = await this.passwordResetService.revokeAllAccess(user)
+    const validAfter = await this.passwordResetService.revokeAllAccess(user, keepSessionId)
 
     await this.#audit(user, 'auth.2fa_enabled')
     await this.#notify(user, 'enabled')

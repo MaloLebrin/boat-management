@@ -65,6 +65,9 @@ règle ; leurs index FK sont nommés `{table}_{column}_idx`.
     renseigné (`User.hasTwoFactorEnabled`)
   - `twoFactorLastUsedStep` (bigint nullable) — dernier pas TOTP accepté ; un
     code d'un pas inférieur ou égal est refusé (anti-rejeu)
+- `notifyNewLogin` (booléen, défaut `true`, #885) — e-mail « nouvelle connexion »
+  quand le compte est ouvert depuis un appareil jamais vu ; réglable depuis
+  `/settings/me`
 - préférences d'interface, nullables — retombent sur le cookie puis sur un défaut :
   - `locale` (`en` | `fr`, #414)
   - `theme` (`system` | `light` | `dark`, #416)
@@ -711,6 +714,29 @@ Codes de secours de la double authentification (#884) — doc de domaine :
 Huit codes par utilisateur, remplacés en bloc à chaque régénération et
 supprimés à la désactivation. Le code en clair n'est montré qu'une fois.
 
+### user_sessions
+
+Registre des sessions authentifiées (#885) — doc de domaine :
+`docs/domain/auth-acl.md`. Le contenu des sessions reste dans le store de
+`SESSION_DRIVER` (cookie en production) : cette table ne sert qu'à les lister et
+à en révoquer une.
+
+- `id` (UUID, clé primaire posée par l'application) — porté par la session
+  (`authSessionRecordId`)
+- `userId` (FK `users`, `CASCADE`)
+- `rememberMeTokenId` (FK `remember_me_tokens` nullable, `SET NULL`, indexé) —
+  le remember-me émis avec la session ; reporté sur le nouveau jeton quand le
+  guard le recycle (`TrackedRememberMeTokensProvider`)
+- `ipAddress` (varchar 45, nullable), `userAgent` (varchar 512, nullable) —
+  rafraîchis avec `lastSeenAt`
+- `createdAt`, `lastSeenAt` — `lastSeenAt` réécrit au plus toutes les 15 min
+- `revokedAt` (nullable) — révocation depuis la liste, « déconnecter partout »,
+  déconnexion ou révocation globale (#763). La ligne est gardée : elle sert à
+  reconnaître un appareil déjà vu
+
+Index `(user_id, revoked_at)`. Les lignes inactives depuis plus de 90 jours
+(`SESSION_RETENTION_DAYS`) sont purgées par `PurgeExpiredTokens`.
+
 ### pending_imports
 
 Une ligne = l'**import CSV en attente de confirmation** d'un utilisateur (#774)
@@ -825,6 +851,7 @@ visiteur remplit depuis le site public et qui portent des adresses e-mail.
 | ----- | ---------------------------- | -------------------------- | -------------- | ----------------------------------------- |
 | 00:00 | `PurgeExpiredTokens`         | `password_reset_tokens`    | `expires_at`   | expiration + 7 j                          |
 | 00:00 | `PurgeExpiredTokens`         | `organization_invitations` | `expires_at`   | expiration + 7 j, **hors acceptées**      |
+| 00:00 | `PurgeExpiredTokens`         | `user_sessions`            | `last_seen_at` | 90 j d'inactivité (#885)                  |
 | 00:30 | `PurgePublicFormData`        | `contact_messages`         | `created_at`   | 24 mois                                   |
 | 00:30 | `PurgePublicFormData`        | `simulator_leads`          | `updated_at`   | 24 mois                                   |
 | 00:30 | `PurgePublicFormData`        | `simulator_shares`         | `expires_at`   | 6 mois (échéance posée à la création)     |

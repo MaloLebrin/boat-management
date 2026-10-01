@@ -36,6 +36,7 @@ import { BILLING_SETTINGS_PATH } from '#shared/constants/billing'
 import { AUTH_SESSION_STARTED_AT_KEY } from '#shared/constants/auth'
 import PasswordResetService from '#services/password_reset_service'
 import TwoFactorService from '#services/two_factor_service'
+import UserSessionService from '#services/user_session_service'
 import { TWO_FACTOR_RECOVERY_CODES_FLASH_KEY } from '#shared/constants/two_factor'
 import type { TwoFactorSettingsProps } from '#shared/types/two_factor'
 
@@ -56,8 +57,10 @@ export default class SettingsController {
     private onlinePaymentService: OnlinePaymentService,
     private invoiceReminderService: InvoiceReminderService,
     private accountingSettingsService: AccountingSettingsService,
-    private twoFactorService: TwoFactorService
+    private twoFactorService: TwoFactorService,
+    private userSessionService: UserSessionService
   ) {}
+
   async me({ inertia, auth, session }: HttpContext) {
     const user = await auth.authenticate()
 
@@ -65,10 +68,12 @@ export default class SettingsController {
     // transitent que par le flash qui suit leur génération : affichés une
     // fois, introuvables ensuite.
     const flashedCodes: unknown = session.flashMessages.get(TWO_FACTOR_RECOVERY_CODES_FLASH_KEY)
-    const [pendingSetup, recoveryCodesRemaining, enforcement] = await Promise.all([
+    const [pendingSetup, recoveryCodesRemaining, enforcement, sessions] = await Promise.all([
       this.twoFactorService.pendingSetup(user),
       user.hasTwoFactorEnabled ? this.twoFactorService.recoveryCodesRemaining(user.id) : 0,
       this.twoFactorService.enforcementFor(user),
+      // Appareils et sessions (#885).
+      this.userSessionService.settingsFor(user, this.userSessionService.currentId(session)),
     ])
     const twoFactor: TwoFactorSettingsProps = {
       enabled: user.hasTwoFactorEnabled,
@@ -82,7 +87,7 @@ export default class SettingsController {
       graceEndsAt: enforcement.graceEndsAt,
     }
 
-    return inertia.render('settings/me', { twoFactor })
+    return inertia.render('settings/me', { twoFactor, sessions })
   }
 
   /** Gestion des notifications push et des appareils abonnés (#498). */
@@ -214,7 +219,11 @@ export default class SettingsController {
     // Révocation des autres sessions (#763) + journal d'audit (#856). On
     // réestampille la session courante pour ne pas déconnecter celui qui
     // vient d'agir — la comparaison du middleware est stricte (`<`).
-    const validAfter = await this.passwordResetService.changePasswordForUser(user, password)
+    const validAfter = await this.passwordResetService.changePasswordForUser(
+      user,
+      password,
+      this.userSessionService.currentId(session)
+    )
     session.put(AUTH_SESSION_STARTED_AT_KEY, validAfter.toISO() ?? '')
 
     session.flash('success', i18n.t('flash.settings.passwordUpdatedOtherDevicesSignedOut'))

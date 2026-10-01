@@ -1,6 +1,7 @@
 import PasswordResetToken from '#models/password_reset_token'
 import User from '#models/user'
 import AuditLogService from '#services/audit_log_service'
+import UserSessionService from '#services/user_session_service'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto'
@@ -12,7 +13,10 @@ function sha256(value: string): string {
 
 @inject()
 export default class PasswordResetService {
-  constructor(private auditLogService: AuditLogService) {}
+  constructor(
+    private auditLogService: AuditLogService,
+    private userSessionService: UserSessionService
+  ) {}
 
   async createToken(email: string): Promise<string | null> {
     const user = await User.findBy('email', email)
@@ -77,9 +81,12 @@ export default class PasswordResetService {
    *
    * `validAfter` est rendu pour que l'appelant puisse **réestampiller la
    * session courante** — le changement depuis les réglages ne doit pas
-   * déconnecter celui qui vient d'agir.
+   * déconnecter celui qui vient d'agir. Pour la même raison, la ligne
+   * `keepSessionId` du registre des appareils (#885) reste ouverte ; toutes
+   * les autres sont closes, pour que la liste ne montre plus de sessions
+   * mortes.
    */
-  async revokeAllAccess(user: User): Promise<DateTime> {
+  async revokeAllAccess(user: User, keepSessionId: string | null = null): Promise<DateTime> {
     const tokens = await User.rememberMeTokens.all(user)
     for (const token of tokens) {
       await User.rememberMeTokens.delete(user, token.identifier)
@@ -88,6 +95,7 @@ export default class PasswordResetService {
     const validAfter = DateTime.now()
     user.sessionsValidAfter = validAfter
     await user.save()
+    await this.userSessionService.revokeAllExcept(user.id, keepSessionId)
 
     return validAfter
   }
@@ -162,11 +170,15 @@ export default class PasswordResetService {
    * Changement de mot de passe depuis les réglages (#856) — même révocation
    * d'accès que le reset, plus une ligne d'audit dédiée.
    */
-  async changePasswordForUser(user: User, newPassword: string): Promise<DateTime> {
+  async changePasswordForUser(
+    user: User,
+    newPassword: string,
+    keepSessionId: string | null = null
+  ): Promise<DateTime> {
     user.password = newPassword
     await user.save()
 
-    const validAfter = await this.revokeAllAccess(user)
+    const validAfter = await this.revokeAllAccess(user, keepSessionId)
 
     if (user.organizationId) {
       await this.auditLogService.log({

@@ -31,3 +31,30 @@ export const PASSWORD_RESET_TOKEN_SESSION_KEY = 'passwordResetToken'
  * les rend non listables côté serveur.
  */
 export const AUTH_SESSION_STARTED_AT_KEY = 'authSessionStartedAt'
+
+/**
+ * Clé de session qui porte l'identifiant de la ligne `user_sessions` de la
+ * session courante (#885). Posée au login ; une session dont la ligne est
+ * révoquée est déconnectée par `SessionRegistryMiddleware`.
+ */
+export const AUTH_SESSION_RECORD_KEY = 'authSessionRecordId'
+
+/**
+ * Intervalle minimal entre deux mises à jour de `last_seen_at` (#885) : la
+ * ligne est lue à chaque requête authentifiée, mais n'est réécrite qu'au plus
+ * une fois par intervalle.
+ */
+export const SESSION_TOUCH_INTERVAL_MINUTES = 15
+
+/**
+ * Inactivité au-delà de laquelle une session sans remember-me est expirée —
+ * aligné sur `age: '5d'` de `config/session.ts`.
+ */
+export const SESSION_IDLE_DAYS = 5
+
+/**
+ * Durée de conservation d'une ligne `user_sessions` après sa dernière
+ * activité (#885). Au-delà, le job de purge la supprime ; d'ici là elle sert
+ * à reconnaître un appareil déjà vu (pas d'e-mail « nouvelle connexion »).
+ */
+export const SESSION_RETENTION_DAYS = 90

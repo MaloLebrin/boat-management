@@ -574,7 +574,9 @@
       "auth_2fa_recovery_used": "Code de secours utilisé",
       "auth_2fa_recovery_regenerated": "Codes de secours régénérés",
       "auth_2fa_failed": "Code de double authentification refusé",
-      "organization_2fa_required": "Politique de double authentification modifiée"
+      "organization_2fa_required": "Politique de double authentification modifiée",
+      "auth_session_revoked": "Session déconnectée à distance",
+      "auth_logout_all": "Déconnexion de toutes les autres sessions"
     },
     "empty": {
       "title": "Aucune activité",
@@ -633,5 +635,26 @@
       "title": "Aucun export",
       "description": "Les exports volumineux apparaîtront ici une fois générés."
     }
+  },
+  "sessions": {
+    "title": "Appareils et sessions",
+    "subtitle": "Les navigateurs où votre compte est ouvert. Déconnectez ceux que vous ne reconnaissez pas.",
+    "device": "{browser} sur {os}",
+    "unknownBrowser": "Navigateur inconnu",
+    "unknownOs": "système inconnu",
+    "current": "Cette session",
+    "remembered": "Connexion mémorisée",
+    "lastSeen": "Dernière activité : {date}",
+    "openedAt": "Ouverte le {date}",
+    "ip": "IP {ip}",
+    "revoke": "Déconnecter",
+    "revokeFor": "Déconnecter {device}",
+    "revokeConfirm": "Déconnecter cette session ? L'appareil devra se reconnecter.",
+    "revokeOthers": "Déconnecter partout sauf ici",
+    "revokeOthersConfirm": "Déconnecter toutes les autres sessions et connexions mémorisées ?",
+    "empty": "Aucune autre session ouverte.",
+    "orphanRemembered": "{count, plural, one {# connexion mémorisée antérieure n'est rattachée à aucune session listée.} other {# connexions mémorisées antérieures ne sont rattachées à aucune session listée.}}",
+    "revokeOrphans": "Les révoquer",
+    "notifyNewLogin": "M'avertir par e-mail d'une connexion depuis un nouvel appareil"
   }
 }

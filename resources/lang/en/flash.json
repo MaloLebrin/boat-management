@@ -81,7 +81,8 @@
     "emailVerified": "Your email address is confirmed. You can sign in.",
     "signupRateLimit": "Too many sign-ups from this network. Please try again in an hour.",
     "loginRateLimit": "Too many sign-in attempts. Please try again later.",
-    "sessionRevoked": "Your password was changed. Please sign in again."
+    "sessionRevoked": "Your password was changed. Please sign in again.",
+    "sessionEnded": "This session was signed out from another device. Please sign in again."
   },
   "settings": {
     "profileUpdated": "Profile updated.",
@@ -553,5 +554,13 @@
     "recoveryRegenerated": "New recovery codes generated.",
     "policyEnabled": "Two-factor authentication is now required for members.",
     "policyDisabled": "Two-factor authentication is no longer required."
+  },
+  "sessions": {
+    "revoked": "Session signed out.",
+    "notFound": "Session not found or already signed out.",
+    "cannotRevokeCurrent": "To close this session, use “Sign out”.",
+    "othersRevoked": "Every other session has been signed out.",
+    "orphansRevoked": "Remembered sign-ins revoked.",
+    "notifyUpdated": "Alert preference saved."
   }
 }

@@ -3,8 +3,10 @@ import DemoService from '#services/demo_service'
 import User from '#models/user'
 import UserService from '#services/user_service'
 import SessionLoginService from '#services/session_login_service'
+import UserSessionService from '#services/user_session_service'
 import { beginTwoFactorChallenge, clearTwoFactorChallenge } from '#utils/two_factor_challenge'
 import { TWO_FACTOR_CHALLENGE_PATH } from '#shared/constants/two_factor'
+import { AUTH_SESSION_RECORD_KEY } from '#shared/constants/auth'
 import { loginValidator } from '#validators/user'
 import { loginAccountKey, loginAccountLimiter } from '#start/limiter'
 import { inject } from '@adonisjs/core'
@@ -17,7 +19,8 @@ export default class SessionController {
     private userService: UserService,
     private auditLogService: AuditLogService,
     private demoService: DemoService,
-    private sessionLoginService: SessionLoginService
+    private sessionLoginService: SessionLoginService,
+    private userSessionService: UserSessionService
   ) {}
 
   async create({ inertia }: HttpContext) {
@@ -60,7 +63,7 @@ export default class SessionController {
 
     clearTwoFactorChallenge(session)
     const redirectTo = await this.sessionLoginService.complete(
-      { auth, session, i18n },
+      { auth, session, i18n, request },
       user,
       remember ?? false
     )
@@ -97,6 +100,10 @@ export default class SessionController {
       })
     }
 
+    // Registre des appareils (#885) : la ligne est close, gardée pour
+    // reconnaître l'appareil à la prochaine connexion.
+    await this.userSessionService.end(this.userSessionService.currentId(session))
+    session.forget(AUTH_SESSION_RECORD_KEY)
     await auth.use('web').logout()
     // #451 — `auth.logout()` ne vide pas la session : sans cette purge, le compteur
     // de session démo restait posé dans le navigateur et la bannière réapparaissait
