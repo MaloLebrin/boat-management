@@ -143,7 +143,14 @@ test.group('User sessions — registry (functional)', (group) => {
     assert.isUndefined(response.session().auth_web)
   })
 
-  test('a session pointing to another account record is signed out', async ({ client, assert }) => {
+  test('a session carrying another account record is recorded for its current user', async ({
+    client,
+    assert,
+  }) => {
+    // Le navigateur a changé de compte sans repasser par la connexion : la
+    // session n'est pas falsifiable, on la recense pour son titulaire actuel
+    // au lieu de couper un login légitime — et la ligne de l'autre compte
+    // n'est pas touchée.
     const user = await createAdminUser()
     const other = await createAdminUser()
     const record = await createRecord(other)
@@ -152,9 +159,15 @@ test.group('User sessions — registry (functional)', (group) => {
       .get('/dashboard')
       .loginAs(user)
       .withSession({ [AUTH_SESSION_RECORD_KEY]: record.id })
-      .redirects(0)
+      .withInertia()
 
-    assert.equal(response.header('location'), '/login')
+    response.assertStatus(200)
+    const adoptedId = response.session()[AUTH_SESSION_RECORD_KEY] as string
+    assert.notEqual(adoptedId, record.id)
+    const adopted = await UserSession.findOrFail(adoptedId)
+    assert.equal(adopted.userId, user.id)
+    await record.refresh()
+    assert.isNull(record.revokedAt)
   })
 
   test('signing out closes the record', async ({ client, assert }) => {

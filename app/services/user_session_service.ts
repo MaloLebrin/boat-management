@@ -122,8 +122,12 @@ export default class UserSessionService {
 
   /**
    * Contrôle de la session courante, à chaque requête authentifiée. Une
-   * ligne absente, révoquée ou d'un autre utilisateur vaut révocation.
-   * `last_seen_at` n'est réécrit qu'une fois par intervalle.
+   * ligne absente ou révoquée vaut révocation. Une ligne d'un **autre**
+   * utilisateur (`foreign`) signale une session qui a changé de compte sans
+   * repasser par `open()` — elle est recensée à nouveau pour son titulaire
+   * actuel : le contenu de la session n'est pas falsifiable, et couper ici
+   * déconnecterait un login légitime. `last_seen_at` n'est réécrit qu'une
+   * fois par intervalle.
    */
   async check(
     id: string,
@@ -131,7 +135,8 @@ export default class UserSessionService {
     request: HttpContext['request']
   ): Promise<SessionRecordStatus> {
     const record = await UserSession.find(id)
-    if (!record || record.userId !== userId || record.revokedAt !== null) return 'revoked'
+    if (!record || record.revokedAt !== null) return 'revoked'
+    if (record.userId !== userId) return 'foreign'
 
     const threshold = DateTime.now().minus({ minutes: SESSION_TOUCH_INTERVAL_MINUTES })
     if (record.lastSeenAt < threshold) {

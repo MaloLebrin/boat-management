@@ -33,5 +33,8 @@ export interface SessionRequestInfo {
   userAgent: string | null
 }
 
-/** Résultat du contrôle d'une session à chaque requête. */
-export type SessionRecordStatus = 'active' | 'revoked'
+/**
+ * Résultat du contrôle d'une session à chaque requête. `foreign` : la ligne
+ * appartient à un autre utilisateur que celui de la session.
+ */
+export type SessionRecordStatus = 'active' | 'revoked' | 'foreign'

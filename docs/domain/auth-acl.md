@@ -301,6 +301,10 @@ place ; la session porte l'identifiant de sa ligne (`authSessionRecordId`).
 - **Adoption** — une session authentifiée sans ligne (restaurée par un
   remember-me, ou ouverte avant le déploiement) est recensée à sa première
   requête. Restaurée par un remember-me, elle reprend la ligne de ce jeton.
+  Une ligne qui appartient à un **autre** compte que celui de la session
+  (changement de compte sans passer par la connexion, comme `loginAs` des
+  tests navigateur) déclenche aussi une adoption plutôt qu'une coupure : le
+  contenu de la session n'est pas falsifiable.
 - **Compte démo** hors registre : partagé par tous les visiteurs, il listerait
   leurs IP les uns aux autres.
 

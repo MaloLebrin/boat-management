@@ -12,7 +12,8 @@ import type { NextFn } from '@adonisjs/core/types/http'
  *   login, dès cette requête.
  * - Session authentifiée sans ligne : restaurée depuis un remember-me, ou
  *   ouverte avant le déploiement du registre — elle est recensée ici
- *   (`adopt`), ce qui la rend visible et révocable.
+ *   (`adopt`), ce qui la rend visible et révocable. Idem pour une ligne qui
+ *   appartient à un autre utilisateur que celui de la session.
  *
  * Placé après `RevokedSessionMiddleware` : une session antérieure à une
  * révocation globale est coupée par celui-ci avant d'être adoptée ici.
@@ -32,6 +33,10 @@ export default class SessionRegistryMiddleware {
     }
 
     const status = await this.userSessionService.check(recordId, user.id, ctx.request)
+    if (status === 'foreign') {
+      await this.userSessionService.adopt(ctx, user)
+      return next()
+    }
     if (status === 'revoked') {
       await ctx.auth.use('web').logout()
       ctx.session.forget(AUTH_SESSION_RECORD_KEY)
