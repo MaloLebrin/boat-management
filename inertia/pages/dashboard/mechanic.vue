@@ -15,6 +15,8 @@ import { useT } from '~/composables/use_t'
 const props = defineProps<{
   overdueTasks: PlanningTask[]
   soonTasks: PlanningTask[]
+  /** Ouverture depuis l'app installée (`?source=pwa`, #865). */
+  launchedFromPwa?: boolean
 }>()
 
 const { t } = useT()
@@ -46,7 +48,10 @@ const upcomingCount = computed(() => visibleSoon.value.length)
 <template>
   <Head :title="t('dashboard.mechanic.title')" />
 
-  <div class="w-full max-w-5xl px-6 py-10 sm:px-8">
+  <div
+    class="w-full max-w-5xl px-6 py-10 sm:px-8"
+    :data-launched-from-pwa="props.launchedFromPwa ? 'true' : undefined"
+  >
     <BaseAlert v-if="overdueCount > 0" variant="warning" styled="bordered" class="mb-6">
       <span class="flex flex-wrap items-center gap-2">
         <span class="font-semibold">{{

@@ -410,6 +410,7 @@ checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`
 
 - Page : `inertia/pages/settings/notifications.vue` → `components/settings/tabs/SettingsNotificationsTab.vue` (prop `pushSubscriptions`, servie par `SettingsController.notifications`), section visible pour **tous les rôles**.
 - Gestion du Web Push : activer/désactiver **cet appareil** (`use_push_notifications.ts` — `subscribe()` uniquement sur geste utilisateur), liste des appareils abonnés (`user_agent`, dates) et retrait par appareil (`DELETE /push/subscriptions/:id`). Sur iOS hors PWA installée, `IosInstallHint.vue` remplace le bouton. Détail : `docs/frontend/pwa.md` § Web Push.
+- L'app installée s'ouvre sur `/dashboard?source=pwa` (#865). Le manifeste (`GET /site.webmanifest`) expose aussi quatre raccourcis d'écran d'accueil : journal, carburant, incidents, flotte. La page reçoit `launchedFromPwa`.
 
 ### Settings — organisation (`/settings/org`, #761)
 

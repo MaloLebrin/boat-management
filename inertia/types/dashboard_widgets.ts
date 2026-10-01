@@ -70,4 +70,6 @@ export interface DashboardPageProps extends DashboardWidgetData {
   taskEquipment?: BoatTaskEquipment
   canAddBoat: boolean
   boatQuota: QuotaUsage['boats']
+  /** Ouverture depuis l'app installée (`start_url` `?source=pwa`, #865). */
+  launchedFromPwa: boolean
 }

@@ -1910,8 +1910,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Mode hors-ligne (PWA)',
     },
     body: {
-      en: 'FleetAi is an installable progressive web app (add it to your phone or desktop home screen). Offline, you can browse recently visited pages and keep entering data at sea: log points, trip creation and closure, refuelings, maintenance sheet items, inspections and damage findings. Entries are stored locally in a queue and synchronized automatically when the connection returns, keeping their real timestamps. If a record changed in the meantime, a conflict dialog lets you resolve it instead of overwriting silently.',
-      fr: 'FleetAi est une application web progressive installable (ajoutez-la à l’écran d’accueil de votre téléphone ou ordinateur). Hors-ligne, vous consultez les pages récemment visitées et continuez à saisir en mer : points de log, création et clôture de sortie, avitaillements, items de fiches d’entretien, états des lieux et dommages constatés. Les saisies sont stockées localement dans une file et synchronisées automatiquement au retour de la connexion, en conservant leur horodatage réel. Si un enregistrement a changé entre-temps, une fenêtre de conflit vous laisse arbitrer au lieu d’écraser en silence.',
+      en: 'FleetAi is an installable progressive web app (add it to your phone or desktop home screen). Once installed, it opens on the dashboard. Home-screen shortcuts open a new trip, a fuel log, an incident report and the fleet. Offline, you can browse recently visited pages and keep entering data at sea: log points, trip creation and closure, refuelings, maintenance sheet items, inspections and damage findings. Entries are stored locally in a queue and synchronized automatically when the connection returns, keeping their real timestamps. If a record changed in the meantime, a conflict dialog lets you resolve it instead of overwriting silently.',
+      fr: 'FleetAi est une application web progressive installable (ajoutez-la à l’écran d’accueil de votre téléphone ou ordinateur). Une fois installée, elle s’ouvre sur le tableau de bord. L’écran d’accueil propose des raccourcis : nouvelle sortie, plein de carburant, incident et flotte. Hors-ligne, vous consultez les pages récemment visitées et continuez à saisir en mer : points de log, création et clôture de sortie, avitaillements, items de fiches d’entretien, états des lieux et dommages constatés. Les saisies sont stockées localement dans une file et synchronisées automatiquement au retour de la connexion, en conservant leur horodatage réel. Si un enregistrement a changé entre-temps, une fenêtre de conflit vous laisse arbitrer au lieu d’écraser en silence.',
     },
     keywords: [
       'hors ligne',
@@ -1925,6 +1925,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'mobile',
       'file d attente',
       'queue',
+      'raccourci',
+      'shortcut',
     ],
     navTarget: null,
   },

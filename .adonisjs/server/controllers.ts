@@ -91,6 +91,7 @@ export const controllers = {
   PublicDiagnosis: () => import('#controllers/public_diagnosis_controller'),
   PublicPartSearch: () => import('#controllers/public_part_search_controller'),
   PushSubscriptions: () => import('#controllers/push_subscriptions_controller'),
+  PwaManifest: () => import('#controllers/pwa_manifest_controller'),
   RentalContracts: () => import('#controllers/rental_contracts_controller'),
   Reports: () => import('#controllers/reports_controller'),
   ReservationPayments: () => import('#controllers/reservation_payments_controller'),

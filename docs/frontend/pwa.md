@@ -48,7 +48,7 @@ Configuration `VitePWA` (`vite.config.ts`) :
 | `srcDir` / `filename` | `inertia` / `sw.ts` — bundlé en `sw.js`                                                                       |
 | `registerType`        | `autoUpdate` — mise à jour silencieuse au rechargement                                                        |
 | `injectRegister`      | `false` — enregistrement manuel via `usePwaUpdate` (`useRegisterSW`)                                          |
-| `manifest`            | `false` — manifest servi depuis `public/site.webmanifest`                                                     |
+| `manifest`            | `false` — manifest servi par `GET /site.webmanifest` (#865)                                                   |
 | `outDir`              | `build/public` — `sw.js` sort à la **racine web**, pas dans `/assets`                                         |
 | `buildBase`           | `/` — le SW est enregistré à `/sw.js`                                                                         |
 | `scope`               | `/` — le SW contrôle toutes les navigations                                                                   |
@@ -125,28 +125,37 @@ Backend : voir `docs/domain/notifications.md` (#497). Côté front :
 
 ---
 
-## Manifest (`public/site.webmanifest`)
+## Manifest (`GET /site.webmanifest`, #865)
 
-```json
-{
-  "name": "FleetAi",
-  "short_name": "FleetAi",
-  "start_url": "/",
-  "display": "standalone",
-  "theme_color": "#0b1d2e",
-  "background_color": "#ffffff",
-  "icons": [
-    { "src": "/web-app-manifest-192x192.png", "sizes": "192x192", "purpose": "maskable" },
-    { "src": "/web-app-manifest-512x512.png", "sizes": "512x512", "purpose": "maskable any" }
-  ]
-}
+Le fichier statique `public/site.webmanifest` a été retiré : un JSON unique ne peut pas
+suivre la locale. `PwaManifestController` répond `application/manifest+json` selon
+`Accept-Language`, le cookie `locale` ou la préférence du compte (même chaîne que le
+reste de l'app). Le lien `<link rel="manifest">` de `inertia_layout.edge` ne change pas.
+
+| Champ          | Valeur                                                                                                             |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `id`           | `/` — identité stable. Sans lui Chrome dérive l'id de `start_url` ; le changer créerait une seconde app installée. |
+| `scope`        | `/` — le service worker contrôle déjà toute l'origine (#482).                                                      |
+| `start_url`    | `/dashboard?source=pwa` — l'app installée ouvre le tableau de bord, pas la home marketing.                         |
+| `lang` / `dir` | locale de la requête / `ltr`                                                                                       |
+| `orientation`  | `any`                                                                                                              |
+| `categories`   | `productivity`, `business`                                                                                         |
+| `shortcuts`    | journal (`/navigation/logbook`), carburant, incidents, flotte (`/boats`), icône 96×96                              |
+| `screenshots`  | `public/pwa/screenshot-wide.png` (1280×720) et `screenshot-narrow.png` (720×1280)                                  |
+
+`theme_color` reste `#0b1d2e` (`--color-navy-900`, surfaces permanentes). À l'exécution,
+les balises `<meta name="theme-color">` de `resources/views/inertia_layout.edge` prennent
+le relais selon le thème clair/sombre (#623).
+
+Un lancement via `start_url` incrémente `pwa_launch_counters.launches` (une ligne par
+organisation, une fois par session) et la page reçoit `launchedFromPwa`. Pas d'analytics
+tiers. Le propriétaire d'un bateau est compté avant la redirection vers `/owner/boats`.
+
+Régénérer les captures, en local seulement :
+
+```bash
+UPDATE_PWA_SCREENSHOTS=1 node ace test --suite browser --files tests/browser/pwa_screenshots.spec.ts
 ```
-
-L'app s'installe sur Android/iOS via le bouton « Ajouter à l'écran d'accueil » du navigateur.
-
-`theme_color` est aligné sur la palette (`--color-navy-900: #0b1d2e`, la couleur des surfaces
-permanentes — sidebar) ; à l'exécution, les balises `<meta name="theme-color">` de
-`resources/views/inertia_layout.edge` prennent le relais selon le thème clair/sombre (#623).
 
 ---
 
