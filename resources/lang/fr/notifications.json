@@ -163,6 +163,16 @@
         "title": "Certification expirée : {crewMemberName}",
         "body": "{count, plural, one {Une certification de {crewMemberName} est expirée : ne l'embarquez pas sans l'avoir renouvelée.} other {# certifications de {crewMemberName} sont expirées : ne l'embarquez pas sans les avoir renouvelées.}}"
       }
+    },
+    "crew": {
+      "assigned": {
+        "title": "Embarquement : {boatName}",
+        "body": "Vous êtes {role} sur {boatName} pour {clientName}, du {startsAt} au {endsAt}."
+      },
+      "assignment_reminder": {
+        "title": "Demain : {boatName}",
+        "body": "Rappel : vous êtes {role} sur {boatName} pour {clientName}, du {startsAt} au {endsAt}."
+      }
     }
   },
   "title": "Notifications",
@@ -209,6 +219,8 @@
     "export.ready": "Export prêt",
     "export.failed": "Export en échec",
     "crew_certification.expiring_soon": "Certification d'équipage à renouveler",
-    "crew_certification.expired": "Certification d'équipage expirée"
+    "crew_certification.expired": "Certification d'équipage expirée",
+    "crew.assigned": "Affectation à une réservation",
+    "crew.assignment_reminder": "Rappel d'embarquement"
   }
 }

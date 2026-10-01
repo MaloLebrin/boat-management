@@ -154,6 +154,12 @@ export const ASSISTANT_NAV_TARGETS = {
     i18nKey: 'assistant.navTargets.crew',
     promptLabel: { fr: 'Équipage', en: 'Crew' },
   },
+  // Planning d'équipage (#883) : calendrier des équipiers, module Location.
+  'crew.planning.index': {
+    path: '/crew/planning',
+    i18nKey: 'assistant.navTargets.crewPlanning',
+    promptLabel: { fr: 'Planning d’équipage', en: 'Crew planning' },
+  },
   'settings.billing': {
     path: '/settings/billing',
     i18nKey: 'assistant.navTargets.settingsBilling',

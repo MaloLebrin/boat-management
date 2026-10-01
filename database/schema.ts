@@ -1242,6 +1242,36 @@ export class BoatPricingSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatReservationCrewMemberSchema extends BaseModel {
+  static $columns = [
+    'boatReservationId',
+    'createdAt',
+    'crewMemberId',
+    'id',
+    'notes',
+    'reminderSentAt',
+    'role',
+    'updatedAt',
+  ] as const
+  $columns = BoatReservationCrewMemberSchema.$columns
+  @column()
+  declare boatReservationId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare crewMemberId: number
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare notes: string | null
+  @column.dateTime()
+  declare reminderSentAt: DateTime | null
+  @column()
+  declare role: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatReservationSchema extends BaseModel {
   static $columns = [
     'balancePaidAt',
@@ -1778,6 +1808,33 @@ export class CrewMemberSchema extends BaseModel {
   declare organizationId: number
   @column()
   declare phone: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class CrewUnavailabilitySchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'crewMemberId',
+    'endsOn',
+    'id',
+    'reason',
+    'startsOn',
+    'updatedAt',
+  ] as const
+  $columns = CrewUnavailabilitySchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare crewMemberId: number
+  @column.date()
+  declare endsOn: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare reason: string | null
+  @column.date()
+  declare startsOn: DateTime
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }
@@ -2988,6 +3045,21 @@ export class PushSubscriptionSchema extends BaseModel {
   declare userAgent: string | null
   @column()
   declare userId: number
+}
+
+export class PwaLaunchCounterSchema extends BaseModel {
+  static $columns = ['createdAt', 'id', 'launches', 'organizationId', 'updatedAt'] as const
+  $columns = PwaLaunchCounterSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare launches: number
+  @column()
+  declare organizationId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class QueueDedupKeySchema extends BaseModel {

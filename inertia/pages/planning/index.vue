@@ -37,6 +37,7 @@ const props = defineProps<{
   /** Réservations superposées (#869) — vide sans module Location. */
   reservations: PlanningReservation[]
   maintenanceAssignees: MaintenanceAssigneeOption[]
+  crewOptions: Array<{ id: number; fullName: string }>
 }>()
 
 const { t } = useT()
@@ -62,6 +63,8 @@ const assigneeFilterOptions = computed(() => [
 // Filtre bateau et couche réservations (#869).
 const boatFilter = ref<number | 'all'>('all')
 const showReservations = ref(true)
+// « Qui skippe quoi » (#883) : réservations où l'équipier est embarqué.
+const crewFilter = ref<number | 'all'>('all')
 const boatOptions = computed(() => {
   const names = new Map<number, string>()
   for (const item of [...props.tasks, ...props.doneTasks, ...props.reservations]) {
@@ -82,7 +85,11 @@ function onlyMatching(tasks: PlanningTask[]): PlanningTask[] {
 
 const visibleReservations = computed(() =>
   showReservations.value
-    ? props.reservations.filter((r) => boatFilter.value === 'all' || r.boatId === boatFilter.value)
+    ? props.reservations.filter(
+        (r) =>
+          (boatFilter.value === 'all' || r.boatId === boatFilter.value) &&
+          (crewFilter.value === 'all' || r.crewMemberIds.includes(crewFilter.value))
+      )
     : []
 )
 
@@ -168,6 +175,7 @@ function handleUngroup(groupId: string) {
       <PlanningToolbar
         v-model:assignee-filter="assigneeFilter"
         v-model:boat-filter="boatFilter"
+        v-model:crew-filter="crewFilter"
         v-model:show-reservations="showReservations"
         v-model:grouping-enabled="groupingEnabled"
         v-model:view-mode="viewMode"
@@ -176,6 +184,7 @@ function handleUngroup(groupId: string) {
         :boat-options="boatOptions"
         :can-group-tasks="canGroupTasks"
         :has-reservations="reservations.length > 0"
+        :crew-options="crewOptions"
       />
     </div>
 

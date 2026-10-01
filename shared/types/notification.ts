@@ -22,6 +22,8 @@ export type NotificationType =
   | 'safety_equipment.expired'
   | 'crew_certification.expiring_soon'
   | 'crew_certification.expired'
+  | 'crew.assigned'
+  | 'crew.assignment_reminder'
   | 'invitation.accepted'
   | 'ai.suggestions_ready'
   | 'boat.status_changed'

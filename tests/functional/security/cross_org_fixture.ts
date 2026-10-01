@@ -4,7 +4,9 @@ import type User from '#models/user'
 import Organization from '#models/organization'
 import Boat from '#models/boat'
 import Client from '#models/client'
+import BoatReservationCrewMember from '#models/boat_reservation_crew_member'
 import CrewCertification from '#models/crew_certification'
+import CrewUnavailability from '#models/crew_unavailability'
 import DataExport from '#models/data_export'
 import ExternalCalendar from '#models/external_calendar'
 import PushSubscription from '#models/push_subscription'
@@ -88,6 +90,8 @@ export interface CrossOrgIds {
   pushId: number
   calendarId: number
   cartItemId: number
+  crewAssignmentId: number
+  unavailabilityId: number
 }
 
 /**
@@ -235,6 +239,20 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
     auth: 'auth-key',
     failureCount: 0,
   })
+  // Planning d'équipage (#883) : affectation et indisponibilité de B.
+  const crewAssignment = await BoatReservationCrewMember.create({
+    reservationId: reservation.id,
+    crewMemberId: crew.id,
+    role: 'skipper',
+    notes: null,
+  })
+  const unavailability = await CrewUnavailability.create({
+    crewMemberId: crew.id,
+    startsOn: DateTime.now().plus({ days: 60 }),
+    endsOn: DateTime.now().plus({ days: 62 }),
+    reason: null,
+  })
+
   const calendar = await ExternalCalendar.create({
     organizationId: orgId,
     boatId: boat.id,
@@ -279,6 +297,8 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
     exportId: dataExport.id,
     pushId: push.id,
     calendarId: calendar.id,
+    crewAssignmentId: crewAssignment.id,
+    unavailabilityId: unavailability.id,
     cartItemId: cartItem.id,
   }
 }

@@ -64,5 +64,9 @@
     "conflictTitle": "The boat is chartered on that date",
     "conflictMessage": "\"{task}\" would fall on {date}, during {client}'s confirmed charter of {boat}. Move it anyway?",
     "conflictConfirm": "Move anyway"
+  },
+  "crewFilter": {
+    "label": "Filter reservations by crew member",
+    "all": "All crew members"
   }
 }

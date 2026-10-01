@@ -9,6 +9,7 @@ import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import CrewCertification from '#models/crew_certification'
 import OrganizationMembership from '#models/organization_membership'
 import NotificationService from '#services/notification_service'
+import CrewPlanningService from '#services/crew_planning_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import QuotaService from '#services/quota_service'
 import Organization from '#models/organization'
@@ -79,7 +80,8 @@ interface CrewCertificationGroup {
  * Scanne la flotte pour créer des notifications planifiées : tâches de
  * maintenance en retard / à venir, documents et équipements de sécurité expirés
  * ou expirant bientôt, acomptes et soldes de location à encaisser (#875),
- * certifications d'équipage à renouveler (#882, par équipier et non par bateau). Les
+ * certifications d'équipage à renouveler (#882, par équipier et non par bateau), rappels
+ * J-1 des équipiers embarqués sur une réservation (#883). Les
  * notifications sont agrégées par bateau (une notif par bateau + type, avec un
  * compte) et destinées aux admins de l'organisation.
  * L'anti-doublon (`NotificationService.createIfNotRecent`) évite le spam d'un
@@ -90,7 +92,8 @@ export default class NotificationScanService {
   constructor(
     private notificationService: NotificationService,
     // Défaut : les tests et le job construisent le service à la main.
-    private quotaService: QuotaService = new QuotaService(new OrganizationModuleService())
+    private quotaService: QuotaService = new QuotaService(new OrganizationModuleService()),
+    private crewPlanningService: CrewPlanningService = new CrewPlanningService(notificationService)
   ) {}
 
   async run(): Promise<{ created: number }> {
@@ -102,7 +105,10 @@ export default class NotificationScanService {
       this.scanReservationPayments(),
     ])
     const groups = scanned.flat()
-    const crewCreated = await this.notifyCrewCertifications()
+    // Rappels J-1 des équipiers embarqués demain (#883), par affectation.
+    const crewCreated =
+      (await this.notifyCrewCertifications()) +
+      (await this.crewPlanningService.sendDayBeforeReminders())
 
     if (groups.length === 0) return { created: crewCreated }
 

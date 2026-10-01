@@ -253,7 +253,19 @@
     "notFound": "Crew member not found.",
     "certificationAdded": "Certification added.",
     "certificationDeleted": "Certification deleted.",
-    "logCrewUpdated": "Trip crew updated."
+    "logCrewUpdated": "Trip crew updated.",
+    "planning": {
+      "assigned": "Crew member assigned to the reservation.",
+      "assignedLapses": "Crew member assigned — note that one of their certifications expires before the end of the reservation.",
+      "unavailable": "This crew member is already on board or unavailable on these dates.",
+      "alreadyAssigned": "This crew member is already assigned to the reservation.",
+      "reservationCancelled": "Cancelled reservation: no crew member can be assigned.",
+      "unassigned": "Crew member removed from the reservation.",
+      "assignmentNotFound": "Assignment not found.",
+      "unavailabilityCreated": "Unavailability added.",
+      "unavailabilityDeleted": "Unavailability deleted.",
+      "unavailabilityNotFound": "Unavailability not found."
+    }
   },
   "clients": {
     "created": "Client created.",

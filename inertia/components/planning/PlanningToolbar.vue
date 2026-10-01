@@ -15,10 +15,13 @@ const props = defineProps<{
   boatOptions: Array<{ id: number; name: string }>
   canGroupTasks: boolean
   hasReservations: boolean
+  /** Équipiers de l'organisation (#883) — vide sans module Location. */
+  crewOptions: Array<{ id: number; fullName: string }>
 }>()
 
 const assigneeFilter = defineModel<TaskAssigneeFilter>('assigneeFilter', { required: true })
 const boatFilter = defineModel<number | 'all'>('boatFilter', { required: true })
+const crewFilter = defineModel<number | 'all'>('crewFilter', { required: true })
 const showReservations = defineModel<boolean>('showReservations', { required: true })
 const groupingEnabled = defineModel<boolean>('groupingEnabled', { required: true })
 const viewMode = defineModel<'kanban' | 'calendar'>('viewMode', { required: true })
@@ -28,6 +31,11 @@ const { t } = useT()
 const boatFilterOptions = computed(() => [
   { label: t('planning.boatFilter.all'), value: 'all' },
   ...props.boatOptions.map((boat) => ({ label: boat.name, value: boat.id })),
+])
+
+const crewFilterOptions = computed(() => [
+  { label: t('planning.crewFilter.all'), value: 'all' },
+  ...props.crewOptions.map((member) => ({ label: member.fullName, value: member.id })),
 ])
 
 function parseBoatFilter(raw: string | number): number | 'all' {
@@ -59,6 +67,20 @@ function parseBoatFilter(raw: string | number): number | 'all' {
         :options="boatFilterOptions"
         :model-value="boatFilter"
         @update:model-value="boatFilter = parseBoatFilter($event)"
+      />
+    </div>
+
+    <!-- Filtre « Équipier » des réservations (#883) -->
+    <div v-if="hasReservations && crewOptions.length > 0" class="w-48">
+      <label for="planning-crew-filter" class="sr-only">
+        {{ t('planning.crewFilter.label') }}
+      </label>
+      <BaseSelect
+        id="planning-crew-filter"
+        :options="crewFilterOptions"
+        :model-value="crewFilter"
+        data-testid="planning-crew-filter"
+        @update:model-value="crewFilter = parseBoatFilter($event)"
       />
     </div>
 

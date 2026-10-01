@@ -97,7 +97,9 @@
     "deleteFor": "Delete the reservation for {client}",
     "createQuoteFor": "Create a quote for {client}",
     "payment": "Payment",
-    "paymentFor": "Payment for the reservation for {client}"
+    "paymentFor": "Payment for the reservation for {client}",
+    "crew": "Crew",
+    "crewFor": "Crew of {client}'s reservation"
   },
   "types": {
     "bareboat": "Bareboat",

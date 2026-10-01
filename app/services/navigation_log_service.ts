@@ -6,6 +6,8 @@ import {
 } from '#exceptions/navigation_log_errors'
 import BoatEngine from '#models/boat_engine'
 import NavigationLog from '#models/navigation_log'
+import CrewPlanningService from '#services/crew_planning_service'
+import { navigationLogRoleFor } from '#shared/helpers/crew_planning'
 import type Boat from '#models/boat'
 import type {
   CloseNavigationLogPayload,
@@ -79,8 +81,9 @@ export default class NavigationLogService {
       .first()
     if (existing) throw new NavigationLogInProgressError()
 
+    let log: NavigationLog
     try {
-      return await NavigationLog.create({
+      log = await NavigationLog.create({
         boatId: boat.id,
         organizationId: boat.organizationId,
         status: 'in_progress',
@@ -107,6 +110,20 @@ export default class NavigationLogService {
       if (isInProgressUniqueViolation(error)) throw new NavigationLogInProgressError()
       throw error
     }
+
+    // Sortie du jour J (#883) : l'équipage affecté à la réservation du bateau
+    // embarque d'office — il reste modifiable depuis le journal de bord.
+    const plannedCrew = await CrewPlanningService.crewForDeparture(boat.id, departedAt)
+    if (plannedCrew.length > 0) {
+      await log
+        .related('crew')
+        .attach(
+          Object.fromEntries(
+            plannedCrew.map((c) => [c.crewMemberId, { role: navigationLogRoleFor(c.role) }])
+          )
+        )
+    }
+    return log
   }
 
   async closeTrip(boat: Boat, logId: number, payload: CloseNavigationLogPayload) {

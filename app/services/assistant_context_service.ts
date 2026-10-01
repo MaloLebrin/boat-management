@@ -2,6 +2,7 @@ import BoatEngine from '#models/boat_engine'
 import type User from '#models/user'
 import BoatListService from '#services/boat_list_service'
 import CrewService from '#services/crew_service'
+import CrewPlanningService from '#services/crew_planning_service'
 import PlanningService from '#services/planning_service'
 import { engineLabelWithStroke } from '#shared/helpers/engine_stroke'
 import {
@@ -16,6 +17,11 @@ import { inject } from '@adonisjs/core'
 /** Longueur max d'une ligne injectée dans le prompt (budget de tokens). */
 const MAX_LINE_LENGTH = 120
 
+/** Horizon de l'équipage injecté (#883), en jours. */
+const UPCOMING_CREW_DAYS = 14
+/** Lignes d'équipage injectées : un week-end chargé dépasse vite cinq lignes. */
+const UPCOMING_CREW_MAX_LINES = 12
+
 /**
  * Contexte flotte injecté dans le prompt système du copilote FleetAi.
  *
@@ -24,14 +30,16 @@ const MAX_LINE_LENGTH = 120
  * - le roster (bateaux + moteurs avec leurs ids) — il sert aussi de référentiel
  *   de validation des ids rendus par le modèle (anti-hallucination) ;
  * - le digest planning (tâches en retard / bientôt dues) et les certifications
- *   d'équipage à renouveler (#882).
+ *   d'équipage à renouveler (#882), et l'équipage des réservations des
+ *   deux prochaines semaines (#883).
  */
 @inject()
 export default class AssistantContextService {
   constructor(
     private boatListService: BoatListService,
     private planningService: PlanningService,
-    private crewService: CrewService
+    private crewService: CrewService,
+    private crewPlanningService: CrewPlanningService
   ) {}
 
   /** Roster complet de l'org — la troncature ne s'applique qu'à l'affichage prompt. */
@@ -137,6 +145,28 @@ export default class AssistantContextService {
                 : `expires on ${alert.expiresAt}`
           lines.push(
             `- ${alert.crewMemberName} : ${alert.type} (${state})`.slice(0, MAX_LINE_LENGTH)
+          )
+        }
+      }
+
+      // « Qui skippe le catamaran samedi ? » (#883) : l'équipage affecté aux
+      // réservations des deux prochaines semaines.
+      const upcoming = await this.crewPlanningService.listUpcoming(
+        user.organizationId,
+        UPCOMING_CREW_DAYS
+      )
+      if (upcoming.length > 0) {
+        lines.push(
+          fr
+            ? 'Équipage des réservations des 14 prochains jours (début → fin) :'
+            : 'Crew on reservations in the next 14 days (start → end):'
+        )
+        for (const a of upcoming.slice(0, UPCOMING_CREW_MAX_LINES)) {
+          lines.push(
+            `- ${a.startsAt.slice(0, 16)} → ${a.endsAt.slice(0, 16)} ${a.boatName} (${a.clientName}) : ${a.crewMemberName} [${a.role}]`.slice(
+              0,
+              MAX_LINE_LENGTH
+            )
           )
         }
       }

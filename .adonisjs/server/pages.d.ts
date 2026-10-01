@@ -25,6 +25,7 @@ declare module '@adonisjs/inertia/types' {
     'boats/navigation_log_show': ExtractProps<(typeof import('../../inertia/pages/boats/navigation_log_show.vue'))['default']>
     'boats/new': ExtractProps<(typeof import('../../inertia/pages/boats/new.vue'))['default']>
     'boats/reservation_contract': ExtractProps<(typeof import('../../inertia/pages/boats/reservation_contract.vue'))['default']>
+    'boats/reservation_crew': ExtractProps<(typeof import('../../inertia/pages/boats/reservation_crew.vue'))['default']>
     'boats/reservation_inspection': ExtractProps<(typeof import('../../inertia/pages/boats/reservation_inspection.vue'))['default']>
     'boats/reservations': ExtractProps<(typeof import('../../inertia/pages/boats/reservations.vue'))['default']>
     'boats/rig_edit': ExtractProps<(typeof import('../../inertia/pages/boats/rig_edit.vue'))['default']>
@@ -77,6 +78,8 @@ declare module '@adonisjs/inertia/types' {
     'navigation/incidents': ExtractProps<(typeof import('../../inertia/pages/navigation/incidents.vue'))['default']>
     'navigation/logbook': ExtractProps<(typeof import('../../inertia/pages/navigation/logbook.vue'))['default']>
     'notifications/index': ExtractProps<(typeof import('../../inertia/pages/notifications/index.vue'))['default']>
+    'organization/crew_member': ExtractProps<(typeof import('../../inertia/pages/organization/crew_member.vue'))['default']>
+    'organization/crew_planning': ExtractProps<(typeof import('../../inertia/pages/organization/crew_planning.vue'))['default']>
     'organization/crew': ExtractProps<(typeof import('../../inertia/pages/organization/crew.vue'))['default']>
     'organization/members': ExtractProps<(typeof import('../../inertia/pages/organization/members.vue'))['default']>
     'owner/boats/index': ExtractProps<(typeof import('../../inertia/pages/owner/boats/index.vue'))['default']>

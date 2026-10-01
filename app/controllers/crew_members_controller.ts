@@ -1,4 +1,6 @@
 import CrewService from '#services/crew_service'
+import CrewPlanningService from '#services/crew_planning_service'
+import QuotaService from '#services/quota_service'
 import { CrewMemberNotFoundError } from '#exceptions/crew_errors'
 import CrewMemberPolicy from '#policies/crew_member_policy'
 import { createCrewMemberValidator, updateCrewMemberValidator } from '#validators/crew'
@@ -7,7 +9,11 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class CrewMembersController {
-  constructor(private crewService: CrewService) {}
+  constructor(
+    private crewService: CrewService,
+    private crewPlanningService: CrewPlanningService,
+    private quotaService: QuotaService
+  ) {}
 
   async index({ inertia, auth, bouncer }: HttpContext) {
     await auth.authenticate()
@@ -15,12 +21,49 @@ export default class CrewMembersController {
     await bouncer.with(CrewMemberPolicy).authorize('create')
     await user.load('organization')
 
-    const [crewMembers, canDelete] = await Promise.all([
+    const [crewMembers, canDelete, planningEnabled] = await Promise.all([
       this.crewService.listForOrganization(user.organization),
       bouncer.with(CrewMemberPolicy).allows('delete'),
+      this.quotaService.canManageReservations(user.organization),
     ])
 
-    return inertia.render('organization/crew', { crewMembers, canDelete })
+    return inertia.render('organization/crew', { crewMembers, canDelete, planningEnabled })
+  }
+
+  /**
+   * Fiche équipier (#883) : certifications, historique d'embarquements et
+   * indisponibilités. Ouverte à tous les plans ; les réservations et les
+   * indisponibilités n'y figurent qu'avec le module Location.
+   */
+  async show({ inertia, auth, params, bouncer, response, session, i18n }: HttpContext) {
+    await auth.authenticate()
+    const user = auth.getUserOrFail()
+    await bouncer.with(CrewMemberPolicy).authorize('create')
+    await user.load('organization')
+
+    let member
+    try {
+      member = await this.crewService.getForOrganizationOrFail(user.organization, Number(params.id))
+    } catch (error) {
+      if (!(error instanceof CrewMemberNotFoundError)) throw error
+      session.flash('error', i18n.t('flash.crew.notFound'))
+      return response.redirect('/crew')
+    }
+
+    const planningEnabled = await this.quotaService.canManageReservations(user.organization)
+    const [history, unavailabilities, canUpdate] = await Promise.all([
+      this.crewPlanningService.historyFor(member, planningEnabled),
+      planningEnabled ? this.crewPlanningService.listUnavailabilities(member) : [],
+      bouncer.with(CrewMemberPolicy).allows('update'),
+    ])
+
+    return inertia.render('organization/crew_member', {
+      member: this.crewService.toRow(member),
+      history,
+      unavailabilities,
+      planningEnabled,
+      canUpdate,
+    })
   }
 
   async store({ request, response, auth, bouncer, session, i18n }: HttpContext) {

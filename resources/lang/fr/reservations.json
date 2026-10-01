@@ -97,7 +97,9 @@
     "deleteFor": "Supprimer la réservation de {client}",
     "createQuoteFor": "Créer un devis pour {client}",
     "payment": "Paiement",
-    "paymentFor": "Paiement de la réservation de {client}"
+    "paymentFor": "Paiement de la réservation de {client}",
+    "crew": "Équipage",
+    "crewFor": "Équipage de la réservation de {client}"
   },
   "types": {
     "bareboat": "Coque nue",

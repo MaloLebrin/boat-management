@@ -48,6 +48,8 @@ const numericIdParams = [
   'eventId',
   'certId',
   'actionId',
+  'unavailabilityId',
+  'assignmentId',
 ]
 
 for (const param of numericIdParams) {

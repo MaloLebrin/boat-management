@@ -62,8 +62,11 @@
     "roles": {
       "skipper": "Skipper",
       "crew": "Équipier",
-      "passenger": "Passager"
-    }
+      "passenger": "Passager",
+      "instructor": "Moniteur"
+    },
+    "boat": "Bateau",
+    "client": "Client"
   },
   "memberStatus": {
     "expired": "Certification expirée",
@@ -81,6 +84,70 @@
       },
       "inDays": "dans {days, plural, one {# jour} other {# jours}}",
       "cta": "Voir l'équipage"
+    }
+  },
+  "planning": {
+    "title": "Planning d'équipage",
+    "reservationTitle": "Équipage de la réservation",
+    "roles": {
+      "skipper": "Skipper",
+      "crew": "Équipier",
+      "instructor": "Moniteur"
+    },
+    "conflict": {
+      "reservation": "Déjà embarqué : {label} (du {from} au {to})",
+      "unavailability": "Indisponible : {label} (du {from} au {to})",
+      "noReason": "sans motif"
+    },
+    "unassignConfirm": "Retirer {name} de l'équipage ?",
+    "unassignFor": "Retirer {name} de l'équipage",
+    "unassign": "Retirer",
+    "noCrew": "Aucun équipier affecté à cette réservation.",
+    "conflictsSince": "Chevauchement apparu depuis l'affectation :",
+    "certificationLapses": "Certification échue avant la fin",
+    "pickMember": "Équipier",
+    "noMemberLeft": "Tous les équipiers sont déjà affectés, ou la liste d'équipage est vide.",
+    "unavailable": "Indisponible",
+    "role": "Rôle",
+    "notes": "Notes",
+    "assign": "Affecter",
+    "downloadPdf": "Rôle d'équipage (PDF)",
+    "missingSkipper": "Location avec skipper : aucun skipper affecté.",
+    "onBoard": "À bord",
+    "addTitle": "Affecter un équipier",
+    "cancelledReservation": "Réservation annulée : plus aucun équipier ne peut y être affecté.",
+    "certifications": "Certifications",
+    "noCertification": "Aucune certification enregistrée.",
+    "calendar": {
+      "member": "Équipier",
+      "boarding": "{boat} — {client} ({role})",
+      "unavailable": "Indisponible : {reason}",
+      "offShort": "Indispo.",
+      "range": "Du {from} au {to}",
+      "previous": "Semaine précédente",
+      "today": "Aujourd'hui",
+      "next": "Semaine suivante",
+      "empty": "Aucun équipier : ajoutez-en depuis la liste d'équipage.",
+      "legend": "En couleur : embarqué sur une réservation. En ambre : indisponible. En rouge : deux occupations le même jour."
+    },
+    "unavailability": {
+      "title": "Indisponibilités",
+      "deleteConfirm": "Supprimer cette indisponibilité ?",
+      "range": "Du {from} au {to}",
+      "empty": "Aucune indisponibilité déclarée.",
+      "startsOn": "Du",
+      "endsOn": "Au (inclus)",
+      "reason": "Motif (congés, autre embarquement…)",
+      "add": "Ajouter l'indisponibilité"
+    },
+    "history": {
+      "title": "Embarquements",
+      "kind": {
+        "reservation": "Réservation",
+        "navigation_log": "Sortie"
+      },
+      "open": "Ouvrir",
+      "empty": "Aucun embarquement pour l'instant."
     }
   }
 }

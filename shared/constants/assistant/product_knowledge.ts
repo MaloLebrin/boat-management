@@ -1047,6 +1047,33 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'crew.index',
   },
   {
+    id: 'crew-planning',
+    title: {
+      en: 'Crew planning',
+      fr: 'Planning d’équipage',
+    },
+    body: {
+      en: 'With the Charter module, crew members are assigned to a reservation with a role (skipper, crew, instructor) from its Crew button. FleetAi refuses a crew member already on an overlapping reservation or declared unavailable, and warns without blocking when a certification expires before the end. The crew calendar (/crew/planning) shows one row per crew member over four weeks; each crew member page lists boardings and unavailabilities. The assigned crew member is notified, then reminded the day before. A crew role PDF prints from the reservation, the trip logged on the day reuses the planned crew, a skippered contract names the skipper, and the planning filters by crew member.',
+      fr: 'Avec le module Location, les équipiers sont affectés à une réservation avec un rôle (skipper, équipier, moniteur) depuis son bouton Équipage. FleetAi refuse un équipier déjà pris sur une réservation qui se chevauche ou déclaré indisponible, et avertit sans bloquer si une certification expire avant la fin. Le calendrier d’équipage (/crew/planning) montre une ligne par équipier sur quatre semaines ; la fiche équipier liste embarquements et indisponibilités. L’équipier est notifié, puis rappelé la veille. Un rôle d’équipage PDF s’imprime depuis la réservation, la sortie du jour J reprend l’équipage prévu, le contrat avec skipper le nomme et le planning se filtre par équipier.',
+    },
+    keywords: [
+      'planning equipage',
+      'affecter equipier',
+      'affecter skipper',
+      'qui skippe',
+      'skipper',
+      'moniteur',
+      'indisponibilite',
+      'conges',
+      'disponibilite equipier',
+      'crew planning',
+      'assign crew',
+      'crew availability',
+    ],
+    navTarget: 'crew.planning.index',
+    planFlag: 'canManageReservations',
+  },
+  {
     id: 'reservations',
     title: {
       en: 'Boat reservations',

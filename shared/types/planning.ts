@@ -82,6 +82,8 @@ export interface PlanningReservation {
   startsAt: string
   endsAt: string
   clientName: string
+  /** Équipiers affectés (#883) : le filtre « Équipier » du planning. */
+  crewMemberIds: number[]
 }
 
 /** Colonnes du kanban sur lesquelles une carte peut être déposée (#869). */

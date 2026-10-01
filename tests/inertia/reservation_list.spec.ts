@@ -13,6 +13,7 @@ const appT = vi.hoisted(() => ({
   'reservations.actions.createQuoteFor': 'Create a quote for {client}',
   'reservations.actions.inspectionFor': 'Inspection for {client}',
   'reservations.actions.contractFor': 'Rental contract for {client}',
+  'reservations.actions.crewFor': "Crew of {client}'s reservation",
   'reservations.actions.editFor': 'Edit the reservation for {client}',
   'reservations.actions.paymentFor': 'Payment for the reservation for {client}',
   'reservations.actions.deleteFor': 'Delete the reservation for {client}',
@@ -150,11 +151,11 @@ describe('ReservationList', () => {
     expect(wrapper.findAll('button')).toHaveLength(0)
   })
 
-  test('shows action buttons (inspection, contract, payment, edit, delete) when canManage is true', () => {
+  test('shows action buttons (inspection, contract, crew, payment, edit, delete) when canManage is true', () => {
     const wrapper = mount(ReservationList, {
       props: { boatId: 5, reservations: [row], canManage: true },
     })
-    expect(wrapper.findAll('button')).toHaveLength(5)
+    expect(wrapper.findAll('button')).toHaveLength(6)
   })
 
   test('the payment action opens the payment modal on the fresh row (#875)', async () => {
@@ -209,6 +210,8 @@ describe('ReservationList', () => {
     expect(labels).toEqual([
       'Inspection for Alice Martin',
       'Rental contract for Alice Martin',
+      // Équipage de la réservation (#883).
+      "Crew of Alice Martin's reservation",
       'Payment for the reservation for Alice Martin',
       'Edit the reservation for Alice Martin',
       'Delete the reservation for Alice Martin',
