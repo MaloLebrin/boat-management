@@ -55,6 +55,8 @@ const EXCLUSIONS: Record<string, string> = {
     'le paramètre est un fournisseur, pas une ressource d’une autre organisation',
   'DELETE /settings/ai/api-key/:provider':
     'le paramètre est un fournisseur, pas une ressource d’une autre organisation',
+  'DELETE /settings/sessions/:id':
+    'session d’un utilisateur (UUID), pas un agrégat d’organisation ; la révocation de la session d’un autre compte est couverte par user_sessions.spec (#885)',
 }
 
 const SAFE_STATUSES = new Set([403, 404, 422])
