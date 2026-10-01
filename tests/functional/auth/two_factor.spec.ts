@@ -505,6 +505,18 @@ test.group('Two-factor authentication — organization policy (functional)', (gr
 
     const dashboard = await client.get('/dashboard').loginAs(member).redirects(0)
     assert.equal(dashboard.header('location'), '/settings/me')
+    // Vérifiée après le contrôleur : la page rendue ne doit pas partir pour autant.
+    assert.notInclude(dashboard.text(), 'data-page')
+
+    // Une mutation hors activation est refusée avant de s'exécuter.
+    const mutation = await client
+      .put('/settings/profile')
+      .loginAs(member)
+      .form({ fullName: 'Renommé malgré le blocage' })
+      .redirects(0)
+    assert.equal(mutation.status(), 302)
+    await member.refresh()
+    assert.notEqual(member.fullName, 'Renommé malgré le blocage')
 
     const settings = await client.get('/settings/me').loginAs(member).withInertia()
     settings.assertStatus(200)

@@ -1,4 +1,4 @@
-import Organization from '#models/organization'
+import type Organization from '#models/organization'
 import TwoFactorRecoveryCode from '#models/two_factor_recovery_code'
 import User from '#models/user'
 import AuditLogService from '#services/audit_log_service'
@@ -290,10 +290,12 @@ export default class TwoFactorService {
     const none: TwoFactorEnforcement = { required: false, graceEndsAt: null, blocked: false }
     if (user.organizationId === null) return none
 
-    const organization = await Organization.query()
-      .where('id', user.organizationId)
-      .select(['id', 'requireTwoFactor', 'twoFactorGraceEndsAt'])
-      .first()
+    // Relation chargée une fois par requête et partagée avec le middleware
+    // Inertia (même mémoïsation que `inertia_middleware.ts`) : appelée depuis
+    // `AuthMiddleware` sur chaque route authentifiée, une requête dédiée
+    // doublerait la lecture de `organizations` sur chaque page.
+    if (user.organization === undefined) await user.load('organization')
+    const organization = user.organization
     if (!organization?.requireTwoFactor) return none
 
     const graceEndsAt = organization.twoFactorGraceEndsAt

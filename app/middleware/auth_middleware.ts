@@ -1,3 +1,4 @@
+import type User from '#models/user'
 import TwoFactorService from '#services/two_factor_service'
 import { TWO_FACTOR_SETUP_PATH } from '#shared/constants/two_factor'
 import { inject } from '@adonisjs/core'
@@ -33,18 +34,36 @@ export default class AuthMiddleware {
     // écoulé, un membre sans second facteur n'a plus accès qu'à l'activation.
     // Posé ici, sur toutes les routes authentifiées, plutôt que route par route.
     const user = ctx.auth.user
-    if (user && !user.hasTwoFactorEnabled && !this.#isAllowedWhileBlocked(ctx.request.url())) {
-      const enforcement = await this.twoFactorService.enforcementFor(user)
-      if (enforcement.blocked) {
-        ctx.session.flash('error', ctx.i18n.t('flash.twoFactor.requiredNow'))
-        if (ctx.request.method() === 'GET') {
-          return ctx.response.redirect().toPath(TWO_FACTOR_SETUP_PATH)
-        }
-        return ctx.response.redirect().back()
-      }
+    if (!user || user.hasTwoFactorEnabled || this.#isAllowedWhileBlocked(ctx.request.url())) {
+      return next()
     }
 
-    return next()
+    // Une mutation est arrêtée **avant** de s'exécuter.
+    if (ctx.request.method() !== 'GET') {
+      if (await this.#isBlocked(user)) {
+        ctx.session.flash('error', ctx.i18n.t('flash.twoFactor.requiredNow'))
+        return ctx.response.redirect().back()
+      }
+      return next()
+    }
+
+    // Une lecture est vérifiée **après** le contrôleur : l'organisation est
+    // alors déjà chargée (contrôleur ou middleware Inertia) et la vérification
+    // ne coûte aucune requête de plus sur chaque page — garde-fou de
+    // `boat_show_queries.spec.ts`. Rien n'est encore parti : le corps de la
+    // réponse est paresseux, et la redirection le remplace entièrement.
+    await next()
+    if (await this.#isBlocked(user)) {
+      ctx.session.flash('error', ctx.i18n.t('flash.twoFactor.requiredNow'))
+      ctx.response.removeHeader('content-disposition')
+      ctx.response.status(302)
+      ctx.response.redirect().toPath(TWO_FACTOR_SETUP_PATH)
+    }
+  }
+
+  async #isBlocked(user: User): Promise<boolean> {
+    const enforcement = await this.twoFactorService.enforcementFor(user)
+    return enforcement.blocked
   }
 
   #isAllowedWhileBlocked(path: string): boolean {
