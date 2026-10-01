@@ -1,4 +1,6 @@
+import BoatReservationCrewMember from '#models/boat_reservation_crew_member'
 import CrewCertification from '#models/crew_certification'
+import CrewUnavailability from '#models/crew_unavailability'
 import NavigationLog from '#models/navigation_log'
 import { BaseModel, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
 import type { HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
@@ -36,6 +38,13 @@ export default class CrewMember extends BaseModel {
 
   @hasMany(() => CrewCertification)
   declare certifications: HasMany<typeof CrewCertification>
+
+  /** Embarquements prévus sur des réservations (#883). */
+  @hasMany(() => BoatReservationCrewMember)
+  declare reservationAssignments: HasMany<typeof BoatReservationCrewMember>
+
+  @hasMany(() => CrewUnavailability)
+  declare unavailabilities: HasMany<typeof CrewUnavailability>
 
   @manyToMany(() => NavigationLog, {
     pivotTable: 'navigation_log_crew',

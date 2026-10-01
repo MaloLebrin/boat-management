@@ -106,3 +106,125 @@ export interface DashboardCrewCertifications {
   /** Les plus urgentes d'abord (échues, puis par échéance), plafonnées. */
   items: CrewCertificationAlert[]
 }
+
+/**
+ * Rôle d'un équipier affecté à une réservation (#883). `instructor` pour les
+ * écoles de voile ; il devient `crew` dans le journal de bord, qui ne connaît
+ * que skipper, équipier et passager.
+ */
+export const RESERVATION_CREW_ROLES = ['skipper', 'crew', 'instructor'] as const
+export type ReservationCrewRole = (typeof RESERVATION_CREW_ROLES)[number]
+
+export interface AssignReservationCrewPayload {
+  crewMemberId: number
+  role: ReservationCrewRole
+  notes?: string | null
+}
+
+/**
+ * Ce qui empêche d'embarquer un équipier sur un créneau (#883) : une autre
+ * réservation qui le recoupe, ou une indisponibilité déclarée.
+ */
+export interface CrewConflict {
+  kind: 'reservation' | 'unavailability'
+  id: number
+  /** ISO — début de la réservation, ou `YYYY-MM-DD` de l'indisponibilité. */
+  startsAt: string
+  endsAt: string
+  /** Bateau et client de la réservation, ou motif de l'indisponibilité. */
+  label: string | null
+}
+
+/** Un équipier affecté à une réservation, tel qu'affiché sur son bloc « Équipage ». */
+export interface ReservationCrewRow {
+  id: number
+  crewMemberId: number
+  fullName: string
+  email: string | null
+  role: ReservationCrewRole
+  notes: string | null
+  certificationStatus: CrewCertificationStatus | null
+  /** Une certification datée expire avant la fin de la réservation. */
+  certificationLapses: boolean
+  /** Chevauchements apparus depuis l'affectation (réservation déplacée…). */
+  conflicts: CrewConflict[]
+}
+
+/** Équipier proposé par le sélecteur d'une réservation, libre ou non sur ses dates. */
+export interface CrewAvailabilityRow {
+  id: number
+  fullName: string
+  certificationStatus: CrewCertificationStatus | null
+  certificationLapses: boolean
+  available: boolean
+  conflicts: CrewConflict[]
+}
+
+/** Avertissement non bloquant renvoyé par une affectation (#883). */
+export type CrewAssignmentWarning = 'certification_lapses' | null
+
+export interface CreateCrewUnavailabilityPayload {
+  /** `YYYY-MM-DD`, bornes comprises. */
+  startsOn: string
+  endsOn: string
+  reason?: string | null
+}
+
+export interface CrewUnavailabilityRow {
+  id: number
+  startsOn: string
+  endsOn: string
+  reason: string | null
+}
+
+/** Une case du calendrier d'équipage : embarquement ou indisponibilité. */
+export interface CrewPlanningEntry {
+  kind: 'reservation' | 'unavailability'
+  id: number
+  /** ISO pour une réservation, `YYYY-MM-DD` pour une indisponibilité. */
+  startsAt: string
+  endsAt: string
+  label: string | null
+  role: ReservationCrewRole | null
+  boatId: number | null
+  boatName: string | null
+}
+
+export interface CrewPlanningRow {
+  crewMemberId: number
+  fullName: string
+  certificationStatus: CrewCertificationStatus | null
+  entries: CrewPlanningEntry[]
+}
+
+/** Calendrier `/crew/planning` : une ligne par équipier sur la période. */
+export interface CrewPlanning {
+  /** `YYYY-MM-DD`, premier et dernier jour affichés. */
+  from: string
+  to: string
+  rows: CrewPlanningRow[]
+}
+
+/** Un embarquement passé ou à venir, sur la fiche d'un équipier. */
+export interface CrewMemberHistoryEntry {
+  kind: 'reservation' | 'navigation_log'
+  id: number
+  boatId: number
+  boatName: string
+  startsAt: string
+  endsAt: string | null
+  role: ReservationCrewRole | NavigationLogCrewRole
+  /** Client de la réservation, port de départ d'une sortie. */
+  label: string | null
+}
+
+/** Affectation à venir, pour l'assistant (« qui skippe le catamaran samedi ? »). */
+export interface UpcomingCrewAssignment {
+  reservationId: number
+  boatName: string
+  clientName: string
+  startsAt: string
+  endsAt: string
+  crewMemberName: string
+  role: ReservationCrewRole
+}

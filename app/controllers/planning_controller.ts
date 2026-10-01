@@ -1,6 +1,7 @@
 import BoatPolicy from '#policies/boat_policy'
 import MaintenancePolicy from '#policies/maintenance_policy'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
+import CrewService from '#services/crew_service'
 import PlanningService from '#services/planning_service'
 import QuotaService from '#services/quota_service'
 import { boatOwnerPortalRedirect } from '#utils/staff_route_guard'
@@ -12,7 +13,8 @@ export default class PlanningController {
   constructor(
     private planningService: PlanningService,
     private taskService: BoatMaintenanceTaskService,
-    private quotaService: QuotaService
+    private quotaService: QuotaService,
+    private crewService: CrewService
   ) {}
 
   async index({ inertia, auth, bouncer, response }: HttpContext) {
@@ -48,6 +50,11 @@ export default class PlanningController {
     } = await this.planningService.getPlanningForOrg(user, { includeReservations })
     // Filtre « Assigné à » (#868).
     const maintenanceAssignees = await this.taskService.listAssignees(user)
+    // Filtre « Équipier » (#883) : seulement quand les réservations sont superposées.
+    const crewMembers = includeReservations
+      ? await this.crewService.listOptionsForOrganization(user.organization!)
+      : []
+    const crewOptions = crewMembers.map((m) => ({ id: m.id, fullName: m.fullName }))
 
     return inertia.render('planning/index', {
       tasks,
@@ -62,6 +69,7 @@ export default class PlanningController {
       canGroupTasks,
       reservations,
       maintenanceAssignees,
+      crewOptions,
     })
   }
 }

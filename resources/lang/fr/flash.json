@@ -253,7 +253,19 @@
     "notFound": "Équipier introuvable.",
     "certificationAdded": "Certification ajoutée.",
     "certificationDeleted": "Certification supprimée.",
-    "logCrewUpdated": "Équipage de la sortie mis à jour."
+    "logCrewUpdated": "Équipage de la sortie mis à jour.",
+    "planning": {
+      "assigned": "Équipier affecté à la réservation.",
+      "assignedLapses": "Équipier affecté — attention, une de ses certifications expire avant la fin de la réservation.",
+      "unavailable": "Cet équipier est déjà embarqué ou indisponible sur ces dates.",
+      "alreadyAssigned": "Cet équipier est déjà affecté à la réservation.",
+      "reservationCancelled": "Réservation annulée : impossible d'y affecter un équipier.",
+      "unassigned": "Équipier retiré de la réservation.",
+      "assignmentNotFound": "Affectation introuvable.",
+      "unavailabilityCreated": "Indisponibilité ajoutée.",
+      "unavailabilityDeleted": "Indisponibilité supprimée.",
+      "unavailabilityNotFound": "Indisponibilité introuvable."
+    }
   },
   "clients": {
     "created": "Client créé.",

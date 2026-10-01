@@ -62,8 +62,11 @@
     "roles": {
       "skipper": "Skipper",
       "crew": "Crew",
-      "passenger": "Passenger"
-    }
+      "passenger": "Passenger",
+      "instructor": "Instructor"
+    },
+    "boat": "Boat",
+    "client": "Client"
   },
   "memberStatus": {
     "expired": "Certification expired",
@@ -81,6 +84,70 @@
       },
       "inDays": "in {days, plural, one {# day} other {# days}}",
       "cta": "View crew"
+    }
+  },
+  "planning": {
+    "title": "Crew planning",
+    "reservationTitle": "Reservation crew",
+    "roles": {
+      "skipper": "Skipper",
+      "crew": "Crew",
+      "instructor": "Instructor"
+    },
+    "conflict": {
+      "reservation": "Already on board: {label} ({from} to {to})",
+      "unavailability": "Unavailable: {label} ({from} to {to})",
+      "noReason": "no reason given"
+    },
+    "unassignConfirm": "Remove {name} from the crew?",
+    "unassignFor": "Remove {name} from the crew",
+    "unassign": "Remove",
+    "noCrew": "No crew member assigned to this reservation.",
+    "conflictsSince": "Overlap since the assignment:",
+    "certificationLapses": "Certification expires before the end",
+    "pickMember": "Crew member",
+    "noMemberLeft": "Every crew member is already assigned, or the crew list is empty.",
+    "unavailable": "Unavailable",
+    "role": "Role",
+    "notes": "Notes",
+    "assign": "Assign",
+    "downloadPdf": "Crew role (PDF)",
+    "missingSkipper": "Skippered charter: no skipper assigned.",
+    "onBoard": "On board",
+    "addTitle": "Assign a crew member",
+    "cancelledReservation": "Cancelled reservation: no crew member can be assigned anymore.",
+    "certifications": "Certifications",
+    "noCertification": "No certification recorded.",
+    "calendar": {
+      "member": "Crew member",
+      "boarding": "{boat} — {client} ({role})",
+      "unavailable": "Unavailable: {reason}",
+      "offShort": "Off",
+      "range": "From {from} to {to}",
+      "previous": "Previous week",
+      "today": "Today",
+      "next": "Next week",
+      "empty": "No crew member yet: add some from the crew list.",
+      "legend": "Coloured: on board a reservation. Amber: unavailable. Red: two commitments on the same day."
+    },
+    "unavailability": {
+      "title": "Unavailability",
+      "deleteConfirm": "Delete this unavailability?",
+      "range": "From {from} to {to}",
+      "empty": "No unavailability declared.",
+      "startsOn": "From",
+      "endsOn": "To (included)",
+      "reason": "Reason (leave, other boarding…)",
+      "add": "Add unavailability"
+    },
+    "history": {
+      "title": "Boardings",
+      "kind": {
+        "reservation": "Reservation",
+        "navigation_log": "Trip"
+      },
+      "open": "Open",
+      "empty": "No boarding yet."
     }
   }
 }

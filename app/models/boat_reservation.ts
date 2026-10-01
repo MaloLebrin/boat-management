@@ -1,7 +1,8 @@
-import { BaseModel, beforeSave, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, beforeSave, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import Boat from '#models/boat'
+import BoatReservationCrewMember from '#models/boat_reservation_crew_member'
 import Organization from '#models/organization'
 import type {
   ReservationPaymentMethod,
@@ -133,4 +134,8 @@ export default class BoatReservation extends BaseModel {
 
   @belongsTo(() => Organization)
   declare organization: BelongsTo<typeof Organization>
+
+  /** Équipiers embarqués (#883). */
+  @hasMany(() => BoatReservationCrewMember, { foreignKey: 'reservationId' })
+  declare crewAssignments: HasMany<typeof BoatReservationCrewMember>
 }

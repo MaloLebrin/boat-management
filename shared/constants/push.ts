@@ -30,6 +30,9 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   // Certification d'équipage échue (#882) : un équipier qu'on ne peut plus
   // embarquer. L'échéance à venir reste in-app, comme les autres rappels.
   'crew_certification.expired',
+  // Embarquement d'un équipier (#883) : il doit savoir qu'il part, et la veille.
+  'crew.assigned',
+  'crew.assignment_reminder',
 ] as const
 
 export function isPushableNotificationType(type: NotificationType): boolean {

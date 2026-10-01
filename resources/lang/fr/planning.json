@@ -64,5 +64,9 @@
     "conflictTitle": "Le bateau est loué à cette date",
     "conflictMessage": "« {task} » tomberait le {date}, pendant la location confirmée de {boat} par {client}. Déplacer quand même ?",
     "conflictConfirm": "Déplacer quand même"
+  },
+  "crewFilter": {
+    "label": "Filtrer les réservations par équipier",
+    "all": "Tous les équipiers"
   }
 }

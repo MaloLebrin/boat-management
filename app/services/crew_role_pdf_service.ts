@@ -1,9 +1,20 @@
+import type BoatReservation from '#models/boat_reservation'
 import type CrewMember from '#models/crew_member'
 import type NavigationLog from '#models/navigation_log'
+import type { DateTime } from 'luxon'
 import type { I18n } from '@adonisjs/i18n'
 import { createPdfDocument, renderPagedFooter } from '#services/pdf/document'
 import { PDF_COLORS, PDF_PAGE } from '#services/pdf/theme'
-import type { NavigationLogCrewRole } from '#shared/types/crew'
+import type { NavigationLogCrewRole, ReservationCrewRole } from '#shared/types/crew'
+
+type CrewRoleRow = { member: CrewMember; role: NavigationLogCrewRole | ReservationCrewRole }
+
+/** En-tête du rôle : départ, retour et route (sortie) ou bateau et client (réservation). */
+interface CrewRoleHeader {
+  departedAt: DateTime
+  arrivedAt: DateTime | null
+  route: string
+}
 
 const {
   navy: NAVY,
@@ -18,27 +29,66 @@ const { margin: MARGIN, contentWidth: CONTENT_W } = PDF_PAGE
 export default class CrewRolePdfService {
   async generate(
     log: NavigationLog,
-    crewWithRoles: Array<{ member: CrewMember; role: NavigationLogCrewRole }>,
+    crewWithRoles: CrewRoleRow[],
     i18n: I18n
+  ): Promise<{ buffer: Buffer; filename: string }> {
+    const t = (key: string) => i18n.t(`crew.pdf.${key}`)
+    const depPort = log.departurePortName ?? '—'
+    const arrPort = log.arrivalPortName ?? '—'
+    return this.#render(
+      {
+        departedAt: log.departedAt,
+        arrivedAt: log.arrivedAt,
+        route: `${t('route')} : ${depPort} → ${arrPort}`,
+      },
+      crewWithRoles,
+      t
+    )
+  }
+
+  /**
+   * Rôle d'équipage d'une réservation (#883) : l'équipage prévu, imprimable
+   * avant le départ — la sortie du journal de bord n'existe pas encore.
+   */
+  async generateForReservation(
+    reservation: BoatReservation,
+    boatName: string,
+    crewWithRoles: CrewRoleRow[],
+    i18n: I18n
+  ): Promise<{ buffer: Buffer; filename: string }> {
+    const t = (key: string) => i18n.t(`crew.pdf.${key}`)
+    return this.#render(
+      {
+        departedAt: reservation.startsAt,
+        arrivedAt: reservation.endsAt,
+        route: `${t('boat')} : ${boatName} — ${t('client')} : ${reservation.clientName}`,
+      },
+      crewWithRoles,
+      t
+    )
+  }
+
+  async #render(
+    header: CrewRoleHeader,
+    crewWithRoles: CrewRoleRow[],
+    t: (key: string) => string
   ): Promise<{ buffer: Buffer; filename: string }> {
     const { doc, finish } = createPdfDocument()
 
-    const t = (key: string) => i18n.t(`crew.pdf.${key}`)
-
-    this.#renderHeader(doc, log, t)
+    this.#renderHeader(doc, header, t)
     this.#renderCrewTable(doc, crewWithRoles, t)
     renderPagedFooter(doc, () => t('footer'))
 
     const buffer = await finish()
 
-    const dateStr = log.departedAt.toFormat('yyyy-MM-dd')
+    const dateStr = header.departedAt.toFormat('yyyy-MM-dd')
     return {
       buffer,
       filename: `role-equipage-${dateStr}.pdf`,
     }
   }
 
-  #renderHeader(doc: PDFKit.PDFDocument, log: NavigationLog, t: (key: string) => string): void {
+  #renderHeader(doc: PDFKit.PDFDocument, log: CrewRoleHeader, t: (key: string) => string): void {
     // Banner
     doc.rect(MARGIN, MARGIN, CONTENT_W, 48).fill(NAVY)
 
@@ -61,16 +111,14 @@ export default class CrewRolePdfService {
       doc.text(`${t('arrivedAt')} : ${log.arrivedAt.toFormat('dd/MM/yyyy HH:mm')}`, MARGIN, y + 16)
     }
 
-    const depPort = log.departurePortName ?? '—'
-    const arrPort = log.arrivalPortName ?? '—'
-    doc.text(`${t('route')} : ${depPort} → ${arrPort}`, MARGIN, y + 32)
+    doc.text(log.route, MARGIN, y + 32)
 
     doc.moveDown(2)
   }
 
   #renderCrewTable(
     doc: PDFKit.PDFDocument,
-    crewWithRoles: Array<{ member: CrewMember; role: NavigationLogCrewRole }>,
+    crewWithRoles: CrewRoleRow[],
     t: (key: string) => string
   ): void {
     const startY = doc.y + 8

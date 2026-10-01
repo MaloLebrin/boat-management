@@ -34,7 +34,7 @@ export default class CrewService {
       .orderBy('last_name', 'asc')
       .orderBy('first_name', 'asc')
 
-    return members.map((m) => this.#toRow(m))
+    return members.map((m) => this.toRow(m))
   }
 
   async listOptionsForOrganization(organization: Organization): Promise<CrewMemberOption[]> {
@@ -200,7 +200,7 @@ export default class CrewService {
     await log.related('crew').sync(pivotData)
   }
 
-  #toRow(member: CrewMember): CrewMemberRow {
+  toRow(member: CrewMember): CrewMemberRow {
     return {
       id: member.id,
       firstName: member.firstName,

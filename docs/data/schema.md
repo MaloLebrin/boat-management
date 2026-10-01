@@ -533,6 +533,27 @@ Titres de navigation d'un équipier (`crew_members`). Le vocabulaire de `type` e
 - `expiresAt` (nullable, indexé) — le formulaire propose une date d'après `shared/helpers/navigation_title.ts` (médical 2 ans, STCW 5 ans) sans jamais écraser une saisie
 - `createdAt`, `updatedAt`
 
+### boat_reservation_crew_members
+
+Équipiers affectés à une réservation (#883, module Location).
+
+- `id`
+- `boatReservationId` (FK `boat_reservations` cascade), `crewMemberId` (FK `crew_members` cascade, indexé), unicité du couple
+- `role` — `skipper` | `crew` | `instructor`
+- `notes` (nullable)
+- `reminderSentAt` (nullable) — rappel J-1 envoyé, une seule fois par affectation
+- `createdAt`, `updatedAt`
+
+### crew_unavailabilities
+
+Indisponibilités d'un équipier (#883) : congés, autre embarquement. Une affectation qui recoupe l'un de ces jours est refusée.
+
+- `id`
+- `crewMemberId` (FK `crew_members` cascade, indexé)
+- `startsOn`, `endsOn` (dates, bornes **incluses**)
+- `reason` (nullable, 255)
+- `createdAt`, `updatedAt`
+
 ### clients
 
 Fiches CRM (module `crm_invoicing`).
@@ -834,6 +855,7 @@ fait un balayage complet de la table qu'elle est censée borner.
 - `User 1..n AiAnalysis` via `ai_analyses.userId` (`organizationId` scope les lectures, `boatId` distingue flotte et bateau)
 - `CrewMember 1..n CrewCertification` via `crew_certifications.crewMemberId`
 - `Boat 1..n BoatReservation`, `Client 0..n BoatReservation` via `boat_reservations.clientId`
+- `BoatReservation n..n CrewMember` via `boat_reservation_crew_members` (rôle sur le pivot, #883) ; `CrewMember 1..n CrewUnavailability`
 - `Boat 1..n BoatFuelLog`, `BoatEngine 0..n BoatFuelLog` via `boat_fuel_logs.boatEngineId`
 - `Boat 1..n NavigationLog` ; `NavigationLog n..n CrewMember` via `navigation_log_crew` (rôle sur le pivot)
 - `NavigationLog 1..n NavigationLogEntry` via `navigation_log_entries.navigationLogId`

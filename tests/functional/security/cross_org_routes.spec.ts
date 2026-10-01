@@ -127,6 +127,8 @@ function valueFor(name: string, pattern: string, ids: CrossOrgIds): string | nul
     inspectionId: ids.inspectionId,
     certId: ids.certId,
     calendarId: ids.calendarId,
+    assignmentId: ids.crewAssignmentId,
+    unavailabilityId: ids.unavailabilityId,
     userId: ids.memberId,
     memberId: ids.memberId,
   }

@@ -551,6 +551,32 @@ router
           )
           .as('boats.reservations.inspections.photos.destroy')
 
+        // Équipage d'une réservation (#883) : affectation, chevauchements, rôle PDF.
+        router
+          .get('boats/:boatId/reservations/:reservationId/crew', [
+            controllers.ReservationCrew,
+            'show',
+          ])
+          .as('boats.reservations.crew.show')
+        router
+          .post('boats/:boatId/reservations/:reservationId/crew', [
+            controllers.ReservationCrew,
+            'store',
+          ])
+          .as('boats.reservations.crew.store')
+        router
+          .delete('boats/:boatId/reservations/:reservationId/crew/:assignmentId', [
+            controllers.ReservationCrew,
+            'destroy',
+          ])
+          .as('boats.reservations.crew.destroy')
+        router
+          .get('boats/:boatId/reservations/:reservationId/crew/pdf', [
+            controllers.ReservationCrew,
+            'pdf',
+          ])
+          .as('boats.reservations.crew.pdf')
+
         router
           .get('boats/:boatId/reservations/:reservationId/contract', [
             controllers.RentalContracts,

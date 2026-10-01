@@ -5,8 +5,8 @@ import type { BoatReservationRow } from '~/types/reservation'
 import { confirmDelete } from '~/utils/native_dialog'
 
 /**
- * Actions d'une ligne de réservation : état des lieux, contrat, paiement
- * (#875), modification et suppression.
+ * Actions d'une ligne de réservation : état des lieux, contrat, équipage
+ * (#883), paiement (#875), modification et suppression.
  */
 const props = defineProps<{
   boatId: number
@@ -64,6 +64,25 @@ function deleteReservation() {
           stroke-linejoin="round"
           stroke-width="2"
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+    </BaseButton>
+    <!-- Équipage de la réservation (#883) -->
+    <BaseButton
+      variant="ghost"
+      size="sm"
+      :title="t('reservations.actions.crew')"
+      :aria-label="t('reservations.actions.crewFor', { client: row.clientName })"
+      route="boats.reservations.crew.show"
+      :params="{ boatId, reservationId: row.id }"
+      data-testid="reservation-crew-action"
+    >
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
         />
       </svg>
     </BaseButton>

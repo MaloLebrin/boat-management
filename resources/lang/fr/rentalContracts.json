@@ -41,6 +41,7 @@
       "sent": "Envoyé",
       "signed": "Signé"
     },
-    "footer": "Page {page} sur {total} - {org}"
+    "footer": "Page {page} sur {total} - {org}",
+    "skipper": "Skipper"
   }
 }

@@ -281,5 +281,111 @@ digest les certifications échues ou à 60 jours (pour qui a `crew.create`) : le
 copilote peut répondre « qui peut skipper samedi ? ».
 
 **Hors périmètre** : le rôle d'équipage PDF ne filtre ni ne signale les
-certificats (document réglementaire, à valider par le capitaine) ; planning
-d'équipage (#883) ; préférences de notification par type (#888).
+certificats (document réglementaire, à valider par le capitaine) ;
+préférences de notification par type (#888). Le planning d'équipage est décrit
+ci-dessous (#883).
+
+## Planning d'équipage (#883)
+
+Pour une école de voile ou un loueur avec skipper, le planning des personnes
+compte autant que celui des bateaux : qui embarque sur quelle réservation, qui
+est libre, qui a ses certificats.
+
+**Gating** — module Location (`canManageReservations`), comme les
+réservations. La liste `/crew`, les certifications et la fiche équipier
+restent ouvertes à tous les plans ; sans module, la fiche n'affiche que les
+sorties du journal de bord.
+
+### Modèle de données
+
+- `boat_reservation_crew_members` (`BoatReservationCrewMember`) :
+  `boat_reservation_id` (cascade), `crew_member_id` (cascade), `role`
+  (`skipper` | `crew` | `instructor`), `notes`, `reminder_sent_at` (rappel
+  J-1 envoyé). Unique sur (réservation, équipier).
+- `crew_unavailabilities` (`CrewUnavailability`) : `crew_member_id`
+  (cascade), `starts_on` / `ends_on` (jours **inclus**), `reason`.
+
+### Règle de disponibilité — `CrewPlanningService`
+
+Un équipier est **pris** sur un créneau `[début, fin[` s'il est affecté à une
+autre réservation `option` ou `confirmed` qui le recoupe (fin exclue : un
+retour à 18 h n'empêche pas un départ à 18 h), ou si une indisponibilité
+couvre l'un de ses jours (jours du créneau calculés dans le fuseau du serveur,
+la fin exclue). Une réservation annulée ne bloque personne et n'embarque plus
+personne. Fonctions pures : `shared/helpers/crew_planning.ts`
+(`intervalsOverlap`, `dayRangeOverlaps`, `navigationLogRoleFor`).
+
+- `assign` refuse un équipier pris (`CrewMemberUnavailableError`, avec la
+  liste des conflits), déjà affecté (`CrewMemberAlreadyAssignedError`),
+  d'une autre organisation (`CrewMemberNotFoundError`) ou une réservation
+  annulée (`CrewAssignmentReservationCancelledError`). La ligne de l'équipier
+  est verrouillée (`FOR UPDATE`) : deux affectations simultanées de la même
+  personne se sérialisent.
+- Une certification datée qui expire **avant la fin** de la réservation est
+  un avertissement (`certification_lapses`, flash `info`), jamais un refus.
+- Une réservation déplacée après coup peut créer un chevauchement : le bloc
+  Équipage le signale (« Chevauchement apparu depuis l'affectation »).
+
+### Routes
+
+| Route                                                                  | Contrôleur                                                    | Droit               |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------- | ------------------- |
+| `GET /boats/:boatId/reservations/:reservationId/crew`                  | `ReservationCrewController.show` → `boats/reservation_crew`   | `BoatPolicy.view`   |
+| `POST /boats/:boatId/reservations/:reservationId/crew`                 | `.store` (`assignReservationCrewValidator`)                   | `BoatPolicy.manage` |
+| `DELETE /boats/:boatId/reservations/:reservationId/crew/:assignmentId` | `.destroy`                                                    | `BoatPolicy.manage` |
+| `GET /boats/:boatId/reservations/:reservationId/crew/pdf`              | `.pdf` — rôle d'équipage de la réservation                    | `BoatPolicy.view`   |
+| `GET /crew/planning` (`?from=YYYY-MM-DD`)                              | `CrewPlanningController.index` → `organization/crew_planning` | `crew.create`       |
+| `POST /crew/:id/unavailabilities`                                      | `.storeUnavailability`                                        | `crew.update`       |
+| `DELETE /crew/:id/unavailabilities/:unavailabilityId`                  | `.destroyUnavailability`                                      | `crew.update`       |
+| `GET /crew/:id`                                                        | `CrewMembersController.show` → `organization/crew_member`     | `crew.create`       |
+
+Les routes de réservation vivent dans le groupe gardé par le module Location
+de `start/routes/boats.ts` ; le calendrier et les indisponibilités dans un
+groupe gardé de `start/routes/crew.ts`.
+
+### Propagations
+
+- **Journal de bord** : `NavigationLogService.createForBoat` embarque d'office
+  l'équipage de la réservation active du bateau qui couvre le jour du départ
+  (`CrewPlanningService.crewForDeparture`) ; `instructor` devient `crew`. Il
+  reste modifiable depuis le panneau équipage de la sortie.
+- **Rôle d'équipage PDF** : `CrewRolePdfService.generateForReservation`,
+  imprimable avant le départ (bateau, client, dates).
+- **Contrat** : pour une location `skippered`, le PDF du contrat nomme le
+  skipper affecté (`rentalContracts.pdf.skipper`).
+- **Planning** : `PlanningReservation.crewMemberIds` alimente le filtre
+  « Équipier » de `/planning`.
+
+### Notifications
+
+- `crew.assigned` (poussable) à l'affectation, à l'équipier dont l'e-mail est
+  celui d'un membre de l'organisation ; lien vers les réservations du bateau
+  s'il a `boats.view`.
+- `crew.assignment_reminder` (poussable) la veille d'un départ, par le scan
+  quotidien (`NotificationScanService` → `sendDayBeforeReminders`), une seule
+  fois par affectation (`reminder_sent_at`), avec bateau, client et horaires.
+
+### Assistant
+
+`AssistantContextService` ajoute l'équipage des réservations des 14 prochains
+jours (12 lignes au plus) pour qui a `crew.create` : « qui skippe le catamaran
+samedi ? ». Entrée `crew-planning` de `product_knowledge.ts`, cible
+`crew.planning.index`.
+
+### UI
+
+- `boats/reservation_crew.vue` : `ReservationCrewList` (rôles, badges de
+  certification, conflits, retrait) et `ReservationCrewAssignForm` (équipiers
+  libres d'abord, les pris grisés avec ce qui les occupe ; rôle `skipper` par
+  défaut pour une location `skippered` sans skipper). Accès par le bouton
+  « Équipage » des actions d'une ligne de réservation.
+- `organization/crew_planning.vue` + `CrewPlanningGrid` : quatre semaines,
+  une ligne par équipier ; brand = embarqué, ambre = indisponible, rouge =
+  deux occupations le même jour.
+- `organization/crew_member.vue` : certifications, `CrewUnavailabilityPanel`,
+  `CrewMemberHistory` (réservations et sorties, les plus récentes d'abord).
+- i18n : `crew.planning.*`, `flash.crew.planning.*`,
+  `notifications.messages.crew.*`, `planning.crewFilter.*`,
+  `reservations.actions.crew*`.
+
+**Hors périmètre** : paie et rémunération des skippers.

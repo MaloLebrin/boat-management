@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Head } from '@inertiajs/vue3'
-import BaseBadge from '~/components/base/BaseBadge.vue'
+import { Link } from '@adonisjs/inertia/vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
+import CrewMemberStatusBadge from '~/components/crew/CrewMemberStatusBadge.vue'
 import CrewMemberForm from '~/components/crew/CrewMemberForm.vue'
 import CrewCertificationForm from '~/components/crew/CrewCertificationForm.vue'
 import CrewCertificationBadge from '~/components/crew/CrewCertificationBadge.vue'
@@ -15,6 +16,8 @@ import { confirmDelete } from '~/utils/native_dialog'
 const props = defineProps<{
   crewMembers: CrewMemberRow[]
   canDelete: boolean
+  /** Module Location actif : lien vers le calendrier d'équipage (#883). */
+  planningEnabled: boolean
 }>()
 
 const { t } = useT()
@@ -41,9 +44,20 @@ function deleteCertification(memberId: number, certId: number) {
   <div class="mx-auto w-full max-w-4xl px-6 py-10 sm:px-8">
     <div class="mb-8 flex items-center justify-between">
       <BaseHeading level="1">{{ t('crew.title') }}</BaseHeading>
-      <BaseButton variant="primary" size="sm" type="button" @click="showCreateForm = true">
-        {{ t('crew.add') }}
-      </BaseButton>
+      <div class="flex gap-2">
+        <BaseButton
+          v-if="planningEnabled"
+          variant="secondary"
+          size="sm"
+          route="crew.planning.index"
+          data-testid="crew-planning-link"
+        >
+          {{ t('crew.planning.title') }}
+        </BaseButton>
+        <BaseButton variant="primary" size="sm" type="button" @click="showCreateForm = true">
+          {{ t('crew.add') }}
+        </BaseButton>
+      </div>
     </div>
 
     <CrewMemberForm v-if="showCreateForm" class="mb-6" @close="showCreateForm = false" />
@@ -58,17 +72,11 @@ function deleteCertification(memberId: number, certId: number) {
           <div class="flex items-start justify-between gap-4">
             <div class="flex-1 min-w-0">
               <div class="flex flex-wrap items-center gap-2">
-                <p class="font-semibold text-fg">{{ member.fullName }}</p>
-                <BaseBadge
-                  v-if="
-                    member.certificationStatus === 'expired' ||
-                    member.certificationStatus === 'expiring_soon'
-                  "
-                  :variant="member.certificationStatus === 'expired' ? 'danger' : 'warning'"
-                  data-testid="crew-member-status"
-                >
-                  {{ t(`crew.memberStatus.${member.certificationStatus}`) }}
-                </BaseBadge>
+                <!-- Fiche équipier (#883) : historique et indisponibilités. -->
+                <Link :href="`/crew/${member.id}`" class="font-semibold text-fg hover:text-brand">
+                  {{ member.fullName }}
+                </Link>
+                <CrewMemberStatusBadge :status="member.certificationStatus" />
               </div>
               <div class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
                 <span v-if="member.email">{{ member.email }}</span>

@@ -438,6 +438,8 @@ Réf. routes : `start/routes/boats.ts` (per-boat) et `start/routes/reservations.
 | `GET /calendar/:jeton.ics` (`calendar.feed`)                                            | `CalendarFeedsController.show`               | Flux publié, **sans session** (#880)                                                                          |
 | `POST /boats/:boatId/external-calendars` (+ `/:calendarId/sync`, `DELETE /:calendarId`) | `ExternalCalendarsController`                | Calendriers externes importés (#880)                                                                          |
 
+| `GET/POST /boats/:boatId/reservations/:reservationId/crew` (+ `DELETE /:assignmentId`, `GET /pdf`) | `ReservationCrewController` | Équipage de la réservation, chevauchements refusés, rôle PDF (#883) — voir [`crew.md`](crew.md#planning-déquipage-883) |
+
 > La **création/édition se fait uniquement depuis le formulaire par bateau**
 > (le `boatId` est fixe) ; la page flotte `/reservations` est en lecture seule.
 

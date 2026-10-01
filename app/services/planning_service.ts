@@ -1,6 +1,7 @@
 import Boat from '#models/boat'
 import BoatMaintenanceTask from '#models/boat_maintenance_task'
 import BoatReservation from '#models/boat_reservation'
+import BoatReservationCrewMember from '#models/boat_reservation_crew_member'
 import Organization from '#models/organization'
 import type User from '#models/user'
 import TaskGroupingService from '#services/task_grouping_service'
@@ -207,6 +208,22 @@ export default class PlanningService {
       .where('startsAt', '<', now.plus({ days: PLANNING_RESERVATIONS_FUTURE_DAYS }).toISO()!)
       .orderBy('startsAt', 'asc')
 
+    const crewByReservation = new Map<number, number[]>()
+    if (rows.length > 0) {
+      const assignments = await BoatReservationCrewMember.query()
+        .select('boat_reservation_id', 'crew_member_id')
+        .whereIn(
+          'reservationId',
+          rows.map((r) => r.id)
+        )
+      for (const a of assignments) {
+        crewByReservation.set(a.reservationId, [
+          ...(crewByReservation.get(a.reservationId) ?? []),
+          a.crewMemberId,
+        ])
+      }
+    }
+
     return rows.map((r) => ({
       id: r.id,
       boatId: r.boatId,
@@ -215,6 +232,7 @@ export default class PlanningService {
       startsAt: r.startsAt.toISO()!,
       endsAt: r.endsAt.toISO()!,
       clientName: r.clientName,
+      crewMemberIds: crewByReservation.get(r.id) ?? [],
     }))
   }
 

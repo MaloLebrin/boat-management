@@ -35,7 +35,7 @@ Vue flotte des tâches de maintenance : un **kanban** par échéance et un **cal
 
 ## 3. Réservations et conflits
 
-- **Bandes.** Dans le calendrier, les réservations se rendent en `AvailabilityBand` sous les tâches (confirmées en `mint`, options en `peach`), avec un lien vers `/boats/:id/reservations`. Le bouton « Réservations » de la barre d'outils masque la couche ; le filtre bateau s'y applique aussi.
+- **Bandes.** Dans le calendrier, les réservations se rendent en `AvailabilityBand` sous les tâches (confirmées en `mint`, options en `peach`), avec un lien vers `/boats/:id/reservations`. Le bouton « Réservations » de la barre d'outils masque la couche ; le filtre bateau s'y applique aussi, comme le filtre « Équipier » (#883, `crewOptions` et `PlanningReservation.crewMemberIds`) qui ne garde que les réservations où l'équipier est embarqué.
 - **Conflit.** `reservationConflictFor` cherche une réservation **confirmée** du même bateau qui chevauche les jours occupés par la tâche (échéance à minuit UTC, sur sa durée prévue, un jour par défaut, comme les fenêtres de #870).
   - La carte affiche « Pendant une location » et la pastille du calendrier est cerclée.
   - Un dépôt qui créerait le conflit ouvre une confirmation (`BaseConfirmModal`).

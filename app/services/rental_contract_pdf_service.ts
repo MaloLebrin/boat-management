@@ -1,3 +1,4 @@
+import BoatReservationCrewMember from '#models/boat_reservation_crew_member'
 import type RentalContract from '#models/rental_contract'
 import type Organization from '#models/organization'
 import type { I18n } from '@adonisjs/i18n'
@@ -44,7 +45,7 @@ export default class RentalContractPdfService {
       locale: i18n.locale,
     })
     this.#renderMetadata(doc, contract, clientName, clientEmail, clientPhone, t)
-    this.#renderBoatAndPeriod(doc, contract, t)
+    this.#renderBoatAndPeriod(doc, contract, await this.#skipperName(contract), t)
     this.#renderConditions(doc, t)
     renderPagedFooter(doc, (page, total) =>
       t('footer', { page: String(page), total: String(total), org: branding.displayName })
@@ -96,9 +97,25 @@ export default class RentalContractPdfService {
     divider(doc)
   }
 
+  /**
+   * Skipper fourni par le loueur (#883) : nommé au contrat d'une location
+   * `skippered` dès qu'il est affecté à la réservation.
+   */
+  async #skipperName(contract: RentalContract): Promise<string | null> {
+    if (contract.reservation.type !== 'skippered') return null
+    const assignment = await BoatReservationCrewMember.query()
+      .where('reservationId', contract.reservation.id)
+      .where('role', 'skipper')
+      .preload('crewMember')
+      .orderBy('id', 'asc')
+      .first()
+    return assignment?.crewMember.fullName ?? null
+  }
+
   #renderBoatAndPeriod(
     doc: PDFKit.PDFDocument,
     contract: RentalContract,
+    skipperName: string | null,
     t: (key: string, data?: Record<string, string>) => string
   ): void {
     const reservation = contract.reservation
@@ -124,6 +141,13 @@ export default class RentalContractPdfService {
         doc.y
       )
     doc.moveDown(0.8)
+
+    if (skipperName) {
+      doc.fontSize(11).font('Helvetica-Bold').fillColor(NAVY).text(t('skipper'), MARGIN, doc.y)
+      doc.moveDown(0.3)
+      doc.fontSize(9).font('Helvetica').fillColor(GREY_D).text(skipperName, MARGIN, doc.y)
+      doc.moveDown(0.8)
+    }
 
     divider(doc)
   }

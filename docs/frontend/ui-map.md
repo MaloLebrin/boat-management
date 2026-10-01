@@ -255,6 +255,14 @@ la nav est masquée via `effectiveQuotas.canManagePorts` ; la carte ports du das
 - `inertia/components/boats/show/tabs/NavigationLogCrewPanel.vue` — options du select suffixées « certification expirée / à renouveler » (`CrewMemberOption.certificationStatus`), badge sur un membre embarqué au certificat expiré, avertissement `role="status"` : jamais bloquant.
 - Widget du tableau de bord `inertia/components/dashboard/DashboardCrewCertificationsCard.vue` (`crew_certifications`, galerie, prop différée `crewCertifications`) : comptes, cinq lignes les plus urgentes, lien `/crew`.
 
+### Planning d'équipage (#883)
+
+- `inertia/pages/boats/reservation_crew.vue` (GET `/boats/:boatId/reservations/:reservationId/crew`) : `components/reservations/crew/ReservationCrewList.vue` et `ReservationCrewAssignForm.vue` ; bouton « Équipage » dans `ReservationRowActions.vue`.
+- `inertia/pages/organization/crew_planning.vue` (GET `/crew/planning?from=`) : `components/crew/CrewPlanningGrid.vue`, jours calculés par `inertia/utils/crew_planning_days.ts`.
+- `inertia/pages/organization/crew_member.vue` (GET `/crew/:id`) : `CrewUnavailabilityPanel.vue`, `CrewMemberHistory.vue`. Le nom d'un équipier sur `/crew` mène à sa fiche ; bouton « Planning d'équipage » avec le module Location (`planningEnabled`).
+- Badges partagés : `CrewMemberStatusBadge.vue` (état le plus grave), `CrewConflictList.vue`.
+- `/planning` : filtre « Équipier » des réservations dans `PlanningToolbar.vue` (prop `crewOptions`).
+
 ### Diagnostic de panne (#515, #516, #576)
 
 - Pages (GET `/diagnostic`, `/boats/:boatId/engines/:engineId/diagnostic[/sheets/:sheetSlug]`) :

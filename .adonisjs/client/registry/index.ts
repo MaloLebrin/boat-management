@@ -186,6 +186,18 @@ const routes = {
     tokens: [{"old":"/boats/:id","type":0,"val":"boats","end":""},{"old":"/boats/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['boats.destroy']['types'],
   },
+  'boats.restore': {
+    methods: ["POST"],
+    pattern: '/boats/:id/restore',
+    tokens: [{"old":"/boats/:id/restore","type":0,"val":"boats","end":""},{"old":"/boats/:id/restore","type":1,"val":"id","end":""},{"old":"/boats/:id/restore","type":0,"val":"restore","end":""}],
+    types: placeholder as Registry['boats.restore']['types'],
+  },
+  'boats.forceDestroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:id/force',
+    tokens: [{"old":"/boats/:id/force","type":0,"val":"boats","end":""},{"old":"/boats/:id/force","type":1,"val":"id","end":""},{"old":"/boats/:id/force","type":0,"val":"force","end":""}],
+    types: placeholder as Registry['boats.forceDestroy']['types'],
+  },
   'boats.status.update': {
     methods: ["PATCH"],
     pattern: '/boats/:id/status',
@@ -816,6 +828,30 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId","type":0,"val":"inspections","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId","type":1,"val":"inspectionId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId","type":0,"val":"equipment-actions","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/equipment-actions/:actionId","type":1,"val":"actionId","end":""}],
     types: placeholder as Registry['boats.reservations.inspections.equipmentActions.destroy']['types'],
   },
+  'boats.reservations.inspections.pdf': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf","type":0,"val":"inspections","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf","type":1,"val":"inspectionId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/pdf","type":0,"val":"pdf","end":""}],
+    types: placeholder as Registry['boats.reservations.inspections.pdf']['types'],
+  },
+  'boats.reservations.inspections.sign': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign","type":0,"val":"inspections","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign","type":1,"val":"inspectionId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/sign","type":0,"val":"sign","end":""}],
+    types: placeholder as Registry['boats.reservations.inspections.sign']['types'],
+  },
+  'boats.reservations.inspections.send': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send","type":0,"val":"inspections","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send","type":1,"val":"inspectionId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/send","type":0,"val":"send","end":""}],
+    types: placeholder as Registry['boats.reservations.inspections.send']['types'],
+  },
+  'boats.publicBooking.update': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/public-booking',
+    tokens: [{"old":"/boats/:boatId/public-booking","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/public-booking","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/public-booking","type":0,"val":"public-booking","end":""}],
+    types: placeholder as Registry['boats.publicBooking.update']['types'],
+  },
   'boats.calendarFeed.regenerate': {
     methods: ["POST"],
     pattern: '/boats/:boatId/calendar-feed',
@@ -863,6 +899,30 @@ const routes = {
     pattern: '/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId',
     tokens: [{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":0,"val":"inspections","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":1,"val":"inspectionId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":0,"val":"photos","end":""},{"old":"/boats/:boatId/reservations/:reservationId/inspections/:inspectionId/photos/:mediaId","type":1,"val":"mediaId","end":""}],
     types: placeholder as Registry['boats.reservations.inspections.photos.destroy']['types'],
+  },
+  'boats.reservations.crew.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/reservations/:reservationId/crew',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/crew","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew","type":0,"val":"crew","end":""}],
+    types: placeholder as Registry['boats.reservations.crew.show']['types'],
+  },
+  'boats.reservations.crew.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/reservations/:reservationId/crew',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/crew","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew","type":0,"val":"crew","end":""}],
+    types: placeholder as Registry['boats.reservations.crew.store']['types'],
+  },
+  'boats.reservations.crew.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/reservations/:reservationId/crew/:assignmentId',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/crew/:assignmentId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/:assignmentId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/:assignmentId","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/:assignmentId","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/:assignmentId","type":0,"val":"crew","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/:assignmentId","type":1,"val":"assignmentId","end":""}],
+    types: placeholder as Registry['boats.reservations.crew.destroy']['types'],
+  },
+  'boats.reservations.crew.pdf': {
+    methods: ["GET","HEAD"],
+    pattern: '/boats/:boatId/reservations/:reservationId/crew/pdf',
+    tokens: [{"old":"/boats/:boatId/reservations/:reservationId/crew/pdf","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/pdf","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/pdf","type":0,"val":"reservations","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/pdf","type":1,"val":"reservationId","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/pdf","type":0,"val":"crew","end":""},{"old":"/boats/:boatId/reservations/:reservationId/crew/pdf","type":0,"val":"pdf","end":""}],
+    types: placeholder as Registry['boats.reservations.crew.pdf']['types'],
   },
   'boats.reservations.contract.show': {
     methods: ["GET","HEAD"],
@@ -1230,6 +1290,12 @@ const routes = {
     tokens: [{"old":"/crew","type":0,"val":"crew","end":""}],
     types: placeholder as Registry['crew.store']['types'],
   },
+  'crew.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/crew/:id',
+    tokens: [{"old":"/crew/:id","type":0,"val":"crew","end":""},{"old":"/crew/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['crew.show']['types'],
+  },
   'crew.update': {
     methods: ["PUT"],
     pattern: '/crew/:id',
@@ -1253,6 +1319,24 @@ const routes = {
     pattern: '/crew/:memberId/certifications/:certId',
     tokens: [{"old":"/crew/:memberId/certifications/:certId","type":0,"val":"crew","end":""},{"old":"/crew/:memberId/certifications/:certId","type":1,"val":"memberId","end":""},{"old":"/crew/:memberId/certifications/:certId","type":0,"val":"certifications","end":""},{"old":"/crew/:memberId/certifications/:certId","type":1,"val":"certId","end":""}],
     types: placeholder as Registry['crew.certifications.destroy']['types'],
+  },
+  'crew.planning.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/crew/planning',
+    tokens: [{"old":"/crew/planning","type":0,"val":"crew","end":""},{"old":"/crew/planning","type":0,"val":"planning","end":""}],
+    types: placeholder as Registry['crew.planning.index']['types'],
+  },
+  'crew.unavailabilities.store': {
+    methods: ["POST"],
+    pattern: '/crew/:id/unavailabilities',
+    tokens: [{"old":"/crew/:id/unavailabilities","type":0,"val":"crew","end":""},{"old":"/crew/:id/unavailabilities","type":1,"val":"id","end":""},{"old":"/crew/:id/unavailabilities","type":0,"val":"unavailabilities","end":""}],
+    types: placeholder as Registry['crew.unavailabilities.store']['types'],
+  },
+  'crew.unavailabilities.destroy': {
+    methods: ["DELETE"],
+    pattern: '/crew/:id/unavailabilities/:unavailabilityId',
+    tokens: [{"old":"/crew/:id/unavailabilities/:unavailabilityId","type":0,"val":"crew","end":""},{"old":"/crew/:id/unavailabilities/:unavailabilityId","type":1,"val":"id","end":""},{"old":"/crew/:id/unavailabilities/:unavailabilityId","type":0,"val":"unavailabilities","end":""},{"old":"/crew/:id/unavailabilities/:unavailabilityId","type":1,"val":"unavailabilityId","end":""}],
+    types: placeholder as Registry['crew.unavailabilities.destroy']['types'],
   },
   'navigation.logbook': {
     methods: ["GET","HEAD"],
@@ -1361,6 +1445,24 @@ const routes = {
     pattern: '/pricing/seasons/:id',
     tokens: [{"old":"/pricing/seasons/:id","type":0,"val":"pricing","end":""},{"old":"/pricing/seasons/:id","type":0,"val":"seasons","end":""},{"old":"/pricing/seasons/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['pricingSeasons.destroy']['types'],
+  },
+  'pwa.manifest': {
+    methods: ["GET","HEAD"],
+    pattern: '/site.webmanifest',
+    tokens: [{"old":"/site.webmanifest","type":0,"val":"site.webmanifest","end":""}],
+    types: placeholder as Registry['pwa.manifest']['types'],
+  },
+  'reports.index': {
+    methods: ["GET","HEAD"],
+    pattern: '/reports',
+    tokens: [{"old":"/reports","type":0,"val":"reports","end":""}],
+    types: placeholder as Registry['reports.index']['types'],
+  },
+  'reports.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/reports/export.csv',
+    tokens: [{"old":"/reports/export.csv","type":0,"val":"reports","end":""},{"old":"/reports/export.csv","type":0,"val":"export.csv","end":""}],
+    types: placeholder as Registry['reports.export']['types'],
   },
   'new_account.create': {
     methods: ["GET","HEAD"],
@@ -2093,6 +2195,24 @@ const routes = {
     pattern: '/calendar/:file',
     tokens: [{"old":"/calendar/:file","type":0,"val":"calendar","end":""},{"old":"/calendar/:file","type":1,"val":"file","end":""}],
     types: placeholder as Registry['calendar.feed']['types'],
+  },
+  'book.fleet': {
+    methods: ["GET","HEAD"],
+    pattern: '/book/:orgSlug',
+    tokens: [{"old":"/book/:orgSlug","type":0,"val":"book","end":""},{"old":"/book/:orgSlug","type":1,"val":"orgSlug","end":""}],
+    types: placeholder as Registry['book.fleet']['types'],
+  },
+  'book.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/book/:orgSlug/:boatSlug',
+    tokens: [{"old":"/book/:orgSlug/:boatSlug","type":0,"val":"book","end":""},{"old":"/book/:orgSlug/:boatSlug","type":1,"val":"orgSlug","end":""},{"old":"/book/:orgSlug/:boatSlug","type":1,"val":"boatSlug","end":""}],
+    types: placeholder as Registry['book.show']['types'],
+  },
+  'book.request': {
+    methods: ["POST"],
+    pattern: '/book/:orgSlug/:boatSlug/request',
+    tokens: [{"old":"/book/:orgSlug/:boatSlug/request","type":0,"val":"book","end":""},{"old":"/book/:orgSlug/:boatSlug/request","type":1,"val":"orgSlug","end":""},{"old":"/book/:orgSlug/:boatSlug/request","type":1,"val":"boatSlug","end":""},{"old":"/book/:orgSlug/:boatSlug/request","type":0,"val":"request","end":""}],
+    types: placeholder as Registry['book.request']['types'],
   },
   'reservations.index': {
     methods: ["GET","HEAD"],
