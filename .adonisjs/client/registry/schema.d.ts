@@ -2971,6 +2971,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/session_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'login.two_factor.create': {
+    methods: ["GET","HEAD"]
+    pattern: '/login/2fa'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/two_factor_challenge_controller').default['create']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_challenge_controller').default['create']>>>
+    }
+  }
+  'login.two_factor.store': {
+    methods: ["POST"]
+    pattern: '/login/2fa'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/two_factor').twoFactorCodeValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/two_factor').twoFactorCodeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/two_factor_challenge_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_challenge_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'password.forgot': {
     methods: ["GET","HEAD"]
     pattern: '/forgot-password'
@@ -3785,6 +3809,78 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['me']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['me']>>>
+    }
+  }
+  'settings.two_factor.store': {
+    methods: ["POST"]
+    pattern: '/settings/two-factor'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['store']>>>
+    }
+  }
+  'settings.two_factor.confirm': {
+    methods: ["POST"]
+    pattern: '/settings/two-factor/confirm'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/two_factor').twoFactorCodeValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/two_factor').twoFactorCodeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['confirm']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['confirm']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.two_factor.cancel': {
+    methods: ["DELETE"]
+    pattern: '/settings/two-factor/setup'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['cancel']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['cancel']>>>
+    }
+  }
+  'settings.two_factor.destroy': {
+    methods: ["DELETE"]
+    pattern: '/settings/two-factor'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/two_factor').disableTwoFactorValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/two_factor').disableTwoFactorValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['destroy']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.two_factor.recovery_codes': {
+    methods: ["POST"]
+    pattern: '/settings/two-factor/recovery-codes'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/two_factor').twoFactorCodeValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/two_factor').twoFactorCodeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['regenerateRecoveryCodes']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['regenerateRecoveryCodes']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.org.two_factor': {
+    methods: ["PUT"]
+    pattern: '/settings/org/two-factor'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/two_factor').organizationTwoFactorPolicyValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/two_factor').organizationTwoFactorPolicyValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['updateOrganizationPolicy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/two_factor_settings_controller').default['updateOrganizationPolicy']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'settings.notifications': {

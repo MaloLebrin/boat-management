@@ -1,21 +1,23 @@
-import { stampAuthSession } from '#utils/auth_session'
 import AuditLogService from '#services/audit_log_service'
 import DemoService from '#services/demo_service'
 import User from '#models/user'
 import UserService from '#services/user_service'
+import SessionLoginService from '#services/session_login_service'
+import { beginTwoFactorChallenge, clearTwoFactorChallenge } from '#utils/two_factor_challenge'
+import { TWO_FACTOR_CHALLENGE_PATH } from '#shared/constants/two_factor'
 import { loginValidator } from '#validators/user'
 import { loginAccountKey, loginAccountLimiter } from '#start/limiter'
 import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import type { HttpContext } from '@adonisjs/core/http'
-import { DateTime } from 'luxon'
 
 @inject()
 export default class SessionController {
   constructor(
     private userService: UserService,
     private auditLogService: AuditLogService,
-    private demoService: DemoService
+    private demoService: DemoService,
+    private sessionLoginService: SessionLoginService
   ) {}
 
   async create({ inertia }: HttpContext) {
@@ -47,23 +49,22 @@ export default class SessionController {
     }
 
     const user = attempt[1]
-    await auth.use('web').login(user, remember ?? false)
-    stampAuthSession(session)
-    // #451 — filet de sécurité : une session navigateur qui traîne encore un
-    // `demoSessionStartedAt` (session démo antérieure) ne doit pas le transmettre
-    // au compte réel qui vient de s'authentifier.
-    session.forget('demoSessionStartedAt')
-    user.lastLoginAt = DateTime.now()
-    await user.save()
 
-    if (user.organizationId) {
-      await this.auditLogService.log({
-        organizationId: user.organizationId,
-        userId: user.id,
-        action: 'login',
-      })
+    // Double authentification (#884) : le mot de passe ne suffit pas, rien
+    // n'est ouvert côté `auth` — seul l'état pré-authentifié est posé, et le
+    // remember-me attend le second facteur.
+    if (user.hasTwoFactorEnabled) {
+      beginTwoFactorChallenge(session, user.id, remember ?? false)
+      return response.redirect().toPath(TWO_FACTOR_CHALLENGE_PATH)
     }
 
+    clearTwoFactorChallenge(session)
+    const redirectTo = await this.sessionLoginService.complete(
+      { auth, session, i18n },
+      user,
+      remember ?? false
+    )
+    if (redirectTo) return response.redirect().toPath(redirectTo)
     response.redirect().toRoute('dashboard')
   }
 

@@ -39,7 +39,10 @@ import SettingsOrgTab from '../../inertia/components/settings/tabs/SettingsOrgTa
 
 function mountAs(role: OrgRole) {
   return mountWithStubs(SettingsOrgTab, {
-    props: { organization: { id: 1, name: 'Marina du Ponant' } } as Record<string, unknown>,
+    props: {
+      organization: { id: 1, name: 'Marina du Ponant' },
+      twoFactorPolicy: { requireTwoFactor: false, graceEndsAt: null, membersWithoutTwoFactor: 2 },
+    } as Record<string, unknown>,
     pageProps: { permissions: { role, capabilities: [...ROLE_PERMISSIONS[role]] } },
   })
 }

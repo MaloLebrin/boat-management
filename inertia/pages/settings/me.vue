@@ -8,6 +8,9 @@ import { Head } from '@inertiajs/vue3'
 import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsMeTab from '~/components/settings/tabs/SettingsMeTab.vue'
 import { useT } from '~/composables/use_t'
+import type { TwoFactorSettingsProps } from '#shared/types/two_factor'
+
+defineProps<{ twoFactor: TwoFactorSettingsProps }>()
 
 const { t } = useT()
 </script>
@@ -15,6 +18,6 @@ const { t } = useT()
 <template>
   <Head :title="t('settings.me.title')" />
   <SettingsShell>
-    <SettingsMeTab />
+    <SettingsMeTab :two-factor="twoFactor" />
   </SettingsShell>
 </template>

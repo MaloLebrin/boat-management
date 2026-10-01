@@ -433,6 +433,10 @@ export interface ApiDefinition {
   }
   login: {
     store: typeof routes['login.store']
+    twoFactor: {
+      create: typeof routes['login.two_factor.create']
+      store: typeof routes['login.two_factor.store']
+    }
   }
   password: {
     forgot: typeof routes['password.forgot']
@@ -535,10 +539,18 @@ export interface ApiDefinition {
   settings: {
     index: typeof routes['settings.index']
     me: typeof routes['settings.me']
-    notifications: typeof routes['settings.notifications']
+    twoFactor: {
+      store: typeof routes['settings.two_factor.store']
+      confirm: typeof routes['settings.two_factor.confirm']
+      cancel: typeof routes['settings.two_factor.cancel']
+      destroy: typeof routes['settings.two_factor.destroy']
+      recoveryCodes: typeof routes['settings.two_factor.recovery_codes']
+    }
     org: typeof routes['settings.org'] & {
+      twoFactor: typeof routes['settings.org.two_factor']
       update: typeof routes['settings.org.update']
     }
+    notifications: typeof routes['settings.notifications']
     members: typeof routes['settings.members']
     billing: typeof routes['settings.billing'] & {
       checkout: typeof routes['settings.billing.checkout']

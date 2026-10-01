@@ -6,6 +6,8 @@ import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
+import TwoFactorPolicyCard from '~/components/settings/org/TwoFactorPolicyCard.vue'
+import type { OrganizationTwoFactorPolicy } from '#shared/types/two_factor'
 
 const { t } = useT()
 const { can } = usePermissions()
@@ -15,6 +17,7 @@ defineProps<{
     id: number
     name: string
   }
+  twoFactorPolicy: OrganizationTwoFactorPolicy
 }>()
 
 // #761 — l'onglet s'ouvre à `members.view` (cf. `SettingsShell`), le renommage
@@ -63,5 +66,7 @@ const canManage = can('organization.manage')
         <p class="text-fg-muted text-sm">{{ t('settings.org.readOnlyHint') }}</p>
       </div>
     </BaseCard>
+
+    <TwoFactorPolicyCard :policy="twoFactorPolicy" :can-manage="canManage" class="mt-10" />
   </div>
 </template>

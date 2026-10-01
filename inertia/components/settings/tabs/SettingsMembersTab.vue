@@ -134,6 +134,11 @@ function removeMember(memberId: number) {
               {{ t('settings.members.columns.status') }}
             </th>
             <th
+              class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-fg-muted"
+            >
+              {{ t('settings.members.columns.twoFactor') }}
+            </th>
+            <th
               class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-fg-muted"
             >
               {{ t('settings.members.columns.actions') }}
@@ -179,6 +184,11 @@ function removeMember(memberId: number) {
             <td class="px-6 py-4">
               <BaseBadge variant="success">
                 {{ t('settings.members.statuses.active') }}
+              </BaseBadge>
+            </td>
+            <td class="px-6 py-4" data-testid="member-two-factor">
+              <BaseBadge :variant="member.twoFactorEnabled ? 'success' : 'empty'">
+                {{ t(`settings.members.twoFactor.${member.twoFactorEnabled ? 'on' : 'off'}`) }}
               </BaseBadge>
             </td>
             <td class="px-6 py-4 text-right">

@@ -1,6 +1,13 @@
 import { test } from '@japa/runner'
 import AuthMiddleware from '#middleware/auth_middleware'
 import { makeCtx } from '#tests/support/http_context'
+import type TwoFactorService from '#services/two_factor_service'
+
+// Politique 2FA (#884) : neutre ici — la redirection vers l'activation est
+// couverte par `tests/functional/auth/two_factor.spec.ts`.
+const twoFactorService = {
+  enforcementFor: async () => ({ required: false, graceEndsAt: null, blocked: false }),
+} as unknown as TwoFactorService
 
 /**
  * Garde d'authentification (#690).
@@ -18,7 +25,7 @@ import { makeCtx } from '#tests/support/http_context'
 
 test.group('AuthMiddleware (unit)', () => {
   test('passes the login route down to the authenticator', async ({ assert }) => {
-    const middleware = new AuthMiddleware()
+    const middleware = new AuthMiddleware(twoFactorService)
     const { ctx, authenticateCalls } = makeCtx()
     let nextCalled = 0
 
@@ -38,7 +45,7 @@ test.group('AuthMiddleware (unit)', () => {
   })
 
   test('forwards undefined guards so the authenticator picks its default', async ({ assert }) => {
-    const middleware = new AuthMiddleware()
+    const middleware = new AuthMiddleware(twoFactorService)
     const { ctx, authenticateCalls } = makeCtx()
 
     await middleware.handle(ctx, async () => {})
@@ -47,7 +54,7 @@ test.group('AuthMiddleware (unit)', () => {
   })
 
   test('does not run the route when authentication fails', async ({ assert }) => {
-    const middleware = new AuthMiddleware()
+    const middleware = new AuthMiddleware(twoFactorService)
     const { ctx } = makeCtx({ authenticateError: new Error('E_UNAUTHORIZED_ACCESS') })
     let nextCalled = 0
 

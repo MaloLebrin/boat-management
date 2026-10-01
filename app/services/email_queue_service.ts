@@ -15,6 +15,7 @@ import { formatDateLong } from '#shared/helpers/date_format'
 import { formatCurrency } from '#shared/helpers/number_format'
 import type { PublicBookingEmailParams } from '#shared/types/public_booking'
 import type { CrewCertificationAlert } from '#shared/types/crew'
+import type { TwoFactorEvent } from '#shared/types/two_factor'
 
 @inject()
 export default class EmailQueueService {
@@ -100,6 +101,48 @@ export default class EmailQueueService {
       text,
       html,
       correlationId: `email-verification:${params.to}:${Date.now()}`,
+    })
+  }
+
+  /**
+   * Changement de double authentification (#884) : activation, désactivation,
+   * code de secours utilisé, codes régénérés. Envoyé au titulaire du compte,
+   * dans sa langue — si ce n'est pas lui qui a agi, c'est son signal d'alerte.
+   * `correlationId` horodaté : deux changements successifs partent tous deux.
+   */
+  async sendTwoFactorChanged(params: {
+    to: string
+    name: string | null
+    locale: string | null
+    event: TwoFactorEvent
+  }) {
+    const i18n = i18nManager.locale(toAppLocale(params.locale))
+    const displayName = params.name ?? params.to
+    const subject = i18n.t(`auth.twoFactor.emails.subject.${params.event}`)
+    const body = i18n.t(`auth.twoFactor.emails.body.${params.event}`)
+    const notYou = i18n.t('auth.twoFactor.emails.notYou')
+    const securityUrl = `${env.get('APP_URL')}/settings/me`
+    const text = [
+      i18n.t('auth.twoFactor.emails.greeting', { name: displayName }),
+      body,
+      notYou,
+      securityUrl,
+    ].join('\n\n')
+
+    const html = await edge.render('emails/two_factor_changed', {
+      i18n,
+      displayName,
+      body,
+      notYou,
+      securityUrl,
+    })
+
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `two-factor:${params.event}:${params.to}:${Date.now()}`,
     })
   }
 

@@ -251,6 +251,8 @@ export type ScannedRoutes = {
     'signup.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'login.store': { paramsTuple?: []; params?: {} }
+    'login.two_factor.create': { paramsTuple?: []; params?: {} }
+    'login.two_factor.store': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password_reset.store': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
@@ -319,6 +321,12 @@ export type ScannedRoutes = {
     'theme.set': { paramsTuple?: []; params?: {} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.store': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.confirm': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.cancel': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.destroy': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.recovery_codes': { paramsTuple?: []; params?: {} }
+    'settings.org.two_factor': { paramsTuple?: []; params?: {} }
     'settings.notifications': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
     'settings.members': { paramsTuple?: []; params?: {} }
@@ -484,6 +492,7 @@ export type ScannedRoutes = {
     'reports.export': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'login.two_factor.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
     'email_verification.show': { paramsTuple?: []; params?: {} }
@@ -640,6 +649,7 @@ export type ScannedRoutes = {
     'reports.export': { paramsTuple?: []; params?: {} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
+    'login.two_factor.create': { paramsTuple?: []; params?: {} }
     'password.forgot': { paramsTuple?: []; params?: {} }
     'password.reset': { paramsTuple?: []; params?: {} }
     'email_verification.show': { paramsTuple?: []; params?: {} }
@@ -782,6 +792,7 @@ export type ScannedRoutes = {
     'pricingSeasons.store': { paramsTuple?: []; params?: {} }
     'signup.store': { paramsTuple?: []; params?: {} }
     'login.store': { paramsTuple?: []; params?: {} }
+    'login.two_factor.store': { paramsTuple?: []; params?: {} }
     'password_reset.store': { paramsTuple?: []; params?: {} }
     'password_reset.update': { paramsTuple?: []; params?: {} }
     'session.destroy': { paramsTuple?: []; params?: {} }
@@ -807,6 +818,9 @@ export type ScannedRoutes = {
     'simulator.share.store': { paramsTuple?: []; params?: {} }
     'locale.set': { paramsTuple?: []; params?: {} }
     'theme.set': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.store': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.confirm': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.recovery_codes': { paramsTuple?: []; params?: {} }
     'settings.billing.checkout': { paramsTuple?: []; params?: {} }
     'settings.billing.portal': { paramsTuple?: []; params?: {} }
     'settings.billing.module.add': { paramsTuple?: []; params?: {} }
@@ -859,6 +873,7 @@ export type ScannedRoutes = {
     'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'pricingSeasons.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.org.two_factor': { paramsTuple?: []; params?: {} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
     'settings.password.update': { paramsTuple?: []; params?: {} }
     'settings.locale.update': { paramsTuple?: []; params?: {} }
@@ -926,6 +941,8 @@ export type ScannedRoutes = {
     'clients.media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'mediaId': ParamValue} }
     'clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'pricingSeasons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.two_factor.cancel': { paramsTuple?: []; params?: {} }
+    'settings.two_factor.destroy': { paramsTuple?: []; params?: {} }
     'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
     'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
     'settings.billing.onlinePayments.disconnect': { paramsTuple?: []; params?: {} }

@@ -47,6 +47,8 @@ export interface OrganizationMemberData {
   fullName: string | null
   email: string
   role: OrgRole
+  /** Double authentification active (#884). */
+  twoFactorEnabled: boolean
 }
 
 export interface OrganizationInvitationData {

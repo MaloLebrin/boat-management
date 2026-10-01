@@ -2755,6 +2755,7 @@ export class OrganizationSchema extends BaseModel {
     'name',
     'plan',
     'primaryColor',
+    'requireTwoFactor',
     'secondaryColor',
     'slug',
     'storageUsedBytes',
@@ -2762,6 +2763,7 @@ export class OrganizationSchema extends BaseModel {
     'stripeConnectChargesEnabled',
     'stripeConnectDetailsSubmitted',
     'stripeCustomerId',
+    'twoFactorGraceEndsAt',
     'type',
     'updatedAt',
   ] as const
@@ -2807,6 +2809,8 @@ export class OrganizationSchema extends BaseModel {
   @column()
   declare primaryColor: string | null
   @column()
+  declare requireTwoFactor: boolean
+  @column()
   declare secondaryColor: string | null
   @column()
   declare slug: string
@@ -2820,6 +2824,8 @@ export class OrganizationSchema extends BaseModel {
   declare stripeConnectDetailsSubmitted: boolean
   @column()
   declare stripeCustomerId: string | null
+  @column.dateTime()
+  declare twoFactorGraceEndsAt: DateTime | null
   @column()
   declare type: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -3420,6 +3426,21 @@ export class SubscriptionSchema extends BaseModel {
   declare updatedAt: DateTime
 }
 
+export class TwoFactorRecoveryCodeSchema extends BaseModel {
+  static $columns = ['codeHash', 'createdAt', 'id', 'usedAt', 'userId'] as const
+  $columns = TwoFactorRecoveryCodeSchema.$columns
+  @column()
+  declare codeHash: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column.dateTime()
+  declare usedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
 export class UserSchema extends BaseModel {
   static $columns = [
     'createdAt',
@@ -3434,6 +3455,9 @@ export class UserSchema extends BaseModel {
     'password',
     'sessionsValidAfter',
     'theme',
+    'twoFactorConfirmedAt',
+    'twoFactorLastUsedStep',
+    'twoFactorSecret',
     'updatedAt',
   ] as const
   $columns = UserSchema.$columns
@@ -3461,6 +3485,12 @@ export class UserSchema extends BaseModel {
   declare sessionsValidAfter: DateTime | null
   @column()
   declare theme: string | null
+  @column.dateTime()
+  declare twoFactorConfirmedAt: DateTime | null
+  @column()
+  declare twoFactorLastUsedStep: bigint | number | null
+  @column()
+  declare twoFactorSecret: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

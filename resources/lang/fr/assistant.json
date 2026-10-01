@@ -133,7 +133,8 @@
     "settingsImport": "Ouvrir l’import de données",
     "diagnostic": "Ouvrir le diagnostic de panne",
     "spareParts": "Voir les pièces détachées",
-    "notifications": "Voir les notifications"
+    "notifications": "Voir les notifications",
+    "settingsMe": "Mon compte et sécurité"
   },
   "usage": {
     "line": "IA ce mois-ci : {used} / {limit} tokens.",

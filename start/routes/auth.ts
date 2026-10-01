@@ -6,9 +6,12 @@ import {
   loginThrottle,
   resetPasswordThrottle,
   signupThrottle,
+  twoFactorChallengeThrottle,
 } from '#start/limiter'
 import { controllers } from '#generated/controllers'
 import router from '@adonisjs/core/services/router'
+
+const TwoFactorChallengeController = () => import('#controllers/two_factor_challenge_controller')
 
 router
   .group(() => {
@@ -17,6 +20,14 @@ router
 
     router.get('login', [controllers.Session, 'create'])
     router.post('login', [controllers.Session, 'store']).as('login.store').use(loginThrottle)
+
+    // Second facteur (#884) : `guest()` aussi — la session n'est ouverte
+    // qu'après le code ; seul un état pré-authentifié court existe avant.
+    router.get('login/2fa', [TwoFactorChallengeController, 'create']).as('login.two_factor.create')
+    router
+      .post('login/2fa', [TwoFactorChallengeController, 'store'])
+      .as('login.two_factor.store')
+      .use(twoFactorChallengeThrottle)
 
     router.get('forgot-password', [controllers.PasswordReset, 'create']).as('password.forgot')
     router.post('forgot-password', [controllers.PasswordReset, 'store']).use(forgotPasswordThrottle)

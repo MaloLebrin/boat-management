@@ -1488,6 +1488,18 @@ const routes = {
     tokens: [{"old":"/login","type":0,"val":"login","end":""}],
     types: placeholder as Registry['login.store']['types'],
   },
+  'login.two_factor.create': {
+    methods: ["GET","HEAD"],
+    pattern: '/login/2fa',
+    tokens: [{"old":"/login/2fa","type":0,"val":"login","end":""},{"old":"/login/2fa","type":0,"val":"2fa","end":""}],
+    types: placeholder as Registry['login.two_factor.create']['types'],
+  },
+  'login.two_factor.store': {
+    methods: ["POST"],
+    pattern: '/login/2fa',
+    tokens: [{"old":"/login/2fa","type":0,"val":"login","end":""},{"old":"/login/2fa","type":0,"val":"2fa","end":""}],
+    types: placeholder as Registry['login.two_factor.store']['types'],
+  },
   'password.forgot': {
     methods: ["GET","HEAD"],
     pattern: '/forgot-password',
@@ -1895,6 +1907,42 @@ const routes = {
     pattern: '/settings/me',
     tokens: [{"old":"/settings/me","type":0,"val":"settings","end":""},{"old":"/settings/me","type":0,"val":"me","end":""}],
     types: placeholder as Registry['settings.me']['types'],
+  },
+  'settings.two_factor.store': {
+    methods: ["POST"],
+    pattern: '/settings/two-factor',
+    tokens: [{"old":"/settings/two-factor","type":0,"val":"settings","end":""},{"old":"/settings/two-factor","type":0,"val":"two-factor","end":""}],
+    types: placeholder as Registry['settings.two_factor.store']['types'],
+  },
+  'settings.two_factor.confirm': {
+    methods: ["POST"],
+    pattern: '/settings/two-factor/confirm',
+    tokens: [{"old":"/settings/two-factor/confirm","type":0,"val":"settings","end":""},{"old":"/settings/two-factor/confirm","type":0,"val":"two-factor","end":""},{"old":"/settings/two-factor/confirm","type":0,"val":"confirm","end":""}],
+    types: placeholder as Registry['settings.two_factor.confirm']['types'],
+  },
+  'settings.two_factor.cancel': {
+    methods: ["DELETE"],
+    pattern: '/settings/two-factor/setup',
+    tokens: [{"old":"/settings/two-factor/setup","type":0,"val":"settings","end":""},{"old":"/settings/two-factor/setup","type":0,"val":"two-factor","end":""},{"old":"/settings/two-factor/setup","type":0,"val":"setup","end":""}],
+    types: placeholder as Registry['settings.two_factor.cancel']['types'],
+  },
+  'settings.two_factor.destroy': {
+    methods: ["DELETE"],
+    pattern: '/settings/two-factor',
+    tokens: [{"old":"/settings/two-factor","type":0,"val":"settings","end":""},{"old":"/settings/two-factor","type":0,"val":"two-factor","end":""}],
+    types: placeholder as Registry['settings.two_factor.destroy']['types'],
+  },
+  'settings.two_factor.recovery_codes': {
+    methods: ["POST"],
+    pattern: '/settings/two-factor/recovery-codes',
+    tokens: [{"old":"/settings/two-factor/recovery-codes","type":0,"val":"settings","end":""},{"old":"/settings/two-factor/recovery-codes","type":0,"val":"two-factor","end":""},{"old":"/settings/two-factor/recovery-codes","type":0,"val":"recovery-codes","end":""}],
+    types: placeholder as Registry['settings.two_factor.recovery_codes']['types'],
+  },
+  'settings.org.two_factor': {
+    methods: ["PUT"],
+    pattern: '/settings/org/two-factor',
+    tokens: [{"old":"/settings/org/two-factor","type":0,"val":"settings","end":""},{"old":"/settings/org/two-factor","type":0,"val":"org","end":""},{"old":"/settings/org/two-factor","type":0,"val":"two-factor","end":""}],
+    types: placeholder as Registry['settings.org.two_factor']['types'],
   },
   'settings.notifications': {
     methods: ["GET","HEAD"],

@@ -133,7 +133,8 @@
     "settingsImport": "Open data import",
     "diagnostic": "Open fault diagnosis",
     "spareParts": "View spare parts",
-    "notifications": "View notifications"
+    "notifications": "View notifications",
+    "settingsMe": "My account and security"
   },
   "usage": {
     "line": "AI this month: {used} / {limit} tokens.",

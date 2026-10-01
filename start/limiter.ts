@@ -212,3 +212,30 @@ export const emailVerificationResendThrottle = limiter.define(
 export const preferencesThrottle = limiter.define('preferences', (ctx) => {
   return limiter.allowRequests(30).every('1 minute').usingKey(`preferences_${ctx.request.ip()}`)
 })
+
+/**
+ * Second facteur à la connexion (#884) — deux compteurs, comme le mot de passe.
+ *
+ * Par IP, monté sur `POST /login/2fa` : même budget que la connexion.
+ */
+export const twoFactorChallengeThrottle = limiter.define('two_factor_ip', (ctx) => {
+  return limiter.allowRequests(10).every('1 minute').usingKey(`two_factor_ip_${ctx.request.ip()}`)
+})
+
+/**
+ * Par compte, consommé via `penalize()` dans `TwoFactorChallengeController` :
+ * seuls les codes refusés décomptent, un code accepté remet à zéro.
+ *
+ * Plus serré que le mot de passe : le mot de passe est déjà prouvé, et un code
+ * TOTP ne compte que 10⁶ valeurs — 5 essais par quart d'heure laissent une
+ * chance de l'ordre de 1 sur 10⁵ par fenêtre.
+ */
+export const TWO_FACTOR_ACCOUNT_LIMIT = { requests: 5, duration: '15 minutes' } as const
+
+export function twoFactorAccountLimiter() {
+  return limiter.use(TWO_FACTOR_ACCOUNT_LIMIT)
+}
+
+export function twoFactorAccountKey(userId: number): string {
+  return `two_factor_account_${userId}`
+}
