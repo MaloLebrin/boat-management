@@ -1278,6 +1278,18 @@ const routes = {
     tokens: [{"old":"/notifications/:id","type":0,"val":"notifications","end":""},{"old":"/notifications/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['notifications.destroy']['types'],
   },
+  'notifications.unsubscribe': {
+    methods: ["GET","HEAD"],
+    pattern: '/notifications/unsubscribe/:userId/:family',
+    tokens: [{"old":"/notifications/unsubscribe/:userId/:family","type":0,"val":"notifications","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":0,"val":"unsubscribe","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":1,"val":"userId","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":1,"val":"family","end":""}],
+    types: placeholder as Registry['notifications.unsubscribe']['types'],
+  },
+  'notifications.unsubscribe.confirm': {
+    methods: ["POST"],
+    pattern: '/notifications/unsubscribe/:userId/:family',
+    tokens: [{"old":"/notifications/unsubscribe/:userId/:family","type":0,"val":"notifications","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":0,"val":"unsubscribe","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":1,"val":"userId","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":1,"val":"family","end":""}],
+    types: placeholder as Registry['notifications.unsubscribe.confirm']['types'],
+  },
   'crew.index': {
     methods: ["GET","HEAD"],
     pattern: '/crew',
@@ -2003,6 +2015,12 @@ const routes = {
     pattern: '/settings/notifications',
     tokens: [{"old":"/settings/notifications","type":0,"val":"settings","end":""},{"old":"/settings/notifications","type":0,"val":"notifications","end":""}],
     types: placeholder as Registry['settings.notifications']['types'],
+  },
+  'settings.notifications.preferences': {
+    methods: ["PUT"],
+    pattern: '/settings/notifications/preferences',
+    tokens: [{"old":"/settings/notifications/preferences","type":0,"val":"settings","end":""},{"old":"/settings/notifications/preferences","type":0,"val":"notifications","end":""},{"old":"/settings/notifications/preferences","type":0,"val":"preferences","end":""}],
+    types: placeholder as Registry['settings.notifications.preferences']['types'],
   },
   'settings.org': {
     methods: ["GET","HEAD"],

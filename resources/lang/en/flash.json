@@ -576,5 +576,8 @@
   "organizationDeletion": {
     "scheduled": "The organization will be permanently deleted on {date}. You can cancel until then.",
     "cancelled": "The organization deletion has been cancelled."
+  },
+  "notifications": {
+    "preferencesSaved": "Notification preferences saved."
   }
 }

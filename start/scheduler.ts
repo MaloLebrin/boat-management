@@ -15,6 +15,7 @@ import SyncExternalCalendars from '#jobs/sync_external_calendars'
 import PurgeTrashedBoats from '#jobs/purge_trashed_boats'
 import PurgeDeletedAccounts from '#jobs/purge_deleted_accounts'
 import PurgeDeletedOrganizations from '#jobs/purge_deleted_organizations'
+import SendNotificationDigests from '#jobs/send_notification_digests'
 
 await SendReminderEmails.schedule({})
   .cron('0 8 * * *')
@@ -139,3 +140,7 @@ await PurgeDeletedOrganizations.schedule({})
   .timezone('Europe/Paris')
   .id('daily-purge-deleted-organizations')
   .run()
+
+// Résumé quotidien des e-mails de notification (#888) : horaire, chaque
+// passage sert les utilisateurs pour qui il est 8h dans leur propre fuseau.
+await SendNotificationDigests.schedule({}).cron('5 * * * *').id('hourly-notification-digests').run()

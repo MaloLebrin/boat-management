@@ -1,0 +1,32 @@
+{{--
+  Résumé quotidien des notifications (#888), envoyé à 8h dans le fuseau du
+  destinataire. Textes déjà traduits par `EmailQueueService.sendNotificationDigest`.
+--}}
+@component('emails/_layout')
+  @slot('content')
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">{{ greeting }}</p>
+    <h2 style="margin:0 0 20px;color:#333333;font-size:22px;">{{ heading }}</h2>
+    @each(entry in entries)
+      <div
+        style="margin:0 0 15px;padding:12px 15px;border-left:3px solid #1e3a5f;background-color:#f8f9fb;"
+      >
+        @if(entry.url)
+          <a
+            href="{{ entry.url }}"
+            style="color:#1e3a5f;font-size:15px;font-weight:bold;text-decoration:none;"
+          >
+            {{ entry.title }}
+          </a>
+        @else
+          <strong style="color:#333333;font-size:15px;">{{ entry.title }}</strong>
+        @end
+        @if(entry.body)
+          <p style="margin:5px 0 0;color:#555555;font-size:14px;line-height:1.5;">
+            {{ entry.body }}
+          </p>
+        @end
+      </div>
+    @end
+    @include('emails/_notification_footer')
+  @end
+@end

@@ -576,5 +576,8 @@
   "organizationDeletion": {
     "scheduled": "L'organisation sera supprimée définitivement le {date}. Vous pouvez annuler d'ici là.",
     "cancelled": "La suppression de l'organisation a été annulée."
+  },
+  "notifications": {
+    "preferencesSaved": "Préférences de notifications enregistrées."
   }
 }

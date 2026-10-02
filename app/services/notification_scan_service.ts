@@ -31,6 +31,8 @@ const DEDUPE_WINDOW_DAYS = 30
  * relance par bateau et par mois en laisserait passer. Une par semaine.
  */
 const PAYMENT_DEDUPE_WINDOW_DAYS = 7
+/** Départs de demain (#888) : un passage par jour, voir `scanReservationsStartingTomorrow`. */
+const STARTS_TOMORROW_DEDUPE_DAYS = 0.5
 /**
  * Certifications d'équipage (#882) : l'anti-doublon porte sur la fenêtre
  * (60/30/7 jours), pas sur un délai fixe — la clé change en entrant dans la
@@ -103,6 +105,7 @@ export default class NotificationScanService {
       this.scanDocuments(),
       this.scanSafetyEquipment(),
       this.scanReservationPayments(),
+      this.scanReservationsStartingTomorrow(),
     ])
     const groups = scanned.flat()
     // Rappels J-1 des équipiers embarqués demain (#883), par affectation.
@@ -437,16 +440,7 @@ export default class NotificationScanService {
       .where('endsAt', '>', now.toISO()!)
       .preload('boat')
 
-    // Module Location coupé : la page des réservations est fermée, le rappel
-    // mènerait à un refus.
-    const orgIds = [...new Set(reservations.map((r) => r.organizationId))]
-    const organizations = orgIds.length ? await Organization.query().whereIn('id', orgIds) : []
-    const charterOrgIds = new Set<number>()
-    for (const organization of organizations) {
-      if (await this.quotaService.canManageReservations(organization)) {
-        charterOrgIds.add(organization.id)
-      }
-    }
+    const charterOrgIds = await this.charterOrgIds(reservations)
 
     const depositDue: BoatReservation[] = []
     const balanceDue: BoatReservation[] = []
@@ -476,6 +470,45 @@ export default class NotificationScanService {
       ...this.groupByBoat(depositDue, 'reservation.deposit_due', 'warning').map(toReservations),
       ...this.groupByBoat(balanceDue, 'reservation.balance_due', 'warning').map(toReservations),
     ]
+  }
+
+  /**
+   * Module Location coupé : la page des réservations est fermée, le rappel
+   * mènerait à un refus. Renvoie les organisations dont le module est actif.
+   */
+  private async charterOrgIds(reservations: BoatReservation[]): Promise<Set<number>> {
+    const orgIds = [...new Set(reservations.map((r) => r.organizationId))]
+    const organizations = orgIds.length ? await Organization.query().whereIn('id', orgIds) : []
+    const charterOrgIds = new Set<number>()
+    for (const organization of organizations) {
+      if (await this.quotaService.canManageReservations(organization)) {
+        charterOrgIds.add(organization.id)
+      }
+    }
+    return charterOrgIds
+  }
+
+  /**
+   * Départs de demain (#888) : réservations confirmées qui commencent le
+   * lendemain (jour de Paris, celui du cron), une notification par bateau.
+   * Le scan est quotidien : une demi-journée d'anti-doublon couvre un second
+   * passage le même jour sans masquer le départ du surlendemain.
+   */
+  private async scanReservationsStartingTomorrow(): Promise<ScanGroup[]> {
+    const tomorrow = DateTime.now().setZone('Europe/Paris').plus({ days: 1 }).startOf('day')
+    const reservations = await BoatReservation.query()
+      .where('status', 'confirmed')
+      .where('startsAt', '>=', tomorrow.toUTC().toISO()!)
+      .where('startsAt', '<', tomorrow.plus({ days: 1 }).toUTC().toISO()!)
+      .preload('boat')
+
+    const charterOrgIds = await this.charterOrgIds(reservations)
+    const starting = reservations.filter((r) => charterOrgIds.has(r.organizationId))
+    return this.groupByBoat(starting, 'reservation.starts_tomorrow', 'info').map((group) => ({
+      ...group,
+      actionUrl: `/boats/${group.boatId}/reservations`,
+      dedupeDays: STARTS_TOMORROW_DEDUPE_DAYS,
+    }))
   }
 
   /**

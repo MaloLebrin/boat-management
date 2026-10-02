@@ -18,6 +18,8 @@ const TwoFactorSettingsController = () => import('#controllers/two_factor_settin
 const UserSessionsController = () => import('#controllers/user_sessions_controller')
 const AccountController = () => import('#controllers/account_controller')
 const OrganizationDeletionController = () => import('#controllers/organization_deletion_controller')
+const NotificationPreferencesController = () =>
+  import('#controllers/notification_preferences_controller')
 
 // Préférences pré-auth (switchers de langue et de thème, aussi disponibles
 // sur le marketing et l'écran de login) : persistées sur le profil quand
@@ -83,6 +85,9 @@ router
     router
       .get('settings/notifications', [SettingsController, 'notifications'])
       .as('settings.notifications')
+    router
+      .put('settings/notifications/preferences', [NotificationPreferencesController, 'update'])
+      .as('settings.notifications.preferences')
     router.get('settings/org', [SettingsController, 'org']).as('settings.org')
     router.get('settings/members', [SettingsController, 'members']).as('settings.members')
     router.get('settings/billing', [SettingsController, 'billing']).as('settings.billing')

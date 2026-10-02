@@ -13,6 +13,9 @@ import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 import AiKeyUndecryptable from '#events/ai_key_undecryptable'
 import MaintenanceTaskAssigned from '#events/maintenance_task_assigned'
 import BoatStatusChanged from '#events/boat_status_changed'
+import ReservationChanged from '#events/reservation_changed'
+import IncidentChanged from '#events/incident_changed'
+import InvoicePaid from '#events/invoice_paid'
 import PublicBookingRequested from '#events/public_booking_requested'
 import PublicBookingDecided from '#events/public_booking_decided'
 
@@ -44,5 +47,9 @@ emitter.listen(AiTokenThresholdCrossed, [
 emitter.listen(AiKeyUndecryptable, [() => import('#listeners/log_ai_key_undecryptable')])
 emitter.listen(MaintenanceTaskAssigned, [() => import('#listeners/on_maintenance_task_assigned')])
 emitter.listen(BoatStatusChanged, [() => import('#listeners/on_boat_status_changed')])
+// Vie des réservations, incidents et factures réglées (#888).
+emitter.listen(ReservationChanged, [() => import('#listeners/on_reservation_changed')])
+emitter.listen(IncidentChanged, [() => import('#listeners/on_incident_changed')])
+emitter.listen(InvoicePaid, [() => import('#listeners/on_invoice_paid')])
 emitter.listen(PublicBookingRequested, [() => import('#listeners/on_public_booking_requested')])
 emitter.listen(PublicBookingDecided, [() => import('#listeners/on_public_booking_decided')])

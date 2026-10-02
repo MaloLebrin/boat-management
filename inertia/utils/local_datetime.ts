@@ -54,3 +54,16 @@ export function tzOffsetMinutes(): number {
  * Rendering one goes through `useDateFormat()`, which parses it the same way.
  */
 export { parseDisplayDate } from '../../shared/helpers/date_format'
+
+/**
+ * IANA zone of the browser (`Europe/Paris`…), sent with the notification
+ * preferences so quiet hours and the daily digest follow the user's clock
+ * (#888). A machine value, never displayed as a date.
+ */
+export function browserTimeZone(): string | null {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || null
+  } catch {
+    return null
+  }
+}

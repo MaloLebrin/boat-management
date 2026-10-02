@@ -124,6 +124,22 @@
       "requested": {
         "title": "Demande de réservation sur {boatName}",
         "body": "{clientName} demande {boatName} en ligne. L'option est posée : confirmez-la ou refusez-la."
+      },
+      "created": {
+        "title": "Nouvelle réservation sur {boatName}",
+        "body": "{actorName} a réservé {boatName} pour {clientName}, départ le {date}."
+      },
+      "confirmed": {
+        "title": "Réservation confirmée sur {boatName}",
+        "body": "{actorName} a confirmé la réservation de {clientName}, départ le {date}."
+      },
+      "cancelled": {
+        "title": "Réservation annulée sur {boatName}",
+        "body": "{actorName} a annulé la réservation de {clientName} prévue le {date}."
+      },
+      "starts_tomorrow": {
+        "title": "Départ demain sur {boatName}",
+        "body": "{count, plural, one {# réservation confirmée commence} other {# réservations confirmées commencent}} demain sur {boatName}."
       }
     },
     "invoice": {
@@ -142,6 +158,10 @@
       "reminder_skipped": {
         "title": "Relance {tier} non envoyée pour {number}",
         "body": "{clientName} ne peut pas être relancé par e-mail ({reason}). Contactez-le directement."
+      },
+      "paid": {
+        "title": "Facture {number} réglée",
+        "body": "La facture {number} de {clientName} a été marquée réglée."
       }
     },
     "export": {
@@ -172,6 +192,16 @@
       "assignment_reminder": {
         "title": "Demain : {boatName}",
         "body": "Rappel : vous êtes {role} sur {boatName} pour {clientName}, du {startsAt} au {endsAt}."
+      }
+    },
+    "incident": {
+      "created": {
+        "title": "Incident sur {boatName} : {incidentType}",
+        "body": "{actorName} a déclaré un incident sur {boatName}."
+      },
+      "resolved": {
+        "title": "Incident clôturé sur {boatName}",
+        "body": "{actorName} a clôturé l'incident « {incidentType} » sur {boatName}."
       }
     }
   },
@@ -221,6 +251,50 @@
     "crew_certification.expiring_soon": "Certification d'équipage à renouveler",
     "crew_certification.expired": "Certification d'équipage expirée",
     "crew.assigned": "Affectation à une réservation",
-    "crew.assignment_reminder": "Rappel d'embarquement"
+    "crew.assignment_reminder": "Rappel d'embarquement",
+    "reservation.created": "Nouvelle réservation",
+    "reservation.confirmed": "Réservation confirmée",
+    "reservation.cancelled": "Réservation annulée",
+    "reservation.starts_tomorrow": "Départ demain",
+    "incident.created": "Incident déclaré",
+    "incident.resolved": "Incident clôturé",
+    "invoice.paid": "Facture réglée"
+  },
+  "families": {
+    "fleet": {
+      "label": "Flotte & maintenance",
+      "hint": "Maintenance, statut des bateaux, documents, sécurité, incidents"
+    },
+    "rental": {
+      "label": "Location & clients",
+      "hint": "Réservations, départs, acomptes et soldes"
+    },
+    "billing": {
+      "label": "Facturation",
+      "hint": "Factures, relances, abonnement et quotas"
+    },
+    "team": {
+      "label": "Équipe & compte",
+      "hint": "Membres, équipage, certifications, exports"
+    },
+    "ai": {
+      "label": "IA",
+      "hint": "Suggestions de l'assistant"
+    }
+  },
+  "email": {
+    "greeting": "Bonjour {name},",
+    "cta": "Ouvrir dans FleetAi",
+    "digestSubject": "Votre résumé FleetAi : {count, plural, one {# notification} other {# notifications}}",
+    "digestHeading": "{count, plural, one {# notification} other {# notifications}} depuis votre dernier résumé",
+    "manage": "Gérer mes notifications",
+    "unsubscribe": "Ne plus recevoir ces e-mails"
+  },
+  "unsubscribe": {
+    "title": "Désinscription des e-mails",
+    "confirm": "Vous ne recevrez plus les e-mails de la catégorie « {family} ». Les notifications dans l'app et sur vos appareils ne changent pas.",
+    "submit": "Me désinscrire",
+    "done": "C'est fait : vous ne recevrez plus les e-mails de la catégorie « {family} ».",
+    "manage": "Gérer toutes mes notifications"
   }
 }

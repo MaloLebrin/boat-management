@@ -124,6 +124,22 @@
       "requested": {
         "title": "Booking request for {boatName}",
         "body": "{clientName} requested {boatName} online. The option is on hold: confirm or decline it."
+      },
+      "created": {
+        "title": "New booking on {boatName}",
+        "body": "{actorName} booked {boatName} for {clientName}, departing {date}."
+      },
+      "confirmed": {
+        "title": "Booking confirmed on {boatName}",
+        "body": "{actorName} confirmed {clientName}'s booking, departing {date}."
+      },
+      "cancelled": {
+        "title": "Booking cancelled on {boatName}",
+        "body": "{actorName} cancelled {clientName}'s booking planned for {date}."
+      },
+      "starts_tomorrow": {
+        "title": "Departure tomorrow on {boatName}",
+        "body": "{count, plural, one {# confirmed booking starts} other {# confirmed bookings start}} tomorrow on {boatName}."
       }
     },
     "invoice": {
@@ -142,6 +158,10 @@
       "reminder_skipped": {
         "title": "Reminder {tier} not sent for {number}",
         "body": "{clientName} cannot be reminded by e-mail ({reason}). Contact them directly."
+      },
+      "paid": {
+        "title": "Invoice {number} paid",
+        "body": "{clientName}'s invoice {number} was marked as paid."
       }
     },
     "export": {
@@ -172,6 +192,16 @@
       "assignment_reminder": {
         "title": "Tomorrow: {boatName}",
         "body": "Reminder: you are {role} on {boatName} for {clientName}, from {startsAt} to {endsAt}."
+      }
+    },
+    "incident": {
+      "created": {
+        "title": "Incident on {boatName}: {incidentType}",
+        "body": "{actorName} reported an incident on {boatName}."
+      },
+      "resolved": {
+        "title": "Incident closed on {boatName}",
+        "body": "{actorName} closed the \"{incidentType}\" incident on {boatName}."
       }
     }
   },
@@ -221,6 +251,50 @@
     "crew_certification.expiring_soon": "Crew certification to renew",
     "crew_certification.expired": "Crew certification expired",
     "crew.assigned": "Assigned to a reservation",
-    "crew.assignment_reminder": "Boarding reminder"
+    "crew.assignment_reminder": "Boarding reminder",
+    "reservation.created": "New booking",
+    "reservation.confirmed": "Booking confirmed",
+    "reservation.cancelled": "Booking cancelled",
+    "reservation.starts_tomorrow": "Departure tomorrow",
+    "incident.created": "Incident reported",
+    "incident.resolved": "Incident closed",
+    "invoice.paid": "Invoice paid"
+  },
+  "families": {
+    "fleet": {
+      "label": "Fleet & maintenance",
+      "hint": "Maintenance, boat status, documents, safety, incidents"
+    },
+    "rental": {
+      "label": "Rentals & clients",
+      "hint": "Bookings, departures, deposits and balances"
+    },
+    "billing": {
+      "label": "Billing",
+      "hint": "Invoices, reminders, subscription and quotas"
+    },
+    "team": {
+      "label": "Team & account",
+      "hint": "Members, crew, certifications, exports"
+    },
+    "ai": {
+      "label": "AI",
+      "hint": "Assistant suggestions"
+    }
+  },
+  "email": {
+    "greeting": "Hello {name},",
+    "cta": "Open in FleetAi",
+    "digestSubject": "Your FleetAi digest: {count, plural, one {# notification} other {# notifications}}",
+    "digestHeading": "{count, plural, one {# notification} other {# notifications}} since your last digest",
+    "manage": "Manage my notifications",
+    "unsubscribe": "Stop these emails"
+  },
+  "unsubscribe": {
+    "title": "Email unsubscribe",
+    "confirm": "You will no longer receive \"{family}\" emails. In-app and device notifications stay as they are.",
+    "submit": "Unsubscribe",
+    "done": "Done: you will no longer receive \"{family}\" emails.",
+    "manage": "Manage all my notifications"
   }
 }

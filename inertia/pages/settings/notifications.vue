@@ -9,9 +9,11 @@ import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsNotificationsTab from '~/components/settings/tabs/SettingsNotificationsTab.vue'
 import { useT } from '~/composables/use_t'
 import type { PushSubscriptionRow } from '../../../shared/types/push'
+import type { NotificationPreferencesProps } from '../../../shared/types/notification'
 
 defineProps<{
   pushSubscriptions: PushSubscriptionRow[]
+  preferences: NotificationPreferencesProps
 }>()
 
 const { t } = useT()
@@ -20,6 +22,6 @@ const { t } = useT()
 <template>
   <Head :title="t('settings.notifications.title')" />
   <SettingsShell>
-    <SettingsNotificationsTab :push-subscriptions="pushSubscriptions" />
+    <SettingsNotificationsTab :push-subscriptions="pushSubscriptions" :preferences="preferences" />
   </SettingsShell>
 </template>

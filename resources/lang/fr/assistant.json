@@ -135,7 +135,8 @@
     "spareParts": "Voir les pièces détachées",
     "notifications": "Voir les notifications",
     "settingsMe": "Mon compte et sécurité",
-    "settingsOrg": "Ouvrir les réglages de l’organisation"
+    "settingsOrg": "Ouvrir les réglages de l’organisation",
+    "settingsNotifications": "Ouvrir les réglages de notifications"
   },
   "usage": {
     "line": "IA ce mois-ci : {used} / {limit} tokens.",

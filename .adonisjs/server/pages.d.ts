@@ -79,6 +79,7 @@ declare module '@adonisjs/inertia/types' {
     'navigation/incidents': ExtractProps<(typeof import('../../inertia/pages/navigation/incidents.vue'))['default']>
     'navigation/logbook': ExtractProps<(typeof import('../../inertia/pages/navigation/logbook.vue'))['default']>
     'notifications/index': ExtractProps<(typeof import('../../inertia/pages/notifications/index.vue'))['default']>
+    'notifications/unsubscribe': ExtractProps<(typeof import('../../inertia/pages/notifications/unsubscribe.vue'))['default']>
     'organization/crew_member': ExtractProps<(typeof import('../../inertia/pages/organization/crew_member.vue'))['default']>
     'organization/crew_planning': ExtractProps<(typeof import('../../inertia/pages/organization/crew_planning.vue'))['default']>
     'organization/crew': ExtractProps<(typeof import('../../inertia/pages/organization/crew.vue'))['default']>

@@ -7,6 +7,7 @@ import {
   CannotEditPaymentError,
   CreditNoteDeleteError,
 } from '#exceptions/invoice_errors'
+import InvoicePaid from '#events/invoice_paid'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
@@ -662,6 +663,12 @@ export default class InvoiceService {
     invoice.paidAt = paidAt ?? DateTime.now()
     await invoice.save()
     await this.#logInvoiceAction(invoice, 'invoice.mark_paid', actorUserId)
+    // Prévient l'équipe (#888) — l'auteur, s'il est connu, est exclu.
+    await InvoicePaid.dispatch(
+      invoice.organizationId,
+      { id: invoice.id, number: invoice.number, clientName: invoice.clientName },
+      actorUserId ?? null
+    )
     return invoice
   }
 

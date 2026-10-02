@@ -216,6 +216,8 @@ export type ScannedRoutes = {
     'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }
     'notifications.markAsRead': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'notifications.unsubscribe': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
+    'notifications.unsubscribe.confirm': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
     'crew.index': { paramsTuple?: []; params?: {} }
     'crew.store': { paramsTuple?: []; params?: {} }
     'crew.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -337,6 +339,7 @@ export type ScannedRoutes = {
     'settings.org.restore': { paramsTuple?: []; params?: {} }
     'settings.org.two_factor': { paramsTuple?: []; params?: {} }
     'settings.notifications': { paramsTuple?: []; params?: {} }
+    'settings.notifications.preferences': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
     'settings.members': { paramsTuple?: []; params?: {} }
     'settings.billing': { paramsTuple?: []; params?: {} }
@@ -484,6 +487,7 @@ export type ScannedRoutes = {
     'pdf_previews.index': { paramsTuple?: []; params?: {} }
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.index': { paramsTuple?: []; params?: {} }
+    'notifications.unsubscribe': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
     'crew.index': { paramsTuple?: []; params?: {} }
     'crew.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.planning.index': { paramsTuple?: []; params?: {} }
@@ -642,6 +646,7 @@ export type ScannedRoutes = {
     'pdf_previews.index': { paramsTuple?: []; params?: {} }
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.index': { paramsTuple?: []; params?: {} }
+    'notifications.unsubscribe': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
     'crew.index': { paramsTuple?: []; params?: {} }
     'crew.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.planning.index': { paramsTuple?: []; params?: {} }
@@ -794,6 +799,7 @@ export type ScannedRoutes = {
     'invitations.decline': { paramsTuple?: []; params?: {} }
     'webhooks.stripe': { paramsTuple?: []; params?: {} }
     'webhooks.stripe.connect': { paramsTuple?: []; params?: {} }
+    'notifications.unsubscribe.confirm': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
     'crew.store': { paramsTuple?: []; params?: {} }
     'crew.certifications.store': { paramsTuple: [ParamValue]; params: {'memberId': ParamValue} }
     'crew.unavailabilities.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -887,6 +893,7 @@ export type ScannedRoutes = {
     'pricingSeasons.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.sessions.notifications': { paramsTuple?: []; params?: {} }
     'settings.org.two_factor': { paramsTuple?: []; params?: {} }
+    'settings.notifications.preferences': { paramsTuple?: []; params?: {} }
     'settings.profile.update': { paramsTuple?: []; params?: {} }
     'settings.password.update': { paramsTuple?: []; params?: {} }
     'settings.locale.update': { paramsTuple?: []; params?: {} }
