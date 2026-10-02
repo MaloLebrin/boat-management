@@ -5,6 +5,7 @@ import {
   DEFAULT_NOTIFICATION_PREFERENCES,
   DEFAULT_NOTIFICATION_TIMEZONE,
   NOTIFICATION_FAMILIES,
+  isNotificationFamily,
   notificationFamilyOf,
 } from '#shared/constants/notifications'
 import type { OrgRole } from '#shared/types/organization'
@@ -16,8 +17,11 @@ import type {
   NotificationType,
   UpdateNotificationPreferencesPayload,
 } from '#shared/types/notification'
+import encryption from '@adonisjs/core/services/encryption'
 import db from '@adonisjs/lucid/services/db'
 import { IANAZone } from 'luxon'
+
+const UNSUBSCRIBE_PURPOSE = 'notification_unsubscribe'
 
 /**
  * Préférences de notifications (#888) : la matrice familles × canaux d'un
@@ -110,10 +114,27 @@ export default class NotificationPreferenceService {
     })
   }
 
-  /** Destinataire d'un lien de désinscription : un compte non anonymisé. */
-  async findActiveUser(userId: number): Promise<User | null> {
-    if (!Number.isInteger(userId) || userId < 1) return null
-    return User.query().where('id', userId).whereNull('anonymizedAt').first()
+  /**
+   * Jeton de désinscription en un clic (#888) : (utilisateur, famille) signés
+   * par le `MessageVerifier` de l'app, sans expiration. Indépendant du routeur,
+   * il se fabrique aussi depuis un job de file.
+   */
+  unsubscribeToken(userId: number, family: NotificationFamily): string {
+    return encryption.getMessageVerifier().sign({ userId, family }, undefined, UNSUBSCRIBE_PURPOSE)
+  }
+
+  /** Destinataire d'un jeton valide : un compte non anonymisé et une famille connue. */
+  async resolveUnsubscribeToken(
+    token: string
+  ): Promise<{ user: User; family: NotificationFamily } | null> {
+    const payload = encryption
+      .getMessageVerifier()
+      .unsign<{ userId?: unknown; family?: unknown }>(token, UNSUBSCRIBE_PURPOSE)
+    if (!payload || typeof payload.userId !== 'number' || !isNotificationFamily(payload.family)) {
+      return null
+    }
+    const user = await User.query().where('id', payload.userId).whereNull('anonymizedAt').first()
+    return user ? { user, family: payload.family } : null
   }
 
   /**

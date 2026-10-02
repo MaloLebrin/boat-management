@@ -32,6 +32,7 @@ test.group('Notification preferences (#888)', () => {
     const response = await client.get('/settings/notifications').loginAs(mechanic).withInertia()
 
     response.assertStatus(200)
+    response.assertInertiaComponent('settings/notifications')
     const preferences = response.inertiaProps.preferences as NotificationPreferencesProps
     assert.deepEqual(preferences.families.rental, { inApp: false, push: false, email: false })
     assert.deepEqual(preferences.families.fleet, { inApp: true, push: true, email: false })
@@ -97,6 +98,7 @@ test.group('Notification preferences (#888)', () => {
     // Sans session : le lien vient d'une boîte de réception.
     const page = await client.get(path).withInertia()
     page.assertStatus(200)
+    page.assertInertiaComponent('notifications/unsubscribe')
     assert.equal(page.inertiaProps.family, 'fleet')
     assert.isFalse(page.inertiaProps.done as boolean)
     const untouched = await NotificationPreference.findByOrFail({
@@ -116,10 +118,9 @@ test.group('Notification preferences (#888)', () => {
 
   test('a tampered unsubscribe link is refused', async ({ client }) => {
     const admin = await createAdminUser()
-    const other = await createAdminUser()
-    const path = unsubscribePath(admin.id).replace(`/${admin.id}/`, `/${other.id}/`)
+    const path = unsubscribePath(admin.id)
 
-    const response = await client.post(path)
+    const response = await client.post(`${path.slice(0, -4)}XXXX`)
     response.assertStatus(404)
   })
 })

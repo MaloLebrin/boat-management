@@ -59,10 +59,6 @@ const EXCLUSIONS: Record<string, string> = {
     'session d’un utilisateur (UUID), pas un agrégat d’organisation ; la révocation de la session d’un autre compte est couverte par user_sessions.spec (#885)',
   'DELETE /settings/me/memberships/:organizationId':
     'ne lit que les adhésions de l’appelant ; quitter une organisation dont on n’est pas membre ne change rien (self_service_account.spec, #886)',
-  'GET /notifications/unsubscribe/:userId/:family':
-    'lien signé d’un e-mail, sans session : sans signature valide la réponse est un 404 (notifications/preferences.spec, #888)',
-  'POST /notifications/unsubscribe/:userId/:family':
-    'lien signé d’un e-mail, sans session : sans signature valide la réponse est un 404 (notifications/preferences.spec, #888)',
 }
 
 const SAFE_STATUSES = new Set([403, 404, 422])

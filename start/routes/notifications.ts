@@ -20,19 +20,15 @@ router
   })
   .use(middleware.auth())
 
-// Désinscription en un clic depuis le pied d'un e-mail (#888) : URL signée,
-// pas de session — le destinataire peut lire ses e-mails sans être connecté.
+// Désinscription en un clic depuis le pied d'un e-mail (#888) : jeton signé
+// (utilisateur, famille), pas de session — le destinataire peut lire ses
+// e-mails sans être connecté.
 router
-  .get('notifications/unsubscribe/:userId/:family', [
+  .get('notifications/unsubscribe/:token', [
     NotificationPreferencesController,
     'confirmUnsubscribe',
   ])
-  .where('userId', router.matchers.number())
   .as('notifications.unsubscribe')
 router
-  .post('notifications/unsubscribe/:userId/:family', [
-    NotificationPreferencesController,
-    'unsubscribe',
-  ])
-  .where('userId', router.matchers.number())
+  .post('notifications/unsubscribe/:token', [NotificationPreferencesController, 'unsubscribe'])
   .as('notifications.unsubscribe.confirm')

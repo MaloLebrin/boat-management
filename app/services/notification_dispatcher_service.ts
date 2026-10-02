@@ -2,6 +2,7 @@ import SendPushNotification from '#jobs/send_push_notification'
 import Notification from '#models/notification'
 import User from '#models/user'
 import EmailQueueService from '#services/email_queue_service'
+import NotificationPreferenceService from '#services/notification_preference_service'
 import {
   DEFAULT_NOTIFICATION_TIMEZONE,
   NOTIFICATION_DIGEST_HOUR,
@@ -11,7 +12,6 @@ import {
 } from '#shared/constants/notifications'
 import app from '@adonisjs/core/services/app'
 import logger from '@adonisjs/core/services/logger'
-import router from '@adonisjs/core/services/router'
 import env from '#start/env'
 import { DateTime } from 'luxon'
 
@@ -97,14 +97,13 @@ export default class NotificationDispatcherService {
     })
   }
 
-  /** Lien signé de désinscription en un clic de la famille du type. */
+  /** Lien de désinscription en un clic de la famille du type (jeton signé). */
   unsubscribeUrl(userId: number, type: Notification['type']): string {
-    const path = router.urlBuilder.signedUrlFor(
-      'notifications.unsubscribe',
-      { userId, family: notificationFamilyOf(type) },
-      { purpose: 'notification_unsubscribe' }
+    const token = new NotificationPreferenceService().unsubscribeToken(
+      userId,
+      notificationFamilyOf(type)
     )
-    return `${env.get('APP_URL')}${path}`
+    return `${env.get('APP_URL')}/notifications/unsubscribe/${token}`
   }
 
   /**

@@ -2553,11 +2553,11 @@ export interface Registry {
   }
   'notifications.unsubscribe': {
     methods: ["GET","HEAD"]
-    pattern: '/notifications/unsubscribe/:userId/:family'
+    pattern: '/notifications/unsubscribe/:token'
     types: {
       body: {}
-      paramsTuple: [ParamValue, ParamValue]
-      params: { userId: ParamValue; family: ParamValue }
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['confirmUnsubscribe']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['confirmUnsubscribe']>>>
@@ -2565,11 +2565,11 @@ export interface Registry {
   }
   'notifications.unsubscribe.confirm': {
     methods: ["POST"]
-    pattern: '/notifications/unsubscribe/:userId/:family'
+    pattern: '/notifications/unsubscribe/:token'
     types: {
       body: {}
-      paramsTuple: [ParamValue, ParamValue]
-      params: { userId: ParamValue; family: ParamValue }
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['unsubscribe']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['unsubscribe']>>>

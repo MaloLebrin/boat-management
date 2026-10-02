@@ -131,9 +131,10 @@ scans, services) y passent, et il lit la préférence de l'utilisateur **avant c
   `SendNotificationDigests` (`5 * * * *`) envoie un seul e-mail (`emails/notification_digest.edge`)
   aux utilisateurs pour qui il est 8h dans leur fuseau, puis vide la file.
 - **Pied d'e-mail** (`emails/_notification_footer.edge`) : lien « Gérer mes notifications »
-  (`/settings/notifications`) et désinscription en un clic de la famille — URL signée
-  (`purpose: 'notification_unsubscribe'`, sans expiration) vers
-  `GET /notifications/unsubscribe/:userId/:family`, page de confirmation sans session ; le `POST`
+  (`/settings/notifications`) et désinscription en un clic de la famille — jeton
+  (utilisateur, famille) signé par le `MessageVerifier` de l'app (`purpose:
+'notification_unsubscribe'`, sans expiration ; indépendant du routeur, il se fabrique aussi
+  depuis un job de file) vers `GET /notifications/unsubscribe/:token`, page de confirmation sans session ; le `POST`
   sur la même URL coupe l'e-mail de la famille (les antivirus de messagerie suivent les liens : un
   `GET` ne change rien). Les e-mails de service existants (quotas, plan rétrogradé, module
   désactivé) ne sont pas des e-mails de notification et restent hors préférences.

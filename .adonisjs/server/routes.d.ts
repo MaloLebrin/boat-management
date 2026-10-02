@@ -216,8 +216,8 @@ export type ScannedRoutes = {
     'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }
     'notifications.markAsRead': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
-    'notifications.unsubscribe': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
-    'notifications.unsubscribe.confirm': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
+    'notifications.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'notifications.unsubscribe.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'crew.index': { paramsTuple?: []; params?: {} }
     'crew.store': { paramsTuple?: []; params?: {} }
     'crew.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -487,7 +487,7 @@ export type ScannedRoutes = {
     'pdf_previews.index': { paramsTuple?: []; params?: {} }
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.index': { paramsTuple?: []; params?: {} }
-    'notifications.unsubscribe': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
+    'notifications.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'crew.index': { paramsTuple?: []; params?: {} }
     'crew.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.planning.index': { paramsTuple?: []; params?: {} }
@@ -646,7 +646,7 @@ export type ScannedRoutes = {
     'pdf_previews.index': { paramsTuple?: []; params?: {} }
     'pdf_previews.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'notifications.index': { paramsTuple?: []; params?: {} }
-    'notifications.unsubscribe': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
+    'notifications.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'crew.index': { paramsTuple?: []; params?: {} }
     'crew.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'crew.planning.index': { paramsTuple?: []; params?: {} }
@@ -799,7 +799,7 @@ export type ScannedRoutes = {
     'invitations.decline': { paramsTuple?: []; params?: {} }
     'webhooks.stripe': { paramsTuple?: []; params?: {} }
     'webhooks.stripe.connect': { paramsTuple?: []; params?: {} }
-    'notifications.unsubscribe.confirm': { paramsTuple: [ParamValue,ParamValue]; params: {'userId': ParamValue,'family': ParamValue} }
+    'notifications.unsubscribe.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'crew.store': { paramsTuple?: []; params?: {} }
     'crew.certifications.store': { paramsTuple: [ParamValue]; params: {'memberId': ParamValue} }
     'crew.unavailabilities.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

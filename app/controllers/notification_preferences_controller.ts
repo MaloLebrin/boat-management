@@ -1,15 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { inject } from '@adonisjs/core'
 import NotificationPreferenceService from '#services/notification_preference_service'
-import { isNotificationFamily } from '#shared/constants/notifications'
 import { updateNotificationPreferencesValidator } from '#validators/notification_preferences'
-
-const UNSUBSCRIBE_PURPOSE = 'notification_unsubscribe'
 
 /**
  * Préférences de notifications (#888) : matrice familles × canaux depuis
  * `/settings/notifications`, et désinscription en un clic depuis le pied
- * d'un e-mail (URL signée, sans session).
+ * d'un e-mail (jeton signé, sans session).
  */
 @inject()
 export default class NotificationPreferencesController {
@@ -26,32 +23,26 @@ export default class NotificationPreferencesController {
   /**
    * Page de confirmation. Le lien d'un e-mail est ouvert par les antivirus de
    * messagerie : un GET ne doit rien changer, la désinscription est le POST
-   * de la page (même URL signée).
+   * de la page (même URL).
    */
-  async confirmUnsubscribe({ inertia, request, response, params }: HttpContext) {
-    const user = await this.#resolve(request, params)
-    if (!user) return response.notFound()
+  async confirmUnsubscribe({ inertia, response, params }: HttpContext) {
+    const target = await this.preferences.resolveUnsubscribeToken(String(params.token))
+    if (!target) return response.notFound()
     return inertia.render('notifications/unsubscribe', {
-      family: params.family,
-      action: request.url(true),
+      family: target.family,
+      action: `/notifications/unsubscribe/${params.token}`,
       done: false,
     })
   }
 
-  async unsubscribe({ inertia, request, response, params }: HttpContext) {
-    const user = await this.#resolve(request, params)
-    if (!user) return response.notFound()
-    await this.preferences.unsubscribeEmail(user, params.family)
+  async unsubscribe({ inertia, response, params }: HttpContext) {
+    const target = await this.preferences.resolveUnsubscribeToken(String(params.token))
+    if (!target) return response.notFound()
+    await this.preferences.unsubscribeEmail(target.user, target.family)
     return inertia.render('notifications/unsubscribe', {
-      family: params.family,
-      action: request.url(true),
+      family: target.family,
+      action: `/notifications/unsubscribe/${params.token}`,
       done: true,
     })
-  }
-
-  async #resolve(request: HttpContext['request'], params: HttpContext['params']) {
-    if (!request.hasValidSignature(UNSUBSCRIBE_PURPOSE)) return null
-    if (!isNotificationFamily(params.family)) return null
-    return this.preferences.findActiveUser(Number(params.userId))
   }
 }

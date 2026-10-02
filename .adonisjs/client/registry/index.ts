@@ -1280,14 +1280,14 @@ const routes = {
   },
   'notifications.unsubscribe': {
     methods: ["GET","HEAD"],
-    pattern: '/notifications/unsubscribe/:userId/:family',
-    tokens: [{"old":"/notifications/unsubscribe/:userId/:family","type":0,"val":"notifications","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":0,"val":"unsubscribe","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":1,"val":"userId","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":1,"val":"family","end":""}],
+    pattern: '/notifications/unsubscribe/:token',
+    tokens: [{"old":"/notifications/unsubscribe/:token","type":0,"val":"notifications","end":""},{"old":"/notifications/unsubscribe/:token","type":0,"val":"unsubscribe","end":""},{"old":"/notifications/unsubscribe/:token","type":1,"val":"token","end":""}],
     types: placeholder as Registry['notifications.unsubscribe']['types'],
   },
   'notifications.unsubscribe.confirm': {
     methods: ["POST"],
-    pattern: '/notifications/unsubscribe/:userId/:family',
-    tokens: [{"old":"/notifications/unsubscribe/:userId/:family","type":0,"val":"notifications","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":0,"val":"unsubscribe","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":1,"val":"userId","end":""},{"old":"/notifications/unsubscribe/:userId/:family","type":1,"val":"family","end":""}],
+    pattern: '/notifications/unsubscribe/:token',
+    tokens: [{"old":"/notifications/unsubscribe/:token","type":0,"val":"notifications","end":""},{"old":"/notifications/unsubscribe/:token","type":0,"val":"unsubscribe","end":""},{"old":"/notifications/unsubscribe/:token","type":1,"val":"token","end":""}],
     types: placeholder as Registry['notifications.unsubscribe.confirm']['types'],
   },
   'crew.index': {

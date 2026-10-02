@@ -18,9 +18,9 @@ mécanicien rien de la location ni de la facturation. L'e-mail n'est jamais
 coché d'office.
 
 - `PUT /settings/notifications/preferences` (`settings.notifications.preferences`).
-- `GET` / `POST /notifications/unsubscribe/:userId/:family`
+- `GET` / `POST /notifications/unsubscribe/:token`
   (`notifications.unsubscribe` / `.confirm`) : désinscription en un clic,
-  par URL signée sans session. Le `GET` affiche une confirmation, le `POST`
+  par jeton signé (utilisateur, famille), sans session. Le `GET` affiche une confirmation, le `POST`
   coupe l'e-mail de la famille.
 
 ## Dispatcher
