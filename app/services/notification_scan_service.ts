@@ -363,13 +363,32 @@ export default class NotificationScanService {
         .whereNotNull('expires_at')
         .where('expires_at', '>=', today.toISODate()!)
         .where('expires_at', '<=', soon.toISODate()!)
-        .preload('boat'),
+        .preload('boat', (query) => query.preload('owners')),
     ])
 
     return [
       ...this.groupByBoat(expired, 'document.expired', 'error'),
       ...this.groupByBoat(expiringSoon, 'document.expiring_soon', 'warning'),
+      ...this.ownerDocumentGroups(expiringSoon),
     ]
+  }
+
+  /**
+   * Le propriétaire d'un bateau confié (#890) apprend qu'un de ses documents
+   * (assurance, francisation…) arrive à échéance : une notification par bateau
+   * et par propriétaire, vers son portail.
+   */
+  private ownerDocumentGroups(documents: BoatDocument[]): ScanGroup[] {
+    return this.groupByBoat(documents, 'owner.document_expiring', 'warning').flatMap((group) => {
+      const boat = documents.find((doc) => doc.boat.id === group.boatId)!.boat
+      return boat.owners
+        .filter((owner) => owner.anonymizedAt === null)
+        .map((owner) => ({
+          ...group,
+          recipientUserId: owner.id,
+          actionUrl: `/owner/boats/${group.boatId}`,
+        }))
+    })
   }
 
   /**

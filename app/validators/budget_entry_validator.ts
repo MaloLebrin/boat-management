@@ -10,5 +10,7 @@ export const budgetEntryValidator = vine.create(
     label: vine.string().trim().minLength(1).maxLength(255),
     category: vine.enum(BUDGET_ENTRY_CATEGORIES).optional(),
     description: vine.string().trim().maxLength(2000).optional(),
+    /** Partagée avec le propriétaire du bateau dans son portail (#890). Absent : inchangé. */
+    visibleToOwner: vine.boolean().optional(),
   })
 )

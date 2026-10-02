@@ -31,6 +31,14 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   // Facture passée en retard (#878) : de l'argent qui n'est pas arrivé. Les
   // relances envoyées restent in-app, le job en fait une par facture et palier.
   'invoice.overdue',
+  // Portail propriétaire (#890) : une demande ou un devis attend une réponse,
+  // et le propriétaire suit son bateau sans ouvrir l'app.
+  'owner.request_created',
+  'owner.approval_requested',
+  'owner.maintenance_done',
+  'owner.incident_created',
+  'owner.document_expiring',
+  'owner.invoice_sent',
   'document.expiring_soon',
   'document.expired',
   'safety_equipment.expiring_soon',

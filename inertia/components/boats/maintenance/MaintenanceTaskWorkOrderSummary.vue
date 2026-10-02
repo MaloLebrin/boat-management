@@ -6,8 +6,8 @@ import type { MaintenanceTaskWorkOrder } from '#shared/types/maintenance'
 
 /**
  * Résumé d'une ligne de l'ordre de travail (#868) sous le titre d'une tâche :
- * responsable, prestataire, coût prévu. Rien n'est rendu quand aucun de ces
- * champs n'est renseigné.
+ * responsable, prestataire, coût prévu, demande et accord du propriétaire
+ * (#890). Rien n'est rendu quand aucun de ces champs n'est renseigné.
  */
 const props = defineProps<{ workOrder: Partial<MaintenanceTaskWorkOrder> }>()
 
@@ -29,6 +29,10 @@ const parts = computed(() => {
         amount: formatCurrency(w.estimatedCost),
       })
     )
+  }
+  if (w.requestedByOwner) out.push(t('boats.maintenance.tasks.workOrder.requestedByOwner'))
+  if (w.ownerApproval) {
+    out.push(t(`boats.maintenance.tasks.workOrder.ownerApproval.${w.ownerApproval}`))
   }
   return out
 })

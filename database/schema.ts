@@ -282,6 +282,7 @@ export class BoatBudgetEntrySchema extends BaseModel {
     'id',
     'label',
     'updatedAt',
+    'visibleToOwner',
   ] as const
   $columns = BoatBudgetEntrySchema.$columns
   @column()
@@ -302,6 +303,8 @@ export class BoatBudgetEntrySchema extends BaseModel {
   declare label: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
+  @column()
+  declare visibleToOwner: boolean
 }
 
 export class BoatDocumentSchema extends BaseModel {
@@ -998,10 +1001,14 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
     'lastDoneEngineHours',
     'notes',
     'organizationId',
+    'ownerApprovalDecidedAt',
+    'ownerApprovalDecidedBy',
+    'ownerApprovalStatus',
     'postponedCount',
     'providerName',
     'recurrenceIntervalEngineHours',
     'recurrenceIntervalMonths',
+    'requestedByOwnerId',
     'status',
     'subject',
     'title',
@@ -1052,6 +1059,12 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare notes: string | null
   @column()
   declare organizationId: number
+  @column.dateTime()
+  declare ownerApprovalDecidedAt: DateTime | null
+  @column()
+  declare ownerApprovalDecidedBy: number | null
+  @column()
+  declare ownerApprovalStatus: string | null
   @column()
   declare postponedCount: number
   @column()
@@ -1060,6 +1073,8 @@ export class BoatMaintenanceTaskSchema extends BaseModel {
   declare recurrenceIntervalEngineHours: number | null
   @column()
   declare recurrenceIntervalMonths: number | null
+  @column()
+  declare requestedByOwnerId: number | null
   @column()
   declare status: string
   @column()

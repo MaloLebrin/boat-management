@@ -9,6 +9,7 @@ import BoatRig from '#models/boat_rig'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
 import Boat from '#models/boat'
+import OwnerBoatChanged from '#events/owner_boat_changed'
 import OrganizationMembership from '#models/organization_membership'
 import type User from '#models/user'
 import { inject } from '@adonisjs/core'
@@ -21,6 +22,7 @@ import {
   subjectForEquipment,
 } from '#shared/helpers/maintenance_task_equipment'
 import { decimalColumnToNumber } from '#shared/helpers/number_format'
+import { requiresOwnerApproval } from '#shared/constants/owner_portal'
 import type { GenericEquipmentCategory } from '#shared/types/boat'
 import { ROLE_PERMISSIONS } from '#shared/types/permissions'
 import type {
@@ -226,7 +228,7 @@ export default class BoatMaintenanceTaskService {
       ...(ref ? { [equipmentFieldName(ref.type)]: ref.id } : {}),
     }
 
-    return await BoatMaintenanceTask.create({
+    const task = await BoatMaintenanceTask.create({
       boatId: boat.id,
       organizationId: boat.organizationId,
       subject,
@@ -251,6 +253,8 @@ export default class BoatMaintenanceTaskService {
           : String(payload.estimatedCost),
       estimatedDurationMinutes: payload.estimatedDurationMinutes ?? null,
     })
+    await this.syncOwnerApproval(task, boat, user.id)
+    return task
   }
 
   /**
@@ -411,6 +415,7 @@ export default class BoatMaintenanceTaskService {
 
     if (postponed) task.postponedCount += 1
     if (changedFields.length > 0) await task.save()
+    if (changedFields.includes('estimatedCost')) await this.syncOwnerApproval(task, boat, user.id)
 
     return { task, changedFields, postponed, assigneeChanged }
   }
@@ -468,6 +473,15 @@ export default class BoatMaintenanceTaskService {
     }
     await task.save()
 
+    // Le propriétaire du bateau voit le travail fait (#890).
+    await OwnerBoatChanged.dispatch(
+      boat.organizationId,
+      { id: boat.id, name: boat.name },
+      'maintenance_done',
+      { id: task.id, label: task.title },
+      user.id
+    )
+
     // Auto-create next task when recurrence is configured
     const nextDueAt =
       task.recurrenceIntervalMonths && task.recurrenceIntervalMonths > 0
@@ -516,6 +530,40 @@ export default class BoatMaintenanceTaskService {
     }
 
     return { task, completed: true }
+  }
+
+  /**
+   * Devis soumis au propriétaire (#890) : une tâche ouverte dont le coût prévu
+   * atteint le seuil, sur un bateau qui a un propriétaire, attend son accord.
+   * Un nouveau coût redemande l'accord, même après une décision ; un coût
+   * repassé sous le seuil lève une demande encore en attente.
+   */
+  private async syncOwnerApproval(task: BoatMaintenanceTask, boat: Boat, actorId: number) {
+    if (task.status === 'done') return
+
+    if (!requiresOwnerApproval(decimalColumnToNumber(task.estimatedCost))) {
+      if (task.ownerApprovalStatus === 'pending') {
+        task.ownerApprovalStatus = null
+        await task.save()
+      }
+      return
+    }
+
+    const owners = await boat.related('owners').query().count('* as total').first()
+    if (Number(owners?.$extras.total ?? 0) === 0) return
+
+    task.ownerApprovalStatus = 'pending'
+    task.ownerApprovalDecidedAt = null
+    task.ownerApprovalDecidedBy = null
+    await task.save()
+
+    await OwnerBoatChanged.dispatch(
+      boat.organizationId,
+      { id: boat.id, name: boat.name },
+      'approval_requested',
+      { id: task.id, label: task.title },
+      actorId
+    )
   }
 
   async deleteForBoat(user: User, boat: Boat, taskId: number) {

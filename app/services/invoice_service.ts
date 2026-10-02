@@ -8,6 +8,7 @@ import {
   CreditNoteDeleteError,
 } from '#exceptions/invoice_errors'
 import InvoicePaid from '#events/invoice_paid'
+import InvoiceSent from '#events/invoice_sent'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
@@ -677,11 +678,20 @@ export default class InvoiceService {
    * ici seul le statut et le journal d'audit.
    */
   async markSent(invoice: Invoice, actorUserId?: number | null): Promise<Invoice> {
-    if (invoice.status === 'draft') {
+    const transitioned = invoice.status === 'draft'
+    if (transitioned) {
       invoice.status = 'sent'
       await invoice.save()
     }
     await this.#logInvoiceAction(invoice, 'invoice.send', actorUserId)
+    // Une facture adressée à un propriétaire arrive dans son portail (#890).
+    if (transitioned && invoice.kind === 'invoice') {
+      await InvoiceSent.dispatch(
+        invoice.organizationId,
+        { id: invoice.id, number: invoice.number, clientId: invoice.clientId },
+        actorUserId ?? null
+      )
+    }
     return invoice
   }
 

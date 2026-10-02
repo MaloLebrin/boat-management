@@ -830,7 +830,13 @@
         "actualDurationPlaceholder": "Durée (min)",
         "assignedTo": "Confiée à {name}",
         "providerShort": "Prestataire : {name}",
-        "estimatedShort": "Prévu : {amount}"
+        "estimatedShort": "Prévu : {amount}",
+        "requestedByOwner": "Demande du propriétaire",
+        "ownerApproval": {
+          "pending": "Devis en attente du propriétaire",
+          "approved": "Devis accepté par le propriétaire",
+          "rejected": "Devis refusé par le propriétaire"
+        }
       }
     },
     "operations": {

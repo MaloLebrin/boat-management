@@ -280,6 +280,13 @@ export interface ApiDefinition {
     boats: {
       index: typeof routes['owner.boats.index']
       show: typeof routes['owner.boats.show']
+      requests: {
+        store: typeof routes['owner.boats.requests.store']
+      }
+      tasks: {
+        approve: typeof routes['owner.boats.tasks.approve']
+        reject: typeof routes['owner.boats.tasks.reject']
+      }
     }
   }
   ports: {

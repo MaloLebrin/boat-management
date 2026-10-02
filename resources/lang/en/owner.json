@@ -10,7 +10,13 @@
       "tabs": {
         "maintenance": "Maintenance",
         "reservations": "Reservations",
-        "invoices": "Invoices"
+        "invoices": "Invoices",
+        "overview": "Overview",
+        "requests": "Requests",
+        "documents": "Documents",
+        "expenses": "Expenses",
+        "incidents": "Incidents",
+        "trips": "Trips"
       },
       "maintenance": {
         "emptyTitle": "No maintenance recorded"
@@ -20,6 +26,60 @@
       },
       "invoices": {
         "emptyTitle": "No invoices"
+      },
+      "dashboard": {
+        "cost12Months": "Expenses over 12 months",
+        "pendingApprovals": "Quotes to approve",
+        "status": "Boat status",
+        "upcoming": "Upcoming deadlines",
+        "noUpcoming": "No deadline in the next 90 days.",
+        "byCategory": "Expenses by category (12 months)",
+        "noExpenses": "No expense shared by your manager.",
+        "lastTrip": "Last trip",
+        "noTrip": "No trip recorded."
+      },
+      "requests": {
+        "formTitle": "Send a request to the manager",
+        "formHint": "Describe what you would like checked or repaired. Your manager schedules it and you follow its progress here.",
+        "title": "Subject",
+        "titlePlaceholder": "Could you check the windlass?",
+        "description": "Details (optional)",
+        "submit": "Send request",
+        "emptyTitle": "No request yet",
+        "requestedOn": "Requested on {date}",
+        "submittedByManager": "Submitted by your manager",
+        "plannedFor": "scheduled for {date}",
+        "estimatedCost": "Estimated cost: {amount}",
+        "status": {
+          "received": "Received",
+          "planned": "Scheduled",
+          "done": "Done"
+        },
+        "approval": {
+          "pending": "Awaiting your approval",
+          "approved": "Approved",
+          "rejected": "Rejected"
+        },
+        "approve": "Approve quote",
+        "reject": "Reject"
+      },
+      "documents": {
+        "emptyTitle": "No document recorded",
+        "expiresOn": "Expires: {date}",
+        "noExpiry": "No expiry"
+      },
+      "expenses": {
+        "emptyTitle": "No shared expense",
+        "emptyDescription": "Your manager chooses which expenses to share with you.",
+        "total": "Total: {amount}"
+      },
+      "incidents": {
+        "emptyTitle": "No incident reported"
+      },
+      "trips": {
+        "emptyTitle": "No trip recorded",
+        "distance": "{value} nm",
+        "engineHours": "{value} engine h"
       }
     }
   }

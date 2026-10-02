@@ -144,7 +144,12 @@
     "boatNotFound": "This boat is not linked to your account.",
     "invalidAssignment": "This user does not have the \"boat owner\" role in this organization.",
     "attached": "Owner added to the boat.",
-    "detached": "Owner removed from the boat."
+    "detached": "Owner removed from the boat.",
+    "requestCreated": "Your request has been sent to the manager.",
+    "taskNotFound": "This request could not be found.",
+    "approvalNotPending": "This quote no longer awaits a decision.",
+    "approved": "Quote approved. The manager has been notified.",
+    "rejected": "Quote rejected. The manager has been notified."
   },
   "billing": {
     "notConfigured": "Payment is not configured yet. Please contact support.",

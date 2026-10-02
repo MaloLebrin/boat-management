@@ -66,4 +66,6 @@ export interface BoatBudgetEntryItem {
   label: string
   category: BudgetEntryCategory | 'other'
   description: string | null
+  /** Partagée avec le propriétaire dans son portail (#890). */
+  visibleToOwner: boolean
 }

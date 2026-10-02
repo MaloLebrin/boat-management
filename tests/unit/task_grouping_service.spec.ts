@@ -23,6 +23,8 @@ function makeTask(
     actualCost: null,
     estimatedDurationMinutes: null,
     actualDurationMinutes: null,
+    requestedByOwner: false,
+    ownerApproval: null,
   }
 }
 

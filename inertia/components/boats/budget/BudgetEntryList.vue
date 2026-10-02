@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCheckbox from '~/components/base/BaseCheckbox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import { useNumberFormat } from '~/composables/use_number_format'
@@ -27,6 +28,7 @@ const editForm = useForm({
   date: '',
   category: '',
   description: '',
+  visibleToOwner: false,
 })
 
 const categoryOptions = computed(() => [
@@ -47,6 +49,7 @@ const edition = useInlineRowEdit<BoatBudgetEntryItem, ReturnType<typeof editForm
     date: entry.date,
     category: entry.category,
     description: entry.description ?? '',
+    visibleToOwner: entry.visibleToOwner,
   }),
   url: (entryId) => `/boats/${props.boatId}/budget/entries/${entryId}`,
 })
@@ -124,6 +127,12 @@ const CATEGORY_COLORS: Record<string, string> = {
                 :error="editForm.errors.description"
               />
             </div>
+            <div class="sm:col-span-2">
+              <BaseCheckbox
+                v-model="editForm.visibleToOwner"
+                :label="t('budget.entries.visibleToOwner')"
+              />
+            </div>
             <div class="sm:col-span-2 flex justify-end gap-2">
               <BaseButton variant="secondary" size="sm" type="button" @click="edition.cancel()">
                 {{ t('common.cancel') }}
@@ -144,6 +153,13 @@ const CATEGORY_COLORS: Record<string, string> = {
                   :class="CATEGORY_COLORS[entry.category] || CATEGORY_COLORS.other"
                 >
                   {{ getCategoryLabel(entry.category) }}
+                </span>
+                <span
+                  v-if="entry.visibleToOwner"
+                  class="text-xs text-fg-subtle"
+                  data-testid="budget-entry-owner-visible"
+                >
+                  {{ t('budget.entries.sharedWithOwner') }}
                 </span>
               </div>
               <p class="text-sm text-fg-muted">{{ formatDate(entry.date) }}</p>

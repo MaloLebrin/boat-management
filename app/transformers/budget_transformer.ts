@@ -10,6 +10,7 @@ export function toBudgetEntryItem(entry: BoatBudgetEntry): BoatBudgetEntryItem {
     label: entry.label,
     category: entry.category as BoatBudgetEntryItem['category'],
     description: entry.description,
+    visibleToOwner: entry.visibleToOwner,
   }
 }
 

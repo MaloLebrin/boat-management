@@ -70,7 +70,10 @@
       "port": "Port / Mouillage",
       "equipment": "Équipements",
       "other": "Autre"
-    }
+    },
+    "visibleToOwner": "Visible du propriétaire",
+    "visibleToOwnerHint": "La dépense apparaîtra dans le portail du propriétaire du bateau. Laissez décoché pour une dépense interne.",
+    "sharedWithOwner": "Partagée avec le propriétaire"
   },
   "csv": {
     "headers": {

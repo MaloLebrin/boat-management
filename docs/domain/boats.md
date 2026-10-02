@@ -170,13 +170,20 @@ Référence: `app/controllers/boat_budget_entry_controller.ts`, `app/services/bo
   - Validator: `budgetEntryValidator`
   - Service: `BoatBudgetEntryService.create`
   - Catégories: `maintenance | fuel | documents | port | equipment | other`
+  - `visibleToOwner` (booléen, faux par défaut) : partage la dépense dans le
+    portail propriétaire (#890) ; absente d'une édition, la valeur est conservée
 - `DELETE /boats/:id/budget/entries/:entryId` → `BoatBudgetEntryController.destroy`
   - Service: `BoatBudgetEntryService.delete`
 
 ### Portail propriétaire (`boat_owner`)
 
 Référence: `app/controllers/boat_owner_portal_controller.ts`,
-`app/services/boat_owner_service.ts`.
+`app/services/boat_owner_service.ts`, `app/services/owner_portal_service.ts`.
+
+> Le portail interactif (documents, dépenses partagées, incidents, sorties,
+> demandes, accord sur un devis, notifications) est décrit dans
+> [`owner-portal.md`](./owner-portal.md) (#890). La section ci-dessous garde
+> l'historique des props bornées (#781).
 
 - `GET /owner/boats` → `BoatOwnerPortalController.index`
   - Service: `BoatOwnerService.listOwnedBoats` (scoping par le pivot `boat_owners`)

@@ -9,6 +9,7 @@ import BoatStatusChanged from '#events/boat_status_changed'
 import ContactMessageReceived from '#events/contact_message_received'
 import IncidentChanged from '#events/incident_changed'
 import InvoicePaid from '#events/invoice_paid'
+import InvoiceSent from '#events/invoice_sent'
 import MaintenanceTaskAssigned from '#events/maintenance_task_assigned'
 import OrganizationInvitationAccepted from '#events/organization_invitation_accepted'
 import OrganizationMemberJoined from '#events/organization_member_joined'
@@ -17,6 +18,8 @@ import OrganizationMemberRoleChanged from '#events/organization_member_role_chan
 import OrganizationModuleDeactivated from '#events/organization_module_deactivated'
 import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
+import OwnerBoatChanged from '#events/owner_boat_changed'
+import OwnerRequestChanged from '#events/owner_request_changed'
 import PublicBookingDecided from '#events/public_booking_decided'
 import PublicBookingRequested from '#events/public_booking_requested'
 import ReservationChanged from '#events/reservation_changed'
@@ -30,6 +33,7 @@ export const events = {
   ContactMessageReceived: ContactMessageReceived,
   IncidentChanged: IncidentChanged,
   InvoicePaid: InvoicePaid,
+  InvoiceSent: InvoiceSent,
   MaintenanceTaskAssigned: MaintenanceTaskAssigned,
   OrganizationInvitationAccepted: OrganizationInvitationAccepted,
   OrganizationMemberJoined: OrganizationMemberJoined,
@@ -38,6 +42,8 @@ export const events = {
   OrganizationModuleDeactivated: OrganizationModuleDeactivated,
   OrganizationPlanDowngraded: OrganizationPlanDowngraded,
   OrganizationPlanUpgraded: OrganizationPlanUpgraded,
+  OwnerBoatChanged: OwnerBoatChanged,
+  OwnerRequestChanged: OwnerRequestChanged,
   PublicBookingDecided: PublicBookingDecided,
   PublicBookingRequested: PublicBookingRequested,
   ReservationChanged: ReservationChanged,

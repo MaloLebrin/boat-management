@@ -2,17 +2,17 @@ import { ref, type Ref } from 'vue'
 
 /**
  * Ce qu'un `useForm()` d'Inertia expose au cycle d'édition inline : ses champs
- * — tous en `string`, un formulaire HTML natif —, sa remise à zéro et son
+ * — des `string`, ou un `boolean` pour une case à cocher —, sa remise à zéro et son
  * `patch`.
  */
-export type InlineEditForm<F extends Record<string, string>> = F & {
+export type InlineEditForm<F extends Record<string, string | boolean>> = F & {
   reset: () => void
   patch: (url: string, options: { preserveScroll: boolean; onSuccess: () => void }) => void
 }
 
 export interface UseInlineRowEditOptions<
   T extends { id: number },
-  F extends Record<string, string>,
+  F extends Record<string, string | boolean>,
 > {
   /** Le `useForm()` du composant, partagé par les lignes éditées à tour de rôle. */
   form: InlineEditForm<F>
@@ -46,9 +46,10 @@ export interface InlineRowEdit<T extends { id: number }> {
  * fermeture au seul succès de l'envoi — pas avant, sinon une erreur de
  * validation referme la ligne et perd la saisie.
  */
-export function useInlineRowEdit<T extends { id: number }, F extends Record<string, string>>(
-  options: UseInlineRowEditOptions<T, F>
-): InlineRowEdit<T> {
+export function useInlineRowEdit<
+  T extends { id: number },
+  F extends Record<string, string | boolean>,
+>(options: UseInlineRowEditOptions<T, F>): InlineRowEdit<T> {
   const editingId = ref<number | null>(null)
 
   function isEditing(id: number): boolean {

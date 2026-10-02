@@ -203,6 +203,36 @@
         "title": "Incident closed on {boatName}",
         "body": "{actorName} closed the \"{incidentType}\" incident on {boatName}."
       }
+    },
+    "owner": {
+      "request_created": {
+        "title": "Owner request on {boatName}",
+        "body": "{ownerName} asks: “{title}”."
+      },
+      "approval_decided": {
+        "title": "{decision, select, rejected {Quote rejected} other {Quote approved}} on {boatName}",
+        "body": "{ownerName} {decision, select, rejected {rejected} other {approved}} the quote “{title}”."
+      },
+      "approval_requested": {
+        "title": "A quote awaits your approval on {boatName}",
+        "body": "The manager submits “{label}”. Open your portal to approve or reject it."
+      },
+      "maintenance_done": {
+        "title": "Work completed on {boatName}",
+        "body": "“{label}” has been completed on your boat."
+      },
+      "incident_created": {
+        "title": "Incident on {boatName}: {label}",
+        "body": "An incident has been reported on your boat. The manager is handling it."
+      },
+      "document_expiring": {
+        "title": "Documents to renew for {boatName}",
+        "body": "{count, plural, one {One document of your boat expires} other {# documents of your boat expire}} within 30 days."
+      },
+      "invoice_sent": {
+        "title": "New invoice {number}",
+        "body": "The manager has sent you invoice {number}."
+      }
     }
   },
   "title": "Notifications",
@@ -258,7 +288,14 @@
     "reservation.starts_tomorrow": "Departure tomorrow",
     "incident.created": "Incident reported",
     "incident.resolved": "Incident closed",
-    "invoice.paid": "Invoice paid"
+    "invoice.paid": "Invoice paid",
+    "owner.request_created": "Owner request",
+    "owner.approval_decided": "Owner decision",
+    "owner.approval_requested": "Quote to approve",
+    "owner.maintenance_done": "Work completed",
+    "owner.incident_created": "Incident on your boat",
+    "owner.document_expiring": "Document to renew",
+    "owner.invoice_sent": "Invoice received"
   },
   "families": {
     "fleet": {
