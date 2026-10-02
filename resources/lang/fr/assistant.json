@@ -134,7 +134,8 @@
     "diagnostic": "Ouvrir le diagnostic de panne",
     "spareParts": "Voir les pièces détachées",
     "notifications": "Voir les notifications",
-    "settingsMe": "Mon compte et sécurité"
+    "settingsMe": "Mon compte et sécurité",
+    "settingsOrg": "Ouvrir les réglages de l’organisation"
   },
   "usage": {
     "line": "IA ce mois-ci : {used} / {limit} tokens.",

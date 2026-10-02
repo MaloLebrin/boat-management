@@ -562,5 +562,19 @@
     "othersRevoked": "Toutes les autres sessions ont été déconnectées.",
     "orphansRevoked": "Connexions mémorisées révoquées.",
     "notifyUpdated": "Préférence d'alerte enregistrée."
+  },
+  "account": {
+    "demoProtected": "Le compte de démonstration ne peut pas être modifié.",
+    "left": "Vous avez quitté l'organisation.",
+    "membershipNotFound": "Vous n'êtes pas membre de cette organisation.",
+    "leaveLastAdmin": "Vous êtes le dernier admin de cette organisation : nommez un autre admin ou supprimez-la.",
+    "leaveOnlyOrganization": "C'est la seule organisation de votre compte : supprimez plutôt votre compte.",
+    "lastAdmin": "Vous êtes le dernier admin de : {organizations}. Nommez un autre admin ou supprimez l'organisation avant de supprimer votre compte.",
+    "deletionScheduled": "Votre compte sera supprimé le {date}. Reconnectez-vous avant cette date pour annuler.",
+    "deletionCancelled": "Bon retour ! La suppression de votre compte a été annulée."
+  },
+  "organizationDeletion": {
+    "scheduled": "L'organisation sera supprimée définitivement le {date}. Vous pouvez annuler d'ici là.",
+    "cancelled": "La suppression de l'organisation a été annulée."
   }
 }

@@ -5,10 +5,18 @@ import TwoFactorCard from '~/components/settings/me/TwoFactorCard.vue'
 import SessionsCard from '~/components/settings/me/SessionsCard.vue'
 import LanguageCard from '~/components/settings/me/LanguageCard.vue'
 import ThemeCard from '~/components/settings/me/ThemeCard.vue'
+import ExportDataCard from '~/components/settings/me/account/ExportDataCard.vue'
+import MembershipsCard from '~/components/settings/me/account/MembershipsCard.vue'
+import DeleteAccountCard from '~/components/settings/me/account/DeleteAccountCard.vue'
 import type { TwoFactorSettingsProps } from '#shared/types/two_factor'
 import type { UserSessionsSettingsProps } from '#shared/types/user_session'
+import type { AccountSettingsProps } from '#shared/types/account'
 
-defineProps<{ twoFactor: TwoFactorSettingsProps; sessions: UserSessionsSettingsProps }>()
+defineProps<{
+  twoFactor: TwoFactorSettingsProps
+  sessions: UserSessionsSettingsProps
+  account: AccountSettingsProps
+}>()
 </script>
 
 <template>
@@ -19,5 +27,9 @@ defineProps<{ twoFactor: TwoFactorSettingsProps; sessions: UserSessionsSettingsP
     <SessionsCard :sessions="sessions" />
     <LanguageCard />
     <ThemeCard />
+    <!-- Zone dangereuse (#886) : export, organisations, suppression du compte. -->
+    <ExportDataCard />
+    <MembershipsCard :memberships="account.memberships" />
+    <DeleteAccountCard :last-admin-of="account.lastAdminOf" :grace-days="account.graceDays" />
   </div>
 </template>

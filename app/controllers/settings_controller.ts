@@ -37,6 +37,8 @@ import { AUTH_SESSION_STARTED_AT_KEY } from '#shared/constants/auth'
 import PasswordResetService from '#services/password_reset_service'
 import TwoFactorService from '#services/two_factor_service'
 import UserSessionService from '#services/user_session_service'
+import AccountService from '#services/account_service'
+import OrganizationDeletionService from '#services/organization_deletion_service'
 import { TWO_FACTOR_RECOVERY_CODES_FLASH_KEY } from '#shared/constants/two_factor'
 import type { TwoFactorSettingsProps } from '#shared/types/two_factor'
 
@@ -58,7 +60,9 @@ export default class SettingsController {
     private invoiceReminderService: InvoiceReminderService,
     private accountingSettingsService: AccountingSettingsService,
     private twoFactorService: TwoFactorService,
-    private userSessionService: UserSessionService
+    private userSessionService: UserSessionService,
+    private accountService: AccountService,
+    private organizationDeletionService: OrganizationDeletionService
   ) {}
 
   async me({ inertia, auth, session }: HttpContext) {
@@ -68,13 +72,16 @@ export default class SettingsController {
     // transitent que par le flash qui suit leur génération : affichés une
     // fois, introuvables ensuite.
     const flashedCodes: unknown = session.flashMessages.get(TWO_FACTOR_RECOVERY_CODES_FLASH_KEY)
-    const [pendingSetup, recoveryCodesRemaining, enforcement, sessions] = await Promise.all([
-      this.twoFactorService.pendingSetup(user),
-      user.hasTwoFactorEnabled ? this.twoFactorService.recoveryCodesRemaining(user.id) : 0,
-      this.twoFactorService.enforcementFor(user),
-      // Appareils et sessions (#885).
-      this.userSessionService.settingsFor(user, this.userSessionService.currentId(session)),
-    ])
+    const [pendingSetup, recoveryCodesRemaining, enforcement, sessions, account] =
+      await Promise.all([
+        this.twoFactorService.pendingSetup(user),
+        user.hasTwoFactorEnabled ? this.twoFactorService.recoveryCodesRemaining(user.id) : 0,
+        this.twoFactorService.enforcementFor(user),
+        // Appareils et sessions (#885).
+        this.userSessionService.settingsFor(user, this.userSessionService.currentId(session)),
+        // Zone dangereuse : organisations, suppression du compte (#886).
+        this.accountService.settingsFor(user),
+      ])
     const twoFactor: TwoFactorSettingsProps = {
       enabled: user.hasTwoFactorEnabled,
       recoveryCodesRemaining,
@@ -87,7 +94,7 @@ export default class SettingsController {
       graceEndsAt: enforcement.graceEndsAt,
     }
 
-    return inertia.render('settings/me', { twoFactor, sessions })
+    return inertia.render('settings/me', { twoFactor, sessions, account })
   }
 
   /** Gestion des notifications push et des appareils abonnés (#498). */
@@ -114,6 +121,8 @@ export default class SettingsController {
       },
       // Politique 2FA (#884) : éditée par `organization.manage`, lue par tous.
       twoFactorPolicy: await this.twoFactorService.organizationPolicy(user.organization),
+      // Suppression de l'organisation (#886) : zone dangereuse, admins seuls.
+      deletion: this.organizationDeletionService.stateFor(user.organization),
     })
   }
 

@@ -9,6 +9,7 @@ import SettingsShell from '~/components/settings/SettingsShell.vue'
 import SettingsOrgTab from '~/components/settings/tabs/SettingsOrgTab.vue'
 import { useT } from '~/composables/use_t'
 import type { OrganizationTwoFactorPolicy } from '#shared/types/two_factor'
+import type { OrganizationDeletionProps } from '#shared/types/account'
 
 defineProps<{
   organization: {
@@ -16,6 +17,7 @@ defineProps<{
     name: string
   }
   twoFactorPolicy: OrganizationTwoFactorPolicy
+  deletion: OrganizationDeletionProps
 }>()
 
 const { t } = useT()
@@ -24,6 +26,10 @@ const { t } = useT()
 <template>
   <Head :title="t('settings.org.title')" />
   <SettingsShell>
-    <SettingsOrgTab :organization="organization" :two-factor-policy="twoFactorPolicy" />
+    <SettingsOrgTab
+      :organization="organization"
+      :two-factor-policy="twoFactorPolicy"
+      :deletion="deletion"
+    />
   </SettingsShell>
 </template>

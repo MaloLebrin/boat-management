@@ -1,4 +1,5 @@
 import type User from '#models/user'
+import AccountService from '#services/account_service'
 import AuditLogService from '#services/audit_log_service'
 import TwoFactorService from '#services/two_factor_service'
 import UserSessionService from '#services/user_session_service'
@@ -19,7 +20,8 @@ export default class SessionLoginService {
   constructor(
     private auditLogService: AuditLogService,
     private twoFactorService: TwoFactorService,
-    private userSessionService: UserSessionService
+    private userSessionService: UserSessionService,
+    private accountService: AccountService
   ) {}
 
   /**
@@ -41,6 +43,12 @@ export default class SessionLoginService {
     ctx.session.forget('demoSessionStartedAt')
     user.lastLoginAt = DateTime.now()
     await user.save()
+
+    // Rétractation (#886) : se reconnecter pendant le délai annule la
+    // suppression du compte demandée.
+    if (await this.accountService.cancelDeletion(user)) {
+      ctx.session.flash('info', ctx.i18n.t('flash.account.deletionCancelled'))
+    }
 
     if (user.organizationId) {
       await this.auditLogService.log({

@@ -17,7 +17,17 @@ export const AUDIT_ACTIONS = [
   // « déconnecter partout sauf ici ».
   'auth.session_revoked',
   'auth.logout_all',
+  // Gestion du compte en libre-service (#886) : export de ses données,
+  // suppression demandée, annulée (reconnexion) puis purgée. Le journal
+  // survit à la purge, rattaché à un compte anonymisé.
+  'account.export',
+  'account.delete_requested',
+  'account.delete_cancelled',
+  'account.purged',
   'organization.2fa_required',
+  // Suppression d'organisation (#886), récupérable pendant la période de grâce.
+  'organization.delete_requested',
+  'organization.delete_cancelled',
   'boat.create',
   'boat.update',
   'boat.delete',
@@ -37,6 +47,8 @@ export const AUDIT_ACTIONS = [
   'member.add',
   'member.remove',
   'member.update_role',
+  // Départ volontaire d'un membre (#886), depuis ses réglages.
+  'member.left',
   'invitation.send',
   'invitation.cancel',
   'invitation.accept',
@@ -168,6 +180,10 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'auth.2fa_failed',
     'auth.session_revoked',
     'auth.logout_all',
+    'account.export',
+    'account.delete_requested',
+    'account.delete_cancelled',
+    'account.purged',
   ],
   boat: [
     'boat.create',
@@ -181,6 +197,7 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'member.add',
     'member.remove',
     'member.update_role',
+    'member.left',
     'invitation.send',
     'invitation.cancel',
     'invitation.accept',
@@ -243,7 +260,13 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'invoice_reminders.update',
   ],
   contract: ['contract.generated', 'contract.sent', 'contract.signed'],
-  organization: ['organization.update', 'organization.branding', 'organization.2fa_required'],
+  organization: [
+    'organization.update',
+    'organization.branding',
+    'organization.2fa_required',
+    'organization.delete_requested',
+    'organization.delete_cancelled',
+  ],
   ai_key: ['ai_key.set', 'ai_key.rotate', 'ai_key.remove', 'ai_key.provider_changed'],
   import: ['import.run'],
   document: ['document.delete'],

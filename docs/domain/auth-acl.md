@@ -350,6 +350,84 @@ première connexion recensée n'envoie rien. Désactivable
 **Hors périmètre** : lieu approximatif par IP (aucune base de géolocalisation
 embarquée).
 
+### Compte et organisation en libre-service — RGPD (#886)
+
+Le RGPD de l'**utilisateur de FleetAi lui-même** (accès, portabilité,
+effacement), distinct de celui des clients du loueur (module CRM). Tout vit
+dans la zone dangereuse de `/settings/me` et de `/settings/org`.
+
+| Route                                    | Effet                                                                                  |
+| ---------------------------------------- | -------------------------------------------------------------------------------------- |
+| `GET /settings/me/export`                | fichier JSON `fleetai.personal-data` v1 (portabilité, art. 20), audit `account.export` |
+| `DELETE /settings/me/memberships/:orgId` | quitter une organisation, audit `member.left`                                          |
+| `DELETE /settings/me`                    | `password` + `confirm` : demande de suppression du compte, déconnexion, `/login`       |
+| `DELETE /settings/org`                   | `organization.manage`, `password` + `organizationName` : suppression programmée        |
+| `POST /settings/org/restore`             | `organization.manage` : annule la suppression pendant la grâce                         |
+
+**Export.** Ce qui est rattaché à la personne : profil et préférences,
+adhésions, sessions, abonnements push, notifications, journal d'audit dont
+elle est l'auteur, saisies dont elle est l'auteur (incidents, actions
+d'équipement, changements de statut, fichiers envoyés — références, pas le
+contenu), conversations du copilote. Pas les données de l'organisation : elles
+appartiennent à l'organisation et passent par les exports flotte (#879).
+Synchrone : le volume d'une personne reste petit.
+
+**Quitter.** Refusé au dernier admin (`LastAdminError`) et sur la seule
+organisation du compte (`OnlyOrganizationError` — supprimer le compte,
+plutôt). Les saisies gardent leur auteur ; les tâches ouvertes qui lui étaient
+confiées redeviennent non assignées (`releaseOpenTasks`, comme un retrait par
+un admin). Si l'organisation quittée était l'organisation active, le compte
+bascule sur la plus ancienne des restantes.
+
+**Supprimer son compte** — rétractation de `ACCOUNT_DELETION_GRACE_DAYS`
+(14) jours :
+
+- refusé au **dernier admin d'une organisation active** ; une organisation déjà
+  programmée pour suppression ne bloque pas ;
+- la demande pose `users.deletion_requested_at`, coupe tous les accès
+  (`revokeAllAccess` : remember-me, `sessions_valid_after`, lignes
+  `user_sessions`), supprime les abonnements push et envoie l'e-mail
+  `emails/deletion_scheduled` ;
+- **se reconnecter annule** la demande (`SessionLoginService.complete` →
+  `AccountService.cancelDeletion`, audit `account.delete_cancelled`) ;
+- au terme, `PurgeDeletedAccounts` (04:30) **anonymise** le compte. La ligne
+  `users` survit : `boat_equipment_actions.created_by` est en `CASCADE`, un
+  `DELETE` effacerait l'historique de la flotte. E-mail
+  `deleted-user-<id>@deleted.invalid`, nom, préférences, 2FA, mot de passe
+  (aléatoire) et organisation vidés, `anonymized_at` posé ; adhésions,
+  notifications, push, sessions, remember-me, codes de secours, imports en
+  attente, accès propriétaire, avatar, jetons par e-mail supprimés ; les
+  invitations acceptées perdent l'adresse. Le journal d'audit garde ses
+  lignes (`account.purged`), rattachées à un compte qui ne dit plus qui il
+  était. Un compte devenu entre-temps dernier admin d'une organisation active
+  est reporté.
+
+**Supprimer l'organisation** — grâce de `ORGANIZATION_DELETION_GRACE_DAYS`
+(30) jours :
+
+- la demande pose `organizations.deletion_requested_at`, programme la fin de
+  l'abonnement Stripe à l'échéance (`cancel_at_period_end`, réversible),
+  prévient **tous** les membres par e-mail ;
+- l'organisation reste utilisable et exportable pendant la grâce ; la prop
+  partagée `organizationDeletionScheduledFor` affiche un bandeau à tous ses
+  membres, avec le lien d'annulation pour `organization.manage` ;
+- au terme, `PurgeDeletedOrganizations` (04:45) résilie l'abonnement, efface
+  les fichiers Cloudinary **ligne par ligne** (`deleteFolder` ne vise que les
+  images, un PDF y survivrait) puis le logo, purge chaque bateau corbeille
+  comprise (`BoatHullService.purgePhysically` : `boats` n'a pas de clé
+  étrangère vers l'organisation), bascule les membres qui ont une autre
+  organisation et **anonymise ceux qui n'en ont pas**, puis supprime
+  l'organisation (le reste suit en `CASCADE`).
+
+Le compte démo est exclu de tout (`DemoAccountProtectedError`).
+
+**Après une résiliation.** Aucune purge automatique : les CGV et la FAQ
+promettent que l'organisation repasse sur Starter et garde ses données. La
+suppression définitive reste une démarche de l'admin, ci-dessus.
+
+**Hors périmètre** : le compte Stripe Connect de l'organisation (#876) n'est
+pas fermé par la purge — il appartient au loueur, côté Stripe.
+
 ### Logout
 
 - `POST /logout` (auth-only)

@@ -576,7 +576,14 @@
       "auth_2fa_failed": "Two-factor code rejected",
       "organization_2fa_required": "Two-factor policy changed",
       "auth_session_revoked": "Session signed out remotely",
-      "auth_logout_all": "Signed out of every other session"
+      "auth_logout_all": "Signed out of every other session",
+      "account_export": "Personal data exported",
+      "account_delete_requested": "Account deletion requested",
+      "account_delete_cancelled": "Account deletion cancelled",
+      "account_purged": "Account anonymized",
+      "member_left": "Left the organization",
+      "organization_delete_requested": "Organization deletion requested",
+      "organization_delete_cancelled": "Organization deletion cancelled"
     },
     "empty": {
       "title": "No activity yet",
@@ -656,5 +663,63 @@
     "orphanRemembered": "{count, plural, one {# older remembered sign-in is not tied to any listed session.} other {# older remembered sign-ins are not tied to any listed session.}}",
     "revokeOrphans": "Revoke them",
     "notifyNewLogin": "Email me when my account is signed in from a new device"
+  },
+  "danger": {
+    "export": {
+      "title": "Export my data",
+      "subtitle": "Download the data linked to your account, in a machine-readable format.",
+      "hint": "Profile, preferences, organizations, sessions, notifications, audit log and entries you authored. The organization's data is downloaded from its exports.",
+      "action": "Download (JSON)"
+    },
+    "memberships": {
+      "title": "My organizations",
+      "subtitle": "The organizations your account can access.",
+      "current": "Active organization",
+      "leave": "Leave",
+      "leaveFor": "Leave {name}",
+      "leaveTitle": "Leave {name}?",
+      "leaveConfirm": "You will lose access to this organization. Your entries stay there, and open tasks assigned to you become unassigned.",
+      "blocked": {
+        "last_admin": "You are the last admin: appoint another admin or delete the organization.",
+        "only_organization": "This is the only organization on your account: delete your account instead."
+      }
+    },
+    "deleteAccount": {
+      "title": "Delete my account",
+      "subtitle": "All your access is cut off immediately. You have {days} days to change your mind: just sign in again. After that, your account is permanently anonymized.",
+      "blocked": "You are the last admin of: {organizations}. Appoint another admin or delete the organization before deleting your account.",
+      "passwordLabel": "Password",
+      "confirmLabel": "I understand my account will be permanently anonymized in {days} days unless I sign in again.",
+      "action": "Delete my account"
+    },
+    "deleteOrganization": {
+      "title": "Delete the organization",
+      "subtitle": "The subscription ends at its renewal date and the organization can be restored for {days} days. After that, its boats, documents, clients, invoices and files are permanently deleted.",
+      "exportHint": "Remember to download your exports (fleet, accounting) before confirming.",
+      "nameLabel": "Type “{name}” to confirm",
+      "passwordLabel": "Password",
+      "action": "Delete the organization",
+      "scheduled": "This organization will be permanently deleted on {date}.",
+      "restore": "Cancel deletion"
+    },
+    "banner": {
+      "text": "This organization will be permanently deleted on {date}.",
+      "action": "Cancel deletion"
+    },
+    "emails": {
+      "greeting": "Hello {name},",
+      "account": {
+        "subject": "Your FleetAi account deletion is scheduled",
+        "body": "Your account deletion request has been recorded. All your access has been cut off, and your account will be permanently anonymized on {date}.",
+        "undo": "Changed your mind? Sign in again before that date and the deletion will be cancelled.",
+        "cta": "Sign in"
+      },
+      "organization": {
+        "subject": "Deletion of {organization} is scheduled",
+        "body": "An admin requested the deletion of the {organization} organization on FleetAi. Its data will be permanently deleted on {date}. If FleetAi has no other organization for you, your account will be closed on the same date.",
+        "undo": "Until then, an admin can cancel the deletion from the organization's settings.",
+        "cta": "Open organization settings"
+      }
+    }
   }
 }

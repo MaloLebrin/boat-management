@@ -7,7 +7,9 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
 import TwoFactorPolicyCard from '~/components/settings/org/TwoFactorPolicyCard.vue'
+import DeleteOrganizationCard from '~/components/settings/org/DeleteOrganizationCard.vue'
 import type { OrganizationTwoFactorPolicy } from '#shared/types/two_factor'
+import type { OrganizationDeletionProps } from '#shared/types/account'
 
 const { t } = useT()
 const { can } = usePermissions()
@@ -18,6 +20,7 @@ defineProps<{
     name: string
   }
   twoFactorPolicy: OrganizationTwoFactorPolicy
+  deletion: OrganizationDeletionProps
 }>()
 
 // #761 — l'onglet s'ouvre à `members.view` (cf. `SettingsShell`), le renommage
@@ -68,5 +71,13 @@ const canManage = can('organization.manage')
     </BaseCard>
 
     <TwoFactorPolicyCard :policy="twoFactorPolicy" :can-manage="canManage" class="mt-10" />
+
+    <!-- Zone dangereuse (#886) : suppression de l'organisation, admins seuls. -->
+    <DeleteOrganizationCard
+      v-if="canManage"
+      :deletion="deletion"
+      :organization-name="organization.name"
+      class="mt-10"
+    />
   </div>
 </template>

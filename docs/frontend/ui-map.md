@@ -453,6 +453,15 @@ checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`
 - Côté app : encart `components/reservations/public_booking/BoatPublicBookingCard.vue` sur `boats/reservations.vue` (bascule `BaseToggle` → `router.patch('/boats/:id/public-booking')`, lien à copier, lien « Voir la page » en nouvel onglet) ; badge `ReservationSourceBadge.vue` (« Demande en ligne ») dans `ReservationList.vue` et `FleetReservationList.vue`.
 - Tests : `tests/inertia/public_booking_calendar.spec.ts`, `public_booking_request_form.spec.ts`, `boat_public_booking_card.spec.ts` ; fonctionnel `tests/functional/reservations/public_booking.spec.ts`.
 
+### Settings — compte et organisation en libre-service (`/settings/me`, `/settings/org`, #886)
+
+- Zone dangereuse de `/settings/me`, après `ThemeCard`, alimentée par la prop de page `account` (`AccountSettingsProps`, servie par `SettingsController.me`) :
+  - `components/settings/me/account/ExportDataCard.vue` — « Télécharger (JSON) » vers `GET /settings/me/export` (`BaseButton` `external-href` : un téléchargement, pas une visite Inertia) ;
+  - `account/MembershipsCard.vue` — une ligne par organisation (badge « Organisation active », rôle). « Quitter » passe par un `BaseConfirmModal` puis `router.delete('/settings/me/memberships/:orgId')` ; sans bouton quand `leaveBlockedReason` vaut `last_admin` ou `only_organization`, avec la raison ;
+  - `account/DeleteAccountCard.vue` — `<Form>` `DELETE /settings/me` (mot de passe + case `confirm`, bouton grisé tant qu'elle n'est pas cochée). Remplacé par une `BaseAlert` quand `lastAdminOf` n'est pas vide.
+- `/settings/org` : `components/settings/org/DeleteOrganizationCard.vue`, sous `can('organization.manage')`, alimentée par la prop `deletion` (`OrganizationDeletionProps`). `<Form>` `DELETE /settings/org` (nom de l'organisation à saisir + mot de passe) ; pendant la grâce, la date de purge et « Annuler la suppression » (`router.post('/settings/org/restore')`).
+- Layout : `components/layout/OrganizationDeletionBanner.vue`, sous `EmailVerificationBanner`, lit la prop partagée `organizationDeletionScheduledFor` et s'affiche à **tous** les membres ; le lien vers `/settings/org` n'est proposé qu'à `organization.manage`. Clés `settings.danger.*`.
+
 ### Settings — facturation (`/settings/billing`)
 
 - Page : `inertia/pages/settings/billing.vue` → `components/settings/tabs/SettingsBillingTab.vue` (props `plan`, `quotaUsage`, `subscription`, `orgModules`, `orgAddons`, servies par `SettingsController.billing`)

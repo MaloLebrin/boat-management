@@ -13,6 +13,8 @@ import GenerateAiSuggestions from '#jobs/generate_ai_suggestions'
 import ReconcileMedia from '#jobs/reconcile_media'
 import SyncExternalCalendars from '#jobs/sync_external_calendars'
 import PurgeTrashedBoats from '#jobs/purge_trashed_boats'
+import PurgeDeletedAccounts from '#jobs/purge_deleted_accounts'
+import PurgeDeletedOrganizations from '#jobs/purge_deleted_organizations'
 
 await SendReminderEmails.schedule({})
   .cron('0 8 * * *')
@@ -121,4 +123,19 @@ await PurgeTrashedBoats.schedule({})
   .cron('15 4 * * *')
   .timezone('Europe/Paris')
   .id('daily-purge-trashed-boats')
+  .run()
+
+// Suppressions en libre-service (#886), après la corbeille des bateaux : les
+// comptes au terme de leur rétractation à 04:30, les organisations au terme
+// de leur période de grâce à 04:45 (Stripe, Cloudinary, puis données).
+await PurgeDeletedAccounts.schedule({})
+  .cron('30 4 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-purge-deleted-accounts')
+  .run()
+
+await PurgeDeletedOrganizations.schedule({})
+  .cron('45 4 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-purge-deleted-organizations')
   .run()

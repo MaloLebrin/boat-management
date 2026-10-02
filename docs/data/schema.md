@@ -42,6 +42,10 @@ règle ; leurs index FK sont nommés `{table}_{column}_idx`.
 - politique de double authentification (#884) : `requireTwoFactor` (booléen,
   défaut `false`) et `twoFactorGraceEndsAt` (nullable — fin du délai de grâce,
   `null` = immédiat). Voir [`docs/domain/auth-acl.md`](../domain/auth-acl.md)
+- `deletionRequestedAt` (nullable, index partiel, #886) — suppression demandée
+  par un admin : l'organisation reste récupérable 30 jours, puis
+  `PurgeDeletedOrganizations` la purge (Stripe, Cloudinary, bateaux, puis la
+  ligne et ses `CASCADE`). Voir [`docs/domain/auth-acl.md`](../domain/auth-acl.md)
 
 ### users
 
@@ -72,6 +76,14 @@ règle ; leurs index FK sont nommés `{table}_{column}_idx`.
   - `locale` (`en` | `fr`, #414)
   - `theme` (`system` | `light` | `dark`, #416)
   - `dashboard_layout` (jsonb nullable) — disposition personnalisée du tableau de bord (`shared/types/dashboard_layout.ts` : `version`, `order.main`, `order.side`, `hidden`) ; `null` = disposition par défaut
+- suppression du compte en libre-service (#886), nullables, index partiel sur
+  les demandes en attente :
+  - `deletionRequestedAt` — demande de suppression ; une reconnexion dans les
+    14 jours l'annule
+  - `anonymizedAt` — compte purgé par `PurgeDeletedAccounts`. La ligne est
+    gardée, vidée de ses données personnelles (e-mail
+    `deleted-user-<id>@deleted.invalid`) : plusieurs `created_by` vers `users`
+    sont en `CASCADE` et emporteraient l'historique de la flotte
 
 ### boats
 

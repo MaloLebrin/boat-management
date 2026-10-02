@@ -169,6 +169,12 @@ export const ASSISTANT_NAV_TARGETS = {
       en: 'Settings — my account and security',
     },
   },
+  // Organisation (#886) : nom, politique 2FA, suppression de l'organisation.
+  'settings.org': {
+    path: '/settings/org',
+    i18nKey: 'assistant.navTargets.settingsOrg',
+    promptLabel: { fr: 'Réglages — organisation', en: 'Settings — organization' },
+  },
   'settings.billing': {
     path: '/settings/billing',
     i18nKey: 'assistant.navTargets.settingsBilling',

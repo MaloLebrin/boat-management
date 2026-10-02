@@ -4,6 +4,7 @@
  */
 
 export const controllers = {
+  Account: () => import('#controllers/account_controller'),
   AccountingSettings: () => import('#controllers/accounting_settings_controller'),
   Ai: () => import('#controllers/ai_controller'),
   Assistant: () => import('#controllers/assistant_controller'),
@@ -81,6 +82,7 @@ export const controllers = {
   NewAccount: () => import('#controllers/new_account_controller'),
   Notifications: () => import('#controllers/notifications_controller'),
   OnlinePayments: () => import('#controllers/online_payments_controller'),
+  OrganizationDeletion: () => import('#controllers/organization_deletion_controller'),
   OrganizationInvitations: () => import('#controllers/organization_invitations_controller'),
   OrganizationMembers: () => import('#controllers/organization_members_controller'),
   PasswordReset: () => import('#controllers/password_reset_controller'),

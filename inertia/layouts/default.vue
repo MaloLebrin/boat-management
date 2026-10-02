@@ -10,6 +10,7 @@ import AsideMenu from '~/components/layout/AsideMenu.vue'
 import AssistantPanel from '~/components/assistant/AssistantPanel.vue'
 import DemoSessionBanner from '~/components/layout/DemoSessionBanner.vue'
 import EmailVerificationBanner from '~/components/layout/EmailVerificationBanner.vue'
+import OrganizationDeletionBanner from '~/components/layout/OrganizationDeletionBanner.vue'
 import MobileBottomNav from '~/components/layout/MobileBottomNav.vue'
 import MobileSidebarDrawer from '~/components/layout/MobileSidebarDrawer.vue'
 import NotificationBell from '~/components/layout/NotificationBell.vue'
@@ -154,6 +155,9 @@ onBeforeUnmount(() => {
 
       <!-- Rappel de vérification d'adresse (#768) -->
       <EmailVerificationBanner />
+
+      <!-- Suppression programmée de l'organisation (#886) -->
+      <OrganizationDeletionBanner />
 
       <!-- Offline indicator -->
       <div

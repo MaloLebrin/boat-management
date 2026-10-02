@@ -57,6 +57,8 @@ const EXCLUSIONS: Record<string, string> = {
     'le paramètre est un fournisseur, pas une ressource d’une autre organisation',
   'DELETE /settings/sessions/:id':
     'session d’un utilisateur (UUID), pas un agrégat d’organisation ; la révocation de la session d’un autre compte est couverte par user_sessions.spec (#885)',
+  'DELETE /settings/me/memberships/:organizationId':
+    'ne lit que les adhésions de l’appelant ; quitter une organisation dont on n’est pas membre ne change rien (self_service_account.spec, #886)',
 }
 
 const SAFE_STATUSES = new Set([403, 404, 422])

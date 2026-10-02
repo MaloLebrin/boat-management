@@ -89,7 +89,7 @@ export default class OrganizationMemberService {
     membership.role = role
     await membership.save()
     if (!ROLE_PERMISSIONS[role].has('maintenance.edit')) {
-      await this.unassignOpenTasks(orgId, membership.userId)
+      await this.releaseOpenTasks(orgId, membership.userId)
     }
 
     // Dispatch après commit : le listener écrit des notifications.
@@ -121,7 +121,7 @@ export default class OrganizationMemberService {
     const memberName = membership.user.fullName ?? membership.user.email
 
     await membership.delete()
-    await this.unassignOpenTasks(orgId, removedUserId)
+    await this.releaseOpenTasks(orgId, removedUserId)
 
     // Dispatch après commit : le listener écrit des notifications.
     const organization = await Organization.findOrFail(orgId)
@@ -135,7 +135,7 @@ export default class OrganizationMemberService {
    * au lieu de viser un ex-membre (#868). Les tâches terminées gardent leur
    * assigné — c'est l'historique de qui a fait le travail.
    */
-  private async unassignOpenTasks(orgId: number, userId: number): Promise<void> {
+  async releaseOpenTasks(orgId: number, userId: number): Promise<void> {
     await BoatMaintenanceTask.query()
       .where('assigneeId', userId)
       .where('status', 'open')

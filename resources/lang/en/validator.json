@@ -25,7 +25,8 @@
   },
   "settings": {
     "wrongCurrentPassword": "The current password is incorrect.",
-    "aiModelWrongProvider": "This model does not belong to the active AI provider."
+    "aiModelWrongProvider": "This model does not belong to the active AI provider.",
+    "organizationNameMismatch": "The name you typed does not match the organization's name."
   },
   "maintenanceTasks": {
     "dueEngineHoursNotAboveCurrent": "Must be greater than the engine's current hours ({current} h)."
