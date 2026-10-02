@@ -315,6 +315,17 @@ export interface ApiDefinition {
         store: typeof routes['ports.mouillages.spots.store']
       }
     }
+    marinaStays: {
+      store: typeof routes['ports.marinaStays.store']
+      updateStatus: typeof routes['ports.marinaStays.updateStatus']
+      invoice: typeof routes['ports.marinaStays.invoice']
+      destroy: typeof routes['ports.marinaStays.destroy']
+    }
+    mooringContracts: {
+      store: typeof routes['ports.mooringContracts.store']
+      terminate: typeof routes['ports.mooringContracts.terminate']
+      destroy: typeof routes['ports.mooringContracts.destroy']
+    }
   }
   spots: {
     update: typeof routes['spots.update']

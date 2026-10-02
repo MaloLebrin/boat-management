@@ -6,6 +6,7 @@ import PurgePublicFormData from '#jobs/purge_public_form_data'
 import PurgeExpiredExports from '#jobs/purge_expired_exports'
 import ResetAiTokenUsage from '#jobs/reset_ai_token_usage'
 import ResetDemoData from '#jobs/reset_demo_data'
+import GenerateMooringContractInvoices from '#jobs/generate_mooring_contract_invoices'
 import MarkOverdueInvoices from '#jobs/mark_overdue_invoices'
 import SendInvoiceReminders from '#jobs/send_invoice_reminders'
 import ScanFleetNotifications from '#jobs/scan_fleet_notifications'
@@ -71,6 +72,14 @@ await ResetDemoData.schedule({})
   .cron('0 4 * * *')
   .timezone('Europe/Paris')
   .id('daily-reset-demo-data')
+  .run()
+
+// À 05:45, avant le passage en retard de 06:00 : les brouillons des contrats
+// d'amarrage échus sont prêts à l'ouverture de la capitainerie (#891).
+await GenerateMooringContractInvoices.schedule({})
+  .cron('45 5 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-generate-mooring-contract-invoices')
   .run()
 
 await MarkOverdueInvoices.schedule({})

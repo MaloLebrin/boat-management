@@ -135,6 +135,8 @@ function valueFor(name: string, pattern: string, ids: CrossOrgIds): string | nul
     unavailabilityId: ids.unavailabilityId,
     userId: ids.memberId,
     memberId: ids.memberId,
+    marinaStayId: ids.marinaStayId,
+    contractId: ids.contractId,
   }
   const id = direct[name]
   return id === undefined ? null : String(id)

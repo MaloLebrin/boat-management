@@ -92,13 +92,21 @@ test.group('Hygiene — toute route de la marina porte la garde de plan', () => 
 
     assert.isAbove(
       routes.length,
-      18,
-      `la découverte ne renvoie que ${routes.length} routes — le domaine en compte 20`
+      25,
+      `la découverte ne renvoie que ${routes.length} routes — le domaine en compte 27`
     )
 
     // Les quatre sous-familles. Un prédicat qui n'attraperait plus que les
     // ports ne pourrait pas passer pour exhaustif.
-    for (const family of ['/pontoons', '/mouillages', '/position', 'spots']) {
+    // Capitainerie (#891) : escales et contrats d'amarrage.
+    for (const family of [
+      '/pontoons',
+      '/mouillages',
+      '/position',
+      'spots',
+      '/marina-stays',
+      '/mooring-contracts',
+    ]) {
       assert.isTrue(
         routes.some((route) => route.pattern.includes(family)),
         `aucune route en « ${family} » : le prédicat de domaine a dérivé`

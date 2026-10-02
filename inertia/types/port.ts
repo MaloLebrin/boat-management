@@ -1,3 +1,5 @@
+import type { PortSpotRow } from '#shared/types/port'
+
 export type BoatOption = { id: number; name: string }
 
 export type PortListItem = {
@@ -19,12 +21,7 @@ export type SpotBoatRow = {
   name: string
 }
 
-export type SpotRow = {
-  id: number
-  name: string
-  description: string | null
-  boat: SpotBoatRow | null
-}
+export type SpotRow = PortSpotRow
 
 export type PontoonRow = {
   id: number

@@ -219,8 +219,29 @@ la nav est masquée via `effectiveQuotas.canManagePorts` ; la carte ports du das
   - dans les deux formulaires, le **pays** est un `BaseSelect` ISO 3166-1 alimenté par
     `useCountries()` (#580). Il remplace le `<BaseInput maxlength="2">` qui bridait la saisie à
     2 caractères alors que le serveur en acceptait 8.
-- `ports/show`: `inertia/pages/ports/show.vue` — GET `/ports/:id`, onglets `list | plan`,
-  suppression via `router.delete('/ports/:id')`
+- `ports/show`: `inertia/pages/ports/show.vue` — GET `/ports/:id`, onglets `list | plan | harbour`,
+  suppression via `router.delete('/ports/:id')`. Props : `port` (places avec dimensions, type,
+  statut saisi et `effectiveStatus`, tarifs, invité d'escale), `boats`, `harbour`
+  (`HarbourOfficeData`, `shared/types/marina.ts`), `clients` (`ClientOption[]`) — #891
+  - `SpotFormModal` : nom, type, statut, dimensions (L/l/TE), tarifs nuitée/mois/an, description,
+    notes ; un champ numérique vidé part en `null`
+  - `SpotsManager` : pastille de statut effectif, invité d'escale, dimensions
+  - onglet **Plan** (`MarinaMapTab`) : `MarinaPlanFilter` (« Bateau de N m » → places **libres**
+    assez longues surlignées en vert, compteur, légende des statuts en SVG — CSP) ; les places sans
+    bateau de la flotte prennent la couleur de leur statut (`SPOT_STATUS_COLORS`,
+    `inertia/composables/use_marina.ts`), infobulle `<title>` nom/statut/dimensions/occupant
+  - onglet **Capitainerie** (`components/ports/show/tabs/HarbourOfficeTab.vue`) : cinq
+    `BaseStatCard` (places occupées, taux du jour, taux du mois, arrivées, départs),
+    `harbour/HarbourTodayCard` (arrivées attendues, départs prévus), `harbour/MarinaStaysList`
+    (gestes par statut : arrivée, départ, facturer, annuler, supprimer ; lien vers la facture),
+    `harbour/MooringContractsList` (badge « à renouveler » à 30 jours, résilier, supprimer si jamais
+    facturé), modales `MarinaStayFormModal` (visiteur ou bateau de la flotte, place, dates, tarif,
+    client, services) et `MooringContractFormModal` (client, place, bateau, dates, périodicité,
+    montant suggéré depuis les tarifs de la place). Gestes via `useHarbourActions`
+    (`router.patch/post/delete`, `only: ['harbour', 'port']`). Boutons gardés par `spots.edit`,
+    `spots.delete`, `invoices.create`
+  - tests : `tests/inertia/harbour_office.spec.ts`, `spots_manager_permissions.spec.ts`,
+    `csp_style_attributes.spec.ts` (fixture `tests/inertia/helpers/spot_row.ts`)
 
 ### Budget
 

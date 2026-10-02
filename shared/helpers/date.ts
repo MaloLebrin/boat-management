@@ -39,3 +39,13 @@ export function toUtcFromLocalInput(
 ): DateTime {
   return toDateTime(value).plus({ minutes: tzOffsetMinutes ?? 0 })
 }
+
+/**
+ * `YYYY-MM-DD` d'une date de validateur (`DateTime`), de `Date` ou déjà ISO —
+ * pour les calculs en nuitées de la marina (#891), qui ne connaissent pas l'heure.
+ */
+export function toIsoDay(value: DateTime | Date | string): string {
+  if (typeof value === 'string') return value.slice(0, 10)
+  if (value instanceof Date) return DateTime.fromJSDate(value).toISODate()!
+  return value.toISODate()!
+}

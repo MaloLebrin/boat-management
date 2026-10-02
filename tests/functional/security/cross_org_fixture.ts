@@ -4,6 +4,8 @@ import type User from '#models/user'
 import Organization from '#models/organization'
 import Boat from '#models/boat'
 import Client from '#models/client'
+import MarinaStay from '#models/marina_stay'
+import MooringContract from '#models/mooring_contract'
 import BoatReservationCrewMember from '#models/boat_reservation_crew_member'
 import CrewCertification from '#models/crew_certification'
 import CrewUnavailability from '#models/crew_unavailability'
@@ -92,6 +94,8 @@ export interface CrossOrgIds {
   cartItemId: number
   crewAssignmentId: number
   unavailabilityId: number
+  marinaStayId: number
+  contractId: number
 }
 
 /**
@@ -193,6 +197,29 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
   })
     .apply('invoice')
     .create()
+  // Capitainerie (#891) : une escale visiteur et un contrat d'amarrage.
+  const marinaStay = await MarinaStay.create({
+    organizationId: orgId,
+    portId: port.id,
+    spotId: spot.id,
+    visitorName: SENTINEL,
+    arrivalOn: DateTime.fromISO('2026-07-01'),
+    departureOn: DateTime.fromISO('2026-07-04'),
+    status: 'arrived',
+    nightlyRate: 30,
+    services: [],
+  })
+  const mooringContract = await MooringContract.create({
+    organizationId: orgId,
+    portId: port.id,
+    spotId: spot.id,
+    clientId: client.id,
+    startsOn: DateTime.fromISO('2026-07-01'),
+    periodicity: 'monthly',
+    amount: 450,
+    nextInvoiceOn: DateTime.fromISO('2026-08-01'),
+    status: 'active',
+  })
   const crew = await CrewMemberFactory.merge({
     organizationId: orgId,
     lastName: SENTINEL,
@@ -298,6 +325,8 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
     pushId: push.id,
     calendarId: calendar.id,
     crewAssignmentId: crewAssignment.id,
+    marinaStayId: marinaStay.id,
+    contractId: mooringContract.id,
     unavailabilityId: unavailability.id,
     cartItemId: cartItem.id,
   }

@@ -5,6 +5,7 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BoatAssignModal from '~/components/ports/modals/BoatAssignModal.vue'
 import MarinaCanvas from '~/components/ports/show/MarinaCanvas.vue'
+import MarinaPlanFilter from '~/components/ports/show/MarinaPlanFilter.vue'
 import MarinaHelpModal from '~/components/ports/modals/MarinaHelpModal.vue'
 import MouillageFormModal from '~/components/ports/modals/MouillageFormModal.vue'
 import PontoonFormModal from '~/components/ports/modals/PontoonFormModal.vue'
@@ -13,6 +14,7 @@ import {
   type LocalPontoon,
   type LocalMouillage,
 } from '~/composables/use_marina_interactions'
+import { useMarina } from '~/composables/use_marina'
 import { useT } from '~/composables/use_t'
 import type { BoatOption, PortShowDetail } from '~/types/port'
 
@@ -29,6 +31,13 @@ const localMouillages = ref<LocalMouillage[]>([])
 const showPontoonForm = ref(false)
 const showMouillageForm = ref(false)
 const showHelp = ref(false)
+
+// Filtre « bateau de N m » (#891) : surligne les places libres assez longues.
+const { matchingSpotIds } = useMarina()
+const boatLength = ref('')
+const matches = computed(() =>
+  matchingSpotIds(props.port, boatLength.value === '' ? null : Number(boatLength.value))
+)
 
 const portId = computed(() => props.port.id)
 const {
@@ -154,6 +163,8 @@ watch(
 
     <p class="text-sm text-fg-muted">{{ t('ports.plan.hint') }}</p>
 
+    <MarinaPlanFilter v-model="boatLength" :match-count="matches.size" />
+
     <!-- Empty state -->
     <BaseCard v-if="localPontoons.length === 0 && localMouillages.length === 0" padded>
       <p class="text-center text-sm text-fg-muted py-8">{{ t('ports.plan.empty') }}</p>
@@ -166,6 +177,7 @@ watch(
         :mouillages="localMouillages"
         :edit-mode="editMode"
         :selected-boat-id="null"
+        :matching-spot-ids="matches"
         @pontoon-drag-end="handlePontoonDragEnd"
         @mouillage-drag-end="handleMouillageDragEnd"
         @spot-click="handleSpotClick"

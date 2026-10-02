@@ -1,5 +1,7 @@
 import PortService from '#services/port_service'
 import BoatListService from '#services/boat_list_service'
+import ClientService from '#services/client_service'
+import HarbourOfficeService from '#services/harbour_office_service'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import PortPolicy from '#policies/port_policy'
 import { createPortValidator, updatePortValidator } from '#validators/port'
@@ -10,7 +12,9 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class PortsController {
   constructor(
     private portService: PortService,
-    private boatListService: BoatListService
+    private boatListService: BoatListService,
+    private harbourOfficeService: HarbourOfficeService,
+    private clientService: ClientService
   ) {}
 
   async index({ inertia, auth, bouncer }: HttpContext) {
@@ -52,11 +56,14 @@ export default class PortsController {
       const port = await this.portService.getForUserOrFail(user, Number(params.id))
       await bouncer.with(PortPolicy).authorize('view', port)
 
-      const [portWithRelations, boats] = await Promise.all([
+      const [portWithRelations, boats, harbour, clients] = await Promise.all([
         this.portService.getWithPontoonsAndMouillagesOrFail(user, Number(params.id)),
         this.boatListService.listNamesForOrg(user),
+        // Capitainerie (#891) : escales, contrats, occupation.
+        this.harbourOfficeService.forPort(port),
+        this.clientService.listOptions(port.organizationId),
       ])
-      return inertia.render('ports/show', { port: portWithRelations, boats })
+      return inertia.render('ports/show', { port: portWithRelations, boats, harbour, clients })
     } catch (error) {
       if (error instanceof PortNotFoundError) return response.redirect('/ports')
       throw error

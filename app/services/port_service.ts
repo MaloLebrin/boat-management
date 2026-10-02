@@ -1,4 +1,5 @@
 import Boat from '#models/boat'
+import MarinaStay from '#models/marina_stay'
 import Mouillage from '#models/mouillage'
 import Organization from '#models/organization'
 import Pontoon from '#models/pontoon'
@@ -6,6 +7,8 @@ import Port from '#models/port'
 import Spot from '#models/spot'
 import type User from '#models/user'
 import { canManagePortsFor } from '#shared/helpers/plan'
+import { spotEffectiveStatus } from '#shared/helpers/marina'
+import type { PortSpotRow } from '#shared/types/port'
 import db from '@adonisjs/lucid/services/db'
 import { PortHasBoatsError, PortNotFoundError } from '#exceptions/port_errors'
 import { UserNotInOrganizationError } from '#exceptions/organization_errors'
@@ -240,6 +243,43 @@ export default class PortService {
       }
     }
 
+    // Escales en cours (#891) : un visiteur arrivé occupe la place aussi
+    // sûrement qu'un bateau de la flotte.
+    const arrivedStays =
+      spotIds.length > 0
+        ? await MarinaStay.query()
+            .whereIn('spotId', spotIds)
+            .where('status', 'arrived')
+            .preload('boat', (q) => q.select('id', 'name'))
+            .select('id', 'spotId', 'boatId', 'visitorName')
+        : []
+    const guestBySpot: Record<number, string | undefined> = {}
+    for (const stay of arrivedStays) {
+      guestBySpot[stay.spotId] = stay.boat?.name ?? stay.visitorName ?? ''
+    }
+
+    const toSpotRow = (s: Spot): PortSpotRow => {
+      const boat = boatBySpot[s.id] ?? null
+      const stayGuestName = guestBySpot[s.id] ?? null
+      return {
+        id: s.id,
+        name: s.name,
+        description: s.description,
+        boat,
+        lengthM: s.lengthM,
+        beamM: s.beamM,
+        draftM: s.draftM,
+        kind: s.kind,
+        status: s.status,
+        effectiveStatus: spotEffectiveStatus(s.status, boat !== null || stayGuestName !== null),
+        dailyRate: s.dailyRate,
+        monthlyRate: s.monthlyRate,
+        annualRate: s.annualRate,
+        notes: s.notes,
+        stayGuestName,
+      }
+    }
+
     return {
       id: port.id,
       name: port.name,
@@ -253,14 +293,7 @@ export default class PortService {
         description: pt.description,
         positionX: pt.positionX,
         positionY: pt.positionY,
-        spots: allSpots
-          .filter((s) => s.pontoonId === pt.id)
-          .map((s) => ({
-            id: s.id,
-            name: s.name,
-            description: s.description,
-            boat: boatBySpot[s.id] ?? null,
-          })),
+        spots: allSpots.filter((s) => s.pontoonId === pt.id).map(toSpotRow),
       })),
       mouillages: port.mouillages.map((m) => ({
         id: m.id,
@@ -268,14 +301,7 @@ export default class PortService {
         description: m.description,
         positionX: m.positionX,
         positionY: m.positionY,
-        spots: allSpots
-          .filter((s) => s.mouillageId === m.id)
-          .map((s) => ({
-            id: s.id,
-            name: s.name,
-            description: s.description,
-            boat: boatBySpot[s.id] ?? null,
-          })),
+        spots: allSpots.filter((s) => s.mouillageId === m.id).map(toSpotRow),
       })),
     }
   }

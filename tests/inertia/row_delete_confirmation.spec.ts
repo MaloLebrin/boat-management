@@ -37,6 +37,7 @@ vi.mock('~/composables/use_date_format', () => ({
 import PricingSeasonsIndex from '../../inertia/pages/pricing/seasons/index.vue'
 import InvoicesIndex from '../../inertia/pages/invoices/index.vue'
 import SpotsManager from '../../inertia/components/ports/show/SpotsManager.vue'
+import { makeSpotRow } from './helpers/spot_row'
 
 /** La modale de confirmation du doublon `BaseConfirmModal`. */
 function modal(wrapper: { find: (s: string) => { exists: () => boolean } }) {
@@ -197,7 +198,7 @@ describe('pages/invoices — confirmation dans l’app', () => {
 })
 
 describe('SpotsManager — suppression sans options de visite', () => {
-  const spot = { id: 5, name: 'A1', positionX: null, positionY: null, boat: null } as SpotRow
+  const spot = makeSpotRow({ id: 5 })
 
   function mountManager() {
     return mountWithStubs(SpotsManager, {

@@ -16,6 +16,7 @@ const props = defineProps<{
   mouillages: MouillageWithPos[]
   editMode: boolean
   selectedBoatId: number | null
+  matchingSpotIds?: Set<number>
 }>()
 
 const emit = defineEmits<{
@@ -139,6 +140,7 @@ function handleSpotClick(info: { spotId: number; boat: { id: number; name: strin
       :y="currentPos('mouillage', m).y"
       :edit-mode="editMode"
       :selected-boat-id="selectedBoatId"
+      :matching-spot-ids="matchingSpotIds"
       @pointerdown="
         (e: PointerEvent) =>
           startMouillageDrag(e, {
@@ -160,6 +162,7 @@ function handleSpotClick(info: { spotId: number; boat: { id: number; name: strin
       :y="currentPos('pontoon', pt).y"
       :edit-mode="editMode"
       :selected-boat-id="selectedBoatId"
+      :matching-spot-ids="matchingSpotIds"
       @pointerdown="
         (e: PointerEvent) =>
           startPontoonDrag(e, {

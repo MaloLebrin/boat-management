@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
 import type { MouillageRow, PontoonRow, SpotRow } from '../../inertia/types/port'
+import { makeSpotRow } from './helpers/spot_row'
 import type {
   DashboardAttentionCounts,
   DashboardFleetStatus,
@@ -263,8 +264,8 @@ describe('AboutTimelineSection — pastilles en classes de palette', () => {
 
 describe('Marina — curseurs en classes', () => {
   const spots: SpotRow[] = [
-    { id: 1, name: 'A1', description: null, boat: null },
-    { id: 2, name: 'A2', description: null, boat: { id: 9, name: 'Albatros' } },
+    makeSpotRow({ id: 1, name: 'A1' }),
+    makeSpotRow({ id: 2, name: 'A2', boat: { id: 9, name: 'Albatros' } }),
   ]
   const pontoon: PontoonRow = {
     id: 1,

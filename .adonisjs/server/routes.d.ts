@@ -189,6 +189,13 @@ export type ScannedRoutes = {
     'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'spots.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ports.marinaStays.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
+    'ports.marinaStays.updateStatus': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'marinaStayId': ParamValue} }
+    'ports.marinaStays.invoice': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'marinaStayId': ParamValue} }
+    'ports.marinaStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'marinaStayId': ParamValue} }
+    'ports.mooringContracts.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
+    'ports.mooringContracts.terminate': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'contractId': ParamValue} }
+    'ports.mooringContracts.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'contractId': ParamValue} }
     'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'planning.index': { paramsTuple?: []; params?: {} }
     'maintenance.history': { paramsTuple?: []; params?: {} }
@@ -799,6 +806,9 @@ export type ScannedRoutes = {
     'ports.mouillages.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
     'ports.pontoons.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.spots.store': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'ports.marinaStays.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
+    'ports.marinaStays.invoice': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'marinaStayId': ParamValue} }
+    'ports.mooringContracts.store': { paramsTuple: [ParamValue]; params: {'portId': ParamValue} }
     'organization.members.store': { paramsTuple?: []; params?: {} }
     'organization.invitations.store': { paramsTuple?: []; params?: {} }
     'invitations.accept': { paramsTuple?: []; params?: {} }
@@ -957,6 +967,8 @@ export type ScannedRoutes = {
     'ports.pontoons.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
     'spots.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'ports.marinaStays.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'marinaStayId': ParamValue} }
+    'ports.mooringContracts.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'contractId': ParamValue} }
     'diagnostic.reset': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'organization.members.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'organization.invitations.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -1006,6 +1018,8 @@ export type ScannedRoutes = {
     'boats.calendarFeed.update': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'ports.pontoons.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'pontoonId': ParamValue} }
     'ports.mouillages.updatePosition': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'mouillageId': ParamValue} }
+    'ports.marinaStays.updateStatus': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'marinaStayId': ParamValue} }
+    'ports.mooringContracts.terminate': { paramsTuple: [ParamValue,ParamValue]; params: {'portId': ParamValue,'contractId': ParamValue} }
     'boats.assign': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'diagnostic.steps.toggle': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'engineId': ParamValue} }
     'notifications.markAllAsRead': { paramsTuple?: []; params?: {} }

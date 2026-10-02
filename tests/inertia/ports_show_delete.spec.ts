@@ -2,6 +2,7 @@ import { beforeEach, expect, test, vi } from 'vitest'
 import type { MouillageRow, PontoonRow, PortShowDetail, SpotRow } from '../../inertia/types/port'
 import PortsShow from '../../inertia/pages/ports/show.vue'
 import { mountWithStubs, routerSpies } from './helpers/mount'
+import { makeSpotRow } from './helpers/spot_row'
 
 vi.mock('@inertiajs/vue3', async () => {
   const { inertiaMock } = await import('./helpers/inertia_mock')
@@ -80,7 +81,7 @@ function makeMouillage(spots: SpotRow[]): MouillageRow {
 }
 
 function makeSpot(name: string, boat: SpotRow['boat'] = null): SpotRow {
-  return { id: name.charCodeAt(0) + name.length, name, description: null, boat }
+  return makeSpotRow({ id: name.charCodeAt(0) + name.length, name, boat })
 }
 
 test('a port with a boat moored on a pontoon spot shows an alert instead of the confirmation modal', async () => {

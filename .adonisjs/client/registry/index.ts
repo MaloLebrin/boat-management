@@ -1116,6 +1116,48 @@ const routes = {
     tokens: [{"old":"/spots/:id","type":0,"val":"spots","end":""},{"old":"/spots/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['spots.destroy']['types'],
   },
+  'ports.marinaStays.store': {
+    methods: ["POST"],
+    pattern: '/ports/:portId/marina-stays',
+    tokens: [{"old":"/ports/:portId/marina-stays","type":0,"val":"ports","end":""},{"old":"/ports/:portId/marina-stays","type":1,"val":"portId","end":""},{"old":"/ports/:portId/marina-stays","type":0,"val":"marina-stays","end":""}],
+    types: placeholder as Registry['ports.marinaStays.store']['types'],
+  },
+  'ports.marinaStays.updateStatus': {
+    methods: ["PATCH"],
+    pattern: '/ports/:portId/marina-stays/:marinaStayId/status',
+    tokens: [{"old":"/ports/:portId/marina-stays/:marinaStayId/status","type":0,"val":"ports","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId/status","type":1,"val":"portId","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId/status","type":0,"val":"marina-stays","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId/status","type":1,"val":"marinaStayId","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId/status","type":0,"val":"status","end":""}],
+    types: placeholder as Registry['ports.marinaStays.updateStatus']['types'],
+  },
+  'ports.marinaStays.invoice': {
+    methods: ["POST"],
+    pattern: '/ports/:portId/marina-stays/:marinaStayId/invoice',
+    tokens: [{"old":"/ports/:portId/marina-stays/:marinaStayId/invoice","type":0,"val":"ports","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId/invoice","type":1,"val":"portId","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId/invoice","type":0,"val":"marina-stays","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId/invoice","type":1,"val":"marinaStayId","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId/invoice","type":0,"val":"invoice","end":""}],
+    types: placeholder as Registry['ports.marinaStays.invoice']['types'],
+  },
+  'ports.marinaStays.destroy': {
+    methods: ["DELETE"],
+    pattern: '/ports/:portId/marina-stays/:marinaStayId',
+    tokens: [{"old":"/ports/:portId/marina-stays/:marinaStayId","type":0,"val":"ports","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId","type":1,"val":"portId","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId","type":0,"val":"marina-stays","end":""},{"old":"/ports/:portId/marina-stays/:marinaStayId","type":1,"val":"marinaStayId","end":""}],
+    types: placeholder as Registry['ports.marinaStays.destroy']['types'],
+  },
+  'ports.mooringContracts.store': {
+    methods: ["POST"],
+    pattern: '/ports/:portId/mooring-contracts',
+    tokens: [{"old":"/ports/:portId/mooring-contracts","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mooring-contracts","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mooring-contracts","type":0,"val":"mooring-contracts","end":""}],
+    types: placeholder as Registry['ports.mooringContracts.store']['types'],
+  },
+  'ports.mooringContracts.terminate': {
+    methods: ["PATCH"],
+    pattern: '/ports/:portId/mooring-contracts/:contractId/terminate',
+    tokens: [{"old":"/ports/:portId/mooring-contracts/:contractId/terminate","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mooring-contracts/:contractId/terminate","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mooring-contracts/:contractId/terminate","type":0,"val":"mooring-contracts","end":""},{"old":"/ports/:portId/mooring-contracts/:contractId/terminate","type":1,"val":"contractId","end":""},{"old":"/ports/:portId/mooring-contracts/:contractId/terminate","type":0,"val":"terminate","end":""}],
+    types: placeholder as Registry['ports.mooringContracts.terminate']['types'],
+  },
+  'ports.mooringContracts.destroy': {
+    methods: ["DELETE"],
+    pattern: '/ports/:portId/mooring-contracts/:contractId',
+    tokens: [{"old":"/ports/:portId/mooring-contracts/:contractId","type":0,"val":"ports","end":""},{"old":"/ports/:portId/mooring-contracts/:contractId","type":1,"val":"portId","end":""},{"old":"/ports/:portId/mooring-contracts/:contractId","type":0,"val":"mooring-contracts","end":""},{"old":"/ports/:portId/mooring-contracts/:contractId","type":1,"val":"contractId","end":""}],
+    types: placeholder as Registry['ports.mooringContracts.destroy']['types'],
+  },
   'boats.assign': {
     methods: ["PATCH"],
     pattern: '/boats/:id/assignment',

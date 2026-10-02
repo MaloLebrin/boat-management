@@ -1,4 +1,4 @@
-# Domaine — Ports et cartographie marina (#604, #695)
+# Domaine — Ports et cartographie marina (#604, #695, #891)
 
 ## Objectif fonctionnel
 
@@ -39,7 +39,7 @@ comparent directement.
 
 ## Deux gardes en amont, pas une
 
-Les **20 routes** du groupe de `start/routes/ports.ts` passent par
+Les **27 routes** du groupe de `start/routes/ports.ts` passent par
 `middleware.auth()` puis `middleware.requirePortsPlan()`, qui refuse deux fois :
 
 | Cas                                                          | Redirection                                             |
@@ -147,6 +147,87 @@ Supprimer un ponton ou un mouillage **cascade** sur ses places
 filet que plus aucun chemin applicatif n'atteint, puisque chaque étage refuse
 avant d'écrire.
 
+## Exploitation : places, escales, contrats (#891)
+
+Le plan ne suffisait pas à une capitainerie : une place n'était qu'un nom. Elle porte désormais ses
+dimensions maximales (`lengthM`, `beamM`, `draftM`), un type (`annual`, `seasonal`, `visitor`,
+`technical`), un **statut saisi** (`available`, `reserved`, `out_of_service`) et trois tarifs
+(nuitée, mois, an). « Occupée » n'est **pas** un statut saisi : `spotEffectiveStatus` le déduit d'un
+bateau amarré (`boats.spot_id`) ou d'une escale `arrived` — hors service prime sur tout.
+
+### Escales (`marina_stays`)
+
+Une escale pose sur une place un bateau de la flotte (`boatId`) **ou** un visiteur décrit en ligne
+(nom, longueur, immatriculation, contact). Un visiteur n'entre ni dans la flotte ni dans le quota de
+bateaux du plan.
+
+| Règle                                                               | Comportement                                                                     |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| place hors service                                                  | refusé — `SpotOutOfServiceError`                                                 |
+| autre escale `expected`/`arrived` qui chevauche `[arrivée, départ)` | refusé — `MarinaStayOverlapError` nommant l'invité ; le jour du départ est libre |
+| ni bateau ni nom de visiteur                                        | refusé — `MarinaStayGuestRequiredError`                                          |
+| bateau plus long que la place                                       | **accepté**, avertissement dans le flash de succès                               |
+| place attribuée à un bateau de la flotte                            | **accepté**, avertissement (le titulaire peut être en mer)                       |
+| tarif nuitée absent                                                 | `spots.dailyRate`, sinon 0 — figé sur l'escale                                   |
+
+Statuts : `expected` → `arrived` → `departed`, ou `expected` → `cancelled`
+(`MARINA_STAY_TRANSITIONS`). `invoiced` n'est posé que par `POST …/invoice`, autorisé depuis
+`arrived` ou `departed` : un brouillon de facture (`InvoiceService.create`, dans la transaction de
+l'escale, ligne verrouillée) avec une ligne « place × nuitées » puis une ligne par service, TVA
+pré-remplie à 20 %. L'escale passe `invoiced` avec `invoiceId` dans la même transaction : une double
+soumission ne crée pas deux factures. Une escale facturée ne se supprime plus.
+
+### Contrats d'amarrage (`mooring_contracts`)
+
+Un client (obligatoire, de l'organisation), une place, un bateau facultatif, une période
+(`endsOn` **inclus**, facultatif), une périodicité (`monthly`, `quarterly`, `annual`) et un montant
+HT par échéance. Un seul contrat `active` par place. `nextInvoiceOn` démarre à `startsOn`.
+
+Le job `GenerateMooringContractInvoices` (cron **05:45** Europe/Paris, avant le passage en retard de
+06:00) émet un brouillon par échéance arrivée, chacune dans sa transaction verrouillée — rattrapage
+borné à 24 périodes, idempotent le même jour. Les échéances sont recalculées **depuis l'ancrage**
+(`addPeriods`) : un contrat du 31 janvier facture le 28 février puis le 31 mars, sans dériver au 28.
+La dernière période s'arrête sur `endsOn` et se facture en entier (pas de prorata : le brouillon se
+corrige). Résilier pose `terminated` et vide `nextInvoiceOn` ; un contrat qui a déjà émis une
+facture (`lastInvoiceId`) se résilie mais ne se supprime pas. Un contrat se termine dans les
+30 jours : badge « à renouveler » (pas de rappel e-mail dans cette version).
+
+### Capitainerie et occupation
+
+L'onglet **Capitainerie** de la fiche port (`HarbourOfficeService.forPort`) sert escales
+(actives + départs des 60 derniers jours), contrats, arrivées attendues aujourd'hui, départs dus
+(escales `arrived` dont le départ est aujourd'hui ou passé) et deux taux :
+
+- **jour** : places occupées (bateau amarré ou escale `arrived`) / places du port ;
+- **mois** : place-nuits occupées / (places × nuits du mois). Comptent les escales arrivées,
+  parties ou facturées, les contrats actifs, et — pour une place sans ni l'un ni l'autre — un bateau
+  amarré sur les nuits écoulées du mois. Une place-nuit couverte deux fois ne compte qu'une fois.
+
+### Supprimer une place réservée
+
+`SpotService.delete` refuse aussi une place tenue par une escale `expected`/`arrived` ou un contrat
+`active` (`SpotHasActiveBookingError`, flash `flash.spots.hasActiveBooking`) : la cascade effacerait
+la réservation sans prévenir. L'historique (escales closes, contrats résiliés) suit la place.
+
+### Routes et autorisations
+
+| Route                                                          | Policy                                     |
+| -------------------------------------------------------------- | ------------------------------------------ |
+| `POST /ports/:portId/marina-stays`                             | `SpotPolicy.edit` (la place)               |
+| `PATCH /ports/:portId/marina-stays/:marinaStayId/status`       | `SpotPolicy.edit`                          |
+| `POST /ports/:portId/marina-stays/:marinaStayId/invoice`       | `SpotPolicy.edit` + `InvoicePolicy.create` |
+| `DELETE /ports/:portId/marina-stays/:marinaStayId`             | `SpotPolicy.delete`                        |
+| `POST /ports/:portId/mooring-contracts`                        | `SpotPolicy.edit`                          |
+| `PATCH /ports/:portId/mooring-contracts/:contractId/terminate` | `SpotPolicy.edit`                          |
+| `DELETE /ports/:portId/mooring-contracts/:contractId`          | `SpotPolicy.delete`                        |
+
+Un `member` pose, fait avancer et facture les escales, crée et résilie les contrats ; seul l'admin
+supprime. Chaque route passe d'abord par le port de l'URL (`PortService.getForUserOrFail`), puis
+par l'escale ou le contrat **de ce port** : une escale d'un autre port, même de l'organisation, est
+introuvable (`flash.marina.stayNotFound`). Toutes vivent dans le groupe gardé de
+`start/routes/ports.ts` (plan Entreprise, profil professionnel), et
+`cross_org_routes.spec.ts` les sonde avec les ids d'une autre organisation.
+
 ## `boat_position_history` : une table, deux natures (#722)
 
 La table porte deux choses, désormais distinguées par la colonne `kind` :
@@ -191,20 +272,26 @@ rend `302` et laisse la position inchangée (`null` si le ponton n'avait jamais
 
 ## Où c'est testé
 
-| Fichier                                                 | Ce qu'il prouve                                                      |
-| ------------------------------------------------------- | -------------------------------------------------------------------- |
-| `tests/unit/hygiene/ports_routes_gated.spec.ts`         | les 20 routes portent `auth` + `requirePortsPlan`                    |
-| `tests/functional/ports/ports_plan_gating.spec.ts`      | le refus de plan, Starter et Pro                                     |
-| `tests/functional/ports/ports_profile_gating.spec.ts`   | le refus de profil `private` (#604)                                  |
-| `tests/functional/ports/spots.spec.ts`                  | les 4 routes de place, hiérarchie et isolation                       |
-| `tests/functional/ports/spot_deletion_frontier.spec.ts` | le refus aux deux étages (#720)                                      |
-| `tests/functional/ports/marina_role_frontier.spec.ts`   | member, mechanic, boat_owner (#719, #723)                            |
-| `tests/inertia/spots_manager_permissions.spec.ts`       | les boutons de place gardés par capacité (#719)                      |
-| `tests/functional/ports/layout_positions.spec.ts`       | isolation et bornes du glisser-déposer                               |
-| `tests/functional/boats/boats_assign.spec.ts`           | l'éviction et le scoping de `spot_id`                                |
-| `tests/functional/boats/boat_berth_history.spec.ts`     | séjours à quai, leur nature, garde marina de l'amarrage (#721, #722) |
-| `tests/functional/ports/ports_pages_contract.spec.ts`   | les 4 pages Inertia (#689)                                           |
-| `tests/browser/marina_canvas.spec.ts`                   | **le geste** : drag, mode édition, affectation                       |
+| Fichier                                                             | Ce qu'il prouve                                                      |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `tests/unit/hygiene/ports_routes_gated.spec.ts`                     | les 27 routes portent `auth` + `requirePortsPlan`                    |
+| `tests/functional/ports/ports_plan_gating.spec.ts`                  | le refus de plan, Starter et Pro                                     |
+| `tests/functional/ports/ports_profile_gating.spec.ts`               | le refus de profil `private` (#604)                                  |
+| `tests/functional/ports/spots.spec.ts`                              | les 4 routes de place, hiérarchie et isolation                       |
+| `tests/functional/ports/spot_deletion_frontier.spec.ts`             | le refus aux deux étages (#720)                                      |
+| `tests/functional/ports/marina_role_frontier.spec.ts`               | member, mechanic, boat_owner (#719, #723)                            |
+| `tests/inertia/spots_manager_permissions.spec.ts`                   | les boutons de place gardés par capacité (#719)                      |
+| `tests/functional/ports/layout_positions.spec.ts`                   | isolation et bornes du glisser-déposer                               |
+| `tests/functional/boats/boats_assign.spec.ts`                       | l'éviction et le scoping de `spot_id`                                |
+| `tests/functional/boats/boat_berth_history.spec.ts`                 | séjours à quai, leur nature, garde marina de l'amarrage (#721, #722) |
+| `tests/functional/ports/ports_pages_contract.spec.ts`               | les 4 pages Inertia (#689)                                           |
+| `tests/browser/marina_canvas.spec.ts`                               | **le geste** : drag, mode édition, affectation                       |
+| `tests/functional/ports/marina_stays.spec.ts`                       | escales : chevauchement, hors service, facture, cycle, rôles (#891)  |
+| `tests/functional/ports/mooring_contracts.spec.ts`                  | contrats : un actif par place, résiliation, suppression gardée       |
+| `tests/integration/jobs/generate_mooring_contract_invoices.spec.ts` | rattrapage, idempotence, fin de contrat                              |
+| `tests/integration/services/harbour_office_service.spec.ts`         | taux du jour et du mois                                              |
+| `tests/unit/helpers/marina.spec.ts`                                 | nuitées, occupation, échéances ancrées                               |
+| `tests/inertia/harbour_office.spec.ts`                              | gestes par statut et rôle, filtre de longueur, capitainerie          |
 
 ### Le geste, et non plus seulement la route (#700)
 
