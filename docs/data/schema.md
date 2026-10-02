@@ -347,7 +347,7 @@ plomberie).
 - portail propriétaire (#890) :
   - `requestedByOwnerId` (FK `users` nullable, SET NULL) — la tâche est née d'une demande du propriétaire ; index `(boat_id, requested_by_owner_id)`
   - `ownerApprovalStatus` (string 20, nullable) : `pending | approved | rejected` — accord du propriétaire sur un coût prévu ≥ 500 €
-  - `ownerApprovalDecidedAt` (timestamptz, nullable), `ownerApprovalDecidedBy` (FK `users` nullable, SET NULL)
+  - `ownerApprovalDecidedAt` (timestamptz, nullable), `ownerApprovalDecidedBy` (FK `users` nullable, SET NULL, indexée)
 - complétion:
   - `doneAt`
 - index `(boat_id, status)` (`boat_maintenance_tasks_boat_status_idx`, #832) — comptage exact des tâches urgentes et « tâches réalisées 30 j » du tableau de bord

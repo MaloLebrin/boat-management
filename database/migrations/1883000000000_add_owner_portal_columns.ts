@@ -25,11 +25,13 @@ export default class extends BaseSchema {
       table.integer('owner_approval_decided_by').unsigned().nullable()
       table.foreign('owner_approval_decided_by').references('users.id').onDelete('SET NULL')
       table.index(['boat_id', 'requested_by_owner_id'])
+      table.index(['owner_approval_decided_by'])
     })
   }
 
   async down() {
     this.schema.alterTable('boat_maintenance_tasks', (table) => {
+      table.dropIndex(['owner_approval_decided_by'])
       table.dropIndex(['boat_id', 'requested_by_owner_id'])
       table.dropForeign(['owner_approval_decided_by'])
       table.dropForeign(['requested_by_owner_id'])
