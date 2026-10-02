@@ -576,7 +576,14 @@
       "auth_2fa_failed": "Code de double authentification refusé",
       "organization_2fa_required": "Politique de double authentification modifiée",
       "auth_session_revoked": "Session déconnectée à distance",
-      "auth_logout_all": "Déconnexion de toutes les autres sessions"
+      "auth_logout_all": "Déconnexion de toutes les autres sessions",
+      "account_export": "Export de ses données personnelles",
+      "account_delete_requested": "Suppression du compte demandée",
+      "account_delete_cancelled": "Suppression du compte annulée",
+      "account_purged": "Compte anonymisé",
+      "member_left": "Départ de l'organisation",
+      "organization_delete_requested": "Suppression de l'organisation demandée",
+      "organization_delete_cancelled": "Suppression de l'organisation annulée"
     },
     "empty": {
       "title": "Aucune activité",
@@ -656,5 +663,63 @@
     "orphanRemembered": "{count, plural, one {# connexion mémorisée antérieure n'est rattachée à aucune session listée.} other {# connexions mémorisées antérieures ne sont rattachées à aucune session listée.}}",
     "revokeOrphans": "Les révoquer",
     "notifyNewLogin": "M'avertir par e-mail d'une connexion depuis un nouvel appareil"
+  },
+  "danger": {
+    "export": {
+      "title": "Exporter mes données",
+      "subtitle": "Téléchargez les données rattachées à votre compte, dans un format lisible par une machine.",
+      "hint": "Profil, préférences, organisations, sessions, notifications, journal d'audit et saisies dont vous êtes l'auteur. Les données de l'organisation se téléchargent depuis ses exports.",
+      "action": "Télécharger (JSON)"
+    },
+    "memberships": {
+      "title": "Mes organisations",
+      "subtitle": "Les organisations auxquelles votre compte a accès.",
+      "current": "Organisation active",
+      "leave": "Quitter",
+      "leaveFor": "Quitter {name}",
+      "leaveTitle": "Quitter {name} ?",
+      "leaveConfirm": "Vous perdrez l'accès à cette organisation. Vos saisies y restent, et les tâches ouvertes qui vous étaient confiées redeviennent non assignées.",
+      "blocked": {
+        "last_admin": "Vous êtes le dernier admin : nommez un autre admin ou supprimez l'organisation.",
+        "only_organization": "Seule organisation de votre compte : supprimez plutôt votre compte."
+      }
+    },
+    "deleteAccount": {
+      "title": "Supprimer mon compte",
+      "subtitle": "Tous vos accès sont coupés immédiatement. Vous disposez de {days} jours pour changer d'avis : il suffit de vous reconnecter. Passé ce délai, votre compte est anonymisé définitivement.",
+      "blocked": "Vous êtes le dernier admin de : {organizations}. Nommez un autre admin ou supprimez l'organisation avant de supprimer votre compte.",
+      "passwordLabel": "Mot de passe",
+      "confirmLabel": "Je comprends que mon compte sera anonymisé définitivement dans {days} jours si je ne me reconnecte pas.",
+      "action": "Supprimer mon compte"
+    },
+    "deleteOrganization": {
+      "title": "Supprimer l'organisation",
+      "subtitle": "L'abonnement prend fin à son échéance et l'organisation reste récupérable pendant {days} jours. Ensuite, ses bateaux, documents, clients, factures et fichiers sont supprimés définitivement.",
+      "exportHint": "Pensez à télécharger vos exports (flotte, comptabilité) avant de confirmer.",
+      "nameLabel": "Saisissez « {name} » pour confirmer",
+      "passwordLabel": "Mot de passe",
+      "action": "Supprimer l'organisation",
+      "scheduled": "Cette organisation sera supprimée définitivement le {date}.",
+      "restore": "Annuler la suppression"
+    },
+    "banner": {
+      "text": "Cette organisation sera supprimée définitivement le {date}.",
+      "action": "Annuler la suppression"
+    },
+    "emails": {
+      "greeting": "Bonjour {name},",
+      "account": {
+        "subject": "Suppression de votre compte FleetAi programmée",
+        "body": "Votre demande de suppression de compte a bien été enregistrée. Tous vos accès ont été coupés, et votre compte sera anonymisé définitivement le {date}.",
+        "undo": "Vous avez changé d'avis ? Reconnectez-vous avant cette date : la suppression sera annulée.",
+        "cta": "Me reconnecter"
+      },
+      "organization": {
+        "subject": "Suppression de l'organisation {organization} programmée",
+        "body": "Un admin a demandé la suppression de l'organisation {organization} sur FleetAi. Ses données seront supprimées définitivement le {date}. Si FleetAi n'a pas d'autre organisation pour vous, votre compte sera fermé à la même date.",
+        "undo": "Jusqu'à cette date, un admin peut annuler la suppression depuis les réglages de l'organisation.",
+        "cta": "Ouvrir les réglages de l'organisation"
+      }
+    }
   }
 }

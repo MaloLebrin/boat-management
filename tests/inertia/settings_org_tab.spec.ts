@@ -42,6 +42,7 @@ function mountAs(role: OrgRole) {
     props: {
       organization: { id: 1, name: 'Marina du Ponant' },
       twoFactorPolicy: { requireTwoFactor: false, graceEndsAt: null, membersWithoutTwoFactor: 2 },
+      deletion: { scheduledFor: null, graceDays: 30 },
     } as Record<string, unknown>,
     pageProps: { permissions: { role, capabilities: [...ROLE_PERMISSIONS[role]] } },
   })

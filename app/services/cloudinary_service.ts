@@ -29,6 +29,9 @@ export interface CloudinaryUploadResult {
 }
 
 export const CloudinaryFolders = {
+  /** Racine d'une organisation : purge à sa suppression (#886). */
+  organization: (orgSlug: string) => `${envPrefix()}/organizations/${orgSlug}`,
+
   boat: (orgSlug: string, boatId: number) =>
     `${envPrefix()}/organizations/${orgSlug}/boats/${boatId}`,
 

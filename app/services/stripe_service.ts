@@ -71,6 +71,20 @@ export default class StripeService {
   }
 
   /**
+   * Programme (ou déprogramme) la fin d'un abonnement à l'échéance (#886) :
+   * posé à la demande de suppression d'une organisation, levé si elle est
+   * annulée pendant la période de grâce. Le webhook synchronise la base.
+   */
+  async setCancelAtPeriodEnd(subscriptionId: string, cancel: boolean): Promise<void> {
+    await this.stripe.subscriptions.update(subscriptionId, { cancel_at_period_end: cancel })
+  }
+
+  /** Résiliation immédiate (#886) : purge définitive d'une organisation. */
+  async cancelSubscriptionNow(subscriptionId: string): Promise<void> {
+    await this.stripe.subscriptions.cancel(subscriptionId)
+  }
+
+  /**
    * Ajoute un item (module add-on) à un abonnement existant (#327). Stripe
    * proratise par défaut ; le webhook `customer.subscription.updated` déclenche
    * ensuite la réconciliation en base.

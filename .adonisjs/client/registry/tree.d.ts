@@ -552,7 +552,14 @@ export interface ApiDefinition {
       notifications: typeof routes['settings.sessions.notifications']
       destroy: typeof routes['settings.sessions.destroy']
     }
+    account: {
+      export: typeof routes['settings.account.export']
+      leave: typeof routes['settings.account.leave']
+      destroy: typeof routes['settings.account.destroy']
+    }
     org: typeof routes['settings.org'] & {
+      destroy: typeof routes['settings.org.destroy']
+      restore: typeof routes['settings.org.restore']
       twoFactor: typeof routes['settings.org.two_factor']
       update: typeof routes['settings.org.update']
     }

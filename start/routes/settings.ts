@@ -16,6 +16,8 @@ const AccountingSettingsController = () => import('#controllers/accounting_setti
 const DataExportsController = () => import('#controllers/data_exports_controller')
 const TwoFactorSettingsController = () => import('#controllers/two_factor_settings_controller')
 const UserSessionsController = () => import('#controllers/user_sessions_controller')
+const AccountController = () => import('#controllers/account_controller')
+const OrganizationDeletionController = () => import('#controllers/organization_deletion_controller')
 
 // Préférences pré-auth (switchers de langue et de thème, aussi disponibles
 // sur le marketing et l'écran de login) : persistées sur le profil quand
@@ -61,6 +63,20 @@ router
       .delete('settings/sessions/:id', [UserSessionsController, 'destroy'])
       .where('id', router.matchers.uuid())
       .as('settings.sessions.destroy')
+    // Gestion du compte en libre-service (#886) : export de ses données,
+    // quitter une organisation, supprimer son compte ou son organisation.
+    router.get('settings/me/export', [AccountController, 'export']).as('settings.account.export')
+    router
+      .delete('settings/me/memberships/:organizationId', [AccountController, 'leave'])
+      .where('organizationId', router.matchers.number())
+      .as('settings.account.leave')
+    router.delete('settings/me', [AccountController, 'destroy']).as('settings.account.destroy')
+    router
+      .delete('settings/org', [OrganizationDeletionController, 'destroy'])
+      .as('settings.org.destroy')
+    router
+      .post('settings/org/restore', [OrganizationDeletionController, 'cancel'])
+      .as('settings.org.restore')
     router
       .put('settings/org/two-factor', [TwoFactorSettingsController, 'updateOrganizationPolicy'])
       .as('settings.org.two_factor')

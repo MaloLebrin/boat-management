@@ -1962,6 +1962,36 @@ const routes = {
     tokens: [{"old":"/settings/sessions/:id","type":0,"val":"settings","end":""},{"old":"/settings/sessions/:id","type":0,"val":"sessions","end":""},{"old":"/settings/sessions/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['settings.sessions.destroy']['types'],
   },
+  'settings.account.export': {
+    methods: ["GET","HEAD"],
+    pattern: '/settings/me/export',
+    tokens: [{"old":"/settings/me/export","type":0,"val":"settings","end":""},{"old":"/settings/me/export","type":0,"val":"me","end":""},{"old":"/settings/me/export","type":0,"val":"export","end":""}],
+    types: placeholder as Registry['settings.account.export']['types'],
+  },
+  'settings.account.leave': {
+    methods: ["DELETE"],
+    pattern: '/settings/me/memberships/:organizationId',
+    tokens: [{"old":"/settings/me/memberships/:organizationId","type":0,"val":"settings","end":""},{"old":"/settings/me/memberships/:organizationId","type":0,"val":"me","end":""},{"old":"/settings/me/memberships/:organizationId","type":0,"val":"memberships","end":""},{"old":"/settings/me/memberships/:organizationId","type":1,"val":"organizationId","end":""}],
+    types: placeholder as Registry['settings.account.leave']['types'],
+  },
+  'settings.account.destroy': {
+    methods: ["DELETE"],
+    pattern: '/settings/me',
+    tokens: [{"old":"/settings/me","type":0,"val":"settings","end":""},{"old":"/settings/me","type":0,"val":"me","end":""}],
+    types: placeholder as Registry['settings.account.destroy']['types'],
+  },
+  'settings.org.destroy': {
+    methods: ["DELETE"],
+    pattern: '/settings/org',
+    tokens: [{"old":"/settings/org","type":0,"val":"settings","end":""},{"old":"/settings/org","type":0,"val":"org","end":""}],
+    types: placeholder as Registry['settings.org.destroy']['types'],
+  },
+  'settings.org.restore': {
+    methods: ["POST"],
+    pattern: '/settings/org/restore',
+    tokens: [{"old":"/settings/org/restore","type":0,"val":"settings","end":""},{"old":"/settings/org/restore","type":0,"val":"org","end":""},{"old":"/settings/org/restore","type":0,"val":"restore","end":""}],
+    types: placeholder as Registry['settings.org.restore']['types'],
+  },
   'settings.org.two_factor': {
     methods: ["PUT"],
     pattern: '/settings/org/two-factor',

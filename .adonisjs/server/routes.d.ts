@@ -330,6 +330,11 @@ export type ScannedRoutes = {
     'settings.sessions.destroy_remembered': { paramsTuple?: []; params?: {} }
     'settings.sessions.notifications': { paramsTuple?: []; params?: {} }
     'settings.sessions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.account.export': { paramsTuple?: []; params?: {} }
+    'settings.account.leave': { paramsTuple: [ParamValue]; params: {'organizationId': ParamValue} }
+    'settings.account.destroy': { paramsTuple?: []; params?: {} }
+    'settings.org.destroy': { paramsTuple?: []; params?: {} }
+    'settings.org.restore': { paramsTuple?: []; params?: {} }
     'settings.org.two_factor': { paramsTuple?: []; params?: {} }
     'settings.notifications': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
@@ -540,6 +545,7 @@ export type ScannedRoutes = {
     'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.account.export': { paramsTuple?: []; params?: {} }
     'settings.notifications': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
     'settings.members': { paramsTuple?: []; params?: {} }
@@ -697,6 +703,7 @@ export type ScannedRoutes = {
     'simulator.share.show.en': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'settings.index': { paramsTuple?: []; params?: {} }
     'settings.me': { paramsTuple?: []; params?: {} }
+    'settings.account.export': { paramsTuple?: []; params?: {} }
     'settings.notifications': { paramsTuple?: []; params?: {} }
     'settings.org': { paramsTuple?: []; params?: {} }
     'settings.members': { paramsTuple?: []; params?: {} }
@@ -825,6 +832,7 @@ export type ScannedRoutes = {
     'settings.two_factor.store': { paramsTuple?: []; params?: {} }
     'settings.two_factor.confirm': { paramsTuple?: []; params?: {} }
     'settings.two_factor.recovery_codes': { paramsTuple?: []; params?: {} }
+    'settings.org.restore': { paramsTuple?: []; params?: {} }
     'settings.billing.checkout': { paramsTuple?: []; params?: {} }
     'settings.billing.portal': { paramsTuple?: []; params?: {} }
     'settings.billing.module.add': { paramsTuple?: []; params?: {} }
@@ -951,6 +959,9 @@ export type ScannedRoutes = {
     'settings.sessions.destroy_others': { paramsTuple?: []; params?: {} }
     'settings.sessions.destroy_remembered': { paramsTuple?: []; params?: {} }
     'settings.sessions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'settings.account.leave': { paramsTuple: [ParamValue]; params: {'organizationId': ParamValue} }
+    'settings.account.destroy': { paramsTuple?: []; params?: {} }
+    'settings.org.destroy': { paramsTuple?: []; params?: {} }
     'settings.billing.module.remove': { paramsTuple?: []; params?: {} }
     'settings.billing.module.enterprise.deactivate': { paramsTuple?: []; params?: {} }
     'settings.billing.onlinePayments.disconnect': { paramsTuple?: []; params?: {} }

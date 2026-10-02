@@ -562,5 +562,19 @@
     "othersRevoked": "Every other session has been signed out.",
     "orphansRevoked": "Remembered sign-ins revoked.",
     "notifyUpdated": "Alert preference saved."
+  },
+  "account": {
+    "demoProtected": "The demo account cannot be modified.",
+    "left": "You left the organization.",
+    "membershipNotFound": "You are not a member of this organization.",
+    "leaveLastAdmin": "You are the last admin of this organization: appoint another admin or delete it.",
+    "leaveOnlyOrganization": "This is the only organization on your account: delete your account instead.",
+    "lastAdmin": "You are the last admin of: {organizations}. Appoint another admin or delete the organization before deleting your account.",
+    "deletionScheduled": "Your account will be deleted on {date}. Sign in again before then to cancel.",
+    "deletionCancelled": "Welcome back! Your account deletion has been cancelled."
+  },
+  "organizationDeletion": {
+    "scheduled": "The organization will be permanently deleted on {date}. You can cancel until then.",
+    "cancelled": "The organization deletion has been cancelled."
   }
 }

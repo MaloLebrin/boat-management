@@ -41,6 +41,9 @@ const REVIEWED_SHARED_KEYS = [
   'demoSessionDurationMs',
   'user',
   'currentPlan',
+  // #886 — date de purge (ISO) d'une organisation en cours de suppression ;
+  // absente pour un visiteur anonyme et pour toute organisation active.
+  'organizationDeletionScheduledFor',
   'organizationType',
   'activeModules',
   'activeAddons',

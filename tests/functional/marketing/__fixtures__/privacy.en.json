@@ -10,7 +10,7 @@
       "titleHighlight": "policy",
       "subtitle": "We take the protection of your data seriously. This page explains what data we collect, why, and what your rights are.",
       "updatedLabel": "Last updated:",
-      "updatedDate": "September 19, 2026"
+      "updatedDate": "October 2, 2026"
     },
     "sections": [
       {
@@ -53,7 +53,7 @@
       },
       {
         "title": "Data retention",
-        "body": "Your account data is kept for as long as your account is active. After it is closed, that data is deleted or anonymized within a reasonable timeframe, except where a legal retention obligation applies (billing, accounting). Data collected on our public pages is deleted automatically, every night, once the following periods have elapsed:",
+        "body": "Your account data is kept for as long as your account is active. You can delete your account yourself from your settings: it is anonymized 14 days after the request, unless you sign in again in the meantime. An organization deleted by its administrator can be restored for 30 days, after which its data and files are erased. Legal retention obligations (billing, accounting) still apply. Data collected on our public pages is deleted automatically, every night, once the following periods have elapsed:",
         "bullets": [
           "Messages sent through the contact form: 24 months after we receive them.",
           "Contact details left on the cost simulator: 24 months after your latest simulation.",

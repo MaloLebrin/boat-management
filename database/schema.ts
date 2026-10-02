@@ -2745,6 +2745,7 @@ export class OrganizationSchema extends BaseModel {
     'aiSystemPrompt',
     'appName',
     'createdAt',
+    'deletionRequestedAt',
     'fleetSize',
     'id',
     'invoiceLatePenaltyNote',
@@ -2788,6 +2789,8 @@ export class OrganizationSchema extends BaseModel {
   declare appName: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column.dateTime()
+  declare deletionRequestedAt: DateTime | null
   @column()
   declare fleetSize: string | null
   @column({ isPrimary: true })
@@ -3473,8 +3476,10 @@ export class UserSessionSchema extends BaseModel {
 
 export class UserSchema extends BaseModel {
   static $columns = [
+    'anonymizedAt',
     'createdAt',
     'dashboardLayout',
+    'deletionRequestedAt',
     'email',
     'emailVerifiedAt',
     'fullName',
@@ -3492,10 +3497,14 @@ export class UserSchema extends BaseModel {
     'updatedAt',
   ] as const
   $columns = UserSchema.$columns
+  @column.dateTime()
+  declare anonymizedAt: DateTime | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
   declare dashboardLayout: any | null
+  @column.dateTime()
+  declare deletionRequestedAt: DateTime | null
   @column()
   declare email: string
   @column.dateTime()

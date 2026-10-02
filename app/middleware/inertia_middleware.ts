@@ -1,3 +1,4 @@
+import { ORGANIZATION_DELETION_GRACE_DAYS } from '#shared/constants/account_deletion'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import type { JSONDataTypes } from '@adonisjs/core/types/transformers'
@@ -217,6 +218,15 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       ),
       user: ctx.inertia.always(auth?.user ? UserTransformer.transform(auth.user) : undefined),
       currentPlan: ctx.inertia.always(currentPlan),
+      // Suppression programmée de l'organisation (#886) : date de purge pour
+      // le bandeau affiché à tous ses membres, absente sinon.
+      organizationDeletionScheduledFor: ctx.inertia.always(
+        auth?.user?.organization?.deletionRequestedAt
+          ? (auth.user.organization.deletionRequestedAt
+              .plus({ days: ORGANIZATION_DELETION_GRACE_DAYS })
+              .toISO() ?? undefined)
+          : undefined
+      ),
       organizationType: ctx.inertia.always(organizationType),
       activeModules: ctx.inertia.always(activeModules),
       activeAddons: ctx.inertia.always(activeAddons as unknown as JSONDataTypes),

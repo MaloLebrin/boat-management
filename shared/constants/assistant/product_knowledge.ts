@@ -2178,4 +2178,49 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     ],
     navTarget: 'settings.me',
   },
+  {
+    id: 'account-data-and-deletion',
+    title: {
+      en: 'My data, leaving an organization, deleting my account',
+      fr: 'Mes données, quitter une organisation, supprimer mon compte',
+    },
+    body: {
+      en: 'Settings → My account has a danger zone. “Export my data” downloads a JSON file of everything linked to the person: profile, preferences, organizations, sessions, notifications, audit log and entries they authored. “My organizations” lets them leave one, except the last admin or the only organization. “Delete my account” asks for the password: access is cut at once, signing in again within 14 days cancels it, then the account is anonymized. The last admin of an organization must appoint another admin or delete it first.',
+      fr: 'Réglages → Mon compte a une zone dangereuse. « Exporter mes données » télécharge un fichier JSON de ce qui est rattaché à la personne : profil, préférences, organisations, sessions, notifications, journal d’audit et saisies dont elle est l’auteur. « Mes organisations » permet d’en quitter une, sauf pour le dernier admin ou la seule organisation. « Supprimer mon compte » demande le mot de passe : les accès sont coupés, une reconnexion sous 14 jours annule, puis le compte est anonymisé. Le dernier admin doit d’abord nommer un autre admin ou supprimer l’organisation.',
+    },
+    keywords: [
+      'exporter mes donnees',
+      'rgpd',
+      'supprimer mon compte',
+      'suppression du compte',
+      'quitter une organisation',
+      'droit a l oubli',
+      'portabilite',
+      'delete my account',
+      'export my data',
+      'leave organization',
+    ],
+    navTarget: 'settings.me',
+  },
+  {
+    id: 'organization-deletion',
+    title: {
+      en: 'Deleting the organization',
+      fr: 'Supprimer l’organisation',
+    },
+    body: {
+      en: 'Settings → Organization lets an admin delete the organization by typing its name and their password. The subscription is set to end at its renewal date, every member gets an email, and a banner shows the deletion date. The organization stays usable and restorable for 30 days, which leaves time to download the fleet and accounting exports; any admin can cancel from the same screen. After that, its boats, documents, clients, invoices and files are permanently deleted, and members with no other organization have their account closed.',
+      fr: 'Réglages → Organisation permet à un admin de supprimer l’organisation en saisissant son nom et son mot de passe. L’abonnement prend fin à son échéance, chaque membre reçoit un e-mail et un bandeau rappelle la date. L’organisation reste utilisable et récupérable 30 jours, le temps de télécharger les exports flotte et comptables ; un admin peut annuler depuis le même écran. Ensuite, bateaux, documents, clients, factures et fichiers sont supprimés définitivement, et les membres sans autre organisation voient leur compte fermé.',
+    },
+    keywords: [
+      'supprimer l organisation',
+      'suppression de l organisation',
+      'fermer l organisation',
+      'annuler la suppression',
+      'delete organization',
+      'close organization',
+      'rgpd',
+    ],
+    navTarget: 'settings.org',
+  },
 ]

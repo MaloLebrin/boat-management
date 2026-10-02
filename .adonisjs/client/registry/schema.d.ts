@@ -3919,6 +3919,66 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user_sessions_controller').default['destroy']>>>
     }
   }
+  'settings.account.export': {
+    methods: ["GET","HEAD"]
+    pattern: '/settings/me/export'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account_controller').default['export']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account_controller').default['export']>>>
+    }
+  }
+  'settings.account.leave': {
+    methods: ["DELETE"]
+    pattern: '/settings/me/memberships/:organizationId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { organizationId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account_controller').default['leave']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account_controller').default['leave']>>>
+    }
+  }
+  'settings.account.destroy': {
+    methods: ["DELETE"]
+    pattern: '/settings/me'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/account').deleteAccountValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/account').deleteAccountValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account_controller').default['destroy']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.org.destroy': {
+    methods: ["DELETE"]
+    pattern: '/settings/org'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/account').deleteOrganizationValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/account').deleteOrganizationValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/organization_deletion_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_deletion_controller').default['destroy']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'settings.org.restore': {
+    methods: ["POST"]
+    pattern: '/settings/org/restore'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/organization_deletion_controller').default['cancel']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/organization_deletion_controller').default['cancel']>>>
+    }
+  }
   'settings.org.two_factor': {
     methods: ["PUT"]
     pattern: '/settings/org/two-factor'

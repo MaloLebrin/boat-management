@@ -200,6 +200,49 @@ export default class EmailQueueService {
     })
   }
 
+  /**
+   * Suppression en libre-service (#886) : confirmation d'une suppression de
+   * compte (`account`) ou d'organisation (`organization`), avec la date de
+   * purge et la marche à suivre pour l'annuler. Bilingue via `i18n`.
+   */
+  async sendDeletionScheduled(params: {
+    kind: 'account' | 'organization'
+    to: string
+    name: string | null
+    locale: string | null
+    purgeAt: DateTime
+    organizationName?: string
+  }) {
+    const i18n = i18nManager.locale(toAppLocale(params.locale))
+    const displayName = params.name ?? params.to
+    const prefix = `settings.danger.emails.${params.kind}`
+    const values = {
+      date: formatDateLong(params.purgeAt.toISO()!, i18n.locale),
+      organization: params.organizationName ?? '',
+    }
+    const subject = i18n.t(`${prefix}.subject`, values)
+    const greeting = i18n.t('settings.danger.emails.greeting', { name: displayName })
+    const paragraphs = [i18n.t(`${prefix}.body`, values), i18n.t(`${prefix}.undo`, values)]
+    const ctaUrl = `${env.get('APP_URL')}${params.kind === 'account' ? '/login' : '/settings/org'}`
+    const ctaLabel = i18n.t(`${prefix}.cta`)
+    const text = [greeting, ...paragraphs, ctaUrl].join('\n\n')
+
+    const html = await edge.render('emails/deletion_scheduled', {
+      greeting,
+      paragraphs,
+      ctaUrl,
+      ctaLabel,
+    })
+
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `deletion-scheduled:${params.kind}:${params.to}:${params.purgeAt.toISODate()}`,
+    })
+  }
+
   async sendInvitation(params: {
     to: string
     inviterName: string | null
