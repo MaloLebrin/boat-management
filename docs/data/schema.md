@@ -474,6 +474,57 @@ avec `boat_port_stays` (dépense d'escale saisie par un plaisancier, port en tex
   plus, il se résilie
 - `notes` (nullable)
 
+### suppliers (#892)
+
+- `id`, `organizationId` (FK cascade, indexé), `name` (string 150)
+- `contactName`, `email`, `phone` (nullables), `leadTimeDays` (int, nullable), `notes`
+
+### inventory_items (#892)
+
+Article du stock central de l'organisation. `quantity` n'est écrite que par
+`InventoryService.recordMovement` : elle vaut toujours la somme du journal.
+
+- `id`, `organizationId` (FK cascade, indexé avec `name`)
+- `name` (string 200), `reference` (string 100, nullable)
+- `unit` : `unit | liter | meter | kit | box` (défaut `unit`, `chk_inventory_items_unit`)
+- `quantity` (decimal 12,2, défaut 0 — peut devenir négative), `minQuantity` (decimal 12,2,
+  nullable — seuil d'alerte, stock bas si `quantity <= minQuantity`)
+- `location` (string 150, nullable), `averageCost` (decimal 12,2, nullable — prix moyen pondéré)
+- `supplierId` (FK `suppliers` SET NULL, nullable, indexé) — fournisseur habituel, `notes`
+
+### inventory_movements (#892)
+
+- `id`, `organizationId` (FK cascade, indexé), `inventoryItemId` (FK cascade, indexé avec
+  `occurredAt`)
+- `quantity` (decimal 12,2, signée, `chk_inventory_movements_quantity` : jamais 0)
+- `reason` : `purchase | consumption | adjustment | return`
+- `unitCost` (decimal 12,2, nullable) — entrée valorisée
+- `maintenanceEventId` (FK `boat_maintenance_events` SET NULL, nullable, indexé) — sortie d'un
+  entretien, ou retour à sa suppression
+- `purchaseOrderId` (FK `purchase_orders` SET NULL, nullable, indexé) — réception
+- `userId` (FK `users` SET NULL, nullable, indexé), `note`, `occurredAt`, `createdAt`
+
+### purchase_orders (#892)
+
+- `id`, `organizationId` (FK cascade), `number` (int, **unique par organisation**, séquentiel)
+- `supplierId` (FK `suppliers` **RESTRICT**, indexé) — un fournisseur commandé ne se supprime pas
+- `boatId` (FK `boats` SET NULL, nullable, indexé) — bateau d'affectation : la réception inscrit
+  le total au budget de ce bateau
+- `status` : `draft | sent | received | cancelled` (indexé avec `organizationId`)
+- `orderedOn` (date, nullable), `receivedAt` (timestamp, nullable)
+- `budgetEntryId` (FK `boat_budget_entries` SET NULL, nullable, indexé) — dépense écrite à la
+  réception
+- `createdBy` (FK `users` SET NULL, nullable, indexé), `notes`
+
+### purchase_order_lines (#892)
+
+- `id`, `purchaseOrderId` (FK cascade, indexé), `inventoryItemId` (FK `inventory_items`
+  **RESTRICT**, indexé)
+- `quantity` (decimal 12,2, `> 0`), `unitCost` (decimal 12,2, HT, défaut 0)
+
+`boat_engine_parts` gagne `inventoryItemId` (FK `inventory_items` SET NULL, nullable, indexé) :
+reliée, la pièce lit son stock dans l'article. Son `stock` local est conservé tel quel.
+
 ### boat_position_history
 
 Deux natures de ligne dans une même table, distinguées par `kind` (#722). À ne pas confondre avec

@@ -1,0 +1,151 @@
+{
+  "title": "Inventaire",
+  "subtitle": "Le stock de pièces de l'atelier, partagé par toute la flotte.",
+  "add": "Ajouter un article",
+  "ordersLink": "Commandes et fournisseurs",
+  "units": {
+    "unit": "u.",
+    "liter": "L",
+    "meter": "m",
+    "kit": "kit(s)",
+    "box": "boîte(s)"
+  },
+  "fields": {
+    "name": "Désignation",
+    "reference": "Référence",
+    "unit": "Unité",
+    "quantity": "Quantité",
+    "minQuantity": "Seuil d'alerte",
+    "location": "Emplacement",
+    "averageCost": "Prix moyen",
+    "stockValue": "Valeur du stock",
+    "supplier": "Fournisseur",
+    "unitCost": "Prix unitaire HT",
+    "notes": "Notes"
+  },
+  "filters": {
+    "all": "Tous",
+    "low": "Stock bas ({count})",
+    "search": "Rechercher",
+    "searchPlaceholder": "Désignation, référence, emplacement…"
+  },
+  "form": {
+    "addTitle": "Nouvel article",
+    "editTitle": "Modifier l'article",
+    "initialStock": "Stock initial",
+    "minQuantityHint": "Alerte quand la quantité atteint ce seuil.",
+    "noSupplier": "Aucun fournisseur"
+  },
+  "list": {
+    "actions": "Actions",
+    "count": "Compter",
+    "edit": "Modifier",
+    "linkedParts": "{count, plural, one {# pièce moteur reliée} other {# pièces moteur reliées}}",
+    "noMatch": "Aucun article ne correspond à ces filtres."
+  },
+  "empty": {
+    "title": "Aucun article en stock",
+    "description": "Ajoutez les pièces de l'atelier, ou reprenez les stocks saisis sur les moteurs."
+  },
+  "import": {
+    "banner": "{count, plural, one {# pièce moteur suit} other {# pièces moteur suivent}} un stock propre à son moteur. Reprenez-les dans l'inventaire : un article par référence, la quantité étant la somme des stocks moteur — à vérifier ensuite par un comptage.",
+    "action": "Reprendre les stocks moteur",
+    "movementNote": "Reprise des stocks saisis par moteur"
+  },
+  "adjust": {
+    "title": "Compter le stock",
+    "current": "Quantité enregistrée : {quantity} {unit}",
+    "counted": "Quantité comptée",
+    "note": "Motif",
+    "notePlaceholder": "Inventaire annuel, casse, retour…",
+    "submit": "Enregistrer le comptage"
+  },
+  "show": {
+    "low": "Stock bas",
+    "noLocation": "Sans emplacement",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer cet article ?",
+    "deleteMessage": "Son journal de mouvements sera effacé et les pièces moteur reliées reprendront leur stock propre.",
+    "linkedParts": "Pièces moteur reliées",
+    "noLinkedParts": "Aucune pièce moteur n'est reliée à cet article. Reliez-en une depuis l'onglet Pièces d'un moteur."
+  },
+  "movements": {
+    "title": "Mouvements",
+    "empty": "Aucun mouvement enregistré.",
+    "reasons": {
+      "purchase": "Achat",
+      "consumption": "Consommation",
+      "adjustment": "Ajustement",
+      "return": "Retour"
+    },
+    "order": "Bon de commande n° {number}",
+    "unitCost": "{cost} l'unité"
+  },
+  "suppliers": {
+    "title": "Fournisseurs",
+    "add": "Ajouter un fournisseur",
+    "addTitle": "Nouveau fournisseur",
+    "editTitle": "Modifier le fournisseur",
+    "empty": "Aucun fournisseur. Ajoutez-en un pour passer commande.",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer ce fournisseur ?",
+    "deleteMessage": "Les articles qui l'avaient comme fournisseur habituel n'en auront plus.",
+    "leadTime": "{days, plural, one {livré en # jour} other {livré en # jours}}",
+    "fields": {
+      "name": "Nom",
+      "contactName": "Contact",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "leadTimeDays": "Délai de livraison (jours)"
+    }
+  },
+  "orders": {
+    "title": "Bons de commande",
+    "subtitle": "Commandez auprès de vos fournisseurs ; la réception met le stock à jour.",
+    "add": "Nouveau bon de commande",
+    "empty": "Aucun bon de commande.",
+    "prerequisites": "Ajoutez au moins un fournisseur et un article pour passer commande.",
+    "number": "Commande n° {number}",
+    "orderedOn": "commandé le {date}",
+    "receivedOn": "reçu le {date}",
+    "total": "Total HT : {total}",
+    "budgetLabel": "Pièces — commande n° {number} ({supplier})",
+    "status": {
+      "draft": "Brouillon",
+      "sent": "Envoyé",
+      "received": "Reçu",
+      "cancelled": "Annulé"
+    },
+    "actions": {
+      "send": "Marquer envoyé",
+      "receive": "Réceptionner",
+      "cancel": "Annuler le bon",
+      "delete": "Supprimer"
+    },
+    "receiveConfirm": {
+      "title": "Réceptionner la commande ?",
+      "message": "Les quantités commandées entrent en stock et le prix moyen des articles est recalculé.",
+      "messageBoat": "Les quantités commandées entrent en stock, le prix moyen est recalculé et le montant est ajouté au budget de {boat}."
+    },
+    "deleteConfirm": {
+      "title": "Supprimer ce bon de commande ?",
+      "message": "Le bon et ses lignes seront effacés."
+    },
+    "reorder": {
+      "supplier": "Commander les stocks bas de",
+      "hint": "Prépare un brouillon avec ses articles sous le seuil.",
+      "submit": "Préparer la commande"
+    },
+    "form": {
+      "addTitle": "Nouveau bon de commande",
+      "editTitle": "Commande n° {number}",
+      "boat": "Bateau",
+      "boatHint": "Facultatif : la réception imputera le montant à son budget.",
+      "workshop": "Stock atelier",
+      "lines": "Lignes",
+      "item": "Article",
+      "addLine": "Ajouter une ligne",
+      "removeLine": "Retirer"
+    }
+  }
+}

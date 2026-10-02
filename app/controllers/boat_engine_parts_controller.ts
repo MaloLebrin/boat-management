@@ -3,6 +3,7 @@ import IncidentPolicy from '#policies/incident_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
 import BoatEquipmentService from '#services/boat_equipment_service'
 import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import { InventoryItemNotFoundError } from '#exceptions/inventory_errors'
 import MediaService from '#services/media_service'
 import { MediaNotFoundError } from '#exceptions/media_errors'
 import OrganizationService from '#services/organization_service'
@@ -72,6 +73,15 @@ export default class BoatEnginePartsController {
         wearState: part.wearState,
         purchasePrice: part.purchasePrice ? Number.parseFloat(part.purchasePrice) : null,
         purchasedAt: part.purchasedAt ? part.purchasedAt.toISODate() : null,
+        inventoryItem: part.inventoryItem
+          ? {
+              id: part.inventoryItem.id,
+              name: part.inventoryItem.name,
+              quantity: part.inventoryItem.quantity,
+              minQuantity: part.inventoryItem.minQuantity,
+              unit: part.inventoryItem.unit,
+            }
+          : null,
         documents: media.filter((m) => m.kind === 'document').map(toMediaRow),
         photos: media.filter((m) => m.kind === 'photo').map(toMediaRow),
       },
@@ -93,6 +103,12 @@ export default class BoatEnginePartsController {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.enginePart.notFound'))
         response.redirect(`/boats/${boat.id}`)
+        return
+      }
+      // Article d'inventaire d'une autre organisation (#892).
+      if (error instanceof InventoryItemNotFoundError) {
+        session.flash('error', i18n.t('flash.inventory.itemNotFound'))
+        response.redirect().back()
         return
       }
       throw error
@@ -120,6 +136,11 @@ export default class BoatEnginePartsController {
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.enginePart.notFound'))
         response.redirect(`/boats/${boat.id}/engines/${params.engineId}?tab=parts`)
+        return
+      }
+      if (error instanceof InventoryItemNotFoundError) {
+        session.flash('error', i18n.t('flash.inventory.itemNotFound'))
+        response.redirect().back()
         return
       }
       throw error

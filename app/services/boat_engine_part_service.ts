@@ -4,6 +4,7 @@ import BoatEnginePart from '#models/boat_engine_part'
 import type Organization from '#models/organization'
 import type User from '#models/user'
 import { CloudinaryFolders } from '#services/cloudinary_service'
+import InventoryService from '#services/inventory_service'
 import MediaService from '#services/media_service'
 import { LOW_STOCK_CAP } from '#shared/constants/dashboard_widgets'
 import type { BoatEnginePartPayload, PartWearState } from '#shared/types/boat'
@@ -16,26 +17,50 @@ export type { BoatEnginePartPayload }
 
 @inject()
 export default class BoatEnginePartService {
-  constructor(private mediaService: MediaService) {}
+  constructor(
+    private mediaService: MediaService,
+    private inventoryService: InventoryService
+  ) {}
 
   async listForEngine(engineId: number) {
-    return await BoatEnginePart.query().where('boatEngineId', engineId).orderBy('id', 'asc')
+    return await BoatEnginePart.query()
+      .where('boatEngineId', engineId)
+      .preload('inventoryItem')
+      .orderBy('id', 'asc')
   }
 
   async findForEngine(engineId: number, partId: number) {
-    return await BoatEnginePart.query().where('id', partId).where('boatEngineId', engineId).first()
+    return await BoatEnginePart.query()
+      .where('id', partId)
+      .where('boatEngineId', engineId)
+      .preload('inventoryItem')
+      .first()
   }
 
   /**
-   * Returns parts whose stock is at or below their minStockAlert threshold.
-   * Only returns parts where minStockAlert is set (non-null).
+   * Pièces du moteur sous leur seuil d'alerte. Une pièce reliée à
+   * l'inventaire (#892) est jugée sur la quantité et le seuil de l'article,
+   * les autres sur leurs compteurs locaux (seuil renseigné).
    */
   async listLowStock(engineId: number) {
     return await BoatEnginePart.query()
       .where('boatEngineId', engineId)
-      .whereNotNull('minStockAlert')
-      .whereRaw('stock <= min_stock_alert')
-      .orderBy('designation', 'asc')
+      .leftJoin('inventory_items', 'inventory_items.id', 'boat_engine_parts.inventory_item_id')
+      .where((q) => {
+        q.where((local) => {
+          local
+            .whereNull('boat_engine_parts.inventory_item_id')
+            .whereNotNull('boat_engine_parts.min_stock_alert')
+            .whereRaw('boat_engine_parts.stock <= boat_engine_parts.min_stock_alert')
+        }).orWhere((linked) => {
+          linked
+            .whereNotNull('inventory_items.min_quantity')
+            .whereRaw('inventory_items.quantity <= inventory_items.min_quantity')
+        })
+      })
+      .select('boat_engine_parts.*')
+      .preload('inventoryItem')
+      .orderBy('boat_engine_parts.designation', 'asc')
   }
 
   /**
@@ -53,11 +78,14 @@ export default class BoatEnginePartService {
       total: 0,
       lowStockCount: 0,
       toReplaceCount: 0,
+      inventoryLowCount: 0,
     }
     if (boatIds.length === 0) return empty
 
+    // Une pièce reliée à l'inventaire (#892) remonte par l'article, pas par
+    // son compteur local qui ne fait plus foi.
     const lowStock =
-      'boat_engine_parts.min_stock_alert is not null and boat_engine_parts.stock <= boat_engine_parts.min_stock_alert'
+      'boat_engine_parts.inventory_item_id is null and boat_engine_parts.min_stock_alert is not null and boat_engine_parts.stock <= boat_engine_parts.min_stock_alert'
     const toReplace = "boat_engine_parts.wear_state in ('to_replace', 'damaged')"
 
     const rows = await BoatEnginePart.query()
@@ -86,6 +114,7 @@ export default class BoatEnginePartService {
       total: Number(first?.window_total ?? 0),
       lowStockCount: Number(first?.low_stock_total ?? 0),
       toReplaceCount: Number(first?.to_replace_total ?? 0),
+      inventoryLowCount: 0,
       items: rows.map((part) => ({
         id: part.id,
         boatId: part.engine.boatId,
@@ -109,8 +138,13 @@ export default class BoatEnginePartService {
 
     const engine = boat.engines.find((e) => e.id === engineId)
     if (!engine) throw new BoatEquipmentNotFoundError()
+    await this.inventoryService.assertInOrganization(
+      boat.organizationId,
+      payload.inventoryItemId ?? null
+    )
 
     return await BoatEnginePart.create({
+      inventoryItemId: payload.inventoryItemId ?? null,
       boatEngineId: engineId,
       designation: payload.designation,
       reference: payload.reference ?? null,
@@ -151,6 +185,10 @@ export default class BoatEnginePartService {
     part.wearState = payload.wearState ?? null
     part.purchasePrice = toDecimalStringOrNull(payload.purchasePrice)
     part.purchasedAt = toDateOrNull(payload.purchasedAt)
+    if (payload.inventoryItemId !== undefined) {
+      await this.inventoryService.assertInOrganization(boat.organizationId, payload.inventoryItemId)
+      part.inventoryItemId = payload.inventoryItemId
+    }
 
     await part.save()
     return part

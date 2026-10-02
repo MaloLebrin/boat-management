@@ -1,3 +1,6 @@
+import InventoryPolicy from '#policies/inventory_policy'
+import InventoryService from '#services/inventory_service'
+import QuotaService from '#services/quota_service'
 import BoatPolicy from '#policies/boat_policy'
 import IncidentPolicy from '#policies/incident_policy'
 import { toMediaRow } from '#transformers/media_row_transformer'
@@ -53,7 +56,9 @@ export default class BoatEquipmentController {
     private diagnosticService: BoatEngineDiagnosticService,
     private engineCatalogService: EngineCatalogService,
     private sailLoftService: SailLoftService,
-    private aiAnalysisService: AiAnalysisService
+    private aiAnalysisService: AiAnalysisService,
+    private inventoryService: InventoryService,
+    private quotaService: QuotaService
   ) {}
 
   async storeEngine({ request, response, auth, params, bouncer, session, i18n }: HttpContext) {
@@ -455,10 +460,18 @@ export default class BoatEquipmentController {
       return response.redirect(`/boats/${boat.id}`)
     }
 
-    const [canManage, canReportIncident] = await Promise.all([
+    const [canManage, canReportIncident, canViewInventory, org] = await Promise.all([
       bouncer.with(BoatPolicy).allows('edit', boat),
       bouncer.with(IncidentPolicy).allows('create', boat),
+      bouncer.with(InventoryPolicy).allows('view'),
+      this.organizationService.findOrFail(boat.organizationId),
     ])
+    // Liaison au stock central (#892) : proposée seulement si le plan ouvre
+    // l'inventaire et que le rôle peut le consulter.
+    const inventoryOptions =
+      canViewInventory && this.quotaService.canManageInventory(org)
+        ? await this.inventoryService.options(boat.organizationId)
+        : null
 
     const [
       maintenanceEvents,
@@ -508,8 +521,18 @@ export default class BoatEquipmentController {
           photos: [],
           purchasePrice: p.purchasePrice ? Number.parseFloat(p.purchasePrice) : null,
           purchasedAt: p.purchasedAt ? p.purchasedAt.toISODate() : null,
+          inventoryItem: p.inventoryItem
+            ? {
+                id: p.inventoryItem.id,
+                name: p.inventoryItem.name,
+                quantity: p.inventoryItem.quantity,
+                minQuantity: p.inventoryItem.minQuantity,
+                unit: p.inventoryItem.unit,
+              }
+            : null,
         })),
       },
+      inventoryOptions,
       maintenanceEvents: maintenanceEvents.map((ev) => ({
         id: ev.id,
         subject: ev.subject,

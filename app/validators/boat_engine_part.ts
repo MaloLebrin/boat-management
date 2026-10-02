@@ -24,6 +24,16 @@ const partFields = {
   wearState: vine.enum(PART_WEAR_STATES).optional(),
   purchasePrice: vine.number().positive().decimal([0, 2]).nullable().optional(),
   purchasedAt: vine.string().trim().optional(),
+  // Article du stock central (#892) : absent = inchangé, vide = délier (le
+  // body parser convertit déjà `''` en `null`). Le formulaire poste des
+  // chaînes (`<Form>`), d'où la conversion à la main.
+  inventoryItemId: vine
+    .string()
+    .trim()
+    .regex(/^\d*$/)
+    .nullable()
+    .optional()
+    .transform((s) => (s === null || s === '' ? null : Number.parseInt(s, 10))),
 }
 
 export const createEnginePartValidator = vine.create(vine.object(partFields))

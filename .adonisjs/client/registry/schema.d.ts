@@ -3067,6 +3067,222 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reports_controller').default['export']>>>
     }
   }
+  'inventory.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/inventory'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: ExtractQueryForGet<InferInput<(typeof import('#validators/inventory').inventoryQueryValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['index']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'inventory.importEngineParts': {
+    methods: ["POST"]
+    pattern: '/inventory/import-engine-parts'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['importEngineParts']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['importEngineParts']>>>
+    }
+  }
+  'purchaseOrders.index': {
+    methods: ["GET","HEAD"]
+    pattern: '/inventory/orders'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['index']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['index']>>>
+    }
+  }
+  'purchaseOrders.store': {
+    methods: ["POST"]
+    pattern: '/inventory/orders'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/inventory').purchaseOrderValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/inventory').purchaseOrderValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'purchaseOrders.reorder': {
+    methods: ["POST"]
+    pattern: '/inventory/orders/reorder'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/inventory').reorderValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/inventory').reorderValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['reorder']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['reorder']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'purchaseOrders.update': {
+    methods: ["PUT"]
+    pattern: '/inventory/orders/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/inventory').purchaseOrderValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/inventory').purchaseOrderValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'purchaseOrders.send': {
+    methods: ["POST"]
+    pattern: '/inventory/orders/:id/send'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['send']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['send']>>>
+    }
+  }
+  'purchaseOrders.receive': {
+    methods: ["POST"]
+    pattern: '/inventory/orders/:id/receive'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['receive']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['receive']>>>
+    }
+  }
+  'purchaseOrders.cancel': {
+    methods: ["POST"]
+    pattern: '/inventory/orders/:id/cancel'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['cancel']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['cancel']>>>
+    }
+  }
+  'purchaseOrders.destroy': {
+    methods: ["DELETE"]
+    pattern: '/inventory/orders/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/purchase_orders_controller').default['destroy']>>>
+    }
+  }
+  'suppliers.store': {
+    methods: ["POST"]
+    pattern: '/inventory/suppliers'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/inventory').supplierValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/inventory').supplierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/suppliers_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/suppliers_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'suppliers.update': {
+    methods: ["PUT"]
+    pattern: '/inventory/suppliers/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/inventory').supplierValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/inventory').supplierValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/suppliers_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/suppliers_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'suppliers.destroy': {
+    methods: ["DELETE"]
+    pattern: '/inventory/suppliers/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/suppliers_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/suppliers_controller').default['destroy']>>>
+    }
+  }
+  'inventory.store': {
+    methods: ["POST"]
+    pattern: '/inventory'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/inventory').inventoryItemValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/inventory').inventoryItemValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'inventory.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/inventory/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['show']>>>
+    }
+  }
+  'inventory.update': {
+    methods: ["PUT"]
+    pattern: '/inventory/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/inventory').inventoryItemValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/inventory').inventoryItemValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'inventory.destroy': {
+    methods: ["DELETE"]
+    pattern: '/inventory/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['destroy']>>>
+    }
+  }
+  'inventory.adjust': {
+    methods: ["POST"]
+    pattern: '/inventory/:id/adjust'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/inventory').inventoryAdjustmentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/inventory').inventoryAdjustmentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['adjust']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['adjust']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'

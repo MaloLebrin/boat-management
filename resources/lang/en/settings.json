@@ -477,7 +477,8 @@
       "import": "Imports",
       "document": "Documents",
       "export": "Exports",
-      "calendar": "Calendars"
+      "calendar": "Calendars",
+      "inventory": "Inventory"
     },
     "export": {
       "button": "Export as CSV",
@@ -586,7 +587,14 @@
       "account_purged": "Account anonymized",
       "member_left": "Left the organization",
       "organization_delete_requested": "Organization deletion requested",
-      "organization_delete_cancelled": "Organization deletion cancelled"
+      "organization_delete_cancelled": "Organization deletion cancelled",
+      "inventory_adjust": "Stock adjusted",
+      "inventory_import": "Engine part stock imported into the inventory",
+      "purchase_order_create": "Purchase order created",
+      "purchase_order_send": "Purchase order sent",
+      "purchase_order_receive": "Purchase order received",
+      "purchase_order_cancel": "Purchase order cancelled",
+      "purchase_order_delete": "Purchase order deleted"
     },
     "empty": {
       "title": "No activity yet",

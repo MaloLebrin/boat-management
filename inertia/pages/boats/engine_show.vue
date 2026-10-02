@@ -20,6 +20,7 @@ import EngineShowTabSpecs from '~/components/engine/show/tabs/EngineShowTabSpecs
 import { globalChecklistForFamily } from '#shared/helpers/diagnostic'
 import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import { isSparePartsEligibleEngine } from '#shared/helpers/spare_parts'
+import type { InventoryItemOption } from '#shared/types/inventory'
 import { useTabDeepLink } from '~/composables/use_tab_deep_link'
 import { useT } from '~/composables/use_t'
 import { engineDisplayTitle, engineFuelLabel } from '~/utils/boat_enum_labels'
@@ -45,6 +46,8 @@ const props = defineProps<{
   aiSuggestions?: AiSuggestion[] | null
   /** `?tab=` vu par le serveur : le rendu SSR part du bon onglet (#463). */
   initialTab?: string | null
+  /** Articles du stock central (#892), `null` si le plan ou le rôle ne l'ouvre pas. */
+  inventoryOptions?: InventoryItemOption[] | null
 }>()
 
 type TabKey =
@@ -351,6 +354,7 @@ function formatYear(iso: string): string {
           :engine-id="engine.id"
           :can-manage="canManage"
           :spare-parts-eligible="isSparePartsEligibleEngine(engine)"
+          :inventory-options="inventoryOptions ?? null"
         />
         <EngineShowTabPhotos
           v-else-if="tab === 'photos'"

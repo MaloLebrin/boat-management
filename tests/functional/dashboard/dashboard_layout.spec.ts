@@ -285,7 +285,13 @@ test.group('Dashboard — disposition personnalisable', (group) => {
     })
     assert.equal(props.fuel!.windowDays, 30)
     assert.equal(props.fuel!.fillUps, 0)
-    assert.deepEqual(props.lowStock, { items: [], total: 0, lowStockCount: 0, toReplaceCount: 0 })
+    assert.deepEqual(props.lowStock, {
+      items: [],
+      total: 0,
+      lowStockCount: 0,
+      toReplaceCount: 0,
+      inventoryLowCount: 0,
+    })
     assert.equal(props.invoicing!.outstandingTotal, 150)
     assert.equal(props.invoicing!.outstandingCount, 1)
     assert.equal(props.charterOccupancy!.boats, 1)

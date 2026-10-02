@@ -28,6 +28,7 @@ import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
 import BoatMaintenancePart from '#models/boat_maintenance_part'
+import InventoryService from '#services/inventory_service'
 import BoatRig from '#models/boat_rig'
 import BoatSafetyEquipment from '#models/boat_safety_equipment'
 import BoatSail from '#models/boat_sail'
@@ -61,6 +62,8 @@ function normalizeIsoDate(value: unknown): string {
 
 @inject()
 export default class BoatMaintenanceService {
+  constructor(private inventoryService: InventoryService = new InventoryService()) {}
+
   /**
    * Historique d'entretien d'un bateau, pièces préchargées.
    *
@@ -247,9 +250,21 @@ export default class BoatMaintenanceService {
           { client: trx }
         )
 
-        // Decrement stock atomically to avoid read-modify-write race conditions
+        // Pièces reliées à l'inventaire (#892) : la sortie se fait dans le stock
+        // central (mouvement `consumption`), le `stock` local n'y fait plus foi.
         const catalogParts = cleanParts.filter((p) => p.enginePartId !== null)
-        for (const p of catalogParts) {
+        const fromInventory = await this.inventoryService.consumeForMaintenance(trx, {
+          organizationId: boat.organizationId,
+          maintenanceEventId: event.id,
+          userId: user.id,
+          parts: catalogParts.map((p) => ({
+            enginePartId: p.enginePartId!,
+            quantity: p.quantity ?? 1,
+          })),
+        })
+
+        // Decrement stock atomically to avoid read-modify-write race conditions
+        for (const p of catalogParts.filter((part) => !fromInventory.has(part.enginePartId!))) {
           const used = p.quantity ?? 1
           await BoatEnginePart.query({ client: trx })
             .where('id', p.enginePartId!)
@@ -281,7 +296,12 @@ export default class BoatMaintenanceService {
 
     if (!event) throw new BoatMaintenanceNotFoundError()
 
-    await event.delete()
+    // Les sorties de stock de l'entretien reviennent à l'inventaire (#892).
+    await db.transaction(async (trx) => {
+      await this.inventoryService.reverseForMaintenance(trx, event.id, user.id)
+      event.useTransaction(trx)
+      await event.delete()
+    })
   }
 
   /**

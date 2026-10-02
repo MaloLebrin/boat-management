@@ -477,7 +477,8 @@
       "import": "Imports",
       "document": "Documents",
       "export": "Exports",
-      "calendar": "Calendriers"
+      "calendar": "Calendriers",
+      "inventory": "Inventaire"
     },
     "export": {
       "button": "Exporter en CSV",
@@ -586,7 +587,14 @@
       "account_purged": "Compte anonymisé",
       "member_left": "Départ de l'organisation",
       "organization_delete_requested": "Suppression de l'organisation demandée",
-      "organization_delete_cancelled": "Suppression de l'organisation annulée"
+      "organization_delete_cancelled": "Suppression de l'organisation annulée",
+      "inventory_adjust": "Stock ajusté",
+      "inventory_import": "Stocks moteur repris dans l'inventaire",
+      "purchase_order_create": "Bon de commande créé",
+      "purchase_order_send": "Bon de commande envoyé",
+      "purchase_order_receive": "Bon de commande réceptionné",
+      "purchase_order_cancel": "Bon de commande annulé",
+      "purchase_order_delete": "Bon de commande supprimé"
     },
     "empty": {
       "title": "Aucune activité",

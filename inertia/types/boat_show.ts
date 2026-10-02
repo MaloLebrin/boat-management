@@ -1,3 +1,4 @@
+import type { InventoryUnit } from '#shared/types/inventory'
 /** Inertia props shapes for boat detail / maintenance UI. */
 
 export type {
@@ -84,6 +85,17 @@ export type BoatShowEnginePart = {
   photos: MediaRow[]
   purchasePrice: number | null
   purchasedAt: string | null
+  /**
+   * Article du stock central relié (#892) : sa quantité remplace le `stock`
+   * local tant que la pièce y est reliée. Absent hors de la fiche moteur.
+   */
+  inventoryItem?: {
+    id: number
+    name: string
+    quantity: number
+    minQuantity: number | null
+    unit: InventoryUnit
+  } | null
 }
 
 export type BoatShowEngine = {

@@ -46,6 +46,10 @@ import { NotificationFactory } from '#database/factories/notification_factory'
 import { PricingSeasonFactory } from '#database/factories/pricing_season_factory'
 import { OrganizationInvitationFactory } from '#database/factories/organization_invitation_factory'
 import { createMemberUser } from '#tests/functional/helpers'
+import InventoryItem from '#models/inventory_item'
+import PurchaseOrder from '#models/purchase_order'
+import PurchaseOrderLine from '#models/purchase_order_line'
+import Supplier from '#models/supplier'
 
 /**
  * Marqueur unique de l'organisation victime. Une réponse qui le contient a
@@ -96,6 +100,9 @@ export interface CrossOrgIds {
   unavailabilityId: number
   marinaStayId: number
   contractId: number
+  inventoryItemId: number
+  supplierId: number
+  purchaseOrderId: number
 }
 
 /**
@@ -287,6 +294,29 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
     url: 'https://calendar.example.test/victim.ics',
   })
 
+  // Inventaire (#892) : un article, un fournisseur et un bon de commande.
+  const supplier = await Supplier.create({ organizationId: orgId, name: SENTINEL })
+  const inventoryItem = await InventoryItem.create({
+    organizationId: orgId,
+    name: SENTINEL,
+    unit: 'unit',
+    quantity: 3,
+    supplierId: supplier.id,
+  })
+  const purchaseOrder = await PurchaseOrder.create({
+    organizationId: orgId,
+    number: 1,
+    supplierId: supplier.id,
+    status: 'draft',
+    notes: SENTINEL,
+  })
+  await PurchaseOrderLine.create({
+    purchaseOrderId: purchaseOrder.id,
+    inventoryItemId: inventoryItem.id,
+    quantity: 2,
+    unitCost: 10,
+  })
+
   return {
     boatId: boat.id,
     engineId: engine.id,
@@ -329,6 +359,9 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
     contractId: mooringContract.id,
     unavailabilityId: unavailability.id,
     cartItemId: cartItem.id,
+    inventoryItemId: inventoryItem.id,
+    supplierId: supplier.id,
+    purchaseOrderId: purchaseOrder.id,
   }
 }
 

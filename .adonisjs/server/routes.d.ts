@@ -259,6 +259,24 @@ export type ScannedRoutes = {
     'pwa.manifest': { paramsTuple?: []; params?: {} }
     'reports.index': { paramsTuple?: []; params?: {} }
     'reports.export': { paramsTuple?: []; params?: {} }
+    'inventory.index': { paramsTuple?: []; params?: {} }
+    'inventory.importEngineParts': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.index': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.store': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.reorder': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'purchaseOrders.send': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'purchaseOrders.receive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'purchaseOrders.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'purchaseOrders.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'suppliers.store': { paramsTuple?: []; params?: {} }
+    'suppliers.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'suppliers.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'inventory.store': { paramsTuple?: []; params?: {} }
+    'inventory.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'inventory.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'inventory.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'signup.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -513,6 +531,9 @@ export type ScannedRoutes = {
     'pwa.manifest': { paramsTuple?: []; params?: {} }
     'reports.index': { paramsTuple?: []; params?: {} }
     'reports.export': { paramsTuple?: []; params?: {} }
+    'inventory.index': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.index': { paramsTuple?: []; params?: {} }
+    'inventory.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'login.two_factor.create': { paramsTuple?: []; params?: {} }
@@ -672,6 +693,9 @@ export type ScannedRoutes = {
     'pwa.manifest': { paramsTuple?: []; params?: {} }
     'reports.index': { paramsTuple?: []; params?: {} }
     'reports.export': { paramsTuple?: []; params?: {} }
+    'inventory.index': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.index': { paramsTuple?: []; params?: {} }
+    'inventory.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
     'login.two_factor.create': { paramsTuple?: []; params?: {} }
@@ -823,6 +847,15 @@ export type ScannedRoutes = {
     'clients.store': { paramsTuple?: []; params?: {} }
     'clients.anonymize': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'pricingSeasons.store': { paramsTuple?: []; params?: {} }
+    'inventory.importEngineParts': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.store': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.reorder': { paramsTuple?: []; params?: {} }
+    'purchaseOrders.send': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'purchaseOrders.receive': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'purchaseOrders.cancel': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'suppliers.store': { paramsTuple?: []; params?: {} }
+    'inventory.store': { paramsTuple?: []; params?: {} }
+    'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'signup.store': { paramsTuple?: []; params?: {} }
     'login.store': { paramsTuple?: []; params?: {} }
     'login.two_factor.store': { paramsTuple?: []; params?: {} }
@@ -907,6 +940,9 @@ export type ScannedRoutes = {
     'crew.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'clients.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'pricingSeasons.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'purchaseOrders.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'suppliers.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'inventory.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.sessions.notifications': { paramsTuple?: []; params?: {} }
     'settings.org.two_factor': { paramsTuple?: []; params?: {} }
     'settings.notifications.preferences': { paramsTuple?: []; params?: {} }
@@ -979,6 +1015,9 @@ export type ScannedRoutes = {
     'clients.media.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'id': ParamValue,'mediaId': ParamValue} }
     'clients.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'pricingSeasons.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'purchaseOrders.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'suppliers.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'inventory.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'settings.two_factor.cancel': { paramsTuple?: []; params?: {} }
     'settings.two_factor.destroy': { paramsTuple?: []; params?: {} }
     'settings.sessions.destroy_others': { paramsTuple?: []; params?: {} }

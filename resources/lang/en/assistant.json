@@ -136,7 +136,9 @@
     "notifications": "View notifications",
     "settingsMe": "My account and security",
     "settingsOrg": "Open organization settings",
-    "settingsNotifications": "Open notification settings"
+    "settingsNotifications": "Open notification settings",
+    "inventory": "Open the inventory",
+    "purchaseOrders": "See purchase orders"
   },
   "usage": {
     "line": "AI this month: {used} / {limit} tokens.",

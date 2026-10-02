@@ -30,5 +30,6 @@
     "business": "GESTION"
   },
   "spareParts": "Pièces détachées",
-  "engines": "Moteurs"
+  "engines": "Moteurs",
+  "inventory": "Inventaire"
 }

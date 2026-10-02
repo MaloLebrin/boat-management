@@ -351,7 +351,8 @@
     "importExceeded": "L'import CSV n'est pas disponible sur votre plan : les dépenses du budget s'importent dès le plan Pro, l'historique d'entretien demande le plan Entreprise.",
     "importExpensesExceeded": "L'import des dépenses est réservé aux plans Pro et Entreprise. Passez au plan Pro pour charger vos relevés de dépenses.",
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
-    "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur."
+    "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur.",
+    "inventoryExceeded": "L'inventaire de pièces (stock central, fournisseurs, bons de commande) est réservé aux plans Pro et Entreprise."
   },
   "organization": {
     "required": "Vous devez appartenir à une organisation pour effectuer cette action."
@@ -607,5 +608,32 @@
       "tooLong": "Attention : le bateau est plus long que la place.",
       "spotHasBoat": "Attention : un bateau de la flotte est attribué à cette place."
     }
+  },
+  "inventory": {
+    "itemCreated": "Article ajouté à l'inventaire.",
+    "itemUpdated": "Article mis à jour.",
+    "itemDeleted": "Article supprimé.",
+    "itemNotFound": "Article introuvable.",
+    "itemInUse": "Cet article figure sur un bon de commande : il ne peut pas être supprimé.",
+    "adjusted": "Stock ajusté.",
+    "adjustUnchanged": "Quantité inchangée : aucun mouvement enregistré.",
+    "imported": "Reprise terminée : {items} article(s) créé(s), {parts} pièce(s) moteur reliée(s).",
+    "supplierCreated": "Fournisseur ajouté.",
+    "supplierUpdated": "Fournisseur mis à jour.",
+    "supplierDeleted": "Fournisseur supprimé.",
+    "supplierNotFound": "Fournisseur introuvable.",
+    "supplierInUse": "Ce fournisseur a des bons de commande : il ne peut pas être supprimé."
+  },
+  "purchaseOrder": {
+    "created": "Bon de commande créé.",
+    "updated": "Bon de commande mis à jour.",
+    "sent": "Bon de commande marqué comme envoyé.",
+    "received": "Commande réceptionnée : le stock est à jour.",
+    "cancelled": "Bon de commande annulé.",
+    "deleted": "Bon de commande supprimé.",
+    "notFound": "Bon de commande introuvable.",
+    "invalidStatus": "Ce geste n'est pas possible dans l'état actuel du bon de commande.",
+    "boatNotFound": "Bateau introuvable.",
+    "nothingToReorder": "Aucun article de ce fournisseur n'est sous son seuil d'alerte."
   }
 }

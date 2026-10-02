@@ -344,6 +344,11 @@ export interface DashboardLowStockParts {
   total: number
   lowStockCount: number
   toReplaceCount: number
+  /**
+   * Articles du stock central sous leur seuil (#892) — les pièces moteur
+   * reliées à l'inventaire remontent par là, plus par `items`.
+   */
+  inventoryLowCount: number
 }
 
 export interface DashboardInvoicingSummary {

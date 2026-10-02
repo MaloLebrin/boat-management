@@ -54,6 +54,9 @@ declare module '@adonisjs/inertia/types' {
     'errors/server_error': ExtractProps<(typeof import('../../inertia/pages/errors/server_error.vue'))['default']>
     'errors/session_expired': ExtractProps<(typeof import('../../inertia/pages/errors/session_expired.vue'))['default']>
     'errors/too_many_requests': ExtractProps<(typeof import('../../inertia/pages/errors/too_many_requests.vue'))['default']>
+    'inventory/index': ExtractProps<(typeof import('../../inertia/pages/inventory/index.vue'))['default']>
+    'inventory/orders': ExtractProps<(typeof import('../../inertia/pages/inventory/orders.vue'))['default']>
+    'inventory/show': ExtractProps<(typeof import('../../inertia/pages/inventory/show.vue'))['default']>
     'invitations/accept': ExtractProps<(typeof import('../../inertia/pages/invitations/accept.vue'))['default']>
     'invoices/credit_note': ExtractProps<(typeof import('../../inertia/pages/invoices/credit_note.vue'))['default']>
     'invoices/form': ExtractProps<(typeof import('../../inertia/pages/invoices/form.vue'))['default']>

@@ -1,3 +1,4 @@
+import InventoryService from '#services/inventory_service'
 import AiAnalysisService from '#services/ai_analysis_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatMaintenanceTaskService from '#services/boat_maintenance_task_service'
@@ -42,7 +43,8 @@ export default class HomeController {
     private enginePartService: BoatEnginePartService,
     private reportingService: FleetReportingService,
     private crewService: CrewService,
-    private pwaLaunchCounter: PwaLaunchCounterService
+    private pwaLaunchCounter: PwaLaunchCounterService,
+    private inventoryService: InventoryService
   ) {}
 
   async index({ inertia, auth, request, response, session, i18n }: HttpContext) {
@@ -194,7 +196,15 @@ export default class HomeController {
       ...(visible.has('low_stock')
         ? {
             lowStock: inertia.defer(
-              deferJson(() => this.enginePartService.listAlertsForBoats(boatIds)),
+              deferJson(async () => {
+                const [alerts, inventoryLowCount] = await Promise.all([
+                  this.enginePartService.listAlertsForBoats(boatIds),
+                  user.organizationId === null
+                    ? 0
+                    : this.inventoryService.lowCount(user.organizationId),
+                ])
+                return { ...alerts, inventoryLowCount }
+              }),
               'lowStock'
             ),
           }

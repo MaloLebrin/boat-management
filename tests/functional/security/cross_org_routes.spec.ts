@@ -161,6 +161,10 @@ function contextualId(pattern: string, ids: CrossOrgIds): string | null {
   if (pattern.startsWith('/organization/members/')) return String(ids.memberId)
   if (pattern.startsWith('/organization/invitations/')) return String(ids.invitationId)
   if (pattern.startsWith('/push/')) return String(ids.pushId)
+  // Inventaire (#892) : les sous-ressources d'abord, l'article ensuite.
+  if (pattern.startsWith('/inventory/orders/')) return String(ids.purchaseOrderId)
+  if (pattern.startsWith('/inventory/suppliers/')) return String(ids.supplierId)
+  if (pattern.startsWith('/inventory/')) return String(ids.inventoryItemId)
   return null
 }
 

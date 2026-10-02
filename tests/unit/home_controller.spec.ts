@@ -11,6 +11,8 @@ let storedLayout: StoredDashboardLayout | null = null
 
 /** Compteur PWA (#865) : no-op, les tests unitaires n'ouvrent pas `?source=pwa`. */
 const pwaLaunchCounter = { increment: async () => {}, countFor: async () => 0 }
+/** Inventaire (#892) : aucun article sous son seuil. */
+const inventoryService = { lowCount: async () => 0 }
 
 test.group('HomeController (unit)', () => {
   test('renders dashboard when authenticated', async ({ assert }) => {
@@ -93,7 +95,8 @@ test.group('HomeController (unit)', () => {
       } as any,
       {} as any,
       {} as any,
-      pwaLaunchCounter as any
+      pwaLaunchCounter as any,
+      inventoryService as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []
@@ -248,7 +251,8 @@ test.group('HomeController (unit)', () => {
         { listAlertsForBoats: async () => ({ items: [], total: 0 }) } as any,
         { getMonthMarginForUser: async () => ({ margin: 0 }) } as any,
         { getDashboardCertifications: async () => ({ items: [] }) } as any,
-        pwaLaunchCounter as any
+        pwaLaunchCounter as any,
+        inventoryService as any
       )
 
       const rendered: Array<{ component: string; props: any }> = []
@@ -369,7 +373,8 @@ test.group('HomeController (unit)', () => {
         {} as any,
         {} as any,
         {} as any,
-        pwaLaunchCounter as any
+        pwaLaunchCounter as any,
+        inventoryService as any
       )
 
       const rendered: Array<{ component: string; props: any }> = []
@@ -460,7 +465,8 @@ test.group('HomeController (unit)', () => {
       {} as any,
       {} as any,
       {} as any,
-      pwaLaunchCounter as any
+      pwaLaunchCounter as any,
+      inventoryService as any
     )
 
     const rendered: Array<{ component: string; props: any }> = []

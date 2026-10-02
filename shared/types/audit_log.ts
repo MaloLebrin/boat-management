@@ -139,6 +139,15 @@ export const AUDIT_ACTIONS = [
   'calendar.token_revoked',
   'external_calendar.added',
   'external_calendar.removed',
+  // Inventaire de pièces (#892) : ajustements de stock, reprise des stocks
+  // moteur et cycle de vie des bons de commande.
+  'inventory.adjust',
+  'inventory.import',
+  'purchase_order.create',
+  'purchase_order.send',
+  'purchase_order.receive',
+  'purchase_order.cancel',
+  'purchase_order.delete',
 ] as const
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number]
@@ -164,6 +173,7 @@ export const AUDIT_FAMILIES = [
   'document',
   'export',
   'calendar',
+  'inventory',
 ] as const
 
 export type AuditFamily = (typeof AUDIT_FAMILIES)[number]
@@ -283,6 +293,15 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'calendar.token_revoked',
     'external_calendar.added',
     'external_calendar.removed',
+  ],
+  inventory: [
+    'inventory.adjust',
+    'inventory.import',
+    'purchase_order.create',
+    'purchase_order.send',
+    'purchase_order.receive',
+    'purchase_order.cancel',
+    'purchase_order.delete',
   ],
 }
 

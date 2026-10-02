@@ -668,7 +668,11 @@
       "notes": "Notes",
       "actions": "Actions",
       "addModalTitle": "Add a part",
-      "editModalTitle": "Edit part"
+      "editModalTitle": "Edit part",
+      "inventoryItem": "Inventory item",
+      "inventoryNone": "Not linked — this engine's own stock",
+      "inventoryHint": "Once linked, the part reads its stock from the inventory and every maintenance that uses it takes it out. Its own stock is kept.",
+      "inventoryLinked": "Inventory stock: {item}"
     },
     "partShow": {
       "tabs": {

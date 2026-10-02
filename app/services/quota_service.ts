@@ -143,6 +143,22 @@ export default class QuotaService {
     return PLAN_LIMITS[org.plan].canViewReports
   }
 
+  /** Inventaire de pièces (#892) — capacité de tier pure, dès Pro. */
+  canManageInventory(org: Organization | null): boolean {
+    this.#assertOrganization(org)
+    return PLAN_LIMITS[org.plan].canManageInventory
+  }
+
+  assertCanManageInventory(org: Organization | null): void {
+    if (!this.canManageInventory(org)) {
+      throw new QuotaExceededError('inventory', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org!.plan),
+      })
+    }
+  }
+
   // Les capacités clients/pricing/invoices peuvent venir du tier OU d'un
   // module add-on (épic #327) : elles passent par les quotas effectifs.
   // Les autres checks restent tier-only tant qu'aucun module ne les accorde.
