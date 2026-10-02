@@ -14,6 +14,9 @@ export function useNavSections() {
   // Cartographie de port réservée aux plans Pro et Entreprise (#604) — même
   // garde que `RequirePortsPlanMiddleware` côté serveur, sinon lien mort.
   const canManagePorts = computed(() => effectiveQuotas.value?.canManagePorts === true)
+  // Inventaire de pièces (#892) : plans Pro et Entreprise, même garde que
+  // `requireModulePlan({ feature: 'inventory' })` côté serveur.
+  const canManageInventory = computed(() => effectiveQuotas.value?.canManageInventory === true)
   // Réservations réservées au module Location / plan Entreprise (#595) — même
   // garde que `RequireReservationsPlanMiddleware` côté serveur.
   const canManageReservations = computed(
@@ -78,6 +81,14 @@ export function useNavSections() {
         { name: t('nav.diagnostic'), path: '/diagnostic', route: null, icon: 'alert-triangle' },
         { name: t('nav.spareParts'), path: '/spare-parts', route: null, icon: 'gear' }
       )
+    }
+    if (canManageInventory.value && can('inventory.view')) {
+      maintenanceItems.push({
+        name: t('nav.inventory'),
+        path: '/inventory',
+        route: null,
+        icon: 'box',
+      })
     }
 
     const businessItems: { name: string; path: string; route: null; icon: string }[] = []

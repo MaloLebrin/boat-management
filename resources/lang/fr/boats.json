@@ -690,7 +690,11 @@
       "notes": "Notes",
       "actions": "Actions",
       "addModalTitle": "Ajouter une pièce",
-      "editModalTitle": "Modifier la pièce"
+      "editModalTitle": "Modifier la pièce",
+      "inventoryItem": "Article de l'inventaire",
+      "inventoryNone": "Non relié — stock propre à ce moteur",
+      "inventoryHint": "Reliée, la pièce lit son stock dans l'inventaire et chaque entretien qui la consomme le décrémente. Son stock propre est conservé.",
+      "inventoryLinked": "Stock de l'inventaire : {item}"
     },
     "partShow": {
       "tabs": {

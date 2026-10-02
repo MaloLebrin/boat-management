@@ -149,6 +149,17 @@ export const ASSISTANT_NAV_TARGETS = {
     i18nKey: 'assistant.navTargets.reports',
     promptLabel: { fr: 'Reporting financier de flotte', en: 'Fleet financial reporting' },
   },
+  // Inventaire de pièces (#892) : stock central et bons de commande.
+  'inventory.index': {
+    path: '/inventory',
+    i18nKey: 'assistant.navTargets.inventory',
+    promptLabel: { fr: 'Inventaire de pièces', en: 'Parts inventory' },
+  },
+  'purchaseOrders.index': {
+    path: '/inventory/orders',
+    i18nKey: 'assistant.navTargets.purchaseOrders',
+    promptLabel: { fr: 'Bons de commande', en: 'Purchase orders' },
+  },
   'crew.index': {
     path: '/crew',
     i18nKey: 'assistant.navTargets.crew',

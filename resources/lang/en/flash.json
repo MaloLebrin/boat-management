@@ -351,7 +351,8 @@
     "importExceeded": "CSV import is not available on your plan: budget expenses import from the Pro plan, maintenance history requires the Enterprise plan.",
     "importExpensesExceeded": "Expense import is reserved to the Pro and Enterprise plans. Upgrade to Pro to load your expense statements.",
     "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
-    "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan."
+    "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan.",
+    "inventoryExceeded": "The parts inventory (central stock, suppliers, purchase orders) is available on the Pro and Enterprise plans."
   },
   "organization": {
     "required": "You must belong to an organization to perform this action."
@@ -607,5 +608,32 @@
       "tooLong": "Warning: the boat is longer than the berth.",
       "spotHasBoat": "Warning: a fleet boat is assigned to this berth."
     }
+  },
+  "inventory": {
+    "itemCreated": "Item added to the inventory.",
+    "itemUpdated": "Item updated.",
+    "itemDeleted": "Item deleted.",
+    "itemNotFound": "Item not found.",
+    "itemInUse": "This item is on a purchase order: it cannot be deleted.",
+    "adjusted": "Stock adjusted.",
+    "adjustUnchanged": "Quantity unchanged: no movement recorded.",
+    "imported": "Import complete: {items} item(s) created, {parts} engine part(s) linked.",
+    "supplierCreated": "Supplier added.",
+    "supplierUpdated": "Supplier updated.",
+    "supplierDeleted": "Supplier deleted.",
+    "supplierNotFound": "Supplier not found.",
+    "supplierInUse": "This supplier has purchase orders: it cannot be deleted."
+  },
+  "purchaseOrder": {
+    "created": "Purchase order created.",
+    "updated": "Purchase order updated.",
+    "sent": "Purchase order marked as sent.",
+    "received": "Order received: stock is up to date.",
+    "cancelled": "Purchase order cancelled.",
+    "deleted": "Purchase order deleted.",
+    "notFound": "Purchase order not found.",
+    "invalidStatus": "This action is not possible in the purchase order's current status.",
+    "boatNotFound": "Boat not found.",
+    "nothingToReorder": "No item from this supplier is below its alert threshold."
   }
 }

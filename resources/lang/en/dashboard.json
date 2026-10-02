@@ -286,7 +286,9 @@
     "toReplaceChip": "{count, plural, one {# to replace} other {# to replace}}",
     "stock": "Stock {stock} / min {min}",
     "open": "Open part {part} ({boat})",
-    "more": "{count, plural, one {# more part on alert} other {# more parts on alert}}"
+    "more": "{count, plural, one {# more part on alert} other {# more parts on alert}}",
+    "inventoryTitle": "Workshop stock",
+    "inventoryCount": "{count, plural, one {# item below threshold} other {# items below threshold}}"
   },
   "invoicing": {
     "title": "Invoicing",

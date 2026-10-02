@@ -897,7 +897,8 @@ export default class MarketingContentService {
                 this.pricingTable.flagRow(t, 'table_g2_r4', 'canGroupTasks'),
                 [t('table_g2_r5'), true, true, true],
                 [t('table_g2_r6'), false, true, true],
-                [t('table_g2_r7'), false, true, true],
+                // Inventaire de pièces (#892) : la ligne suit le flag, plus un littéral.
+                this.pricingTable.flagRow(t, 'table_g2_r7', 'canManageInventory'),
                 this.pricingTable.flagRow(t, 'table_g2_r8', 'canManagePorts'),
               ] as PricingTableRow[],
             },

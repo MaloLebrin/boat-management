@@ -57,6 +57,9 @@ export default class RequireModulePlanMiddleware {
         return this.quotaService.assertCanManagePricing(org)
       case 'reservations':
         return this.quotaService.assertCanManageReservations(org)
+      // Inventaire de pièces (#892) : capacité de tier pure, dès Pro.
+      case 'inventory':
+        return Promise.resolve().then(() => this.quotaService.assertCanManageInventory(org))
     }
   }
 }

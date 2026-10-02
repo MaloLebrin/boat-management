@@ -14,13 +14,16 @@ import BudgetService from '#services/budget_service'
 import ClientService from '#services/client_service'
 import DashboardService from '#services/dashboard_service'
 import FleetReportingService from '#services/fleet_reporting_service'
+import InventoryService from '#services/inventory_service'
 import InvoiceService from '#services/invoice_service'
 import NavigationService from '#services/navigation_service'
 import OrganizationModuleService from '#services/organization_module_service'
 import PlanningService from '#services/planning_service'
 import PortService from '#services/port_service'
+import PurchaseOrderService from '#services/purchase_order_service'
 import QuotaService from '#services/quota_service'
 import SubscriptionService from '#services/subscription_service'
+import { effectivePartStock } from '#shared/helpers/inventory'
 import { DEFAULT_APP_LOCALE } from '#shared/helpers/locale_path'
 import type { AiSuggestionLocale, AiToolCall, AiToolDefinition } from '#shared/types/ai'
 import {
@@ -116,7 +119,9 @@ export default class AssistantToolsService {
     private safetyComplianceService: BoatSafetyComplianceService,
     private subscriptionService: SubscriptionService,
     private availabilityService: BoatAvailabilityService,
-    private reportingService: FleetReportingService
+    private reportingService: FleetReportingService,
+    private inventoryService: InventoryService,
+    private purchaseOrderService: PurchaseOrderService
   ) {}
 
   /** Outils proposés au modèle pour cet utilisateur (rôle + plan). */
@@ -320,14 +325,19 @@ export default class AssistantToolsService {
             this.enginePartService.listForEngine(engine.id),
             this.enginePartService.listLowStock(engine.id),
           ])
-          const toPartRow = (part: (typeof parts)[number]) => ({
-            id: part.id,
-            designation: part.designation,
-            reference: part.reference,
-            stock: part.stock,
-            minStockAlert: part.minStockAlert,
-            wearState: part.wearState,
-          })
+          const toPartRow = (part: (typeof parts)[number]) => {
+            // Reliée à l'inventaire (#892), la pièce lit le stock de l'atelier.
+            const view = effectivePartStock(part, part.inventoryItem)
+            return {
+              id: part.id,
+              designation: part.designation,
+              reference: part.reference,
+              stock: view.stock,
+              minStockAlert: view.minStockAlert,
+              fromInventory: view.fromInventory,
+              wearState: part.wearState,
+            }
+          }
           return {
             id: engine.id,
             boatId: engine.boatId,
@@ -455,6 +465,59 @@ export default class AssistantToolsService {
               costPerRentalDay: row.costPerRentalDay,
               costPerNauticalMile: row.costPerNauticalMile,
             })),
+          }
+        },
+      },
+      {
+        name: 'inventory_status',
+        description:
+          'Central parts inventory of the workshop (#892): items with quantity, unit, alert threshold, location, average cost and usual supplier — items at or below their threshold first — plus open purchase orders (draft or sent). Use it for "how many oil filters are left", "what should I reorder", "is my order received". Engine parts linked to an item read their stock from it.',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: { type: 'string', description: 'Filter by name, reference or location' },
+            lowOnly: { type: 'boolean', description: 'Only items at or below their threshold' },
+          },
+        },
+        capability: 'inventory.view',
+        planFlags: ['canManageInventory'],
+        execute: async (user, args) => {
+          if (user.organizationId === null) return { error: 'No organization' }
+          const [items, orders] = await Promise.all([
+            this.inventoryService.list(user.organizationId, {
+              q: toStr(args.query) ?? '',
+              filter: toBool(args.lowOnly) ? 'low' : 'all',
+            }),
+            this.purchaseOrderService.list(user.organizationId),
+          ])
+          const sorted = [...items].sort((a, b) => Number(b.isLow) - Number(a.isLow))
+          return {
+            totalItems: items.length,
+            lowCount: items.filter((item) => item.isLow).length,
+            items: sorted.slice(0, 40).map((item) => ({
+              id: item.id,
+              name: item.name,
+              reference: item.reference,
+              quantity: item.quantity,
+              unit: item.unit,
+              minQuantity: item.minQuantity,
+              isLow: item.isLow,
+              location: item.location,
+              averageCost: item.averageCost,
+              supplier: item.supplierName,
+              linkedEngineParts: item.linkedPartsCount,
+            })),
+            openOrders: orders
+              .filter((order) => order.status === 'draft' || order.status === 'sent')
+              .slice(0, 10)
+              .map((order) => ({
+                number: order.number,
+                status: order.status,
+                supplier: order.supplierName,
+                orderedOn: order.orderedOn,
+                total: order.total,
+                lines: order.lines.map((line) => `${line.quantity} × ${line.itemName}`),
+              })),
           }
         },
       },

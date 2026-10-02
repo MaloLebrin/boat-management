@@ -8,12 +8,15 @@ import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEnginePart } from '~/types/boat_show'
+import type { InventoryItemOption } from '#shared/types/inventory'
 
 const props = defineProps<{
   open: boolean
   boatId: number
   engineId: number
   editingPart: BoatShowEnginePart | null
+  /** Articles du stock central (#892), `null` quand l'inventaire n'est pas ouvert. */
+  inventoryOptions?: InventoryItemOption[] | null
 }>()
 
 const emit = defineEmits<{
@@ -30,6 +33,15 @@ const notes = ref('')
 const wearState = ref('')
 const purchasePrice = ref('')
 const purchasedAt = ref('')
+const inventoryItemId = ref('')
+
+const inventorySelectOptions = computed(() => [
+  { value: '', label: t('boats.engineShow.parts.inventoryNone') },
+  ...(props.inventoryOptions ?? []).map((item) => ({
+    value: String(item.id),
+    label: item.reference ? `${item.name} · ${item.reference}` : item.name,
+  })),
+])
 
 const isEditing = computed(() => props.editingPart !== null)
 
@@ -73,7 +85,11 @@ watch(
       purchasedAt.value = props.editingPart.purchasedAt
         ? props.editingPart.purchasedAt.slice(0, 10)
         : ''
+      inventoryItemId.value = props.editingPart.inventoryItem
+        ? String(props.editingPart.inventoryItem.id)
+        : ''
     } else if (isOpen) {
+      inventoryItemId.value = ''
       designation.value = ''
       reference.value = ''
       stock.value = ''
@@ -123,6 +139,18 @@ function close() {
           v-model="stock"
           :errors="errors"
         />
+      </div>
+
+      <div v-if="inventoryOptions" class="space-y-1">
+        <BaseSelect
+          id="part-inventory-item"
+          name="inventoryItemId"
+          :label="t('boats.engineShow.parts.inventoryItem')"
+          :options="inventorySelectOptions"
+          v-model="inventoryItemId"
+          :errors="errors"
+        />
+        <p class="text-xs text-fg-subtle">{{ t('boats.engineShow.parts.inventoryHint') }}</p>
       </div>
 
       <BaseInput

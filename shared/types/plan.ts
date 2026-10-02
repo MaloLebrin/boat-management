@@ -56,6 +56,12 @@ export interface PlanQuotas {
    * apparaissent qu'avec le module Location, mais les coûts se lisent sans).
    */
   canViewReports: boolean
+  /**
+   * Inventaire de pièces au niveau de l'organisation (`/inventory`, #892) :
+   * stock central, fournisseurs, bons de commande — dès le plan **Pro**.
+   * Capacité de tier pure, comme le reporting.
+   */
+  canManageInventory: boolean
 }
 
 export interface QuotaUsage {
@@ -106,6 +112,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canImport: false,
     canImportExpenses: false,
     canViewReports: false,
+    canManageInventory: false,
   },
   pro: {
     maxBoats: 8,
@@ -126,6 +133,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canImport: false,
     canImportExpenses: true,
     canViewReports: true,
+    canManageInventory: true,
   },
   enterprise: {
     maxBoats: null,
@@ -146,6 +154,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canImport: true,
     canImportExpenses: true,
     canViewReports: true,
+    canManageInventory: true,
   },
 }
 
@@ -249,4 +258,4 @@ export function getUpgradeTier(current: PlanTier): PlanTier | null {
  * (`middleware.requireModulePlan({ feature })`) : chacune correspond à un
  * `assertCanManage*` de `QuotaService` et à un message `flash.quota.<feature>Exceeded`.
  */
-export type ModulePlanFeature = 'clients' | 'invoices' | 'pricing' | 'reservations'
+export type ModulePlanFeature = 'clients' | 'invoices' | 'pricing' | 'reservations' | 'inventory'

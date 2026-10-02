@@ -20,6 +20,7 @@ const lowStock: DashboardLowStockParts = {
   total: 8,
   lowStockCount: 5,
   toReplaceCount: 3,
+  inventoryLowCount: 0,
   items: [
     {
       id: 1,
@@ -55,6 +56,26 @@ const lowStock: DashboardLowStockParts = {
 }
 
 describe('DashboardLowStockCard', () => {
+  // Stock central (#892) : les articles sous leur seuil remontent par un lien
+  // unique vers l'inventaire filtré, et l'état vide ne ment plus.
+  test('links to the low-stock inventory instead of claiming nothing is missing', () => {
+    const w = mount(DashboardLowStockCard, {
+      props: {
+        lowStock: {
+          items: [],
+          total: 0,
+          lowStockCount: 0,
+          toReplaceCount: 0,
+          inventoryLowCount: 2,
+        },
+      },
+    })
+    const link = w.get('[data-testid="dashboard-low-stock-inventory"]')
+    expect(link.attributes('href')).toBe('/inventory?filter=low')
+    expect(link.text()).toContain('dashboard.lowStock.inventoryCount(2)')
+    expect(w.find('[data-testid="dashboard-low-stock-empty"]').exists()).toBe(false)
+  })
+
   test('shows a skeleton while the deferred prop has not arrived', () => {
     const w = mount(DashboardLowStockCard, { props: { lowStock: undefined } })
     expect(w.find('[data-testid="dashboard-low-stock-skeleton"]').exists()).toBe(true)
@@ -63,7 +84,15 @@ describe('DashboardLowStockCard', () => {
 
   test('renders the empty state without any alert', () => {
     const w = mount(DashboardLowStockCard, {
-      props: { lowStock: { items: [], total: 0, lowStockCount: 0, toReplaceCount: 0 } },
+      props: {
+        lowStock: {
+          items: [],
+          total: 0,
+          lowStockCount: 0,
+          toReplaceCount: 0,
+          inventoryLowCount: 0,
+        },
+      },
     })
     expect(w.find('[data-testid="dashboard-low-stock-empty"]').exists()).toBe(true)
     expect(w.find('[data-testid="dashboard-low-stock-more"]').exists()).toBe(false)

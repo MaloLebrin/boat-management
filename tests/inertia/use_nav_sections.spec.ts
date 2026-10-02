@@ -398,3 +398,18 @@ test('an admin sees the reports item on every plan, a member never', () => {
   const member = mountWithPlan('enterprise')
   expect(businessNames(member.navSections)).not.toContain('nav.reports')
 })
+
+// Inventaire de pièces (#892) : plans Pro et Entreprise, capability `inventory.view`.
+
+test('the inventory item needs a Pro plan and inventory.view', () => {
+  const names = (plan: string, capabilities: Capability[]) =>
+    mountWithPlan(plan, [], capabilities)
+      .navSections.value.flatMap((section) => section.items)
+      .map((item) => item.name)
+
+  const withInventory: Capability[] = [...MEMBER_CAPABILITIES, 'inventory.view']
+  expect(names('pro', withInventory)).toContain('nav.inventory')
+  expect(names('enterprise', withInventory)).toContain('nav.inventory')
+  expect(names('starter', withInventory)).not.toContain('nav.inventory')
+  expect(names('pro', MEMBER_CAPABILITIES)).not.toContain('nav.inventory')
+})

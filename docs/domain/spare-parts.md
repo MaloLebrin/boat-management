@@ -120,6 +120,56 @@ Le même chatbot, ouvert en page publique marketing (`/en/engine-part-finder-ai`
 - **SEO (2026-09-22)** : `show()` sert aussi une prop `content` (`PublicPartSearchContentProps`) construite par `PublicPartSearchContentService` — étapes, huit pièces fréquentes, maillage, FAQ, CTA final — le contenu indexable de la page, quota interpolé depuis `PUBLIC_PART_SEARCH_LIFETIME_LIMIT`. Tests : `tests/functional/marketing/parts_ai_seo.spec.ts`.
 - **Acquisition** : CTA `/signup?from=parts` (quota épuisé, carte résultat) → notice `auth.signup.fromPartsAiNotice` ; liens nav/footer publics ; entrée sitemap `partsAi`. La mise en avant home/tarifs (pattern #609) reste à faire.
 
+## Inventaire de pièces au niveau de l'organisation (#892)
+
+Jusqu'ici, le stock était **par pièce de moteur** (`boat_engine_parts.stock` / `min_stock_alert`) : douze moteurs du même modèle, douze « stocks » du même filtre, pour un seul carton à l'atelier. L'inventaire tient ce stock **une fois pour toute l'organisation**. Plans **Pro et Entreprise** (`canManageInventory`, capacité de tier pure) ; Starter est renvoyé vers les offres par `requireModulePlan({ feature: 'inventory' })`, posé sur tout le groupe de routes.
+
+### Modèle
+
+- `inventory_items` — l'article : désignation, référence, unité (`unit`, `liter`, `meter`, `kit`, `box`), `quantity` décimale, `min_quantity` (seuil), emplacement, `average_cost`, fournisseur habituel.
+- `inventory_movements` — le journal, une ligne signée par entrée ou sortie : `purchase`, `consumption`, `adjustment`, `return`, avec l'entretien (`maintenance_event_id`) ou le bon de commande d'origine, l'auteur et une note. **La quantité d'un article est toujours la somme de son journal** : seul `InventoryService.recordMovement` l'écrit, sous verrou (`FOR UPDATE`) et dans la transaction de l'appelant.
+- `suppliers`, `purchase_orders`, `purchase_order_lines` — fournisseurs et bons de commande (`draft` → `sent` → `received`, ou `cancelled`), numérotés séquentiellement par organisation (verrou consultatif de transaction).
+- `boat_engine_parts.inventory_item_id` — liaison facultative d'une pièce moteur à un article.
+
+### Règles
+
+- **Stock bas** : `quantity <= min_quantity`, seuil renseigné — la même règle que les pièces moteur (`isInventoryLow`, `shared/helpers/inventory.ts`).
+- **Prix moyen pondéré** à chaque entrée valorisée (achat, stock initial, reprise) : `(stock détenu × prix moyen + reçu × prix) / (stock détenu + reçu)`. Un stock négatif ne pèse pas ; sans prix moyen antérieur, le prix d'achat fait foi. Un retour ne change pas le prix moyen.
+- **Comptage** (`POST /inventory/:id/adjust`) : on saisit la quantité comptée, le mouvement `adjustment` porte l'écart ; aucun mouvement si rien ne change. Journal d'audit `inventory.adjust`.
+- **Entretien** : saisir un entretien avec une pièce moteur **reliée** écrit un mouvement `consumption` (quantité de la ligne, 1 par défaut) dans la transaction de l'entretien, et le `stock` local de la pièce n'est plus décrémenté. Une pièce non reliée garde l'ancien décrément local. **Supprimer l'entretien** remet ses sorties en stock (mouvement `return` du net par article). Le stock peut devenir négatif : c'est un signal (saisie antérieure à la livraison, ou inventaire faux), pas une erreur.
+- **Stock vu d'une pièce reliée** : `effectivePartStock()` — la quantité et le seuil de l'article remplacent les compteurs locaux dans l'onglet Pièces, la fiche pièce, `get_engine` de l'assistant et le contexte des suggestions IA ; `listLowStock(engineId)` juge une pièce reliée sur son article.
+- **Délier ne perd rien** : le `stock` local d'une pièce n'est ni effacé ni migré ; il redevient la référence si on délie la pièce, ou si l'article est supprimé (FK `SET NULL`).
+- **Reprise des stocks moteur** (`POST /inventory/import-engine-parts`) : les pièces suivies en stock (compteur ou seuil saisi) et non reliées sont regroupées par référence (à défaut par désignation, casse ignorée). Un article par groupe : quantité = **somme** des stocks moteur (mouvement `adjustment` annoté — à vérifier par un comptage si les compteurs désignaient le même carton), seuil = le plus haut, prix moyen = moyenne des prix d'achat renseignés. Idempotente. Journal `inventory.import`.
+- **Bons de commande** : seul un brouillon se modifie (lignes remplacées). « Préparer la commande » (`POST /inventory/orders/reorder`) crée un brouillon avec les articles sous leur seuil dont c'est le fournisseur habituel, à `ceil(2 × seuil − quantité)` (une unité au moins), au dernier prix moyen. Une ligne sans prix reprend le prix moyen de l'article.
+- **Réception** (`POST /inventory/orders/:id/receive`, depuis `draft` ou `sent`, bon verrouillé) : un mouvement `purchase` par ligne, prix moyen recalculé ; si le bon est **affecté à un bateau**, une dépense « entretien » de son total HT est inscrite au budget de ce bateau (`boat_budget_entries`, référencée par `purchase_orders.budget_entry_id`). Sans bateau (« stock atelier »), aucune dépense : le budget par bateau n'a pas de ligne d'organisation.
+- **Suppressions** (admin, `inventory.delete`) : un article encore porté par un bon de commande, un fournisseur qui a des bons, un bon reçu ou envoyé ne se suppriment pas.
+- **Rôles** : `inventory.view` et `inventory.manage` pour admin et member ; `inventory.delete` admin seul ; le mechanic n'y a pas accès (ses capabilities restent `maintenance.*`).
+
+### Routes (`start/routes/inventory.ts`, auth + garde de plan)
+
+| Méthode          | Pattern                                       | Action                                    |
+| ---------------- | --------------------------------------------- | ----------------------------------------- |
+| GET              | `/inventory?q=&filter=all\|low`               | liste, recherche, filtre stock bas        |
+| POST / PUT / DEL | `/inventory`, `/inventory/:id`                | article (création avec stock initial)     |
+| GET              | `/inventory/:id`                              | fiche : chiffres, pièces reliées, journal |
+| POST             | `/inventory/:id/adjust`                       | comptage                                  |
+| POST             | `/inventory/import-engine-parts`              | reprise des stocks moteur                 |
+| GET / POST       | `/inventory/orders`                           | bons de commande                          |
+| PUT / DEL        | `/inventory/orders/:id`                       | modifier (brouillon), supprimer           |
+| POST             | `/inventory/orders/reorder`                   | brouillon depuis les stocks bas           |
+| POST             | `/inventory/orders/:id/send\|receive\|cancel` | transitions                               |
+| POST / PUT / DEL | `/inventory/suppliers[/:id]`                  | fournisseurs                              |
+
+Code : `InventoryService`, `SupplierService`, `PurchaseOrderService` ; contrôleurs `InventoryController`, `SuppliersController`, `PurchaseOrdersController` ; `InventoryPolicy` ; erreurs `app/exceptions/inventory_errors.ts` ; types `shared/types/inventory.ts` ; calculs purs `shared/helpers/inventory.ts`.
+
+### Ailleurs dans l'app
+
+- **Widget « Pièces manquantes »** (#840) : une pièce reliée ne remonte plus par son compteur local ; la carte affiche à la place un lien « Stock atelier — N articles sous le seuil » vers `/inventory?filter=low` (`inventoryLowCount`).
+- **Assistant** : outil `inventory_status` (articles, stock bas d'abord, bons ouverts), gardé par `inventory.view` + `canManageInventory` ; cibles de navigation `inventory.index` et `purchaseOrders.index` ; entrée `parts-inventory` de la base de connaissance.
+- **Fiche moteur** : prop `inventoryOptions` (articles de l'organisation, `null` hors plan ou sans `inventory.view`) pour le sélecteur « Article de l'inventaire » du formulaire de pièce.
+
 ## Hors périmètre
 
 Reconnaissance de pièce par photo ; vues éclatées intégrées (partenariat/affiliation ou schémas propres) ; reprise automatisée des catalogues revendeurs (contenus sous droits) ; prix et disponibilité en temps réel — les `priceKey` restent des fourchettes indicatives ; compatibilité croisée entre modèles (« cette turbine va aussi sur… ») ; affiliation ou partenariat revendeur, point ouvert de #517. Les checklists de diagnostic in-bord, un temps listées ici, sont livrées par #576 — voir `docs/domain/diagnostic.md`.
+
+Côté inventaire (#892), restent hors périmètre : export PDF / envoi par e-mail du bon de commande, création d'un bon depuis la liste de réparation IA, notification push/e-mail du stock bas (le widget et la page suffisent pour l'instant), codes-barres / scan, prix fournisseurs en temps réel.

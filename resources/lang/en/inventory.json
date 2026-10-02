@@ -1,0 +1,151 @@
+{
+  "title": "Inventory",
+  "subtitle": "The workshop's parts stock, shared by the whole fleet.",
+  "add": "Add an item",
+  "ordersLink": "Orders and suppliers",
+  "units": {
+    "unit": "pcs",
+    "liter": "L",
+    "meter": "m",
+    "kit": "kit(s)",
+    "box": "box(es)"
+  },
+  "fields": {
+    "name": "Name",
+    "reference": "Reference",
+    "unit": "Unit",
+    "quantity": "Quantity",
+    "minQuantity": "Alert threshold",
+    "location": "Location",
+    "averageCost": "Average cost",
+    "stockValue": "Stock value",
+    "supplier": "Supplier",
+    "unitCost": "Unit price (excl. VAT)",
+    "notes": "Notes"
+  },
+  "filters": {
+    "all": "All",
+    "low": "Low stock ({count})",
+    "search": "Search",
+    "searchPlaceholder": "Name, reference, location…"
+  },
+  "form": {
+    "addTitle": "New item",
+    "editTitle": "Edit item",
+    "initialStock": "Opening stock",
+    "minQuantityHint": "Alert when the quantity reaches this threshold.",
+    "noSupplier": "No supplier"
+  },
+  "list": {
+    "actions": "Actions",
+    "count": "Count",
+    "edit": "Edit",
+    "linkedParts": "{count, plural, one {# linked engine part} other {# linked engine parts}}",
+    "noMatch": "No item matches these filters."
+  },
+  "empty": {
+    "title": "No item in stock",
+    "description": "Add the workshop's parts, or import the stock recorded on engines."
+  },
+  "import": {
+    "banner": "{count, plural, one {# engine part tracks} other {# engine parts track}} a stock of its own. Import them into the inventory: one item per reference, its quantity being the sum of the engine stocks — check it with a count afterwards.",
+    "action": "Import engine stock",
+    "movementNote": "Import of stock recorded per engine"
+  },
+  "adjust": {
+    "title": "Count stock",
+    "current": "Recorded quantity: {quantity} {unit}",
+    "counted": "Counted quantity",
+    "note": "Reason",
+    "notePlaceholder": "Yearly count, breakage, return…",
+    "submit": "Save count"
+  },
+  "show": {
+    "low": "Low stock",
+    "noLocation": "No location",
+    "delete": "Delete",
+    "deleteTitle": "Delete this item?",
+    "deleteMessage": "Its movement log will be erased and linked engine parts will go back to their own stock.",
+    "linkedParts": "Linked engine parts",
+    "noLinkedParts": "No engine part is linked to this item. Link one from an engine's Parts tab."
+  },
+  "movements": {
+    "title": "Movements",
+    "empty": "No movement recorded.",
+    "reasons": {
+      "purchase": "Purchase",
+      "consumption": "Consumption",
+      "adjustment": "Adjustment",
+      "return": "Return"
+    },
+    "order": "Purchase order #{number}",
+    "unitCost": "{cost} each"
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "add": "Add a supplier",
+    "addTitle": "New supplier",
+    "editTitle": "Edit supplier",
+    "empty": "No supplier yet. Add one to place orders.",
+    "delete": "Delete",
+    "deleteTitle": "Delete this supplier?",
+    "deleteMessage": "Items that had it as their usual supplier will no longer have one.",
+    "leadTime": "{days, plural, one {delivered in # day} other {delivered in # days}}",
+    "fields": {
+      "name": "Name",
+      "contactName": "Contact",
+      "email": "Email",
+      "phone": "Phone",
+      "leadTimeDays": "Lead time (days)"
+    }
+  },
+  "orders": {
+    "title": "Purchase orders",
+    "subtitle": "Order from your suppliers; receiving an order updates the stock.",
+    "add": "New purchase order",
+    "empty": "No purchase order.",
+    "prerequisites": "Add at least one supplier and one item to place an order.",
+    "number": "Order #{number}",
+    "orderedOn": "ordered on {date}",
+    "receivedOn": "received on {date}",
+    "total": "Total excl. VAT: {total}",
+    "budgetLabel": "Parts — order #{number} ({supplier})",
+    "status": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "received": "Received",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "send": "Mark as sent",
+      "receive": "Receive",
+      "cancel": "Cancel order",
+      "delete": "Delete"
+    },
+    "receiveConfirm": {
+      "title": "Receive this order?",
+      "message": "Ordered quantities enter the stock and the items' average cost is recalculated.",
+      "messageBoat": "Ordered quantities enter the stock, the average cost is recalculated and the amount is added to {boat}'s budget."
+    },
+    "deleteConfirm": {
+      "title": "Delete this purchase order?",
+      "message": "The order and its lines will be erased."
+    },
+    "reorder": {
+      "supplier": "Reorder low stock from",
+      "hint": "Prepares a draft with its items below threshold.",
+      "submit": "Prepare the order"
+    },
+    "form": {
+      "addTitle": "New purchase order",
+      "editTitle": "Order #{number}",
+      "boat": "Boat",
+      "boatHint": "Optional: receiving will charge the amount to its budget.",
+      "workshop": "Workshop stock",
+      "lines": "Lines",
+      "item": "Item",
+      "addLine": "Add a line",
+      "removeLine": "Remove"
+    }
+  }
+}

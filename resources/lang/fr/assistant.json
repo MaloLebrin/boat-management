@@ -136,7 +136,9 @@
     "notifications": "Voir les notifications",
     "settingsMe": "Mon compte et sécurité",
     "settingsOrg": "Ouvrir les réglages de l’organisation",
-    "settingsNotifications": "Ouvrir les réglages de notifications"
+    "settingsNotifications": "Ouvrir les réglages de notifications",
+    "inventory": "Ouvrir l’inventaire",
+    "purchaseOrders": "Voir les bons de commande"
   },
   "usage": {
     "line": "IA ce mois-ci : {used} / {limit} tokens.",

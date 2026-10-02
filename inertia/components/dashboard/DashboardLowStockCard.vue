@@ -57,15 +57,33 @@ function engineLabel(part: DashboardLowStockPart): string {
       <BaseSkeleton v-for="i in 3" :key="i" height-class="h-10" />
     </div>
 
-    <p
-      v-else-if="lowStock.items.length === 0"
-      class="text-sm text-fg-muted"
-      data-testid="dashboard-low-stock-empty"
-    >
-      {{ t('dashboard.lowStock.empty') }}
-    </p>
+    <template v-else>
+      <!-- Stock central (#892) : les pièces reliées à l'inventaire remontent par
+           leur article, compté ici plutôt que pièce par pièce. -->
+      <Link
+        v-if="(lowStock.inventoryLowCount ?? 0) > 0"
+        href="/inventory?filter=low"
+        data-testid="dashboard-low-stock-inventory"
+        class="-mx-2 mb-2 flex min-h-11 items-center justify-between gap-3 rounded-(--radius-control) px-2 py-2 text-sm transition-colors hover:bg-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+      >
+        <span class="font-semibold text-fg">{{ t('dashboard.lowStock.inventoryTitle') }}</span>
+        <BaseBadge variant="danger" class="shrink-0">
+          {{
+            t('dashboard.lowStock.inventoryCount', { count: String(lowStock.inventoryLowCount) })
+          }}
+        </BaseBadge>
+      </Link>
 
-    <ul v-else class="-mx-2 space-y-1">
+      <p
+        v-if="lowStock.items.length === 0 && !((lowStock.inventoryLowCount ?? 0) > 0)"
+        class="text-sm text-fg-muted"
+        data-testid="dashboard-low-stock-empty"
+      >
+        {{ t('dashboard.lowStock.empty') }}
+      </p>
+    </template>
+
+    <ul v-if="lowStock && lowStock.items.length > 0" class="-mx-2 space-y-1">
       <li v-for="part in lowStock.items" :key="part.id">
         <Link
           :href="`/boats/${part.boatId}/engines/${part.engineId}?tab=parts`"

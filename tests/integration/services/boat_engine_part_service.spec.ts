@@ -188,6 +188,7 @@ test.group('BoatEnginePartService.listAlertsForBoats (widget « Pièces manquant
       total: 0,
       lowStockCount: 0,
       toReplaceCount: 0,
+      inventoryLowCount: 0,
     })
   })
 })

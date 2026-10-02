@@ -442,6 +442,30 @@ export interface ApiDefinition {
     index: typeof routes['reports.index']
     export: typeof routes['reports.export']
   }
+  inventory: {
+    index: typeof routes['inventory.index']
+    importEngineParts: typeof routes['inventory.importEngineParts']
+    store: typeof routes['inventory.store']
+    show: typeof routes['inventory.show']
+    update: typeof routes['inventory.update']
+    destroy: typeof routes['inventory.destroy']
+    adjust: typeof routes['inventory.adjust']
+  }
+  purchaseOrders: {
+    index: typeof routes['purchaseOrders.index']
+    store: typeof routes['purchaseOrders.store']
+    reorder: typeof routes['purchaseOrders.reorder']
+    update: typeof routes['purchaseOrders.update']
+    send: typeof routes['purchaseOrders.send']
+    receive: typeof routes['purchaseOrders.receive']
+    cancel: typeof routes['purchaseOrders.cancel']
+    destroy: typeof routes['purchaseOrders.destroy']
+  }
+  suppliers: {
+    store: typeof routes['suppliers.store']
+    update: typeof routes['suppliers.update']
+    destroy: typeof routes['suppliers.destroy']
+  }
   newAccount: {
     create: typeof routes['new_account.create']
   }

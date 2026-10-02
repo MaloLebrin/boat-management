@@ -1291,6 +1291,31 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canViewReports',
   },
   {
+    id: 'parts-inventory',
+    title: {
+      en: 'Parts inventory and purchase orders',
+      fr: 'Inventaire de pièces et bons de commande',
+    },
+    body: {
+      en: 'The inventory (Pro and Enterprise plans) holds the workshop stock once for the whole fleet: quantity, unit, alert threshold, location, average purchase cost and usual supplier. Link an engine part to an item and recording a maintenance with that part takes it out of stock; deleting the maintenance puts it back. A stock count records the difference as an adjustment. Purchase orders go from draft to sent to received; a draft can be prefilled from a supplier’s low-stock items, and receiving updates stock, the average cost and, if a boat is chosen, its budget. Existing engine part stock can be imported in one click.',
+      fr: 'L’inventaire (plans Pro et Entreprise) tient le stock de l’atelier une seule fois pour toute la flotte : quantité, unité, seuil d’alerte, emplacement, prix d’achat moyen et fournisseur habituel. Reliez une pièce moteur à un article : saisir un entretien avec cette pièce la sort du stock, supprimer l’entretien l’y remet. Un comptage écrit l’écart en ajustement. Les bons de commande passent de brouillon à envoyé puis réceptionné ; un brouillon se préremplit avec les articles bas d’un fournisseur, et la réception met à jour le stock, le prix moyen et, si un bateau est choisi, son budget. Les stocks saisis par moteur se reprennent en un clic.',
+    },
+    keywords: [
+      'inventaire',
+      'stock',
+      'pieces',
+      'atelier',
+      'fournisseur',
+      'commande',
+      'bon de commande',
+      'reapprovisionner',
+      'seuil',
+      'filtre',
+    ],
+    navTarget: 'inventory.index',
+    planFlag: 'canManageInventory',
+  },
+  {
     id: 'rental-contracts',
     title: {
       en: 'Rental contracts',

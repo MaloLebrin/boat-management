@@ -38,6 +38,9 @@ export type Capability =
   | 'inspections.create'
   | 'inspections.edit'
   | 'inspections.delete'
+  | 'inventory.view'
+  | 'inventory.manage'
+  | 'inventory.delete'
   | 'invoices.view'
   | 'invoices.create'
   | 'invoices.update'
@@ -98,6 +101,9 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'equipmentActions.delete',
   'incidents.delete',
   'inspections.delete',
+  // Inventaire (#892) : supprimer un article efface son journal de mouvements,
+  // supprimer un fournisseur ou un bon de commande, la trace d'un achat.
+  'inventory.delete',
   'invoices.delete',
   'maintenance.delete',
   'mouillages.create',
@@ -141,6 +147,8 @@ const MEMBER_CAPABILITIES: Capability[] = [
   'inspections.view',
   'inspections.create',
   'inspections.edit',
+  'inventory.view',
+  'inventory.manage',
   'invoices.view',
   'invoices.create',
   'invoices.update',

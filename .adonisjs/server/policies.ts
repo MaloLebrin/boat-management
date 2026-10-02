@@ -6,6 +6,7 @@ export const policies = {
   FuelLogPolicy: () => import('#policies/fuel_log_policy'),
   IncidentPolicy: () => import('#policies/incident_policy'),
   InspectionPolicy: () => import('#policies/inspection_policy'),
+  InventoryPolicy: () => import('#policies/inventory_policy'),
   InvoicePolicy: () => import('#policies/invoice_policy'),
   MaintenancePolicy: () => import('#policies/maintenance_policy'),
   MouillagePolicy: () => import('#policies/mouillage_policy'),

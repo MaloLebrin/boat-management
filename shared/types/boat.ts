@@ -138,6 +138,8 @@ export type BoatEnginePartPayload = {
   wearState?: PartWearState | null
   purchasePrice?: number | null
   purchasedAt?: Date | string | DateTime | null
+  /** Article du stock central (#892) : `undefined` = inchangé, `null` = délier. */
+  inventoryItemId?: number | null
 }
 
 export type LowStockPartRow = {

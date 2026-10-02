@@ -30,5 +30,6 @@
     "business": "MANAGEMENT"
   },
   "spareParts": "Spare parts",
-  "engines": "Engines"
+  "engines": "Engines",
+  "inventory": "Inventory"
 }

@@ -1,3 +1,4 @@
+import { effectivePartStock, isPartLow } from '#shared/helpers/inventory'
 import i18nManager from '@adonisjs/i18n/services/main'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import Boat from '#models/boat'
@@ -40,7 +41,9 @@ export default class AiSuggestionContextService {
     const boat = await Boat.query()
       .where('id', boatId)
       .preload('engines', (q) =>
-        q.preload('parts', (pq) => pq.orderBy('id', 'asc')).orderBy('id', 'asc')
+        q
+          .preload('parts', (pq) => pq.preload('inventoryItem').orderBy('id', 'asc'))
+          .orderBy('id', 'asc')
       )
       .preload('sails', (q) => q.orderBy('id', 'asc'))
       .preload('rig')
@@ -136,7 +139,7 @@ export default class AiSuggestionContextService {
     locale: AiSuggestionLocale
   ): Promise<EngineSuggestionsInput> {
     const [parts, maintenanceTasks, maintenanceEvents] = await Promise.all([
-      engine.related('parts').query().orderBy('id', 'asc'),
+      engine.related('parts').query().preload('inventoryItem').orderBy('id', 'asc'),
       BoatMaintenanceTask.query()
         .where('boatId', boat.id)
         .where('boatEngineId', engine.id)
@@ -187,8 +190,8 @@ export default class AiSuggestionContextService {
         designation: part.designation,
         reference: part.reference,
         wearState: part.wearState,
-        stock: part.stock,
-        minStockAlert: part.minStockAlert,
+        // Pièce reliée à l'inventaire (#892) : le stock de l'atelier fait foi.
+        ...pickStock(effectivePartStock(part, part.inventoryItem)),
         purchasedAt: part.purchasedAt ? part.purchasedAt.toISODate() : null,
       })),
       maintenanceTasks: maintenanceTasks.map((task) => ({
@@ -215,5 +218,9 @@ function engineFamilyOf(engine: BoatEngine): string | null {
 
 /** Même prédicat que `BoatEnginePartService.listLowStock`, appliqué en mémoire. */
 function isLowStock(part: BoatEnginePart): boolean {
-  return part.minStockAlert !== null && part.stock !== null && part.stock <= part.minStockAlert
+  return isPartLow(part, part.inventoryItem)
+}
+
+function pickStock(view: ReturnType<typeof effectivePartStock>) {
+  return { stock: view.stock, minStockAlert: view.minStockAlert }
 }

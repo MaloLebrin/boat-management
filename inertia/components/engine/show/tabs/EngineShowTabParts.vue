@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Link } from '@adonisjs/inertia/vue'
 import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import EnginePartModal from '~/components/engine/show/EnginePartModal.vue'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
+import type { InventoryItemOption } from '#shared/types/inventory'
 import type { BoatShowEnginePart } from '~/types/boat_show'
 import { wearStateVariant } from '~/utils/status_variants'
 import { confirmDelete } from '~/utils/native_dialog'
@@ -20,9 +23,12 @@ const props = defineProps<{
    * `isSparePartsEligibleEngine()`, jamais dupliquée dans un template.
    */
   sparePartsEligible?: boolean
+  /** Articles du stock central (#892) proposés à la liaison, `null` hors plan. */
+  inventoryOptions?: InventoryItemOption[] | null
 }>()
 
 const { t } = useT()
+const { formatNumber } = useNumberFormat()
 
 const isModalOpen = ref(false)
 const editingPart = ref<BoatShowEnginePart | null>(null)
@@ -84,7 +90,21 @@ function deletePart(partId: number) {
               </div>
             </td>
             <td class="px-4 py-3 text-fg-muted">{{ part.reference ?? '-' }}</td>
-            <td class="px-4 py-3 text-fg-muted">{{ part.stock ?? '-' }}</td>
+            <td class="px-4 py-3 text-fg-muted">
+              <Link
+                v-if="part.inventoryItem"
+                :href="`/inventory/${part.inventoryItem.id}`"
+                class="text-brand hover:underline"
+                :title="
+                  t('boats.engineShow.parts.inventoryLinked', { item: part.inventoryItem.name })
+                "
+                data-testid="engine-part-inventory-stock"
+              >
+                {{ formatNumber(part.inventoryItem.quantity) }}
+                {{ t(`inventory.units.${part.inventoryItem.unit}`) }}
+              </Link>
+              <template v-else>{{ part.stock ?? '-' }}</template>
+            </td>
             <td class="px-4 py-3 text-fg-muted">{{ part.supplier ?? '-' }}</td>
             <td class="px-4 py-3">
               <BaseBadge v-if="part.wearState" :variant="wearStateVariant(part.wearState)">
@@ -135,6 +155,7 @@ function deletePart(partId: number) {
       :boat-id="boatId"
       :engine-id="engineId"
       :editing-part="editingPart"
+      :inventory-options="inventoryOptions ?? null"
     />
   </div>
 </template>

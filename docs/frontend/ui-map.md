@@ -284,6 +284,17 @@ la nav est masquée via `effectiveQuotas.canManagePorts` ; la carte ports du das
 - Couleurs des graphiques : `use_chart_palette.ts` lit les tokens CSS (`--color-amber-600`, `--color-success`…) et se recalcule quand `data-theme` bascule — aucune couleur en dur.
 - Props : `ReportsPageProps` (`shared/types/reporting.ts`). Source : `ReportsController.index`.
 
+### Inventaire de pièces (`/inventory`, #892)
+
+- Entrée « Inventaire » de la section Maintenance de la nav (icône `box`), visible avec `inventory.view` sur un plan Pro ou Entreprise (`canManageInventory`).
+- `inertia/pages/inventory/index.vue` (GET `/inventory?q=&filter=`) : en-tête (lien « Commandes et fournisseurs », « Ajouter un article »), bandeau de reprise des stocks moteur (`unlinkedPartsCount > 0`), `InventoryToolbar` (recherche + `BaseSegmentedControl` Tous / Stock bas, portés par l'URL), `InventoryItemsTable` (quantité en badge `danger` sous le seuil, « Compter », « Modifier »), état vide.
+- `inertia/pages/inventory/show.vue` (GET `/inventory/:id`) : fil d'Ariane, `BaseStatCard` (quantité, seuil, prix moyen, valeur), pièces moteur reliées (liens vers leur fiche), `InventoryMovementsList` (motif en badge, signe et couleur `text-success` / `text-danger`, lien vers le bon de commande).
+- `inertia/pages/inventory/orders.vue` (GET `/inventory/orders`) : `ReorderForm` (brouillon depuis les stocks bas d'un fournisseur), `PurchaseOrdersList` (gestes selon le statut, réception confirmée par `BaseConfirmModal`), `SuppliersPanel` (+ `SupplierFormModal`).
+- Modales `inertia/components/inventory/` : `InventoryItemFormModal` (stock initial à la création), `InventoryAdjustModal` (quantité comptée), `PurchaseOrderFormModal` + `PurchaseOrderLinesEditor` (lignes, prix moyen proposé, total HT).
+- Fiche moteur, onglet Pièces : une pièce reliée affiche le stock de l'article (lien vers `/inventory/:id`) ; `EnginePartModal` gagne le sélecteur « Article de l'inventaire » (prop `inventoryOptions`). La fiche pièce affiche aussi le stock de l'article.
+- Widget « Pièces manquantes » : lien « Stock atelier » vers `/inventory?filter=low` quand des articles sont sous leur seuil.
+- Props : `InventoryPageProps`, `InventoryItemShowProps`, `PurchaseOrdersPageProps` (`shared/types/inventory.ts`).
+
 ### Équipage (`/crew`) et alertes de certifications (#882)
 
 - Page : `inertia/pages/organization/crew.vue` (props `crewMembers: CrewMemberRow[]`, `canDelete`). À côté du nom, badge d'équipier `danger` « Certification expirée » ou `warning` « À renouveler » (`certificationStatus`, état le plus grave).
