@@ -5,6 +5,12 @@ import Boat from '#models/boat'
 import Mouillage from '#models/mouillage'
 import Organization from '#models/organization'
 import Pontoon from '#models/pontoon'
+import type { SpotKind, SpotStatus } from '#shared/types/spot'
+
+/** Les colonnes `decimal` reviennent de Postgres en chaîne. */
+const decimalColumn = {
+  consume: (value: unknown) => (value === null || value === undefined ? null : Number(value)),
+}
 
 export default class Spot extends BaseModel {
   static table = 'spots'
@@ -26,6 +32,35 @@ export default class Spot extends BaseModel {
 
   @column()
   declare organizationId: number
+
+  /** Dimensions maximales accueillies (#891), en mètres. */
+  @column(decimalColumn)
+  declare lengthM: number | null
+
+  @column(decimalColumn)
+  declare beamM: number | null
+
+  @column(decimalColumn)
+  declare draftM: number | null
+
+  @column()
+  declare kind: SpotKind
+
+  /** Statut saisi — « occupée » se déduit, voir `spotEffectiveStatus`. */
+  @column()
+  declare status: SpotStatus
+
+  @column(decimalColumn)
+  declare dailyRate: number | null
+
+  @column(decimalColumn)
+  declare monthlyRate: number | null
+
+  @column(decimalColumn)
+  declare annualRate: number | null
+
+  @column()
+  declare notes: string | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

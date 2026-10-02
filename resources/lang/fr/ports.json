@@ -3,7 +3,8 @@
   "title": "Mes ports",
   "tabs": {
     "list": "Liste",
-    "plan": "Plan du port"
+    "plan": "Plan du port",
+    "harbour": "Capitainerie"
   },
   "plan": {
     "editLayout": "Modifier le plan",
@@ -15,6 +16,19 @@
       "title": "Comment utiliser le plan du port",
       "select": "Cliquez sur une place pour ouvrir la fenêtre d'affectation",
       "move": "En mode \"Modifier le plan\", glissez-déposez un ponton ou mouillage pour le repositionner"
+    },
+    "filter": {
+      "label": "Bateau de",
+      "placeholder": "longueur (m)",
+      "matches": "{count, plural, =0 {Aucune place libre adaptée} one {# place libre adaptée} other {# places libres adaptées}}",
+      "clear": "Effacer"
+    },
+    "legend": {
+      "available": "Libre",
+      "occupied": "Occupée",
+      "reserved": "Réservée",
+      "out_of_service": "Hors service",
+      "match": "Adaptée"
     }
   },
   "spots": {
@@ -37,9 +51,40 @@
     "current": "Actuel",
     "fields": {
       "name": "Nom de la place",
-      "description": "Description"
+      "description": "Description",
+      "lengthM": "Longueur max (m)",
+      "beamM": "Largeur max (m)",
+      "draftM": "Tirant d'eau max (m)",
+      "kind": "Type de place",
+      "status": "Statut",
+      "dailyRate": "Tarif nuitée (€)",
+      "monthlyRate": "Tarif mensuel (€)",
+      "annualRate": "Tarif annuel (€)",
+      "notes": "Notes internes"
     },
-    "deleteConfirm": "Supprimer cette place ?"
+    "deleteConfirm": "Supprimer cette place ?",
+    "sections": {
+      "dimensions": "Dimensions",
+      "pricing": "Tarifs"
+    },
+    "kinds": {
+      "annual": "Annuelle",
+      "seasonal": "Saisonnière",
+      "visitor": "Visiteur",
+      "technical": "Technique"
+    },
+    "statuses": {
+      "available": "Libre",
+      "reserved": "Réservée",
+      "out_of_service": "Hors service",
+      "occupied": "Occupée"
+    },
+    "dims": {
+      "length": "L {value}",
+      "beam": "l {value}",
+      "draft": "TE {value}"
+    },
+    "guest": "Escale : {name}"
   },
   "empty": "Aucun port enregistré.",
   "emptyDescription": "Ajoutez un port pour organiser vos pontons et emplacements de bateaux.",
@@ -89,5 +134,114 @@
     "emptySpot": "Non assigné",
     "noBoats": "Aucun bateau sur ce ponton.",
     "noBoatsMouillage": "Aucun bateau sur ce mouillage."
+  },
+  "invoice": {
+    "stayNotes": "Escale de {guest} sur la place {spot}, du {arrival} au {departure}.",
+    "nightsLine": "Place {spot} — {count, plural, one {# nuitée} other {# nuitées}}",
+    "contractLine": "Contrat d'amarrage — place {spot}, du {from} au {to}"
+  },
+  "harbour": {
+    "kpis": {
+      "occupiedNow": "Places occupées",
+      "rateNow": "Occupation aujourd'hui",
+      "rateMonth": "Occupation du mois",
+      "arrivals": "Arrivées du jour",
+      "departures": "Départs du jour",
+      "ofSpots": "sur {total}"
+    },
+    "today": {
+      "title": "Aujourd'hui",
+      "arrivals": "Arrivées attendues",
+      "departures": "Départs prévus",
+      "none": "Rien de prévu."
+    },
+    "stays": {
+      "title": "Escales",
+      "add": "Nouvelle escale",
+      "empty": "Aucune escale enregistrée pour ce port.",
+      "visitor": "Visiteur",
+      "fleet": "Flotte",
+      "nights": "{count, plural, one {# nuitée} other {# nuitées}}",
+      "dates": "du {arrival} au {departure}",
+      "status": {
+        "expected": "Attendue",
+        "arrived": "Arrivée",
+        "departed": "Partie",
+        "invoiced": "Facturée",
+        "cancelled": "Annulée"
+      },
+      "actions": {
+        "arrive": "Arrivée",
+        "depart": "Départ",
+        "cancel": "Annuler",
+        "invoice": "Facturer",
+        "viewInvoice": "Voir la facture",
+        "delete": "Supprimer"
+      },
+      "deleteConfirm": "Supprimer cette escale ?",
+      "invoiceConfirm": "Créer une facture brouillon pour cette escale ?",
+      "form": {
+        "title": "Nouvelle escale",
+        "fleetBoat": "Bateau de la flotte",
+        "visitor": "Bateau visiteur",
+        "boat": "Bateau",
+        "visitorName": "Nom du bateau",
+        "visitorLength": "Longueur (m)",
+        "visitorRegistration": "Immatriculation",
+        "visitorContact": "Contact (téléphone, e-mail)",
+        "spot": "Place",
+        "client": "Client à facturer",
+        "noClient": "Aucun",
+        "arrival": "Arrivée",
+        "departure": "Départ",
+        "nightlyRate": "Tarif nuitée (€)",
+        "nightlyRateHint": "Vide : tarif nuitée de la place.",
+        "services": "Services consommés",
+        "addService": "Ajouter un service",
+        "serviceLabel": "Service (électricité, eau…)",
+        "serviceQty": "Qté",
+        "servicePrice": "Prix unitaire (€)",
+        "removeService": "Retirer ce service",
+        "notes": "Notes"
+      }
+    },
+    "contracts": {
+      "title": "Contrats d'amarrage",
+      "add": "Nouveau contrat",
+      "empty": "Aucun contrat pour ce port.",
+      "periodicity": {
+        "monthly": "Mensuel",
+        "quarterly": "Trimestriel",
+        "annual": "Annuel"
+      },
+      "status": {
+        "active": "Actif",
+        "terminated": "Résilié"
+      },
+      "renewalDue": "À renouveler",
+      "nextInvoice": "Prochaine facture le {date}",
+      "period": "du {from} au {to}",
+      "since": "depuis le {from}",
+      "actions": {
+        "terminate": "Résilier",
+        "delete": "Supprimer",
+        "viewInvoice": "Dernière facture"
+      },
+      "terminateConfirm": "Résilier ce contrat ? La facturation périodique s’arrête.",
+      "deleteConfirm": "Supprimer ce contrat ?",
+      "form": {
+        "title": "Nouveau contrat d'amarrage",
+        "spot": "Place",
+        "client": "Client",
+        "boat": "Bateau (facultatif)",
+        "noBoat": "Aucun",
+        "startsOn": "Début",
+        "endsOn": "Fin (facultatif)",
+        "periodicity": "Périodicité",
+        "amount": "Montant par échéance (€ HT)",
+        "notes": "Notes",
+        "hint": "Une facture brouillon est générée automatiquement à chaque échéance."
+      }
+    }
   }
 }

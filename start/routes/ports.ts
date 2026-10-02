@@ -57,6 +57,42 @@ router
     router.put('spots/:id', [controllers.Spots, 'update']).as('spots.update')
     router.delete('spots/:id', [controllers.Spots, 'destroy']).as('spots.destroy')
 
+    // Capitainerie (#891) : escales et contrats d'amarrage, toujours sous le
+    // port de l'URL — le contrôleur vérifie que l'escale/le contrat est de ce port.
+    router
+      .post('ports/:portId/marina-stays', [controllers.MarinaStays, 'store'])
+      .as('ports.marinaStays.store')
+    router
+      .patch('ports/:portId/marina-stays/:marinaStayId/status', [
+        controllers.MarinaStays,
+        'updateStatus',
+      ])
+      .as('ports.marinaStays.updateStatus')
+    router
+      .post('ports/:portId/marina-stays/:marinaStayId/invoice', [
+        controllers.MarinaStays,
+        'invoice',
+      ])
+      .as('ports.marinaStays.invoice')
+    router
+      .delete('ports/:portId/marina-stays/:marinaStayId', [controllers.MarinaStays, 'destroy'])
+      .as('ports.marinaStays.destroy')
+    router
+      .post('ports/:portId/mooring-contracts', [controllers.MooringContracts, 'store'])
+      .as('ports.mooringContracts.store')
+    router
+      .patch('ports/:portId/mooring-contracts/:contractId/terminate', [
+        controllers.MooringContracts,
+        'terminate',
+      ])
+      .as('ports.mooringContracts.terminate')
+    router
+      .delete('ports/:portId/mooring-contracts/:contractId', [
+        controllers.MooringContracts,
+        'destroy',
+      ])
+      .as('ports.mooringContracts.destroy')
+
     // Amarrage d'un bateau : l'URL est sous `/boats`, mais la route écrit
     // `boats.spot_id` et n'est appelée que depuis le plan de marina. Elle vit
     // donc ici, sous la garde de plan du groupe (#721).

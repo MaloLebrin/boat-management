@@ -2,10 +2,12 @@
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { LinkIcon, PencilIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BoatAssignModal from '~/components/ports/modals/BoatAssignModal.vue'
 import SpotFormModal from '~/components/ports/modals/SpotFormModal.vue'
+import { useMarina } from '~/composables/use_marina'
 import { usePermissions } from '~/composables/use_permissions'
 import { useT } from '~/composables/use_t'
 import { notify } from '~/utils/native_dialog'
@@ -25,9 +27,10 @@ const { t } = useT()
 // Chaque bouton suit la capacité que sa route lit (#719) : un member crée et
 // renomme, seul l'admin supprime ; amarrer passe par `BoatPolicy.edit`.
 const { can } = usePermissions()
+const { spotDimensions, statusBadge } = useMarina()
 
 const showSpotModal = ref(false)
-const editingSpot = ref<{ id: number; name: string; description: string | null } | null>(null)
+const editingSpot = ref<SpotRow | null>(null)
 const spotDeletion = useRowDeleteConfirmation<SpotRow>({
   url: (spot) => routes.spots.destroy(spot.id),
 })
@@ -40,7 +43,7 @@ function handleAddSpot() {
 }
 
 function handleEditSpot(spot: SpotRow) {
-  editingSpot.value = { id: spot.id, name: spot.name, description: spot.description }
+  editingSpot.value = spot
   showSpotModal.value = true
 }
 
@@ -112,11 +115,21 @@ function handleAssignConfirm({ spotId, boatId }: { spotId: number; boatId: numbe
     <ul v-else class="divide-y divide-border">
       <li v-for="spot in spots" :key="spot.id" class="flex items-center justify-between py-2">
         <div class="flex-1 min-w-0">
-          <p class="font-medium text-fg truncate">{{ spot.name }}</p>
+          <div class="flex items-center gap-2">
+            <p class="font-medium text-fg truncate">{{ spot.name }}</p>
+            <BaseBadge :variant="statusBadge(spot.effectiveStatus)">
+              {{ t(`ports.spots.statuses.${spot.effectiveStatus}`) }}
+            </BaseBadge>
+          </div>
           <p v-if="spot.boat" class="text-xs text-fg-muted">
             {{ t('ports.spots.occupiedBy', { name: spot.boat.name }) }}
           </p>
-          <p v-else class="text-xs text-fg-subtle">{{ t('ports.spots.free') }}</p>
+          <p v-else-if="spot.stayGuestName" class="text-xs text-fg-muted">
+            {{ t('ports.spots.guest', { name: spot.stayGuestName }) }}
+          </p>
+          <p v-if="spotDimensions(spot)" class="text-xs text-fg-subtle">
+            {{ spotDimensions(spot) }}
+          </p>
         </div>
         <div class="flex items-center gap-1 ml-2">
           <BaseButton

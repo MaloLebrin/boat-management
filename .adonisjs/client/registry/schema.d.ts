@@ -2227,6 +2227,90 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/spots_controller').default['destroy']>>>
     }
   }
+  'ports.marinaStays.store': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/marina-stays'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina').marinaStayValidator)>>
+      paramsTuple: [ParamValue]
+      params: { portId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina').marinaStayValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marina_stays_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marina_stays_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.marinaStays.updateStatus': {
+    methods: ["PATCH"]
+    pattern: '/ports/:portId/marina-stays/:marinaStayId/status'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina').marinaStayStatusValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; marinaStayId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina').marinaStayStatusValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marina_stays_controller').default['updateStatus']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marina_stays_controller').default['updateStatus']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.marinaStays.invoice': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/marina-stays/:marinaStayId/invoice'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; marinaStayId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marina_stays_controller').default['invoice']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marina_stays_controller').default['invoice']>>>
+    }
+  }
+  'ports.marinaStays.destroy': {
+    methods: ["DELETE"]
+    pattern: '/ports/:portId/marina-stays/:marinaStayId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; marinaStayId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marina_stays_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marina_stays_controller').default['destroy']>>>
+    }
+  }
+  'ports.mooringContracts.store': {
+    methods: ["POST"]
+    pattern: '/ports/:portId/mooring-contracts'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/marina').mooringContractValidator)>>
+      paramsTuple: [ParamValue]
+      params: { portId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/marina').mooringContractValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/mooring_contracts_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mooring_contracts_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'ports.mooringContracts.terminate': {
+    methods: ["PATCH"]
+    pattern: '/ports/:portId/mooring-contracts/:contractId/terminate'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; contractId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/mooring_contracts_controller').default['terminate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mooring_contracts_controller').default['terminate']>>>
+    }
+  }
+  'ports.mooringContracts.destroy': {
+    methods: ["DELETE"]
+    pattern: '/ports/:portId/mooring-contracts/:contractId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { portId: ParamValue; contractId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/mooring_contracts_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/mooring_contracts_controller').default['destroy']>>>
+    }
+  }
   'boats.assign': {
     methods: ["PATCH"]
     pattern: '/boats/:id/assignment'

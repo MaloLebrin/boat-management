@@ -337,9 +337,15 @@ export default class InvoiceService {
   async create(
     org: Organization,
     payload: ServiceCreateInvoicePayload,
-    actorUserId?: number | null
+    actorUserId?: number | null,
+    // Transaction de l'appelant (escale marina, #891) : la facture naît dans un
+    // savepoint, et disparaît avec elle si l'appelant annule.
+    parentTrx?: TransactionClientContract
   ): Promise<Invoice> {
-    const invoice = await db.transaction(async (trx) => {
+    const run = <T>(cb: (trx: TransactionClientContract) => Promise<T>) =>
+      parentTrx ? parentTrx.transaction(cb) : db.transaction(cb)
+
+    const invoice = await run(async (trx) => {
       // Allocate gap-free number
       const number = await this.allocateNumber(trx, org.id, payload.kind)
 

@@ -467,7 +467,8 @@
     "hasBoats": "Cannot delete this pontoon: boats are assigned to it."
   },
   "spots": {
-    "hasBoat": "Cannot delete this berth: {name} is moored there. Free it first."
+    "hasBoat": "Cannot delete this berth: {name} is moored there. Free it first.",
+    "hasActiveBooking": "Cannot delete this berth: an active stay or contract holds it."
   },
   "mouillages": {
     "hasBoats": "Cannot delete this mooring: boats are assigned to it."
@@ -584,5 +585,27 @@
   },
   "notifications": {
     "preferencesSaved": "Notification preferences saved."
+  },
+  "marina": {
+    "stayCreated": "Stay recorded.",
+    "stayInvoiced": "Draft invoice created from the stay — review it before sending.",
+    "contractCreated": "Mooring contract recorded.",
+    "contractTerminated": "Contract terminated.",
+    "stayNotFound": "Stay not found.",
+    "spotNotInPort": "This berth does not belong to this port.",
+    "spotOutOfService": "This berth is out of service.",
+    "guestRequired": "Pick a fleet boat or name the visitor.",
+    "invalidTransition": "This status change is not possible for this stay.",
+    "notInvoiceable": "This stay cannot be invoiced (not arrived yet, or already invoiced).",
+    "stayLocked": "An invoiced stay can no longer be deleted.",
+    "stayOverlap": "This berth is already taken on these dates by {name}.",
+    "contractNotFound": "Contract not found.",
+    "clientNotFound": "Client not found.",
+    "contractOverlap": "An active contract already covers this berth.",
+    "contractLocked": "This contract has already been invoiced: terminate it instead of deleting it.",
+    "warnings": {
+      "tooLong": "Warning: the boat is longer than the berth.",
+      "spotHasBoat": "Warning: a fleet boat is assigned to this berth."
+    }
   }
 }

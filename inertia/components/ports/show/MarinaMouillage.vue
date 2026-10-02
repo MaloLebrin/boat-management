@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { SPOT_MATCH_STROKE, SPOT_STATUS_COLORS, useMarina } from '~/composables/use_marina'
 import type { MouillageRow, SpotRow } from '~/types/port'
 
 const RX = 120
 const RY = 75
 const SPOT_SIZE = 28
 const SPOT_OCCUPIED_SIZE = 38
+const DEFAULT_EMPTY_FILL = 'rgba(33,150,243,0.2)'
+const DEFAULT_EMPTY_STROKE = '#2196F3'
+const DEFAULT_EMPTY_TEXT = '#2196F3'
 
 const props = defineProps<{
   mouillage: MouillageRow
@@ -13,7 +17,30 @@ const props = defineProps<{
   y: number
   editMode: boolean
   selectedBoatId: number | null
+  /** Places libres adaptées au filtre de longueur (#891), surlignées. */
+  matchingSpotIds?: Set<number>
 }>()
+
+const { spotTooltip } = useMarina()
+
+/** Place sans bateau de la flotte : couleur de son statut (escale, réservée, hors service). */
+function emptyFill(spot: SpotRow): string {
+  const fill = SPOT_STATUS_COLORS[spot.effectiveStatus].fill
+  return fill === 'transparent' ? DEFAULT_EMPTY_FILL : fill
+}
+
+function emptyStroke(spot: SpotRow): string {
+  if (props.matchingSpotIds?.has(spot.id)) return SPOT_MATCH_STROKE
+  return spot.effectiveStatus === 'available'
+    ? DEFAULT_EMPTY_STROKE
+    : SPOT_STATUS_COLORS[spot.effectiveStatus].stroke
+}
+
+function emptyText(spot: SpotRow): string {
+  return spot.effectiveStatus === 'available' || spot.effectiveStatus === 'reserved'
+    ? DEFAULT_EMPTY_TEXT
+    : 'white'
+}
 
 const emit = defineEmits<{
   'pointerdown': [e: PointerEvent]
@@ -98,6 +125,7 @@ function handleSpotClick(spot: SpotRow) {
       class="cursor-pointer"
       @click.stop="handleSpotClick(spot)"
     >
+      <title>{{ spotTooltip(spot) }}</title>
       <!-- Occupied: large circle + boat icon + name -->
       <template v-if="spot.boat">
         <circle
@@ -135,17 +163,17 @@ function handleSpotClick(spot: SpotRow) {
           :width="SPOT_SIZE"
           :height="SPOT_SIZE"
           :rx="SPOT_SIZE / 2"
-          fill="rgba(33,150,243,0.2)"
-          stroke="#2196F3"
-          stroke-dasharray="4 2"
-          stroke-width="2"
+          :fill="emptyFill(spot)"
+          :stroke="emptyStroke(spot)"
+          :stroke-dasharray="spot.effectiveStatus === 'available' ? '4 2' : undefined"
+          :stroke-width="matchingSpotIds?.has(spot.id) ? 3 : 2"
         />
         <text
           :x="SPOT_SIZE / 2"
           y="17"
           text-anchor="middle"
           font-size="8"
-          fill="#2196F3"
+          :fill="emptyText(spot)"
           font-weight="600"
           pointer-events="none"
         >

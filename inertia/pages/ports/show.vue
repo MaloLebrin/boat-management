@@ -7,17 +7,22 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseTabs from '~/components/base/BaseTabs.vue'
+import HarbourOfficeTab from '~/components/ports/show/tabs/HarbourOfficeTab.vue'
 import MarinaMapTab from '~/components/ports/show/tabs/MarinaMapTab.vue'
 import PortListTab from '~/components/ports/show/tabs/PortListTab.vue'
 import { useCountries } from '~/composables/use_countries'
 import { useT } from '~/composables/use_t'
 import { useDeleteConfirmation } from '~/composables/use_delete_confirmation'
 import type { BoatOption, PortShowDetail } from '~/types/port'
+import type { ClientOption } from '../../../shared/types/client'
+import type { HarbourOfficeData } from '../../../shared/types/marina'
 import { notify } from '~/utils/native_dialog'
 
 const props = defineProps<{
   port: PortShowDetail
   boats: BoatOption[]
+  harbour: HarbourOfficeData
+  clients: ClientOption[]
 }>()
 
 const { t } = useT()
@@ -28,11 +33,12 @@ function locationLabel(port: PortShowDetail): string {
   return [port.city, countryName(port.country)].filter(Boolean).join(', ')
 }
 
-const activeTab = ref<'list' | 'plan'>('list')
+const activeTab = ref<'list' | 'plan' | 'harbour'>('list')
 
 const tabs = [
   { key: 'list', label: t('ports.tabs.list') },
   { key: 'plan', label: t('ports.tabs.plan') },
+  { key: 'harbour', label: t('ports.tabs.harbour') },
 ]
 
 const deletion = useDeleteConfirmation({ url: () => `/ports/${props.port.id}` })
@@ -100,6 +106,13 @@ function handleDeletePort() {
     <div class="mt-6">
       <PortListTab v-if="activeTab === 'list'" :port="port" :boats="boats" />
       <MarinaMapTab v-if="activeTab === 'plan'" :port="port" :boats="boats" />
+      <HarbourOfficeTab
+        v-if="activeTab === 'harbour'"
+        :port="port"
+        :boats="boats"
+        :clients="clients"
+        :harbour="harbour"
+      />
     </div>
 
     <BaseConfirmModal

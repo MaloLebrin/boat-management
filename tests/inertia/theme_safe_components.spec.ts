@@ -146,16 +146,16 @@ const EXCEPTIONS: Component[] = [
   {
     path: 'components/ports/show/MarinaMouillage.vue',
     allow: [
-      { pattern: 'stroke="#2196F3"', count: 2, reason: MARINA_MAP },
+      { pattern: 'stroke="#2196F3"', count: 1, reason: MARINA_MAP },
       { pattern: 'fill="#1565C0"', count: 2, reason: MARINA_MAP },
-      { pattern: 'fill="#2196F3"', count: 1, reason: MARINA_MAP },
     ],
   },
   {
     path: 'components/ports/show/MarinaPontoon.vue',
     allow: [
-      { pattern: 'fill="#5D4037"', count: 3, reason: MARINA_MAP },
-      { pattern: 'stroke="#5D4037"', count: 1, reason: MARINA_MAP },
+      // Les places vides prennent la couleur de leur statut depuis #891
+      // (`SPOT_STATUS_COLORS`, liée en `:fill`/`:stroke`) : restent le ponton et son « +N ».
+      { pattern: 'fill="#5D4037"', count: 2, reason: MARINA_MAP },
     ],
   },
   // Pad de signature d'état des lieux (#889) : il figure la feuille du PDF où

@@ -3,7 +3,8 @@
   "title": "My ports",
   "tabs": {
     "list": "List",
-    "plan": "Port plan"
+    "plan": "Port plan",
+    "harbour": "Harbour office"
   },
   "plan": {
     "editLayout": "Edit layout",
@@ -15,6 +16,19 @@
       "title": "How to use the port plan",
       "select": "Click a berth to open the assignment dialog",
       "move": "In \"Edit layout\" mode, drag a pontoon or anchorage to reposition it"
+    },
+    "filter": {
+      "label": "Boat of",
+      "placeholder": "length (m)",
+      "matches": "{count, plural, =0 {No suitable free berth} one {# suitable free berth} other {# suitable free berths}}",
+      "clear": "Clear"
+    },
+    "legend": {
+      "available": "Free",
+      "occupied": "Occupied",
+      "reserved": "Reserved",
+      "out_of_service": "Out of service",
+      "match": "Suitable"
     }
   },
   "spots": {
@@ -37,9 +51,40 @@
     "current": "Current",
     "fields": {
       "name": "Spot name",
-      "description": "Description"
+      "description": "Description",
+      "lengthM": "Max length (m)",
+      "beamM": "Max beam (m)",
+      "draftM": "Max draft (m)",
+      "kind": "Berth type",
+      "status": "Status",
+      "dailyRate": "Nightly rate (€)",
+      "monthlyRate": "Monthly rate (€)",
+      "annualRate": "Annual rate (€)",
+      "notes": "Internal notes"
     },
-    "deleteConfirm": "Delete this spot?"
+    "deleteConfirm": "Delete this spot?",
+    "sections": {
+      "dimensions": "Dimensions",
+      "pricing": "Rates"
+    },
+    "kinds": {
+      "annual": "Annual",
+      "seasonal": "Seasonal",
+      "visitor": "Visitor",
+      "technical": "Technical"
+    },
+    "statuses": {
+      "available": "Free",
+      "reserved": "Reserved",
+      "out_of_service": "Out of service",
+      "occupied": "Occupied"
+    },
+    "dims": {
+      "length": "L {value}",
+      "beam": "B {value}",
+      "draft": "D {value}"
+    },
+    "guest": "Stay: {name}"
   },
   "empty": "No port registered yet.",
   "emptyDescription": "Add a port to organize your pontoons and boat berths.",
@@ -89,5 +134,114 @@
     "emptySpot": "Unassigned",
     "noBoats": "No boats on this pontoon.",
     "noBoatsMouillage": "No boats at this anchorage."
+  },
+  "invoice": {
+    "stayNotes": "Stay of {guest} on berth {spot}, from {arrival} to {departure}.",
+    "nightsLine": "Berth {spot} — {count, plural, one {# night} other {# nights}}",
+    "contractLine": "Mooring contract — berth {spot}, from {from} to {to}"
+  },
+  "harbour": {
+    "kpis": {
+      "occupiedNow": "Occupied berths",
+      "rateNow": "Occupancy today",
+      "rateMonth": "Occupancy this month",
+      "arrivals": "Today's arrivals",
+      "departures": "Today's departures",
+      "ofSpots": "of {total}"
+    },
+    "today": {
+      "title": "Today",
+      "arrivals": "Expected arrivals",
+      "departures": "Scheduled departures",
+      "none": "Nothing scheduled."
+    },
+    "stays": {
+      "title": "Stays",
+      "add": "New stay",
+      "empty": "No stay recorded for this port.",
+      "visitor": "Visitor",
+      "fleet": "Fleet",
+      "nights": "{count, plural, one {# night} other {# nights}}",
+      "dates": "from {arrival} to {departure}",
+      "status": {
+        "expected": "Expected",
+        "arrived": "Arrived",
+        "departed": "Departed",
+        "invoiced": "Invoiced",
+        "cancelled": "Cancelled"
+      },
+      "actions": {
+        "arrive": "Arrival",
+        "depart": "Departure",
+        "cancel": "Cancel",
+        "invoice": "Invoice",
+        "viewInvoice": "View invoice",
+        "delete": "Delete"
+      },
+      "deleteConfirm": "Delete this stay?",
+      "invoiceConfirm": "Create a draft invoice for this stay?",
+      "form": {
+        "title": "New stay",
+        "fleetBoat": "Fleet boat",
+        "visitor": "Visiting boat",
+        "boat": "Boat",
+        "visitorName": "Boat name",
+        "visitorLength": "Length (m)",
+        "visitorRegistration": "Registration",
+        "visitorContact": "Contact (phone, email)",
+        "spot": "Berth",
+        "client": "Client to invoice",
+        "noClient": "None",
+        "arrival": "Arrival",
+        "departure": "Departure",
+        "nightlyRate": "Nightly rate (€)",
+        "nightlyRateHint": "Empty: the berth's nightly rate.",
+        "services": "Services used",
+        "addService": "Add a service",
+        "serviceLabel": "Service (power, water…)",
+        "serviceQty": "Qty",
+        "servicePrice": "Unit price (€)",
+        "removeService": "Remove this service",
+        "notes": "Notes"
+      }
+    },
+    "contracts": {
+      "title": "Mooring contracts",
+      "add": "New contract",
+      "empty": "No contract for this port.",
+      "periodicity": {
+        "monthly": "Monthly",
+        "quarterly": "Quarterly",
+        "annual": "Annual"
+      },
+      "status": {
+        "active": "Active",
+        "terminated": "Terminated"
+      },
+      "renewalDue": "Renewal due",
+      "nextInvoice": "Next invoice on {date}",
+      "period": "from {from} to {to}",
+      "since": "since {from}",
+      "actions": {
+        "terminate": "Terminate",
+        "delete": "Delete",
+        "viewInvoice": "Last invoice"
+      },
+      "terminateConfirm": "Terminate this contract? Periodic invoicing stops.",
+      "deleteConfirm": "Delete this contract?",
+      "form": {
+        "title": "New mooring contract",
+        "spot": "Berth",
+        "client": "Client",
+        "boat": "Boat (optional)",
+        "noBoat": "None",
+        "startsOn": "Start",
+        "endsOn": "End (optional)",
+        "periodicity": "Periodicity",
+        "amount": "Amount per period (€ excl. VAT)",
+        "notes": "Notes",
+        "hint": "A draft invoice is generated automatically on each due date."
+      }
+    }
   }
 }

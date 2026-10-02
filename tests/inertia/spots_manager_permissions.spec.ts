@@ -19,8 +19,9 @@ vi.mock('@inertiajs/vue3', async () => {
 })
 
 import SpotsManager from '../../inertia/components/ports/show/SpotsManager.vue'
+import { makeSpotRow } from './helpers/spot_row'
 
-const spot = { id: 5, name: 'A1', positionX: null, positionY: null, boat: null } as SpotRow
+const spot = makeSpotRow({ id: 5 })
 
 function mountAs(role: OrgRole, spots: SpotRow[] = [spot]) {
   return mountWithStubs(SpotsManager, {
@@ -73,7 +74,7 @@ describe('SpotsManager — une place occupée ne se supprime pas (#720)', () => 
 
   test('une place occupée prévient au lieu d’ouvrir la confirmation', async () => {
     window.alert = vi.fn()
-    const occupied = { ...spot, boat: { id: 9, name: 'Belle Île' } } as SpotRow
+    const occupied = makeSpotRow({ id: 5, boat: { id: 9, name: 'Belle Île' } })
     const w = mountAs('admin', [occupied])
 
     await deleteButton(w).trigger('click')

@@ -426,6 +426,54 @@ Fichiers Cloudinary polymorphes (`entity_type`, `entity_id`).
 - `cost` (decimal 10,2, nullable)
 - `notes` (nullable)
 
+### spots — champs d'exploitation (#891)
+
+Les colonnes historiques (`name`, `description`, `pontoonId` **ou** `mouillageId`, `organizationId`)
+sont décrites dans `docs/domain/ports-and-marina.md`. Ajouts de #891, tous facultatifs :
+
+- `lengthM`, `beamM` (decimal 6,2), `draftM` (decimal 5,2) — dimensions maximales accueillies
+- `kind` : `annual | seasonal | visitor | technical` (défaut `annual`, contrainte `chk_spots_kind`)
+- `status` : `available | reserved | out_of_service` (défaut `available`, `chk_spots_status`) —
+  **statut saisi** ; « occupée » se déduit d'un bateau amarré (`boats.spotId`) ou d'une escale
+  `arrived`, il ne se stocke pas
+- `dailyRate`, `monthlyRate`, `annualRate` (decimal 10,2, nullable)
+- `notes` (text, nullable)
+
+### marina_stays (#891)
+
+Escale sur une place : un bateau de la flotte **ou** un visiteur décrit en ligne. À ne pas confondre
+avec `boat_port_stays` (dépense d'escale saisie par un plaisancier, port en texte libre).
+
+- `id`, `organizationId` (FK cascade, indexé), `portId` (FK cascade, indexé avec `arrivalOn`)
+- `spotId` (FK `spots` cascade, indexé avec `status`)
+- `boatId` (FK `boats` SET NULL, nullable, indexé) — bateau de la flotte
+- `clientId` (FK `clients` SET NULL, nullable, indexé) — client à facturer
+- `visitorName`, `visitorLengthM` (decimal 6,2), `visitorRegistration`, `visitorContact` — visiteur
+  (contrainte `chk_marina_stays_guest` : `boatId` ou `visitorName`)
+- `arrivalOn`, `departureOn` (date, `chk_marina_stays_dates` : départ > arrivée) — nuitées =
+  différence en jours, le jour du départ ne compte pas
+- `status` : `expected | arrived | departed | invoiced | cancelled` (défaut `expected`)
+- `nightlyRate` (decimal 10,2, défaut 0) — figé à la création (saisi, sinon `spots.dailyRate`)
+- `services` (jsonb, défaut `[]`) — lignes `{ label, quantity, unitPrice }` reprises sur la facture
+- `invoiceId` (FK `invoices` SET NULL, nullable, indexé) — posé avec `status = 'invoiced'`
+- `notes` (nullable)
+
+### mooring_contracts (#891)
+
+- `id`, `organizationId` (FK cascade, indexé), `portId` (FK cascade, indexé)
+- `spotId` (FK `spots` cascade, indexé avec `status`) — un seul contrat `active` par place (règle
+  applicative)
+- `clientId` (FK `clients` SET NULL, nullable, indexé — requis à la création), `boatId` (FK `boats`
+  SET NULL, nullable, indexé)
+- `startsOn` (date), `endsOn` (date, nullable, **inclus** ; `chk_mooring_contracts_dates`)
+- `periodicity` : `monthly | quarterly | annual`, `amount` (decimal 10,2, HT par échéance)
+- `nextInvoiceOn` (date, nullable) — prochaine échéance ; `null` une fois le contrat terminé ou
+  résilié. Indexé avec `status` pour le job `GenerateMooringContractInvoices`
+- `status` : `active | terminated`
+- `lastInvoiceId` (FK `invoices` SET NULL, nullable, indexé) — non nul = le contrat ne se supprime
+  plus, il se résilie
+- `notes` (nullable)
+
 ### boat_position_history
 
 Deux natures de ligne dans une même table, distinguées par `kind` (#722). À ne pas confondre avec
@@ -946,6 +994,8 @@ fait un balayage complet de la table qu'elle est censée borner.
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
 - `Boat 1..n BoatPositionHistory` via `boat_position_history.boatId` (cascade) ; `Spot 0..n BoatPositionHistory` via `spotId` (`SET NULL`), sur les seules lignes `kind='berth'` (#722)
 - `Boat 1..n BoatPortStay`
+- `Port 1..n MarinaStay`, `Spot 1..n MarinaStay` (cascade) ; `Boat 0..n MarinaStay`, `Client 0..n MarinaStay`, `Invoice 0..1 MarinaStay` (SET NULL) (#891)
+- `Port 1..n MooringContract`, `Spot 1..n MooringContract` (cascade) ; `Client 0..n MooringContract`, `Boat 0..n MooringContract`, `Invoice 0..n MooringContract` via `lastInvoiceId` (SET NULL) (#891)
 - `Boat 1..n BoatBudgetEntry`
 - `User 1..n AiAnalysis` via `ai_analyses.userId` (`organizationId` scope les lectures, `boatId` distingue flotte et bateau)
 - `CrewMember 1..n CrewCertification` via `crew_certifications.crewMemberId`

@@ -467,7 +467,8 @@
     "hasBoats": "Impossible de supprimer ce ponton : des bateaux y sont assignés."
   },
   "spots": {
-    "hasBoat": "Impossible de supprimer cette place : {name} y est amarré. Libérez-la d'abord."
+    "hasBoat": "Impossible de supprimer cette place : {name} y est amarré. Libérez-la d'abord.",
+    "hasActiveBooking": "Impossible de supprimer cette place : une escale ou un contrat actif la réserve."
   },
   "mouillages": {
     "hasBoats": "Impossible de supprimer ce mouillage : des bateaux y sont assignés."
@@ -584,5 +585,27 @@
   },
   "notifications": {
     "preferencesSaved": "Préférences de notifications enregistrées."
+  },
+  "marina": {
+    "stayCreated": "Escale enregistrée.",
+    "stayInvoiced": "Facture brouillon créée depuis l'escale — relisez-la avant envoi.",
+    "contractCreated": "Contrat d'amarrage enregistré.",
+    "contractTerminated": "Contrat résilié.",
+    "stayNotFound": "Escale introuvable.",
+    "spotNotInPort": "Cette place n'appartient pas à ce port.",
+    "spotOutOfService": "Cette place est hors service.",
+    "guestRequired": "Choisissez un bateau de la flotte ou nommez le visiteur.",
+    "invalidTransition": "Ce changement de statut n'est pas possible pour cette escale.",
+    "notInvoiceable": "Cette escale n'est pas facturable (pas encore arrivée, ou déjà facturée).",
+    "stayLocked": "Une escale facturée ne peut plus être supprimée.",
+    "stayOverlap": "Cette place est déjà prise sur ces dates par {name}.",
+    "contractNotFound": "Contrat introuvable.",
+    "clientNotFound": "Client introuvable.",
+    "contractOverlap": "Un contrat actif couvre déjà cette place.",
+    "contractLocked": "Ce contrat a déjà été facturé : résiliez-le plutôt que de le supprimer.",
+    "warnings": {
+      "tooLong": "Attention : le bateau est plus long que la place.",
+      "spotHasBoat": "Attention : un bateau de la flotte est attribué à cette place."
+    }
   }
 }

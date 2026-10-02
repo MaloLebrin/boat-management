@@ -5,6 +5,7 @@ import {
   SpotHasBoatError,
   SpotNotFoundError,
 } from '#exceptions/port_errors'
+import { SpotHasActiveBookingError } from '#exceptions/marina_errors'
 import MouillageService from '#services/mouillage_service'
 import PontoonService from '#services/pontoon_service'
 import PortService from '#services/port_service'
@@ -92,6 +93,10 @@ export default class SpotsController {
       if (error instanceof SpotNotFoundError) return response.redirect('/ports')
       if (error instanceof SpotHasBoatError) {
         session.flash('error', i18n.t('flash.spots.hasBoat', { name: error.boatName }))
+        return response.redirect().back()
+      }
+      if (error instanceof SpotHasActiveBookingError) {
+        session.flash('error', i18n.t('flash.spots.hasActiveBooking'))
         return response.redirect().back()
       }
       throw error
