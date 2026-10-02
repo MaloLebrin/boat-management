@@ -42,6 +42,15 @@ export type NotificationType =
   | 'invoice.overdue'
   | 'invoice.reminder_sent'
   | 'invoice.reminder_skipped'
+  // Portail propriétaire (#890) : demandes et accords côté équipe, vie du
+  // bateau côté propriétaire.
+  | 'owner.request_created'
+  | 'owner.approval_decided'
+  | 'owner.approval_requested'
+  | 'owner.maintenance_done'
+  | 'owner.incident_created'
+  | 'owner.document_expiring'
+  | 'owner.invoice_sent'
   | 'export.ready'
   | 'export.failed'
   | (string & {}) // extensible pour les futurs types sans casser le type

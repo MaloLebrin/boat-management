@@ -10,6 +10,7 @@ import type AssistantTransformer from '#transformers/assistant_transformer'
 import type BoatEngineTransformer from '#transformers/boat_engine_transformer'
 import type BoatEquipmentActionTransformer from '#transformers/boat_equipment_action_transformer'
 import type BoatInspectionTransformer from '#transformers/boat_inspection_transformer'
+import type BoatOwnerTransformer from '#transformers/boat_owner_transformer'
 import type BoatPricingTransformer from '#transformers/boat_pricing_transformer'
 import type BoatReservationTransformer from '#transformers/boat_reservation_transformer'
 import type BoatStatusTransformer from '#transformers/boat_status_transformer'
@@ -55,6 +56,10 @@ export namespace Data {
   export type BoatInspection = InferData<BoatInspectionTransformer>
   export namespace BoatInspection {
     export type Variants = InferVariants<BoatInspectionTransformer>
+  }
+  export type BoatOwner = InferData<BoatOwnerTransformer>
+  export namespace BoatOwner {
+    export type Variants = InferVariants<BoatOwnerTransformer>
   }
   export type BoatPricing = InferData<BoatPricingTransformer>
   export namespace BoatPricing {

@@ -144,7 +144,12 @@
     "boatNotFound": "Ce bateau n'est pas rattaché à votre compte.",
     "invalidAssignment": "Cet utilisateur n'a pas le rôle « propriétaire de bateau » dans cette organisation.",
     "attached": "Propriétaire ajouté au bateau.",
-    "detached": "Propriétaire retiré du bateau."
+    "detached": "Propriétaire retiré du bateau.",
+    "requestCreated": "Votre demande a été transmise au gestionnaire.",
+    "taskNotFound": "Cette demande est introuvable.",
+    "approvalNotPending": "Ce devis n'attend plus de décision.",
+    "approved": "Devis accepté. Le gestionnaire est prévenu.",
+    "rejected": "Devis refusé. Le gestionnaire est prévenu."
   },
   "billing": {
     "notConfigured": "Le paiement n'est pas encore configuré. Contactez le support.",

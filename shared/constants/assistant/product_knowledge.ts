@@ -1613,8 +1613,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Membres, rôles et invitations',
     },
     body: {
-      en: 'The Members settings (/settings/members) manage who accesses the organization. Four roles exist: admin (everything, including deletions and settings), member (day-to-day work without deletions), mechanic (restricted to the maintenance module across the whole organization) and boat_owner (read-only self-service portal limited to their own boats). New people join by email invitation; inviting a boat owner requires selecting the boats they own. The last admin of an organization can never be demoted or removed.',
-      fr: 'Les réglages Membres (/settings/members) gèrent qui accède à l’organisation. Quatre rôles existent : admin (tout, y compris suppressions et réglages), membre (le travail quotidien sans les suppressions), mécanicien (restreint au module maintenance sur toute l’organisation) et propriétaire de bateau (portail self-service en lecture seule limité à ses propres bateaux). L’arrivée passe par une invitation par email ; inviter un propriétaire demande de sélectionner ses bateaux. Le dernier admin d’une organisation ne peut jamais être rétrogradé ni supprimé.',
+      en: 'The Members settings (/settings/members) manage who accesses the organization. Four roles exist: admin (everything, including deletions and settings), member (day-to-day work without deletions), mechanic (restricted to the maintenance module across the whole organization) and boat_owner (self-service portal limited to their own boats). New people join by email invitation; inviting a boat owner requires selecting the boats they own. The last admin of an organization can never be demoted or removed.',
+      fr: 'Les réglages Membres (/settings/members) gèrent qui accède à l’organisation. Quatre rôles existent : admin (tout, y compris suppressions et réglages), membre (le travail quotidien sans les suppressions), mécanicien (restreint au module maintenance sur toute l’organisation) et propriétaire de bateau (portail self-service limité à ses propres bateaux). L’arrivée passe par une invitation par email ; inviter un propriétaire demande de sélectionner ses bateaux. Le dernier admin d’une organisation ne peut jamais être rétrogradé ni supprimé.',
     },
     keywords: [
       'membres',
@@ -1637,8 +1637,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Portail propriétaire',
     },
     body: {
-      en: 'Users with the boat_owner role get a dedicated read-only portal at /owner/boats, listing only the boats they own — co-ownership is supported, a boat can have several owners. The portal shows each boat with its maintenance, its reservations and the invoices linked to those reservations, without any access to the staff pages of the organization. Owners are invited by an admin from the Members settings, selecting which boats they own; admins also manage co-owners from the boat edit page.',
-      fr: 'Les utilisateurs au rôle propriétaire de bateau disposent d’un portail dédié en lecture seule sur /owner/boats, qui liste uniquement les bateaux qu’ils possèdent — la copropriété est gérée, un bateau peut avoir plusieurs propriétaires. Le portail montre chaque bateau avec sa maintenance, ses réservations et les factures liées à ces réservations, sans aucun accès aux pages staff de l’organisation. Les propriétaires sont invités par un admin depuis les réglages Membres, en sélectionnant leurs bateaux ; les copropriétaires se gèrent depuis l’édition du bateau.',
+      en: 'Users with the boat_owner role get a portal at /owner/boats limited to the boats they own. Each boat opens on a dashboard (shared expenses over 12 months, upcoming deadlines, last trip, status) with its documents, the expenses the manager shared, incidents, trips, maintenance and invoices. The owner sends requests that become maintenance tasks for the team, and approves or rejects any task whose estimated cost reaches 500 €. They are notified of completed work, incidents, expiring documents, quotes and invoices sent to them. Managers share an expense with the “Visible to the owner” box.',
+      fr: 'Le rôle propriétaire de bateau dispose d’un portail sur /owner/boats limité à ses bateaux. Chaque bateau s’ouvre sur un tableau de bord (dépenses partagées sur 12 mois, échéances, dernière sortie, état) avec ses documents, les dépenses partagées par le gestionnaire, incidents, sorties, entretiens et factures. Le propriétaire envoie des demandes qui deviennent des tâches pour l’équipe, et accepte ou refuse une tâche dont le coût prévu atteint 500 €. Il est prévenu des travaux faits, incidents, documents à renouveler, devis et factures. Le gestionnaire partage une dépense par la case « Visible du propriétaire ».',
     },
     keywords: [
       'portail',
@@ -1646,8 +1646,11 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'proprietaire',
       'owner',
       'boat owner',
-      'lecture seule',
-      'read only',
+      'demande',
+      'request',
+      'devis',
+      'quote',
+      'approbation',
       'copropriete',
       'co-ownership',
       'self-service',

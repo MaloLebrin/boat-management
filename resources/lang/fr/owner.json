@@ -10,7 +10,13 @@
       "tabs": {
         "maintenance": "Entretien",
         "reservations": "Réservations",
-        "invoices": "Factures"
+        "invoices": "Factures",
+        "overview": "Vue d'ensemble",
+        "requests": "Demandes",
+        "documents": "Documents",
+        "expenses": "Dépenses",
+        "incidents": "Incidents",
+        "trips": "Sorties"
       },
       "maintenance": {
         "emptyTitle": "Aucun entretien enregistré"
@@ -20,6 +26,60 @@
       },
       "invoices": {
         "emptyTitle": "Aucune facture"
+      },
+      "dashboard": {
+        "cost12Months": "Dépenses sur 12 mois",
+        "pendingApprovals": "Devis à valider",
+        "status": "État du bateau",
+        "upcoming": "Prochaines échéances",
+        "noUpcoming": "Aucune échéance dans les 90 prochains jours.",
+        "byCategory": "Dépenses par catégorie (12 mois)",
+        "noExpenses": "Aucune dépense partagée par votre gestionnaire.",
+        "lastTrip": "Dernière sortie",
+        "noTrip": "Aucune sortie enregistrée."
+      },
+      "requests": {
+        "formTitle": "Faire une demande au gestionnaire",
+        "formHint": "Décrivez ce que vous souhaitez faire vérifier ou réparer. Votre gestionnaire la planifie et vous suivez son avancement ici.",
+        "title": "Objet de la demande",
+        "titlePlaceholder": "Pouvez-vous vérifier le guindeau ?",
+        "description": "Détails (facultatif)",
+        "submit": "Envoyer la demande",
+        "emptyTitle": "Aucune demande pour le moment",
+        "requestedOn": "Demandée le {date}",
+        "submittedByManager": "Soumis par votre gestionnaire",
+        "plannedFor": "prévue le {date}",
+        "estimatedCost": "Coût prévu : {amount}",
+        "status": {
+          "received": "Reçue",
+          "planned": "Planifiée",
+          "done": "Faite"
+        },
+        "approval": {
+          "pending": "En attente de votre accord",
+          "approved": "Accepté",
+          "rejected": "Refusé"
+        },
+        "approve": "Accepter le devis",
+        "reject": "Refuser"
+      },
+      "documents": {
+        "emptyTitle": "Aucun document enregistré",
+        "expiresOn": "Échéance : {date}",
+        "noExpiry": "Sans échéance"
+      },
+      "expenses": {
+        "emptyTitle": "Aucune dépense partagée",
+        "emptyDescription": "Votre gestionnaire choisit les dépenses qu'il partage avec vous.",
+        "total": "Total : {amount}"
+      },
+      "incidents": {
+        "emptyTitle": "Aucun incident déclaré"
+      },
+      "trips": {
+        "emptyTitle": "Aucune sortie enregistrée",
+        "distance": "{value} milles",
+        "engineHours": "{value} h moteur"
       }
     }
   }

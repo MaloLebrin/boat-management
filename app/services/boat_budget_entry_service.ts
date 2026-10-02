@@ -22,6 +22,7 @@ export default class BoatBudgetEntryService {
       label: string
       category?: BudgetEntryCategory | null
       description?: string | null
+      visibleToOwner?: boolean
     }
   ): Promise<BoatBudgetEntry> {
     return BoatBudgetEntry.create({
@@ -31,6 +32,7 @@ export default class BoatBudgetEntryService {
       label: data.label,
       category: data.category ?? 'other',
       description: data.description ?? null,
+      visibleToOwner: data.visibleToOwner ?? false,
     })
   }
 
@@ -43,6 +45,7 @@ export default class BoatBudgetEntryService {
       label: string
       category?: BudgetEntryCategory | null
       description?: string | null
+      visibleToOwner?: boolean
     }
   ): Promise<void> {
     const entry = await BoatBudgetEntry.query()
@@ -57,6 +60,8 @@ export default class BoatBudgetEntryService {
       category: data.category ?? 'other',
       description: data.description ?? null,
     })
+    // Le formulaire d'édition peut ne pas porter la case : l'absence n'efface rien.
+    if (data.visibleToOwner !== undefined) entry.visibleToOwner = data.visibleToOwner
     await entry.save()
   }
 

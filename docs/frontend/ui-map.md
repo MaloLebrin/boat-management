@@ -231,11 +231,25 @@ la nav est masquée via `effectiveQuotas.canManagePorts` ; la carte ports du das
   - `inertia/components/boats/budget/BudgetPortStayForm.vue` — formulaire ajout séjour port
   - `inertia/components/boats/budget/BudgetPortStayList.vue` — liste séjours port avec suppression
   - `inertia/components/boats/budget/BudgetEntryForm.vue` — formulaire dépense libre (catégorie, montant, date)
-  - `inertia/components/boats/budget/BudgetEntryList.vue` — liste dépenses libres avec badges catégorie
+  - `inertia/components/boats/budget/BudgetEntryList.vue` — liste dépenses libres avec badges catégorie ; mention « Partagée avec le propriétaire » quand `visibleToOwner` (#890)
+  - La case « Visible du propriétaire » (`BaseCheckbox`) des deux formulaires partage la dépense dans le portail propriétaire (#890)
 - En-tête : export CSV (`external-href`) et, si `canImport` (`canImportExpenses`, plan Pro ou Entreprise, + `import.run`), bouton « Importer des dépenses » → `<Link>` vers `/settings/import?type=expenses&boatId=:id`
 - Props: `boat`, `budget`, `year`, `portStays`, `entries`, `canManage`, `canImport`, `portOptions`
 - Types frontend: `inertia/types/budget.ts`
 - Source backend: `BudgetController.show`
+
+### Portail propriétaire (`/owner/boats/:id`, #890)
+
+- Page : `inertia/pages/owner/boats/show.vue`, layout du rôle `boat_owner`, ouverte sur l'onglet **Vue d'ensemble**
+- Onglets (`BaseTabs`) : `overview | requests | maintenance | documents | expenses | incidents | trips | reservations | invoices`, chacun dans `inertia/components/owner/` :
+  - `OwnerDashboardTab.vue` — dépenses 12 mois et devis à valider (`BaseStatCard`), état (`BoatStatusBadge`), prochaines échéances, répartition par catégorie, dernière sortie
+  - `OwnerRequestsTab.vue` + `OwnerRequestForm.vue` — formulaire de demande (`useForm` → `POST /owner/boats/:id/requests`) et liste avec statut reçue / planifiée / faite ; boutons Accepter / Refuser (`router.post …/tasks/:taskId/approve|reject`, `preserveScroll`) sur un devis en attente seulement
+  - `OwnerDocumentsTab.vue`, `OwnerExpensesTab.vue`, `OwnerIncidentsTab.vue`, `OwnerTripsTab.vue` — listes en lecture
+  - `BoatOwnerMaintenanceTab.vue`, `BoatOwnerReservationsTab.vue`, `BoatOwnerInvoicesTab.vue` — inchangés
+- Props : `boat`, `dashboard`, `maintenanceEvents`, `reservations`, `invoices`, `documents`, `expenses`, `incidents`, `trips`, `requests` (types `shared/types/owner_portal.ts`)
+- i18n : `owner.boats.show.*` (vouvoiement)
+- Côté équipe, `MaintenanceTaskWorkOrderSummary.vue` ajoute « Demande du propriétaire » et l'état de l'accord (`boats.maintenance.tasks.workOrder.requestedByOwner`, `…ownerApproval.*`)
+- Source backend : `BoatOwnerPortalController`, voir `docs/domain/owner-portal.md`
 
 ### Reporting (`/reports`, #887)
 

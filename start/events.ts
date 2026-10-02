@@ -16,6 +16,9 @@ import BoatStatusChanged from '#events/boat_status_changed'
 import ReservationChanged from '#events/reservation_changed'
 import IncidentChanged from '#events/incident_changed'
 import InvoicePaid from '#events/invoice_paid'
+import InvoiceSent from '#events/invoice_sent'
+import OwnerBoatChanged from '#events/owner_boat_changed'
+import OwnerRequestChanged from '#events/owner_request_changed'
 import PublicBookingRequested from '#events/public_booking_requested'
 import PublicBookingDecided from '#events/public_booking_decided'
 
@@ -51,5 +54,9 @@ emitter.listen(BoatStatusChanged, [() => import('#listeners/on_boat_status_chang
 emitter.listen(ReservationChanged, [() => import('#listeners/on_reservation_changed')])
 emitter.listen(IncidentChanged, [() => import('#listeners/on_incident_changed')])
 emitter.listen(InvoicePaid, [() => import('#listeners/on_invoice_paid')])
+// Portail propriétaire (#890) : vie du bateau confié, factures, demandes et accords.
+emitter.listen(OwnerBoatChanged, [() => import('#listeners/on_owner_boat_changed')])
+emitter.listen(OwnerRequestChanged, [() => import('#listeners/on_owner_request_changed')])
+emitter.listen(InvoiceSent, [() => import('#listeners/on_invoice_sent')])
 emitter.listen(PublicBookingRequested, [() => import('#listeners/on_public_booking_requested')])
 emitter.listen(PublicBookingDecided, [() => import('#listeners/on_public_booking_decided')])

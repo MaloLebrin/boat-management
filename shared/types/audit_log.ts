@@ -60,6 +60,10 @@ export const AUDIT_ACTIONS = [
   'maintenance_task.update',
   'maintenance_task.postpone',
   'maintenance_task.assign',
+  // Portail propriétaire (#890) : demande déposée, devis accepté ou refusé.
+  'maintenance_task.owner_request',
+  'maintenance_task.owner_approve',
+  'maintenance_task.owner_reject',
   // Actions confirmées depuis le copilote FleetAi (agent actionnable) : même
   // journal que les créations manuelles correspondantes.
   'engine.add_hours',
@@ -209,6 +213,9 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'maintenance_task.update',
     'maintenance_task.postpone',
     'maintenance_task.assign',
+    'maintenance_task.owner_request',
+    'maintenance_task.owner_approve',
+    'maintenance_task.owner_reject',
     'engine.add_hours',
     'navigation_log.create',
     'navigation_log.close',

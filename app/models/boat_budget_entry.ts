@@ -27,6 +27,10 @@ export default class BoatBudgetEntry extends BaseModel {
   @column()
   declare description: string | null
 
+  /** Partagée avec le propriétaire dans son portail (#890) ; interne par défaut. */
+  @column()
+  declare visibleToOwner: boolean
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

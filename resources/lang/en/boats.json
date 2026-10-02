@@ -808,7 +808,13 @@
         "actualDurationPlaceholder": "Time (min)",
         "assignedTo": "Assigned to {name}",
         "providerShort": "Provider: {name}",
-        "estimatedShort": "Estimated: {amount}"
+        "estimatedShort": "Estimated: {amount}",
+        "requestedByOwner": "Owner request",
+        "ownerApproval": {
+          "pending": "Quote awaiting the owner",
+          "approved": "Quote approved by the owner",
+          "rejected": "Quote rejected by the owner"
+        }
       }
     },
     "operations": {

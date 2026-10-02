@@ -346,10 +346,8 @@ export default class InvoicesController {
 
     // Transition draft -> sent — avant l'envoi, pour que la facture soit
     // payable quand son lien de paiement en ligne est posé (#876).
-    if (invoice.status === 'draft') {
-      invoice.status = 'sent'
-      await invoice.save()
-    }
+    // `markSent` journalise l'envoi et prévient le propriétaire destinataire (#890).
+    await this.invoiceService.markSent(invoice, auth.getUserOrFail().id)
     await this.onlinePaymentService.ensurePaymentLink(invoice, org)
 
     // Enqueue the email

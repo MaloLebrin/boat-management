@@ -1,5 +1,6 @@
 import { BoatIncidentNotFoundError, BoatIncidentValidationError } from '#exceptions/incident_errors'
 import IncidentChanged, { type IncidentChange } from '#events/incident_changed'
+import OwnerBoatChanged from '#events/owner_boat_changed'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
 import BoatGenericEquipment from '#models/boat_generic_equipment'
@@ -215,6 +216,16 @@ export default class BoatIncidentService {
       change,
       { id: user.id, name: user.fullName || user.email }
     )
+    // Le propriétaire du bateau, premier intéressé (#890).
+    if (change === 'created') {
+      await OwnerBoatChanged.dispatch(
+        boat.organizationId,
+        { id: boat.id, name: boat.name },
+        'incident_created',
+        { id: incident.id, label: incident.type, labelKey: `incidents.type.${incident.type}` },
+        user.id
+      )
+    }
   }
 
   async updateForBoat(user: User, boat: Boat, incidentId: number, payload: UpdateIncidentPayload) {

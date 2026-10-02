@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { test, expect, vi } from 'vitest'
+import { beforeEach, test, expect, vi } from 'vitest'
 import OwnerBoatsShow from '../../inertia/pages/owner/boats/show.vue'
 import { UNPAID_RESERVATION_FIELDS } from './helpers/reservation_payment'
 
@@ -11,10 +11,18 @@ vi.mock('@adonisjs/inertia/vue', () => ({
   },
 }))
 
-vi.mock('@inertiajs/vue3', () => ({
-  Head: { template: '<div><slot /></div>' },
-  usePage: () => ({ props: { appT: {}, locale: 'en' } }),
-}))
+const { routerPost, formPost } = vi.hoisted(() => ({ routerPost: vi.fn(), formPost: vi.fn() }))
+
+vi.mock('@inertiajs/vue3', async () => {
+  const { reactive } = await import('vue')
+  return {
+    Head: { template: '<div><slot /></div>' },
+    usePage: () => ({ props: { appT: {}, locale: 'en' } }),
+    router: { post: routerPost },
+    useForm: (data: Record<string, string>) =>
+      reactive({ ...data, errors: {}, processing: false, post: formPost, reset: vi.fn() }),
+  }
+})
 
 const boat = {
   id: 1,
@@ -83,23 +91,110 @@ const invoices = [
   },
 ]
 
-test('read-only portal renders no action buttons beyond the tab switcher', () => {
-  const wrapper = mount(OwnerBoatsShow, {
-    props: { boat, maintenanceEvents, reservations, invoices },
-  })
+const dashboard = {
+  totalCost12Months: 1840.5,
+  costByCategory: [{ category: 'maintenance' as const, total: 1840.5 }],
+  upcomingDeadlines: [
+    { kind: 'task' as const, id: 3, label: 'Carénage', documentType: null, date: '2026-11-01' },
+  ],
+  lastTrip: null,
+  status: 'available',
+  pendingApprovals: 1,
+}
 
-  // Only the 3 tab-switcher buttons from BaseTabs should exist — no
-  // edit/delete/create action anywhere in the read-only owner portal.
-  const buttons = wrapper.findAll('button')
-  expect(buttons).toHaveLength(3)
-  expect(wrapper.find('form').exists()).toBe(false)
+const requests = [
+  {
+    id: 7,
+    title: 'Remplacement du guindeau',
+    description: null,
+    status: 'received' as const,
+    requestedByOwner: false,
+    dueAt: null,
+    doneAt: null,
+    estimatedCost: 1200,
+    approval: 'pending' as const,
+    createdAt: '2026-10-01T08:00:00.000Z',
+  },
+  {
+    id: 8,
+    title: 'Vérifier le guindeau',
+    description: 'Il force à la remontée.',
+    status: 'planned' as const,
+    requestedByOwner: true,
+    dueAt: '2026-10-15',
+    doneAt: null,
+    estimatedCost: null,
+    approval: null,
+    createdAt: '2026-09-20T08:00:00.000Z',
+  },
+]
+
+const props = {
+  boat,
+  dashboard,
+  maintenanceEvents,
+  reservations,
+  invoices,
+  documents: [],
+  expenses: [],
+  incidents: [],
+  trips: [],
+  requests,
+}
+
+beforeEach(() => {
+  routerPost.mockReset()
+  formPost.mockReset()
 })
 
-test('renders the boat name and defaults to the maintenance tab', () => {
-  const wrapper = mount(OwnerBoatsShow, {
-    props: { boat, maintenanceEvents, reservations, invoices },
-  })
+async function openTab(wrapper: ReturnType<typeof mount>, label: string) {
+  const tab = wrapper.findAll('button').find((button) => button.text().includes(label))
+  await tab!.trigger('click')
+}
+
+test('opens on the owner dashboard (#890)', () => {
+  const wrapper = mount(OwnerBoatsShow, { props })
 
   expect(wrapper.text()).toContain('Bora Bora')
+  expect(wrapper.find('[data-testid="owner-dashboard"]').exists()).toBe(true)
+  expect(wrapper.text()).toContain('Carénage')
+})
+
+test('the requests tab offers the request form and posts it to the owned boat', async () => {
+  const wrapper = mount(OwnerBoatsShow, { props })
+  await openTab(wrapper, 'owner.boats.show.tabs.requests')
+
+  const form = wrapper.find('[data-testid="owner-request-form"]')
+  expect(form.exists()).toBe(true)
+  await form.trigger('submit')
+  expect(formPost).toHaveBeenCalledWith('/owner/boats/1/requests', expect.anything())
+})
+
+test('only a pending quote shows the approve and reject actions', async () => {
+  const wrapper = mount(OwnerBoatsShow, { props })
+  await openTab(wrapper, 'owner.boats.show.tabs.requests')
+
+  expect(wrapper.findAll('[data-testid="owner-request-row"]')).toHaveLength(2)
+  expect(wrapper.findAll('[data-testid="owner-approve"]')).toHaveLength(1)
+
+  await wrapper.find('[data-testid="owner-approve"]').trigger('click')
+  expect(routerPost).toHaveBeenCalledWith(
+    '/owner/boats/1/tasks/7/approve',
+    {},
+    { preserveScroll: true }
+  )
+
+  await wrapper.find('[data-testid="owner-reject"]').trigger('click')
+  expect(routerPost).toHaveBeenLastCalledWith(
+    '/owner/boats/1/tasks/7/reject',
+    {},
+    { preserveScroll: true }
+  )
+})
+
+test('the maintenance history is still one tab away', async () => {
+  const wrapper = mount(OwnerBoatsShow, { props })
+  await openTab(wrapper, 'owner.boats.show.tabs.maintenance')
+
   expect(wrapper.text()).toContain('Antifouling')
 })

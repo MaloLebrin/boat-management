@@ -984,6 +984,24 @@ const routes = {
     tokens: [{"old":"/owner/boats/:id","type":0,"val":"owner","end":""},{"old":"/owner/boats/:id","type":0,"val":"boats","end":""},{"old":"/owner/boats/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['owner.boats.show']['types'],
   },
+  'owner.boats.requests.store': {
+    methods: ["POST"],
+    pattern: '/owner/boats/:id/requests',
+    tokens: [{"old":"/owner/boats/:id/requests","type":0,"val":"owner","end":""},{"old":"/owner/boats/:id/requests","type":0,"val":"boats","end":""},{"old":"/owner/boats/:id/requests","type":1,"val":"id","end":""},{"old":"/owner/boats/:id/requests","type":0,"val":"requests","end":""}],
+    types: placeholder as Registry['owner.boats.requests.store']['types'],
+  },
+  'owner.boats.tasks.approve': {
+    methods: ["POST"],
+    pattern: '/owner/boats/:id/tasks/:taskId/approve',
+    tokens: [{"old":"/owner/boats/:id/tasks/:taskId/approve","type":0,"val":"owner","end":""},{"old":"/owner/boats/:id/tasks/:taskId/approve","type":0,"val":"boats","end":""},{"old":"/owner/boats/:id/tasks/:taskId/approve","type":1,"val":"id","end":""},{"old":"/owner/boats/:id/tasks/:taskId/approve","type":0,"val":"tasks","end":""},{"old":"/owner/boats/:id/tasks/:taskId/approve","type":1,"val":"taskId","end":""},{"old":"/owner/boats/:id/tasks/:taskId/approve","type":0,"val":"approve","end":""}],
+    types: placeholder as Registry['owner.boats.tasks.approve']['types'],
+  },
+  'owner.boats.tasks.reject': {
+    methods: ["POST"],
+    pattern: '/owner/boats/:id/tasks/:taskId/reject',
+    tokens: [{"old":"/owner/boats/:id/tasks/:taskId/reject","type":0,"val":"owner","end":""},{"old":"/owner/boats/:id/tasks/:taskId/reject","type":0,"val":"boats","end":""},{"old":"/owner/boats/:id/tasks/:taskId/reject","type":1,"val":"id","end":""},{"old":"/owner/boats/:id/tasks/:taskId/reject","type":0,"val":"tasks","end":""},{"old":"/owner/boats/:id/tasks/:taskId/reject","type":1,"val":"taskId","end":""},{"old":"/owner/boats/:id/tasks/:taskId/reject","type":0,"val":"reject","end":""}],
+    types: placeholder as Registry['owner.boats.tasks.reject']['types'],
+  },
   'ports.index': {
     methods: ["GET","HEAD"],
     pattern: '/ports',

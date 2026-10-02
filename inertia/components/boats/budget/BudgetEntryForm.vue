@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
+import BaseCheckbox from '~/components/base/BaseCheckbox.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
@@ -18,6 +19,7 @@ const form = useForm({
   date: '',
   category: '',
   description: '',
+  visibleToOwner: false,
 })
 
 const categoryOptions = [
@@ -77,6 +79,13 @@ function submit() {
           :label="t('budget.entries.description')"
           :error="form.errors.description"
           :rows="2"
+        />
+      </div>
+      <div class="sm:col-span-2">
+        <BaseCheckbox
+          v-model="form.visibleToOwner"
+          :label="t('budget.entries.visibleToOwner')"
+          :hint="t('budget.entries.visibleToOwnerHint')"
         />
       </div>
       <div class="sm:col-span-2 flex justify-end">

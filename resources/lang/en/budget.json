@@ -70,7 +70,10 @@
       "port": "Port / Mooring",
       "equipment": "Equipment",
       "other": "Other"
-    }
+    },
+    "visibleToOwner": "Visible to the owner",
+    "visibleToOwnerHint": "The expense will appear in the boat owner's portal. Leave unchecked for an internal expense.",
+    "sharedWithOwner": "Shared with the owner"
   },
   "csv": {
     "headers": {

@@ -16,6 +16,7 @@ import type {
   TaskEquipmentSource,
 } from '#shared/types/maintenance'
 import { decimalColumnToNumber } from '#shared/helpers/number_format'
+import type { OwnerApprovalStatus } from '#shared/types/owner_portal'
 
 interface TaskEquipmentModels {
   engines?: BoatEngine[]
@@ -87,6 +88,8 @@ export function toMaintenanceTaskWorkOrder(t: BoatMaintenanceTask): MaintenanceT
     actualCost: decimalColumnToNumber(t.actualCost),
     estimatedDurationMinutes: t.estimatedDurationMinutes ?? null,
     actualDurationMinutes: t.actualDurationMinutes ?? null,
+    requestedByOwner: t.requestedByOwnerId !== null && t.requestedByOwnerId !== undefined,
+    ownerApproval: (t.ownerApprovalStatus as OwnerApprovalStatus | null | undefined) ?? null,
   }
 }
 

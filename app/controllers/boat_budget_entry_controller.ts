@@ -34,6 +34,7 @@ export default class BoatBudgetEntryController {
       label: body.label,
       category: body.category ?? null,
       description: body.description ?? null,
+      visibleToOwner: body.visibleToOwner,
     })
 
     session.flash('success', i18n.t('flash.budgetEntry.created'))
@@ -61,6 +62,7 @@ export default class BoatBudgetEntryController {
       label: body.label,
       category: body.category ?? null,
       description: body.description ?? null,
+      visibleToOwner: body.visibleToOwner,
     })
 
     session.flash('success', i18n.t('flash.budgetEntry.updated'))

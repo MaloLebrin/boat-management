@@ -203,6 +203,36 @@
         "title": "Incident clôturé sur {boatName}",
         "body": "{actorName} a clôturé l'incident « {incidentType} » sur {boatName}."
       }
+    },
+    "owner": {
+      "request_created": {
+        "title": "Demande du propriétaire sur {boatName}",
+        "body": "{ownerName} demande : « {title} »."
+      },
+      "approval_decided": {
+        "title": "{decision, select, rejected {Devis refusé} other {Devis accepté}} sur {boatName}",
+        "body": "{ownerName} a {decision, select, rejected {refusé} other {accepté}} le devis « {title} »."
+      },
+      "approval_requested": {
+        "title": "Un devis attend votre accord sur {boatName}",
+        "body": "Le gestionnaire vous soumet « {label} ». Ouvrez votre portail pour l'accepter ou le refuser."
+      },
+      "maintenance_done": {
+        "title": "Travaux réalisés sur {boatName}",
+        "body": "« {label} » a été réalisé sur votre bateau."
+      },
+      "incident_created": {
+        "title": "Incident sur {boatName} : {label}",
+        "body": "Un incident a été déclaré sur votre bateau. Le gestionnaire s'en occupe."
+      },
+      "document_expiring": {
+        "title": "Documents à renouveler pour {boatName}",
+        "body": "{count, plural, one {Un document de votre bateau arrive} other {# documents de votre bateau arrivent}} à échéance dans les 30 jours."
+      },
+      "invoice_sent": {
+        "title": "Nouvelle facture {number}",
+        "body": "Le gestionnaire vous a adressé la facture {number}."
+      }
     }
   },
   "title": "Notifications",
@@ -258,7 +288,14 @@
     "reservation.starts_tomorrow": "Départ demain",
     "incident.created": "Incident déclaré",
     "incident.resolved": "Incident clôturé",
-    "invoice.paid": "Facture réglée"
+    "invoice.paid": "Facture réglée",
+    "owner.request_created": "Demande du propriétaire",
+    "owner.approval_decided": "Décision du propriétaire",
+    "owner.approval_requested": "Devis à valider",
+    "owner.maintenance_done": "Travaux réalisés",
+    "owner.incident_created": "Incident sur votre bateau",
+    "owner.document_expiring": "Document à renouveler",
+    "owner.invoice_sent": "Facture reçue"
   },
   "families": {
     "fleet": {

@@ -1963,6 +1963,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['show']>>>
     }
   }
+  'owner.boats.requests.store': {
+    methods: ["POST"]
+    pattern: '/owner/boats/:id/requests'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/owner_portal').createOwnerRequestValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/owner_portal').createOwnerRequestValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['storeRequest']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['storeRequest']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'owner.boats.tasks.approve': {
+    methods: ["POST"]
+    pattern: '/owner/boats/:id/tasks/:taskId/approve'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; taskId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['approve']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['approve']>>>
+    }
+  }
+  'owner.boats.tasks.reject': {
+    methods: ["POST"]
+    pattern: '/owner/boats/:id/tasks/:taskId/reject'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { id: ParamValue; taskId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['reject']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_owner_portal_controller').default['reject']>>>
+    }
+  }
   'ports.index': {
     methods: ["GET","HEAD"]
     pattern: '/ports'

@@ -59,6 +59,38 @@ test.group('Budget Entries (functional)', (group) => {
     assert.equal(entries[0].category, 'other')
   })
 
+  test('an entry is internal by default and can be shared with the owner (#890)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const form = { label: 'Antifouling', amount: '640.00', date: '2024-04-02' }
+
+    await client.post(`/boats/${boat.id}/budget/entries`).form(form).loginAs(user).redirects(0)
+    await client
+      .post(`/boats/${boat.id}/budget/entries`)
+      .form({ ...form, label: 'Partagée', visibleToOwner: 'true' })
+      .loginAs(user)
+      .redirects(0)
+
+    const entries = await BoatBudgetEntry.query().where('boat_id', boat.id).orderBy('id')
+    assert.deepEqual(
+      entries.map((entry) => entry.visibleToOwner),
+      [false, true]
+    )
+
+    // Une édition qui ne porte pas la case ne la décoche pas.
+    await client
+      .patch(`/boats/${boat.id}/budget/entries/${entries[1].id}`)
+      .form({ ...form, label: 'Partagée, renommée' })
+      .loginAs(user)
+      .redirects(0)
+    await entries[1].refresh()
+    assert.equal(entries[1].label, 'Partagée, renommée')
+    assert.isTrue(entries[1].visibleToOwner)
+  })
+
   test('POST /boats/:id/budget/entries redirects to /login when unauthenticated', async ({
     client,
   }) => {

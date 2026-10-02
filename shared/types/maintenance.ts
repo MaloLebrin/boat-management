@@ -2,6 +2,7 @@ import type { DateTime } from 'luxon'
 import type { MaintenanceSubject } from '#shared/constants/maintenance/maintenance_subjects'
 import type { EquipmentReferenceType } from '#shared/constants/equipment_action'
 import type { GenericEquipmentCategory } from '#shared/types/boat'
+import type { OwnerApprovalStatus } from '#shared/types/owner_portal'
 
 /** Alias historique de `MaintenanceSubject` — même vocabulaire, une seule source. */
 export type MaintenanceTaskSubject = MaintenanceSubject
@@ -135,6 +136,10 @@ export interface MaintenanceTaskWorkOrder {
   actualCost: number | null
   estimatedDurationMinutes: number | null
   actualDurationMinutes: number | null
+  /** Née d'une demande du propriétaire depuis son portail (#890). */
+  requestedByOwner: boolean
+  /** Accord du propriétaire sur le coût prévu (#890), `null` si non soumis. */
+  ownerApproval: OwnerApprovalStatus | null
 }
 
 export type CreateMaintenanceTaskPayload = MaintenanceWorkOrderFields & {
