@@ -4,15 +4,21 @@ import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import IosInstallHint from '~/components/pwa/IosInstallHint.vue'
+import NotificationPreferencesForm from '~/components/settings/notifications/NotificationPreferencesForm.vue'
 import { usePushNotifications } from '~/composables/use_push_notifications'
 import { isIos, isStandalone } from '~/composables/use_pwa_install'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type { PushSubscriptionRow } from '../../../../shared/types/push'
+import type { NotificationPreferencesProps } from '../../../../shared/types/notification'
 
-/** Gestion permanente du Web Push : cet appareil + liste des appareils (#498). */
+/**
+ * Préférences par famille et par canal (#888), puis gestion permanente du Web
+ * Push : cet appareil + liste des appareils (#498).
+ */
 const props = defineProps<{
   pushSubscriptions: PushSubscriptionRow[]
+  preferences: NotificationPreferencesProps
 }>()
 
 const { t } = useT()
@@ -52,6 +58,10 @@ function deviceLabel(subscription: PushSubscriptionRow): string {
       <BaseHeading level="2">{{ t('settings.notifications.title') }}</BaseHeading>
       <p class="mt-2 text-sm text-fg-muted">{{ t('settings.notifications.subtitle') }}</p>
     </div>
+
+    <NotificationPreferencesForm :preferences="props.preferences" />
+
+    <BaseHeading level="3">{{ t('settings.notifications.pushTitle') }}</BaseHeading>
 
     <!-- Push non configuré côté serveur -->
     <p v-if="!pushConfigured" class="text-sm text-fg-muted">

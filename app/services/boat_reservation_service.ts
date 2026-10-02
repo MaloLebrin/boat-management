@@ -10,6 +10,7 @@ import { BoatUnavailableError } from '#exceptions/boat_errors'
 import type { BoatUnavailabilityWindow } from '#shared/types/boat_status'
 import BoatReservation from '#models/boat_reservation'
 import PublicBookingDecided from '#events/public_booking_decided'
+import ReservationChanged, { type ReservationChange } from '#events/reservation_changed'
 import BoatModel from '#models/boat'
 import Client from '#models/client'
 import type Boat from '#models/boat'
@@ -290,11 +291,35 @@ export default class BoatReservationService {
     })
 
     await this.notifyDeclinedPublicRequests(result.cancelled)
+    if (result.reservation.status !== 'cancelled') {
+      await this.#notifyTeam(user, boat, result.reservation, 'created')
+    }
     return {
       reservation: result.reservation,
       cancelledOptions: result.cancelled.length,
       forcedOver: result.forcedOver,
     }
+  }
+
+  /** Prévient l'équipe d'une réservation créée, confirmée ou annulée (#888). */
+  async #notifyTeam(
+    user: User,
+    boat: Boat,
+    reservation: BoatReservation,
+    change: ReservationChange
+  ): Promise<void> {
+    await ReservationChanged.dispatch(
+      boat.organizationId,
+      {
+        id: reservation.id,
+        boatId: boat.id,
+        boatName: boat.name,
+        clientName: reservation.clientName,
+        startsAt: reservation.startsAt.toISO()!,
+      },
+      change,
+      { id: user.id, name: user.fullName || user.email }
+    )
   }
 
   /**
@@ -505,6 +530,9 @@ export default class BoatReservationService {
       await PublicBookingDecided.dispatch(result.reservation.id, decided)
     }
     await this.notifyDeclinedPublicRequests(result.cancelled)
+    if (previousStatus !== decided && (decided === 'confirmed' || decided === 'cancelled')) {
+      await this.#notifyTeam(user, boat, result.reservation, decided)
+    }
 
     return {
       reservation: result.reservation,

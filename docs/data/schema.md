@@ -84,6 +84,13 @@ règle ; leurs index FK sont nommés `{table}_{column}_idx`.
     gardée, vidée de ses données personnelles (e-mail
     `deleted-user-<id>@deleted.invalid`) : plusieurs `created_by` vers `users`
     sont en `CASCADE` et emporteraient l'historique de la flotte
+- réglages transverses des notifications (#888) :
+  - `notificationTimezone` (string 64, défaut `Europe/Paris`) — fuseau IANA du
+    navigateur à l'enregistrement des préférences ; règle les heures calmes et
+    l'heure du résumé
+  - `notificationQuietHours` (booléen, défaut `false`) — pas de push de 22h à 7h
+  - `notificationEmailDigest` (booléen, défaut `false`) — e-mails de
+    notification non urgents regroupés en un résumé quotidien à 8h
 
 ### boats
 
@@ -852,6 +859,23 @@ Compteurs journaliers de la surface IA publique (#762) — doc de domaine :
 Purgée sans cron : chaque ligne meurt en 24 h d'utilité, et
 `assertDailyBudgetAvailable()` balaye les lignes au-delà de
 `PUBLIC_AI_USAGE_RETENTION_DAYS` (7 jours) au premier passage de la journée.
+
+### notification_preferences
+
+Préférences de notifications par famille et par canal (#888). Une ligne par
+(utilisateur, famille), posée au premier enregistrement de la matrice de
+`/settings/notifications` ; sans ligne, les défauts du rôle
+(`DEFAULT_NOTIFICATION_PREFERENCES`) s'appliquent.
+
+- `user_id` (FK `users`, `CASCADE`)
+- `family` (string 30) — `fleet` | `rental` | `billing` | `team` | `ai`
+- `in_app`, `push` (booléens, défaut `true`), `email` (booléen, défaut `false`)
+- unicité `(user_id, family)`
+
+La table `notifications` gagne `in_app` (booléen, défaut `true` — une
+notification coupée in-app reste écrite pour l'anti-doublon des scans, jamais
+listée) et `email_digest_pending` (booléen, défaut `false`, index partiel par
+`user_id`) — en attente du prochain résumé quotidien.
 
 ## Rétention des données personnelles (#775)
 

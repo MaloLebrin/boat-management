@@ -2,15 +2,26 @@ import { inject } from '@adonisjs/core'
 import logger from '@adonisjs/core/services/logger'
 import { DateTime } from 'luxon'
 import Notification from '#models/notification'
-import SendPushNotification from '#jobs/send_push_notification'
+import NotificationDispatcherService from '#services/notification_dispatcher_service'
+import NotificationPreferenceService from '#services/notification_preference_service'
 import { isPushableNotificationType } from '#shared/constants/push'
 import { isSafeInternalPath } from '#shared/helpers/safe_path'
 import type { CreateNotificationParams, NotificationsSharedProps } from '#shared/types/notification'
 import * as NotificationTransformer from '#transformers/notification_transformer'
 import transmit from '@adonisjs/transmit/services/main'
 
+/**
+ * Point d'entrée unique des notifications : tous les émetteurs (listeners,
+ * scans, services) appellent `create()`, qui fait office de dispatcher (#888)
+ * — préférence lue par canal, puis in-app, push et e-mail.
+ */
 @inject()
 export default class NotificationService {
+  constructor(
+    private preferences: NotificationPreferenceService = new NotificationPreferenceService(),
+    private dispatcher: NotificationDispatcherService = new NotificationDispatcherService()
+  ) {}
+
   async create(params: CreateNotificationParams): Promise<Notification> {
     // Garde à l'écriture (#780). `actionUrl` est une colonne de texte libre
     // dont la valeur est passée telle quelle à une navigation, côté page
@@ -30,6 +41,16 @@ export default class NotificationService {
       )
     }
 
+    // Préférence de l'utilisateur pour la famille du type (#888) : lue une
+    // fois, avant chaque canal. Tous les émetteurs passent par ici.
+    const channels = await this.preferences.channelsFor(
+      params.userId,
+      params.organizationId,
+      params.type
+    )
+
+    // La ligne est écrite même coupée in-app : c'est le journal qui sert
+    // l'anti-doublon des scans (`createIfNotRecent`), et l'attente du résumé.
     const notification = await Notification.create({
       userId: params.userId,
       organizationId: params.organizationId,
@@ -39,31 +60,44 @@ export default class NotificationService {
       body: params.body ?? null,
       actionUrl: isSafeInternalPath(actionUrl) ? actionUrl : null,
       metadata: params.metadata ?? null,
+      inApp: channels.inApp,
+      emailDigestPending: false,
     })
 
-    try {
-      // Named-property interfaces lack the index signature Broadcastable requires; cast is safe (all fields are JSON primitives).
-      const payload = {
-        notification: NotificationTransformer.toRow(notification),
-      } as unknown as Parameters<typeof transmit.broadcast>[1]
-      transmit.broadcast(`notifications/${notification.userId}`, payload)
-    } catch (error) {
-      logger.warn({ err: error }, 'failed to broadcast notification via SSE')
+    if (channels.inApp) {
+      try {
+        // Named-property interfaces lack the index signature Broadcastable requires; cast is safe (all fields are JSON primitives).
+        const payload = {
+          notification: NotificationTransformer.toRow(notification),
+        } as unknown as Parameters<typeof transmit.broadcast>[1]
+        transmit.broadcast(`notifications/${notification.userId}`, payload)
+      } catch (error) {
+        logger.warn({ err: error }, 'failed to broadcast notification via SSE')
+      }
     }
 
+    const wantsPush = channels.push && isPushableNotificationType(notification.type)
+    if (!wantsPush && !channels.email) return notification
+    const recipient = await this.dispatcher.recipient(notification.userId)
+    if (!recipient) return notification
+
     // Web Push (#497) — même contrat que le broadcast SSE : un échec de
-    // dispatch ne doit jamais faire échouer la création de la notification
-    if (isPushableNotificationType(notification.type)) {
+    // dispatch ne doit jamais faire échouer la création de la notification.
+    // Les heures calmes (#888) sont tenues par le dispatcher.
+    if (wantsPush) {
       try {
-        await SendPushNotification.dispatch({
-          userId: notification.userId,
-          title: notification.title,
-          body: notification.body,
-          actionUrl: notification.actionUrl,
-          type: notification.type,
-        })
+        await this.dispatcher.push(notification, recipient)
       } catch (error) {
         logger.warn({ err: error }, 'failed to dispatch push notification job')
+      }
+    }
+
+    // E-mail (#888) — opt-in par famille, immédiat ou en résumé quotidien.
+    if (channels.email) {
+      try {
+        await this.dispatcher.email(notification, recipient)
+      } catch (error) {
+        logger.warn({ err: error }, 'failed to dispatch notification email')
       }
     }
 
@@ -99,6 +133,7 @@ export default class NotificationService {
   async getUnreadCount(userId: number): Promise<number> {
     const result = await Notification.query()
       .where('userId', userId)
+      .where('inApp', true)
       .whereNull('readAt')
       .count('* as total')
     return Number(result[0].$extras.total)
@@ -107,6 +142,7 @@ export default class NotificationService {
   async getRecentUnread(userId: number, limit = 5): Promise<Notification[]> {
     return Notification.query()
       .where('userId', userId)
+      .where('inApp', true)
       .whereNull('readAt')
       .orderBy('createdAt', 'desc')
       .limit(limit)
@@ -126,6 +162,7 @@ export default class NotificationService {
   async listForUser(userId: number, page: number, perPage = 20) {
     return Notification.query()
       .where('userId', userId)
+      .where('inApp', true)
       .orderBy('createdAt', 'desc')
       .paginate(page, perPage)
   }

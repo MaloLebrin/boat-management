@@ -175,6 +175,12 @@ export const ASSISTANT_NAV_TARGETS = {
     i18nKey: 'assistant.navTargets.settingsOrg',
     promptLabel: { fr: 'Réglages — organisation', en: 'Settings — organization' },
   },
+  // Notifications (#888) : préférences par famille et par canal, appareils push.
+  'settings.notifications': {
+    path: '/settings/notifications',
+    i18nKey: 'assistant.navTargets.settingsNotifications',
+    promptLabel: { fr: 'Réglages — notifications', en: 'Settings — notifications' },
+  },
   'settings.billing': {
     path: '/settings/billing',
     i18nKey: 'assistant.navTargets.settingsBilling',

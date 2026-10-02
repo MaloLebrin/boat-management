@@ -608,6 +608,25 @@
       "lastUsed": "Last notified {date}",
       "remove": "Remove",
       "removeAriaLabel": "Remove device: {device}"
+    },
+    "pushTitle": "Push notifications",
+    "preferences": {
+      "title": "What you receive, and where",
+      "description": "For each notification family, pick the channels that suit you. Emails are always optional.",
+      "family": "Family",
+      "muteAll": "Mute all",
+      "enableAll": "Enable all",
+      "cellLabel": "{family} — {channel}",
+      "quietHours": "Quiet hours: no push between 10pm and 7am",
+      "emailDigest": "Bundle emails into a daily digest at 8am (urgent alerts are sent right away)",
+      "digestNeedsEmail": "With no email channel ticked, there is nothing to bundle.",
+      "timezone": "Time zone: {timezone} (this device's when saving)",
+      "save": "Save my preferences"
+    },
+    "channels": {
+      "inApp": "In-app",
+      "push": "Push",
+      "email": "Email"
     }
   },
   "exports": {

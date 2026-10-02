@@ -2551,6 +2551,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notifications_controller').default['destroy']>>>
     }
   }
+  'notifications.unsubscribe': {
+    methods: ["GET","HEAD"]
+    pattern: '/notifications/unsubscribe/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['confirmUnsubscribe']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['confirmUnsubscribe']>>>
+    }
+  }
+  'notifications.unsubscribe.confirm': {
+    methods: ["POST"]
+    pattern: '/notifications/unsubscribe/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['unsubscribe']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['unsubscribe']>>>
+    }
+  }
   'crew.index': {
     methods: ["GET","HEAD"]
     pattern: '/crew'
@@ -4001,6 +4025,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['notifications']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings_controller').default['notifications']>>>
+    }
+  }
+  'settings.notifications.preferences': {
+    methods: ["PUT"]
+    pattern: '/settings/notifications/preferences'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/notification_preferences').updateNotificationPreferencesValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/notification_preferences').updateNotificationPreferencesValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/notification_preferences_controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'settings.org': {

@@ -2223,4 +2223,29 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     ],
     navTarget: 'settings.org',
   },
+  {
+    id: 'notification-preferences',
+    title: {
+      en: 'Choosing which notifications you receive',
+      fr: 'Choisir les notifications reçues',
+    },
+    body: {
+      en: 'Settings → Notifications has a grid of families (fleet & maintenance, rentals & clients, billing, team & account, AI) by channel (in-app, push, email), with a mute-all switch per channel. Defaults follow your role: a mechanic gets nothing about rentals or billing. Emails are opt-in and can be bundled into a daily digest at 8am; urgent alerts still go out at once. Quiet hours hold push between 10pm and 7am in your time zone. Every notification email has a one-click unsubscribe link for its family.',
+      fr: 'Réglages → Notifications présente une matrice des familles (flotte et maintenance, location et clients, facturation, équipe et compte, IA) par canal (dans l’app, push, e-mail), avec « tout couper » par canal. Les défauts suivent le rôle : un mécanicien ne reçoit rien de la location ni de la facturation. L’e-mail se coche à la demande et peut être regroupé en un résumé quotidien à 8h ; les alertes urgentes partent quand même tout de suite. Les heures calmes retiennent le push de 22h à 7h dans votre fuseau. Chaque e-mail porte un lien de désinscription en un clic de sa famille.',
+    },
+    keywords: [
+      'preferences de notification',
+      'couper les notifications',
+      'desactiver les notifications',
+      'notifications par e-mail',
+      'resume quotidien',
+      'heures calmes',
+      'se desinscrire',
+      'notification settings',
+      'email digest',
+      'quiet hours',
+      'unsubscribe',
+    ],
+    navTarget: 'settings.notifications',
+  },
 ]

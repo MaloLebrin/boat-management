@@ -18,6 +18,14 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   'reservation.balance_due',
   // Demande en ligne d'un client (#881) : un client attend une réponse.
   'reservation.requested',
+  // Vie des réservations et incidents signalés (#888) : l'équipe qui prépare
+  // le bateau doit le savoir sans ouvrir l'app. La clôture d'un incident et le
+  // règlement manuel d'une facture restent in-app : personne n'a à agir.
+  'reservation.created',
+  'reservation.confirmed',
+  'reservation.cancelled',
+  'reservation.starts_tomorrow',
+  'incident.created',
   // Facture réglée en ligne par le client (#876) : de l'argent arrivé.
   'invoice.paid_online',
   // Facture passée en retard (#878) : de l'argent qui n'est pas arrivé. Les

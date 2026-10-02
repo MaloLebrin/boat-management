@@ -417,7 +417,9 @@ checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`
 
 ### Settings — notifications (`/settings/notifications`, #498)
 
-- Page : `inertia/pages/settings/notifications.vue` → `components/settings/tabs/SettingsNotificationsTab.vue` (prop `pushSubscriptions`, servie par `SettingsController.notifications`), section visible pour **tous les rôles**.
+- Page : `inertia/pages/settings/notifications.vue` → `components/settings/tabs/SettingsNotificationsTab.vue` (props `pushSubscriptions` et `preferences`, servies par `SettingsController.notifications`), section visible pour **tous les rôles**.
+- Préférences (#888) : `components/settings/notifications/NotificationPreferencesForm.vue` — matrice familles (`notifications.families.*`) × canaux (`settings.notifications.channels.*`), « Tout couper / Tout activer » par colonne, cases « heures calmes » et « résumé quotidien », fuseau du navigateur (`browserTimeZone()`) envoyé à l'enregistrement → `useForm(...).put('/settings/notifications/preferences')`. Clés `settings.notifications.preferences.*`. Test : `tests/inertia/notification_preferences_form.spec.ts`.
+- Désinscription d'un e-mail (#888) : `inertia/pages/notifications/unsubscribe.vue` (layout `auth`, sans session), props `family`, `action` (l'URL du jeton signé), `done` ; bouton `<Form>` en `POST` sur la même URL. Clés `notifications.unsubscribe.*`.
 - Gestion du Web Push : activer/désactiver **cet appareil** (`use_push_notifications.ts` — `subscribe()` uniquement sur geste utilisateur), liste des appareils abonnés (`user_agent`, dates) et retrait par appareil (`DELETE /push/subscriptions/:id`). Sur iOS hors PWA installée, `IosInstallHint.vue` remplace le bouton. Détail : `docs/frontend/pwa.md` § Web Push.
 - L'app installée s'ouvre sur `/dashboard?source=pwa` (#865). Le manifeste (`GET /site.webmanifest`) expose aussi quatre raccourcis d'écran d'accueil : journal, carburant, incidents, flotte. La page reçoit `launchedFromPwa`.
 

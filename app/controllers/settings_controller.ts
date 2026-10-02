@@ -39,6 +39,7 @@ import TwoFactorService from '#services/two_factor_service'
 import UserSessionService from '#services/user_session_service'
 import AccountService from '#services/account_service'
 import OrganizationDeletionService from '#services/organization_deletion_service'
+import NotificationPreferenceService from '#services/notification_preference_service'
 import { TWO_FACTOR_RECOVERY_CODES_FLASH_KEY } from '#shared/constants/two_factor'
 import type { TwoFactorSettingsProps } from '#shared/types/two_factor'
 
@@ -62,7 +63,8 @@ export default class SettingsController {
     private twoFactorService: TwoFactorService,
     private userSessionService: UserSessionService,
     private accountService: AccountService,
-    private organizationDeletionService: OrganizationDeletionService
+    private organizationDeletionService: OrganizationDeletionService,
+    private notificationPreferenceService: NotificationPreferenceService
   ) {}
 
   async me({ inertia, auth, session }: HttpContext) {
@@ -100,9 +102,14 @@ export default class SettingsController {
   /** Gestion des notifications push et des appareils abonnés (#498). */
   async notifications({ inertia, auth }: HttpContext) {
     const user = await auth.authenticate()
-    const subscriptions = await this.pushSubscriptionService.listForUser(user.id)
+    const [subscriptions, preferences] = await Promise.all([
+      this.pushSubscriptionService.listForUser(user.id),
+      // Matrice familles × canaux (#888).
+      this.notificationPreferenceService.settingsFor(user),
+    ])
     return inertia.render('settings/notifications', {
       pushSubscriptions: subscriptions.map(PushSubscriptionTransformer.toRow),
+      preferences,
     })
   }
 

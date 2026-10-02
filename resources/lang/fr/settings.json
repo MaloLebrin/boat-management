@@ -608,6 +608,25 @@
       "lastUsed": "Dernière notification le {date}",
       "remove": "Retirer",
       "removeAriaLabel": "Retirer l'appareil : {device}"
+    },
+    "pushTitle": "Notifications push",
+    "preferences": {
+      "title": "Ce que vous recevez, et où",
+      "description": "Choisissez, pour chaque famille de notifications, les canaux qui vous conviennent. Les e-mails sont toujours facultatifs.",
+      "family": "Famille",
+      "muteAll": "Tout couper",
+      "enableAll": "Tout activer",
+      "cellLabel": "{family} — {channel}",
+      "quietHours": "Heures calmes : pas de push entre 22h et 7h",
+      "emailDigest": "Regrouper les e-mails en un résumé quotidien à 8h (les alertes urgentes partent tout de suite)",
+      "digestNeedsEmail": "Sans canal e-mail coché, il n'y a rien à regrouper.",
+      "timezone": "Fuseau horaire : {timezone} (celui de cet appareil à l'enregistrement)",
+      "save": "Enregistrer mes préférences"
+    },
+    "channels": {
+      "inApp": "Dans l'app",
+      "push": "Push",
+      "email": "E-mail"
     }
   },
   "exports": {

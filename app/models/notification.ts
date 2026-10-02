@@ -41,6 +41,14 @@ export default class Notification extends BaseModel {
   })
   declare metadata: Record<string, unknown> | null
 
+  /** Coupée in-app par l'utilisateur (#888) : écrite, mais jamais listée. */
+  @column()
+  declare inApp: boolean
+
+  /** En attente du prochain résumé quotidien des e-mails (#888). */
+  @column()
+  declare emailDigestPending: boolean
+
   @column.dateTime()
   declare readAt: DateTime | null
 

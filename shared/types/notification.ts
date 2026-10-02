@@ -31,6 +31,13 @@ export type NotificationType =
   | 'reservation.deposit_due'
   | 'reservation.balance_due'
   | 'reservation.requested'
+  | 'reservation.created'
+  | 'reservation.confirmed'
+  | 'reservation.cancelled'
+  | 'reservation.starts_tomorrow'
+  | 'incident.created'
+  | 'incident.resolved'
+  | 'invoice.paid'
   | 'invoice.paid_online'
   | 'invoice.overdue'
   | 'invoice.reminder_sent'
@@ -78,4 +85,42 @@ export interface CreateNotificationParams {
   body?: string | null
   actionUrl?: string | null
   metadata?: Record<string, unknown> | null
+}
+
+/**
+ * Familles de notifications (#888) : l'unité des préférences. Chaque type
+ * appartient à une famille (`notificationFamilyOf`).
+ */
+export type NotificationFamily = 'fleet' | 'rental' | 'billing' | 'team' | 'ai'
+
+/** Canaux de livraison d'une notification (#888). */
+export type NotificationChannel = 'inApp' | 'push' | 'email'
+
+export type NotificationChannelPreferences = Record<NotificationChannel, boolean>
+
+export type NotificationPreferenceMatrix = Record<
+  NotificationFamily,
+  NotificationChannelPreferences
+>
+
+/** Prop `preferences` de `/settings/notifications` (#888). */
+export interface NotificationPreferencesProps {
+  families: NotificationPreferenceMatrix
+  quietHours: boolean
+  emailDigest: boolean
+  timezone: string
+}
+
+export interface UpdateNotificationPreferencesPayload {
+  families: NotificationPreferenceMatrix
+  quietHours: boolean
+  emailDigest: boolean
+  timezone: string
+}
+
+/** Une ligne du résumé quotidien des e-mails (#888). */
+export interface NotificationDigestEntry {
+  title: string
+  body: string | null
+  actionUrl: string | null
 }

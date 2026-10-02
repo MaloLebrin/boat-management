@@ -1,4 +1,5 @@
 import { BoatIncidentNotFoundError, BoatIncidentValidationError } from '#exceptions/incident_errors'
+import IncidentChanged, { type IncidentChange } from '#events/incident_changed'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
 import BoatGenericEquipment from '#models/boat_generic_equipment'
@@ -187,7 +188,7 @@ export default class BoatIncidentService {
 
     const target = await resolveIncidentTarget(boat, payload)
 
-    return await BoatIncident.create({
+    const incident = await BoatIncident.create({
       boatId: boat.id,
       organizationId: boat.organizationId,
       // Déclarant (#816) : le même chemin sert la déclaration manuelle et celle
@@ -202,6 +203,18 @@ export default class BoatIncidentService {
       status: 'open',
       ...incidentTargetColumns(target),
     })
+    await this.#notifyTeam(user, boat, incident, 'created')
+    return incident
+  }
+
+  /** Prévient l'équipe d'un incident déclaré ou clôturé (#888). */
+  async #notifyTeam(user: User, boat: Boat, incident: BoatIncident, change: IncidentChange) {
+    await IncidentChanged.dispatch(
+      boat.organizationId,
+      { id: incident.id, boatId: boat.id, boatName: boat.name, type: incident.type },
+      change,
+      { id: user.id, name: user.fullName || user.email }
+    )
   }
 
   async updateForBoat(user: User, boat: Boat, incidentId: number, payload: UpdateIncidentPayload) {
@@ -259,7 +272,11 @@ export default class BoatIncidentService {
       }
     }
 
+    const wasClosed = incident.$original.status === 'closed'
     await incident.save()
+    if (!wasClosed && incident.status === 'closed') {
+      await this.#notifyTeam(user, boat, incident, 'resolved')
+    }
     return incident
   }
 

@@ -80,6 +80,7 @@ export const controllers = {
   NavigationLogEntries: () => import('#controllers/navigation_log_entries_controller'),
   NavigationLogs: () => import('#controllers/navigation_logs_controller'),
   NewAccount: () => import('#controllers/new_account_controller'),
+  NotificationPreferences: () => import('#controllers/notification_preferences_controller'),
   Notifications: () => import('#controllers/notifications_controller'),
   OnlinePayments: () => import('#controllers/online_payments_controller'),
   OrganizationDeletion: () => import('#controllers/organization_deletion_controller'),

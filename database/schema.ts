@@ -2581,12 +2581,44 @@ export class NavigationLogSchema extends BaseModel {
   declare windForceBeaufort: number | null
 }
 
+export class NotificationPreferenceSchema extends BaseModel {
+  static $columns = [
+    'createdAt',
+    'email',
+    'family',
+    'id',
+    'inApp',
+    'push',
+    'updatedAt',
+    'userId',
+  ] as const
+  $columns = NotificationPreferenceSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: boolean
+  @column()
+  declare family: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare inApp: boolean
+  @column()
+  declare push: boolean
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: number
+}
+
 export class NotificationSchema extends BaseModel {
   static $columns = [
     'actionUrl',
     'body',
     'createdAt',
+    'emailDigestPending',
     'id',
+    'inApp',
     'metadata',
     'organizationId',
     'readAt',
@@ -2602,8 +2634,12 @@ export class NotificationSchema extends BaseModel {
   declare body: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare emailDigestPending: boolean
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare inApp: boolean
   @column()
   declare metadata: any | null
   @column()
@@ -3486,6 +3522,9 @@ export class UserSchema extends BaseModel {
     'id',
     'lastLoginAt',
     'locale',
+    'notificationEmailDigest',
+    'notificationQuietHours',
+    'notificationTimezone',
     'notifyNewLogin',
     'organizationId',
     'password',
@@ -3517,6 +3556,12 @@ export class UserSchema extends BaseModel {
   declare lastLoginAt: DateTime | null
   @column()
   declare locale: string | null
+  @column()
+  declare notificationEmailDigest: boolean
+  @column()
+  declare notificationQuietHours: boolean
+  @column()
+  declare notificationTimezone: string
   @column()
   declare notifyNewLogin: boolean
   @column()

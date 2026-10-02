@@ -367,6 +367,9 @@ export interface ApiDefinition {
     markAllAsRead: typeof routes['notifications.markAllAsRead']
     markAsRead: typeof routes['notifications.markAsRead']
     destroy: typeof routes['notifications.destroy']
+    unsubscribe: typeof routes['notifications.unsubscribe'] & {
+      confirm: typeof routes['notifications.unsubscribe.confirm']
+    }
   }
   crew: {
     index: typeof routes['crew.index']
@@ -563,7 +566,9 @@ export interface ApiDefinition {
       twoFactor: typeof routes['settings.org.two_factor']
       update: typeof routes['settings.org.update']
     }
-    notifications: typeof routes['settings.notifications']
+    notifications: typeof routes['settings.notifications'] & {
+      preferences: typeof routes['settings.notifications.preferences']
+    }
     members: typeof routes['settings.members']
     billing: typeof routes['settings.billing'] & {
       checkout: typeof routes['settings.billing.checkout']

@@ -17,6 +17,7 @@ import type { PublicBookingEmailParams } from '#shared/types/public_booking'
 import type { CrewCertificationAlert } from '#shared/types/crew'
 import type { TwoFactorEvent } from '#shared/types/two_factor'
 import type { DeviceInfo } from '#shared/types/user_session'
+import type { NotificationDigestEntry } from '#shared/types/notification'
 
 @inject()
 export default class EmailQueueService {
@@ -986,5 +987,116 @@ export default class EmailQueueService {
         await SendInspectionEmail.dispatch(p)
       },
     })
+  }
+  /**
+   * Notification livrée par e-mail (#888), dans la langue du destinataire.
+   * `actionUrl` est un chemin interne (validé à la création), rendu absolu ici.
+   * Le pied porte le lien vers les réglages et la désinscription de la famille.
+   */
+  async sendNotification(params: {
+    notificationId: number
+    to: string
+    name: string | null
+    locale: string | null
+    title: string
+    body: string | null
+    actionUrl: string | null
+    unsubscribeUrl: string | null
+  }) {
+    const i18n = i18nManager.locale(toAppLocale(params.locale))
+    const appUrl = env.get('APP_URL')
+    const greeting = i18n.t('notifications.email.greeting', { name: params.name ?? params.to })
+    const ctaUrl = params.actionUrl ? `${appUrl}${params.actionUrl}` : null
+    const footer = this.#notificationFooter(i18n, params.unsubscribeUrl)
+    const text = [greeting, params.title, params.body, ctaUrl, footer.text]
+      .filter((part): part is string => Boolean(part))
+      .join('\n\n')
+
+    const html = await edge.render('emails/notification', {
+      greeting,
+      title: params.title,
+      body: params.body,
+      ctaUrl,
+      ctaLabel: i18n.t('notifications.email.cta'),
+      ...footer.view,
+    })
+
+    await this.#enqueue({
+      to: params.to,
+      subject: params.title,
+      text,
+      html,
+      correlationId: `notification:${params.notificationId}`,
+    })
+  }
+
+  /** Résumé quotidien des notifications mises en attente (#888). */
+  async sendNotificationDigest(params: {
+    userId: number
+    to: string
+    name: string | null
+    locale: string | null
+    date: string
+    entries: NotificationDigestEntry[]
+  }) {
+    const i18n = i18nManager.locale(toAppLocale(params.locale))
+    const appUrl = env.get('APP_URL')
+    const count = String(params.entries.length)
+    const subject = i18n.t('notifications.email.digestSubject', { count })
+    const greeting = i18n.t('notifications.email.greeting', { name: params.name ?? params.to })
+    const heading = i18n.t('notifications.email.digestHeading', { count })
+    const entries = params.entries.map((entry) => ({
+      title: entry.title,
+      body: entry.body,
+      url: entry.actionUrl ? `${appUrl}${entry.actionUrl}` : null,
+    }))
+    const footer = this.#notificationFooter(i18n, null)
+    const text = [
+      greeting,
+      heading,
+      ...entries.map((entry) =>
+        [`- ${entry.title}`, entry.body, entry.url].filter(Boolean).join('\n  ')
+      ),
+      footer.text,
+    ].join('\n\n')
+
+    const html = await edge.render('emails/notification_digest', {
+      greeting,
+      heading,
+      entries,
+      ...footer.view,
+    })
+
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `notification-digest:${params.userId}:${params.date}`,
+    })
+  }
+
+  #notificationFooter(
+    i18n: ReturnType<typeof i18nManager.locale>,
+    unsubscribeUrl: string | null
+  ): {
+    text: string
+    view: {
+      manageUrl: string
+      manageLabel: string
+      unsubscribeUrl: string | null
+      unsubscribeLabel: string
+    }
+  } {
+    const manageUrl = `${env.get('APP_URL')}/settings/notifications`
+    const manageLabel = i18n.t('notifications.email.manage')
+    const unsubscribeLabel = i18n.t('notifications.email.unsubscribe')
+    const text = [
+      `${manageLabel}\n${manageUrl}`,
+      unsubscribeUrl && `${unsubscribeLabel}\n${unsubscribeUrl}`,
+    ]
+      .filter(Boolean)
+      .join('\n')
+    return { text, view: { manageUrl, manageLabel, unsubscribeUrl, unsubscribeLabel } }
   }
 }

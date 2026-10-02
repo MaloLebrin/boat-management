@@ -7,6 +7,8 @@ import AiKeyUndecryptable from '#events/ai_key_undecryptable'
 import AiTokenThresholdCrossed from '#events/ai_token_threshold_crossed'
 import BoatStatusChanged from '#events/boat_status_changed'
 import ContactMessageReceived from '#events/contact_message_received'
+import IncidentChanged from '#events/incident_changed'
+import InvoicePaid from '#events/invoice_paid'
 import MaintenanceTaskAssigned from '#events/maintenance_task_assigned'
 import OrganizationInvitationAccepted from '#events/organization_invitation_accepted'
 import OrganizationMemberJoined from '#events/organization_member_joined'
@@ -17,6 +19,7 @@ import OrganizationPlanDowngraded from '#events/organization_plan_downgraded'
 import OrganizationPlanUpgraded from '#events/organization_plan_upgraded'
 import PublicBookingDecided from '#events/public_booking_decided'
 import PublicBookingRequested from '#events/public_booking_requested'
+import ReservationChanged from '#events/reservation_changed'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
 
@@ -25,6 +28,8 @@ export const events = {
   AiTokenThresholdCrossed: AiTokenThresholdCrossed,
   BoatStatusChanged: BoatStatusChanged,
   ContactMessageReceived: ContactMessageReceived,
+  IncidentChanged: IncidentChanged,
+  InvoicePaid: InvoicePaid,
   MaintenanceTaskAssigned: MaintenanceTaskAssigned,
   OrganizationInvitationAccepted: OrganizationInvitationAccepted,
   OrganizationMemberJoined: OrganizationMemberJoined,
@@ -35,6 +40,7 @@ export const events = {
   OrganizationPlanUpgraded: OrganizationPlanUpgraded,
   PublicBookingDecided: PublicBookingDecided,
   PublicBookingRequested: PublicBookingRequested,
+  ReservationChanged: ReservationChanged,
   SimulatorLeadCreated: SimulatorLeadCreated,
   StorageThresholdCrossed: StorageThresholdCrossed,
 }

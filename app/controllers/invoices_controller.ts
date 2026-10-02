@@ -399,7 +399,7 @@ export default class InvoicesController {
   }
 
   async markPaid({ response, auth, bouncer, params, session, i18n }: HttpContext) {
-    await auth.authenticate()
+    const user = await auth.authenticate()
     const org = await this.loadOrg(auth)
 
     await bouncer.with(InvoicePolicy).authorize('update')
@@ -416,7 +416,7 @@ export default class InvoicesController {
     }
 
     try {
-      await this.invoiceService.markAsPaid(invoice)
+      await this.invoiceService.markAsPaid(invoice, undefined, user.id)
     } catch (error) {
       if (error instanceof CannotMarkPaidError) {
         session.flash('error', i18n.t('flash.invoices.cannotMarkPaid'))

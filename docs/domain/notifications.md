@@ -96,7 +96,64 @@ Les notifications sont produites par des **listeners** branchés sur des events 
 
 ¹ `error` dès que `percent >= 100`, sinon `warning`.
 
+Depuis #888, `reservation.*`, `incident.*` et `invoice.paid` sont émis depuis leurs événements — voir « Préférences par famille et par canal ».
+
 Les listeners quota destinent la notification aux **admins** de l'organisation, et envoient en parallèle un email (`EmailQueueService`). Le scan quotidien (`NotificationScanService`) produit aussi les alertes de flotte (`maintenance.*`, `document.*`, `safety_equipment.*`, `reservation.*`) et, depuis #882, `crew_certification.expiring_soon` / `crew_certification.expired` — une notification par **équipier** (et non par bateau), anti-doublon par fenêtre 60/30/7 jours via `metadata.crewAlertKey`, aussi adressée à l'équipier quand son e-mail est celui d'un membre de l'organisation (détail : `docs/domain/crew.md`). Depuis #883, l'affectation d'un équipier à une réservation produit `crew.assigned`, et le scan quotidien `crew.assignment_reminder` la veille du départ (une fois par affectation, `reminder_sent_at`) — tous deux poussables, à l'équipier qui a un compte dans l'organisation. D'autres `NotificationType` sont déjà déclarés dans le type (`maintenance.*`, `document.*`, `safety_equipment.*`, `member.removed`, `plan.upgraded`, `invitation.accepted`) en prévision de futurs producteurs.
+
+## Préférences par famille et par canal (#888)
+
+Références : `shared/constants/notifications.ts`, `app/services/notification_preference_service.ts`,
+`app/services/notification_dispatcher_service.ts`, `app/controllers/notification_preferences_controller.ts`.
+
+`NotificationService.create()` est le **dispatcher unique** : tous les émetteurs (listeners,
+scans, services) y passent, et il lit la préférence de l'utilisateur **avant chaque canal**.
+
+- **Familles** : chaque type appartient à une famille par son préfixe (`notificationFamilyOf`) —
+  `fleet` (maintenance, bateau, documents, sécurité, incidents), `rental` (réservations),
+  `billing` (factures, quotas, plan, modules), `team` (membres, équipage, certifications,
+  exports, et tout préfixe inconnu), `ai`.
+- **Canaux** : `inApp`, `push`, `email`. Une ligne `notification_preferences` par
+  (utilisateur, famille) une fois la matrice enregistrée ; avant, les **défauts du rôle**
+  (`DEFAULT_NOTIFICATION_PREFERENCES`) tenu dans l'organisation de la notification : l'admin
+  reçoit tout, le membre rien de la facturation, le mécanicien rien de la location ni de la
+  facturation, le propriétaire sa flotte et son équipage. L'e-mail n'est **jamais** coché d'office.
+  Sans adhésion connue, rien n'est filtré : l'émetteur a choisi son destinataire.
+- **In-app coupé** : la ligne `notifications` est quand même écrite (`in_app = false`) — elle sert
+  l'anti-doublon des scans (`createIfNotRecent`) — mais n'est ni diffusée en SSE, ni comptée, ni
+  listée.
+- **Push** : toujours restreint à `PUSHABLE_NOTIFICATION_TYPES`, puis à la préférence. Les
+  **heures calmes** (`users.notification_quiet_hours`) retiennent le push de 22h à 7h dans
+  `users.notification_timezone` (fuseau du navigateur à l'enregistrement) ; la notification reste
+  in-app.
+- **E-mail** : `EmailQueueService.sendNotification` (gabarit `emails/notification.edge`), ou mise en
+  attente (`notifications.email_digest_pending`) quand le **résumé quotidien** est activé — sauf une
+  notification urgente (`severity = 'error'`), qui part tout de suite. Le job horaire
+  `SendNotificationDigests` (`5 * * * *`) envoie un seul e-mail (`emails/notification_digest.edge`)
+  aux utilisateurs pour qui il est 8h dans leur fuseau, puis vide la file.
+- **Pied d'e-mail** (`emails/_notification_footer.edge`) : lien « Gérer mes notifications »
+  (`/settings/notifications`) et désinscription en un clic de la famille — jeton
+  (utilisateur, famille) signé par le `MessageVerifier` de l'app (`purpose:
+'notification_unsubscribe'`, sans expiration ; indépendant du routeur, il se fabrique aussi
+  depuis un job de file) vers `GET /notifications/unsubscribe/:token`, page de confirmation sans session ; le `POST`
+  sur la même URL coupe l'e-mail de la famille (les antivirus de messagerie suivent les liens : un
+  `GET` ne change rien). Les e-mails de service existants (quotas, plan rétrogradé, module
+  désactivé) ne sont pas des e-mails de notification et restent hors préférences.
+
+Les réglages se font sur `/settings/notifications` (`PUT /settings/notifications/preferences`,
+matrice complète validée par `updateNotificationPreferencesValidator`).
+
+### Événements d'équipe (#888)
+
+| Event                | Émis depuis                                              | `type`                                                         | `actionUrl`                        |
+| -------------------- | -------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
+| `ReservationChanged` | `BoatReservationService.create` / `update` (statut)      | `reservation.created` / `reservation.confirmed` / `.cancelled` | `/boats/:id/reservations`          |
+| `IncidentChanged`    | `BoatIncidentService.createForBoat` / passage à `closed` | `incident.created` (`error`) / `incident.resolved`             | `/boats/:id/incidents/:incidentId` |
+| `InvoicePaid`        | `InvoiceService.markAsPaid` (règlement manuel)           | `invoice.paid`                                                 | `/invoices/:id`                    |
+
+Destinataires : toute l'équipe (`admin`, `member`, `mechanic` — `NotificationAudienceService.staffOf`),
+**auteur exclu**, triée ensuite par les préférences. Le scan quotidien ajoute
+`reservation.starts_tomorrow` : réservations confirmées qui partent le lendemain (jour de Paris),
+une notification par bateau aux admins, module Location actif.
 
 ## Exposition au frontend (shared props)
 
@@ -234,10 +291,13 @@ Pas une liste noire de schémas, qui est toujours en retard d'un schéma.
 3. Créer un **listener** dans `app/listeners/` qui appelle `notificationService.create({ userId, organizationId, type, severity, title, body, actionUrl, metadata })`. Localiser `title`/`body` via `i18nManager` (ajouter les clés `notifications.messages.<type>.*` dans **`en` et `fr`**).
 4. Brancher le listener dans `start/events.ts` (`emitter.listen`).
 5. Ajouter la clé d'affichage `notifications.types.<type>` (en/fr).
-6. Écrire les tests (voir ci-dessous) et documenter dans une entrée `docs/changelog/YYYY-MM-DD-HHMM-slug.md`.
+6. Vérifier la famille du préfixe (`notificationFamilyOf`, `shared/constants/notifications.ts`) : un préfixe inconnu tombe dans `team`. Si le type mérite le push, l'ajouter à `PUSHABLE_NOTIFICATION_TYPES`.
+7. Écrire les tests (voir ci-dessous) et documenter dans une entrée `docs/changelog/YYYY-MM-DD-HHMM-slug.md`.
 
 Aucune modification frontend n'est nécessaire : la cloche, le panneau et la page consomment génériquement `NotificationForFront`.
 
 ## Tests
+
+Préférences et dispatcher (#888) : `tests/integration/services/notification_dispatcher.spec.ts` (défauts du rôle, préférence par canal, heures calmes, résumé de 8h, désinscription), `tests/integration/jobs/send_notification_digests.spec.ts`, `tests/functional/notifications/preferences.spec.ts` (page, `PUT`, lien signé), `tests/functional/notifications/team_events.spec.ts` (émission des nouveaux types, départ du lendemain), `tests/inertia/notification_preferences_form.spec.ts` (matrice).
 
 Référence : `tests/functional/notifications/notifications.spec.ts` (marquage lu unitaire/global, cohérence `readAt` en `DateTime` Luxon, non-régression sur les déjà-lues, exigence d'authentification) et `tests/inertia/notification_bell.spec.ts` (badge, cap `9+`, ouverture/fermeture du panneau, props `align`/`tone`).
