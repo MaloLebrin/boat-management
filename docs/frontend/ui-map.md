@@ -471,7 +471,8 @@ checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`
 
 ### Settings — organisation (`/settings/org`, #761)
 
-- Page : `inertia/pages/settings/org.vue` → `components/settings/tabs/SettingsOrgTab.vue` (prop `organization` — `id` et `name` seulement, servie par `SettingsController.org`).
+- Page : `inertia/pages/settings/org.vue` → `components/settings/tabs/SettingsOrgTab.vue` (prop `organization` : `OrganizationSettingsData` — `id`, `name`, `currency`, servie par `SettingsController.org`).
+- **Devise de travail (#627)** : `<BaseSelect name="currency">` dans le même formulaire que le nom (options `useNumberFormat().currencyOptions`, libellés ICU localisés), lecture seule hors `organization.manage`. Clés `settings.org.currencyLabel` / `currencyHint`. La devise est partagée en prop `organizationCurrency` et sert de repli à `useNumberFormat().formatCurrency` ; les `<select>` de devise de `invoices/form.vue` et `BoatShowTabPricing.vue` utilisent la même liste et la présélectionnent — voir `docs/domain/currencies.md`.
 - **Un écran, deux audiences** : **ouvrir** la page est `members.view` (admin + member, comme `/settings/members` — `SettingsShell` conditionne les deux onglets à cette même capability), **renommer** est `organization.manage` (admin seul, #761). Le formulaire n'est rendu que sous `can('organization.manage')` ; sinon le nom s'affiche en lecture seule (`BaseInput` `disabled`) avec `settings.org.readOnlyHint`. Sans cette distinction, un member gardait un formulaire que `PUT /settings/org` refuse.
 - Les deux gardes sont côté backend, pas seulement dans le rendu : `authorize('viewMembers')` sur le `GET`, `authorize('manageOrganization')` sur le `PUT` — un mechanic ou un boat_owner qui tape l'URL reçoit la page 403.
 - Le logo de l'organisation ne vit **pas** ici mais sur `/settings/branding` (`branding.configure`), avec le reste de la marque.

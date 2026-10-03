@@ -16,6 +16,8 @@
     "title": "Profil organisation",
     "nameLabel": "Nom de l'organisation",
     "namePlaceholder": "Mon organisation",
+    "currencyLabel": "Devise de travail",
+    "currencyHint": "Devise des montants sans devise propre (budget, carburant, statistiques) et proposée par défaut pour les nouvelles factures et les nouveaux tarifs. Les factures déjà émises gardent leur devise.",
     "readOnlyHint": "Seul un administrateur peut renommer l'organisation.",
     "logoLabel": "Logo",
     "logoPlaceholder": "Logo",

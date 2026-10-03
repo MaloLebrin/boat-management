@@ -1,3 +1,5 @@
+import type { CurrencyCode } from './currency.js'
+
 export type OrgRole = 'admin' | 'member' | 'mechanic' | 'boat_owner'
 
 export type InvitationStatus = 'pending' | 'accepted' | 'cancelled'
@@ -35,6 +37,13 @@ export interface SignupInput {
 /**
  * Payload accepted by `OrganizationService.createForSignup`.
  */
+/** Props `organization` de `/settings/org` (renommage + devise de travail, #627). */
+export interface OrganizationSettingsData {
+  id: number
+  name: string
+  currency: CurrencyCode
+}
+
 export interface CreateOrganizationForSignupInput {
   name: string
   type?: OrganizationType | null

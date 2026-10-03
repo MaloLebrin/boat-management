@@ -9,6 +9,7 @@ import {
 } from '#exceptions/invoice_errors'
 import InvoicePaid from '#events/invoice_paid'
 import InvoiceSent from '#events/invoice_sent'
+import BoatPricing from '#models/boat_pricing'
 import BoatReservation from '#models/boat_reservation'
 import Client from '#models/client'
 import Invoice from '#models/invoice'
@@ -372,7 +373,7 @@ export default class InvoiceService {
           taxRate: String(payload.taxRate),
           taxAmount: String(totals.taxAmount),
           total: String(totals.total),
-          currency: payload.currency ?? 'EUR',
+          currency: payload.currency ?? org.currency,
           notes: payload.notes?.trim() || null,
         },
         { client: trx }
@@ -621,7 +622,9 @@ export default class InvoiceService {
           taxRate: '0',
           taxAmount: String(totals.taxAmount),
           total: String(totals.total),
-          currency: 'EUR',
+          // Le prix de la réservation vient du tarif du bateau : le devis en
+          // reprend la devise, sinon celle de l'organisation (#627).
+          currency: await this.#reservationCurrency(trx, org, reservation),
           notes: null,
         },
         { client: trx }
@@ -823,6 +826,23 @@ export default class InvoiceService {
     return client
       ? { clientId: client.id, clientName: client.fullName }
       : { clientId: null, clientName: null }
+  }
+
+  /**
+   * Devise d'un devis né d'une réservation (#627) : celle du tarif du bateau
+   * (le prix de la réservation en découle), sinon la devise de l'organisation.
+   */
+  async #reservationCurrency(
+    trx: TransactionClientContract,
+    org: Organization,
+    reservation: BoatReservation
+  ): Promise<string> {
+    const pricing = await BoatPricing.query({ client: trx })
+      .select('currency')
+      .where('boatId', reservation.boatId)
+      .where('organizationId', org.id)
+      .first()
+    return pricing?.currency ?? org.currency
   }
 
   /**

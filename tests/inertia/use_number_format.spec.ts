@@ -1,9 +1,12 @@
 import { describe, expect, test, vi } from 'vitest'
 
 const mockLocale = { value: 'en' }
+const mockCurrency: { value: string | undefined } = { value: undefined }
 
 vi.mock('@inertiajs/vue3', () => ({
-  usePage: () => ({ props: { appT: {}, locale: mockLocale.value } }),
+  usePage: () => ({
+    props: { appT: {}, locale: mockLocale.value, organizationCurrency: mockCurrency.value },
+  }),
 }))
 
 import { useNumberFormat } from '../../inertia/composables/use_number_format'
@@ -93,5 +96,34 @@ describe('useNumberFormat', () => {
     mockLocale.value = 'en'
     const { formatCurrencyNoDecimals: noDecimalsEn } = useNumberFormat()
     expect(plain(noDecimalsEn(12000))).toBe('€12,000')
+  })
+
+  // #627 — sans devise propre, un montant suit la devise de l'organisation.
+  test('formatCurrency defaults to the organization currency', () => {
+    mockLocale.value = 'en'
+    mockCurrency.value = 'AUD'
+    const { formatCurrency, formatCurrencyNoDecimals, organizationCurrency } = useNumberFormat()
+    expect(organizationCurrency.value).toBe('AUD')
+    expect(plain(formatCurrency(1200.5))).toBe('A$1,200.50')
+    expect(plain(formatCurrencyNoDecimals(1200.5))).toBe('A$1,201')
+    // La devise propre d'un document l'emporte toujours.
+    expect(plain(formatCurrency(10, { currency: 'EUR' }))).toBe('€10.00')
+    mockCurrency.value = undefined
+  })
+
+  test('formatCurrency falls back to EUR without an organization (public pages)', () => {
+    mockLocale.value = 'en'
+    mockCurrency.value = undefined
+    const { formatCurrency, organizationCurrency } = useNumberFormat()
+    expect(organizationCurrency.value).toBe('EUR')
+    expect(plain(formatCurrency(10))).toBe('€10.00')
+  })
+
+  test('currencyOptions are labelled in the app locale', () => {
+    mockLocale.value = 'fr'
+    const { currencyOptions } = useNumberFormat()
+    expect(currencyOptions.value.find((o) => o.value === 'USD')?.label).toBe(
+      'dollar des États-Unis (USD)'
+    )
   })
 })

@@ -13,8 +13,7 @@ import NotificationService from '#services/notification_service'
 import QuotaService from '#services/quota_service'
 import StripeService from '#services/stripe_service'
 import { invoiceBalanceDue, isInvoicePayableOnline } from '#shared/helpers/invoice_lifecycle'
-import { formatCurrency } from '#shared/helpers/number_format'
-import { toCents } from '#shared/helpers/reservation_payment'
+import { formatCurrency, toMinorUnits } from '#shared/helpers/number_format'
 import type {
   InvoiceCheckoutMetadata,
   OnlinePaymentsAccountState,
@@ -248,7 +247,8 @@ export default class OnlinePaymentService {
 
     const session = await this.stripeService.createInvoiceCheckoutSession({
       accountId: org.stripeConnectAccountId,
-      amountCents: toCents(await this.#amountDue(invoice)) ?? 0,
+      // #627 — plus petite unité de la devise : pas de centimes pour JPY / XPF.
+      amountCents: toMinorUnits(await this.#amountDue(invoice), invoice.currency),
       currency: invoice.currency,
       productName: i18n.t('invoices.onlinePayment.checkoutProduct', {
         number: invoice.number,

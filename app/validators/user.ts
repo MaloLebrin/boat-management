@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { SUPPORTED_CURRENCIES } from '#shared/types/currency'
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '#shared/constants/auth'
 import { AI_PROVIDERS, ALL_AI_MODELS } from '#shared/types/ai'
 import { FLEET_SIZES, ORGANIZATION_TYPES } from '#shared/types/organization'
@@ -66,6 +67,9 @@ export const updateThemeValidator = vine.create({
 
 export const updateOrganizationValidator = vine.create({
   name: vine.string().minLength(1).maxLength(255),
+  // Devise de travail (#627) — facultative : un ancien formulaire qui ne
+  // l'envoie pas ne remet pas l'organisation en euros.
+  currency: vine.enum(SUPPORTED_CURRENCIES).optional(),
 })
 
 /**

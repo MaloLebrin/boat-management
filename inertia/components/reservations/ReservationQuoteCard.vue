@@ -28,7 +28,7 @@ const quote = computed(() =>
 )
 
 function formatCurrency(value: number): string {
-  return money(value, { currency: quote.value.currency || 'EUR' })
+  return money(value, { currency: quote.value.currency })
 }
 
 function lineLabel(line: { seasonName: string | null; isWeekly: boolean }): string {

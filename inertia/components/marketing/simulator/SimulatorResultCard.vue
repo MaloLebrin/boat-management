@@ -36,8 +36,10 @@ const categoryLabels: Record<string, string> = {
   rigging: 'simulator.cat_rigging',
 }
 
+// Les barèmes du simulateur sont des coûts du marché français, en euros : ils ne
+// suivent pas la devise de l'organisation d'un visiteur connecté (#627).
 function formatCurrency(amount: number): string {
-  return formatCurrencyNoDecimals(amount)
+  return formatCurrencyNoDecimals(amount, { currency: 'EUR' })
 }
 
 const maxCategoryCost = computed(() =>

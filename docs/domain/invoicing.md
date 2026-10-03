@@ -99,7 +99,7 @@ Devis **et** factures partagent la même table, discriminés par `kind`.
 | `tax_rate`                   | decimal(5,2)                                           | Pourcentage TVA (0–100)                                                                                         |
 | `tax_amount`                 | decimal(10,2)                                          | Recalculé serveur                                                                                               |
 | `total`                      | decimal(10,2)                                          | Recalculé serveur                                                                                               |
-| `currency`                   | string(3), défaut `EUR`                                | Champ libre                                                                                                     |
+| `currency`                   | string(3), défaut `EUR`                                | Liste `SUPPORTED_CURRENCIES` ; défaut = devise de l’organisation (#627)                                         |
 | `notes`                      | text, nullable                                         |                                                                                                                 |
 | `reminder_count`             | smallint, défaut 0                                     | Relances envoyées au client (#878), badge « Relancée ×N »                                                       |
 | `last_reminder_tier`         | smallint, défaut 0                                     | Dernier palier de relance traité, envoyé ou non (#878) — un palier ne se rejoue pas                             |

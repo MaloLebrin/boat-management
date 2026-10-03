@@ -3,6 +3,7 @@ import BaseInput from '~/components/base/BaseInput.vue'
 import BaseSelect from '~/components/base/BaseSelect.vue'
 import BaseTextarea from '~/components/base/BaseTextarea.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import type { InvoiceKind, InvoiceStatus } from '../../../shared/types/invoice'
 import type { ClientOption } from '../../../shared/types/client'
 
@@ -51,11 +52,8 @@ const clientSelectOptions = props.clientOptions.map((c) => ({
   value: String(c.id),
 }))
 
-const currencyOptions = [
-  { label: 'EUR', value: 'EUR' },
-  { label: 'USD', value: 'USD' },
-  { label: 'GBP', value: 'GBP' },
-]
+// Liste partagée avec le validateur (#627), libellée dans la locale de l'app.
+const { currencyOptions } = useNumberFormat()
 </script>
 
 <template>

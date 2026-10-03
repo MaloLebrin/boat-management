@@ -11,6 +11,12 @@
  */
 
 import { resolveLocaleTag } from './date_format.js'
+import {
+  DEFAULT_CURRENCY,
+  SUPPORTED_CURRENCIES,
+  type CurrencyCode,
+  type CurrencyOption,
+} from '../types/currency.js'
 
 /**
  * Parses a raw `<input>` value into a number, or `null` when it does not read
@@ -66,9 +72,12 @@ export function formatPrice(value: number, locale?: string | null): string {
 }
 
 export interface FormatCurrencyOptions {
-  /** Code ISO 4217 — `EUR` par défaut, l'app est mono-devise. */
+  /** Code ISO 4217 — `EUR` par défaut (côté Inertia : la devise de l'organisation). */
   currency?: string
-  /** Décimales affichées — `2` par défaut ; `0` pour une estimation en euros ronds. */
+  /**
+   * Décimales affichées — par défaut celles de la devise (`2` pour l'euro,
+   * `0` pour le yen ou le franc CFP) ; `0` pour une estimation en unités rondes.
+   */
   fractionDigits?: number
 }
 
@@ -85,11 +94,56 @@ export function formatCurrency(
   locale?: string | null,
   options: FormatCurrencyOptions = {}
 ): string {
-  const digits = options.fractionDigits ?? 2
+  const digits = options.fractionDigits
   return new Intl.NumberFormat(resolveLocaleTag(locale), {
     style: 'currency',
-    currency: options.currency ?? 'EUR',
-    minimumFractionDigits: digits,
-    maximumFractionDigits: digits,
+    currency: options.currency || DEFAULT_CURRENCY,
+    // Sans précision explicite, `Intl` applique les décimales de la devise :
+    // `1 200,00 €` mais `¥1,200` — forcer `2` afficherait des centimes de yen.
+    ...(digits === undefined
+      ? {}
+      : { minimumFractionDigits: digits, maximumFractionDigits: digits }),
   }).format(value)
+}
+
+/** Garde de type : `'usd'` n'en est pas une, la colonne stocke le code en majuscules. */
+export function isCurrencyCode(value: unknown): value is CurrencyCode {
+  return typeof value === 'string' && (SUPPORTED_CURRENCIES as readonly string[]).includes(value)
+}
+
+/** Une devise lue en base ou en prop, ramenée à la devise par défaut si inconnue. */
+export function toCurrencyCode(value: unknown): CurrencyCode {
+  return isCurrencyCode(value) ? value : DEFAULT_CURRENCY
+}
+
+/**
+ * Nom localisé d'une devise suivi de son code — `euro (EUR)` · `Euro (EUR)`.
+ * Les noms viennent d'ICU (`Intl.DisplayNames`) : aucune clé i18n à maintenir
+ * par devise.
+ */
+export function currencyLabel(code: string, locale?: string | null): string {
+  const name = new Intl.DisplayNames([resolveLocaleTag(locale)], { type: 'currency' }).of(code)
+  return name && name !== code ? `${name} (${code})` : code
+}
+
+/** Les options du `<select>` de devise, dans l'ordre de {@link SUPPORTED_CURRENCIES}. */
+export function currencyOptions(locale?: string | null): CurrencyOption[] {
+  return SUPPORTED_CURRENCIES.map((value) => ({ value, label: currencyLabel(value, locale) }))
+}
+
+/** Décimales d'une devise selon ICU : `2` pour l'euro, `0` pour le yen ou le franc CFP. */
+export function currencyFractionDigits(currency: string): number {
+  return (
+    new Intl.NumberFormat('en', { style: 'currency', currency }).resolvedOptions()
+      .maximumFractionDigits ?? 2
+  )
+}
+
+/**
+ * Montant en plus petite unité de la devise, comme l'attend Stripe
+ * (`unit_amount`) : `12.34 EUR` → `1234`, mais `1200 JPY` → `1200`. Multiplier
+ * un montant en yens ou en francs CFP par 100 le facturerait cent fois (#627).
+ */
+export function toMinorUnits(amount: number, currency: string): number {
+  return Math.round(amount * 10 ** currencyFractionDigits(currency))
 }

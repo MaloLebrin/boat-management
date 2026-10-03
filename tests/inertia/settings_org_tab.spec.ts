@@ -40,7 +40,7 @@ import SettingsOrgTab from '../../inertia/components/settings/tabs/SettingsOrgTa
 function mountAs(role: OrgRole) {
   return mountWithStubs(SettingsOrgTab, {
     props: {
-      organization: { id: 1, name: 'Marina du Ponant' },
+      organization: { id: 1, name: 'Marina du Ponant', currency: 'AUD' },
       twoFactorPolicy: { requireTwoFactor: false, graceEndsAt: null, membersWithoutTwoFactor: 2 },
       deletion: { scheduledFor: null, graceDays: 30 },
     } as Record<string, unknown>,
@@ -65,6 +65,27 @@ describe('SettingsOrgTab — renommage gardé par capacité (#761)', () => {
     // Le nom reste lisible : l'onglet informe, il n'agit pas.
     expect(w.find('input').attributes('disabled')).toBeDefined()
     expect((w.find('input').element as HTMLInputElement).value).toBe('Marina du Ponant')
+    w.unmount()
+  })
+})
+
+describe('SettingsOrgTab — devise de travail (#627)', () => {
+  test('un admin choisit la devise dans le formulaire', () => {
+    const w = mountAs('admin')
+
+    const select = w.find('form select[name="currency"]')
+    expect(select.exists()).toBe(true)
+    expect((select.element as HTMLSelectElement).value).toBe('AUD')
+    expect(select.findAll('option').length).toBeGreaterThanOrEqual(13)
+    w.unmount()
+  })
+
+  test('un member lit la devise sans pouvoir la changer', () => {
+    const w = mountAs('member')
+
+    const select = w.find('select[name="currency"]')
+    expect(select.exists()).toBe(true)
+    expect(select.attributes('disabled')).toBeDefined()
     w.unmount()
   })
 })

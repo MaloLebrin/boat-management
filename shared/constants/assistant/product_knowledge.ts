@@ -2252,6 +2252,30 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'settings.org',
   },
   {
+    id: 'organization-currency',
+    title: {
+      en: 'Working in another currency (USD, AUD…)',
+      fr: 'Travailler dans une autre devise (USD, AUD…)',
+    },
+    body: {
+      en: 'Settings → Organization lets an admin pick the working currency: euro, US, Australian, New Zealand or Canadian dollar, pound, Swiss franc, Nordic crowns, zloty, CFP franc or yen. Amounts without their own currency (budget, fuel, dashboard, reports) are shown in it, and new invoices, quotes and rental rates start in it. Each rate keeps its own currency, and so does each invoice, editable while it is a draft; issued invoices never change. The language only changes how amounts are written. There is no exchange-rate conversion.',
+      fr: 'Réglages → Organisation permet à un admin de choisir la devise de travail : euro, dollar américain, australien, néo-zélandais ou canadien, livre, franc suisse, couronnes nordiques, zloty, franc CFP ou yen. Les montants sans devise propre (budget, carburant, tableau de bord, rapports) s’affichent dans cette devise, et les nouvelles factures, nouveaux devis et tarifs de location la reprennent. Chaque tarif garde sa devise, comme chaque facture, modifiable tant qu’elle est en brouillon ; une facture émise ne change jamais. La langue ne change que l’écriture des montants. Aucune conversion de change n’est faite.',
+    },
+    keywords: [
+      'devise',
+      'monnaie',
+      'dollar',
+      'livre sterling',
+      'franc cfp',
+      'changer la devise',
+      'currency',
+      'usd',
+      'aud',
+      'multi devises',
+    ],
+    navTarget: 'settings.org',
+  },
+  {
     id: 'notification-preferences',
     title: {
       en: 'Choosing which notifications you receive',

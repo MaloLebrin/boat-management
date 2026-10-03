@@ -10,12 +10,10 @@ import SettingsOrgTab from '~/components/settings/tabs/SettingsOrgTab.vue'
 import { useT } from '~/composables/use_t'
 import type { OrganizationTwoFactorPolicy } from '#shared/types/two_factor'
 import type { OrganizationDeletionProps } from '#shared/types/account'
+import type { OrganizationSettingsData } from '#shared/types/organization'
 
 defineProps<{
-  organization: {
-    id: number
-    name: string
-  }
+  organization: OrganizationSettingsData
   twoFactorPolicy: OrganizationTwoFactorPolicy
   deletion: OrganizationDeletionProps
 }>()
