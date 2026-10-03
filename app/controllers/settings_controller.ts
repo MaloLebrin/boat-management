@@ -125,6 +125,7 @@ export default class SettingsController {
       organization: {
         id: user.organization.id,
         name: user.organization.name,
+        currency: user.organization.currency,
       },
       // Politique 2FA (#884) : éditée par `organization.manage`, lue par tous.
       twoFactorPolicy: await this.twoFactorService.organizationPolicy(user.organization),
@@ -332,9 +333,12 @@ export default class SettingsController {
     await user.load('organization')
     await bouncer.with(OrganizationPolicy).authorize('manageOrganization')
 
-    const { name } = await request.validateUsing(updateOrganizationValidator)
+    const { name, currency } = await request.validateUsing(updateOrganizationValidator)
 
     user.organization.name = name
+    // #627 — la devise ne s'applique qu'aux nouveaux documents : une facture
+    // émise garde la sienne (snapshot), un tarif existant aussi.
+    if (currency) user.organization.currency = currency
     await user.organization.save()
 
     session.flash('success', i18n.t('flash.settings.orgUpdated'))

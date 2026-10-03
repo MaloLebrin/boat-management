@@ -45,6 +45,7 @@ async function sentInvoice(
     total: string
     paymentToken: string | null
     kind: Invoice['kind']
+    currency: string
   }> = {}
 ) {
   const client = await Client.create({
@@ -67,7 +68,7 @@ async function sentInvoice(
     taxRate: '20.00',
     taxAmount: '20.00',
     total: overrides.total ?? '120.50',
-    currency: 'EUR',
+    currency: overrides.currency ?? 'EUR',
     paymentToken: overrides.paymentToken === undefined ? 'tok_public_1' : overrides.paymentToken,
   })
 }
@@ -389,6 +390,23 @@ test.group('Online payments — public payment page (functional)', (group) => {
 
     await invoice.refresh()
     assert.equal(invoice.stripeCheckoutSessionId, 'cs_fake_1')
+  })
+
+  test('a zero-decimal currency is charged in whole units, not ×100 (#627)', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const stripe = swapStripeConnectService()
+    cleanup(() => stripe.restore())
+    const admin = await createEnterpriseAdminUser()
+    await connectedOrg(admin, 'acct_lessor')
+    await sentInvoice(admin.organizationId!, { total: '12000.00', currency: 'JPY' })
+
+    await client.post('/pay/tok_public_1/checkout').withInertia().redirects(0)
+
+    assert.equal(stripe.checkoutSessions[0].currency, 'JPY')
+    assert.equal(stripe.checkoutSessions[0].amountCents, 12000)
   })
 
   test('a partially credited invoice is charged its balance only (#877)', async ({

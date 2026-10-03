@@ -17,7 +17,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { formatCurrency } = useNumberFormat()
+const { formatCurrency, organizationCurrency, currencyOptions } = useNumberFormat()
 
 const form = useForm({
   baseDailyPrice: String(props.pricing?.baseDailyPrice ?? ''),
@@ -26,15 +26,9 @@ const form = useForm({
   depositAmount: props.pricing?.depositAmount != null ? String(props.pricing.depositAmount) : '',
   minDays: props.pricing?.minDays != null ? String(props.pricing.minDays) : '',
   maxDays: props.pricing?.maxDays != null ? String(props.pricing.maxDays) : '',
-  currency: props.pricing?.currency ?? 'EUR',
+  // #627 — un nouveau tarif part dans la devise de l'organisation.
+  currency: props.pricing?.currency ?? organizationCurrency.value,
 })
-
-const currencyOptions = [
-  { label: 'EUR', value: 'EUR' },
-  { label: 'USD', value: 'USD' },
-  { label: 'GBP', value: 'GBP' },
-  { label: 'CHF', value: 'CHF' },
-]
 
 const hasPricing = computed(() => props.pricing !== null)
 

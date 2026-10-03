@@ -128,7 +128,7 @@ Modèle : `app/models/boat_pricing.ts`. Contrainte **`unique(boat_id)`**.
 | `base_weekly_price`     | decimal(10,2)? | tarif hebdomadaire (optionnel)         |
 | `deposit_amount`        | decimal(10,2)? | caution                                |
 | `min_days` / `max_days` | int?           | bornes de durée                        |
-| `currency`              | string(3)      | défaut `EUR`                           |
+| `currency`              | string(3)      | défaut : devise de l'org (#627)        |
 
 ### 3.3 `pricing_seasons` (#293 — org-scopé, global ou par bateau)
 

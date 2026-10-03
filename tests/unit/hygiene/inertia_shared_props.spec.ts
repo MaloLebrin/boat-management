@@ -45,6 +45,9 @@ const REVIEWED_SHARED_KEYS = [
   // absente pour un visiteur anonyme et pour toute organisation active.
   'organizationDeletionScheduledFor',
   'organizationType',
+  // #627 — code ISO 4217 de la devise de l'organisation (3 caractères) ;
+  // absent pour un visiteur anonyme.
+  'organizationCurrency',
   'activeModules',
   'activeAddons',
   'branding',

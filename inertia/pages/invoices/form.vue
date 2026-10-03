@@ -9,6 +9,7 @@ import InvoiceFormFields from '~/components/invoices/InvoiceFormFields.vue'
 import InvoiceLinesEditor from '~/components/invoices/InvoiceLinesEditor.vue'
 import InvoiceTotalsPreview from '~/components/invoices/InvoiceTotalsPreview.vue'
 import { useT } from '~/composables/use_t'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { computeInvoiceTotals } from '#shared/helpers/invoice_totals'
 import type {
   InvoiceDetail,
@@ -40,7 +41,10 @@ const status = ref<InvoiceStatus>(props.invoice?.status ?? 'draft')
 const issuedAt = ref(props.invoice?.issuedAt?.slice(0, 10) ?? todayISO())
 const dueAt = ref(props.invoice?.dueAt?.slice(0, 10) ?? '')
 const taxRate = ref(String(props.invoice?.taxRate ?? 20))
-const currency = ref(props.invoice?.currency ?? 'EUR')
+// #627 — une nouvelle pièce part dans la devise de l'organisation ; une pièce
+// existante garde la sienne.
+const { organizationCurrency } = useNumberFormat()
+const currency = ref<string>(props.invoice?.currency ?? organizationCurrency.value)
 const notes = ref(props.invoice?.notes ?? '')
 const lines = ref<InvoiceLineInput[]>(
   props.invoice?.lines.map((l) => ({

@@ -17,6 +17,9 @@ règle ; leurs index FK sont nommés `{table}_{column}_idx`.
 
 - `id`
 - `name`, `slug`
+- `currency` — devise de travail, code ISO 4217 (string(3), défaut `EUR`, #627) :
+  défaut des montants sans devise propre et des nouvelles factures / nouveaux
+  tarifs — voir [`docs/domain/currencies.md`](../domain/currencies.md)
 - profil déclaré à l'inscription, nullables (#448) :
   - `type` (`rental` | `school` | `marina` | `private`)
   - `fleetSize` (`1-4` | `5-20` | `21-50` | `51+`)

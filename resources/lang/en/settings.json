@@ -16,6 +16,8 @@
     "title": "Organisation profile",
     "nameLabel": "Organisation name",
     "namePlaceholder": "My organisation",
+    "currencyLabel": "Working currency",
+    "currencyHint": "Currency of amounts without their own currency (budget, fuel, statistics) and the default for new invoices and new rates. Invoices already issued keep their currency.",
     "readOnlyHint": "Only an administrator can rename the organisation.",
     "logoLabel": "Logo",
     "logoPlaceholder": "Logo",

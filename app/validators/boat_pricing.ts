@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { SUPPORTED_CURRENCIES } from '#shared/types/currency'
 
 export const upsertBoatPricingValidator = vine.compile(
   vine.object({
@@ -7,6 +8,6 @@ export const upsertBoatPricingValidator = vine.compile(
     depositAmount: vine.number().min(0).nullable().optional(),
     minDays: vine.number().min(1).nullable().optional(),
     maxDays: vine.number().min(1).nullable().optional(),
-    currency: vine.string().trim().fixedLength(3).optional(),
+    currency: vine.enum(SUPPORTED_CURRENCIES).optional(),
   })
 )

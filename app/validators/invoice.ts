@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { SUPPORTED_CURRENCIES } from '#shared/types/currency'
 import { INVOICE_PAYMENT_METHODS } from '#shared/helpers/invoice_lifecycle'
 import { INVOICE_REMINDER_TEXT_MAX_LENGTH } from '#shared/constants/invoice_reminders'
 
@@ -20,7 +21,7 @@ export const createInvoiceValidator = vine.compile(
       .nullable()
       .optional(),
     taxRate: vine.number().range([0, 100]),
-    currency: vine.string().trim().fixedLength(3).optional(),
+    currency: vine.enum(SUPPORTED_CURRENCIES).optional(),
     notes: vine.string().trim().maxLength(5000).nullable().optional(),
     lines: vine.array(invoiceLineSchema).minLength(1),
   })
@@ -38,7 +39,7 @@ export const updateInvoiceValidator = vine.compile(
       .nullable()
       .optional(),
     taxRate: vine.number().range([0, 100]),
-    currency: vine.string().trim().fixedLength(3).optional(),
+    currency: vine.enum(SUPPORTED_CURRENCIES).optional(),
     notes: vine.string().trim().maxLength(5000).nullable().optional(),
     lines: vine.array(invoiceLineSchema).minLength(1),
   })

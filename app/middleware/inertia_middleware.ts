@@ -228,6 +228,10 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
           : undefined
       ),
       organizationType: ctx.inertia.always(organizationType),
+      // Devise de travail (#627) : défaut de `useNumberFormat().formatCurrency`
+      // pour tout montant sans devise propre. Absente pour un visiteur anonyme
+      // (le front retombe sur l'euro).
+      organizationCurrency: ctx.inertia.always(auth?.user?.organization?.currency ?? undefined),
       activeModules: ctx.inertia.always(activeModules),
       activeAddons: ctx.inertia.always(activeAddons as unknown as JSONDataTypes),
       branding: ctx.inertia.always(branding),

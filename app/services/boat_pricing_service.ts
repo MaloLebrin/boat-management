@@ -75,7 +75,7 @@ export default class BoatPricingService {
           : null,
       minDays: payload.minDays ?? null,
       maxDays: payload.maxDays ?? null,
-      currency: payload.currency ?? 'EUR',
+      currency: payload.currency ?? org.currency,
     })
   }
 }

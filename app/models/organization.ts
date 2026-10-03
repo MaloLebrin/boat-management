@@ -8,6 +8,7 @@ import type { HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import type { PlanTier } from '#shared/types/plan'
 import type { AiProvider } from '#shared/types/ai'
 import type { FleetSize, OrganizationType } from '#shared/types/organization'
+import type { CurrencyCode } from '#shared/types/currency'
 
 export default class Organization extends OrganizationSchema {
   @column()
@@ -35,6 +36,13 @@ export default class Organization extends OrganizationSchema {
    */
   @column()
   declare requireTwoFactor: boolean
+
+  /**
+   * Devise de travail (#627) — défaut des montants sans devise propre et des
+   * nouvelles factures / nouveaux tarifs. Narrowed from the generated `string`.
+   */
+  @column()
+  declare currency: CurrencyCode
 
   @hasMany(() => OrganizationAiKey)
   declare aiKeys: HasMany<typeof OrganizationAiKey>

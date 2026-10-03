@@ -4,21 +4,22 @@ import BaseCard from '~/components/base/BaseCard.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseHeading from '~/components/base/BaseHeading.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
+import BaseSelect from '~/components/base/BaseSelect.vue'
+import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
 import { usePermissions } from '~/composables/use_permissions'
 import TwoFactorPolicyCard from '~/components/settings/org/TwoFactorPolicyCard.vue'
 import DeleteOrganizationCard from '~/components/settings/org/DeleteOrganizationCard.vue'
 import type { OrganizationTwoFactorPolicy } from '#shared/types/two_factor'
 import type { OrganizationDeletionProps } from '#shared/types/account'
+import type { OrganizationSettingsData } from '#shared/types/organization'
 
 const { t } = useT()
 const { can } = usePermissions()
+const { currencyOptions } = useNumberFormat()
 
 defineProps<{
-  organization: {
-    id: number
-    name: string
-  }
+  organization: OrganizationSettingsData
   twoFactorPolicy: OrganizationTwoFactorPolicy
   deletion: OrganizationDeletionProps
 }>()
@@ -47,6 +48,14 @@ const canManage = can('organization.manage')
             :placeholder="t('settings.org.namePlaceholder')"
             :errors="errors"
           />
+          <BaseSelect
+            name="currency"
+            :label="t('settings.org.currencyLabel')"
+            :hint="t('settings.org.currencyHint')"
+            :model-value="organization.currency"
+            :options="currencyOptions"
+            :errors="errors"
+          />
         </div>
         <template #footer>
           <div class="flex justify-end">
@@ -64,6 +73,13 @@ const canManage = can('organization.manage')
           :label="t('settings.org.nameLabel')"
           :model-value="organization.name"
           readonly
+          disabled
+        />
+        <BaseSelect
+          name="currency"
+          :label="t('settings.org.currencyLabel')"
+          :model-value="organization.currency"
+          :options="currencyOptions"
           disabled
         />
         <p class="text-fg-muted text-sm">{{ t('settings.org.readOnlyHint') }}</p>
