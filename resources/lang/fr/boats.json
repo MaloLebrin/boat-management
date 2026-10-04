@@ -691,6 +691,8 @@
       "actions": "Actions",
       "addModalTitle": "Ajouter une pièce",
       "editModalTitle": "Modifier la pièce",
+      "minStockAlert": "Seuil d'alerte",
+      "minStockAlertHint": "À ce stock ou en dessous, la pièce est signalée comme manquante sur le tableau de bord. Laisser vide pour ne pas suivre.",
       "inventoryItem": "Article de l'inventaire",
       "inventoryNone": "Non relié — stock propre à ce moteur",
       "inventoryHint": "Reliée, la pièce lit son stock dans l'inventaire et chaque entretien qui la consomme le décrémente. Son stock propre est conservé.",

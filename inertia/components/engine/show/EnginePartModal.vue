@@ -28,6 +28,7 @@ const { t } = useT()
 const designation = ref('')
 const reference = ref('')
 const stock = ref('')
+const minStockAlert = ref('')
 const supplier = ref('')
 const notes = ref('')
 const wearState = ref('')
@@ -75,6 +76,10 @@ watch(
       designation.value = props.editingPart.designation
       reference.value = props.editingPart.reference ?? ''
       stock.value = props.editingPart.stock !== null ? String(props.editingPart.stock) : ''
+      minStockAlert.value =
+        props.editingPart.minStockAlert !== null && props.editingPart.minStockAlert !== undefined
+          ? String(props.editingPart.minStockAlert)
+          : ''
       supplier.value = props.editingPart.supplier ?? ''
       notes.value = props.editingPart.notes ?? ''
       wearState.value = props.editingPart.wearState ?? ''
@@ -93,6 +98,7 @@ watch(
       designation.value = ''
       reference.value = ''
       stock.value = ''
+      minStockAlert.value = ''
       supplier.value = ''
       notes.value = ''
       wearState.value = ''
@@ -140,6 +146,19 @@ function close() {
           :errors="errors"
         />
       </div>
+
+      <BaseInput
+        id="part-min-stock-alert"
+        name="minStockAlert"
+        :label="t('boats.engineShow.parts.minStockAlert')"
+        :hint="t('boats.engineShow.parts.minStockAlertHint')"
+        type="number"
+        inputmode="numeric"
+        min="0"
+        step="1"
+        v-model="minStockAlert"
+        :errors="errors"
+      />
 
       <div v-if="inventoryOptions" class="space-y-1">
         <BaseSelect

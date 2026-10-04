@@ -669,6 +669,8 @@
       "actions": "Actions",
       "addModalTitle": "Add a part",
       "editModalTitle": "Edit part",
+      "minStockAlert": "Alert threshold",
+      "minStockAlertHint": "At or below this stock, the part is flagged as missing on the dashboard. Leave empty to not track it.",
       "inventoryItem": "Inventory item",
       "inventoryNone": "Not linked — this engine's own stock",
       "inventoryHint": "Once linked, the part reads its stock from the inventory and every maintenance that uses it takes it out. Its own stock is kept.",

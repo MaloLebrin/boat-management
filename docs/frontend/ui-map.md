@@ -292,6 +292,7 @@ la nav est masquée via `effectiveQuotas.canManagePorts` ; la carte ports du das
 - `inertia/pages/inventory/orders.vue` (GET `/inventory/orders`) : `ReorderForm` (brouillon depuis les stocks bas d'un fournisseur), `PurchaseOrdersList` (gestes selon le statut, réception confirmée par `BaseConfirmModal`), `SuppliersPanel` (+ `SupplierFormModal`).
 - Modales `inertia/components/inventory/` : `InventoryItemFormModal` (stock initial à la création), `InventoryAdjustModal` (quantité comptée), `PurchaseOrderFormModal` + `PurchaseOrderLinesEditor` (lignes, prix moyen proposé, total HT).
 - Fiche moteur, onglet Pièces : une pièce reliée affiche le stock de l'article (lien vers `/inventory/:id`) ; `EnginePartModal` gagne le sélecteur « Article de l'inventaire » (prop `inventoryOptions`). La fiche pièce affiche aussi le stock de l'article.
+- Fiche moteur, onglet Pièces (#947) : `EnginePartModal` porte un champ « Seuil d'alerte » (`minStockAlert`, entier ≥ 0, avec une aide), prérempli en édition.
 - Widget « Pièces manquantes » : lien « Stock atelier » vers `/inventory?filter=low` quand des articles sont sous leur seuil.
 - Props : `InventoryPageProps`, `InventoryItemShowProps`, `PurchaseOrdersPageProps` (`shared/types/inventory.ts`).
 

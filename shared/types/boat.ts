@@ -132,6 +132,7 @@ export type BoatEnginePartPayload = {
   designation: string
   reference?: string | null
   stock?: number | null
+  /** Seuil d'alerte (#947) : en mise à jour, `undefined` = inchangé, `null` = effacé. */
   minStockAlert?: number | null
   supplier?: string | null
   notes?: string | null
