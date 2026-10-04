@@ -18,7 +18,16 @@ const partFields = {
   designation: vine.string().trim().minLength(1).maxLength(200),
   reference: vine.string().trim().maxLength(100).nullable().optional(),
   stock: positiveIntOrNull(),
-  minStockAlert: positiveIntOrNull(),
+  // Seuil d'alerte (#947) : absent = inchangé, vide = effacé. `nullable()` est
+  // indispensable — sans lui, VineJS traite le `null` du body parser (champ
+  // vidé) comme un champ absent, et l'effacement serait impossible.
+  minStockAlert: vine
+    .string()
+    .trim()
+    .regex(/^\d*$/)
+    .nullable()
+    .optional()
+    .transform((s) => (s === null || s === '' ? null : Number.parseInt(s, 10))),
   supplier: vine.string().trim().maxLength(200).nullable().optional(),
   notes: vine.string().trim().maxLength(2000).nullable().optional(),
   wearState: vine.enum(PART_WEAR_STATES).optional(),

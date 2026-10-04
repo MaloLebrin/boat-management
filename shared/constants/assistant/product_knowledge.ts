@@ -231,8 +231,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Inventaire des moteurs de la flotte',
     },
     body: {
-      en: 'The Engines page (/engines) lists every engine of the organization across all boats. You can search by brand, model, serial number or boat name, and filter by boat, kind, status or motorization family, then sort by recency, brand or hours. Status counters (active, out of service…) are computed on the whole fleet, not just the current page. Each row links back to the engine on its boat page, where you edit hours, parts, documents and photos.',
-      fr: 'La page Moteurs (/engines) liste tous les moteurs de l’organisation, tous bateaux confondus. Vous pouvez chercher par marque, modèle, numéro de série ou nom du bateau, filtrer par bateau, type, statut ou famille de motorisation, puis trier par récence, marque ou heures. Les compteurs par statut (actif, hors service…) sont calculés sur toute la flotte, pas seulement la page affichée. Chaque ligne renvoie vers le moteur sur sa fiche bateau, où vous modifiez heures, pièces, documents et photos.',
+      en: 'The Engines page (/engines) lists every engine of the organization across all boats. You can search by brand, model, serial number or boat name, and filter by boat, kind, status or motorization family, then sort by recency, brand or hours. Status counters (active, out of service…) are computed on the whole fleet, not just the current page. Each row links back to the engine on its boat page, where you edit hours, parts, documents and photos. Each part carries an alert threshold: at or below it, the part shows up in the Missing parts dashboard widget.',
+      fr: 'La page Moteurs (/engines) liste tous les moteurs de l’organisation, tous bateaux confondus. Vous pouvez chercher par marque, modèle, numéro de série ou nom du bateau, filtrer par bateau, type, statut ou famille de motorisation, puis trier par récence, marque ou heures. Les compteurs par statut (actif, hors service…) sont calculés sur toute la flotte, pas seulement la page affichée. Chaque ligne renvoie vers le moteur sur sa fiche bateau, où vous modifiez heures, pièces, documents et photos. Chaque pièce porte un seuil d’alerte : à ce stock ou en dessous, elle apparaît dans le widget Pièces manquantes du tableau de bord.',
     },
     keywords: [
       'moteur',
@@ -245,6 +245,9 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'filtre',
       'statut',
       'famille',
+      'seuil',
+      'alerte',
+      'threshold',
     ],
     navTarget: 'engines.index',
   },

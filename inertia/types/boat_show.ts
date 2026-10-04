@@ -78,6 +78,8 @@ export type BoatShowEnginePart = {
   designation: string
   reference: string | null
   stock: number | null
+  /** Seuil d'alerte de stock (#947). Absent hors de la fiche moteur. */
+  minStockAlert?: number | null
   supplier: string | null
   notes: string | null
   wearState: 'new' | 'good' | 'worn' | 'to_replace' | 'damaged' | null

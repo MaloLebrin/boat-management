@@ -514,6 +514,7 @@ export default class BoatEquipmentController {
           designation: p.designation,
           reference: p.reference,
           stock: p.stock,
+          minStockAlert: p.minStockAlert,
           supplier: p.supplier,
           notes: p.notes,
           wearState: p.wearState,

@@ -179,7 +179,7 @@ export default class BoatEnginePartService {
     part.designation = payload.designation
     part.reference = payload.reference ?? null
     part.stock = payload.stock ?? null
-    part.minStockAlert = payload.minStockAlert ?? null
+    if (payload.minStockAlert !== undefined) part.minStockAlert = payload.minStockAlert
     part.supplier = payload.supplier ?? null
     part.notes = payload.notes ?? null
     part.wearState = payload.wearState ?? null
