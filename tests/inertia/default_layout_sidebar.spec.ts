@@ -47,6 +47,7 @@ vi.mock('~/composables/use_network_status', () => ({
 }))
 
 vi.mock('~/composables/use_offline_queue', () => ({
+  cancelScheduledRetry: vi.fn(),
   useOfflineQueue: () => ({
     drainQueue: mockDrainQueue,
     pendingCount: ref(0),
@@ -54,6 +55,8 @@ vi.mock('~/composables/use_offline_queue', () => ({
     failedCount: ref(0),
     failedActions: ref([]),
     isSyncing: ref(false),
+    suspendedReason: ref(null),
+    retryAttempt: ref(0),
     enqueue: vi.fn(),
     cancelAction: vi.fn(),
     retryFailedAction: vi.fn(),

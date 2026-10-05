@@ -10,10 +10,22 @@ vi.mock('vue-sonner', () => ({
   },
 }))
 
+const mockPageProps = vi.hoisted(() => ({
+  // Shared prop `user` : session valide. Mise à `undefined` pour simuler la
+  // redirection /login suivie par Inertia (#950).
+  user: { id: 1 } as { id: number } | undefined,
+}))
+
 vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({
     props: {
+      get user() {
+        return mockPageProps.user
+      },
       appT: {
+        'common.offline.sessionExpired': 'Session expirée',
+        'common.offline.queue.suspendedAuth':
+          'Synchronisation en pause : reconnectez-vous pour envoyer ces saisies.',
         'common.offline.queue.title':
           '{count, plural, one {# action en attente} other {# actions en attente}}',
         'common.offline.queue.syncNow': 'Synchroniser',
@@ -71,15 +83,60 @@ function mountComponent() {
 }
 
 describe('OfflinePendingQueue', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
+    mockPageProps.user = { id: 1 }
     conflictedAction.value = null
     global.indexedDB = new IDBFactory()
+    // L'état de suspension (#950) est module-level : un drain à vide sur une
+    // session valide le remet à zéro entre deux tests.
+    await useOfflineQueue().drainQueue()
+    vi.clearAllMocks()
   })
 
   test('renders nothing when no pending actions', () => {
     const wrapper = mountComponent()
     expect(wrapper.find('ul').exists()).toBe(false)
+  })
+
+  // #950 — la session a expiré pendant le rejeu : la file reste intacte et
+  // l'utilisateur voit pourquoi rien ne part.
+  test('shows the paused notice when the drain is suspended for auth', async () => {
+    const { router } = await import('@inertiajs/vue3')
+    const { enqueue, drainQueue } = useOfflineQueue()
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '50' },
+    })
+
+    mockPageProps.user = undefined
+    await drainQueue()
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    expect(router.post).not.toHaveBeenCalled()
+    expect(wrapper.findAll('li')).toHaveLength(1)
+    expect(wrapper.find('[data-test="queue-suspended"]').text()).toContain(
+      'Synchronisation en pause'
+    )
+  })
+
+  test('does not show the paused notice while the session is valid', async () => {
+    const { enqueue } = useOfflineQueue()
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '50' },
+    })
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    expect(wrapper.find('[data-test="queue-suspended"]').exists()).toBe(false)
   })
 
   test('renders list with one item after enqueueing', async () => {

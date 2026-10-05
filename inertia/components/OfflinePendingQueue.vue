@@ -11,6 +11,7 @@ const {
   pendingActions,
   failedActions,
   isSyncing,
+  suspendedReason,
   cancelAction,
   drainQueue,
   retryFailedAction,
@@ -47,6 +48,11 @@ function failureReason(errors: Record<string, string>): string {
         {{ isSyncing ? t('common.offline.syncing') : t('common.offline.queue.syncNow') }}
       </BaseButton>
     </div>
+
+    <!-- Session expirée pendant le rejeu (#950) : la file attend la reconnexion. -->
+    <p v-if="suspendedReason === 'auth'" class="text-xs text-amber-700" data-test="queue-suspended">
+      {{ t('common.offline.queue.suspendedAuth') }}
+    </p>
 
     <ul class="space-y-2">
       <li

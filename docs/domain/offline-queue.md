@@ -154,10 +154,29 @@ La photo, elle, reste **exemptée hors-ligne** : la file ne transporte que du
 qu'une saisie perdue. C'est le refus de clôture côté serveur
 (`photoRequiredToClose`) qui la réclame au retour du réseau.
 
+## Session expirée et erreurs transitoires (#950)
+
+Deux cas où le rejeu n'atteint **pas** le contrôleur, et où la file doit
+pourtant garder la saisie :
+
+- **Session expirée.** `auth_middleware` redirige vers `/login`, qu'Inertia
+  suit comme un succès. `drainQueue` vérifie la shared prop `user` avant
+  d'envoyer et dans `onSuccess` : absente, la file passe en
+  `suspendedReason = 'auth'`, rien n'est supprimé, rien ne cascade vers
+  `failed`. La page de connexion vit dans le layout `auth` ; au remontage de
+  `default.vue` (`resumeQueueIfSuspended`), le drain reprend. L'état est
+  module-level et survit à la navigation Inertia.
+- **5xx / coupure.** `onFinish` sans règlement programme une relance différée
+  (`shared/helpers/offline_retry.ts` : 1 s, doublé, plafonné à 5 min). Succès,
+  refus 4xx ou file vide remettent `retryAttempt` à zéro ; le passage
+  hors-ligne annule le timer (`cancelScheduledRetry`), l'événement `online`
+  relançant de toute façon le drain.
+
 ## Où c'est testé
 
 | Fichier                                                        | Maillon                                                    |
 | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| `tests/inertia/use_offline_queue.spec.ts`                      | suspension `auth`, reprise, relance différée (#950)        |
 | `tests/unit/middleware/inertia_offline_protocol.spec.ts`       | les cinq clés traversent le middleware                     |
 | `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts`       | les deux moitiés du vocabulaire coïncident                 |
 | `tests/functional/navigation/offline_conflict_payload.spec.ts` | `conflictData` porte les champs de la modale               |
