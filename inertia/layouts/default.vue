@@ -21,7 +21,7 @@ import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
 import OfflinePendingQueue from '~/components/OfflinePendingQueue.vue'
 import PushOptInCard from '~/components/pwa/PushOptInCard.vue'
 import { useFlashToasts } from '~/composables/use_flash_toasts'
-import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { cancelScheduledRetry, useOfflineQueue } from '~/composables/use_offline_queue'
 import { usePwaUpdate } from '~/composables/use_pwa_update'
 import { useT } from '~/composables/use_t'
 
@@ -32,13 +32,28 @@ const { t } = useT()
 const { isOnline } = useNetworkStatus()
 const { isOpen: isAssistantOpen } = useAssistantPanel()
 const { isBoatOwner } = usePermissions()
-const { drainQueue, conflictedAction, resolveConflict } = useOfflineQueue()
+const { drainQueue, conflictedAction, resolveConflict, pendingCount, suspendedReason } =
+  useOfflineQueue()
 const { dismissAll: dismissToasts } = useFlashToasts()
 usePwaUpdate()
 
 watch(isOnline, (online) => {
   if (online) drainQueue()
+  // Hors-ligne, une relance différée (#950) échouerait à coup sûr : l'événement
+  // `online` relancera le drain.
+  else cancelScheduledRetry()
 })
+
+// Session expirée pendant la traversée (#950) : la file s'est mise en pause et
+// l'utilisateur est passé par /login (layout `auth`, celui-ci démonté). Au
+// remontage, `user` est de retour : on reprend sans attendre un événement
+// réseau. L'état de la file est module-level, il survit à la navigation Inertia.
+function resumeQueueIfSuspended() {
+  if (page.props.user && suspendedReason.value === 'auth' && pendingCount.value > 0) {
+    drainQueue()
+  }
+}
+watch(() => Boolean(page.props.user), resumeQueueIfSuspended)
 
 function closeSidebar() {
   isSidebarOpen.value = false
@@ -88,6 +103,7 @@ onMounted(() => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.addEventListener('message', onSwMessage)
   }
+  resumeQueueIfSuspended()
 })
 
 onBeforeUnmount(() => {

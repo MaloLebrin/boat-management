@@ -33,6 +33,8 @@ vi.mock('@inertiajs/vue3', () => ({
       },
       locale: 'fr',
       flash: {},
+      // Session valide : sans `user`, la file se suspend au lieu de rejouer (#950).
+      user: { id: 1 },
     },
   }),
   router: {

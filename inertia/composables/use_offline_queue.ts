@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { useT } from '~/composables/use_t'
 import type { OfflineActionType } from '#shared/constants/offline_queue'
+import { retryDelayMs } from '#shared/helpers/offline_retry'
 
 /**
  * Charge utile acceptée par une visite Inertia (`Record<string, FormDataConvertible>`).
@@ -154,6 +155,31 @@ const isSyncing = ref(false)
 export const conflictedAction = ref<ConflictState | null>(null)
 let countInitialized = false
 
+/**
+ * Motif de suspension de la file (#950). `auth` : la session a expiré pendant
+ * la traversée — le rejeu serait redirigé vers /login, qu'Inertia rend comme un
+ * succès et qui supprimerait la saisie. Rien ne part tant que `user` n'est pas
+ * revenu dans les shared props.
+ */
+export type QueueSuspensionReason = 'auth'
+const suspendedReason = ref<QueueSuspensionReason | null>(null)
+
+/** Échecs transitoires (5xx/réseau) consécutifs ; remis à zéro dès qu'une action aboutit ou est refusée. */
+const retryAttempt = ref(0)
+let retryTimer: ReturnType<typeof setTimeout> | null = null
+
+/** Annule la relance différée programmée après un échec transitoire (#950). */
+export function cancelScheduledRetry() {
+  if (retryTimer !== null) {
+    clearTimeout(retryTimer)
+    retryTimer = null
+  }
+}
+
+function readOnline(): boolean {
+  return typeof navigator === 'undefined' || navigator.onLine !== false
+}
+
 async function refreshCount() {
   if (!isIndexedDbAvailable()) return
   const db = await getDb()
@@ -288,13 +314,51 @@ export function useOfflineQueue() {
     toast.info(t('common.offline.savedQueue'))
   }
 
+  function isAuthenticated(): boolean {
+    return Boolean((page.props as Record<string, unknown>).user)
+  }
+
+  /**
+   * Session absente (#950) : la file se met en pause sans toucher à la
+   * saisie. Le layout relance `drainQueue` quand `user` revient.
+   */
+  function suspendForAuth() {
+    const alreadySuspended = suspendedReason.value === 'auth'
+    suspendedReason.value = 'auth'
+    isSyncing.value = false
+    if (!alreadySuspended) toast.error(t('common.offline.sessionExpired'))
+  }
+
+  /**
+   * Erreur transitoire (5xx, coupure) : relance différée avec délai
+   * exponentiel plafonné plutôt qu'au prochain `online` brut (#950). Le timer
+   * est sauté si le navigateur se dit hors-ligne — l'événement `online`
+   * relancera le drain.
+   */
+  function scheduleRetry() {
+    cancelScheduledRetry()
+    retryAttempt.value += 1
+    retryTimer = setTimeout(() => {
+      retryTimer = null
+      if (!readOnline()) return
+      void drainQueue()
+    }, retryDelayMs(retryAttempt.value))
+  }
+
   async function drainQueue() {
     if (isSyncing.value || !isIndexedDbAvailable()) return
+    cancelScheduledRetry()
+    if (!isAuthenticated()) {
+      suspendForAuth()
+      return
+    }
+    suspendedReason.value = null
     isSyncing.value = true
     const db = await getDb()
     const actions = (await db.getAll(STORE_NAME)) as QueuedAction[]
     if (!actions.length) {
       isSyncing.value = false
+      retryAttempt.value = 0
       return
     }
 
@@ -319,6 +383,16 @@ export function useOfflineQueue() {
       preserveScroll: true as const,
       onSuccess: async () => {
         settled = true
+        retryAttempt.value = 0
+
+        // Redirection /login suivie par Inertia : la page rendue n'a plus de
+        // `user`. Succès HTTP, mais la saisie n'a jamais atteint le contrôleur —
+        // ne surtout pas la supprimer (#950).
+        if (!isAuthenticated()) {
+          suspendForAuth()
+          return
+        }
+
         const flash = (page.props as Record<string, unknown>).flash as
           | Record<string, unknown>
           | undefined
@@ -375,6 +449,7 @@ export function useOfflineQueue() {
       // la file continue avec l'action suivante.
       onError: async (errors: Record<string, string>) => {
         settled = true
+        retryAttempt.value = 0
         await moveToFailed(db, action, errors ?? {})
         if (action.tempId) {
           await cascadeDependentsToFailed(
@@ -386,10 +461,12 @@ export function useOfflineQueue() {
         await afterRejection()
       },
       // On 5xx or unexpected network error, onSuccess/onError are not called.
-      // Keep the action in the queue and reset the guard so the next reconnect can retry.
+      // Keep the action in the queue, reset the guard and schedule a backed-off
+      // retry (#950) — the next reconnect can still trigger an immediate drain.
       onFinish: () => {
         if (!settled) {
           isSyncing.value = false
+          scheduleRetry()
         }
       },
     }
@@ -494,6 +571,8 @@ export function useOfflineQueue() {
     failedCount,
     failedActions,
     isSyncing,
+    suspendedReason,
+    retryAttempt,
     conflictedAction,
     enqueue,
     drainQueue,

@@ -53,6 +53,8 @@
   "offline.syncing": "Syncing…",
   "offline.syncSuccess": "{count, plural, one {# entry synced} other {# entries synced}}",
   "offline.syncRejected": "Rejected by the server — kept in failed actions",
+  "offline.sessionExpired": "Session expired — sign in again to sync your offline entries",
+  "offline.queue.suspendedAuth": "Sync paused: sign in again to send these entries.",
   "pwa.offlineReady": "App is ready for offline use",
   "pwa.install": "Install app",
   "pwa.manifest.description": "Track your fleet, trips and maintenance, even when offline.",

@@ -25,9 +25,14 @@ const mockPageProps = vi.hoisted(() => ({
     'common.offline.failed.discarded': 'Action en échec abandonnée',
     'common.offline.failed.dependencyBlocked':
       "L'état des lieux auquel cette saisie est rattachée n'a pas pu être enregistré.",
+    'common.offline.sessionExpired': 'Session expirée — reconnectez-vous pour synchroniser',
   },
   locale: 'fr',
   flash: {} as Record<string, unknown>,
+  // Shared prop `user` (#950) : définie tant que la session est valide. Le
+  // rejeu d'une action sur session expirée est redirigé vers /login, page
+  // rendue **sans** `user` — c'est ce que la file doit détecter.
+  user: { id: 1 } as { id: number } | undefined,
 }))
 
 vi.mock('@inertiajs/vue3', async () => {
@@ -46,11 +51,13 @@ vi.mock('@inertiajs/vue3', async () => {
 import { router } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
 import {
+  cancelScheduledRetry,
   conflictedAction,
   groupByDependency,
   newTempId,
   useOfflineQueue,
 } from '../../inertia/composables/use_offline_queue'
+import { OFFLINE_RETRY_BASE_MS } from '../../shared/helpers/offline_retry'
 
 function mountComposable() {
   let result: ReturnType<typeof useOfflineQueue> | undefined
@@ -155,11 +162,20 @@ function makeRouterCallOnSuccessWithConflict(
 }
 
 describe('useOfflineQueue', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
+    vi.useRealTimers()
+    cancelScheduledRetry()
     mockPageProps.flash = {}
+    mockPageProps.user = { id: 1 }
     conflictedAction.value = null
+    // L'état de suspension (#950) est module-level : un drain à vide sur une
+    // session valide le remet à zéro entre deux tests. Il ouvre la base en v2,
+    // d'où la factory IndexedDB fraîche **après** (test de migration v1 → v2).
     global.indexedDB = new IDBFactory()
+    await mountComposable().drainQueue()
+    global.indexedDB = new IDBFactory()
+    vi.clearAllMocks()
   })
 
   test('enqueue adds item to IndexedDB and shows info toast', async () => {
@@ -747,6 +763,239 @@ describe('useOfflineQueue', () => {
 
     expect(pendingCount.value).toBe(1)
     expect(pendingActions.value[0].type).toBe('create-fuel-log')
+  })
+
+  // #950 — une session expirée pendant la traversée : le rejeu est redirigé
+  // vers /login, qu'Inertia rend comme un succès. La file ne doit rien
+  // supprimer tant que la shared prop `user` n'est pas revenue.
+  describe('session expirée pendant le rejeu (#950)', () => {
+    /** Redirection /login suivie par Inertia : `onSuccess` sur une page sans `user`. */
+    function makeRouterCallOnSuccessAsLoggedOut() {
+      const impl = (_url: string, _data: unknown, options: any) => {
+        mockPageProps.user = undefined
+        options?.onSuccess?.()
+        return undefined as any
+      }
+      vi.mocked(router.post).mockImplementation(impl)
+      vi.mocked(router.patch).mockImplementation(impl)
+      vi.mocked(router.put).mockImplementation(impl)
+    }
+
+    test('a redirect to /login keeps the action in the queue and suspends the drain', async () => {
+      makeRouterCallOnSuccessAsLoggedOut()
+      const { enqueue, drainQueue, pendingCount, isSyncing, suspendedReason } = mountComposable()
+
+      await enqueue({
+        type: 'create-navigation-log',
+        url: '/boats/1/navigation-logs',
+        method: 'post',
+        payload: { departedAt: '2026-06-24T10:00' },
+      })
+
+      await drainQueue()
+      await flushPromises()
+
+      expect(pendingCount.value).toBe(1)
+      expect(isSyncing.value).toBe(false)
+      expect(suspendedReason.value).toBe('auth')
+      expect(toast.success).not.toHaveBeenCalled()
+      expect(toast.error).toHaveBeenCalledWith(
+        'Session expirée — reconnectez-vous pour synchroniser'
+      )
+    })
+
+    test('drainQueue does not hit the network while the user is logged out', async () => {
+      mockPageProps.user = undefined
+      makeRouterCallOnSuccess()
+      const { enqueue, drainQueue, pendingCount, suspendedReason } = mountComposable()
+
+      await enqueue({
+        type: 'create-fuel-log',
+        url: '/boats/1/fuel-logs',
+        method: 'post',
+        payload: { quantityLiters: '50' },
+      })
+
+      await drainQueue()
+      await flushPromises()
+
+      expect(router.post).not.toHaveBeenCalled()
+      expect(pendingCount.value).toBe(1)
+      expect(suspendedReason.value).toBe('auth')
+    })
+
+    test('the drain resumes once the user is back and clears the suspension', async () => {
+      makeRouterCallOnSuccessAsLoggedOut()
+      const { enqueue, drainQueue, pendingCount, suspendedReason } = mountComposable()
+
+      await enqueue({
+        type: 'create-fuel-log',
+        url: '/boats/1/fuel-logs',
+        method: 'post',
+        payload: { quantityLiters: '50' },
+      })
+      await drainQueue()
+      await flushPromises()
+      expect(suspendedReason.value).toBe('auth')
+
+      // Reconnexion : la page rend à nouveau `user`, le rejeu aboutit.
+      mockPageProps.user = { id: 1 }
+      makeRouterCallOnSuccess()
+      await drainQueue()
+      await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+
+      expect(suspendedReason.value).toBeNull()
+      expect(toast.success).toHaveBeenCalledOnce()
+    })
+
+    test('a logged-out parent creation does not cascade its dependents to failed', async () => {
+      makeRouterCallOnSuccessAsLoggedOut()
+      const { enqueue, drainQueue, pendingCount, failedCount } = mountComposable()
+
+      await enqueue({
+        type: 'create-inspection',
+        url: '/boats/1/reservations/2/inspections',
+        method: 'post',
+        payload: { kind: 'checkout' },
+        tempId: 'tmp_abc',
+      })
+      await enqueue({
+        type: 'create-inspection-defect',
+        url: '/boats/1/reservations/2/inspections/tmp_abc/equipment-actions',
+        method: 'post',
+        payload: { note: 'x' },
+        dependsOn: 'tmp_abc',
+      })
+
+      await drainQueue()
+      await flushPromises()
+
+      expect(pendingCount.value).toBe(2)
+      expect(failedCount.value).toBe(0)
+    })
+  })
+
+  // #950 — sur 5xx/réseau, la file ne doit pas marteler un lien satellite
+  // dégradé : relance différée avec délai exponentiel plafonné.
+  describe('relance différée après erreur transitoire (#950)', () => {
+    /** fake-indexeddb planifie sur `setImmediate` : ne simuler que les timeouts. */
+    function useTimeoutFakeTimers() {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    }
+
+    /**
+     * Avance l'horloge simulée puis laisse passer les macrotâches réelles :
+     * la relance appelle `drainQueue`, qui lit IndexedDB (`setImmediate`)
+     * avant d'atteindre `router.*`.
+     */
+    async function advanceAndSettle(ms: number) {
+      await vi.advanceTimersByTimeAsync(ms)
+      for (let i = 0; i < 20; i++) {
+        await new Promise<void>((resolve) => setImmediate(resolve))
+      }
+    }
+
+    test('a transient failure schedules a retry with exponential backoff', async () => {
+      useTimeoutFakeTimers()
+      makeRouterCallOnFinishOnly()
+      const { enqueue, drainQueue, retryAttempt } = mountComposable()
+
+      await enqueue({
+        type: 'create-fuel-log',
+        url: '/boats/1/fuel-logs',
+        method: 'post',
+        payload: { quantityLiters: '50' },
+      })
+
+      await drainQueue()
+      await advanceAndSettle(0)
+      expect(router.post).toHaveBeenCalledTimes(1)
+      expect(retryAttempt.value).toBe(1)
+
+      // Pas de relance avant le délai de base
+      await advanceAndSettle(OFFLINE_RETRY_BASE_MS - 1)
+      expect(router.post).toHaveBeenCalledTimes(1)
+
+      await advanceAndSettle(1)
+      expect(router.post).toHaveBeenCalledTimes(2)
+      expect(retryAttempt.value).toBe(2)
+
+      // Deuxième relance : délai doublé
+      await advanceAndSettle(OFFLINE_RETRY_BASE_MS * 2)
+      expect(router.post).toHaveBeenCalledTimes(3)
+    })
+
+    test('a successful replay resets the backoff', async () => {
+      useTimeoutFakeTimers()
+      makeRouterCallOnFinishOnly()
+      const { enqueue, drainQueue, retryAttempt, pendingCount } = mountComposable()
+
+      await enqueue({
+        type: 'create-fuel-log',
+        url: '/boats/1/fuel-logs',
+        method: 'post',
+        payload: { quantityLiters: '50' },
+      })
+      await drainQueue()
+      await advanceAndSettle(0)
+      expect(retryAttempt.value).toBe(1)
+
+      makeRouterCallOnSuccess()
+      await advanceAndSettle(OFFLINE_RETRY_BASE_MS)
+      await advanceAndSettle(0)
+
+      expect(pendingCount.value).toBe(0)
+      expect(retryAttempt.value).toBe(0)
+    })
+
+    test('cancelScheduledRetry drops the pending timer', async () => {
+      useTimeoutFakeTimers()
+      makeRouterCallOnFinishOnly()
+      const { enqueue, drainQueue } = mountComposable()
+
+      await enqueue({
+        type: 'create-fuel-log',
+        url: '/boats/1/fuel-logs',
+        method: 'post',
+        payload: { quantityLiters: '50' },
+      })
+      await drainQueue()
+      await advanceAndSettle(0)
+      expect(router.post).toHaveBeenCalledTimes(1)
+
+      cancelScheduledRetry()
+      await advanceAndSettle(OFFLINE_RETRY_BASE_MS * 10)
+      expect(router.post).toHaveBeenCalledTimes(1)
+    })
+
+    test('a scheduled retry is skipped while the browser reports offline', async () => {
+      useTimeoutFakeTimers()
+      makeRouterCallOnFinishOnly()
+      const { enqueue, drainQueue } = mountComposable()
+
+      await enqueue({
+        type: 'create-fuel-log',
+        url: '/boats/1/fuel-logs',
+        method: 'post',
+        payload: { quantityLiters: '50' },
+      })
+      await drainQueue()
+      await advanceAndSettle(0)
+      expect(router.post).toHaveBeenCalledTimes(1)
+
+      Object.defineProperty(navigator, 'onLine', {
+        value: false,
+        writable: true,
+        configurable: true,
+      })
+      await advanceAndSettle(OFFLINE_RETRY_BASE_MS)
+      expect(router.post).toHaveBeenCalledTimes(1)
+      Object.defineProperty(navigator, 'onLine', {
+        value: true,
+        writable: true,
+        configurable: true,
+      })
+    })
   })
 
   // #622 — une création hors-ligne porte un jeton temporaire, les actions qui la

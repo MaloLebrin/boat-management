@@ -53,6 +53,8 @@
   "offline.syncing": "Synchronisation en cours…",
   "offline.syncSuccess": "{count, plural, one {# entrée synchronisée} other {# entrées synchronisées}}",
   "offline.syncRejected": "Refusée par le serveur — conservée dans les échecs",
+  "offline.sessionExpired": "Session expirée — reconnectez-vous pour synchroniser vos saisies hors-ligne",
+  "offline.queue.suspendedAuth": "Synchronisation en pause : reconnectez-vous pour envoyer ces saisies.",
   "pwa.offlineReady": "Application prête pour une utilisation hors-ligne",
   "pwa.install": "Installer l'application",
   "pwa.manifest.description": "Suivez votre flotte, vos sorties et l'entretien, même hors connexion.",
