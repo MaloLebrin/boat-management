@@ -166,6 +166,8 @@ STRIPE_CUSTOMER_PORTAL_ID=bpc_...        # optionnel
 
 ## Codes promo (#955)
 
+> Guide d'exploitation (créer, tester, suivre, désactiver, dépanner) : [`promo-codes.md`](./promo-codes.md). Cette section n'en donne que le résumé technique.
+
 Les codes promo sont **créés dans le Dashboard Stripe**, jamais dans l'app : il n'y a pas de backoffice plateforme. L'app se contente de vérifier le code saisi et de pré-appliquer la remise à la session Checkout.
 
 1. **Coupon** — Dashboard → **Product catalog** → **Coupons** → **+ New** : pourcentage ou montant fixe (dans la devise des prix), durée `Once` / `Repeating` (N mois) / `Forever`, et, sous _Apply to specific products_, les produits des plans Pro / Entreprise. Plafond d'utilisations et date limite facultatifs.
