@@ -30,6 +30,7 @@ const subscription: SubscriptionInfo = {
   billingInterval: 'month',
   currentPeriodEnd: '2030-01-01',
   cancelAtPeriodEnd: false,
+  discount: null,
 }
 
 function mountExtraBoats(

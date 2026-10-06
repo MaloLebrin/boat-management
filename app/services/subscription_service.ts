@@ -1,6 +1,8 @@
 import Organization from '#models/organization'
 import Subscription from '#models/subscription'
 import type { BillingInterval, SubscriptionInfo, SubscriptionStatus } from '#shared/types/billing'
+import { toSubscriptionInfo } from '#transformers/subscription_transformer'
+import { discountFromStripe, type SyncedDiscount } from '#services/promo_code_service'
 import { isPlanModule } from '#shared/types/plan'
 import type { PlanAddon, PlanModule, PlanTier } from '#shared/types/plan'
 import StripeService from '#services/stripe_service'
@@ -35,14 +37,7 @@ export default class SubscriptionService {
   }
 
   toInfo(sub: Subscription): SubscriptionInfo {
-    return {
-      id: sub.id,
-      status: sub.status,
-      planTier: sub.planTier,
-      billingInterval: sub.billingInterval,
-      currentPeriodEnd: sub.currentPeriodEnd.toISO()!,
-      cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
-    }
+    return toSubscriptionInfo(sub)
   }
 
   /**
@@ -70,9 +65,10 @@ export default class SubscriptionService {
 
     const plan = this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, plan)
+    const discount = await this.resolveDiscount(stripeSub)
 
     await this.runInTransaction(trx, (tx) =>
-      this.applySync(org, stripeSub, tierItem, plan, desiredModules, tx)
+      this.applySync(org, stripeSub, tierItem, plan, desiredModules, discount, tx)
     )
   }
 
@@ -92,10 +88,38 @@ export default class SubscriptionService {
     const newPlan =
       stripeSub.status === 'canceled' ? 'starter' : this.planFromPriceId(tierItem.price.id)
     const desiredModules = this.desiredModulesFrom(stripeSub, newPlan)
+    // Hors transaction : un éventuel appel Stripe ne doit pas tenir un verrou.
+    const discount = await this.resolveDiscount(stripeSub)
 
     await this.runInTransaction(trx, (tx) =>
-      this.applySync(org, stripeSub, tierItem, newPlan, desiredModules, tx)
+      this.applySync(org, stripeSub, tierItem, newPlan, desiredModules, discount, tx)
     )
+  }
+
+  /**
+   * Remise active de l'abonnement, prête à persister (#955), ou `null`.
+   *
+   * Dans un payload webhook, `discounts` est une liste d'**identifiants** non
+   * développés : seul `retrieveSubscription` (avec `expand`) donne le coupon et
+   * le code promo. L'appel réseau n'est fait que si nécessaire — un abonnement
+   * sans remise (`discounts` vide ou absent, cas de toutes les fixtures
+   * existantes) ne touche pas Stripe, et un abonnement résilié ne garde rien.
+   *
+   * Une seule remise est retenue (`discounts[0]`) : Checkout n'en pose qu'une,
+   * et la page Facturation n'en affiche qu'une.
+   */
+  private async resolveDiscount(stripeSub: Stripe.Subscription): Promise<SyncedDiscount | null> {
+    const discounts = stripeSub.discounts ?? []
+    if (discounts.length === 0 || stripeSub.status === 'canceled') return null
+
+    let first: string | Stripe.Discount | undefined = discounts[0]
+    if (typeof first === 'string') {
+      const expanded = await this.stripeService.retrieveSubscription(stripeSub.id)
+      first = expanded.discounts?.[0]
+    }
+    if (!first || typeof first === 'string') return null
+
+    return discountFromStripe(first)
   }
 
   /**
@@ -135,6 +159,7 @@ export default class SubscriptionService {
     tierItem: Stripe.SubscriptionItem,
     plan: PlanTier,
     desiredModules: DesiredSubscriptionModule[],
+    discount: SyncedDiscount | null,
     trx: TransactionClientContract
   ): Promise<void> {
     const heldBy = await this.subscriptionHolderElsewhere(org.id, stripeSub.id, trx)
@@ -143,7 +168,7 @@ export default class SubscriptionService {
       return
     }
 
-    await this.upsertSubscription(org.id, stripeSub, tierItem, trx)
+    await this.upsertSubscription(org.id, stripeSub, tierItem, discount, trx)
     const reconciled = await this.organizationModuleService.reconcileSubscriptionModules(
       org.id,
       desiredModules,
@@ -316,6 +341,7 @@ export default class SubscriptionService {
     organizationId: number,
     stripeSub: Stripe.Subscription,
     tierItem: Stripe.SubscriptionItem,
+    discount: SyncedDiscount | null,
     trx: TransactionClientContract
   ) {
     const priceId = tierItem.price.id
@@ -332,6 +358,17 @@ export default class SubscriptionService {
         currentPeriodStart: start,
         currentPeriodEnd: end,
         cancelAtPeriodEnd: stripeSub.cancel_at_period_end,
+        // Toutes les colonnes `discount_*` sont réécrites à chaque synchro :
+        // `null` partout quand la remise a disparu (#955).
+        discountCouponId: discount?.couponId ?? null,
+        discountPromoCode: discount?.promoCode ?? null,
+        discountName: discount?.name ?? null,
+        discountPercentOff: discount?.percentOff ?? null,
+        discountAmountOffCents: discount?.amountOffCents ?? null,
+        discountCurrency: discount?.currency ?? null,
+        discountDuration: discount?.duration ?? null,
+        discountDurationInMonths: discount?.durationInMonths ?? null,
+        discountEnd: discount?.end ?? null,
       },
       { client: trx }
     )

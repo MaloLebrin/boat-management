@@ -12,6 +12,40 @@ export type SubscriptionStatus =
 
 export type BillingInterval = 'month' | 'year'
 
+/** Durée d'un coupon Stripe : `once` (première facture), `repeating` (N mois), `forever`. */
+export type DiscountDuration = 'forever' | 'once' | 'repeating'
+
+/**
+ * Détail d'une remise Stripe (coupon), tel qu'il est affiché et persisté (#955).
+ * Un coupon porte **soit** `percentOff` **soit** `amountOffCents` + `currency`.
+ */
+export interface DiscountDetails {
+  couponId: string
+  /** Code promo saisi par le client (ex. `BIENVENUE20`), `null` pour un coupon posé sans code. */
+  promoCode: string | null
+  name: string | null
+  percentOff: number | null
+  amountOffCents: number | null
+  currency: string | null
+  duration: DiscountDuration
+  /** Nombre de mois — `repeating` uniquement. */
+  durationInMonths: number | null
+}
+
+/** Code promo résolu chez Stripe et valide — prêt pour `discounts: [{ promotion_code }]`. */
+export interface ResolvedPromoCode extends DiscountDetails {
+  promotionCodeId: string
+}
+
+/** Remise active sur l'abonnement, lue depuis `subscriptions.discount_*`. */
+export interface SubscriptionDiscountInfo extends DiscountDetails {
+  /** Fin de la remise (ISO) — `repeating` uniquement, `null` pour `once`/`forever`. */
+  end: string | null
+}
+
+/** Pourquoi un code promo est refusé au checkout (#955). */
+export type PromoCodeRejectReason = 'notFound' | 'expired' | 'exhausted' | 'notApplicable'
+
 export interface SubscriptionInfo {
   id: number
   status: SubscriptionStatus
@@ -19,6 +53,8 @@ export interface SubscriptionInfo {
   billingInterval: BillingInterval
   currentPeriodEnd: string
   cancelAtPeriodEnd: boolean
+  /** Remise en cours, `null` sans coupon (#955). */
+  discount: SubscriptionDiscountInfo | null
 }
 
 export interface CheckoutPayload {
@@ -26,6 +62,8 @@ export interface CheckoutPayload {
   interval: BillingInterval
   /** Modules add-ons souscrits à la souscription — Pro uniquement (épic #327). */
   modules?: PlanModule[]
+  /** Code promo Stripe, vérifié côté serveur avant la session Checkout (#955). */
+  promoCode?: string
 }
 
 /**

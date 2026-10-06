@@ -164,6 +164,25 @@ STRIPE_CUSTOMER_PORTAL_ID=bpc_...        # optionnel
 
 ---
 
+## Codes promo (#955)
+
+Les codes promo sont **créés dans le Dashboard Stripe**, jamais dans l'app : il n'y a pas de backoffice plateforme. L'app se contente de vérifier le code saisi et de pré-appliquer la remise à la session Checkout.
+
+1. **Coupon** — Dashboard → **Product catalog** → **Coupons** → **+ New** : pourcentage ou montant fixe (dans la devise des prix), durée `Once` / `Repeating` (N mois) / `Forever`, et, sous _Apply to specific products_, les produits des plans Pro / Entreprise. Plafond d'utilisations et date limite facultatifs.
+2. **Code promo** — depuis le coupon, **Promotion codes** → **+ New** : le code que le client tape (ex. `ASSO50`, comparaison insensible à la casse), restrictions facultatives (première transaction uniquement, montant minimum, client donné).
+3. Test et Live ont chacun leur catalogue : un code créé en mode test n'existe pas en production.
+
+Ce que fait l'app (`PromoCodeService`, `BillingController.checkout`) :
+
+- `promotionCodes.list({ code, active: true, expand: ['data.promotion.coupon'] })` puis contrôle local (coupon `valid`, `expires_at`, `max_redemptions`). Un code inconnu, inactif, expiré ou épuisé est refusé **sous le champ**, sans ouvrir de session.
+- La session est créée avec `discounts: [{ promotion_code }]`. **Jamais `allow_promotion_codes`** : Stripe interdit de le combiner avec `discounts`, et le champ Stripe ferait doublon avec le nôtre.
+- Les restrictions que seul Stripe évalue (première transaction, montant minimum, produits) sont refusées par `checkout.sessions.create` (`StripeInvalidRequestError`) et affichées « ne s'applique pas à cet abonnement ».
+- La remise est ensuite relue par le webhook (`discounts` sur `customer.subscription.updated` / `checkout.session.completed`, relecture avec `expand` si les identifiants arrivent nus) et persistée dans `subscriptions.discount_*` pour l'affichage. Aucun nouvel événement webhook à abonner.
+
+Un coupon posé à la main sur un client depuis le Dashboard (sans code promo) est synchronisé de la même façon, simplement sans `discount_promo_code`.
+
+---
+
 ## Add-ons quantitatifs — « bateaux supplémentaires » (épic #333)
 
 L'add-on `extra_boats` est facturé **à la quantité** : le code place `quantity` sur l'item d'abonnement (checkout / `addSubscriptionItem` / `updateSubscriptionItemQuantity`) et Stripe multiplie `unit_amount × quantity`. Le Price doit donc être **récurrent et `licensed`** (à l'unité) — surtout **pas `metered`**, qui imposerait des usage records et casserait la sync déclarative.

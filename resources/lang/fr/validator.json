@@ -43,9 +43,18 @@
     "subject": "sujet",
     "organization": "organisation",
     "message": "message",
-    "consent": "consentement"
+    "consent": "consentement",
+    "promoCode": "code promo"
   },
   "twoFactor": {
     "invalidCode": "Code invalide ou déjà utilisé."
+  },
+  "billing": {
+    "promoCode": {
+      "notFound": "Ce code promo est inconnu ou n'est plus actif.",
+      "expired": "Ce code promo a expiré.",
+      "exhausted": "Ce code promo a atteint sa limite d'utilisations.",
+      "notApplicable": "Ce code promo ne s'applique pas à cet abonnement."
+    }
   }
 }

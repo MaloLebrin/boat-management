@@ -109,17 +109,19 @@ La page `GET /settings/billing` reste consultable par tous les rôles (usage et 
 
 ### 3.1 Initiation
 
-L'utilisateur choisit un plan et un intervalle (mensuel/annuel) dans `SettingsBillingTab.vue`, puis soumet le formulaire Inertia vers `POST /settings/billing/checkout`.
+L'utilisateur choisit un plan et un intervalle (mensuel/annuel) dans `SettingsBillingTab.vue` (ou la modale `UpgradePlanModal.vue`), saisit éventuellement un **code promo**, puis soumet le formulaire Inertia vers `POST /settings/billing/checkout` (`preserveState: true`, pour que la saisie et l'erreur restent à l'écran en cas de refus).
 
 `BillingController.checkout()` :
 
-1. Valide le payload (`checkoutValidator`) → `{ planTier: 'pro'|'enterprise', interval: 'month'|'year' }`
-2. Résout le `priceId` Stripe via `StripeService.priceIdFor(planTier, interval)` (lecture des variables d'env `STRIPE_*_PRICE_ID`)
-3. Crée ou récupère le client Stripe via `StripeService.getOrCreateCustomer(org, email)` :
+1. Valide le payload (`checkoutValidator`) → `{ planTier: 'pro'|'enterprise', interval: 'month'|'year', modules?, promoCode? }`
+2. **Code promo (#955)** : si `promoCode` est présent, `PromoCodeService.resolve(code)` le lit chez Stripe (`promotionCodes.list({ code, active: true, expand: ['data.promotion.coupon'] })`, comparaison insensible à la casse) et applique les règles vérifiables localement (`evaluatePromotionCode` : coupon valide, `expires_at`, `max_redemptions`). Refus → `InvalidPromoCodeError(reason)` rendu **sous le champ** (`inputErrorsBag.promoCode`, messages `validator.billing.promoCode.*`), `flashAll()` conserve la saisie, aucune session n'est ouverte
+3. Résout le `priceId` Stripe via `StripeService.priceIdFor(planTier, interval)` (lecture des variables d'env `STRIPE_*_PRICE_ID`)
+4. Crée ou récupère le client Stripe via `StripeService.getOrCreateCustomer(org, email)` :
    - Si `org.stripeCustomerId` est déjà renseigné → utilise l'ID existant
    - Sinon → `stripe.customers.create()` + sauvegarde en base
-4. Crée la session Checkout via `StripeService.createCheckoutSession(...)` avec `mode: 'subscription'`
-5. Retourne `inertia.location(url)` → le navigateur reçoit HTTP 409 + header `X-Inertia-Location` → redirection vers Stripe Checkout
+5. Crée la session Checkout via `StripeService.createCheckoutSession(...)` avec `mode: 'subscription'` et, si un code a été résolu, `discounts: [{ promotion_code }]`. `allow_promotion_codes` n'est **jamais** posé : Stripe interdit de le combiner avec `discounts`, et le code est saisi dans l'app, pas sur la page Stripe. Les restrictions que seul Stripe évalue (première transaction, montant minimum, coupon limité à d'autres produits) remontent ici en `StripeInvalidRequestError`, traduite en erreur de champ `notApplicable`
+6. Journalise `billing.checkout` (`planTier`, `interval`, `modules`, et `promoCode` seulement si un code a été appliqué)
+7. Retourne `inertia.location(url)` → le navigateur reçoit HTTP 409 + header `X-Inertia-Location` → redirection vers Stripe Checkout
 
 ```
 Navigateur → POST /settings/billing/checkout
@@ -167,7 +169,7 @@ les événements dès que la clé API manque — et Stripe rejouerait indéfinim
 ### 4.4 `syncFromCheckoutSession(session)`
 
 1. Trouve l'organisation via `stripe_customer_id`
-2. Résout l'**item du tier** (voir §4.5 bis) et calcule les modules désirés
+2. Relit l'abonnement (`retrieveSubscription`, `expand: ['items.data.price', 'discounts.source.coupon', 'discounts.promotion_code']`), résout l'**item du tier** (voir §4.5 bis), calcule les modules désirés et la **remise** (voir §4.5 ter)
 3. Dans une transaction : `upsertSubscription` + `reconcileSubscriptionModules` + `applyOrgPlan`
 
 ### 4.4 bis Idempotence du webhook (#703)
@@ -193,7 +195,8 @@ La rétention est de **30 jours** (`PROCESSED_EVENT_RETENTION_DAYS`), purgée pa
 2. Résout l'item du tier et détermine le nouveau plan :
    - Si `stripeSub.status === 'canceled'` → `'starter'`
    - Sinon → plan déduit du `priceId` de l'item du tier (mapping env vars)
-3. Dans une transaction : `upsertSubscription` + `reconcileSubscriptionModules` + `applyOrgPlan`
+3. Résout la **remise** (voir §4.5 ter) — hors transaction, car elle peut appeler Stripe
+4. Dans une transaction : `upsertSubscription` + `reconcileSubscriptionModules` + `applyOrgPlan`
 
 C'est ici que le downgrade vers Starter s'opère automatiquement à l'annulation.
 
@@ -206,9 +209,13 @@ Avec les modules add-ons, un abonnement Stripe porte **plusieurs items** : un it
 - **`desiredModulesFrom(stripeSub, plan)`** : mappe chaque item de module via `StripeService.moduleForPriceId(priceId)`. Un abonnement annulé (plan `starter`) ne conserve aucun module.
 - **`OrganizationModuleService.reconcileSubscriptionModules(orgId, desired, trx)`** : dans la même transaction que l'upsert, retire les modules `subscription` absents des items, ajoute/actualise les désirés (avec leur `stripe_subscription_item_id`), et **ne touche jamais un module `granted`**.
 
-### 4.6 `upsertSubscription(organizationId, stripeSub)`
+### 4.5 ter Remise de l'abonnement (#955)
 
-`Subscription.updateOrCreate({ organizationId }, { ... })` — un seul enregistrement par organisation (contrainte UNIQUE sur `organization_id`).
+`resolveDiscount(stripeSub)` retient `discounts[0]` (Checkout n'en pose qu'une, la page Facturation n'en affiche qu'une) et rend `null` quand `discounts` est vide/absent ou que l'abonnement est `canceled`. Dans un payload webhook, `discounts` est une liste d'**identifiants** non développés : la synchro relit alors l'abonnement avec `expand` — l'appel réseau n'a lieu **que** dans ce cas, un abonnement sans remise ne touche jamais Stripe (c'est ce qui garde toutes les fixtures de test hors réseau). `discountFromStripe` (`app/services/promo_code_service.ts`) est le seul endroit qui connaît la forme Stripe de la remise : coupon sous `source.coupon`, code promo sous `promotion_code.code` (connu seulement si développé — un coupon posé depuis le Dashboard n'a pas de code), fin sous `end`.
+
+### 4.6 `upsertSubscription(organizationId, stripeSub, tierItem, discount)`
+
+`Subscription.updateOrCreate({ organizationId }, { ... })` — un seul enregistrement par organisation (contrainte UNIQUE sur `organization_id`). Les neuf colonnes `discount_*` sont réécrites à chaque synchro : toutes à `null` quand la remise a disparu.
 
 **Garde d'attribution (#705).** `subscriptions` porte **deux** clés d'unicité : `organization_id` et `stripe_subscription_id`. L'upsert n'étant clé que sur la première, un `sub_…` rattaché à l'organisation A qui arriverait sur l'organisation B (abonnement déplacé d'un client à l'autre côté Stripe, `stripe_customer_id` réattribué, deux organisations créées depuis le même client) déclenchait un `INSERT` rejeté par PostgreSQL sur la seconde — une 500, donc un rejeu Stripe indéfini. `subscriptionHolderElsewhere(organizationId, stripeSubscriptionId, trx)` détecte désormais le conflit **dans la transaction de synchro**, avant toute écriture : rien n'est écrit (ni `subscriptions`, ni le plan, ni les modules), le conflit est loggé en `error` avec les deux `organizationId`, et le webhook répond **200**. C'est une incohérence de données qui demande un arbitrage humain : deviner laquelle des deux organisations garde l'abonnement reviendrait à retirer son plan payant à l'autre sur la foi d'un webhook.
 
@@ -315,17 +322,26 @@ La prop `quotaUsage` transmise au frontend :
 
 ## 7. Table `subscriptions`
 
-| Colonne                  | Type          | Notes                                                                                |
-| ------------------------ | ------------- | ------------------------------------------------------------------------------------ |
-| `organization_id`        | FK unique     | 1 abonnement max par org                                                             |
-| `stripe_subscription_id` | string unique | ID Stripe `sub_xxx`                                                                  |
-| `stripe_price_id`        | string        | ID du prix actif                                                                     |
-| `plan_tier`              | enum          | starter / pro / enterprise                                                           |
-| `status`                 | enum          | active, trialing, past_due, canceled, incomplete, incomplete_expired, unpaid, paused |
-| `billing_interval`       | enum          | month / year                                                                         |
-| `current_period_start`   | datetime      | calculé par `getPeriodBounds()`                                                      |
-| `current_period_end`     | datetime      | date de prochain renouvellement                                                      |
-| `cancel_at_period_end`   | boolean       | annulation programmée                                                                |
+| Colonne                       | Type            | Notes                                                                                                 |
+| ----------------------------- | --------------- | ----------------------------------------------------------------------------------------------------- |
+| `organization_id`             | FK unique       | 1 abonnement max par org                                                                              |
+| `stripe_subscription_id`      | string unique   | ID Stripe `sub_xxx`                                                                                   |
+| `stripe_price_id`             | string          | ID du prix actif                                                                                      |
+| `plan_tier`                   | enum            | starter / pro / enterprise                                                                            |
+| `status`                      | enum            | active, trialing, past_due, canceled, incomplete, incomplete_expired, unpaid, paused                  |
+| `billing_interval`            | enum            | month / year                                                                                          |
+| `current_period_start`        | datetime        | calculé par `getPeriodBounds()`                                                                       |
+| `current_period_end`          | datetime        | date de prochain renouvellement                                                                       |
+| `cancel_at_period_end`        | boolean         | annulation programmée                                                                                 |
+| `discount_coupon_id`          | string, null    | coupon Stripe de la remise active (#955) — `null` sans remise, comme toutes les colonnes `discount_*` |
+| `discount_promo_code`         | string, null    | code promo saisi (graphie canonique Stripe), `null` pour un coupon posé sans code                     |
+| `discount_name`               | string, null    | nom du coupon                                                                                         |
+| `discount_percent_off`        | float, null     | pourcentage de remise (exclusif avec le montant)                                                      |
+| `discount_amount_off_cents`   | integer, null   | montant de remise en centimes, par période de facturation                                             |
+| `discount_currency`           | string(3), null | devise du montant                                                                                     |
+| `discount_duration`           | enum, null      | `forever` / `once` / `repeating`                                                                      |
+| `discount_duration_in_months` | integer, null   | nombre de mois — `repeating` uniquement                                                               |
+| `discount_end`                | datetime, null  | fin de la remise (`Discount.end`) — `repeating` uniquement                                            |
 
 `SubscriptionService.getActive()` interroge les statuts `active`, `trialing` et `past_due` — un abonnement `past_due` est encore considéré actif pour ne pas bloquer l'accès immédiatement.
 
@@ -400,14 +416,15 @@ Utilisateur                App                    Stripe
 | Fichier                                                                                 | Rôle                                                          |
 | --------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | [`shared/types/plan.ts`](../shared/types/plan.ts)                                       | `PLAN_LIMITS`, `PlanTier`, `QuotaUsage`                       |
-| [`shared/types/billing.ts`](../shared/types/billing.ts)                                 | `SubscriptionInfo`, `SubscriptionStatus`, `CheckoutPayload`   |
+| [`shared/types/billing.ts`](../shared/types/billing.ts)                                 | `SubscriptionInfo`, `CheckoutPayload`, `DiscountDetails`…     |
 | [`app/services/quota_service.ts`](../app/services/quota_service.ts)                     | Assertions de quotas                                          |
 | [`app/services/pricing_catalog_service.ts`](../app/services/pricing_catalog_service.ts) | Confrontation du barème au catalogue Stripe (`pricing:check`) |
-| [`app/services/stripe_service.ts`](../app/services/stripe_service.ts)                   | Client Stripe, sessions                                       |
+| [`app/services/stripe_service.ts`](../app/services/stripe_service.ts)                   | Client Stripe, sessions, `findPromotionCode`                  |
+| [`app/services/promo_code_service.ts`](../app/services/promo_code_service.ts)           | Résolution d'un code promo, lecture de la remise (#955)       |
 | [`app/services/subscription_service.ts`](../app/services/subscription_service.ts)       | Sync webhooks, `getActive`, `toInfo`                          |
 | [`app/controllers/billing_controller.ts`](../app/controllers/billing_controller.ts)     | Checkout, portal, webhook                                     |
 | [`app/exceptions/quota_errors.ts`](../app/exceptions/quota_errors.ts)                   | `QuotaExceededError`                                          |
-| [`app/exceptions/billing_errors.ts`](../app/exceptions/billing_errors.ts)               | `StripeNotConfiguredError`, `StripeCustomerError`             |
+| [`app/exceptions/billing_errors.ts`](../app/exceptions/billing_errors.ts)               | `StripeNotConfiguredError`, `InvalidPromoCodeError`…          |
 | [`app/models/subscription.ts`](../app/models/subscription.ts)                           | Modèle Lucid                                                  |
 | [`app/models/organization.ts`](../app/models/organization.ts)                           | `plan`, `stripeCustomerId`, relation subscription             |
 | [`start/routes/webhooks.ts`](../start/routes/webhooks.ts)                               | Route publique webhook                                        |

@@ -1,8 +1,10 @@
 import {
+  InvalidPromoCodeError,
   ModulesRequireEnterprisePlanError,
   ModulesRequireProPlanError,
   StripeNotConfiguredError,
 } from '#exceptions/billing_errors'
+import PromoCodeService from '#services/promo_code_service'
 import StripeService from '#services/stripe_service'
 import StripeWebhookService from '#services/stripe_webhook_service'
 import SubscriptionService from '#services/subscription_service'
@@ -12,6 +14,7 @@ import { addonActionValidator, checkoutValidator, moduleActionValidator } from '
 import OrganizationPolicy from '#policies/organization_policy'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import type { PromoCodeRejectReason } from '#shared/types/billing'
 import env from '#start/env'
 import Stripe from 'stripe'
 
@@ -22,7 +25,8 @@ export default class BillingController {
     private subscriptionService: SubscriptionService,
     private stripeWebhookService: StripeWebhookService,
     private organizationModuleService: OrganizationModuleService,
-    private auditLogService: AuditLogService
+    private auditLogService: AuditLogService,
+    private promoCodeService: PromoCodeService
   ) {}
 
   async checkout({ request, inertia, auth, bouncer, response, session, i18n }: HttpContext) {
@@ -33,12 +37,17 @@ export default class BillingController {
       await bouncer.with(OrganizationPolicy).authorize('manageBilling')
       await user.load('organization')
 
-      const { planTier, interval, modules } = await request.validateUsing(checkoutValidator)
+      const { planTier, interval, modules, promoCode } =
+        await request.validateUsing(checkoutValidator)
 
       // Les modules add-ons ne sont vendables que sur le socle Pro (#327).
       if (modules && modules.length > 0 && planTier !== 'pro') {
         throw new ModulesRequireProPlanError()
       }
+
+      // Code promo (#955) : résolu chez Stripe avant toute création — un code
+      // refusé renvoie sur le formulaire sans avoir ouvert de session.
+      const promo = promoCode ? await this.promoCodeService.resolve(promoCode) : null
 
       const priceIds = [
         this.stripeService.priceIdFor(planTier, interval),
@@ -51,13 +60,19 @@ export default class BillingController {
         priceIds,
         successUrl: `${env.get('APP_URL')}/settings/billing?checkout=success`,
         cancelUrl: `${env.get('APP_URL')}/settings/billing`,
+        ...(promo ? { promotionCodeId: promo.promotionCodeId } : {}),
       })
 
       await this.auditLogService.log({
         organizationId: user.organization.id,
         userId: user.id,
         action: 'billing.checkout',
-        metadata: { planTier, interval, modules: modules ?? [] },
+        metadata: {
+          planTier,
+          interval,
+          modules: modules ?? [],
+          ...(promo ? { promoCode: promo.promoCode } : {}),
+        },
       })
 
       return inertia.location(url)
@@ -70,8 +85,33 @@ export default class BillingController {
         session.flash('error', i18n.t('flash.billing.modulesRequirePro'))
         return response.redirect().back()
       }
+      if (error instanceof InvalidPromoCodeError) {
+        return this.rejectPromoCode(error.reason, { session, response, i18n })
+      }
+      // Stripe refuse une restriction qu'on ne pré-vérifie pas (première
+      // transaction, montant minimum, coupon limité à d'autres produits) : c'est
+      // une erreur de saisie à afficher sous le champ, pas une 500.
+      if (error instanceof Stripe.errors.StripeInvalidRequestError && request.input('promoCode')) {
+        return this.rejectPromoCode('notApplicable', { session, response, i18n })
+      }
       throw error
     }
+  }
+
+  /**
+   * Refus d'un code promo (#955), rendu **sous le champ** comme une erreur de
+   * validation : `flashAll()` conserve la saisie, `inputErrorsBag` est le sac
+   * que le middleware Inertia transforme en prop `errors`.
+   */
+  private rejectPromoCode(
+    reason: PromoCodeRejectReason,
+    { session, response, i18n }: Pick<HttpContext, 'session' | 'response' | 'i18n'>
+  ) {
+    session.flashAll()
+    session.flash('inputErrorsBag', {
+      promoCode: [i18n.t(`validator.billing.promoCode.${reason}`)],
+    })
+    return response.redirect().back()
   }
 
   async portal({ inertia, auth, bouncer, response, session, i18n }: HttpContext) {

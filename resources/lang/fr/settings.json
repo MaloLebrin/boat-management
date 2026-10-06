@@ -138,6 +138,24 @@
       "annualDiscount": "−20 %",
       "adminOnly": "Seul un administrateur peut changer de plan ou gérer l'abonnement."
     },
+    "promoCode": {
+      "label": "Code promo",
+      "placeholder": "Ex. BIENVENUE20",
+      "hint": "Facultatif. La remise est appliquée sur la page de paiement Stripe."
+    },
+    "discount": {
+      "label": "Remise",
+      "percentOff": "−{percent}",
+      "amountOff": {
+        "month": "−{amount} / mois",
+        "year": "−{amount} / an"
+      },
+      "forever": "à vie",
+      "once": "sur la première facture",
+      "until": "jusqu'au {date}",
+      "months": "{count, plural, one {pendant # mois} other {pendant # mois}}",
+      "code": "code {code}"
+    },
     "modules": {
       "title": "Modules add-ons",
       "subtitle": "Complétez votre plan Pro avec des modules facturés séparément.",

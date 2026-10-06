@@ -3445,6 +3445,15 @@ export class SubscriptionSchema extends BaseModel {
     'createdAt',
     'currentPeriodEnd',
     'currentPeriodStart',
+    'discountAmountOffCents',
+    'discountCouponId',
+    'discountCurrency',
+    'discountDuration',
+    'discountDurationInMonths',
+    'discountEnd',
+    'discountName',
+    'discountPercentOff',
+    'discountPromoCode',
     'id',
     'organizationId',
     'planTier',
@@ -3464,6 +3473,24 @@ export class SubscriptionSchema extends BaseModel {
   declare currentPeriodEnd: DateTime
   @column.dateTime()
   declare currentPeriodStart: DateTime
+  @column()
+  declare discountAmountOffCents: number | null
+  @column()
+  declare discountCouponId: string | null
+  @column()
+  declare discountCurrency: string | null
+  @column()
+  declare discountDuration: string | null
+  @column()
+  declare discountDurationInMonths: number | null
+  @column.dateTime()
+  declare discountEnd: DateTime | null
+  @column()
+  declare discountName: string | null
+  @column()
+  declare discountPercentOff: number | null
+  @column()
+  declare discountPromoCode: string | null
   @column({ isPrimary: true })
   declare id: number
   @column()

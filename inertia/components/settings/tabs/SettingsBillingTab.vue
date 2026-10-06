@@ -8,6 +8,9 @@ import SettingsBillingFeatureList from '~/components/settings/SettingsBillingFea
 import SettingsBillingModules from '~/components/settings/SettingsBillingModules.vue'
 import SettingsBillingExtraBoats from '~/components/settings/SettingsBillingExtraBoats.vue'
 import SettingsBillingSubscriptionNotice from '~/components/settings/SettingsBillingSubscriptionNotice.vue'
+import SettingsBillingIntervalToggle from '~/components/settings/SettingsBillingIntervalToggle.vue'
+import SettingsBillingPromoCodeField from '~/components/settings/SettingsBillingPromoCodeField.vue'
+import SettingsBillingDiscountLine from '~/components/settings/SettingsBillingDiscountLine.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useT } from '~/composables/use_t'
 import type {
@@ -42,13 +45,20 @@ const props = defineProps<{
 const interval = ref<BillingInterval>('month')
 const upgradeTier = computed(() => getUpgradeTier(props.plan))
 
-const checkoutForm = useForm({})
+// Le code promo (#955) est vérifié par le serveur : un refus revient dans
+// `checkoutForm.errors.promoCode`. `preserveState` garde la saisie et l'erreur
+// à l'écran — sans lui, le retour en arrière remonte la page.
+const checkoutForm = useForm({ promoCode: '' })
 const portalForm = useForm({})
 
 function startCheckout(planTier: 'pro' | 'enterprise') {
   checkoutForm
-    .transform(() => ({ planTier, interval: interval.value }))
-    .post('/settings/billing/checkout')
+    .transform((data) => ({
+      planTier,
+      interval: interval.value,
+      ...(data.promoCode ? { promoCode: data.promoCode } : {}),
+    }))
+    .post('/settings/billing/checkout', { preserveState: true, preserveScroll: true })
 }
 
 function openPortal() {
@@ -113,6 +123,11 @@ const storageOverflow = computed(() => {
               {{ t('settings.billing.subscription.cancelAtPeriodEnd') }}
               {{ formatDateLong(subscription.currentPeriodEnd) }}
             </p>
+            <SettingsBillingDiscountLine
+              v-if="subscription.discount"
+              :discount="subscription.discount"
+              :billing-interval="subscription.billingInterval"
+            />
           </div>
 
           <!-- Boats usage -->
@@ -168,37 +183,15 @@ const storageOverflow = computed(() => {
             </BaseButton>
           </div>
 
-          <!-- Non abonné : sélecteur intervalle + bouton upgrade -->
+          <!-- Non abonné : sélecteur intervalle + code promo + bouton upgrade -->
           <div v-else-if="upgradeTier" class="space-y-3">
-            <div class="flex gap-2">
-              <button
-                type="button"
-                class="rounded-md px-3 py-1 text-sm font-medium transition-colors"
-                :class="
-                  interval === 'month'
-                    ? 'bg-brand text-on-brand'
-                    : 'bg-surface-muted text-fg-muted hover:text-fg'
-                "
-                @click="interval = 'month'"
-              >
-                {{ t('settings.billing.subscription.interval.month') }}
-              </button>
-              <button
-                type="button"
-                class="flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors"
-                :class="
-                  interval === 'year'
-                    ? 'bg-brand text-on-brand'
-                    : 'bg-surface-muted text-fg-muted hover:text-fg'
-                "
-                @click="interval = 'year'"
-              >
-                {{ t('settings.billing.subscription.interval.year') }}
-                <span class="rounded bg-mint-100 px-1 text-xs font-semibold text-success">
-                  {{ t('settings.billing.subscription.annualDiscount') }}
-                </span>
-              </button>
-            </div>
+            <SettingsBillingIntervalToggle v-model:interval="interval" />
+            <SettingsBillingPromoCodeField
+              v-model="checkoutForm.promoCode"
+              :errors="checkoutForm.errors"
+              :disabled="checkoutForm.processing"
+              class="max-w-xs"
+            />
             <BaseButton
               variant="primary"
               :loading="checkoutForm.processing"

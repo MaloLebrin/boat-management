@@ -1761,6 +1761,30 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'settings.billing',
   },
   {
+    id: 'promo-codes',
+    title: {
+      en: 'Promo codes on the subscription checkout',
+      fr: 'Codes promo au paiement de l’abonnement',
+    },
+    body: {
+      en: 'When upgrading to Pro or Enterprise, an admin can enter a promo code in the "Promo code" field of Settings, Billing (or of the upgrade dialog) before clicking the upgrade button. FleetAi checks the code with Stripe first: an unknown, expired or exhausted code is rejected under the field and no payment page opens. A valid code pre-applies the discount on the Stripe payment page, so the amount shown there is already reduced. Once the subscription is active, the discount appears next to the plan in Settings, Billing: percentage or amount, duration (for life, first invoice only, or until a date) and the code used. Codes are issued by FleetAi, for example for schools and sports associations: contact support to get one. A code cannot be added after payment.',
+      fr: 'Au passage au plan Pro ou Entreprise, un admin peut saisir un code promo dans le champ « Code promo » de Réglages, Facturation (ou de la fenêtre de changement de plan) avant de valider. FleetAi vérifie d’abord le code auprès de Stripe : un code inconnu, expiré ou épuisé est refusé sous le champ et aucune page de paiement ne s’ouvre. Un code valide pré-applique la remise sur la page de paiement Stripe, dont le montant est déjà réduit. Une fois l’abonnement actif, la remise apparaît à côté du plan dans Réglages, Facturation : pourcentage ou montant, durée (à vie, première facture, ou jusqu’à une date) et code utilisé. Les codes sont fournis par FleetAi, par exemple pour les écoles et associations sportives : contactez le support pour en obtenir un. Un code ne s’ajoute pas après paiement.',
+    },
+    keywords: [
+      'code promo',
+      'promo',
+      'coupon',
+      'remise',
+      'reduction',
+      'discount',
+      'promotion code',
+      'promo code',
+      'offre',
+      'association',
+    ],
+    navTarget: 'settings.billing',
+  },
+  {
     id: 'settings-ai-byok',
     title: {
       en: 'AI settings: bring your own API key (BYOK)',

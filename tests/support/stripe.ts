@@ -97,6 +97,12 @@ export interface StripeSubscriptionOptions {
   priceId?: string
   anchor?: number
   cancelAtPeriodEnd?: boolean
+  /**
+   * Remises (#955). Des chaînes reproduisent un payload webhook (identifiants
+   * non développés), des objets `stripeDiscount(...)` un abonnement relu avec
+   * `expand`. Omis : pas de clé `discounts` du tout, comme avant.
+   */
+  discounts?: Array<string | Stripe.Discount>
 }
 
 /**
@@ -116,7 +122,84 @@ export function stripeSubscription(options: StripeSubscriptionOptions): Stripe.S
     cancel_at_period_end: options.cancelAtPeriodEnd ?? false,
     billing_cycle_anchor: options.anchor ?? BILLING_CYCLE_ANCHOR,
     items: { data: items },
+    ...(options.discounts ? { discounts: options.discounts } : {}),
   } as unknown as Stripe.Subscription
+}
+
+// ── Coupons, codes promo et remises (#955) ─────────────────────────────────
+
+export interface StripeCouponOptions {
+  id?: string
+  name?: string | null
+  percentOff?: number | null
+  amountOff?: number | null
+  currency?: string | null
+  duration?: Stripe.Coupon.Duration
+  durationInMonths?: number | null
+  valid?: boolean
+}
+
+/** Un coupon Stripe : par défaut −20 % à vie. */
+export function stripeCoupon(options: StripeCouponOptions = {}): Stripe.Coupon {
+  const hasAmount = options.amountOff !== undefined && options.amountOff !== null
+  return {
+    id: options.id ?? 'coupon_test',
+    object: 'coupon',
+    name: options.name === undefined ? 'Bienvenue' : options.name,
+    percent_off: hasAmount ? null : (options.percentOff ?? 20),
+    amount_off: hasAmount ? options.amountOff : null,
+    currency: hasAmount ? (options.currency ?? 'eur') : null,
+    duration: options.duration ?? 'forever',
+    duration_in_months: options.durationInMonths ?? null,
+    valid: options.valid ?? true,
+  } as unknown as Stripe.Coupon
+}
+
+export interface StripePromotionCodeOptions {
+  id?: string
+  code?: string
+  active?: boolean
+  /** Coupon développé, ou son identifiant nu (expansion oubliée). */
+  coupon?: Stripe.Coupon | string
+  expiresAt?: number | null
+  maxRedemptions?: number | null
+  timesRedeemed?: number
+}
+
+/** Un code promo tel que `promotionCodes.list({ expand: ['data.promotion.coupon'] })` le rend. */
+export function stripePromotionCode(
+  options: StripePromotionCodeOptions = {}
+): Stripe.PromotionCode {
+  return {
+    id: options.id ?? 'promo_test',
+    object: 'promotion_code',
+    code: options.code ?? 'BIENVENUE20',
+    active: options.active ?? true,
+    promotion: { type: 'coupon', coupon: options.coupon ?? stripeCoupon() },
+    expires_at: options.expiresAt ?? null,
+    max_redemptions: options.maxRedemptions ?? null,
+    times_redeemed: options.timesRedeemed ?? 0,
+    restrictions: { first_time_transaction: false, minimum_amount: null },
+  } as unknown as Stripe.PromotionCode
+}
+
+/** Une remise d'abonnement, coupon et code promo développés (ou identifiants nus). */
+export function stripeDiscount(
+  options: {
+    id?: string
+    coupon?: Stripe.Coupon | string
+    promotionCode?: Stripe.PromotionCode | string | null
+    end?: number | null
+  } = {}
+): Stripe.Discount {
+  return {
+    id: options.id ?? 'di_test',
+    object: 'discount',
+    source: { type: 'coupon', coupon: options.coupon ?? stripeCoupon() },
+    promotion_code:
+      options.promotionCode === undefined ? stripePromotionCode() : options.promotionCode,
+    end: options.end ?? null,
+  } as unknown as Stripe.Discount
 }
 
 /** Enveloppe un objet dans la forme d'un événement webhook Stripe. */
