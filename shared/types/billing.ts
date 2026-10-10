@@ -1,3 +1,4 @@
+import type { DateTime } from 'luxon'
 import type { PlanModule, PlanTier } from './plan.js'
 
 export type SubscriptionStatus =
@@ -45,6 +46,16 @@ export interface SubscriptionDiscountInfo extends DiscountDetails {
 
 /** Pourquoi un code promo est refusé au checkout (#955). */
 export type PromoCodeRejectReason = 'notFound' | 'expired' | 'exhausted' | 'notApplicable'
+
+/** Verdict du pré-contrôle local d'un code promo (`evaluatePromotionCode`). */
+export type PromoCodeEvaluation =
+  | { ok: true; value: ResolvedPromoCode }
+  | { ok: false; reason: PromoCodeRejectReason }
+
+/** Remise lue sur un abonnement Stripe, avec sa date de fin (`repeating`). */
+export interface SyncedDiscount extends DiscountDetails {
+  end: DateTime | null
+}
 
 export interface SubscriptionInfo {
   id: number

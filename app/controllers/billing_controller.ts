@@ -4,7 +4,7 @@ import {
   ModulesRequireProPlanError,
   StripeNotConfiguredError,
 } from '#exceptions/billing_errors'
-import PromoCodeService from '#services/promo_code_service'
+import PromoCodeService, { isPromotionRefusal } from '#services/promo_code_service'
 import StripeService from '#services/stripe_service'
 import StripeWebhookService from '#services/stripe_webhook_service'
 import SubscriptionService from '#services/subscription_service'
@@ -55,13 +55,30 @@ export default class BillingController {
       ]
       const customerId = await this.stripeService.getOrCreateCustomer(user.organization, user.email)
 
-      const url = await this.stripeService.createCheckoutSession({
-        customerId,
-        priceIds,
-        successUrl: `${env.get('APP_URL')}/settings/billing?checkout=success`,
-        cancelUrl: `${env.get('APP_URL')}/settings/billing`,
-        ...(promo ? { promotionCodeId: promo.promotionCodeId } : {}),
-      })
+      let url: string
+      try {
+        url = await this.stripeService.createCheckoutSession({
+          customerId,
+          priceIds,
+          successUrl: `${env.get('APP_URL')}/settings/billing?checkout=success`,
+          cancelUrl: `${env.get('APP_URL')}/settings/billing`,
+          ...(promo ? { promotionCodeId: promo.promotionCodeId } : {}),
+        })
+      } catch (error) {
+        // Stripe refuse une restriction qu'on ne pré-vérifie pas (première
+        // transaction, montant minimum, coupon limité à d'autres produits) : une
+        // erreur de saisie à afficher sous le champ, pas une 500. Seulement si la
+        // remise est en cause : un prix inconnu doit remonter même quand un code
+        // a été saisi.
+        if (
+          promo &&
+          error instanceof Stripe.errors.StripeInvalidRequestError &&
+          isPromotionRefusal(error)
+        ) {
+          throw new InvalidPromoCodeError('notApplicable')
+        }
+        throw error
+      }
 
       await this.auditLogService.log({
         organizationId: user.organization.id,
@@ -87,12 +104,6 @@ export default class BillingController {
       }
       if (error instanceof InvalidPromoCodeError) {
         return this.rejectPromoCode(error.reason, { session, response, i18n })
-      }
-      // Stripe refuse une restriction qu'on ne pré-vérifie pas (première
-      // transaction, montant minimum, coupon limité à d'autres produits) : c'est
-      // une erreur de saisie à afficher sous le champ, pas une 500.
-      if (error instanceof Stripe.errors.StripeInvalidRequestError && request.input('promoCode')) {
-        return this.rejectPromoCode('notApplicable', { session, response, i18n })
       }
       throw error
     }

@@ -20,8 +20,9 @@ import {
  *
  * Un payload `customer.subscription.*` porte `discounts` en identifiants nus :
  * la synchro relit alors l'abonnement avec `expand` (via `swapStripeService`).
- * Un payload sans remise ne touche jamais Stripe — c'est ce que vérifie le
- * dernier test, qui garde toutes les fixtures existantes hors réseau.
+ * Un payload sans remise ne touche jamais Stripe (avant-dernier test), pas plus
+ * qu'un abonnement résilié, même s'il porte encore des identifiants de remise
+ * (dernier test) : c'est ce qui garde toutes les fixtures existantes hors réseau.
  */
 const CUSTOMER = 'cus_discount_test'
 const END = Math.floor(Date.UTC(2027, 2, 12) / 1000)
@@ -188,7 +189,27 @@ test.group('Stripe webhook — subscription discount sync (functional)', (group)
     assert.equal(stored.percentOff, 20)
   })
 
-  test('a canceled subscription keeps no discount, and a payload without discounts never calls Stripe', async ({
+  test('an active subscription without discounts never calls Stripe', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const org = await createOrgWithStripeCustomer({ customerId: CUSTOMER, plan: 'pro' })
+    const stripe = swapStripeService()
+    cleanup(() => stripe.restore())
+
+    const response = await postStripeWebhook(
+      client,
+      stripeEvent('customer.subscription.updated', discountedSubscription('sub_plain', []))
+    )
+
+    response.assertStatus(200)
+    assert.deepEqual(stripe.retrievedSubscriptionIds, [])
+    const stored = await storedDiscount(org.id)
+    assert.isNull(stored.couponId)
+  })
+
+  test('a canceled subscription never calls Stripe, even with discount ids, and keeps no discount', async ({
     client,
     assert,
     cleanup,

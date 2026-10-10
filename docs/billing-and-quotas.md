@@ -113,13 +113,13 @@ L'utilisateur choisit un plan et un intervalle (mensuel/annuel) dans `SettingsBi
 
 `BillingController.checkout()` :
 
-1. Valide le payload (`checkoutValidator`) → `{ planTier: 'pro'|'enterprise', interval: 'month'|'year', modules?, promoCode? }`
+1. Valide le payload (`checkoutValidator`) → `{ planTier: 'pro'|'enterprise', interval: 'month'|'year', modules?, promoCode? }`. La route est sous `checkoutThrottle` (10 requêtes par minute et par utilisateur, `start/limiter.ts`) : chaque envoi avec un code interroge Stripe, la limite empêche d'énumérer les codes existants
 2. **Code promo (#955)** : si `promoCode` est présent, `PromoCodeService.resolve(code)` le lit chez Stripe (`promotionCodes.list({ code, active: true, expand: ['data.promotion.coupon'] })`, comparaison insensible à la casse) et applique les règles vérifiables localement (`evaluatePromotionCode` : coupon valide, `expires_at`, `max_redemptions`). Refus → `InvalidPromoCodeError(reason)` rendu **sous le champ** (`inputErrorsBag.promoCode`, messages `validator.billing.promoCode.*`), `flashAll()` conserve la saisie, aucune session n'est ouverte
 3. Résout le `priceId` Stripe via `StripeService.priceIdFor(planTier, interval)` (lecture des variables d'env `STRIPE_*_PRICE_ID`)
 4. Crée ou récupère le client Stripe via `StripeService.getOrCreateCustomer(org, email)` :
    - Si `org.stripeCustomerId` est déjà renseigné → utilise l'ID existant
    - Sinon → `stripe.customers.create()` + sauvegarde en base
-5. Crée la session Checkout via `StripeService.createCheckoutSession(...)` avec `mode: 'subscription'` et, si un code a été résolu, `discounts: [{ promotion_code }]`. `allow_promotion_codes` n'est **jamais** posé : Stripe interdit de le combiner avec `discounts`, et le code est saisi dans l'app, pas sur la page Stripe. Les restrictions que seul Stripe évalue (première transaction, montant minimum, coupon limité à d'autres produits) remontent ici en `StripeInvalidRequestError`, traduite en erreur de champ `notApplicable`
+5. Crée la session Checkout via `StripeService.createCheckoutSession(...)` avec `mode: 'subscription'` et, si un code a été résolu, `discounts: [{ promotion_code }]`. `allow_promotion_codes` n'est **jamais** posé : Stripe interdit de le combiner avec `discounts`, et le code est saisi dans l'app, pas sur la page Stripe. Les restrictions que seul Stripe évalue (première transaction, montant minimum, coupon limité à d'autres produits) remontent ici en `StripeInvalidRequestError`, traduite en erreur de champ `notApplicable` **uniquement si l'erreur vise la remise** (`isPromotionRefusal` : paramètre `discounts`/`promotion_code`/`coupon` ou message qui les nomme) : un prix inconnu ou une clé invalide remonte en 500 même quand un code a été saisi
 6. Journalise `billing.checkout` (`planTier`, `interval`, `modules`, et `promoCode` seulement si un code a été appliqué)
 7. Retourne `inertia.location(url)` → le navigateur reçoit HTTP 409 + header `X-Inertia-Location` → redirection vers Stripe Checkout
 

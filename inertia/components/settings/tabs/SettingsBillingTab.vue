@@ -25,7 +25,7 @@ import type {
   SubscriptionStatus,
 } from '../../../../shared/types/billing'
 import { getUpgradeTier } from '../../../../shared/types/plan'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import { usePermissions } from '~/composables/use_permissions'
 
@@ -50,6 +50,12 @@ const upgradeTier = computed(() => getUpgradeTier(props.plan))
 // à l'écran — sans lui, le retour en arrière remonte la page.
 const checkoutForm = useForm({ promoCode: '' })
 const portalForm = useForm({})
+
+// Retaper le code efface l'erreur du précédent essai.
+watch(
+  () => checkoutForm.promoCode,
+  () => checkoutForm.clearErrors('promoCode')
+)
 
 function startCheckout(planTier: 'pro' | 'enterprise') {
   checkoutForm

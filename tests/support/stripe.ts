@@ -137,6 +137,11 @@ export interface StripeCouponOptions {
   duration?: Stripe.Coupon.Duration
   durationInMonths?: number | null
   valid?: boolean
+  /** Plafond d'utilisations du **coupon** (distinct de celui du code promo). */
+  maxRedemptions?: number | null
+  timesRedeemed?: number
+  /** Dernière date d'utilisation du coupon (timestamp Unix). */
+  redeemBy?: number | null
 }
 
 /** Un coupon Stripe : par défaut −20 % à vie. */
@@ -152,6 +157,9 @@ export function stripeCoupon(options: StripeCouponOptions = {}): Stripe.Coupon {
     duration: options.duration ?? 'forever',
     duration_in_months: options.durationInMonths ?? null,
     valid: options.valid ?? true,
+    max_redemptions: options.maxRedemptions ?? null,
+    times_redeemed: options.timesRedeemed ?? 0,
+    redeem_by: options.redeemBy ?? null,
   } as unknown as Stripe.Coupon
 }
 

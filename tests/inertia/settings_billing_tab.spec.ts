@@ -16,12 +16,17 @@ vi.mock('~/composables/use_permissions', () => ({
 
 // `useForm` factice : `transform` capture le callback pour observer le payload
 // réellement posté, `post` enregistre l'URL et ses options (#955).
-const { post, formState } = vi.hoisted(() => ({
+const { post, clearErrors, formState } = vi.hoisted(() => ({
   post: vi.fn(),
+  clearErrors: vi.fn(),
   formState: { promoCode: '', errors: {} as Record<string, string> },
 }))
 vi.mock('@inertiajs/vue3', async () => {
   const actual = await vi.importActual<typeof import('@inertiajs/vue3')>('@inertiajs/vue3')
+  // État réactif : le composant observe `promoCode` pour effacer l'erreur du
+  // précédent essai quand on retape le code.
+  const { reactive } = await vi.importActual<typeof import('vue')>('vue')
+  const state = reactive(formState)
   return {
     ...actual,
     useForm: (initial: Record<string, unknown>) => {
@@ -30,11 +35,12 @@ vi.mock('@inertiajs/vue3', async () => {
       const form = {
         processing: false,
         get promoCode() {
-          return formState.promoCode
+          return state.promoCode
         },
         set promoCode(v: string) {
-          formState.promoCode = v
+          state.promoCode = v
         },
+        clearErrors: (...fields: string[]) => clearErrors(...fields),
         errors: formState.errors,
         transform(fn: (data: typeof formState) => unknown) {
           transformFn = fn
@@ -150,6 +156,16 @@ test('the checkout posts the promo code only when one was typed, preserving stat
     { planTier: 'pro', interval: 'month', promoCode: 'BIENVENUE20' },
     { preserveState: true, preserveScroll: true }
   )
+})
+
+test('retyping the code clears the error of the previous attempt', async () => {
+  capabilities.value = ['subscription.manage']
+  const w = mountTab({ plan: 'starter', subscription: null })
+  clearErrors.mockClear()
+
+  await w.find('input#promoCode').setValue('AUTRE')
+
+  expect(clearErrors).toHaveBeenCalledWith('promoCode')
 })
 
 test('the active discount is shown with the subscription', () => {

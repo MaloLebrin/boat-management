@@ -36,7 +36,7 @@ function buttonClass(active: boolean): string {
       @click="emit('update:interval', 'year')"
     >
       {{ t('settings.billing.subscription.interval.year') }}
-      <span class="rounded bg-mint-100 px-1 text-xs font-semibold text-success">
+      <span class="rounded bg-mint-100 px-1 text-xs font-semibold text-mint-700">
         {{ t('settings.billing.subscription.annualDiscount') }}
       </span>
     </button>

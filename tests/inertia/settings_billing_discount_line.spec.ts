@@ -76,3 +76,10 @@ test('a repeating coupon shows its end date when known, else its month count', (
 test('a coupon applied without a promo code shows no code', () => {
   expect(mountLine({ promoCode: null }).text()).not.toContain('settings.billing.discount.code')
 })
+
+test('a coupon with neither percentage nor amount renders no empty amount label', () => {
+  const w = mountLine({ percentOff: null, amountOffCents: null, currency: null })
+
+  expect(w.find('span.text-success').exists()).toBe(false)
+  expect(w.text()).toContain('settings.billing.discount.label')
+})

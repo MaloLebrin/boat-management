@@ -1,8 +1,10 @@
 import { test } from '@japa/runner'
+import Stripe from 'stripe'
 import {
   discountDetailsFromCoupon,
   discountFromStripe,
   evaluatePromotionCode,
+  isPromotionRefusal,
 } from '#services/promo_code_service'
 import { stripeCoupon, stripeDiscount, stripePromotionCode } from '#tests/support/stripe'
 
@@ -63,6 +65,26 @@ test.group('evaluatePromotionCode', () => {
     }
   })
 
+  test('an invalid coupon says why: its own limit, its own deadline, or simply unknown', ({
+    assert,
+  }) => {
+    const exhausted = stripeCoupon({ valid: false, maxRedemptions: 3, timesRedeemed: 3 })
+    const expired = stripeCoupon({ valid: false, redeemBy: NOW - 1 })
+
+    assert.deepEqual(evaluatePromotionCode(stripePromotionCode({ coupon: exhausted }), NOW), {
+      ok: false,
+      reason: 'exhausted',
+    })
+    assert.deepEqual(evaluatePromotionCode(stripePromotionCode({ coupon: expired }), NOW), {
+      ok: false,
+      reason: 'expired',
+    })
+    assert.deepEqual(
+      evaluatePromotionCode(stripePromotionCode({ coupon: stripeCoupon({ valid: false }) }), NOW),
+      { ok: false, reason: 'notFound' }
+    )
+  })
+
   test('a past expires_at reads as expired, a future one does not', ({ assert }) => {
     assert.deepEqual(evaluatePromotionCode(stripePromotionCode({ expiresAt: NOW - 1 }), NOW), {
       ok: false,
@@ -79,6 +101,28 @@ test.group('evaluatePromotionCode', () => {
     assert.isTrue(
       evaluatePromotionCode(stripePromotionCode({ maxRedemptions: 5, timesRedeemed: 4 }), NOW).ok
     )
+  })
+})
+
+test.group('isPromotionRefusal', () => {
+  function invalidRequest(message: string, param?: string) {
+    return new Stripe.errors.StripeInvalidRequestError({
+      type: 'invalid_request_error',
+      message,
+      ...(param ? { param } : {}),
+    })
+  }
+
+  test('a refusal that names the discount is a promo code problem', ({ assert }) => {
+    assert.isTrue(isPromotionRefusal(invalidRequest('x', 'discounts[0][promotion_code]')))
+    assert.isTrue(isPromotionRefusal(invalidRequest('This promotion code cannot be redeemed.')))
+    assert.isTrue(isPromotionRefusal(invalidRequest('This coupon only applies to other products.')))
+  })
+
+  test('a price, customer or key problem is not', ({ assert }) => {
+    assert.isFalse(isPromotionRefusal(invalidRequest('No such price: price_x', 'line_items')))
+    assert.isFalse(isPromotionRefusal(invalidRequest('No such customer: cus_x', 'customer')))
+    assert.isFalse(isPromotionRefusal(invalidRequest('Invalid API Key provided')))
   })
 })
 

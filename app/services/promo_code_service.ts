@@ -2,21 +2,13 @@ import { InvalidPromoCodeError } from '#exceptions/billing_errors'
 import StripeService from '#services/stripe_service'
 import type {
   DiscountDetails,
-  PromoCodeRejectReason,
+  PromoCodeEvaluation,
   ResolvedPromoCode,
+  SyncedDiscount,
 } from '#shared/types/billing'
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 import type Stripe from 'stripe'
-
-/** Remise lue sur un abonnement Stripe, avec sa date de fin (`repeating`). */
-export interface SyncedDiscount extends DiscountDetails {
-  end: DateTime | null
-}
-
-export type PromoCodeEvaluation =
-  | { ok: true; value: ResolvedPromoCode }
-  | { ok: false; reason: PromoCodeRejectReason }
 
 /**
  * Le coupon porté par un code promo ou une remise. Depuis l'API embarquée par le
@@ -49,6 +41,35 @@ export function discountDetailsFromCoupon(
 }
 
 /**
+ * Stripe passe `coupon.valid` à `false` quand le coupon lui-même est épuisé
+ * (`max_redemptions`) ou périmé (`redeem_by`), indépendamment des limites du code
+ * promo : le client doit lire « limite atteinte » ou « expiré », pas « inconnu »
+ * — il croirait à une faute de frappe.
+ */
+function invalidCouponReason(
+  coupon: Stripe.Coupon,
+  nowSeconds: number
+): 'expired' | 'exhausted' | 'notFound' {
+  if (coupon.max_redemptions !== null && coupon.times_redeemed >= coupon.max_redemptions) {
+    return 'exhausted'
+  }
+  if (coupon.redeem_by !== null && coupon.redeem_by <= nowSeconds) return 'expired'
+  return 'notFound'
+}
+
+/**
+ * Vrai si Stripe refuse la création de la session **à cause de la remise**
+ * (première transaction, montant minimum, produits, client) : seul cas où l'erreur
+ * est une faute de saisie à montrer sous le champ. Un prix inconnu ou une clé
+ * invalide lève la même classe d'erreur — ils doivent remonter, pas se déguiser
+ * en « code non applicable ».
+ */
+export function isPromotionRefusal(error: { message: string; param?: string }): boolean {
+  if (/^(discounts|promotion_code|coupon)/.test(error.param ?? '')) return true
+  return /promotion code|coupon|discount/i.test(error.message)
+}
+
+/**
  * Pré-contrôle local des règles que l'on peut vérifier sans créer la session
  * Checkout : code actif et coupon valide, date d'expiration, plafond
  * d'utilisations. Les restrictions que Stripe seul peut évaluer (première
@@ -61,7 +82,8 @@ export function evaluatePromotionCode(
   nowSeconds = Math.floor(Date.now() / 1000)
 ): PromoCodeEvaluation {
   const coupon = couponOf(promo.promotion)
-  if (!promo.active || !coupon || !coupon.valid) return { ok: false, reason: 'notFound' }
+  if (!promo.active || !coupon) return { ok: false, reason: 'notFound' }
+  if (!coupon.valid) return { ok: false, reason: invalidCouponReason(coupon, nowSeconds) }
   if (promo.expires_at !== null && promo.expires_at <= nowSeconds) {
     return { ok: false, reason: 'expired' }
   }

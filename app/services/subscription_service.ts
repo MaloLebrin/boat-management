@@ -1,8 +1,13 @@
 import Organization from '#models/organization'
 import Subscription from '#models/subscription'
-import type { BillingInterval, SubscriptionInfo, SubscriptionStatus } from '#shared/types/billing'
+import type {
+  BillingInterval,
+  SubscriptionInfo,
+  SubscriptionStatus,
+  SyncedDiscount,
+} from '#shared/types/billing'
 import { toSubscriptionInfo } from '#transformers/subscription_transformer'
-import { discountFromStripe, type SyncedDiscount } from '#services/promo_code_service'
+import { discountFromStripe } from '#services/promo_code_service'
 import { isPlanModule } from '#shared/types/plan'
 import type { PlanAddon, PlanModule, PlanTier } from '#shared/types/plan'
 import StripeService from '#services/stripe_service'

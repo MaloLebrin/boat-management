@@ -95,8 +95,8 @@ Messages montrés au client sous le champ (`validator.billing.promoCode.*`) :
 | Message affiché                                       | Raison          | Cause fréquente / action                                                                                                                                                                                           |
 | ----------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | « Ce code promo est inconnu ou n'est plus actif. »    | `notFound`      | Faute de frappe ; code désactivé ; **mauvais mode** (code créé en Test, clé Live) ; coupon déjà arrivé à terme.                                                                                                    |
-| « Ce code promo a expiré. »                           | `expired`       | `expires_at` du code dépassé : recréer un code avec une nouvelle date.                                                                                                                                             |
-| « Ce code promo a atteint sa limite d'utilisations. » | `exhausted`     | `max_redemptions` atteint : recréer un code avec un plafond plus haut.                                                                                                                                             |
+| « Ce code promo a expiré. »                           | `expired`       | `expires_at` du code (ou `redeem_by` du coupon) dépassé : recréer un code avec une nouvelle date.                                                                                                                  |
+| « Ce code promo a atteint sa limite d'utilisations. » | `exhausted`     | `max_redemptions` atteint, sur le code **ou** sur le coupon : recréer avec un plafond plus haut.                                                                                                                   |
 | « Ce code promo ne s'applique pas à cet abonnement. » | `notApplicable` | Stripe refuse à l'ouverture de Checkout : code « première transaction » sur un client existant, montant minimum non atteint, code réservé à un autre client, coupon limité à d'autres produits que ceux du panier. |
 
 Autres cas :
@@ -104,7 +104,8 @@ Autres cas :
 - **La remise n'apparaît pas sur la page Facturation après paiement** : webhook non reçu (voir `stripe.md` § Diagnostic — `stripe listen` en dev, endpoint du Dashboard en production) ; ou l'abonnement est résilié (une remise n'est jamais affichée sur un abonnement `canceled`).
 - **La remise apparaît sans code** : elle a été posée à la main sur le client ou l'abonnement (coupon sans code promo) — le coupon est affiché, c'est normal.
 - **Le code marche en Test mais pas en production** : il faut le recréer dans le catalogue Live.
-- Les restrictions de première transaction, de montant minimum, de client et de produits ne sont **pas** vérifiées par l'app avant l'ouverture de Checkout : elles ne remontent qu'à la création de la session, d'où le message générique `notApplicable`.
+- Les restrictions de première transaction, de montant minimum, de client et de produits ne sont **pas** vérifiées par l'app avant l'ouverture de Checkout : elles ne remontent qu'à la création de la session, d'où le message générique `notApplicable`. L'app ne l'affiche que si l'erreur Stripe nomme la remise ; toute autre erreur Stripe au checkout (prix introuvable, clé invalide) reste une erreur serveur, à chercher dans les logs.
+- **Trop d'essais** : la route de checkout est limitée à 10 requêtes par minute et par utilisateur. Au-delà, la requête est refusée avant toute recherche chez Stripe ; attendre une minute.
 
 ## 8. Ce que l'app ne fait pas
 

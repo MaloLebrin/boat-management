@@ -48,7 +48,7 @@ const durationText = computed(() => {
 <template>
   <p class="flex flex-wrap items-center gap-x-2 gap-y-1">
     <BaseBadge variant="success">{{ t('settings.billing.discount.label') }}</BaseBadge>
-    <span class="font-medium text-success">{{ amountText }}</span>
+    <span v-if="amountText" class="font-medium text-success">{{ amountText }}</span>
     <span v-if="durationText" class="text-fg-muted">{{ durationText }}</span>
     <span v-if="discount.promoCode" class="text-fg-subtle">
       {{ t('settings.billing.discount.code', { code: discount.promoCode }) }}

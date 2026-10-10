@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { usePage, useForm } from '@inertiajs/vue3'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
@@ -32,6 +32,24 @@ const interval = ref<BillingInterval>('month')
 // `preserveState` garde la modale ouverte et la saisie en place quand le
 // serveur renvoie sur le formulaire.
 const checkoutForm = useForm({ promoCode: '' })
+
+// Retaper le code efface l'erreur du précédent essai.
+watch(
+  () => checkoutForm.promoCode,
+  () => checkoutForm.clearErrors('promoCode')
+)
+
+// Le composant reste monté quand la modale se ferme : sans remise à zéro, la
+// réouverture (pour une autre limite) montrerait l'ancien code et son erreur.
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (isOpen) return
+    checkoutForm.reset()
+    checkoutForm.clearErrors()
+    interval.value = 'month'
+  }
+)
 
 function startCheckout() {
   const tier = upgradeTier.value

@@ -6,6 +6,7 @@ import { createAdminUser } from '#tests/functional/helpers'
 import { swapCheckoutStripeService } from '#tests/support/fakes'
 import { assertFieldErrors, assertNoFieldErrors, inertiaErrors } from '#tests/support/validation'
 import { stripeCoupon, stripePromotionCode } from '#tests/support/stripe'
+import { CHECKOUT_LIMIT } from '#start/limiter'
 
 /**
  * Code promo au checkout (#955). Le code est résolu chez Stripe **avant** la
@@ -33,7 +34,7 @@ test.group('Billing checkout — promo code (functional)', (group) => {
       .redirects(0)
 
     // `inertia.location` : 409 + X-Inertia-Location vers Stripe.
-    assert.oneOf(response.status(), [409, 302])
+    assert.equal(response.status(), 409)
     assert.deepEqual(stripe.promotionCodeLookups, ['bienvenue20'])
     assert.lengthOf(stripe.checkoutSessions, 1)
     assert.equal(stripe.checkoutSessions[0].promotionCodeId, 'promo_valid')
@@ -104,6 +105,12 @@ test.group('Billing checkout — promo code (functional)', (group) => {
       { promo: stripePromotionCode({ expiresAt: 1 }), message: 'This promo code has expired.' },
       {
         promo: stripePromotionCode({ maxRedemptions: 1, timesRedeemed: 1 }),
+        message: 'This promo code has reached its redemption limit.',
+      },
+      {
+        promo: stripePromotionCode({
+          coupon: stripeCoupon({ valid: false, maxRedemptions: 1, timesRedeemed: 1 }),
+        }),
         message: 'This promo code has reached its redemption limit.',
       },
       {
@@ -178,6 +185,60 @@ test.group('Billing checkout — promo code (functional)', (group) => {
       .redirects(0)
 
     assert.isAtLeast(response.status(), 500)
+  })
+
+  test('a Stripe error unrelated to the promo code is not disguised as a promo error', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const stripe = swapCheckoutStripeService({
+      promotionCode: stripePromotionCode(),
+      checkoutError: new Stripe.errors.StripeInvalidRequestError({
+        type: 'invalid_request_error',
+        message: 'No such price: price_wrong',
+        param: 'line_items',
+      }),
+    })
+    cleanup(() => stripe.restore())
+    const admin = await createAdminUser('starter')
+
+    const response = await client
+      .post('/settings/billing/checkout')
+      .loginAs(admin)
+      .form({ planTier: 'pro', interval: 'month', promoCode: 'BIENVENUE20' })
+      .redirects(0)
+
+    // Une mauvaise configuration doit se voir (500), pas se lire « code non applicable ».
+    assert.isAtLeast(response.status(), 500)
+  })
+
+  test('the endpoint refuses past its quota so codes cannot be enumerated', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const stripe = swapCheckoutStripeService({ promotionCode: null })
+    cleanup(() => stripe.restore())
+    const admin = await createAdminUser('starter')
+
+    for (let attempt = 0; attempt < CHECKOUT_LIMIT; attempt += 1) {
+      await client
+        .post('/settings/billing/checkout')
+        .loginAs(admin)
+        .form({ planTier: 'pro', interval: 'month', promoCode: `GUESS${attempt}` })
+        .redirects(0)
+    }
+    assert.lengthOf(stripe.promotionCodeLookups, CHECKOUT_LIMIT)
+
+    await client
+      .post('/settings/billing/checkout')
+      .loginAs(admin)
+      .form({ planTier: 'pro', interval: 'month', promoCode: 'ONE-TOO-MANY' })
+      .redirects(0)
+
+    // Le refus tombe avant le contrôleur : aucune recherche de plus chez Stripe.
+    assert.lengthOf(stripe.promotionCodeLookups, CHECKOUT_LIMIT)
   })
 
   test('a code longer than 64 characters is rejected by validation before Stripe', async ({
