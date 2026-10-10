@@ -138,6 +138,24 @@
       "annualDiscount": "−20%",
       "adminOnly": "Only an administrator can change the plan or manage the subscription."
     },
+    "promoCode": {
+      "label": "Promo code",
+      "placeholder": "e.g. WELCOME20",
+      "hint": "Optional. The discount is applied on the Stripe payment page."
+    },
+    "discount": {
+      "label": "Discount",
+      "percentOff": "−{percent}",
+      "amountOff": {
+        "month": "−{amount} / month",
+        "year": "−{amount} / year"
+      },
+      "forever": "for life",
+      "once": "on the first invoice",
+      "until": "until {date}",
+      "months": "{count, plural, one {for # month} other {for # months}}",
+      "code": "code {code}"
+    },
     "modules": {
       "title": "Add-on modules",
       "subtitle": "Extend your Pro plan with modules billed separately.",

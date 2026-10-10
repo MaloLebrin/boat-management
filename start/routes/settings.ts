@@ -1,6 +1,6 @@
 import { middleware } from '#start/kernel'
 import router from '@adonisjs/core/services/router'
-import { preferencesThrottle } from '#start/limiter'
+import { checkoutThrottle, preferencesThrottle } from '#start/limiter'
 import { AI_PROVIDERS } from '#shared/types/ai'
 
 // Un fournisseur inconnu ne matche pas la route → 404 natif (pas de 500).
@@ -99,6 +99,9 @@ router
       // Stripe, lui, reste ouvert : un client déjà payant doit pouvoir gérer
       // son abonnement, y compris le résilier.
       .use(middleware.requireVerifiedEmail())
+      // Chaque envoi avec un code promo interroge Stripe (#955) : borné pour
+      // qu'un compte vérifié ne puisse pas énumérer les codes existants.
+      .use(checkoutThrottle)
     router
       .post('settings/billing/portal', [BillingController, 'portal'])
       .as('settings.billing.portal')

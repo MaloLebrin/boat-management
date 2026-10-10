@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { usePage, useForm } from '@inertiajs/vue3'
 import BaseModal from '~/components/base/BaseModal.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import SettingsBillingIntervalToggle from '~/components/settings/SettingsBillingIntervalToggle.vue'
+import SettingsBillingPromoCodeField from '~/components/settings/SettingsBillingPromoCodeField.vue'
 import { useT } from '~/composables/use_t'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { PLAN_LIMITS, PLAN_PRICES, getUpgradeTier } from '../../../shared/types/plan'
@@ -26,14 +28,39 @@ const currentPlan = computed<PlanTier>(
 const upgradeTier = computed(() => getUpgradeTier(currentPlan.value))
 
 const interval = ref<BillingInterval>('month')
-const checkoutForm = useForm({})
+// Code promo (#955) : vérifié par le serveur, l'erreur revient sous le champ.
+// `preserveState` garde la modale ouverte et la saisie en place quand le
+// serveur renvoie sur le formulaire.
+const checkoutForm = useForm({ promoCode: '' })
+
+// Retaper le code efface l'erreur du précédent essai.
+watch(
+  () => checkoutForm.promoCode,
+  () => checkoutForm.clearErrors('promoCode')
+)
+
+// Le composant reste monté quand la modale se ferme : sans remise à zéro, la
+// réouverture (pour une autre limite) montrerait l'ancien code et son erreur.
+watch(
+  () => props.open,
+  (isOpen) => {
+    if (isOpen) return
+    checkoutForm.reset()
+    checkoutForm.clearErrors()
+    interval.value = 'month'
+  }
+)
 
 function startCheckout() {
   const tier = upgradeTier.value
   if (!tier) return
   checkoutForm
-    .transform(() => ({ planTier: tier, interval: interval.value }))
-    .post('/settings/billing/checkout')
+    .transform((data) => ({
+      planTier: tier,
+      interval: interval.value,
+      ...(data.promoCode ? { promoCode: data.promoCode } : {}),
+    }))
+    .post('/settings/billing/checkout', { preserveState: true, preserveScroll: true })
 }
 
 const featureLimit = computed<number | null>(() => {
@@ -95,35 +122,15 @@ const modalTitle = computed(() =>
       </div>
 
       <!-- Toggle mensuel / annuel -->
-      <div v-if="upgradeTier" class="flex gap-2">
-        <button
-          type="button"
-          class="rounded-md px-3 py-1 text-sm font-medium transition-colors"
-          :class="
-            interval === 'month'
-              ? 'bg-brand text-on-brand'
-              : 'bg-surface-muted text-fg-muted hover:text-fg'
-          "
-          @click="interval = 'month'"
-        >
-          {{ t('settings.billing.subscription.interval.month') }}
-        </button>
-        <button
-          type="button"
-          class="flex items-center gap-1.5 rounded-md px-3 py-1 text-sm font-medium transition-colors"
-          :class="
-            interval === 'year'
-              ? 'bg-brand text-on-brand'
-              : 'bg-surface-muted text-fg-muted hover:text-fg'
-          "
-          @click="interval = 'year'"
-        >
-          {{ t('settings.billing.subscription.interval.year') }}
-          <span class="rounded bg-mint-100 px-1 text-xs font-semibold text-mint-700">
-            {{ t('settings.billing.subscription.annualDiscount') }}
-          </span>
-        </button>
-      </div>
+      <SettingsBillingIntervalToggle v-if="upgradeTier" v-model:interval="interval" />
+
+      <!-- Code promo (#955) -->
+      <SettingsBillingPromoCodeField
+        v-if="upgradeTier"
+        v-model="checkoutForm.promoCode"
+        :errors="checkoutForm.errors"
+        :disabled="checkoutForm.processing"
+      />
     </div>
 
     <template #footer>

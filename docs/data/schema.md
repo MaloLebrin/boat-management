@@ -1089,6 +1089,19 @@ Référence: `database/seeders/billing_module_states_seeder.ts` (environnements 
 - crée de l’historique de maintenance
 - crée des tasks “planned” pour les entrées ayant une `dueAt`
 
+### subscriptions
+
+Abonnement Stripe de l'organisation — **un au plus** par organisation (`organizationId` unique), synchronisé par le webhook (`docs/billing-and-quotas.md` §4). `plan` reste sur `organizations` : une organisation peut avoir un plan sans abonnement actif (#456).
+
+- `id`
+- `organizationId` (FK unique, cascade)
+- `stripeSubscriptionId` (unique) — `sub_…`
+- `stripePriceId` — prix de l'item du tier
+- `planTier` (enum `starter`/`pro`/`enterprise`), `status` (statuts Stripe), `billingInterval` (`month`/`year`)
+- `currentPeriodStart`, `currentPeriodEnd` (timestamps, lus sur l'item du tier), `cancelAtPeriodEnd`
+- remise active (#955), toutes nullables et réécrites à chaque synchro (`null` partout sans remise) : `discountCouponId`, `discountPromoCode` (code saisi, `null` pour un coupon posé sans code), `discountName`, `discountPercentOff` (float) **ou** `discountAmountOffCents` + `discountCurrency` (string(3)), `discountDuration` (enum `forever`/`once`/`repeating`), `discountDurationInMonths`, `discountEnd` (timestamp, `repeating` uniquement)
+- `createdAt`, `updatedAt`
+
 ### processed_stripe_events
 
 Trace des webhooks Stripe déjà traités (#703). Stripe livre **au moins une fois**, jamais exactement une fois : il rejoue à chaque réponse non-2xx, et parfois après un 2xx. C'est l'index unique sur `stripeEventId` qui rend `POST /webhooks/stripe` idempotent — avant lui, le rejeu n'était inoffensif que par effet de bord.

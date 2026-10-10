@@ -31,6 +31,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/frontend/i18n.md` — internationalisation, `useT()`, ajouter une langue
 - **Tests**: `docs/dev/testing.md`
 - **Hébergement & déploiement**: `docs/dev/hosting.md` — image GHCR, migrations au déploiement, docker-compose.prod.yml, healthcheck `/up`
+- **Codes promo**: `docs/dev/promo-codes.md` — créer, tester, suivre et désactiver un code dans le Dashboard Stripe, produits visés, dépannage des messages d'erreur
 - **Runbook d'exploitation**: `docs/dev/runbook.md` — sauvegardes PostgreSQL (service `backup`, copie hors site), restauration (`scripts/db_restore.sh`), test trimestriel, RPO/RTO
 - **Clés de chiffrement**: `docs/dev/encryption-keys.md` — `ENCRYPTION_KEY` vs `APP_KEY`, migration initiale, procédure de rotation (`node ace encryption:rotate`)
 - **Seeders**: `docs/dev/seeders.md`

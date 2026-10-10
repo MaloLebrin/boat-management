@@ -98,6 +98,17 @@ export const aiThrottle = limiter.define('ai', (ctx) => {
     .usingKey(`ai_${ctx.auth.user?.id ?? ctx.request.ip()}`)
 })
 
+// Checkout d'abonnement (#955) : chaque envoi avec un code promo fait une
+// recherche chez Stripe — sans borne, un compte vérifié pourrait énumérer les
+// codes existants. Un admin qui souscrit essaie quelques codes, pas des centaines.
+export const CHECKOUT_LIMIT = 10
+export const checkoutThrottle = limiter.define('checkout', (ctx) => {
+  return limiter
+    .allowRequests(CHECKOUT_LIMIT)
+    .every('1 minute')
+    .usingKey(`checkout_${ctx.auth.user?.id ?? ctx.request.ip()}`)
+})
+
 export const demoThrottle = limiter.define('demo', (ctx) => {
   return limiter.allowRequests(5).every('1 minute').usingKey(`demo_${ctx.request.ip()}`)
 })

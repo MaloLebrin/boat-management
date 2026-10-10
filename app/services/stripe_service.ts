@@ -35,11 +35,18 @@ export default class StripeService {
     return customer.id
   }
 
+  /**
+   * Session Checkout d'abonnement. Avec `promotionCodeId`, la remise est
+   * pré-appliquée via `discounts` (#955) ; Stripe refuse de le combiner avec
+   * `allow_promotion_codes`, qu'on ne pose donc jamais — le code est saisi et
+   * vérifié dans l'app, pas sur la page Stripe.
+   */
   async createCheckoutSession(opts: {
     customerId: string
     priceIds: string[]
     successUrl: string
     cancelUrl: string
+    promotionCodeId?: string
   }): Promise<string> {
     const session = await this.stripe.checkout.sessions.create({
       customer: opts.customerId,
@@ -47,9 +54,25 @@ export default class StripeService {
       mode: 'subscription',
       success_url: opts.successUrl,
       cancel_url: opts.cancelUrl,
+      ...(opts.promotionCodeId ? { discounts: [{ promotion_code: opts.promotionCodeId }] } : {}),
     })
 
     return session.url!
+  }
+
+  /**
+   * Le code promo **actif** portant ce code, coupon développé, ou `null` (#955).
+   * Stripe compare les codes sans tenir compte de la casse : la saisie est
+   * transmise telle quelle et `promo.code` rend la graphie canonique.
+   */
+  async findPromotionCode(code: string): Promise<Stripe.PromotionCode | null> {
+    const { data } = await this.stripe.promotionCodes.list({
+      code,
+      active: true,
+      limit: 1,
+      expand: ['data.promotion.coupon'],
+    })
+    return data[0] ?? null
   }
 
   async createPortalSession(customerId: string, returnUrl: string): Promise<string> {
@@ -66,7 +89,9 @@ export default class StripeService {
 
   async retrieveSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
     return this.stripe.subscriptions.retrieve(subscriptionId, {
-      expand: ['items.data.price'],
+      // `discounts` arrive en identifiants nus, et le coupon comme le code promo
+      // d'une remise ne sont lus que développés (#955).
+      expand: ['items.data.price', 'discounts.source.coupon', 'discounts.promotion_code'],
     })
   }
 

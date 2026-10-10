@@ -11,6 +11,9 @@ export const checkoutValidator = vine.create(
     // Modules add-ons optionnels souscrits à la souscription (épic #327).
     // Le contrôleur vérifie qu'ils ne sont demandés que sur le socle Pro.
     modules: vine.array(vine.enum(PLAN_MODULES)).optional(),
+    // Code promo Stripe (#955). Le front omet la clé quand le champ est vide ;
+    // la validité réelle (existence, expiration…) est vérifiée chez Stripe.
+    promoCode: vine.string().trim().minLength(1).maxLength(64).optional(),
   })
 )
 

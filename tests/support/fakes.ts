@@ -370,6 +370,60 @@ export function swapStripeConnectService(
   return state
 }
 
+/** Ce qu'un test peut asserter après coup sur le faux Stripe du checkout (#955). */
+export interface FakeStripeCheckout {
+  /** Codes passés à `findPromotionCode`, dans l'ordre. */
+  promotionCodeLookups: string[]
+  checkoutSessions: Array<Parameters<StripeService['createCheckoutSession']>[0]>
+  restore(): void
+}
+
+/**
+ * Remplace `StripeService` pour le checkout d'abonnement (#955) : résolution du
+ * code promo, client et session Checkout — les seuls appels réseau du chemin.
+ * Les mappings de prix restent les vrais (ils lisent `env`).
+ *
+ * - `promotionCode` : ce que `findPromotionCode` rend (`null` = code inconnu) ;
+ * - `checkoutError` : lancée par `createCheckoutSession`, pour simuler un refus
+ *   de Stripe à la création de la session.
+ */
+export function swapCheckoutStripeService(
+  options: { promotionCode?: Stripe.PromotionCode | null; checkoutError?: Error } = {}
+): FakeStripeCheckout {
+  const real = new StripeService()
+  const state: FakeStripeCheckout = {
+    promotionCodeLookups: [],
+    checkoutSessions: [],
+    restore: restoreStripeService,
+  }
+
+  app.container.swap(
+    StripeService,
+    () =>
+      ({
+        isConfigured: () => true,
+        priceIdFor: (tier: 'pro' | 'enterprise', interval: 'month' | 'year') =>
+          real.priceIdFor(tier, interval),
+        priceIdForModule: (
+          module: Parameters<StripeService['priceIdForModule']>[0],
+          interval: 'month' | 'year'
+        ) => real.priceIdForModule(module, interval),
+        getOrCreateCustomer: async () => 'cus_fake',
+        findPromotionCode: async (code: string) => {
+          state.promotionCodeLookups.push(code)
+          return options.promotionCode ?? null
+        },
+        createCheckoutSession: async (opts: FakeStripeCheckout['checkoutSessions'][number]) => {
+          if (options.checkoutError) throw options.checkoutError
+          state.checkoutSessions.push(opts)
+          return `https://checkout.stripe.test/cs_fake_${state.checkoutSessions.length}`
+        },
+      }) as unknown as StripeService
+  )
+
+  return state
+}
+
 /** Ce qu'un test peut asserter après coup sur les appels à la synchro. */
 export interface CountingSubscriptionService {
   /** Un compteur par méthode de synchro, dans l'ordre d'appel. */

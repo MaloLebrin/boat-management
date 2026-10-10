@@ -1,3 +1,5 @@
+import type { PromoCodeRejectReason } from '#shared/types/billing'
+
 export class StripeNotConfiguredError extends Error {
   name = 'StripeNotConfiguredError'
   constructor() {
@@ -35,6 +37,18 @@ export class ModulesRequireEnterprisePlanError extends Error {
   name = 'ModulesRequireEnterprisePlanError'
   constructor() {
     super('Included modules can only be toggled on the Enterprise plan.')
+  }
+}
+
+/**
+ * Code promo refusé au checkout (#955) : inconnu ou inactif, expiré, épuisé, ou
+ * refusé par Stripe à la création de la session (première transaction, montant
+ * minimum, coupon limité à d'autres produits). `reason` choisit le message.
+ */
+export class InvalidPromoCodeError extends Error {
+  name = 'InvalidPromoCodeError'
+  constructor(public readonly reason: PromoCodeRejectReason) {
+    super(`Invalid promotion code: ${reason}`)
   }
 }
 
