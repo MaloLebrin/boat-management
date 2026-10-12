@@ -125,7 +125,7 @@ const storageOverflow = computed(() => {
               &mdash;
               {{ t(`settings.billing.subscription.interval.${subscription.billingInterval}`) }}
             </p>
-            <p v-else class="text-amber-600 font-medium">
+            <p v-else class="text-warning font-medium">
               {{ t('settings.billing.subscription.cancelAtPeriodEnd') }}
               {{ formatDateLong(subscription.currentPeriodEnd) }}
             </p>

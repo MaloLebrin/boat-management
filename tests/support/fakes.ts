@@ -319,10 +319,11 @@ export interface FakeStripeConnect {
  * session Checkout — les seuls appels réseau du chemin.
  *
  * Les vérifications de signature restent les vraies, comme dans
- * `swapStripeService`.
+ * `swapStripeService`. `checkoutError` est lancée par
+ * `createInvoiceCheckoutSession`, pour simuler un échec de Stripe.
  */
 export function swapStripeConnectService(
-  options: { chargesEnabled?: boolean; detailsSubmitted?: boolean } = {}
+  options: { chargesEnabled?: boolean; detailsSubmitted?: boolean; checkoutError?: Error } = {}
 ): FakeStripeConnect {
   const real = new StripeService()
   const state: FakeStripeConnect = {
@@ -360,6 +361,7 @@ export function swapStripeConnectService(
         createInvoiceCheckoutSession: async (
           opts: FakeStripeConnect['checkoutSessions'][number]
         ) => {
+          if (options.checkoutError) throw options.checkoutError
           state.checkoutSessions.push(opts)
           const id = `cs_fake_${state.checkoutSessions.length}`
           return { id, url: `https://checkout.stripe.test/${id}` }

@@ -1,10 +1,12 @@
 import {
+  CheckoutSessionUrlMissingError,
   InvoiceNotPayableError,
   OnlinePaymentsUnavailableError,
   PaymentLinkNotFoundError,
 } from '#exceptions/billing_errors'
 import OnlinePaymentService from '#services/online_payment_service'
 import { inject } from '@adonisjs/core'
+import logger from '@adonisjs/core/services/logger'
 import type { HttpContext } from '@adonisjs/core/http'
 
 /**
@@ -49,6 +51,11 @@ export default class InvoicePaymentLinksController {
         error instanceof OnlinePaymentsUnavailableError
       ) {
         session.flash('error', i18n.t('flash.onlinePayments.notPayable'))
+        return response.redirect(`/pay/${token}`)
+      }
+      if (error instanceof CheckoutSessionUrlMissingError) {
+        logger.error({ sessionId: error.sessionId }, error.message)
+        session.flash('error', i18n.t('flash.onlinePayments.checkoutUnavailable'))
         return response.redirect(`/pay/${token}`)
       }
       throw error
