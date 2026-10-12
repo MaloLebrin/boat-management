@@ -1,0 +1,103 @@
+{{--
+  Rapport mensuel de flotte (#871), envoyé le 1er du mois avec le PDF joint.
+  Textes déjà traduits par `FleetDigestMailService.renderMonthly`.
+--}}
+@component('emails/_layout', { branding })
+  @slot('content')
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">{{ greeting }}</p>
+    <h2 style="margin:0 0 5px;color:#333333;font-size:22px;">{{ heading }}</h2>
+    <p style="margin:0 0 25px;color:#888888;font-size:14px;">{{ period }}</p>
+
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      style="border:1px solid #eeeeee;border-radius:6px;"
+    >
+      @each(kpi in kpis)
+        <tr>
+          <td
+            style="padding:9px 14px;color:#555555;font-size:14px;border-bottom:1px solid #f0f0f0;"
+          >
+            {{ kpi.label }}
+          </td>
+          <td
+            style="padding:9px 14px;color:#333333;font-size:14px;font-weight:bold;text-align:right;border-bottom:1px solid #f0f0f0;"
+          >
+            {{ kpi.value }}
+          </td>
+        </tr>
+      @end
+    </table>
+    @if(topCategories.length)
+      <h3 style="margin:25px 0 10px;color:#1e3a5f;font-size:16px;">{{ topCategoriesTitle }}</h3>
+      @each(category in topCategories)
+        <p style="margin:0 0 6px;color:#555555;font-size:14px;">
+          {{ category.label }}
+          —
+          <strong style="color:#333333;">{{ category.value }}</strong>
+        </p>
+      @end
+    @end
+    @if(boats.length)
+      <h3 style="margin:25px 0 10px;color:#1e3a5f;font-size:16px;">{{ boatsTitle }}</h3>
+      <table
+        role="presentation"
+        width="100%"
+        cellspacing="0"
+        cellpadding="0"
+        style="border:1px solid #eeeeee;border-radius:6px;font-size:13px;"
+      >
+        <tr style="background-color:#f9f9f9;">
+          <th style="padding:8px 10px;text-align:left;color:#555555;">{{ boatColumns.boat }}</th>
+          <th style="padding:8px 10px;text-align:right;color:#555555;">{{ boatColumns.costs }}</th>
+          <th style="padding:8px 10px;text-align:right;color:#555555;">
+            {{ boatColumns.engineHours }}
+          </th>
+          @if(showRental)
+            <th style="padding:8px 10px;text-align:right;color:#555555;">
+              {{ boatColumns.revenue }}
+            </th>
+          @end
+        </tr>
+        @each(boat in boats)
+          <tr>
+            <td style="padding:8px 10px;color:#333333;border-top:1px solid #f0f0f0;">
+              {{ boat.name }}
+            </td>
+            <td
+              style="padding:8px 10px;text-align:right;color:#333333;border-top:1px solid #f0f0f0;"
+            >
+              {{ boat.costs }}
+            </td>
+            <td
+              style="padding:8px 10px;text-align:right;color:#333333;border-top:1px solid #f0f0f0;"
+            >
+              {{ boat.engineHours }}
+            </td>
+            @if(showRental)
+              <td
+                style="padding:8px 10px;text-align:right;color:#333333;border-top:1px solid #f0f0f0;"
+              >
+                {{ boat.revenue }}
+              </td>
+            @end
+          </tr>
+        @end
+      </table>
+    @end
+
+    <p style="margin:25px 0 0;color:#555555;font-size:14px;line-height:1.5;">{{ attachment }}</p>
+
+    <p style="margin:25px 0 0;text-align:center;">
+      <a
+        href="{{ ctaUrl }}"
+        style="display:inline-block;padding:12px 24px;background-color:{{ branding?.primaryColor ?? '#1e3a5f' }};color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none;border-radius:6px;"
+      >
+        {{ ctaLabel }}
+      </a>
+    </p>
+    @include('emails/_fleet_digest_footer')
+  @end
+@end

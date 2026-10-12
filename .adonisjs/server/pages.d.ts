@@ -96,6 +96,7 @@ declare module '@adonisjs/inertia/types' {
     'ports/new': ExtractProps<(typeof import('../../inertia/pages/ports/new.vue'))['default']>
     'ports/show': ExtractProps<(typeof import('../../inertia/pages/ports/show.vue'))['default']>
     'pricing/seasons/index': ExtractProps<(typeof import('../../inertia/pages/pricing/seasons/index.vue'))['default']>
+    'reports/digest_unsubscribe': ExtractProps<(typeof import('../../inertia/pages/reports/digest_unsubscribe.vue'))['default']>
     'reports/index': ExtractProps<(typeof import('../../inertia/pages/reports/index.vue'))['default']>
     'reservations/index': ExtractProps<(typeof import('../../inertia/pages/reservations/index.vue'))['default']>
     'settings/ai': ExtractProps<(typeof import('../../inertia/pages/settings/ai.vue'))['default']>

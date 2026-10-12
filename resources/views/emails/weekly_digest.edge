@@ -1,0 +1,82 @@
+{{--
+  Synthèse hebdomadaire de flotte (#871), envoyée le lundi matin. Textes déjà
+  traduits par `FleetDigestMailService.renderWeekly` ; une section vide n'est
+  pas dans `sections`.
+--}}
+@component('emails/_layout', { branding })
+  @slot('content')
+    <p style="margin:0 0 15px;color:#555555;font-size:16px;line-height:1.5;">{{ greeting }}</p>
+    <h2 style="margin:0 0 5px;color:#333333;font-size:22px;">{{ heading }}</h2>
+    <p style="margin:0 0 25px;color:#888888;font-size:14px;">{{ intro }}</p>
+    @each(section in sections)
+      <h3 style="margin:25px 0 10px;color:#1e3a5f;font-size:16px;">
+        <a href="{{ section.url }}" style="color:#1e3a5f;text-decoration:none;">
+          {{ section.title }}
+        </a>
+      </h3>
+      @each(row in section.rows)
+        <div
+          style="margin:0 0 8px;padding:10px 14px;border-left:3px solid #1e3a5f;background-color:#f8f9fb;"
+        >
+          @if(row.url)
+            <a
+              href="{{ row.url }}"
+              style="color:#1e3a5f;font-size:15px;font-weight:bold;text-decoration:none;"
+            >
+              {{ row.primary }}
+            </a>
+          @else
+            <strong style="color:#333333;font-size:15px;">{{ row.primary }}</strong>
+          @end
+
+          <p style="margin:3px 0 0;color:#555555;font-size:13px;line-height:1.4;">
+            {{ row.secondary }}
+          </p>
+        </div>
+      @end
+      @if(section.more)
+        <p style="margin:0 0 5px;color:#888888;font-size:13px;">
+          <a href="{{ section.url }}" style="color:#888888;">{{ section.more }}</a>
+        </p>
+      @end
+    @end
+    @if(expenses)
+      <h3 style="margin:25px 0 10px;color:#1e3a5f;font-size:16px;">{{ expenses.title }}</h3>
+      <table
+        role="presentation"
+        width="100%"
+        cellspacing="0"
+        cellpadding="0"
+        style="border:1px solid #eeeeee;border-radius:6px;"
+      >
+        @each(line in expenses.lines)
+          <tr>
+            <td
+              style="padding:8px 14px;color:#555555;font-size:14px;border-bottom:1px solid #f0f0f0;"
+            >
+              {{ line.label }}
+            </td>
+            <td
+              style="padding:8px 14px;color:#333333;font-size:14px;text-align:right;border-bottom:1px solid #f0f0f0;"
+            >
+              {{ line.value }}
+            </td>
+          </tr>
+        @end
+      </table>
+      <p style="margin:8px 0 0;color:#333333;font-size:14px;font-weight:bold;text-align:right;">
+        {{ expenses.total }}
+      </p>
+    @end
+
+    <p style="margin:30px 0 0;text-align:center;">
+      <a
+        href="{{ ctaUrl }}"
+        style="display:inline-block;padding:12px 24px;background-color:{{ branding?.primaryColor ?? '#1e3a5f' }};color:#ffffff;font-size:15px;font-weight:bold;text-decoration:none;border-radius:6px;"
+      >
+        {{ ctaLabel }}
+      </a>
+    </p>
+    @include('emails/_fleet_digest_footer')
+  @end
+@end

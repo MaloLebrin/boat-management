@@ -3067,6 +3067,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reports_controller').default['export']>>>
     }
   }
+  'reports.digest.unsubscribe': {
+    methods: ["GET","HEAD"]
+    pattern: '/reports/digest/unsubscribe/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/fleet_digest_unsubscribe_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/fleet_digest_unsubscribe_controller').default['show']>>>
+    }
+  }
+  'reports.digest.unsubscribe.confirm': {
+    methods: ["POST"]
+    pattern: '/reports/digest/unsubscribe/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/fleet_digest_unsubscribe_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/fleet_digest_unsubscribe_controller').default['store']>>>
+    }
+  }
   'inventory.index': {
     methods: ["GET","HEAD"]
     pattern: '/inventory'

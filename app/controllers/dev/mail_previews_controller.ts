@@ -3,6 +3,9 @@ import i18nManager from '@adonisjs/i18n/services/main'
 import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS } from '#shared/constants/email_verification'
 import env from '#start/env'
 import type { HttpContext } from '@adonisjs/core/http'
+import { inject } from '@adonisjs/core'
+import FleetDigestMailService from '#services/fleet_digest_mail_service'
+import type { MonthlyFleetReport, WeeklyFleetDigest } from '#shared/types/fleet_digest'
 
 const TEMPLATES = [
   { name: 'welcome', label: 'Bienvenue' },
@@ -22,6 +25,10 @@ const TEMPLATES = [
   { name: 'reminder-overdue-tasks', label: 'Relance — taches en retard' },
   { name: 'reminder-engine-tasks', label: 'Relance — echeances moteur' },
   { name: 'reminder-boat-check-tasks', label: 'Relance — verifications bateau' },
+  { name: 'fleet-weekly-digest-fr', label: 'Synthese hebdomadaire de flotte (FR)' },
+  { name: 'fleet-weekly-digest-en', label: 'Synthese hebdomadaire de flotte (EN)' },
+  { name: 'fleet-monthly-report-fr', label: 'Rapport mensuel de flotte (FR)' },
+  { name: 'fleet-monthly-report-en', label: 'Rapport mensuel de flotte (EN)' },
 ]
 
 const FAKE_TASKS = [
@@ -79,7 +86,161 @@ const FAKE_TIPS_EN = [
   },
 ]
 
+// Rapports de flotte par e-mail (#871).
+const ORGANIZATION = { id: 0, name: 'Yacht Club Bordeaux', currency: 'EUR' } as const
+
+const PREVIEW_WEEKLY_DIGEST: WeeklyFleetDigest = {
+  organization: ORGANIZATION,
+  week: '2026-W42',
+  upcoming: { from: '2026-10-12', to: '2026-10-18' },
+  past: { from: '2026-10-05', to: '2026-10-11' },
+  overdueTasks: {
+    total: 7,
+    items: [
+      { id: 1, title: 'Vidange moteur', boatId: 1, boatName: 'Le Temeraire', dueAt: '2026-10-02' },
+      {
+        id: 2,
+        title: 'Changer les anodes',
+        boatId: 2,
+        boatName: 'Albatros II',
+        dueAt: '2026-10-08',
+      },
+    ],
+  },
+  upcomingTasks: {
+    total: 1,
+    items: [
+      {
+        id: 3,
+        title: 'Révision du gréement',
+        boatId: 1,
+        boatName: 'Le Temeraire',
+        dueAt: '2026-10-15',
+      },
+    ],
+  },
+  openIncidents: {
+    total: 1,
+    items: [
+      {
+        id: 4,
+        boatId: 2,
+        boatName: 'Albatros II',
+        type: 'collision',
+        status: 'open',
+        occurredAt: '2026-10-09',
+      },
+    ],
+  },
+  expiring: {
+    total: 2,
+    items: [
+      {
+        kind: 'document',
+        id: 5,
+        boatId: 1,
+        boatName: 'Le Temeraire',
+        type: 'insurance',
+        customLabel: null,
+        expiresAt: '2026-10-20',
+        expired: false,
+      },
+      {
+        kind: 'safety_equipment',
+        id: 6,
+        boatId: 2,
+        boatName: 'Albatros II',
+        type: 'flare',
+        customLabel: null,
+        expiresAt: '2026-10-01',
+        expired: true,
+      },
+    ],
+  },
+  reservations: {
+    total: 1,
+    items: [
+      {
+        id: 7,
+        boatId: 1,
+        boatName: 'Le Temeraire',
+        clientName: 'Camille Martin',
+        startsAt: '2026-10-16',
+        endsAt: '2026-10-18',
+        status: 'confirmed',
+      },
+    ],
+  },
+  expenses: {
+    maintenance: 420,
+    fuel: 185.5,
+    documents: 0,
+    port: 90,
+    equipment: 0,
+    entries: 0,
+    total: 695.5,
+  },
+  overdueInvoices: {
+    total: 1,
+    items: [
+      {
+        id: 8,
+        number: 'F-2026-0042',
+        clientName: 'Camille Martin',
+        total: 1250,
+        dueAt: '2026-10-01',
+      },
+    ],
+  },
+}
+
+const PREVIEW_MONTHLY_REPORT: MonthlyFleetReport = {
+  organization: ORGANIZATION,
+  month: '2026-09',
+  period: { preset: 'month', from: '2026-09-01', to: '2026-09-30', days: 30 },
+  costs: {
+    maintenance: 1840,
+    fuel: 620,
+    documents: 0,
+    port: 450,
+    equipment: 310,
+    entries: 75,
+    total: 3295,
+  },
+  previousCosts: 2710,
+  topCategories: [
+    { category: 'maintenance', amount: 1840 },
+    { category: 'fuel', amount: 620 },
+    { category: 'port', amount: 450 },
+  ],
+  engineHours: 64.5,
+  distanceNm: 412,
+  maintenance: { planned: 6, completed: 5, performed: 9 },
+  rental: { revenue: 8400, rentalDays: 31, occupancyRate: 52 },
+  boats: [
+    {
+      boatId: 1,
+      boatName: 'Le Temeraire',
+      costs: 2100,
+      engineHours: 40,
+      rentalRevenue: 5200,
+      occupancyRate: 60,
+    },
+    {
+      boatId: 2,
+      boatName: 'Albatros II',
+      costs: 1195,
+      engineHours: 24.5,
+      rentalRevenue: 3200,
+      occupancyRate: 43,
+    },
+  ],
+}
+
+@inject()
 export default class MailPreviewsController {
+  constructor(private fleetDigestMail: FleetDigestMailService) {}
+
   index({ response }: HttpContext) {
     const links = TEMPLATES.map(
       (t) =>
@@ -258,6 +419,24 @@ export default class MailPreviewsController {
           appUrl,
         })
         break
+
+      case 'fleet-weekly-digest-fr':
+      case 'fleet-weekly-digest-en':
+      case 'fleet-monthly-report-fr':
+      case 'fleet-monthly-report-en': {
+        const context = {
+          to: 'jean@example.com',
+          name: 'Jean Dupont',
+          locale: name.slice(-2),
+          branding: null,
+          unsubscribeUrl: `${appUrl}/reports/digest/unsubscribe/preview`,
+        }
+        const rendered = name.startsWith('fleet-weekly')
+          ? await this.fleetDigestMail.renderWeekly(PREVIEW_WEEKLY_DIGEST, context)
+          : await this.fleetDigestMail.renderMonthly(PREVIEW_MONTHLY_REPORT, context)
+        html = rendered.html
+        break
+      }
 
       default:
         break

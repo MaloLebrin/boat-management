@@ -658,6 +658,13 @@
       "inApp": "Dans l'app",
       "push": "Push",
       "email": "E-mail"
+    },
+    "reports": {
+      "title": "Rapports par e-mail",
+      "weekly": "Synthèse hebdomadaire de la flotte",
+      "weeklyHint": "Le lundi matin : tâches en retard et à venir, incidents, échéances, réservations et dépenses de la semaine.",
+      "monthly": "Rapport mensuel de la flotte",
+      "monthlyHint": "Le 1er du mois : dépenses, heures moteur, entretiens et occupation du mois écoulé, avec le PDF joint."
     }
   },
   "exports": {

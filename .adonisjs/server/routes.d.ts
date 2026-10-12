@@ -259,6 +259,8 @@ export type ScannedRoutes = {
     'pwa.manifest': { paramsTuple?: []; params?: {} }
     'reports.index': { paramsTuple?: []; params?: {} }
     'reports.export': { paramsTuple?: []; params?: {} }
+    'reports.digest.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'reports.digest.unsubscribe.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'inventory.index': { paramsTuple?: []; params?: {} }
     'inventory.importEngineParts': { paramsTuple?: []; params?: {} }
     'purchaseOrders.index': { paramsTuple?: []; params?: {} }
@@ -531,6 +533,7 @@ export type ScannedRoutes = {
     'pwa.manifest': { paramsTuple?: []; params?: {} }
     'reports.index': { paramsTuple?: []; params?: {} }
     'reports.export': { paramsTuple?: []; params?: {} }
+    'reports.digest.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'inventory.index': { paramsTuple?: []; params?: {} }
     'purchaseOrders.index': { paramsTuple?: []; params?: {} }
     'inventory.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -693,6 +696,7 @@ export type ScannedRoutes = {
     'pwa.manifest': { paramsTuple?: []; params?: {} }
     'reports.index': { paramsTuple?: []; params?: {} }
     'reports.export': { paramsTuple?: []; params?: {} }
+    'reports.digest.unsubscribe': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'inventory.index': { paramsTuple?: []; params?: {} }
     'purchaseOrders.index': { paramsTuple?: []; params?: {} }
     'inventory.show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -847,6 +851,7 @@ export type ScannedRoutes = {
     'clients.store': { paramsTuple?: []; params?: {} }
     'clients.anonymize': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'pricingSeasons.store': { paramsTuple?: []; params?: {} }
+    'reports.digest.unsubscribe.confirm': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'inventory.importEngineParts': { paramsTuple?: []; params?: {} }
     'purchaseOrders.store': { paramsTuple?: []; params?: {} }
     'purchaseOrders.reorder': { paramsTuple?: []; params?: {} }

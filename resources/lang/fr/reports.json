@@ -86,5 +86,82 @@
     "costPerRentalDay": "cout_par_jour_loue",
     "costPerNauticalMile": "cout_par_mille",
     "fleetTotal": "TOTAL FLOTTE"
+  },
+  "digest": {
+    "greeting": "Bonjour {name},",
+    "more": "+ {count, plural, one {# autre} other {# autres}}",
+    "reason": "Vous recevez cet e-mail en tant que membre de {org}.",
+    "manage": "Gérer mes rapports par e-mail",
+    "weekly": {
+      "subject": "{org} — votre semaine du {date}",
+      "heading": "La semaine de {org}",
+      "intro": "Du {from} au {to}",
+      "cta": "Ouvrir le tableau de bord",
+      "unsubscribe": "Ne plus recevoir la synthèse hebdomadaire",
+      "expensesTotal": "Total : {amount}",
+      "sections": {
+        "overdueTasks": "{count, plural, one {# tâche en retard} other {# tâches en retard}}",
+        "upcomingTasks": "{count, plural, one {# tâche à faire} other {# tâches à faire}} dans les 7 jours",
+        "openIncidents": "{count, plural, one {# incident ouvert} other {# incidents ouverts}}",
+        "expiring": "{count, plural, one {# échéance} other {# échéances}} de documents et de sécurité sous 30 jours",
+        "reservations": "{count, plural, one {# réservation} other {# réservations}} cette semaine",
+        "overdueInvoices": "{count, plural, one {# facture en retard} other {# factures en retard}}",
+        "expenses": "Dépenses de la semaine passée"
+      },
+      "rows": {
+        "task": "{boat} · échéance le {date}",
+        "incident": "{boat} · depuis le {date}",
+        "expires": "{boat} · expire le {date}",
+        "expired": "{boat} · expiré le {date}",
+        "reservation": "{boat} · du {from} au {to}",
+        "invoice": "{amount} · échue le {date}"
+      }
+    },
+    "monthly": {
+      "subject": "{org} — rapport de flotte de {month}",
+      "heading": "Rapport de flotte de {month}",
+      "period": "Du {from} au {to}",
+      "cta": "Ouvrir le reporting",
+      "unsubscribe": "Ne plus recevoir le rapport mensuel",
+      "attachment": "Le rapport complet est joint en PDF : prêt à archiver ou à transmettre à votre assureur.",
+      "topCategories": "Principaux postes de coût",
+      "kpi": {
+        "costs": "Dépenses du mois",
+        "previousCosts": "Dépenses du mois précédent",
+        "engineHours": "Heures moteur",
+        "distance": "Milles parcourus",
+        "maintenance": "Entretiens planifiés",
+        "maintenanceValue": "{completed} faits sur {planned}",
+        "performed": "Interventions saisies au carnet",
+        "revenue": "Revenus de location",
+        "occupancy": "Taux d'occupation"
+      },
+      "boats": {
+        "title": "Par bateau",
+        "boat": "Bateau",
+        "costs": "Dépenses",
+        "engineHours": "Heures moteur",
+        "revenue": "Revenus",
+        "occupancy": "Occupation"
+      },
+      "pdf": {
+        "generatedOn": "Généré le {date}",
+        "summary": "Synthèse du mois",
+        "footer": "{org} — page {page} / {total}",
+        "filename": "rapport-flotte-{month}"
+      }
+    },
+    "unsubscribe": {
+      "title": "Rapports par e-mail",
+      "submit": "Me désinscrire",
+      "confirm": {
+        "weekly": "Ne plus recevoir la synthèse hebdomadaire de votre flotte ?",
+        "monthly": "Ne plus recevoir le rapport mensuel de votre flotte ?"
+      },
+      "done": {
+        "weekly": "C'est noté : vous ne recevrez plus la synthèse hebdomadaire. Vous pouvez la réactiver dans vos réglages de notifications.",
+        "monthly": "C'est noté : vous ne recevrez plus le rapport mensuel. Vous pouvez le réactiver dans vos réglages de notifications."
+      }
+    }
   }
 }
