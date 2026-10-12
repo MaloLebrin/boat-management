@@ -192,3 +192,14 @@ test('the active discount is shown with the subscription', () => {
     false
   )
 })
+
+// #957 : l'avertissement de résiliation suit le token `warning`, qui s'éclaircit
+// en thème sombre — `text-amber-600` restait un ton moyen figé.
+test('the scheduled cancellation warning uses the warning token', () => {
+  const w = mountTab({ plan: 'pro', subscription: { ...subscription, cancelAtPeriodEnd: true } })
+
+  const warning = w.find('p.text-warning')
+  expect(warning.exists()).toBe(true)
+  expect(warning.text()).toContain('settings.billing.subscription.cancelAtPeriodEnd')
+  expect(warning.classes().some((c) => c.startsWith('text-amber-'))).toBe(false)
+})

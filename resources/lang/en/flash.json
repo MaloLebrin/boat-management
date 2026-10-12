@@ -165,7 +165,8 @@
     "modulesRequireEnterprise": "This action is only available on the Enterprise plan.",
     "addonUpdated": "Add-on updated. The change will apply once the payment is confirmed.",
     "addonRemoved": "Add-on removed. It will be removed once confirmed.",
-    "addonNotActive": "This add-on is not active on your subscription."
+    "addonNotActive": "This add-on is not active on your subscription.",
+    "checkoutUnavailable": "Payment is temporarily unavailable. Please try again in a few minutes."
   },
   "demo": {
     "rateLimitError": "Too many attempts. Please try again in a minute.",
@@ -521,7 +522,8 @@
     "pending": "Stripe has not activated your account yet. Complete the requested steps to accept online payments.",
     "disconnected": "Stripe account disconnected. Payment links already sent no longer work.",
     "notPayable": "This invoice cannot be paid online.",
-    "linkCreated": "Payment link created."
+    "linkCreated": "Payment link created.",
+    "checkoutUnavailable": "Online payment is temporarily unavailable. Please try again in a few minutes."
   },
   "exports": {
     "queued": "Large export: it is being generated. You will be notified as soon as it is ready, and will find it under Settings → Exports."

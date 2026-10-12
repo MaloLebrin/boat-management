@@ -1,4 +1,7 @@
-import { StripeNotConfiguredError } from '#exceptions/billing_errors'
+import {
+  CheckoutSessionUrlMissingError,
+  StripeNotConfiguredError,
+} from '#exceptions/billing_errors'
 import Organization from '#models/organization'
 import type { BillingInterval } from '#shared/types/billing'
 import type { PlanAddon, PlanModule } from '#shared/types/plan'
@@ -57,7 +60,7 @@ export default class StripeService {
       ...(opts.promotionCodeId ? { discounts: [{ promotion_code: opts.promotionCodeId }] } : {}),
     })
 
-    return session.url!
+    return this.#checkoutUrl(session)
   }
 
   /**
@@ -241,7 +244,13 @@ export default class StripeService {
       { stripeAccount: opts.accountId }
     )
 
-    return { id: session.id, url: session.url! }
+    return { id: session.id, url: this.#checkoutUrl(session) }
+  }
+
+  /** URL de redirection d'une session Checkout, jamais `null` (#960). */
+  #checkoutUrl(session: Stripe.Checkout.Session): string {
+    if (!session.url) throw new CheckoutSessionUrlMissingError(session.id)
+    return session.url
   }
 
   /**

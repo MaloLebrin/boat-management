@@ -13,6 +13,7 @@ import {
   createMemberUser,
 } from '#tests/functional/helpers'
 import { swapStripeConnectService } from '#tests/support/fakes'
+import { CheckoutSessionUrlMissingError } from '#exceptions/billing_errors'
 import {
   postStripeConnectWebhook,
   stripeConnectEvent,
@@ -453,6 +454,27 @@ test.group('Online payments — public payment page (functional)', (group) => {
     response.assertHeader('location', '/pay/tok_public_1')
     response.assertFlashMessage('error')
     assert.lengthOf(stripe.checkoutSessions, 0)
+  })
+  test('a Checkout session without URL sends back to the payment page (#960)', async ({
+    client,
+    cleanup,
+  }) => {
+    const stripe = swapStripeConnectService({
+      checkoutError: new CheckoutSessionUrlMissingError('cs_no_url'),
+    })
+    cleanup(() => stripe.restore())
+    const admin = await createEnterpriseAdminUser()
+    await connectedOrg(admin)
+    await sentInvoice(admin.organizationId!)
+
+    const response = await client.post('/pay/tok_public_1/checkout').redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', '/pay/tok_public_1')
+    response.assertFlashMessage(
+      'error',
+      'Online payment is temporarily unavailable. Please try again in a few minutes.'
+    )
   })
 })
 

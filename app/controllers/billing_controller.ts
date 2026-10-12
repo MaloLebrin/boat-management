@@ -1,4 +1,5 @@
 import {
+  CheckoutSessionUrlMissingError,
   InvalidPromoCodeError,
   ModulesRequireEnterprisePlanError,
   ModulesRequireProPlanError,
@@ -16,6 +17,7 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { PromoCodeRejectReason } from '#shared/types/billing'
 import env from '#start/env'
+import logger from '@adonisjs/core/services/logger'
 import Stripe from 'stripe'
 
 @inject()
@@ -104,6 +106,11 @@ export default class BillingController {
       }
       if (error instanceof InvalidPromoCodeError) {
         return this.rejectPromoCode(error.reason, { session, response, i18n })
+      }
+      if (error instanceof CheckoutSessionUrlMissingError) {
+        logger.error({ sessionId: error.sessionId }, error.message)
+        session.flash('error', i18n.t('flash.billing.checkoutUnavailable'))
+        return response.redirect().back()
       }
       throw error
     }

@@ -4,6 +4,7 @@ import { truncateDb } from '#tests/utils/db'
 import AuditLog from '#models/audit_log'
 import { createAdminUser } from '#tests/functional/helpers'
 import { swapCheckoutStripeService } from '#tests/support/fakes'
+import { CheckoutSessionUrlMissingError } from '#exceptions/billing_errors'
 import { assertFieldErrors, assertNoFieldErrors, inertiaErrors } from '#tests/support/validation'
 import { stripeCoupon, stripePromotionCode } from '#tests/support/stripe'
 import { CHECKOUT_LIMIT } from '#start/limiter'
@@ -211,6 +212,29 @@ test.group('Billing checkout — promo code (functional)', (group) => {
 
     // Une mauvaise configuration doit se voir (500), pas se lire « code non applicable ».
     assert.isAtLeast(response.status(), 500)
+  })
+
+  test('a Checkout session without URL flashes an error instead of a broken redirect (#960)', async ({
+    client,
+    cleanup,
+  }) => {
+    const stripe = swapCheckoutStripeService({
+      checkoutError: new CheckoutSessionUrlMissingError('cs_no_url'),
+    })
+    cleanup(() => stripe.restore())
+    const admin = await createAdminUser('starter')
+
+    const response = await client
+      .post('/settings/billing/checkout')
+      .loginAs(admin)
+      .form({ planTier: 'pro', interval: 'month' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertFlashMessage(
+      'error',
+      'Payment is temporarily unavailable. Please try again in a few minutes.'
+    )
   })
 
   test('the endpoint refuses past its quota so codes cannot be enumerated', async ({

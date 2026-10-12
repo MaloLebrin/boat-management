@@ -165,7 +165,8 @@
     "modulesRequireEnterprise": "Cette action n'est disponible que sur le plan Entreprise.",
     "addonUpdated": "Add-on mis à jour. Le changement s'appliquera une fois le paiement confirmé.",
     "addonRemoved": "Add-on retiré. Il sera retiré une fois la confirmation reçue.",
-    "addonNotActive": "Cet add-on n'est pas actif sur votre abonnement."
+    "addonNotActive": "Cet add-on n'est pas actif sur votre abonnement.",
+    "checkoutUnavailable": "Le paiement est momentanément indisponible. Veuillez réessayer dans quelques minutes."
   },
   "demo": {
     "rateLimitError": "Trop de tentatives. Veuillez réessayer dans une minute.",
@@ -521,7 +522,8 @@
     "pending": "Stripe n'a pas encore activé votre compte. Terminez les étapes demandées pour encaisser en ligne.",
     "disconnected": "Compte Stripe déconnecté. Les liens de paiement déjà envoyés ne fonctionnent plus.",
     "notPayable": "Cette facture ne peut pas être réglée en ligne.",
-    "linkCreated": "Lien de paiement créé."
+    "linkCreated": "Lien de paiement créé.",
+    "checkoutUnavailable": "Le paiement en ligne est momentanément indisponible. Veuillez réessayer dans quelques minutes."
   },
   "exports": {
     "queued": "Export volumineux : il est en cours de génération. Vous recevrez une notification dès qu'il sera prêt, et le retrouverez dans Paramètres → Exports."

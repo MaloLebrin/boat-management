@@ -79,3 +79,15 @@ export class PaymentLinkNotFoundError extends Error {
     super('Payment link not found.')
   }
 }
+
+/**
+ * Stripe a créé la session Checkout sans URL de redirection (#960) : le type
+ * est `string | null` — session expirée, changement d'API. Sans cette garde,
+ * la redirection partait vers `null` avec une erreur incompréhensible.
+ */
+export class CheckoutSessionUrlMissingError extends Error {
+  name = 'CheckoutSessionUrlMissingError'
+  constructor(public readonly sessionId: string) {
+    super(`Stripe Checkout session ${sessionId} has no redirect URL.`)
+  }
+}

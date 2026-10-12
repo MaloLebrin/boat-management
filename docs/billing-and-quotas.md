@@ -219,17 +219,7 @@ Avec les modules add-ons, un abonnement Stripe porte **plusieurs items** : un it
 
 **Garde d'attribution (#705).** `subscriptions` porte **deux** clés d'unicité : `organization_id` et `stripe_subscription_id`. L'upsert n'étant clé que sur la première, un `sub_…` rattaché à l'organisation A qui arriverait sur l'organisation B (abonnement déplacé d'un client à l'autre côté Stripe, `stripe_customer_id` réattribué, deux organisations créées depuis le même client) déclenchait un `INSERT` rejeté par PostgreSQL sur la seconde — une 500, donc un rejeu Stripe indéfini. `subscriptionHolderElsewhere(organizationId, stripeSubscriptionId, trx)` détecte désormais le conflit **dans la transaction de synchro**, avant toute écriture : rien n'est écrit (ni `subscriptions`, ni le plan, ni les modules), le conflit est loggé en `error` avec les deux `organizationId`, et le webhook répond **200**. C'est une incohérence de données qui demande un arbitrage humain : deviner laquelle des deux organisations garde l'abonnement reviendrait à retirer son plan payant à l'autre sur la foi d'un webhook.
 
-**Calcul des bornes de période (Stripe v22+)** : les champs `current_period_start/end` ont été supprimés de l'objet `Stripe.Subscription` en v22. La méthode `getPeriodBounds()` les recalcule à partir de `billing_cycle_anchor` et des champs `recurring.interval` / `recurring.interval_count` du prix :
-
-```ts
-// Principe : on avance par intervalles depuis l'anchor jusqu'à encadrer "now"
-let periodStart = anchor // ex: 2025-01-15
-let periodEnd = addInterval(anchor) // ex: 2025-02-15
-while (periodEnd < now) {
-  periodStart = periodEnd
-  periodEnd = addInterval(periodEnd)
-}
-```
+**Bornes de période (Stripe v22+)** : les champs `current_period_start/end` ont quitté l'objet `Stripe.Subscription` en v22 pour l'**item d'abonnement**. `getPeriodBounds(tierItem)` les **lit** sur l'item du tier (voir §4.5 bis) — aucun recalcul. Les bornes de Stripe font foi : elles intègrent déjà essais, pauses et ajustements en cours de cycle, qu'une reconstruction depuis `billing_cycle_anchor` et `recurring.interval` fausserait (correctif A-07).
 
 ---
 
@@ -330,7 +320,7 @@ La prop `quotaUsage` transmise au frontend :
 | `plan_tier`                   | enum            | starter / pro / enterprise                                                                            |
 | `status`                      | enum            | active, trialing, past_due, canceled, incomplete, incomplete_expired, unpaid, paused                  |
 | `billing_interval`            | enum            | month / year                                                                                          |
-| `current_period_start`        | datetime        | calculé par `getPeriodBounds()`                                                                       |
+| `current_period_start`        | datetime        | lu sur l'item Stripe du tier (`getPeriodBounds()`)                                                    |
 | `current_period_end`          | datetime        | date de prochain renouvellement                                                                       |
 | `cancel_at_period_end`        | boolean         | annulation programmée                                                                                 |
 | `discount_coupon_id`          | string, null    | coupon Stripe de la remise active (#955) — `null` sans remise, comme toutes les colonnes `discount_*` |
