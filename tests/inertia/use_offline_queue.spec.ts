@@ -11,6 +11,11 @@ vi.mock('vue-sonner', () => ({
   },
 }))
 
+const { requestPersistentStorage } = vi.hoisted(() => ({
+  requestPersistentStorage: vi.fn().mockResolvedValue(true),
+}))
+vi.mock('~/composables/use_persistent_storage', () => ({ requestPersistentStorage }))
+
 const mockPageProps = vi.hoisted(() => ({
   appT: {
     'common.offline.savedQueue': 'Enregistré hors-ligne',
@@ -453,6 +458,25 @@ describe('useOfflineQueue', () => {
     expect(pendingActions.value[0].payload).toEqual({ isDone: false, notes: 'huile changée' })
     // Un seul toast : l'upsert ne renotifie pas chaque frappe
     expect(toast.info).toHaveBeenCalledTimes(1)
+  })
+
+  // #952 — la première saisie mise en file demande le stockage persistant ;
+  // l'upsert d'une saisie déjà en file ne redemande rien.
+  test('enqueue requests persistent storage on a new action, not on a dedupe upsert', async () => {
+    const { enqueue } = mountComposable()
+    const action = {
+      type: 'update-sheet-item' as const,
+      url: '/boats/1/maintenance-sheets/2/items/3',
+      method: 'put' as const,
+      payload: { isDone: true, notes: '' },
+      dedupeKey: 'update-sheet-item:/boats/1/maintenance-sheets/2/items/3',
+    }
+
+    await enqueue(action)
+    expect(requestPersistentStorage).toHaveBeenCalledOnce()
+
+    await enqueue({ ...action, payload: { isDone: false, notes: '' } })
+    expect(requestPersistentStorage).toHaveBeenCalledOnce()
   })
 
   test('enqueue with different dedupeKeys keeps separate actions', async () => {

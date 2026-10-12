@@ -172,11 +172,28 @@ pourtant garder la saisie :
   hors-ligne annule le timer (`cancelScheduledRetry`), l'événement `online`
   relançant de toute façon le drain.
 
+## Stockage persistant (#952)
+
+Sans `navigator.storage.persist()`, le navigateur peut évincer la base
+IndexedDB de la file et les caches du service worker : iOS au bout de 7 jours
+sans visite hors PWA installée, Android sous pression disque. Une traversée de
+2 à 4 semaines y perdrait ses saisies.
+
+`inertia/composables/use_persistent_storage.ts` demande la persistance sur deux
+gestes utilisateur : l'événement `appinstalled` (`use_pwa_install.ts`) et
+l'ajout d'une **nouvelle** action par `enqueue` (un upsert par `dedupeKey` ne
+redemande rien). Une seule demande par chargement de page, même refusée ; si
+`persisted()` est déjà vrai, `persist()` n'est pas rappelé. L'API absente, un
+refus ou une erreur rendent `false`, sans exception. `usePersistentStorage()`
+expose `persisted` et `estimate` (`usage`/`quota`, rafraîchi après la demande)
+pour le futur écran `/sync`.
+
 ## Où c'est testé
 
 | Fichier                                                        | Maillon                                                    |
 | -------------------------------------------------------------- | ---------------------------------------------------------- |
 | `tests/inertia/use_offline_queue.spec.ts`                      | suspension `auth`, reprise, relance différée (#950)        |
+| `tests/inertia/use_persistent_storage.spec.ts`                 | stockage persistant : absent, refusé, accordé (#952)       |
 | `tests/unit/middleware/inertia_offline_protocol.spec.ts`       | les cinq clés traversent le middleware                     |
 | `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts`       | les deux moitiés du vocabulaire coïncident                 |
 | `tests/functional/navigation/offline_conflict_payload.spec.ts` | `conflictData` porte les champs de la modale               |

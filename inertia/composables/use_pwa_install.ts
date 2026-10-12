@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { requestPersistentStorage } from '~/composables/use_persistent_storage'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -19,6 +20,9 @@ if (typeof window !== 'undefined') {
   window.addEventListener('appinstalled', () => {
     canInstall.value = false
     deferredPrompt = null
+    // L'installation est le geste le plus fort : la file et les caches doivent
+    // survivre à une traversée (#952).
+    void requestPersistentStorage()
   })
 }
 

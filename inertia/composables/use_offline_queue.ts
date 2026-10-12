@@ -2,6 +2,7 @@ import { router, usePage } from '@inertiajs/vue3'
 import { openDB } from 'idb'
 import { ref } from 'vue'
 import { toast } from 'vue-sonner'
+import { requestPersistentStorage } from '~/composables/use_persistent_storage'
 import { useT } from '~/composables/use_t'
 import type { OfflineActionType } from '#shared/constants/offline_queue'
 import { retryDelayMs } from '#shared/helpers/offline_retry'
@@ -312,6 +313,9 @@ export function useOfflineQueue() {
     await db.add(STORE_NAME, { ...action, createdAt: new Date().toISOString() })
     await refreshCount()
     toast.info(t('common.offline.savedQueue'))
+    // Première saisie mise en file : on demande que l'origine ne soit pas
+    // évincée avant le retour du réseau (#952). Sans effet si déjà accordé.
+    void requestPersistentStorage()
   }
 
   function isAuthenticated(): boolean {
