@@ -139,6 +139,16 @@ extraire explicitement avec `.withQs(false)`.
   - `session.forget('demoSessionStartedAt')` — voir « Session démo » ci-dessous
   - Redirect: route `home`
 
+**Durées de session (#951).** Une session tient `SESSION_IDLE_DAYS` (30 j)
+sans activité — `age` de `config/session.ts` — et un remember-me
+`REMEMBER_ME_DAYS` (90 j) — `rememberMeTokensAge` de `config/auth.ts`. Les deux
+constantes vivent dans `shared/constants/auth.ts` et pilotent aussi
+`UserSessionService.listActive` et le libellé de la case. Dimensionnées pour
+une traversée de 2 à 4 semaines sans réseau : en deçà, la file hors-ligne
+retombait sur `/login` au retour (#950). La case « Rester connecté »
+(`LoginRememberCheckbox.vue`) est cochée par défaut quand l'app tourne
+installée (`display-mode: standalone`), décochée dans un onglet.
+
 ### Bornage de la connexion (#767)
 
 Deux compteurs, complémentaires, et un par route.
@@ -178,7 +188,8 @@ réinitialisation, c'est-à-dire de se sortir d'affaire.
 Changer son mot de passe est le seul geste de remédiation offert à quelqu'un
 qui pense son compte compromis. Il ne révoquait rien : l'attaquant déjà
 connecté le restait, jusqu'à **cinq jours** pour une session (`age: '5d'`,
-`clearWithBrowser: false`) et **trente** pour un remember-me — et ce dernier
+`clearWithBrowser: false` — 30 jours depuis #951) et **trente** pour un
+remember-me (90 depuis #951) — et ce dernier
 suffit à se réauthentifier sans le mot de passe.
 
 `PasswordResetService.revokeAllAccess(user)` coupe les deux :

@@ -1,3 +1,4 @@
+import { SESSION_IDLE_DAYS } from '#shared/constants/auth'
 import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { defineConfig, stores } from '@adonisjs/session'
@@ -21,9 +22,10 @@ const sessionConfig = defineConfig({
 
   /**
    * Define how long to keep the session data alive without
-   * any activity.
+   * any activity. Lue depuis `shared/constants/auth.ts` (#951) : la même
+   * valeur sert à `UserSessionService.listActive`.
    */
-  age: '5d',
+  age: `${SESSION_IDLE_DAYS}d`,
 
   /**
    * Configuration for session cookie and the
