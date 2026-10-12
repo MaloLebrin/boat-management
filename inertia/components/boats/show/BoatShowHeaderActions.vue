@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@adonisjs/inertia/vue'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import BaseDropdown from '~/components/base/BaseDropdown.vue'
+import PassagePreparationModal from '~/components/boats/show/PassagePreparationModal.vue'
 import { useT } from '~/composables/use_t'
 
 const props = defineProps<{
@@ -23,6 +24,9 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useT()
+
+// « Préparer la traversée » (#967) : ouverte depuis le menu « ⋯ »
+const passageOpen = ref(false)
 
 const hasAddMenuItems = computed(
   () =>
@@ -112,6 +116,15 @@ const menuItemClass =
       >
         {{ t('boats.show.editBoat') }}
       </Link>
+      <button
+        type="button"
+        role="menuitem"
+        :class="menuItemClass"
+        data-testid="passage-open"
+        @click="((passageOpen = true), close())"
+      >
+        {{ t('boats.show.passage.open') }}
+      </button>
       <!-- eslint-disable vue/no-restricted-v-bind -- téléchargement PDF : une visite Inertia rendrait le binaire comme une page -->
       <a
         v-if="canExport"
@@ -127,4 +140,6 @@ const menuItemClass =
       <!-- eslint-enable vue/no-restricted-v-bind -->
     </template>
   </BaseDropdown>
+
+  <PassagePreparationModal v-model:open="passageOpen" :boat-id="boatId" />
 </template>

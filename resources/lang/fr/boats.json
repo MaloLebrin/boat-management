@@ -488,6 +488,60 @@
     "moreMenu": {
       "label": "⋯",
       "aria": "Autres actions"
+    },
+    "passage": {
+      "open": "Préparer la traversée",
+      "title": "Préparer la traversée",
+      "subtitle": "Gardez les pages du bateau disponibles sans réseau pendant plusieurs semaines.",
+      "noServiceWorker": "Le pré-chargement a besoin du mode hors-ligne de l’app : rechargez la page, ou installez l’app, puis réessayez.",
+      "pagesTitle": "Pages disponibles hors-ligne",
+      "prepare": "Pré-charger les pages",
+      "preparing": "Pré-chargement…",
+      "cachedAt": "En cache depuis le {date}",
+      "notCached": "Pas encore en cache",
+      "pages": {
+        "boat": "Fiche du bateau",
+        "navigationLogs": "Journal de navigation",
+        "sheets": "Fiches d’entretien",
+        "fuel": "Carburant",
+        "incidents": "Incidents",
+        "planning": "Planning"
+      },
+      "pageStatus": {
+        "loading": "En cours",
+        "done": "Prête",
+        "failed": "Échec"
+      },
+      "checklistTitle": "Avant de partir",
+      "returnDate": "Date de retour prévue",
+      "returnDateHint": "Sert à vérifier que votre session tiendra jusqu’au retour.",
+      "status": {
+        "ok": "OK",
+        "warning": "À vérifier",
+        "unknown": "Inconnu"
+      },
+      "checklist": {
+        "storage": "Stockage persistant",
+        "storageDetail": {
+          "ok": "Le navigateur ne supprimera pas vos saisies ni les pages en cache.",
+          "warning": "Refusé : le navigateur peut vider le cache sous pression. Installez l’app pour l’obtenir.",
+          "unknown": "Sera demandé au pré-chargement des pages."
+        },
+        "quota": "Espace disponible",
+        "quotaDetail": "{free} libres sur cet appareil.",
+        "quotaUnknown": "Ce navigateur n’indique pas l’espace disponible.",
+        "pages": "Pages en cache",
+        "pagesDetail": "{cached} sur {total} pages disponibles hors-ligne.",
+        "queue": "Saisies hors-ligne",
+        "queueEmpty": "Tout est synchronisé.",
+        "queuePending": "{count} saisie(s) à synchroniser avant le départ.",
+        "session": "Session",
+        "sessionDetail": {
+          "ok": "Votre session tiendra jusqu’au retour.",
+          "warning": "Sans réseau, la session expire après {days} jours. Reconnectez-vous en cochant « Rester connecté » ({rememberDays} jours) avant de partir.",
+          "unknown": "Renseignez la date de retour pour vérifier la session."
+        }
+      }
     }
   },
   "specs": {
