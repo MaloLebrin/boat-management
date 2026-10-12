@@ -1,20 +1,21 @@
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { connectivityState, readNavigatorOnline } from '~/composables/use_connectivity'
 
-// Issue #459 — en SSR, Node ≥ 21 expose bien un objet `navigator` global mais
-// sans `onLine` : lire `navigator.onLine` y renvoyait `undefined`, l'état partait
-// donc à « hors-ligne » et la bannière orange était rendue dans le HTML SSR
-// jusqu'à l'hydratation (~1 s). On ne considère l'app hors-ligne que sur un
-// `false` explicite du navigateur.
-function readOnlineStatus(): boolean {
-  if (typeof navigator === 'undefined') return true
-  return navigator.onLine !== false
-}
-
+/**
+ * Dérivé de `use_connectivity` (#953) pour les formulaires qui choisissent
+ * entre envoi direct et mise en file : hors-ligne **ou** réseau dégradé
+ * (Wi-Fi de bord sans WAN), un envoi direct échouerait — la saisie part en file.
+ *
+ * Les événements `online`/`offline` restent écoutés ici : sans layout qui pilote
+ * la probe, `isOnline` suit le navigateur comme avant.
+ */
 export function useNetworkStatus() {
-  const isOnline = ref(readOnlineStatus())
+  const navigatorOnline = ref(readNavigatorOnline())
+  const connectivity = connectivityState()
+  const isOnline = computed(() => navigatorOnline.value && connectivity.value !== 'degraded')
 
   function updateStatus() {
-    isOnline.value = readOnlineStatus()
+    navigatorOnline.value = readNavigatorOnline()
   }
 
   onMounted(() => {

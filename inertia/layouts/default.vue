@@ -3,7 +3,7 @@ import { isSafeInternalPath } from '#shared/helpers/safe_path'
 import { Link } from '@adonisjs/inertia/vue'
 import type { Data } from '@generated/data'
 import { router, usePage } from '@inertiajs/vue3'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Toaster } from 'vue-sonner'
 import brandIconUrl from '~/assets/brand/fleetai_compass.svg'
 import AsideMenu from '~/components/layout/AsideMenu.vue'
@@ -15,7 +15,7 @@ import MobileBottomNav from '~/components/layout/MobileBottomNav.vue'
 import MobileSidebarDrawer from '~/components/layout/MobileSidebarDrawer.vue'
 import NotificationBell from '~/components/layout/NotificationBell.vue'
 import { useAssistantPanel } from '~/composables/use_assistant_panel'
-import { useNetworkStatus } from '~/composables/use_network_status'
+import { useConnectivity } from '~/composables/use_connectivity'
 import { usePermissions } from '~/composables/use_permissions'
 import ConflictResolutionModal from '~/components/ConflictResolutionModal.vue'
 import OfflinePendingQueue from '~/components/OfflinePendingQueue.vue'
@@ -29,7 +29,7 @@ const page = usePage<Data.SharedProps>()
 const isSidebarOpen = ref(false)
 
 const { t } = useT()
-const { isOnline } = useNetworkStatus()
+const { state: connectivity, reachableCount } = useConnectivity()
 const { isOpen: isAssistantOpen } = useAssistantPanel()
 const { isBoatOwner } = usePermissions()
 const { drainQueue, conflictedAction, resolveConflict, pendingCount, suspendedReason } =
@@ -37,11 +37,22 @@ const { drainQueue, conflictedAction, resolveConflict, pendingCount, suspendedRe
 const { dismissAll: dismissToasts } = useFlashToasts()
 usePwaUpdate()
 
-watch(isOnline, (online) => {
-  if (online) drainQueue()
-  // Hors-ligne, une relance différée (#950) échouerait à coup sûr : l'événement
-  // `online` relancera le drain.
-  else cancelScheduledRetry()
+// Le drain ne part qu'après une probe `/up` réussie (#953) : l'événement
+// `online` brut se déclenche dès que le Wi-Fi de bord est associé, WAN mort ou
+// non. Chaque probe réussie relance une file non vide (y compris au chargement).
+watch(reachableCount, () => {
+  if (pendingCount.value > 0) drainQueue()
+})
+// Hors-ligne ou dégradé, une relance différée (#950) échouerait à coup sûr : la
+// prochaine probe réussie relancera le drain.
+watch(connectivity, (state) => {
+  if (state !== 'online') cancelScheduledRetry()
+})
+
+const connectivityBanner = computed(() => {
+  if (connectivity.value === 'offline') return t('common.offline.banner')
+  if (connectivity.value === 'degraded') return t('common.offline.degradedBanner')
+  return null
 })
 
 // Session expirée pendant la traversée (#950) : la file s'est mise en pause et
@@ -175,12 +186,12 @@ onBeforeUnmount(() => {
       <!-- Suppression programmée de l'organisation (#886) -->
       <OrganizationDeletionBanner />
 
-      <!-- Offline indicator -->
+      <!-- Connectivité : hors-ligne ou réseau dégradé (#953) -->
       <div
-        v-if="!isOnline"
+        v-if="connectivityBanner"
         class="bg-amber-600 text-white text-sm font-medium text-center py-1.5 px-4 shrink-0"
       >
-        {{ t('common.offline.banner') }}
+        {{ connectivityBanner }}
       </div>
 
       <!-- Scrollable content area -->

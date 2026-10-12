@@ -1,12 +1,21 @@
-import { mount } from '@vue/test-utils'
+import { enableAutoUnmount, mount } from '@vue/test-utils'
 import { ref, nextTick } from 'vue'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import DefaultLayout from '../../inertia/layouts/default.vue'
 
+enableAutoUnmount(afterEach)
 const mockDrainQueue = vi.hoisted(() => vi.fn())
 const mockPromptInstall = vi.hoisted(() => vi.fn())
 const mockUsePwaUpdate = vi.hoisted(() => vi.fn())
 const mockUsePwaInstall = vi.hoisted(() => vi.fn())
+const mockCancelScheduledRetry = vi.hoisted(() => vi.fn())
+// État de connectivité (#953) piloté par le test : `reachableCount` simule une
+// probe `/up` réussie, `pendingCount` la file hors-ligne.
+const net = vi.hoisted(() => ({
+  state: { value: 'online' } as { value: 'online' | 'degraded' | 'offline' },
+  reachableCount: { value: 0 },
+  pendingCount: { value: 0 },
+}))
 
 vi.mock('@adonisjs/inertia/vue', () => ({
   Link: { template: '<a><slot /></a>' },
@@ -36,35 +45,46 @@ vi.mock('@inertiajs/vue3', () => ({
         'nav.sections.business': 'MANAGEMENT',
         'ports.nav': 'Ports',
         'common.offline.banner': 'You are offline',
+        'common.offline.degradedBanner': 'Unstable network',
         'common.pwa.install': 'Install app',
       },
     },
   }),
 }))
 
-vi.mock('~/composables/use_network_status', () => ({
-  useNetworkStatus: vi.fn(() => ({ isOnline: ref(true) })),
-}))
+vi.mock('~/composables/use_connectivity', async () => {
+  const { ref: vueRef } = await vi.importActual<typeof import('vue')>('vue')
+  const state = vueRef(net.state.value)
+  const reachableCount = vueRef(0)
+  net.state = state
+  net.reachableCount = reachableCount
+  return { useConnectivity: () => ({ state, reachableCount, probeConnectivity: vi.fn() }) }
+})
 
-vi.mock('~/composables/use_offline_queue', () => ({
-  cancelScheduledRetry: vi.fn(),
-  useOfflineQueue: () => ({
-    drainQueue: mockDrainQueue,
-    pendingCount: ref(0),
-    pendingActions: ref([]),
-    failedCount: ref(0),
-    failedActions: ref([]),
-    isSyncing: ref(false),
-    suspendedReason: ref(null),
-    retryAttempt: ref(0),
-    enqueue: vi.fn(),
-    cancelAction: vi.fn(),
-    retryFailedAction: vi.fn(),
-    discardFailedAction: vi.fn(),
-    conflictedAction: ref(null),
-    resolveConflict: vi.fn(),
-  }),
-}))
+vi.mock('~/composables/use_offline_queue', async () => {
+  const { ref: vueRef } = await vi.importActual<typeof import('vue')>('vue')
+  const pendingCount = vueRef(0)
+  net.pendingCount = pendingCount
+  return {
+    cancelScheduledRetry: mockCancelScheduledRetry,
+    useOfflineQueue: () => ({
+      drainQueue: mockDrainQueue,
+      pendingCount,
+      pendingActions: ref([]),
+      failedCount: ref(0),
+      failedActions: ref([]),
+      isSyncing: ref(false),
+      suspendedReason: ref(null),
+      retryAttempt: ref(0),
+      enqueue: vi.fn(),
+      cancelAction: vi.fn(),
+      retryFailedAction: vi.fn(),
+      discardFailedAction: vi.fn(),
+      conflictedAction: vueRef(null),
+      resolveConflict: vi.fn(),
+    }),
+  }
+})
 
 vi.mock('~/composables/use_pwa_update', () => ({
   usePwaUpdate: mockUsePwaUpdate,
@@ -73,9 +93,6 @@ vi.mock('~/composables/use_pwa_update', () => ({
 vi.mock('~/composables/use_pwa_install', () => ({
   usePwaInstall: mockUsePwaInstall,
 }))
-
-// Import after vi.mock so we get the mocked version
-import { useNetworkStatus } from '../../inertia/composables/use_network_status'
 
 // Default install mock — canInstall false unless overridden per test
 beforeEach(() => {
@@ -92,37 +109,59 @@ describe('DefaultLayout — sidebar', () => {
   })
 })
 
-describe('DefaultLayout — offline mode', () => {
+describe('DefaultLayout — connectivité (#953)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    net.state.value = 'online'
+    net.reachableCount.value = 0
+    net.pendingCount.value = 0
   })
 
-  test('offline banner is hidden when online', () => {
-    vi.mocked(useNetworkStatus).mockReturnValue({ isOnline: ref(true) })
+  test('aucun bandeau en ligne', () => {
     const w = mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
     expect(w.text()).not.toContain('You are offline')
+    expect(w.text()).not.toContain('Unstable network')
   })
 
-  test('offline banner is shown when offline', () => {
-    vi.mocked(useNetworkStatus).mockReturnValue({ isOnline: ref(false) })
+  test('bandeau hors-ligne', () => {
+    net.state.value = 'offline'
     const w = mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
     expect(w.text()).toContain('You are offline')
   })
 
-  test('drainQueue is called when coming back online', async () => {
-    const isOnline = ref(false)
-    vi.mocked(useNetworkStatus).mockReturnValue({ isOnline })
-    mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+  test('bandeau réseau dégradé', () => {
+    net.state.value = 'degraded'
+    const w = mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    expect(w.text()).toContain('Unstable network')
+    expect(w.text()).not.toContain('You are offline')
+  })
 
-    isOnline.value = true
+  test('le drain part après une probe réussie quand la file est non vide', async () => {
+    net.pendingCount.value = 2
+    mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    expect(mockDrainQueue).not.toHaveBeenCalled()
+
+    net.reachableCount.value += 1
     await nextTick()
 
     expect(mockDrainQueue).toHaveBeenCalledOnce()
   })
 
-  test('drainQueue is not called on initial mount when already online', () => {
-    vi.mocked(useNetworkStatus).mockReturnValue({ isOnline: ref(true) })
+  test('pas de drain sur probe réussie si la file est vide', async () => {
     mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    net.reachableCount.value += 1
+    await nextTick()
+
+    expect(mockDrainQueue).not.toHaveBeenCalled()
+  })
+
+  test('le passage en dégradé annule la relance différée, sans drain', async () => {
+    net.pendingCount.value = 2
+    mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    net.state.value = 'degraded'
+    await nextTick()
+
+    expect(mockCancelScheduledRetry).toHaveBeenCalled()
     expect(mockDrainQueue).not.toHaveBeenCalled()
   })
 })

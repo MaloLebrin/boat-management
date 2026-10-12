@@ -169,8 +169,35 @@ pourtant garder la saisie :
 - **5xx / coupure.** `onFinish` sans règlement programme une relance différée
   (`shared/helpers/offline_retry.ts` : 1 s, doublé, plafonné à 5 min). Succès,
   refus 4xx ou file vide remettent `retryAttempt` à zéro ; le passage
-  hors-ligne annule le timer (`cancelScheduledRetry`), l'événement `online`
-  relançant de toute façon le drain.
+  hors-ligne ou dégradé annule le timer (`cancelScheduledRetry`), la prochaine
+  probe `/up` réussie relançant de toute façon le drain.
+
+## Connectivité réelle (#953)
+
+`navigator.onLine` est vrai dès que le Wi-Fi de bord est associé, WAN mort ou
+non (Starlink en obstruction). Se synchroniser sur l'événement `online` brut
+lançait un drain qui échouait en boucle.
+
+`inertia/composables/use_connectivity.ts` combine le navigateur et une probe
+`HEAD /up` (timeout 5 s, `cache: 'no-store'`, exclue du service worker) :
+
+| État       | Condition                                       | Prochaine probe        |
+| ---------- | ----------------------------------------------- | ---------------------- |
+| `offline`  | `navigator.onLine === false`                    | à l'événement `online` |
+| `degraded` | `/up` injoignable, en erreur (503) ou trop lent | 30 s                   |
+| `online`   | `/up` a répondu 2xx                             | 5 min                  |
+
+Les probes se mettent en pause quand l'onglet passe en arrière-plan
+(`visibilitychange`) et repartent immédiatement au retour. L'événement `online`
+ne fait que déclencher une probe : l'état reste `offline` tant qu'elle n'a pas
+répondu.
+
+`default.vue` démarre la surveillance (`useConnectivity()`) et relance
+`drainQueue` à **chaque probe réussie** si la file n'est pas vide — y compris
+au chargement de la page. Le bandeau a trois états : rien en ligne,
+« hors-ligne » ou « réseau instable ». `useNetworkStatus()` en dérive pour les
+formulaires : `isOnline` est faux hors-ligne **et** en dégradé, la saisie part
+alors en file au lieu d'un envoi direct voué à l'échec.
 
 ## Stockage persistant (#952)
 
@@ -193,6 +220,7 @@ pour le futur écran `/sync`.
 | Fichier                                                        | Maillon                                                    |
 | -------------------------------------------------------------- | ---------------------------------------------------------- |
 | `tests/inertia/use_offline_queue.spec.ts`                      | suspension `auth`, reprise, relance différée (#950)        |
+| `tests/inertia/use_connectivity.spec.ts`                       | probe `/up`, trois états, intervalle adaptatif (#953)      |
 | `tests/inertia/use_persistent_storage.spec.ts`                 | stockage persistant : absent, refusé, accordé (#952)       |
 | `tests/unit/middleware/inertia_offline_protocol.spec.ts`       | les cinq clés traversent le middleware                     |
 | `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts`       | les deux moitiés du vocabulaire coïncident                 |
@@ -219,22 +247,22 @@ le flash, et la couture devient observable — c'est le seul endroit où elle l'
 
 `tests/browser/offline_queue.spec.ts` (6 cas) mesure, sur `/boats/:id?tab=navigation-logs` :
 
-| Cas                                | Ce qu'il fixe                                                                |
-| ---------------------------------- | ---------------------------------------------------------------------------- |
-| création hors-ligne                | la saisie entre dans la file, **zéro ligne en base**                         |
-| retour en ligne                    | l'événement `online` relayé par `default.vue` vide la file et écrit la ligne |
-| bouton « Sync now »                | l'autre voie de déclenchement, isolée de la première                         |
-| édition serveur pendant la coupure | la modale de conflit s'ouvre et **la file se met en pause**                  |
-| « Use server version »             | l'action est abandonnée, la ligne serveur intacte                            |
-| « Keep my changes »                | l'action est ré-enfilée avec `_expectedUpdatedAt` et franchit le verrou      |
+| Cas                                | Ce qu'il fixe                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------- |
+| création hors-ligne                | la saisie entre dans la file, **zéro ligne en base**                            |
+| retour en ligne                    | l'événement `online` déclenche la probe `/up` ; sa réussite vide la file (#953) |
+| bouton « Sync now »                | l'autre voie de déclenchement, isolée de la première                            |
+| édition serveur pendant la coupure | la modale de conflit s'ouvre et **la file se met en pause**                     |
+| « Use server version »             | l'action est abandonnée, la ligne serveur intacte                               |
+| « Keep my changes »                | l'action est ré-enfilée avec `_expectedUpdatedAt` et franchit le verrou         |
 
 Deux contraintes à connaître avant d'en écrire un autre :
 
 - **Ne jamais naviguer pendant la coupure.** Le service worker est désactivé sous test
   (`vite.config.ts`, #496) : aucune page n'est en cache. `enqueue()` court côté client avant toute
   requête réseau, le parcours n'en a pas besoin.
-- **Isoler le bouton de l'événement.** `setOffline(false)` émet `online`, que `default.vue` relaie
-  à `drainQueue` : pour mesurer le bouton seul, il faut fermer la page **avant** de rétablir le
+- **Isoler le bouton de l'événement.** `setOffline(false)` émet `online`, qui déclenche la probe
+  `/up` dont la réussite relance `drainQueue` (#953) : pour mesurer le bouton seul, il faut fermer la page **avant** de rétablir le
   réseau (IndexedDB est attaché au contexte, la file survit).
 
 ## Constats ouverts

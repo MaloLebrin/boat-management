@@ -23,7 +23,7 @@ import type User from '#models/user'
  * sur `use_offline_queue` avec `fake-indexeddb`, et le verrou optimiste côté
  * serveur par `tests/functional/navigation/offline_conflict_payload.spec.ts`.
  * Ce fichier ne les rejoue pas : il prouve **le raccord**, c'est-à-dire
- * `navigator.onLine` → IndexedDB → événement `online` → rejeu → base.
+ * `navigator.onLine` → IndexedDB → événement `online` → probe `HEAD /up` → rejeu → base.
  *
  * Décor : `/boats/:id?tab=navigation-logs` porte à la fois le formulaire de
  * création et celui de clôture, et le layout y monte `OfflinePendingQueue` et
@@ -128,8 +128,9 @@ test.group('E2E · Offline queue', (group) => {
     await form.getByRole('button', { name: 'Save', exact: true }).click()
     await page.locator('[data-test="queue-group"]').waitFor()
 
-    // `use_network_status` écoute l'événement `online`, et `default.vue` le
-    // relaie à `drainQueue` par un watch. C'est ce câblage-là qu'on mesure.
+    // L'événement `online` déclenche la probe `HEAD /up` (`use_connectivity`),
+    // et `default.vue` relance `drainQueue` sur sa réussite (#953). C'est ce
+    // câblage-là qu'on mesure.
     await browserContext.setOffline(false)
 
     await page.locator('[data-test="queue-group"]').waitFor({ state: 'detached' })
@@ -138,6 +139,35 @@ test.group('E2E · Offline queue', (group) => {
     assert.lengthOf(logs, 1)
     assert.equal(logs[0].crewCount, 7)
     assert.equal(logs[0].boatId, boat.id)
+  })
+
+  // #953 — Wi-Fi de bord associé, WAN mort : `navigator.onLine` repasse à vrai
+  // mais `/up` est injoignable. La file ne doit pas partir et le bandeau doit
+  // dire « réseau instable », pas « hors-ligne ».
+  test('an online event without a reachable server keeps the queue and shows the degraded banner', async ({
+    browserContext,
+    visit,
+    assert,
+  }) => {
+    const { user, boat } = await decor()
+    await browserContext.loginAs(user)
+
+    const page = await visit(LOGS_TAB(boat.id))
+    await page.waitForLoadState('networkidle')
+
+    await browserContext.setOffline(true)
+    await page.getByRole('button', { name: '+ New trip' }).first().click()
+    const form = createForm(page)
+    await form.locator('#crewCount').fill('3')
+    await form.getByRole('button', { name: 'Save', exact: true }).click()
+    await page.locator('[data-test="queue-group"]').waitFor()
+
+    await browserContext.route(/\/up$/, (route) => route.abort())
+    await browserContext.setOffline(false)
+
+    await page.getByText('Unstable network', { exact: false }).waitFor()
+    assert.isTrue(await page.locator('[data-test="queue-group"]').isVisible())
+    assert.lengthOf(await NavigationLog.all(), 0)
   })
 
   test('the Sync now button drains the queue without an online event', async ({
@@ -159,18 +189,19 @@ test.group('E2E · Offline queue', (group) => {
     await page.locator('[data-test="queue-group"]').waitFor()
 
     // Le bouton est l'autre voie de déclenchement, et il faut l'isoler de la
-    // première : `setOffline(false)` émet l'événement `online`, que
-    // `default.vue` relaie à `drainQueue`. On ferme donc la page **avant** de
-    // rétablir le réseau — sans page montée, aucun watch ne reçoit la
-    // transition. La file, elle, vit dans IndexedDB, qui est attaché au
-    // contexte : elle survit à la fermeture.
+    // première : toute probe `HEAD /up` réussie relance `drainQueue` (#953),
+    // y compris celle du montage. On coupe donc la probe — Wi-Fi de bord sans
+    // WAN : la page se charge, `/up` échoue, la connectivité reste `degraded`
+    // et rien ne part seul. La file vit dans IndexedDB, attaché au contexte :
+    // elle survit à la fermeture de la page.
     await page.close()
+    await browserContext.route(/\/up$/, (route) => route.abort())
     await browserContext.setOffline(false)
 
     const relaunched = await visit(LOGS_TAB(boat.id))
     await relaunched.waitForLoadState('networkidle')
     await relaunched.locator('[data-test="queue-group"]').waitFor()
-    // Le montage en ligne n'a rien vidé : c'est bien le bouton qu'on mesure.
+    // Probe en échec : la file n'a pas été vidée, c'est bien le bouton qu'on mesure.
     assert.lengthOf(await NavigationLog.all(), 0)
 
     await relaunched.getByRole('button', { name: 'Sync now' }).click()
