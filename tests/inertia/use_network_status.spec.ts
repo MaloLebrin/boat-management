@@ -94,6 +94,24 @@ describe('useNetworkStatus', () => {
     expect(result.isOnline.value).toBe(true)
   })
 
+  // #953 — Wi-Fi de bord associé sans WAN : la probe `/up` échoue, un envoi
+  // direct échouerait aussi, les formulaires doivent mettre en file.
+  test('isOnline is false when connectivity is degraded', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'))
+    vi.stubGlobal('fetch', fetchMock)
+    const { probeConnectivity } = await import('../../inertia/composables/use_connectivity')
+    const { result } = mountComposable()
+    expect(result.isOnline.value).toBe(true)
+
+    await probeConnectivity()
+    expect(result.isOnline.value).toBe(false)
+
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }))
+    await probeConnectivity()
+    expect(result.isOnline.value).toBe(true)
+    vi.unstubAllGlobals()
+  })
+
   test('removes event listeners on unmount', () => {
     const removeSpy = vi.spyOn(window, 'removeEventListener')
     const { wrapper } = mountComposable()

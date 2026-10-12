@@ -1,0 +1,11 @@
+# 2026-10-12 — Connectivité réelle : probe `HEAD /up`, bandeau à trois états, drain après probe réussie (#953)
+
+Brique de la phase 0 de l'épic « Mode traversée » (#949). `navigator.onLine` est vrai dès que le Wi-Fi de bord est associé, même sans WAN (Starlink en obstruction) : l'événement `online` brut lançait le drain de la file, qui échouait en boucle.
+
+- **Nouveau composable** `inertia/composables/use_connectivity.ts` : état `offline` / `degraded` / `online` à partir de `navigator.onLine` et d'une probe `HEAD /up` (timeout 5 s, `cache: 'no-store'`). 2xx → `online` ; erreur réseau, 503 ou timeout → `degraded`. Intervalle adaptatif : 30 s en dégradé, 5 min en ligne, aucune probe hors-ligne. Pause quand l'onglet passe en arrière-plan (`visibilitychange`), probe immédiate au retour. Une seule probe en vol. L'événement `online` ne fait que déclencher une probe.
+- **`default.vue`** : démarre la surveillance ; le drain de la file part à chaque probe réussie si la file n'est pas vide (y compris au chargement), plus sur l'événement `online` brut. Passer hors-ligne ou en dégradé annule la relance différée (#950). Bandeau à trois états : rien, « hors-ligne » (`common.offline.banner`), « réseau instable » (`common.offline.degradedBanner`, nouvelle clé FR/EN).
+- **`useNetworkStatus`** conservé comme dérivé : `isOnline` est faux hors-ligne **et** en dégradé, les formulaires mettent alors la saisie en file au lieu d'un envoi direct.
+- **Route** : `GET /up` répond aussi à `HEAD` (déjà publique, sans throttle, exclue du service worker) — aucun changement serveur.
+- **Copilote** : l'entrée `offline-pwa` précise que la synchronisation attend que le serveur réponde.
+- **Doc** : section « Connectivité réelle » dans `docs/domain/offline-queue.md`.
+- **Tests** : `tests/inertia/use_connectivity.spec.ts` (faux timers, `fetch` mocké : 2xx, erreur, 503, timeout, hors-ligne, intervalles, `online`/`offline`, arrière-plan, démontage, probe unique) ; `tests/inertia/default_layout_sidebar.spec.ts` (bandeaux, drain après probe réussie, pas de drain file vide, annulation en dégradé) ; `tests/inertia/use_network_status.spec.ts` (dégradé) ; `tests/functional/health/up.spec.ts` (`HEAD /up` → 200 sans corps).

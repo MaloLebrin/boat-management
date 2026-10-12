@@ -49,6 +49,7 @@
   },
   "offline.photoUploadUnavailable": "Photo upload is unavailable while offline. Reconnect and try again.",
   "offline.banner": "You're offline — changes will be saved and synced when reconnected",
+  "offline.degradedBanner": "Unstable network — syncing will resume as soon as the server responds",
   "offline.savedQueue": "Saved offline — will sync when reconnected",
   "offline.syncing": "Syncing…",
   "offline.syncSuccess": "{count, plural, one {# entry synced} other {# entries synced}}",

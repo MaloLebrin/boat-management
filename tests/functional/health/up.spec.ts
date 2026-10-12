@@ -18,6 +18,18 @@ test.group('Healthcheck GET /up (functional)', (group) => {
     })
   })
 
+  // #953 — probe de connectivité côté PWA : `HEAD /up`, sans corps, sans
+  // session (le client la lance aussi quand la session a expiré).
+  test('answers HEAD with 200 and no body for the PWA connectivity probe', async ({
+    client,
+    assert,
+  }) => {
+    const response = await client.head('/up')
+
+    response.assertStatus(200)
+    assert.isNotOk(response.text())
+  })
+
   test('returns 503 when the database is unreachable', async ({ client, assert }) => {
     app.container.swap(
       HealthService,
