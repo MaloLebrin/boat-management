@@ -199,6 +199,26 @@ au chargement de la page. Le bandeau a trois états : rien en ligne,
 formulaires : `isOnline` est faux hors-ligne **et** en dégradé, la saisie part
 alors en file au lieu d'un envoi direct voué à l'échec.
 
+## Navigation Inertia hors-ligne (#968)
+
+Le service worker ne met en cache que les **navigations pleine page** des pages
+terrain (`inertia-pages`) : une visite Inertia est un XHR `X-Inertia` qui
+répond du JSON sur la même URL, et la cacher sous la même clé servirait du JSON
+à un document. Hors-ligne, un clic sur un `<Link>` échouait donc sans rien
+afficher — seul un rechargement complet servait la page en cache.
+
+`inertia/utils/offline_navigation.ts`, installé dans `inertia/app.ts`, écoute
+l'événement `exception` du routeur Inertia. Quand une visite **GET** n'obtient
+**aucune réponse** (erreur réseau, pas une 4xx/5xx), il annule le rejet,
+relance une probe de connectivité et bascule en `window.location.assign` : le
+SW sert la copie en cache ou `/offline.html`. Restent exclus les mutations (la
+file s'en charge), les préchargements (`Purpose: prefetch`) et les
+rechargements partiels (`X-Inertia-Partial-Component`). Une seule bascule par
+page : la suivante est un chargement de document, elle ne peut pas reboucler.
+
+La bascule ne dépend pas de l'état de connectivité : au moment du clic, la
+dernière probe peut dater de 5 minutes. L'absence de réponse fait foi.
+
 ## Stockage persistant (#952)
 
 Sans `navigator.storage.persist()`, le navigateur peut évincer la base
@@ -222,6 +242,8 @@ pour le futur écran `/sync`.
 | `tests/inertia/use_offline_queue.spec.ts`                      | suspension `auth`, reprise, relance différée (#950)        |
 | `tests/inertia/use_connectivity.spec.ts`                       | probe `/up`, trois états, intervalle adaptatif (#953)      |
 | `tests/inertia/use_persistent_storage.spec.ts`                 | stockage persistant : absent, refusé, accordé (#952)       |
+| `tests/inertia/offline_navigation.spec.ts`                     | bascule en navigation pleine page sans réponse (#968)      |
+| `tests/browser/offline_navigation.spec.ts`                     | la même bascule, sur un vrai clic de lien (#968)           |
 | `tests/unit/middleware/inertia_offline_protocol.spec.ts`       | les cinq clés traversent le middleware                     |
 | `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts`       | les deux moitiés du vocabulaire coïncident                 |
 | `tests/functional/navigation/offline_conflict_payload.spec.ts` | `conflictData` porte les champs de la modale               |
