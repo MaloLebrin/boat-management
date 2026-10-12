@@ -7,7 +7,7 @@ import AuditLog from '#models/audit_log'
 import User from '#models/user'
 import UserSession from '#models/user_session'
 import EmailQueueService from '#services/email_queue_service'
-import { AUTH_SESSION_RECORD_KEY } from '#shared/constants/auth'
+import { AUTH_SESSION_RECORD_KEY, SESSION_IDLE_DAYS } from '#shared/constants/auth'
 import type { UserSessionRow, UserSessionsSettingsProps } from '#shared/types/user_session'
 import { truncateDb } from '#tests/utils/db'
 import { createAdminUser } from '#tests/functional/helpers'
@@ -108,7 +108,7 @@ test.group('User sessions — registry (functional)', (group) => {
     const elsewhere = await createRecord(user)
     await createRecord(other)
     await createRecord(user, { revokedAt: DateTime.now() })
-    await createRecord(user, { lastSeenAt: DateTime.now().minus({ days: 6 }) })
+    await createRecord(user, { lastSeenAt: DateTime.now().minus({ days: SESSION_IDLE_DAYS + 1 }) })
 
     const page = await client
       .get('/settings/me')

@@ -1,3 +1,4 @@
+import { REMEMBER_ME_DAYS } from '#shared/constants/auth'
 import { defineConfig } from '@adonisjs/auth'
 import { sessionGuard, sessionUserProvider } from '@adonisjs/auth/session'
 import type { InferAuthenticators, InferAuthEvents, Authenticators } from '@adonisjs/auth/types'
@@ -14,10 +15,11 @@ const authConfig = defineConfig({
      */
     web: sessionGuard({
       /**
-       * Enable persistent login using remember-me tokens.
+       * Enable persistent login using remember-me tokens. Durée lue depuis
+       * `shared/constants/auth.ts` (#951), comme le libellé de la case.
        */
       useRememberMeTokens: true,
-      rememberMeTokensAge: '30d',
+      rememberMeTokensAge: `${REMEMBER_ME_DAYS}d`,
 
       provider: sessionUserProvider({
         model: () => import('#models/user'),

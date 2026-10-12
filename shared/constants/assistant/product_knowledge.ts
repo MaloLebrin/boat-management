@@ -2013,6 +2013,33 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: null,
   },
   {
+    id: 'session-duration',
+    title: {
+      en: 'Staying logged in during a long crossing',
+      fr: 'Rester connecté pendant une longue traversée',
+    },
+    body: {
+      en: 'A session stays open for 30 days without activity, so a crossing of several weeks without network does not log you out: when the connection returns, the offline entries synchronize on their own. Ticking “Stay logged in” on the login screen extends this to 90 days. On the installed app (PWA) the box is ticked by default, with a short explanation; in a browser tab it stays unticked, which suits a shared computer. You can always untick it. Changing your password still closes every open session.',
+      fr: 'Une session reste ouverte 30 jours sans activité : une traversée de plusieurs semaines sans réseau ne vous déconnecte donc pas, et au retour de la connexion les saisies hors-ligne se synchronisent seules. Cocher « Rester connecté » sur l’écran de connexion porte cette durée à 90 jours. Sur l’app installée (PWA), la case est cochée par défaut, avec une courte explication ; dans un onglet de navigateur, elle reste décochée, ce qui convient à un poste partagé. Vous pouvez toujours la décocher. Changer de mot de passe ferme toujours toutes les sessions ouvertes.',
+    },
+    keywords: [
+      'session',
+      'connexion',
+      'login',
+      'deconnexion',
+      'logged out',
+      'rester connecte',
+      'remember me',
+      'se souvenir',
+      'traversee',
+      'crossing',
+      'hors ligne',
+      'offline',
+      'pwa',
+    ],
+    navTarget: null,
+  },
+  {
     id: 'notifications',
     title: {
       en: 'Notifications: bell, page and push',

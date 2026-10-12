@@ -47,10 +47,21 @@ export const AUTH_SESSION_RECORD_KEY = 'authSessionRecordId'
 export const SESSION_TOUCH_INTERVAL_MINUTES = 15
 
 /**
- * Inactivité au-delà de laquelle une session sans remember-me est expirée —
- * aligné sur `age: '5d'` de `config/session.ts`.
+ * Inactivité au-delà de laquelle une session sans remember-me est expirée.
+ * **Source** de `age` dans `config/session.ts` (#951) : dimensionnée pour une
+ * traversée de 2 à 4 semaines sans réseau — en deçà, la file hors-ligne
+ * retombait sur /login au retour (#950). Un changement de mot de passe révoque
+ * toujours les sessions ouvertes (#763).
  */
-export const SESSION_IDLE_DAYS = 5
+export const SESSION_IDLE_DAYS = 30
+
+/**
+ * Durée d'un jeton remember-me — source de `rememberMeTokensAge` dans
+ * `config/auth.ts` et du libellé de la case « rester connecté » (#951). Reste
+ * ≤ `SESSION_RETENTION_DAYS` : une session restaurée par ce jeton retrouve sa
+ * ligne `user_sessions`.
+ */
+export const REMEMBER_ME_DAYS = 90
 
 /**
  * Durée de conservation d'une ligne `user_sessions` après sa dernière

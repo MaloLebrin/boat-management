@@ -12,6 +12,7 @@ import { Form } from '@adonisjs/inertia/vue'
 import { Head } from '@inertiajs/vue3'
 import { computed, ref } from 'vue'
 import AuthNavyPanel from '~/components/auth/AuthNavyPanel.vue'
+import LoginRememberCheckbox from '~/components/auth/LoginRememberCheckbox.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import { useT } from '~/composables/use_t'
@@ -98,14 +99,7 @@ const passwordType = computed(() => (showPassword.value ? 'text' : 'password'))
                 </template>
               </BaseInput>
 
-              <label class="flex cursor-pointer items-center gap-2.5 select-none">
-                <input
-                  type="checkbox"
-                  name="remember"
-                  class="h-[18px] w-[18px] rounded-[5px] border-border accent-[var(--color-brand)]"
-                />
-                <span class="text-[13px] text-fg-muted">{{ t('auth.login.rememberMe') }}</span>
-              </label>
+              <LoginRememberCheckbox />
 
               <BaseButton
                 type="submit"
