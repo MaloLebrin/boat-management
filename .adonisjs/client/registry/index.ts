@@ -1536,6 +1536,18 @@ const routes = {
     tokens: [{"old":"/reports/export.csv","type":0,"val":"reports","end":""},{"old":"/reports/export.csv","type":0,"val":"export.csv","end":""}],
     types: placeholder as Registry['reports.export']['types'],
   },
+  'reports.digest.unsubscribe': {
+    methods: ["GET","HEAD"],
+    pattern: '/reports/digest/unsubscribe/:token',
+    tokens: [{"old":"/reports/digest/unsubscribe/:token","type":0,"val":"reports","end":""},{"old":"/reports/digest/unsubscribe/:token","type":0,"val":"digest","end":""},{"old":"/reports/digest/unsubscribe/:token","type":0,"val":"unsubscribe","end":""},{"old":"/reports/digest/unsubscribe/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['reports.digest.unsubscribe']['types'],
+  },
+  'reports.digest.unsubscribe.confirm': {
+    methods: ["POST"],
+    pattern: '/reports/digest/unsubscribe/:token',
+    tokens: [{"old":"/reports/digest/unsubscribe/:token","type":0,"val":"reports","end":""},{"old":"/reports/digest/unsubscribe/:token","type":0,"val":"digest","end":""},{"old":"/reports/digest/unsubscribe/:token","type":0,"val":"unsubscribe","end":""},{"old":"/reports/digest/unsubscribe/:token","type":1,"val":"token","end":""}],
+    types: placeholder as Registry['reports.digest.unsubscribe.confirm']['types'],
+  },
   'inventory.index': {
     methods: ["GET","HEAD"],
     pattern: '/inventory',

@@ -441,6 +441,11 @@ export interface ApiDefinition {
   reports: {
     index: typeof routes['reports.index']
     export: typeof routes['reports.export']
+    digest: {
+      unsubscribe: typeof routes['reports.digest.unsubscribe'] & {
+        confirm: typeof routes['reports.digest.unsubscribe.confirm']
+      }
+    }
   }
   inventory: {
     index: typeof routes['inventory.index']
