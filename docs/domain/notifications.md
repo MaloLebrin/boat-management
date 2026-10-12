@@ -155,6 +155,49 @@ Destinataires : toute l'équipe (`admin`, `member`, `mechanic` — `Notification
 `reservation.starts_tomorrow` : réservations confirmées qui partent le lendemain (jour de Paris),
 une notification par bateau aux admins, module Location actif.
 
+## Rapports de flotte par e-mail (#871)
+
+Références : `app/services/fleet_digest_service.ts` (données, destinataires, envoi),
+`app/services/fleet_digest_mail_service.ts` (rendu), `app/services/fleet_report_pdf_service.ts`,
+`shared/types/fleet_digest.ts`, `shared/helpers/fleet_digest.ts`.
+
+Ce ne sont pas des notifications : pas de ligne `notifications`, pas de famille. Deux e-mails de
+synthèse, assemblés **une fois par organisation** en objets typés puis rendus dans la langue de
+chaque destinataire (`users.locale`). Organisations servies : ni la démo (`marina-demo`), ni celles
+dont la suppression est demandée (`deletion_requested_at`). Bateaux en corbeille exclus partout.
+
+| Rapport               | Job (cron, `Europe/Paris`)                          | Contenu                                                                                                                                                                                                                                                                                                                |
+| --------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Synthèse hebdomadaire | `SendWeeklyFleetDigests` (`30 7 * * 1`)             | tâches ouvertes en retard / à échéance sous 7 jours, incidents ouverts ou en cours, documents et équipements de sécurité expirés ou qui expirent sous 30 jours, réservations (option ou confirmées) de la semaine (module Location), dépenses de la semaine écoulée par poste, factures en retard (module Facturation) |
+| Rapport mensuel       | `SendMonthlyFleetReports` (`30 8 1 * *`), PDF joint | le mois civil écoulé lu par `FleetReportingService` (#887) : dépenses par poste et par bateau, top 3 des postes, dépenses du mois précédent, heures moteur, milles, tâches à échéance dans le mois (dont faites), interventions saisies au carnet, revenus et occupation (module Location)                             |
+
+- **Destinataires** : le rôle doit être éligible — synthèse : `admin`, `member`, `mechanic` ;
+  rapport mensuel (financier) : `admin`, et seulement sur un plan qui ouvre `/reports`
+  (`canViewReports`). Préférence par utilisateur `users.weekly_digest_email` /
+  `users.monthly_report_email` : `null` = défaut du rôle (**admins oui, autres non**).
+- **Vue par rôle** (`scopeWeeklyDigest`) : une section n'est gardée que si le rôle a la capacité
+  de l'écran — maintenance (`maintenance.view`), incidents (`incidents.view`), échéances et
+  réservations (`boats.view`), factures (`invoices.view`), dépenses de flotte (`reports.view`,
+  admin, comme la carte « Dépenses » #832). Le mécanicien n'y lit donc que la maintenance.
+- **Jamais vide** : une synthèse sans section (après la vue par rôle) ou un mois sans dépense,
+  heure moteur, entretien ni location n'est pas envoyé.
+- **Une seule fois** : synthèse via `SendEmail`, `correlationId`
+  `fleet-digest:weekly:<orgId>:<semaine ISO>` (clé `email:<to>:…`) ; rapport mensuel via son
+  job `SendMonthlyFleetReportEmail` (rendu + PDF à l'exécution, à partir du rapport figé dans le
+  payload), clé `fleet-report:monthly:<orgId>:<YYYY-MM>:<userId>`. Un redémarrage du scheduler
+  ou un cron rejoué ne renvoie rien.
+- **Marque blanche** : `BrandingService.toEmailParams` pour l'e-mail, `resolveBranding` pour
+  l'en-tête du PDF (plan Entreprise).
+- **Désinscription en un clic** : jeton (utilisateur, rapport) signé par le `MessageVerifier`
+  (`purpose: 'fleet_digest_unsubscribe'` — un jeton de famille ne désabonne pas d'un rapport, et
+  inversement) vers `GET /reports/digest/unsubscribe/:token` (page de confirmation
+  `reports/digest_unsubscribe`, sans session), `POST` sur la même URL pour couper le rapport.
+- **Réglages** : deux cases dans `/settings/notifications` (prop `preferences.fleetDigests` :
+  valeurs effectives + `weeklyAvailable` / `monthlyAvailable`), envoyées avec la matrice
+  (`weeklyDigest`, `monthlyReport`, optionnels : un rapport non proposé garde son réglage).
+- **Aperçus** : `/dev/mails/fleet-weekly-digest-{fr,en}` et `/dev/mails/fleet-monthly-report-{fr,en}`.
+- **i18n** : `reports.digest.*` (e-mails, PDF, page de désinscription), `settings.notifications.reports.*`.
+
 ## Exposition au frontend (shared props)
 
 Référence : `app/middleware/inertia_middleware.ts` (`share()`).

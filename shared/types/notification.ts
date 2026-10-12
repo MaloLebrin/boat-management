@@ -1,3 +1,5 @@
+import type { FleetDigestPreferences } from './fleet_digest.js'
+
 export interface JsonObject {
   [key: string]: JsonValue
 }
@@ -118,6 +120,8 @@ export interface NotificationPreferencesProps {
   quietHours: boolean
   emailDigest: boolean
   timezone: string
+  /** Rapports de flotte par e-mail (#871). */
+  fleetDigests: FleetDigestPreferences
 }
 
 export interface UpdateNotificationPreferencesPayload {
@@ -125,6 +129,9 @@ export interface UpdateNotificationPreferencesPayload {
   quietHours: boolean
   emailDigest: boolean
   timezone: string
+  /** Absents quand le rapport n'est pas proposé à l'utilisateur (#871). */
+  weeklyDigest?: boolean
+  monthlyReport?: boolean
 }
 
 /** Une ligne du résumé quotidien des e-mails (#888). */

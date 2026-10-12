@@ -3564,6 +3564,7 @@ export class UserSchema extends BaseModel {
     'id',
     'lastLoginAt',
     'locale',
+    'monthlyReportEmail',
     'notificationEmailDigest',
     'notificationQuietHours',
     'notificationTimezone',
@@ -3576,6 +3577,7 @@ export class UserSchema extends BaseModel {
     'twoFactorLastUsedStep',
     'twoFactorSecret',
     'updatedAt',
+    'weeklyDigestEmail',
   ] as const
   $columns = UserSchema.$columns
   @column.dateTime()
@@ -3598,6 +3600,8 @@ export class UserSchema extends BaseModel {
   declare lastLoginAt: DateTime | null
   @column()
   declare locale: string | null
+  @column()
+  declare monthlyReportEmail: boolean | null
   @column()
   declare notificationEmailDigest: boolean
   @column()
@@ -3622,4 +3626,6 @@ export class UserSchema extends BaseModel {
   declare twoFactorSecret: string | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare weeklyDigestEmail: boolean | null
 }

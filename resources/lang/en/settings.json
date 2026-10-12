@@ -658,6 +658,13 @@
       "inApp": "In-app",
       "push": "Push",
       "email": "Email"
+    },
+    "reports": {
+      "title": "Email reports",
+      "weekly": "Weekly fleet digest",
+      "weeklyHint": "Monday morning: overdue and upcoming tasks, incidents, expiries, bookings and the week's expenses.",
+      "monthly": "Monthly fleet report",
+      "monthlyHint": "On the 1st: last month's expenses, engine hours, maintenance and occupancy, with the PDF attached."
     }
   },
   "exports": {

@@ -36,7 +36,11 @@ const form = useForm({
   quietHours: props.preferences.quietHours,
   emailDigest: props.preferences.emailDigest,
   timezone: props.preferences.timezone,
+  weeklyDigest: props.preferences.fleetDigests.weekly,
+  monthlyReport: props.preferences.fleetDigests.monthly,
 })
+
+const fleetDigests = computed(() => props.preferences.fleetDigests)
 
 function columnOn(channel: NotificationChannel): boolean {
   return NOTIFICATION_FAMILIES.some((family) => form.families[family][channel])
@@ -51,7 +55,13 @@ const emailUsed = computed(() => columnOn('email'))
 
 function save() {
   form
-    .transform((data) => ({ ...data, timezone: browserTimeZone() ?? data.timezone }))
+    .transform(({ weeklyDigest, monthlyReport, ...data }) => ({
+      ...data,
+      timezone: browserTimeZone() ?? data.timezone,
+      // Un rapport non proposé (rôle, plan) n'est pas envoyé : son réglage reste.
+      ...(fleetDigests.value.weeklyAvailable ? { weeklyDigest } : {}),
+      ...(fleetDigests.value.monthlyAvailable ? { monthlyReport } : {}),
+    }))
     .put('/settings/notifications/preferences', { preserveScroll: true })
 }
 </script>
@@ -145,6 +155,34 @@ function save() {
       <p class="text-xs text-fg-subtle">
         {{ t('settings.notifications.preferences.timezone', { timezone: preferences.timezone }) }}
       </p>
+
+      <fieldset
+        v-if="fleetDigests.weeklyAvailable || fleetDigests.monthlyAvailable"
+        class="space-y-3 border-t border-border pt-4"
+        data-testid="fleet-digest-preferences"
+      >
+        <legend class="text-sm font-semibold text-fg">
+          {{ t('settings.notifications.reports.title') }}
+        </legend>
+        <BaseCheckbox
+          v-if="fleetDigests.weeklyAvailable"
+          id="fleet-weekly-digest"
+          v-model="form.weeklyDigest"
+          name="weeklyDigest"
+          :hint="t('settings.notifications.reports.weeklyHint')"
+        >
+          {{ t('settings.notifications.reports.weekly') }}
+        </BaseCheckbox>
+        <BaseCheckbox
+          v-if="fleetDigests.monthlyAvailable"
+          id="fleet-monthly-report"
+          v-model="form.monthlyReport"
+          name="monthlyReport"
+          :hint="t('settings.notifications.reports.monthlyHint')"
+        >
+          {{ t('settings.notifications.reports.monthly') }}
+        </BaseCheckbox>
+      </fieldset>
 
       <BaseButton type="submit" size="sm" :disabled="form.processing">
         {{ t('settings.notifications.preferences.save') }}

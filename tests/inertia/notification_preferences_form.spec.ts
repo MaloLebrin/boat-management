@@ -11,7 +11,9 @@ vi.mock('@inertiajs/vue3', async () => {
 
 import NotificationPreferencesForm from '../../inertia/components/settings/notifications/NotificationPreferencesForm.vue'
 
-function preferences(): NotificationPreferencesProps {
+function preferences(
+  fleetDigests: Partial<NotificationPreferencesProps['fleetDigests']> = {}
+): NotificationPreferencesProps {
   return {
     families: {
       fleet: { inApp: true, push: true, email: false },
@@ -23,6 +25,13 @@ function preferences(): NotificationPreferencesProps {
     quietHours: false,
     emailDigest: false,
     timezone: 'Europe/Paris',
+    fleetDigests: {
+      weekly: true,
+      monthly: false,
+      weeklyAvailable: true,
+      monthlyAvailable: true,
+      ...fleetDigests,
+    },
   }
 }
 
@@ -71,6 +80,43 @@ describe('NotificationPreferencesForm', () => {
     expect(formSpies.put).toHaveBeenCalledWith('/settings/notifications/preferences', {
       preserveScroll: true,
     })
+    w.unmount()
+  })
+
+  test('offers the fleet reports and sends them with the preferences (#871)', async () => {
+    resetInertiaMock()
+    const w = mountWithStubs(NotificationPreferencesForm, { props: { preferences: preferences() } })
+    expect(w.find('[data-testid="fleet-digest-preferences"]').exists()).toBe(true)
+    await w.find('input[name="monthlyReport"]').setValue(true)
+    await w.find('form').trigger('submit')
+
+    const sent = forms[0].transformed()
+    expect(sent.weeklyDigest).toBe(true)
+    expect(sent.monthlyReport).toBe(true)
+    w.unmount()
+  })
+
+  test('a report the user cannot receive is neither shown nor sent (#871)', async () => {
+    resetInertiaMock()
+    const w = mountWithStubs(NotificationPreferencesForm, {
+      props: { preferences: preferences({ monthlyAvailable: false }) },
+    })
+    expect(w.find('input[name="weeklyDigest"]').exists()).toBe(true)
+    expect(w.find('input[name="monthlyReport"]').exists()).toBe(false)
+    await w.find('form').trigger('submit')
+
+    const sent = forms[0].transformed()
+    expect(sent).toHaveProperty('weeklyDigest', true)
+    expect(sent).not.toHaveProperty('monthlyReport')
+    w.unmount()
+  })
+
+  test('no reports block for a role without any report (#871)', () => {
+    resetInertiaMock()
+    const w = mountWithStubs(NotificationPreferencesForm, {
+      props: { preferences: preferences({ weeklyAvailable: false, monthlyAvailable: false }) },
+    })
+    expect(w.find('[data-testid="fleet-digest-preferences"]').exists()).toBe(false)
     w.unmount()
   })
 })

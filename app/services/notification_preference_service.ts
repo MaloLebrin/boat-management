@@ -9,6 +9,8 @@ import {
   notificationFamilyOf,
 } from '#shared/constants/notifications'
 import type { OrgRole } from '#shared/types/organization'
+import type { FleetDigestKind, FleetDigestPreferences } from '#shared/types/fleet_digest'
+import { fleetDigestEnabled, isFleetDigestEligible } from '#shared/helpers/fleet_digest'
 import type {
   NotificationChannelPreferences,
   NotificationFamily,
@@ -22,6 +24,7 @@ import db from '@adonisjs/lucid/services/db'
 import { IANAZone } from 'luxon'
 
 const UNSUBSCRIBE_PURPOSE = 'notification_unsubscribe'
+const FLEET_DIGEST_UNSUBSCRIBE_PURPOSE = 'fleet_digest_unsubscribe'
 
 /**
  * Préférences de notifications (#888) : la matrice familles × canaux d'un
@@ -83,12 +86,28 @@ export default class NotificationPreferenceService {
     return { ...DEFAULT_NOTIFICATION_PREFERENCES[role][family] }
   }
 
-  async settingsFor(user: User): Promise<NotificationPreferencesProps> {
+  /**
+   * `canViewReports` : le plan de l'organisation ouvre `/reports` — sans lui,
+   * le rapport mensuel n'est jamais envoyé, la case n'est pas proposée.
+   */
+  async settingsFor(user: User, canViewReports: boolean): Promise<NotificationPreferencesProps> {
+    const role = await this.#roleIn(user.id, user.organizationId)
     return {
       families: await this.matrixFor(user.id, user.organizationId),
       quietHours: user.notificationQuietHours,
       emailDigest: user.notificationEmailDigest,
       timezone: user.notificationTimezone,
+      fleetDigests: this.#fleetDigests(user, role, canViewReports),
+    }
+  }
+
+  /** Rapports de flotte par e-mail (#871) : préférence effective et disponibilité. */
+  #fleetDigests(user: User, role: OrgRole, canViewReports: boolean): FleetDigestPreferences {
+    return {
+      weekly: fleetDigestEnabled('weekly', role, user.weeklyDigestEmail),
+      monthly: fleetDigestEnabled('monthly', role, user.monthlyReportEmail),
+      weeklyAvailable: isFleetDigestEligible('weekly', role),
+      monthlyAvailable: canViewReports && isFleetDigestEligible('monthly', role),
     }
   }
 
@@ -107,6 +126,9 @@ export default class NotificationPreferenceService {
       user.useTransaction(trx)
       user.notificationQuietHours = payload.quietHours
       user.notificationEmailDigest = payload.emailDigest
+      // Un rapport absent du formulaire (rôle non éligible) garde son réglage.
+      if (payload.weeklyDigest !== undefined) user.weeklyDigestEmail = payload.weeklyDigest
+      if (payload.monthlyReport !== undefined) user.monthlyReportEmail = payload.monthlyReport
       user.notificationTimezone = IANAZone.isValidZone(payload.timezone)
         ? payload.timezone
         : DEFAULT_NOTIFICATION_TIMEZONE
@@ -148,5 +170,39 @@ export default class NotificationPreferenceService {
       { userId: user.id, family },
       { ...current, email: false }
     )
+  }
+
+  /**
+   * Désinscription en un clic d'un rapport de flotte (#871) : même mécanique
+   * que les familles, avec son propre `purpose` — un jeton de famille ne
+   * désabonne jamais d'un rapport, et inversement.
+   */
+  fleetDigestUnsubscribeToken(userId: number, kind: FleetDigestKind): string {
+    return encryption
+      .getMessageVerifier()
+      .sign({ userId, kind }, undefined, FLEET_DIGEST_UNSUBSCRIBE_PURPOSE)
+  }
+
+  async resolveFleetDigestUnsubscribeToken(
+    token: string
+  ): Promise<{ user: User; kind: FleetDigestKind } | null> {
+    const payload = encryption
+      .getMessageVerifier()
+      .unsign<{ userId?: unknown; kind?: unknown }>(token, FLEET_DIGEST_UNSUBSCRIBE_PURPOSE)
+    if (
+      !payload ||
+      typeof payload.userId !== 'number' ||
+      (payload.kind !== 'weekly' && payload.kind !== 'monthly')
+    ) {
+      return null
+    }
+    const user = await User.query().where('id', payload.userId).whereNull('anonymizedAt').first()
+    return user ? { user, kind: payload.kind } : null
+  }
+
+  async unsubscribeFleetDigest(user: User, kind: FleetDigestKind): Promise<void> {
+    if (kind === 'weekly') user.weeklyDigestEmail = false
+    else user.monthlyReportEmail = false
+    await user.save()
   }
 }

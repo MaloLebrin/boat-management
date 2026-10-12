@@ -2355,6 +2355,32 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: 'settings.notifications',
   },
   {
+    id: 'fleet-email-reports',
+    title: {
+      en: 'Weekly digest and monthly fleet report by email',
+      fr: 'Synthèse hebdomadaire et rapport mensuel de flotte par e-mail',
+    },
+    body: {
+      en: 'Every Monday morning, FleetAi emails a digest of the week: overdue tasks and those due within 7 days, open incidents, documents and safety equipment expiring within 30 days, the week’s bookings (Charter module), last week’s expenses and overdue invoices (Invoicing module). Each role only sees its sections, and an empty week sends nothing. On the 1st of the month, Pro and Enterprise admins also get last month’s fleet report with a PDF to file: expenses by category and boat, engine hours, maintenance done vs planned, occupancy and rental revenue. Admins get both by default; others turn them on in Settings → Notifications, and each email has a one-click unsubscribe link.',
+      fr: 'Chaque lundi matin, FleetAi envoie par e-mail la synthèse de la semaine : tâches en retard et à faire sous 7 jours, incidents ouverts, documents et équipements de sécurité qui expirent sous 30 jours, réservations de la semaine (module Location), dépenses de la semaine passée et factures en retard (module Facturation). Chaque rôle n’y lit que ses sections, et une semaine vide n’envoie rien. Le 1er du mois, les admins des plans Pro et Entreprise reçoivent aussi le rapport de flotte du mois écoulé, avec un PDF à archiver : dépenses par poste et par bateau, heures moteur, entretiens faits sur prévus, occupation et revenus de location. Les admins les reçoivent par défaut ; les autres les activent dans Réglages → Notifications, et chaque e-mail porte un lien de désinscription en un clic.',
+    },
+    keywords: [
+      'rapport hebdomadaire',
+      'synthese hebdomadaire',
+      'rapport mensuel',
+      'rapport par e-mail',
+      'rapport par email',
+      'resume de la semaine',
+      'pdf mensuel',
+      'assurance',
+      'weekly digest',
+      'weekly report',
+      'monthly report',
+      'email report',
+    ],
+    navTarget: 'settings.notifications',
+  },
+  {
     id: 'marina-harbour-office',
     title: {
       en: 'Marina: berths, visiting boats and mooring contracts',

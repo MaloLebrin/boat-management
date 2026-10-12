@@ -75,6 +75,11 @@ règle ; leurs index FK sont nommés `{table}_{column}_idx`.
 - `notifyNewLogin` (booléen, défaut `true`, #885) — e-mail « nouvelle connexion »
   quand le compte est ouvert depuis un appareil jamais vu ; réglable depuis
   `/settings/me`
+- rapports de flotte par e-mail (#871), booléens nullables — `null` = défaut du
+  rôle (les admins les reçoivent, les autres membres non) :
+  - `weeklyDigestEmail` — synthèse hebdomadaire du lundi
+  - `monthlyReportEmail` — rapport mensuel du 1er (PDF joint, admins sur plan
+    qui ouvre `/reports`)
 - préférences d'interface, nullables — retombent sur le cookie puis sur un défaut :
   - `locale` (`en` | `fr`, #414)
   - `theme` (`system` | `light` | `dark`, #416)

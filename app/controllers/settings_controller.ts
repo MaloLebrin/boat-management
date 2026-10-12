@@ -102,10 +102,14 @@ export default class SettingsController {
   /** Gestion des notifications push et des appareils abonnés (#498). */
   async notifications({ inertia, auth }: HttpContext) {
     const user = await auth.authenticate()
+    if (user.organizationId !== null) await user.load('organization')
+    // Rapport mensuel par e-mail (#871) : proposé si le plan ouvre `/reports`.
+    const canViewReports =
+      user.organizationId !== null && this.quotaService.canViewReports(user.organization)
     const [subscriptions, preferences] = await Promise.all([
       this.pushSubscriptionService.listForUser(user.id),
       // Matrice familles × canaux (#888).
-      this.notificationPreferenceService.settingsFor(user),
+      this.notificationPreferenceService.settingsFor(user, canViewReports),
     ])
     return inertia.render('settings/notifications', {
       pushSubscriptions: subscriptions.map(PushSubscriptionTransformer.toRow),

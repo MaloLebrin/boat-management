@@ -68,7 +68,11 @@ export type FakeForm = Record<string, unknown> & {
   wasSuccessful: boolean
   recentlySuccessful: boolean
   data(): Record<string, unknown>
+  /** Données telles qu'envoyées : `data()` passé au dernier `transform()`. */
+  transformed(): Record<string, unknown>
 } & typeof formSpies
+
+type Transformer = (data: Record<string, unknown>) => Record<string, unknown>
 
 /** Chaque `useForm()` créé depuis le dernier `resetInertiaMock()`, dans l'ordre. */
 export const forms: FakeForm[] = []
@@ -77,6 +81,7 @@ function fakeUseForm(...args: unknown[]): FakeForm {
   // Signature `useForm(rememberKey, data)` ou `useForm(data)`.
   const initial = (typeof args[0] === 'string' ? args[1] : args[0]) as Record<string, unknown>
   const keys = Object.keys(initial ?? {})
+  let transformer: Transformer | null = null
   const form = reactive({
     ...initial,
     errors: {},
@@ -87,7 +92,11 @@ function fakeUseForm(...args: unknown[]): FakeForm {
     recentlySuccessful: false,
     ...formSpies,
     data: () => Object.fromEntries(keys.map((key) => [key, form[key]])),
-    transform: () => form,
+    transformed: () => (transformer ? transformer(form.data()) : form.data()),
+    transform: (callback: Transformer) => {
+      transformer = callback
+      return form
+    },
     defaults: () => form,
   }) as FakeForm
   forms.push(form)

@@ -18,4 +18,7 @@ export const updateNotificationPreferencesValidator = vine.create({
   quietHours: vine.boolean(),
   emailDigest: vine.boolean(),
   timezone: vine.string().trim().minLength(1).maxLength(64),
+  // Rapports de flotte par e-mail (#871), envoyés seulement s'ils sont proposés.
+  weeklyDigest: vine.boolean().optional(),
+  monthlyReport: vine.boolean().optional(),
 })

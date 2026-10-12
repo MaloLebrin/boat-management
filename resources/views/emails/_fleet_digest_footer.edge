@@ -1,0 +1,15 @@
+{{--
+  Pied des rapports de flotte (#871) : pourquoi on reçoit l'e-mail, lien vers
+  les réglages et désinscription en un clic du rapport (URL signée).
+--}}
+<p
+  style="margin:30px 0 0;padding-top:15px;border-top:1px solid #eeeeee;color:#888888;font-size:12px;line-height:1.5;text-align:center;"
+>
+  {{ reason }}
+  <br />
+  <a href="{{ manageUrl }}" style="color:#888888;">{{ manageLabel }}</a>
+  @if(unsubscribeUrl)
+    ·
+    <a href="{{ unsubscribeUrl }}" style="color:#888888;">{{ unsubscribeLabel }}</a>
+  @end
+</p>

@@ -17,6 +17,8 @@ import PurgeTrashedBoats from '#jobs/purge_trashed_boats'
 import PurgeDeletedAccounts from '#jobs/purge_deleted_accounts'
 import PurgeDeletedOrganizations from '#jobs/purge_deleted_organizations'
 import SendNotificationDigests from '#jobs/send_notification_digests'
+import SendWeeklyFleetDigests from '#jobs/send_weekly_fleet_digests'
+import SendMonthlyFleetReports from '#jobs/send_monthly_fleet_reports'
 
 await SendReminderEmails.schedule({})
   .cron('0 8 * * *')
@@ -153,3 +155,18 @@ await PurgeDeletedOrganizations.schedule({})
 // Résumé quotidien des e-mails de notification (#888) : horaire, chaque
 // passage sert les utilisateurs pour qui il est 8h dans leur propre fuseau.
 await SendNotificationDigests.schedule({}).cron('5 * * * *').id('hourly-notification-digests').run()
+
+// Rapports de flotte par e-mail (#871). Le lundi à 07:30, après le scan de
+// notifications de 07:00 : la synthèse de la semaine. Le 1er du mois à 08:30,
+// après les relances de 08:00 : le rapport du mois écoulé, PDF joint.
+await SendWeeklyFleetDigests.schedule({})
+  .cron('30 7 * * 1')
+  .timezone('Europe/Paris')
+  .id('weekly-fleet-digests')
+  .run()
+
+await SendMonthlyFleetReports.schedule({})
+  .cron('30 8 1 * *')
+  .timezone('Europe/Paris')
+  .id('monthly-fleet-reports')
+  .run()

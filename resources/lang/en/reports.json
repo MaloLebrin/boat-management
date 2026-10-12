@@ -86,5 +86,82 @@
     "costPerRentalDay": "cost_per_rental_day",
     "costPerNauticalMile": "cost_per_nautical_mile",
     "fleetTotal": "FLEET TOTAL"
+  },
+  "digest": {
+    "greeting": "Hello {name},",
+    "more": "+ {count} more",
+    "reason": "You receive this email as a member of {org}.",
+    "manage": "Manage my email reports",
+    "weekly": {
+      "subject": "{org} — your week of {date}",
+      "heading": "{org}'s week",
+      "intro": "From {from} to {to}",
+      "cta": "Open the dashboard",
+      "unsubscribe": "Stop the weekly digest",
+      "expensesTotal": "Total: {amount}",
+      "sections": {
+        "overdueTasks": "{count, plural, one {# overdue task} other {# overdue tasks}}",
+        "upcomingTasks": "{count, plural, one {# task} other {# tasks}} due in the next 7 days",
+        "openIncidents": "{count, plural, one {# open incident} other {# open incidents}}",
+        "expiring": "{count, plural, one {# document or safety item} other {# documents and safety items}} expiring within 30 days",
+        "reservations": "{count, plural, one {# booking} other {# bookings}} this week",
+        "overdueInvoices": "{count, plural, one {# overdue invoice} other {# overdue invoices}}",
+        "expenses": "Last week's expenses"
+      },
+      "rows": {
+        "task": "{boat} · due {date}",
+        "incident": "{boat} · since {date}",
+        "expires": "{boat} · expires {date}",
+        "expired": "{boat} · expired {date}",
+        "reservation": "{boat} · {from} to {to}",
+        "invoice": "{amount} · due {date}"
+      }
+    },
+    "monthly": {
+      "subject": "{org} — fleet report for {month}",
+      "heading": "Fleet report for {month}",
+      "period": "From {from} to {to}",
+      "cta": "Open reports",
+      "unsubscribe": "Stop the monthly report",
+      "attachment": "The full report is attached as a PDF, ready to file or to send to your insurer.",
+      "topCategories": "Top cost categories",
+      "kpi": {
+        "costs": "This month's expenses",
+        "previousCosts": "Previous month's expenses",
+        "engineHours": "Engine hours",
+        "distance": "Nautical miles",
+        "maintenance": "Planned maintenance",
+        "maintenanceValue": "{completed} of {planned} done",
+        "performed": "Jobs logged",
+        "revenue": "Rental revenue",
+        "occupancy": "Occupancy rate"
+      },
+      "boats": {
+        "title": "By boat",
+        "boat": "Boat",
+        "costs": "Expenses",
+        "engineHours": "Engine hours",
+        "revenue": "Revenue",
+        "occupancy": "Occupancy"
+      },
+      "pdf": {
+        "generatedOn": "Generated on {date}",
+        "summary": "Month at a glance",
+        "footer": "{org} — page {page} / {total}",
+        "filename": "fleet-report-{month}"
+      }
+    },
+    "unsubscribe": {
+      "title": "Email reports",
+      "submit": "Unsubscribe",
+      "confirm": {
+        "weekly": "Stop receiving your fleet's weekly digest?",
+        "monthly": "Stop receiving your fleet's monthly report?"
+      },
+      "done": {
+        "weekly": "Done: you won't receive the weekly digest anymore. You can turn it back on in your notification settings.",
+        "monthly": "Done: you won't receive the monthly report anymore. You can turn it back on in your notification settings."
+      }
+    }
   }
 }

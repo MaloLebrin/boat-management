@@ -1,6 +1,7 @@
 import edge from 'edge.js'
 import SendEmail, { type SendEmailPayload } from '#jobs/send_email'
-import QueueDedupService from '#services/queue_dedup_service'
+import QueueDedupService, { type EnqueueUniqueResult } from '#services/queue_dedup_service'
+import FleetDigestMailService from '#services/fleet_digest_mail_service'
 import type { ReminderBoatItem, ReminderPortItem, ReminderTaskItem } from '#shared/types/reminder'
 import type { ReminderDocumentItem } from '#shared/types/boat_document'
 import type { PlanModule, PlanTier } from '#shared/types/plan'
@@ -18,10 +19,18 @@ import type { CrewCertificationAlert } from '#shared/types/crew'
 import type { TwoFactorEvent } from '#shared/types/two_factor'
 import type { DeviceInfo } from '#shared/types/user_session'
 import type { NotificationDigestEntry } from '#shared/types/notification'
+import type {
+  MonthlyFleetReport,
+  SendMonthlyFleetReportPayload,
+  WeeklyFleetDigest,
+} from '#shared/types/fleet_digest'
 
 @inject()
 export default class EmailQueueService {
-  constructor(private dedup: QueueDedupService) {}
+  constructor(
+    private dedup: QueueDedupService,
+    private fleetDigestMail: FleetDigestMailService
+  ) {}
 
   /**
    * Toute notification `SendEmail` passe ici : clé de déduplication dérivée
@@ -1073,6 +1082,58 @@ export default class EmailQueueService {
       text,
       html,
       correlationId: `notification-digest:${params.userId}:${params.date}`,
+    })
+  }
+
+  /**
+   * Synthèse hebdomadaire de flotte (#871), déjà taillée au rôle du
+   * destinataire. La clé (destinataire, organisation, semaine ISO) empêche
+   * un second envoi si le cron repasse dans la semaine.
+   */
+  async sendWeeklyFleetDigest(params: {
+    digest: WeeklyFleetDigest
+    to: string
+    name: string | null
+    locale: string | null
+    branding: BrandingEmailParams | null
+    unsubscribeUrl: string | null
+  }) {
+    const { subject, text, html } = await this.fleetDigestMail.renderWeekly(params.digest, params)
+    await this.#enqueue({
+      to: params.to,
+      subject,
+      text,
+      html,
+      correlationId: `fleet-digest:weekly:${params.digest.organization.id}:${params.digest.week}`,
+    })
+  }
+
+  /**
+   * Rapport mensuel de flotte (#871) : son propre job, qui rend l'e-mail et
+   * génère le PDF joint à l'exécution. Une clé par (organisation, mois,
+   * destinataire) : un rapport ne part qu'une fois.
+   */
+  async sendMonthlyFleetReport(params: {
+    report: MonthlyFleetReport
+    userId: number
+    to: string
+    name: string | null
+    locale: string | null
+  }): Promise<EnqueueUniqueResult> {
+    const dedupKey = `fleet-report:monthly:${params.report.organization.id}:${params.report.month}:${params.userId}`
+    const payload: SendMonthlyFleetReportPayload = { ...params, dedupKey }
+
+    const { default: SendMonthlyFleetReportEmail } =
+      await import('#jobs/send_monthly_fleet_report_email')
+
+    return this.dedup.enqueueUnique({
+      key: dedupKey,
+      jobName: SendMonthlyFleetReportEmail.name,
+      queue: 'emails',
+      payload,
+      dispatch: async (p) => {
+        await SendMonthlyFleetReportEmail.dispatch(p)
+      },
     })
   }
 

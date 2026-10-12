@@ -62,6 +62,7 @@ export const controllers = {
   EmailVerification: () => import('#controllers/email_verification_controller'),
   Engines: () => import('#controllers/engines_controller'),
   ExternalCalendars: () => import('#controllers/external_calendars_controller'),
+  FleetDigestUnsubscribe: () => import('#controllers/fleet_digest_unsubscribe_controller'),
   FleetExports: () => import('#controllers/fleet_exports_controller'),
   Health: () => import('#controllers/health_controller'),
   Home: () => import('#controllers/home_controller'),

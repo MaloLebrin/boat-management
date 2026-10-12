@@ -120,6 +120,12 @@ sur la flotte.
 l'utilisateur, montants numériques (sommables dans un tableur), séparateur `;`
 et BOM UTF-8 (`buildCsv`). Nom : `rapport_flotte_<from>_<to>.csv`.
 
+## Rapport mensuel par e-mail (#871)
+
+Le 1er du mois, les admins des plans qui ouvrent `/reports` reçoivent le mois écoulé de ce
+reporting par e-mail, avec un PDF joint — la version « push » de cette page. Détails :
+`docs/domain/notifications.md`, section « Rapports de flotte par e-mail ».
+
 ## Hors périmètre
 
 - Multi-devises (#627) : une seule devise d'organisation.
