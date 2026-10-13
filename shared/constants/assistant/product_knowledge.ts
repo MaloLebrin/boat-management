@@ -2046,8 +2046,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Préparer une traversée (pages hors-ligne)',
     },
     body: {
-      en: 'Before a long passage without network, open the boat page, then the “⋯” menu and “Prepare for passage”. The app pre-loads the boat page, navigation log, maintenance sheets, fuel, incidents and planning so they open offline, even if you never visited them, and keeps them for 35 days. A checklist shows persistent storage, free space, cached pages and their date, entries still to sync, and whether your session lasts until your return date.',
-      fr: 'Avant une longue traversée sans réseau, ouvrez la fiche du bateau, puis le menu « ⋯ » et « Préparer la traversée ». L’app pré-charge la fiche, le journal de navigation, les fiches d’entretien, le carburant, les incidents et le planning : ils s’ouvrent hors-ligne même sans visite préalable, et restent 35 jours en cache. Une check-list indique le stockage persistant, l’espace libre, les pages en cache et leur date, les saisies à synchroniser et si votre session tiendra jusqu’à la date de retour.',
+      en: 'Before a long passage without network, open the boat page, then the “⋯” menu and “Prepare for passage”. The app pre-loads the boat page, navigation log, maintenance sheets, fuel, incidents and planning so they open offline, even if you never visited them, and keeps them for 35 days. Engines with diagnostic content also get their breakdown checklist and sheets, which you can tick at sea. A checklist shows persistent storage, free space, cached pages and their date, entries still to sync, and whether your session lasts until your return date.',
+      fr: 'Avant une longue traversée sans réseau, ouvrez la fiche du bateau, puis le menu « ⋯ » et « Préparer la traversée ». L’app pré-charge la fiche, le journal de navigation, les fiches d’entretien, le carburant, les incidents et le planning : ils s’ouvrent hors-ligne même sans visite préalable, et restent 35 jours en cache. Les moteurs éligibles y ajoutent leur checklist et leurs fiches de diagnostic de panne, que vous pouvez cocher en mer. Une check-list indique le stockage persistant, l’espace libre, les pages en cache et leur date, les saisies à synchroniser et si votre session tiendra jusqu’à la date de retour.',
     },
     keywords: [
       'traversee',
@@ -2062,6 +2062,7 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'preload',
       'check list',
       'checklist',
+      'panne en mer',
     ],
     navTarget: null,
   },

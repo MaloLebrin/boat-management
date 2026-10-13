@@ -191,5 +191,6 @@
       "periodHint": "Filter by client creation date.",
       "anonymizedHint": "Anonymized clients are excluded from the export."
     }
-  }
+  },
+  "offline.queue.type.toggle-diagnostic-step": "Breakdown diagnosis step"
 }

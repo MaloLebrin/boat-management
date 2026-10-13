@@ -4,6 +4,7 @@ import BoatEngineDiagnosticCheck from '#models/boat_engine_diagnostic_check'
 import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
 import { createAdminUser, createMechanicUser } from '#tests/functional/helpers'
+import { TOGGLE_DIAGNOSTIC_STEP_ACTION } from '#shared/constants/offline_queue'
 
 async function makeEligibleEngine(boatId: number) {
   return BoatEngineFactory.merge({
@@ -77,6 +78,8 @@ test.group('Diagnostic checks (functional)', (group) => {
 
     response.assertStatus(302)
     response.assertFlashMessage('error', 'Unknown diagnostic step.')
+    // Rejoué depuis la file hors-ligne (#981) : le refus doit se distinguer d'un succès.
+    response.assertFlashMessage('rejectedType', TOGGLE_DIAGNOSTIC_STEP_ACTION)
     assert.lengthOf(await checksFor(engine.id), 0)
   })
 
@@ -166,7 +169,30 @@ test.group('Diagnostic checks (functional)', (group) => {
       'error',
       'Troubleshooting checklists are not available for this engine family.'
     )
+    response.assertFlashMessage('rejectedType', TOGGLE_DIAGNOSTIC_STEP_ACTION)
     assert.lengthOf(await checksFor(engine.id), 0)
+  })
+
+  test('PATCH toggle on an engine deleted meanwhile is rejected for the offline queue (#981)', async ({
+    client,
+    assert,
+  }) => {
+    const user = await createAdminUser()
+    const boat = await BoatFactory.merge({ organizationId: user.organizationId! }).create()
+    const engine = await makeEligibleEngine(boat.id)
+    const engineId = engine.id
+    await engine.delete()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/engines/${engineId}/diagnostic/steps`)
+      .loginAs(user)
+      .form({ stepKey: 'global.flywheel', checked: true })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertHeader('location', `/boats/${boat.id}`)
+    response.assertFlashMessage('rejectedType', TOGGLE_DIAGNOSTIC_STEP_ACTION)
+    assert.lengthOf(await checksFor(engineId), 0)
   })
 
   test('PATCH toggle from another org redirects and stores nothing', async ({ client, assert }) => {

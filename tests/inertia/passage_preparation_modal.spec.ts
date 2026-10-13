@@ -8,7 +8,13 @@ const queue = vi.hoisted(() => ({ pendingCount: { value: 0 }, failedCount: { val
 const storage = vi.hoisted(() => ({ persisted: { value: null as boolean | null } }))
 
 vi.mock('@inertiajs/vue3', () => ({
-  usePage: () => ({ version: 'v1', props: { appT: {}, locale: 'fr' } }),
+  usePage: () => ({
+    version: 'v1',
+    props: {
+      appT: { 'boats.show.passage.pages.diagnostic': 'Diagnostic de panne — {engine}' },
+      locale: 'fr',
+    },
+  }),
 }))
 vi.mock('~/composables/use_offline_queue', async () => {
   const { ref: vueRef } = await import('vue')
@@ -49,9 +55,9 @@ function setController(controller: Partial<ServiceWorker> | null) {
 }
 
 /** BaseModal re-rend son contenu une fois monté (#835) : attendre avant d'interagir. */
-async function mountModal() {
+async function mountModal(engines: unknown[] = []) {
   const wrapper = mount(PassagePreparationModal, {
-    props: { boatId: 3, open: true },
+    props: { boatId: 3, open: true, engines: engines as never },
     global: { stubs: { teleport: true } },
   })
   await flushPromises()
@@ -145,5 +151,38 @@ describe('PassagePreparationModal', () => {
     expect(status(wrapper, 'passage-check-pages')).toBe('ok')
     expect(status(wrapper, 'passage-check-storage')).toBe('ok')
     expect(wrapper.text()).toContain('boats.show.passage.cachedAt')
+  })
+
+  test('une ligne de diagnostic par moteur éligible, au nom du moteur (#981)', async () => {
+    setController(null)
+    const wrapper = await mountModal([
+      {
+        id: 21,
+        kind: 'outboard',
+        fuel: 'essence',
+        strokeType: '2_stroke',
+        family: null,
+        brand: 'Yamaha',
+        model: '25 BMHS',
+        serialNumber: null,
+      },
+      {
+        id: 22,
+        kind: 'electric',
+        fuel: null,
+        strokeType: null,
+        family: null,
+        brand: 'Torqeedo',
+        model: null,
+        serialNumber: null,
+      },
+    ])
+
+    expect(wrapper.findAll('[data-testid^="passage-page-"]')).toHaveLength(8)
+    expect(wrapper.find('[data-testid="passage-page-diagnosticIndex"]').exists()).toBe(true)
+    expect(wrapper.get('[data-testid="passage-page-diagnostic-21"]').text()).toContain(
+      'Diagnostic de panne — Yamaha 25 BMHS'
+    )
+    expect(wrapper.find('[data-testid="passage-page-diagnostic-22"]').exists()).toBe(false)
   })
 })

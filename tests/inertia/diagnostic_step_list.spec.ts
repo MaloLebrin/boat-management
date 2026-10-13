@@ -2,6 +2,16 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi, beforeEach } from 'vitest'
 
 const patchMock = vi.hoisted(() => vi.fn())
+const enqueueMock = vi.hoisted(() => vi.fn())
+const network = vi.hoisted(() => ({ online: true }))
+
+vi.mock('~/composables/use_network_status', async () => {
+  const { computed } = await import('vue')
+  return { useNetworkStatus: () => ({ isOnline: computed(() => network.online) }) }
+})
+vi.mock('~/composables/use_offline_queue', () => ({
+  useOfflineQueue: () => ({ enqueue: enqueueMock }),
+}))
 
 vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({ props: { appT: {}, locale: 'fr' } }),
@@ -29,6 +39,8 @@ function mountList(overrides: Record<string, unknown> = {}) {
 describe('DiagnosticStepList (#515)', () => {
   beforeEach(() => {
     patchMock.mockClear()
+    enqueueMock.mockClear()
+    network.online = true
   })
 
   test("rend les étapes dans l'ordre du tableau de constantes", () => {
@@ -96,5 +108,54 @@ describe('DiagnosticStepList (#515)', () => {
     await wrapper.find('li button').trigger('click')
 
     expect(patchMock).not.toHaveBeenCalled()
+  })
+
+  describe('hors-ligne (#981)', () => {
+    const URL = '/boats/1/engines/2/diagnostic/steps'
+
+    test('le clic est enfilé, dédupliqué par étape, et coché tout de suite', async () => {
+      network.online = false
+      const wrapper = mountList()
+
+      await wrapper.find('li button').trigger('click')
+
+      expect(patchMock).not.toHaveBeenCalled()
+      expect(enqueueMock).toHaveBeenCalledWith({
+        type: 'toggle-diagnostic-step',
+        url: URL,
+        method: 'patch',
+        payload: { stepKey: steps[0].key, checked: true },
+        dedupeKey: `toggle-diagnostic-step:${URL}:${steps[0].key}`,
+      })
+      expect(wrapper.find('li button').attributes('aria-pressed')).toBe('true')
+    })
+
+    test('un second clic décoche : même clé, dernier état', async () => {
+      network.online = false
+      const wrapper = mountList()
+
+      await wrapper.find('li button').trigger('click')
+      await wrapper.find('li button').trigger('click')
+
+      expect(enqueueMock).toHaveBeenCalledTimes(2)
+      expect(enqueueMock.mock.calls[1][0]).toMatchObject({
+        payload: { stepKey: steps[0].key, checked: false },
+        dedupeKey: `toggle-diagnostic-step:${URL}:${steps[0].key}`,
+      })
+      expect(wrapper.find('li button').attributes('aria-pressed')).toBe('false')
+    })
+
+    test('l’état optimiste s’efface quand le serveur le reflète', async () => {
+      network.online = false
+      const wrapper = mountList()
+      await wrapper.find('li button').trigger('click')
+
+      network.online = true
+      await wrapper.setProps({ checkedKeys: new Set([steps[0].key]) })
+      await wrapper.setProps({ checkedKeys: new Set<string>() })
+
+      // Plus d'état optimiste : la prop fait foi.
+      expect(wrapper.find('li button').attributes('aria-pressed')).toBe('false')
+    })
   })
 })

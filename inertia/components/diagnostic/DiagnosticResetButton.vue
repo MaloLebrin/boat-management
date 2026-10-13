@@ -4,9 +4,13 @@ import { ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import type { DiagnosticResetScope } from '#shared/types/diagnostic'
+import { useNetworkStatus } from '~/composables/use_network_status'
 import { useT } from '~/composables/use_t'
 
 const { t } = useT()
+// Un DELETE ne passe pas par la file hors-ligne (post/patch/put) : en mer, la
+// réinitialisation attend le retour du réseau plutôt que d'échouer (#981).
+const { isOnline } = useNetworkStatus()
 
 const props = defineProps<{
   boatId: number
@@ -26,7 +30,13 @@ function reset() {
 </script>
 
 <template>
-  <BaseButton variant="outline" size="sm" @click="confirmOpen = true">
+  <BaseButton
+    variant="outline"
+    size="sm"
+    :disabled="!isOnline"
+    :title="isOnline ? undefined : t('diagnostic.common.resetOffline')"
+    @click="confirmOpen = true"
+  >
     {{ t('diagnostic.common.reset') }}
   </BaseButton>
   <BaseConfirmModal

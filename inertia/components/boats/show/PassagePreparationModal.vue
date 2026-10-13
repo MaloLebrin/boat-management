@@ -8,28 +8,50 @@ import PassageChecklist from '~/components/boats/show/PassageChecklist.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import {
   usePassagePreparation,
+  type PassagePageState,
   type PassagePageStatus,
 } from '~/composables/use_passage_preparation'
 import { useT } from '~/composables/use_t'
+import type { BoatShowEngine } from '~/types/boat_show'
+import { engineDisplayTitle } from '~/utils/boat_enum_labels'
 
 /**
  * « Préparer la traversée » (#967, épic #949) : pré-charge les pages terrain
  * du bateau dans le cache du service worker et dresse la check-list du départ.
  */
-const props = defineProps<{
-  boatId: number
-}>()
+const props = withDefaults(
+  defineProps<{
+    boatId: number
+    /** Moteurs du bateau : leurs checklists de diagnostic sont pré-chargées (#981). */
+    engines?: BoatShowEngine[]
+  }>(),
+  { engines: () => [] }
+)
 
 const open = defineModel<boolean>('open', { required: true })
 
 const { t } = useT()
 const { formatDateTime } = useDateFormat()
 const { pages, isPreparing, serviceWorkerReady, prepare, refreshCachedDates } =
-  usePassagePreparation(() => props.boatId)
+  usePassagePreparation(
+    () => props.boatId,
+    () => props.engines
+  )
 
 watch(open, (isOpen) => {
   if (isOpen) void refreshCachedDates()
 })
+
+function pageLabel(item: PassagePageState): string {
+  const engine = props.engines.find((candidate) => candidate.id === item.engineId)
+  return t(`boats.show.passage.pages.${item.key}`, {
+    engine: engine ? engineDisplayTitle(t, engine) : '',
+  })
+}
+
+function pageId(item: PassagePageState): string {
+  return item.engineId === undefined ? item.key : `${item.key}-${item.engineId}`
+}
 
 const cachedAt = computed(() => pages.value.map((item) => item.cachedAt))
 
@@ -67,14 +89,14 @@ const STATUS_BADGE: Record<Exclude<PassagePageStatus, 'idle'>, 'info' | 'success
         <ul class="divide-y divide-border rounded-(--radius-control) border border-border">
           <li
             v-for="item in pages"
-            :key="item.key"
+            :key="pageId(item)"
             class="flex items-center justify-between gap-3 px-4 py-2.5"
-            :data-testid="`passage-page-${item.key}`"
+            :data-testid="`passage-page-${pageId(item)}`"
             :data-status="item.status"
           >
             <div class="min-w-0">
               <p class="text-sm font-semibold text-fg">
-                {{ t(`boats.show.passage.pages.${item.key}`) }}
+                {{ pageLabel(item) }}
               </p>
               <p class="text-xs text-fg-muted">
                 {{

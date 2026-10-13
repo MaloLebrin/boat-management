@@ -29,7 +29,8 @@
     "localStateHint": "Cette fiche n'est liée à aucun moteur de votre flotte : les cases ne sont pas enregistrées et repartent de zéro à la prochaine visite.",
     "safetyTitle": "Sécurité",
     "seaCockTitle": "Vanne de coque ouverte avant de démarrer",
-    "seaCock": "Cette fiche implique de démarrer le moteur : vérifiez que la vanne de coque d'eau de mer est ouverte et qu'un filet d'eau sort à l'échappement dans les premières secondes. Sans eau, coupez immédiatement — la turbine se détruit en quelques secondes."
+    "seaCock": "Cette fiche implique de démarrer le moteur : vérifiez que la vanne de coque d'eau de mer est ouverte et qu'un filet d'eau sort à l'échappement dans les premières secondes. Sans eau, coupez immédiatement — la turbine se détruit en quelques secondes.",
+    "resetOffline": "Réinitialisation indisponible hors-ligne"
   },
   "tab": {
     "title": "Diagnostic panne",

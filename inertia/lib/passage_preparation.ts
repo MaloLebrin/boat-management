@@ -1,4 +1,9 @@
 import { SESSION_IDLE_DAYS } from '../../shared/constants/auth'
+import {
+  isDiagnosticEligibleEngine,
+  sheetsForEngine,
+  type DiagnosticEngine,
+} from '#shared/helpers/diagnostic'
 
 /**
  * « Préparer la traversée » (#967, épic #949) — logique pure de l'écran :
@@ -13,19 +18,34 @@ export type PassagePageKey =
   | 'fuel'
   | 'incidents'
   | 'planning'
+  | 'diagnosticIndex'
+  | 'diagnostic'
 
 export interface PassagePage {
   key: PassagePageKey
   /** Chemin relatif, tel que la navigation le demandera hors-ligne. */
   url: string
+  /** Moteur concerné : une ligne de diagnostic par moteur éligible (#981). */
+  engineId?: number
+  /**
+   * Pages rangées sous la même ligne : les fiches de diagnostic du moteur.
+   * Huit à dix par famille — une ligne chacune noierait la modale.
+   */
+  extraUrls?: string[]
 }
+
+/** Moteur du bateau, tel que la fiche le connaît : de quoi résoudre sa famille. */
+export type PassageEngine = DiagnosticEngine & { id: number }
 
 /**
  * Pages terrain d'un bateau. Les onglets de la fiche sont des URLs distinctes
  * pour le cache des documents (`?tab=` est conservé par un rechargement) :
  * chacune est pré-chargée. Leurs props différées, elles, sont communes.
  */
-export function passagePages(boatId: number): PassagePage[] {
+export function passagePages(
+  boatId: number,
+  engines: readonly PassageEngine[] = []
+): PassagePage[] {
   const boat = `/boats/${boatId}`
   return [
     { key: 'boat', url: boat },
@@ -34,7 +54,36 @@ export function passagePages(boatId: number): PassagePage[] {
     { key: 'fuel', url: `${boat}?tab=fuel` },
     { key: 'incidents', url: `${boat}?tab=incidents` },
     { key: 'planning', url: '/planning' },
+    ...diagnosticPages(boatId, engines),
   ]
+}
+
+/**
+ * Checklists de diagnostic de panne (#981) : la réponse déterministe au
+ * « diagnostiquer en mer » que le spike #972 refuse de confier à un modèle
+ * embarqué. L'index `/diagnostic` (entrée de la barre latérale), puis pour
+ * chaque moteur éligible sa checklist et les fiches de sa famille.
+ */
+function diagnosticPages(boatId: number, engines: readonly PassageEngine[]): PassagePage[] {
+  const eligible = engines.filter((engine) => isDiagnosticEligibleEngine(engine))
+  if (eligible.length === 0) return []
+  return [
+    { key: 'diagnosticIndex', url: '/diagnostic' },
+    ...eligible.map((engine): PassagePage => {
+      const checklist = `/boats/${boatId}/engines/${engine.id}/diagnostic`
+      return {
+        key: 'diagnostic',
+        url: checklist,
+        engineId: engine.id,
+        extraUrls: sheetsForEngine(engine).map((sheet) => `${checklist}/sheets/${sheet.slug}`),
+      }
+    }),
+  ]
+}
+
+/** Toutes les URLs d'une ligne : la page, puis celles rangées dessous. */
+export function passagePageUrls(page: PassagePage): string[] {
+  return [page.url, ...(page.extraUrls ?? [])]
 }
 
 export type ChecklistStatus = 'ok' | 'warning' | 'unknown'

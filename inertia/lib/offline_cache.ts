@@ -25,8 +25,8 @@ export const DATA_MAX_ENTRIES = 240
 /** Délai réseau avant de servir la copie en cache (pages et données). */
 export const NETWORK_TIMEOUT_SECONDS = 3
 
-/** Pages terrain mises en cache par le service worker. */
-export const TERRAIN_PATH = /^\/(boats|navigation|planning)(\/|$)/
+/** Pages terrain mises en cache par le service worker (diagnostic de panne depuis #981). */
+export const TERRAIN_PATH = /^\/(boats|navigation|planning|diagnostic)(\/|$)/
 
 /** Message client → SW : pré-charger un document dans `inertia-pages`. */
 export const WARM_PAGE_MESSAGE = 'passage:warm-page'

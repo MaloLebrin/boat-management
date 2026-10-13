@@ -505,7 +505,9 @@
         "sheets": "Maintenance sheets",
         "fuel": "Fuel",
         "incidents": "Incidents",
-        "planning": "Planning"
+        "planning": "Planning",
+        "diagnosticIndex": "Breakdown diagnosis — engine list",
+        "diagnostic": "Breakdown diagnosis — {engine}"
       },
       "pageStatus": {
         "loading": "Loading",

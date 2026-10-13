@@ -50,6 +50,9 @@ describe('constantes et messages', () => {
     expect(TERRAIN_PATH.test('/boats/1')).toBe(true)
     expect(TERRAIN_PATH.test('/planning')).toBe(true)
     expect(TERRAIN_PATH.test('/settings')).toBe(false)
+    // #981 — l'index du diagnostic de panne ; la page marketing reste hors cache.
+    expect(TERRAIN_PATH.test('/diagnostic')).toBe(true)
+    expect(TERRAIN_PATH.test('/diagnostic-panne-ia')).toBe(false)
   })
 
   test('isWarmPageMessage', () => {

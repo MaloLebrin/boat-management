@@ -155,17 +155,24 @@ L'invariant ne tenait pas avant #576 : `gearcase` pointait vers `lower-unit`, qu
 
 `ALL_DIAGNOSTIC_STEP_KEYS` est l'ensemble des clés **persistables** : il exclut les fiches `standalone` (« premier contact »), dont l'état vit dans le navigateur — le moteur prospect n'existe pas en base.
 
+### Hors-ligne (#981)
+
+« Préparer la traversée » (menu « ⋯ » de la fiche bateau, `docs/domain/offline-queue.md`) pré-charge `/diagnostic`, puis la checklist et les fiches de chaque moteur éligible du bateau : le diagnostic reste consultable en mer. Une étape cochée sans réseau est affichée tout de suite (état optimiste dans `DiagnosticStepList.vue`) et part en file hors-ligne (`toggle-diagnostic-step`), rejouée au retour du réseau. La barre de progression, calculée par la page sur les props, ne reflète ces coches qu'après synchronisation. La réinitialisation, elle, attend le réseau.
+
+C'est la réponse retenue par le spike #972 au « diagnostiquer en mer » : un contenu déterministe plutôt qu'un modèle embarqué.
+
 ---
 
 ## Tests
 
-| Fichier                                                       | Couvre                                                                            |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `tests/inertia/diagnostic_content.spec.ts`                    | invariants de contenu, clés persistées, i18n `fr` + `en`, éligibilité par famille |
-| `tests/inertia/spare_parts_content.spec.ts`                   | réciprocité des liens croisés                                                     |
-| `tests/unit/services/engine_diagnosis_prompt_service.spec.ts` | prompt et parser par famille                                                      |
-| `tests/functional/diagnostic/*.spec.ts`                       | pages, ACL, toggle, reset, fiche hors famille                                     |
-| `tests/functional/ai/engine_diagnosis.spec.ts`                | gating plan/quota, prompt in-bord, fiche hors famille rejetée                     |
+| Fichier                                                       | Couvre                                                                               |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `tests/inertia/diagnostic_content.spec.ts`                    | invariants de contenu, clés persistées, i18n `fr` + `en`, éligibilité par famille    |
+| `tests/inertia/spare_parts_content.spec.ts`                   | réciprocité des liens croisés                                                        |
+| `tests/unit/services/engine_diagnosis_prompt_service.spec.ts` | prompt et parser par famille                                                         |
+| `tests/functional/diagnostic/*.spec.ts`                       | pages, ACL, toggle (et `rejectedType` pour la file, #981), reset, fiche hors famille |
+| `tests/inertia/diagnostic_step_list.spec.ts`                  | toggle en ligne, enfilé hors-ligne avec état optimiste (#981)                        |
+| `tests/functional/ai/engine_diagnosis.spec.ts`                | gating plan/quota, prompt in-bord, fiche hors famille rejetée                        |
 
 ## Ajouter une fiche
 
