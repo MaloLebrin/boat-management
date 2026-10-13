@@ -6,6 +6,7 @@ import BoatIncidentService from '#services/boat_incident_service'
 import { CloudinaryFolders } from '#services/cloudinary_service'
 import MediaService from '#services/media_service'
 import OrganizationService from '#services/organization_service'
+import { UPLOAD_PHOTOS_ACTION } from '#shared/constants/offline_queue'
 import { storeBoatPhotosValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -45,6 +46,9 @@ export default class BoatIncidentMediaController {
       incidentId = incident.id
     } catch (error) {
       if (error instanceof BoatIncidentNotFoundError) {
+        // Incident supprimé avant le rejeu de ses photos : elles passent en
+        // échec plutôt que de disparaître (#969). Inerte hors rejeu.
+        ctx.session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
         ctx.response.redirect(`/boats/${boat.id}?tab=incidents`)
         return null
       }
@@ -96,6 +100,9 @@ export default class BoatIncidentMediaController {
       )
     } else {
       ctx.session.flash('error', ctx.i18n.t('flash.media.photosAddFailed'))
+      // Lot rejoué depuis la file hors-ligne (#969) : sans marqueur, ce refus
+      // serait lu comme un succès et les photos détruites avec l'action.
+      ctx.session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
     }
     ctx.response.redirect(photosUrl)
   }

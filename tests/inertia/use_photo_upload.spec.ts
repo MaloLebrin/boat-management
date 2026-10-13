@@ -19,6 +19,11 @@ vi.mock('~/composables/use_network_status', async () => {
   return { useNetworkStatus: () => ({ isOnline: computed(() => mockIsOnline.value) }) }
 })
 
+const mockQueuePhotos = vi.hoisted(() => vi.fn().mockResolvedValue(true))
+vi.mock('~/composables/use_offline_photos', () => ({
+  useOfflinePhotos: () => ({ queuePhotos: mockQueuePhotos }),
+}))
+
 import { usePhotoUpload } from '../../inertia/composables/use_photo_upload'
 
 function changeEvent(files: File[] | null): Event {
@@ -87,15 +92,33 @@ describe('usePhotoUpload', () => {
     expect(mockFormPost).not.toHaveBeenCalled()
   })
 
-  test('hors-ligne, rien ne part', () => {
-    // La file IndexedDB ne transporte pas de multipart (#621) : le refus est
-    // explicite, il ne dépend pas de la désactivation des boutons.
+  test('hors-ligne, le lot part en file au lieu du réseau (#969)', async () => {
     mockIsOnline.value = false
-    const { onFileChange } = usePhotoUpload('/media/photos')
+    const { fileInput, cameraInput, isQueueing, onFileChange } = usePhotoUpload('/media/photos')
+    fileInput.value = { value: 'C:\\fakepath\\a.jpg' } as HTMLInputElement
+    cameraInput.value = { value: '' } as HTMLInputElement
+    const photos = [file('a.jpg'), file('b.jpg')]
 
-    onFileChange(changeEvent([file('a.jpg')]))
+    onFileChange(changeEvent(photos))
+    expect(isQueueing.value).toBe(true)
+    await vi.waitFor(() => expect(isQueueing.value).toBe(false))
 
     expect(mockFormPost).not.toHaveBeenCalled()
+    expect(mockQueuePhotos).toHaveBeenCalledWith({ url: '/media/photos', files: photos })
+    // Comme au succès en ligne : resélectionner la même photo doit réémettre `change`.
+    expect(mockFormReset).toHaveBeenCalledOnce()
+    expect(fileInput.value.value).toBe('')
+  })
+
+  test('hors-ligne, un refus de la file (quota) libère quand même les boutons', async () => {
+    mockIsOnline.value = false
+    mockQueuePhotos.mockResolvedValueOnce(false)
+    const { isQueueing, onFileChange } = usePhotoUpload('/media/photos')
+
+    onFileChange(changeEvent([file('a.jpg')]))
+    await vi.waitFor(() => expect(isQueueing.value).toBe(false))
+
+    expect(mockFormReset).toHaveBeenCalledOnce()
   })
 
   test('au succès, le formulaire et les deux entrées sont remis à zéro', () => {

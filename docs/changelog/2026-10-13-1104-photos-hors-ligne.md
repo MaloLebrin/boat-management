@@ -1,0 +1,13 @@
+# 2026-10-13 — Photos hors-ligne : pièces jointes dans la file, réduction et rejeu multipart (#969)
+
+Fait partie de l'épic #949 (Mode traversée), phase 2. `usePhotoUpload` refusait l'envoi hors-ligne (#621) : la file IndexedDB ne transportait pas de fichiers. Sur une traversée, les photos d'incident ou d'avarie ne pouvaient pas être saisies dans l'app pendant des semaines.
+
+- **File avec pièces jointes.** `QueuedAction.attachments` (`{ field, name, type, data: ArrayBuffer }`), stockées dans l'enregistrement de l'action, reportées à chaque réécriture (dépendances, échecs, reprise), supprimées avec l'action après un rejeu réussi. `drainQueue` les rejoue en `FormData` (`forceFormData`, `files[]`), comme l'envoi en ligne. Pas de montée de version IndexedDB.
+- **Réduction avant mise en file** (`inertia/lib/offline_photos.ts`) : 2048 px sur le plus grand côté, JPEG qualité 0,8. GIF et HEIC partent tels quels ; l'original est gardé si le réencodage échoue ou ne gagne rien. Une photo encore au-delà de 10 Mo est refusée.
+- **Quota.** `navigator.storage.estimate()` avec 20 Mo de marge : place insuffisante → message, rien n'est enfilé.
+- **Galeries.** Galerie du bateau et `MediaPhotoGallery` (équipements, incidents, états des lieux) : les boutons restent actifs hors-ligne ou sur réseau dégradé, un bandeau explique que les photos attendent, et `PendingPhotoTiles.vue` affiche les vignettes « En attente ».
+- **Incidents.** Déclaré hors-ligne avec des photos, l'incident part en file avec un `tempId` et ses photos le suivent dans une action `upload-photos` dépendante, envoyée sur l'id réel au rejeu. La photo reste facultative hors-ligne.
+- **Protocole.** Nouvelle action `upload-photos` (`UPLOAD_PHOTOS_ACTION`). Les quatre contrôleurs d'envoi de photos flashent son `rejectedType` quand aucune photo du lot n'a pu être enregistrée et sur leurs refus avant envoi (équipement ou incident disparu, état des lieux introuvable ou signé) : le lot part dans les échecs, octets compris, au lieu d'être détruit.
+- **i18n.** `common.offline.photoQueuedNotice` (remplace `photoUploadUnavailable`), `common.offline.photos.*`, `common.offline.queue.type.upload-photos`, `incidents.form.photoOfflineNotice` réécrit (FR/EN).
+- **Copilote.** Entrée `offline-photos` ; `boats-photos` et l'entrée incidents ne disent plus que l'envoi est impossible hors-ligne.
+- **Tests.** Vitest : `offline_photos.spec.ts`, `use_offline_photos.spec.ts`, pièces jointes dans `use_offline_queue.spec.ts`, galeries, `use_photo_upload.spec.ts`, `boat_incident_form.spec.ts`. Japa functional : `offline_photo_replay.spec.ts` (rejeu multipart, marqueurs). Japa browser : `offline_photos.spec.ts` (photo prise hors-ligne puis synchronisée).

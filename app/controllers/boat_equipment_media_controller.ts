@@ -4,6 +4,7 @@ import MediaService from '#services/media_service'
 import { MediaNotFoundError } from '#exceptions/media_errors'
 import OrganizationService from '#services/organization_service'
 import type { EquipmentMediaSlug } from '#shared/types/equipment_media'
+import { UPLOAD_PHOTOS_ACTION } from '#shared/constants/offline_queue'
 import { storeBoatPhotosValidator } from '#validators/media'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -58,6 +59,9 @@ export default class BoatEquipmentMediaController {
     )
 
     if (!resolution.ok) {
+      // Équipement supprimé pendant la traversée : les photos enfilées
+      // passent en échec plutôt que de disparaître (#969). Inerte hors rejeu.
+      ctx.session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
       ctx.response.redirect(resolution.redirectTo)
       return null
     }
@@ -100,6 +104,9 @@ export default class BoatEquipmentMediaController {
       )
     } else {
       ctx.session.flash('error', ctx.i18n.t('flash.media.photosAddFailed'))
+      // Lot rejoué depuis la file hors-ligne (#969) : sans marqueur, ce refus
+      // serait lu comme un succès et les photos détruites avec l'action.
+      ctx.session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
     }
     ctx.response.redirect(resolved.photosUrl)
   }

@@ -332,8 +332,9 @@ avec un **jeton temporaire**, et les défauts saisis dans la foulée le
 référencent (voir « Dépendances entre actions » ci-dessous). Ce qui reste
 indisponible sur un état des lieux pas encore synchronisé, avec un message
 explicite plutôt qu'un échec silencieux : la **checklist** (les constats
-`PATCH .../items` n'ont pas de chemin hors-ligne) et l'**ajout de photos**
-(#621 — la file stocke du JSON, pas des `File`). Le refus explicite de
+`PATCH .../items` n'ont pas de chemin hors-ligne) et l'**ajout de photos** :
+la file transporte des photos depuis #969, mais la galerie d'un état des lieux
+n'est montée qu'une fois celui-ci synchronisé. Le refus explicite de
 `InspectionDefectModal` (#491) ne subsiste que lorsqu'il n'existe aucun état des
 lieux, même temporaire.
 

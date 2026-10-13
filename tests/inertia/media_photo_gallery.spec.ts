@@ -28,6 +28,18 @@ vi.mock('~/composables/use_network_status', async () => {
   }
 })
 
+const mockQueuePhotos = vi.hoisted(() => vi.fn().mockResolvedValue(true))
+const mockPendingPhotos = vi.hoisted(() => ({
+  value: [] as { key: string; name: string; src: string }[],
+}))
+vi.mock('~/composables/use_offline_photos', async () => {
+  const { computed } = await import('vue')
+  return {
+    useOfflinePhotos: () => ({ queuePhotos: mockQueuePhotos }),
+    usePendingPhotos: () => ({ pendingPhotos: computed(() => mockPendingPhotos.value) }),
+  }
+})
+
 vi.mock('~/components/base/BaseButton.vue', () => ({
   default: {
     template:
@@ -66,6 +78,7 @@ describe('MediaPhotoGallery', () => {
     mockForm.files = []
     mockForm.processing = false
     mockIsOnline.value = true
+    mockPendingPhotos.value = []
   })
 
   test('renders the empty state when there are no photos', () => {
@@ -217,63 +230,78 @@ describe('MediaPhotoGallery', () => {
     expect(wrapper.text()).not.toContain('media.photos.takePhoto')
   })
 
-  // #621 — refus explicite hors-ligne : la file IndexedDB ne transporte pas de multipart.
-  test('disables the upload buttons and shows an offline message when offline', () => {
+  // #969 — hors-ligne, les photos partent en file IndexedDB au lieu d'être refusées (#621).
+  test('keeps the upload enabled offline and explains that photos are queued', () => {
     mockIsOnline.value = false
     const wrapper = mount(MediaPhotoGallery, { props: baseProps })
 
     const buttons = wrapper.findAll('button')
-    expect(buttons).toHaveLength(2)
+    expect(buttons.length).toBeGreaterThanOrEqual(2)
     for (const button of buttons) {
-      expect(button.attributes('disabled')).toBeDefined()
+      expect(button.attributes('disabled')).toBeUndefined()
     }
-    const alert = wrapper.find('[role="alert"]')
-    expect(alert.exists()).toBe(true)
-    expect(alert.text()).toContain('common.offline.photoUploadUnavailable')
+    const notice = wrapper.find('[role="status"]')
+    expect(notice.exists()).toBe(true)
+    expect(notice.text()).toContain('common.offline.photoQueuedNotice')
   })
 
-  test('does not post files selected while offline', async () => {
+  test('queues files selected while offline instead of posting them', async () => {
     mockIsOnline.value = false
     const wrapper = mount(MediaPhotoGallery, { props: baseProps })
-    const file = new File(['x'], 'engine.jpg', { type: 'image/jpeg' })
+    const file = new File(['x'], 'offline.jpg', { type: 'image/jpeg' })
     const input = wrapper.find('input[type="file"]')
 
     Object.defineProperty(input.element, 'files', { value: [file] })
     await input.trigger('change')
 
     expect(mockFormPost).not.toHaveBeenCalled()
+    expect(mockQueuePhotos).toHaveBeenCalledWith({ url: baseProps.uploadUrl, files: [file] })
   })
 
-  test('keeps the upload enabled and hides the offline message when online', () => {
+  test('keeps the upload enabled and hides the offline notice when online', () => {
     const wrapper = mount(MediaPhotoGallery, { props: baseProps })
 
     for (const button of wrapper.findAll('button')) {
       expect(button.attributes('disabled')).toBeUndefined()
     }
-    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
-    expect(wrapper.text()).not.toContain('common.offline.photoUploadUnavailable')
+    expect(wrapper.find('[role="status"]').exists()).toBe(false)
   })
 
-  test('does not open the file picker from the empty-state dropzone when offline', async () => {
+  test('opens the file picker from the empty state even offline', async () => {
     mockIsOnline.value = false
     const wrapper = mount(MediaPhotoGallery, { props: baseProps })
     const input = wrapper.find('input[type="file"]')
-    const clickSpy = vi.spyOn(input.element as HTMLInputElement, 'click')
+    const clickSpy = vi
+      .spyOn(input.element as HTMLInputElement, 'click')
+      .mockImplementation(() => {})
 
     await wrapper.find('.border-dashed').trigger('click')
 
-    expect(clickSpy).not.toHaveBeenCalled()
+    expect(clickSpy).toHaveBeenCalled()
   })
 
-  test('offlinePhotoUploadUnavailable key is translated in both locales', () => {
+  test('shows the photos still waiting in the offline queue', () => {
+    mockPendingPhotos.value = [{ key: '1-0', name: 'a.jpg', src: 'blob:a' }]
+    const wrapper = mount(MediaPhotoGallery, { props: baseProps })
+
+    const tiles = wrapper.findAll('[data-testid="pending-photo"]')
+    expect(tiles).toHaveLength(1)
+    expect(tiles[0].find('img').attributes('src')).toBe('blob:a')
+    expect(tiles[0].text()).toContain('common.offline.photos.pending')
+  })
+
+  test('photoQueuedNotice key is translated in both locales', () => {
     for (const locale of ['en', 'fr'] as const) {
       const json = JSON.parse(
         readFileSync(resolve(__dirname, `../../resources/lang/${locale}/common.json`), 'utf8')
       ) as Record<string, string>
-      expect(
-        json['offline.photoUploadUnavailable'],
-        `common.offline.photoUploadUnavailable (${locale})`
-      ).toBeTruthy()
+      for (const key of [
+        'offline.photoQueuedNotice',
+        'offline.photos.pending',
+        'offline.photos.pendingAlt',
+      ]) {
+        expect(json[key], `common.${key} (${locale})`).toBeTruthy()
+      }
     }
   })
 

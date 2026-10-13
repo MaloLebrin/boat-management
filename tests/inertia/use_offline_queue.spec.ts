@@ -1246,4 +1246,124 @@ describe('useOfflineQueue', () => {
       expect(groups[2].dependents).toHaveLength(0)
     })
   })
+
+  describe('pièces jointes — photos hors-ligne (#969)', () => {
+    function attachment(name: string, content: string) {
+      return {
+        field: 'files',
+        name,
+        type: 'image/jpeg',
+        data: new TextEncoder().encode(content).buffer as ArrayBuffer,
+      }
+    }
+
+    test('le rejeu part en multipart, les fichiers reconstruits sous leur champ', async () => {
+      makeRouterCallOnSuccess()
+      const { enqueue, drainQueue, pendingCount } = mountComposable()
+
+      await enqueue({
+        type: 'upload-photos',
+        url: '/boats/1/photos',
+        method: 'post',
+        payload: {},
+        attachments: [attachment('a.jpg', 'aaa'), attachment('b.jpg', 'bb')],
+      })
+      expect(pendingCount.value).toBe(1)
+      await drainQueue()
+
+      const [url, data, options] = vi.mocked(router.post).mock.calls[0] as [
+        string,
+        { files: File[] },
+        { forceFormData?: boolean },
+      ]
+      expect(url).toBe('/boats/1/photos')
+      expect(options.forceFormData).toBe(true)
+      expect(data.files.map((file) => file.name)).toEqual(['a.jpg', 'b.jpg'])
+      expect(data.files[0].type).toBe('image/jpeg')
+      expect(await data.files[0].text()).toBe('aaa')
+      // Rejeu réussi : l'action et ses octets quittent la file.
+      await vi.waitFor(() => expect(pendingCount.value).toBe(0))
+    })
+
+    test('une action sans pièce jointe ne force pas le multipart', async () => {
+      makeRouterCallOnSuccess()
+      const { enqueue, drainQueue } = mountComposable()
+
+      await enqueue({
+        type: 'create-fuel-log',
+        url: '/boats/1/fuel-logs',
+        method: 'post',
+        payload: { liters: 10 },
+      })
+      await drainQueue()
+
+      const [, data, options] = vi.mocked(router.post).mock.calls[0] as [
+        string,
+        unknown,
+        { forceFormData?: boolean },
+      ]
+      expect(data).toEqual({ liters: 10 })
+      expect(options.forceFormData).toBeUndefined()
+    })
+
+    test('un refus garde les photos dans les échecs, et la reprise les renvoie', async () => {
+      makeRouterCallOnSuccessWithRejection('upload-photos', 'Aucune photo enregistrée')
+      const { enqueue, drainQueue, failedActions, pendingCount, retryFailedAction } =
+        mountComposable()
+
+      await enqueue({
+        type: 'upload-photos',
+        url: '/boats/1/photos',
+        method: 'post',
+        payload: {},
+        attachments: [attachment('a.jpg', 'aaa')],
+      })
+      await drainQueue()
+
+      await vi.waitFor(() => expect(failedActions.value).toHaveLength(1))
+      expect(failedActions.value[0].attachments?.[0].name).toBe('a.jpg')
+
+      mockPageProps.flash = {}
+      makeRouterCallOnSuccess()
+      await retryFailedAction(failedActions.value[0].id!)
+
+      await vi.waitFor(() => expect(vi.mocked(router.post)).toHaveBeenCalledTimes(2))
+      const [, data] = vi.mocked(router.post).mock.calls[1] as [string, { files: File[] }]
+      expect(await data.files[0].text()).toBe('aaa')
+      // Le drain relancé par la reprise doit finir ici, pas dans le test suivant.
+      await vi.waitFor(() => expect(pendingCount.value).toBe(0))
+    })
+
+    test('les photos d’un incident saisi hors-ligne suivent son id réel', async () => {
+      const tempId = newTempId()
+      makeRouterCallOnSuccessWithCreatedId('create-incident', '42')
+      const { enqueue, drainQueue, pendingCount } = mountComposable()
+
+      await enqueue({
+        type: 'create-incident',
+        url: '/boats/1/incidents',
+        method: 'post',
+        payload: { title: 'Voie d’eau' },
+        tempId,
+      })
+      await enqueue({
+        type: 'upload-photos',
+        url: `/boats/1/incidents/${tempId}/photos`,
+        method: 'post',
+        payload: {},
+        attachments: [attachment('voie.jpg', 'water')],
+        dependsOn: tempId,
+      })
+      await drainQueue()
+
+      await vi.waitFor(() => expect(pendingCount.value).toBe(0))
+      const calls = vi.mocked(router.post).mock.calls
+      expect(calls.map((call) => call[0])).toEqual([
+        '/boats/1/incidents',
+        '/boats/1/incidents/42/photos',
+      ])
+      const photoData = calls[1][1] as { files: File[] }
+      expect(await photoData.files[0].text()).toBe('water')
+    })
+  })
 })

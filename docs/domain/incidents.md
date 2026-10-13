@@ -54,7 +54,7 @@ Un incident sans photo est inexploitable pour un dossier assurance — la raison
 | Chemin                       | Photo à la déclaration       | Ce qui tient la règle                            |
 | ---------------------------- | ---------------------------- | ------------------------------------------------ |
 | Formulaire, en ligne         | **exigée** par le formulaire | envoi en deux temps (ci-dessous)                 |
-| Formulaire, hors-ligne       | **exemptée**                 | verrou de clôture au retour du réseau            |
+| Formulaire, hors-ligne       | **facultative** (#969)       | photos en file derrière l'incident, sinon verrou |
 | Copilote (`report_incident`) | impossible (aucun fichier)   | verrou de clôture + relance dans la confirmation |
 | Clôture (`status: 'closed'`) | —                            | **refus serveur** `photoRequiredToClose`         |
 
@@ -62,7 +62,7 @@ Un incident sans photo est inexploitable pour un dossier assurance — la raison
 
 `POST /boats/:boatId/incidents` reste un POST **JSON**. Le basculer en multipart coûterait trois choses : les six FK de cible repartiraient en chaînes vides au lieu de `number | null` ; la route devrait entrer dans `LARGE_UPLOAD_ROUTES`, dont la garde `mediaBatchKindFor` impose un suffixe `/photos` ou `/documents` ; et la branche hors-ligne enfilerait des `File`, que `QueuedAction.payload` (`FormDataConvertible`) ne transporte pas (#621).
 
-Le formulaire crée donc l'incident, puis envoie les photos sur `POST …/incidents/:incidentId/photos` — route déjà validée par `storeBoatPhotosValidator`, déjà plafonnée pour les lots. Pour connaître l'id, `BoatIncidentsController.store` flashe `createdResourceType = create-incident` et `createdResourceId`, le canal déjà relayé par `InertiaMiddleware.share()` et déjà utilisé par les inspections, les journaux et les pleins. **Neutre pour `drainQueue`** : ces clés ne sont lues que si l'action porte un `tempId`, ce que les incidents ne font pas.
+Le formulaire crée donc l'incident, puis envoie les photos sur `POST …/incidents/:incidentId/photos` — route déjà validée par `storeBoatPhotosValidator`, déjà plafonnée pour les lots. Pour connaître l'id, `BoatIncidentsController.store` flashe `createdResourceType = create-incident` et `createdResourceId`, le canal déjà relayé par `InertiaMiddleware.share()` et déjà utilisé par les inspections, les journaux et les pleins. Hors-ligne, ces mêmes clés résolvent le `tempId` que porte la création quand des photos l'accompagnent (#969, ci-dessous).
 
 Tout tient dans `inertia/composables/use_incident_photo_flow.ts` (exemption hors-ligne, enchaînement, `createdIncidentId` mémorisé pour qu'une resoumission après un envoi raté ne crée pas un second incident) et `inertia/components/media/MediaPendingPhotoPicker.vue` — sélecteur de fichiers **en attente**, qui ne poste rien et remonte des `File` à son parent, contrairement à `usePhotoUpload` et `MediaPhotoGallery`. Les bornes viennent de `shared/constants/media.ts` et sont appliquées dès la sélection, pour qu'un fichier refusé ne le soit pas après la création.
 
@@ -78,7 +78,7 @@ Un incident sans photo est signalé partout : `BoatIncidentCard`, `IncidentRow` 
 - `POST …/incidents/:incidentId/photos` et `DELETE …/photos/:mediaId` → `BoatIncidentMediaController` (autorisé par **`IncidentPolicy.edit`**, pas `BoatPolicy.edit` comme les équipements). Deux gardes IDOR : `BoatIncidentService.findForBoat` (l'incident est du bateau, lui-même scopé à l'organisation) puis `mediaService.getForEntity(mediaId, 'boat_incident', incidentId)`. Redirection vers la page de détail ; incident étranger → `/boats/:id?tab=incidents`.
 - Médias : `entity_type = 'boat_incident'` (`MEDIA_ENTITY_TYPES`), dossier `CloudinaryFolders.boatIncidentPhotos` (`…/boats/{id}/incidents/{id}/photos`), route dans `LARGE_UPLOAD_ROUTES`. Purge à la suppression de l'incident (`deleteForBoat(…, org)`) et à la purge physique du bateau (`BoatHullService.purgePhysically`).
 - `BoatIncidentRow.photosCount` (compteur seul, une requête groupée dans `listForBoat`) : les médias ne voyagent jamais dans la prop différée `incidents`.
-- Hors-ligne : la déclaration d'un incident est enfilée, **pas** les photos — `usePhotoUpload` refuse l'envoi sans réseau (#621), le bouton est désactivé avec un message. C'est ce qui motive l'exemption de la section précédente.
+- Hors-ligne (#969) : la déclaration est enfilée avec un `tempId` quand des photos sont choisies, et les photos suivent dans une action `upload-photos` qui en dépend (`dependsOn`), sur `…/incidents/<tempId>/photos`. Au rejeu, `createdResourceId` remplace le jeton dans l'URL. Une photo refusée par la file (quota, taille) n'empêche pas l'incident de partir. La galerie de la page de détail accepte elle aussi des photos hors-ligne. Mécanique dans `docs/domain/offline-queue.md`, section « Photos hors-ligne ».
 
 ## Suites : tâche et action à réparer (#815)
 

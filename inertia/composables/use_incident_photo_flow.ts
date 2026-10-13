@@ -2,7 +2,8 @@ import { router } from '@inertiajs/vue3'
 import { ref, toValue, type MaybeRefOrGetter, type Ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { useNetworkStatus } from '~/composables/use_network_status'
-import { useOfflineQueue } from '~/composables/use_offline_queue'
+import { useOfflinePhotos } from '~/composables/use_offline_photos'
+import { newTempId, useOfflineQueue } from '~/composables/use_offline_queue'
 import { useT } from '~/composables/use_t'
 import { CREATE_INCIDENT_ACTION, UPDATE_INCIDENT_ACTION } from '#shared/constants/offline_queue'
 import { tzOffsetMinutes } from '~/utils/local_datetime'
@@ -60,14 +61,17 @@ export interface IncidentPhotoFlowOptions {
  * `createdResourceId`, puis on envoie les photos sur `…/incidents/:id/photos`,
  * la route déjà validée et déjà plafonnée pour les lots.
  *
- * **Hors-ligne, la photo est exemptée** : mieux vaut un incident déclaré sans
- * photo sur un ponton qu'une saisie perdue. Le verrou de clôture côté serveur
- * la réclamera au retour du réseau.
+ * **Hors-ligne, la photo reste facultative** : mieux vaut un incident déclaré
+ * sans photo sur un ponton qu'une saisie perdue. Celles qui sont prises
+ * partent en file derrière l'incident (#969) : l'action photos dépend du
+ * `tempId` de la création et rejoue sur `…/incidents/:id/photos` une fois l'id
+ * réel flashé. Le verrou de clôture côté serveur réclamera la photo manquante.
  */
 export function useIncidentPhotoFlow(options: IncidentPhotoFlowOptions) {
   const { t } = useT()
   const { isOnline } = useNetworkStatus()
   const { enqueue } = useOfflineQueue()
+  const { queuePhotos } = useOfflinePhotos()
 
   const photoError = ref<string | null>(null)
   const isUploadingPhotos = ref(false)
@@ -97,6 +101,39 @@ export function useIncidentPhotoFlow(options: IncidentPhotoFlowOptions) {
     )
   }
 
+  /**
+   * Hors-ligne : l'incident, puis ses photos rattachées par jeton (#969). Une
+   * édition ne porte pas de photos — elles se gèrent depuis la galerie.
+   */
+  async function queueOffline() {
+    const isEditing = toValue(options.isEditing)
+    const photos = isEditing ? [] : options.photos.value
+    const tempId = photos.length > 0 ? newTempId() : undefined
+
+    isUploadingPhotos.value = true
+    try {
+      await enqueue({
+        type: isEditing ? UPDATE_INCIDENT_ACTION : CREATE_INCIDENT_ACTION,
+        url: toValue(options.actionUrl),
+        method: isEditing ? 'put' : 'post',
+        payload: options.form.data(),
+        ...(tempId ? { tempId } : {}),
+      })
+      if (tempId) {
+        // Refus (quota, taille) : l'incident reste en file sans ses photos, le
+        // toast l'a dit — la saisie principale n'est pas sacrifiée.
+        await queuePhotos({
+          url: `/boats/${toValue(options.boatId)}/incidents/${tempId}/photos`,
+          files: photos,
+          dependsOn: tempId,
+        })
+      }
+    } finally {
+      isUploadingPhotos.value = false
+      options.onDone()
+    }
+  }
+
   function submit() {
     photoError.value = null
 
@@ -106,13 +143,7 @@ export function useIncidentPhotoFlow(options: IncidentPhotoFlowOptions) {
     options.form.tzOffsetMinutes = tzOffsetMinutes()
 
     if (!isOnline.value) {
-      enqueue({
-        type: toValue(options.isEditing) ? UPDATE_INCIDENT_ACTION : CREATE_INCIDENT_ACTION,
-        url: toValue(options.actionUrl),
-        method: toValue(options.isEditing) ? 'put' : 'post',
-        payload: options.form.data(),
-      })
-      options.onDone()
+      void queueOffline()
       return
     }
 

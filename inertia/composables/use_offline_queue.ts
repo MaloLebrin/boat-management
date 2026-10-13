@@ -71,6 +71,26 @@ export interface QueuedAction {
    * synchronisée (#622).
    */
   dependsOn?: string
+  /**
+   * Pièces jointes (#969) : présentes, elles font rejouer l'action en
+   * multipart (`forceFormData`), les fichiers ajoutés au payload sous leur
+   * `field`. Supprimées avec l'action une fois le rejeu réussi.
+   */
+  attachments?: QueuedAttachment[]
+}
+
+/**
+ * Fichier joint à une action (#969) : une photo prise hors-ligne. Les octets
+ * sont gardés en `ArrayBuffer` et non en `Blob` : un `Blob` en IndexedDB a
+ * longtemps été perdu par Safari iOS, et ne se clone pas hors navigateur. Au
+ * rejeu, `attachmentFiles` reconstruit les `File` que le multipart attend.
+ */
+export interface QueuedAttachment {
+  /** Champ du formulaire multipart, rejoué en tableau (`files[]`). */
+  field: string
+  name: string
+  type: string
+  data: ArrayBuffer
 }
 
 export interface FailedAction extends QueuedAction {
@@ -81,6 +101,26 @@ export interface FailedAction extends QueuedAction {
 export interface ConflictState {
   action: QueuedAction
   serverData: Record<string, unknown>
+}
+
+/** Les `File` d'une action, regroupés par champ, tels que le multipart les attend. */
+export function attachmentFiles(attachments: QueuedAttachment[]): Record<string, File[]> {
+  const byField: Record<string, File[]> = {}
+  for (const attachment of attachments) {
+    const file = new File([attachment.data], attachment.name, { type: attachment.type })
+    ;(byField[attachment.field] ??= []).push(file)
+  }
+  return byField
+}
+
+/** Les métadonnées optionnelles d'une action, à reporter à chaque réécriture. */
+function optionalFields(action: QueuedAction) {
+  return {
+    ...(action.dedupeKey ? { dedupeKey: action.dedupeKey } : {}),
+    ...(action.tempId ? { tempId: action.tempId } : {}),
+    ...(action.dependsOn ? { dependsOn: action.dependsOn } : {}),
+    ...(action.attachments?.length ? { attachments: action.attachments } : {}),
+  }
 }
 
 /** Jeton d'inspection (ou autre création) saisie hors-ligne, référencé par ses actions filles. */
@@ -223,8 +263,7 @@ async function resolveTempId(db: QueueDb, tempId: string, realId: string) {
       method: dependent.method,
       payload: substitutePayload(dependent.payload, tempId, realId),
       createdAt: dependent.createdAt,
-      ...(dependent.dedupeKey ? { dedupeKey: dependent.dedupeKey } : {}),
-      ...(dependent.tempId ? { tempId: dependent.tempId } : {}),
+      ...optionalFields({ ...dependent, dependsOn: undefined }),
     })
   }
 }
@@ -236,9 +275,7 @@ function toFailedRecord(action: QueuedAction, errors: Record<string, string>) {
     method: action.method,
     payload: action.payload,
     createdAt: action.createdAt,
-    ...(action.dedupeKey ? { dedupeKey: action.dedupeKey } : {}),
-    ...(action.tempId ? { tempId: action.tempId } : {}),
-    ...(action.dependsOn ? { dependsOn: action.dependsOn } : {}),
+    ...optionalFields(action),
     failedAt: new Date().toISOString(),
     errors,
   }
@@ -272,9 +309,7 @@ async function requeue(db: QueueDb, action: QueuedAction) {
     method: action.method,
     payload: action.payload,
     createdAt: action.createdAt,
-    ...(action.dedupeKey ? { dedupeKey: action.dedupeKey } : {}),
-    ...(action.tempId ? { tempId: action.tempId } : {}),
-    ...(action.dependsOn ? { dependsOn: action.dependsOn } : {}),
+    ...optionalFields(action),
   })
 }
 
@@ -291,8 +326,9 @@ export function useOfflineQueue() {
   const { t } = useT()
   const page = usePage()
 
-  async function enqueue(action: Omit<QueuedAction, 'id' | 'createdAt'>) {
-    if (!isIndexedDbAvailable()) return
+  /** `false` quand IndexedDB est absent : la saisie n'a pas été gardée. */
+  async function enqueue(action: Omit<QueuedAction, 'id' | 'createdAt'>): Promise<boolean> {
+    if (!isIndexedDbAvailable()) return false
     const db = await getDb()
 
     if (action.dedupeKey) {
@@ -306,7 +342,7 @@ export function useOfflineQueue() {
         // en file ne doit pas orpheliner les défauts déjà rattachés (#622).
         await db.put(STORE_NAME, { ...duplicate, payload: action.payload })
         await refreshCount()
-        return
+        return true
       }
     }
 
@@ -316,6 +352,7 @@ export function useOfflineQueue() {
     // Première saisie mise en file : on demande que l'origine ne soit pas
     // évincée avant le retour du réseau (#952). Sans effet si déjà accordé.
     void requestPersistentStorage()
+    return true
   }
 
   function isAuthenticated(): boolean {
@@ -475,12 +512,20 @@ export function useOfflineQueue() {
       },
     }
 
+    // Pièces jointes (#969) : les fichiers rejoignent le payload et la visite
+    // part en multipart, comme l'envoi en ligne de la galerie.
+    const attachments = action.attachments ?? []
+    const payload: InertiaPayload = attachments.length
+      ? { ...action.payload, ...attachmentFiles(attachments) }
+      : action.payload
+    const options = attachments.length ? { ...callbacks, forceFormData: true } : callbacks
+
     if (action.method === 'patch') {
-      router.patch(action.url, action.payload, callbacks)
+      router.patch(action.url, payload, options)
     } else if (action.method === 'put') {
-      router.put(action.url, action.payload, callbacks)
+      router.put(action.url, payload, options)
     } else {
-      router.post(action.url, action.payload, callbacks)
+      router.post(action.url, payload, options)
     }
   }
 

@@ -630,11 +630,13 @@ checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`
 
 `inertia/components/media/MediaPhotoGallery.vue` — galerie réutilisable pilotée par props
 (`uploadUrl`, `deleteUrlFor`, `photos`, `canUpload`, `canDelete`). Suppression via
-`router.delete`. i18n : `media.photos.*`.
+`router.delete`. i18n : `media.photos.*`. Les photos encore en file hors-ligne y sont
+rendues par `inertia/components/media/PendingPhotoTiles.vue` (vignette « En attente »,
+`data-testid="pending-photo"`), comme dans `BoatPhotoGallery` (#969).
 
 L'envoi lui-même vient de `inertia/composables/use_photo_upload.ts` — `usePhotoUpload(url)`
 porte le formulaire multipart (`forceFormData`), les `ref` des deux entrées de fichiers,
-`isOnline` et le refus explicite hors-ligne (#621). L'URL est acceptée en getter : côté
+`isOnline`, `isQueueing` et la mise en file hors-ligne (#969, via `useOfflinePhotos`). L'URL est acceptée en getter : côté
 bateau elle dérive d'une prop. Les `ref` restent rendues à l'appelant, qui ouvre le
 sélecteur depuis ses propres zones (état vide, tuile d'ajout, zone de dépôt).
 

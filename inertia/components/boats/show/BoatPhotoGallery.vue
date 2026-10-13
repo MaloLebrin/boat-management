@@ -3,6 +3,7 @@ import { CameraIcon, PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { Form } from '@adonisjs/inertia/vue'
 import { computed } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
+import PendingPhotoTiles from '~/components/media/PendingPhotoTiles.vue'
 import { usePhotoUpload } from '~/composables/use_photo_upload'
 import { useT } from '~/composables/use_t'
 import type { BoatShowDetail, MediaRow } from '~/types/boat_show'
@@ -14,7 +15,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { form, fileInput, cameraInput, isOnline, onFileChange } = usePhotoUpload(
+const { form, fileInput, cameraInput, isOnline, isQueueing, onFileChange } = usePhotoUpload(
   () => `/boats/${props.boat.id}/photos`
 )
 
@@ -30,7 +31,7 @@ const photos = computed<MediaRow[]>(() => sortedBoatPhotos(props.boat.media))
           variant="secondary"
           size="sm"
           type="button"
-          :disabled="form.processing || !isOnline"
+          :disabled="form.processing || isQueueing"
           @click="cameraInput?.click()"
         >
           <CameraIcon class="h-4 w-4 mr-1" />
@@ -40,7 +41,7 @@ const photos = computed<MediaRow[]>(() => sortedBoatPhotos(props.boat.media))
           variant="secondary"
           size="sm"
           type="button"
-          :disabled="form.processing || !isOnline"
+          :disabled="form.processing || isQueueing"
           @click="fileInput?.click()"
         >
           <PlusIcon class="h-4 w-4 mr-1" />
@@ -56,9 +57,9 @@ const photos = computed<MediaRow[]>(() => sortedBoatPhotos(props.boat.media))
     <p
       v-if="canManage && !isOnline"
       class="mb-3 rounded-md border border-warning/40 bg-surface-muted px-3 py-2 text-sm text-fg"
-      role="alert"
+      role="status"
     >
-      {{ t('common.offline.photoUploadUnavailable') }}
+      {{ t('common.offline.photoQueuedNotice') }}
     </p>
 
     <input
@@ -82,12 +83,20 @@ const photos = computed<MediaRow[]>(() => sortedBoatPhotos(props.boat.media))
       @change="onFileChange"
     />
 
+    <PendingPhotoTiles
+      v-if="canManage"
+      :upload-url="`/boats/${boat.id}/photos`"
+      class="mb-3 lg:grid-cols-4"
+    />
+
     <!-- Empty state -->
     <div
       v-if="photos.length === 0"
       class="rounded-lg border-2 border-dashed border-border bg-surface-muted/30 p-8 text-center"
-      :class="{ 'cursor-pointer hover:border-brand/50 transition-colors': canManage && isOnline }"
-      @click="canManage && isOnline ? fileInput?.click() : undefined"
+      :class="{
+        'cursor-pointer hover:border-brand/50 transition-colors': canManage && !isQueueing,
+      }"
+      @click="canManage && !isQueueing ? fileInput?.click() : undefined"
     >
       <PhotoIcon class="mx-auto h-8 w-8 text-fg-subtle" />
       <p class="mt-2 text-sm text-fg-muted">{{ t('boats.show.mediaUpload.noPhotos') }}</p>
@@ -138,7 +147,7 @@ const photos = computed<MediaRow[]>(() => sortedBoatPhotos(props.boat.media))
       <button
         v-if="canManage"
         type="button"
-        :disabled="form.processing || !isOnline"
+        :disabled="form.processing || isQueueing"
         class="aspect-square rounded-lg border-2 border-dashed border-border bg-surface-muted/30 flex flex-col items-center justify-center gap-1 hover:border-brand/50 transition-colors disabled:opacity-50"
         @click="fileInput?.click()"
       >
