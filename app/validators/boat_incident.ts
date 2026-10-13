@@ -15,9 +15,16 @@ const incidentStatusChoices = ['open', 'in_progress', 'closed'] as const
 
 const targetId = vine.number().withoutDecimals().positive().nullable().optional()
 
+/**
+ * Heure murale de l'incident (#976). Le formulaire envoie la valeur d'un
+ * `<input type="datetime-local">` (`2026-06-01T10:00`), que le format par
+ * défaut de `vine.date()` refuse ; `YYYY-MM-DD HH:mm:ss` reste accepté.
+ */
+const occurredAtFormats = ['YYYY-MM-DDTHH:mm', 'YYYY-MM-DDTHH:mm:ss', 'YYYY-MM-DD HH:mm:ss']
+
 export const createBoatIncidentValidator = vine.create(
   vine.object({
-    occurredAt: vine.date(),
+    occurredAt: vine.date({ formats: occurredAtFormats }),
     // browser's getTimezoneOffset() — shifts the naive local datetime to UTC
     tzOffsetMinutes: vine.number().withoutDecimals().optional(),
     type: vine.enum(incidentTypeChoices),
@@ -40,7 +47,7 @@ export const createBoatIncidentValidator = vine.create(
 
 export const updateBoatIncidentValidator = vine.create(
   vine.object({
-    occurredAt: vine.date().optional(),
+    occurredAt: vine.date({ formats: occurredAtFormats }).optional(),
     // browser's getTimezoneOffset() — shifts the naive local datetime to UTC
     tzOffsetMinutes: vine.number().withoutDecimals().optional(),
     type: vine.enum(incidentTypeChoices).optional(),
