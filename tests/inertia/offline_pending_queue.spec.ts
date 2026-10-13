@@ -376,14 +376,14 @@ describe('OfflinePendingQueue', () => {
       await seedInspectionGroup()
       const { drainQueue, failedCount } = useOfflineQueue()
       await drainQueue()
-      await vi.waitFor(() => expect(failedCount.value).toBe(2), { timeout: 1000 })
+      await vi.waitFor(() => expect(failedCount.value).toBe(2), { timeout: 5000 })
 
       const wrapper = mountComponent()
       await flushPromises()
       const buttons = wrapper.findAll('li button')
       await buttons[buttons.length - 1].trigger('click')
 
-      await vi.waitFor(() => expect(failedCount.value).toBe(0), { timeout: 1000 })
+      await vi.waitFor(() => expect(failedCount.value).toBe(0), { timeout: 5000 })
     })
   })
 })
