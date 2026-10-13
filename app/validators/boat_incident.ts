@@ -57,6 +57,8 @@ export const updateBoatIncidentValidator = vine.create(
     insuranceClaimed: vine.boolean().optional(),
     insuranceClaimRef: vine.string().trim().optional(),
     status: vine.enum(incidentStatusChoices).optional(),
+    // Verrou optimiste du rejeu hors-ligne (#970)
+    _expectedUpdatedAt: vine.string().optional(),
     // Cible de l'incident (#813) : un id par famille, au plus un renseigné —
     // la règle et l'appartenance au bateau sont tenues par le service. JSON
     // (useForm) : un nombre ou null, jamais une chaîne vide.

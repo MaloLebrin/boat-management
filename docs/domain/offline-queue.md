@@ -64,8 +64,8 @@ les 58 cas concernés entièrement verts.
 
 `shared/constants/offline_queue.ts` est, depuis **#726**, la **source unique**
 du vocabulaire : chaque identifiant y est déclaré une fois, et les deux moitiés
-l'importent — contrôleurs, formulaires Vue et les trois cartes de
-`ConflictResolutionModal.vue`. Le fichier exporte aussi `OFFLINE_ACTION_TYPES`
+l'importent — contrôleurs, formulaires Vue et les cartes de la modale de
+conflit, sorties dans `inertia/lib/conflict_fields.ts` (#970). Le fichier exporte aussi `OFFLINE_ACTION_TYPES`
 et l'union fermée `OfflineActionType`, qui type le `type` d'une `QueuedAction` :
 un renommage casse désormais à la compilation plutôt qu'en mer.
 
@@ -83,7 +83,7 @@ un renommage casse désormais à la compilation plutôt qu'en mer.
 | `create-fuel-log`             | `CREATE_FUEL_LOG_ACTION`             | —               | ✅             | —                      |
 | `increment-engine-hours`      | `INCREMENT_ENGINE_HOURS_ACTION`      | —               | ✅             | —                      |
 | `create-incident`             | `CREATE_INCIDENT_ACTION`             | —               | ✅             | —                      |
-| `update-incident`             | `UPDATE_INCIDENT_ACTION`             | ❌              | ✅             | —                      |
+| `update-incident`             | `UPDATE_INCIDENT_ACTION`             | ✅              | ✅             | ✅                     |
 | `upload-photos`               | `UPLOAD_PHOTOS_ACTION`               | —               | ✅             | —                      |
 
 `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` relit les sources — il
@@ -92,9 +92,8 @@ hériterait de ses angles morts. Il tient trois choses : **aucun littéral** ne
 réapparaît (le contournement qui rouvrirait #726), les deux moitiés se
 **répondent**, et aucune constante déclarée n'est **morte**.
 
-Le seul ❌ restant est le verrou optimiste de `update-incident` : l'édition
-d'un incident rejouée écrase la version du serveur, sans `conflictType`. Les
-deux `rejectedType` des incidents, longtemps le dernier trou du protocole, sont
+Plus aucun ❌ depuis #970 : l'édition d'un incident, dernier trou du tableau,
+porte son verrou optimiste. Les deux `rejectedType` des incidents, longtemps le dernier trou du protocole, sont
 renvoyés par `BoatIncidentsController` depuis #816 — la liste d'exemptions de
 la garde (`ENQUEUED_WITHOUT_SERVER_ANSWER`) est vide, mais reste en place :
 c'est là qu'un prochain trou devra s'écrire, avec sa raison. Un « — » signale
@@ -114,18 +113,64 @@ au contraire un marqueur qui n'a pas lieu d'être.
 
 ## Verrou optimiste
 
-Quatre mutations envoient `_expectedUpdatedAt` avec leur payload — depuis #725,
-l'édition d'un point de journal comprise. C'est l'écran où le verrou compte le
+Six mutations envoient `_expectedUpdatedAt` avec leur payload : depuis #725
+l'édition d'un point de journal, depuis #970 celle d'un incident. C'est l'écran où le verrou compte le
 plus : un point se saisit **en mer**, précisément là où il n'y a pas de réseau. Le service
 compare à l'`updated_at` en base et lève une erreur de conflit si l'horodatage a
 bougé — c'est ce qui distingue « ma version est périmée » de « le serveur a
 refusé ».
 
 `conflictData` porte alors **la ligne du serveur**, sérialisée en JSON. Les
-champs qu'elle doit contenir sont ceux que `FIELDS_BY_TYPE` de
-`ConflictResolutionModal.vue` affiche pour ce type ; le contrat est tenu par
+champs qu'elle doit contenir sont ceux que `FIELDS_BY_TYPE`
+(`inertia/lib/conflict_fields.ts`) affiche pour ce type ; le contrat est tenu par
 `tests/functional/navigation/offline_conflict_payload.spec.ts`, qui ouvre le
 JSON au lieu de constater la présence de la clé.
+
+### L'édition d'un incident (#970)
+
+`BoatIncidentRow.updatedAt` est servi par `toIncident`. Hors-ligne,
+`useIncidentPhotoFlow` l'enfile en `_expectedUpdatedAt` avec l'édition.
+`BoatIncidentService.updateForBoat` le compare avant toute écriture et lève
+`BoatIncidentConflictError` avec la ligne du serveur (`ConflictIncidentSnapshot`).
+Deux éditions hors-ligne du même incident fusionnent (`dedupeKey`
+`update-incident:<url>`) : rejouées l'une après l'autre, la seconde buterait sur
+le verrou posé par la première. Sans `_expectedUpdatedAt`, l'édition en ligne
+garde son comportement.
+
+### Conflits en lot (#970)
+
+Après deux à quatre semaines en mer, le drain peut remonter des dizaines de
+conflits. Jusqu'à #970, le premier mettait toute la file en pause et la modale
+les présentait un par un.
+
+- **La file ne s'arrête plus.** Une action en conflit reste dans IndexedDB (un
+  rechargement la rejoue et retrouve le conflit), rejoint `conflicts`, et le
+  drain passe à la suivante. Les passes suivantes la sautent tant qu'elle n'est
+  pas tranchée.
+- **Une seule modale**, ouverte tant que `conflicts` n'est pas vide. Les conflits y sont groupés
+  par bateau puis par type (`groupConflicts`), dans l'ordre de la file. Le nom
+  du bateau vient de `conflictData` : `toConflictData`
+  (`app/transformers/offline_conflict_transformer.ts`) l'ajoute à la ligne du
+  serveur dans les cinq contrôleurs, le client n'ayant pas la liste des bateaux.
+- **Trancher** : chaque conflit a ses deux boutons (`resolveConflict(id, choice)`),
+  le pied de modale tranche tout (`resolveAllConflicts`). Un conflit seul garde
+  la présentation d'avant. « Garder ma version » ré-enfile l'action avec
+  l'`updatedAt` du serveur, comme avant.
+- **Bilan de passe** (`DrainReport`) : un seul toast quand plus rien n'est
+  rejouable. Il dit « N entrées synchronisées » si tout est passé, sinon
+  `common.offline.syncSummary` (envoyées, refusées, en conflit), en erreur dès
+  qu'un refus existe. Il remplace le toast `syncRejected` qui suivait chaque
+  refus. « Synchronisation en cours… » ne s'affiche qu'au début de la passe.
+- **Lecture des valeurs** : `conflictRows` traduit les énumérations
+  (`incidents.type.*`, `incidents.status.*`) et les booléens. Il formate les
+  horodatages avec `formatDateTime` et compare une heure murale locale à l'ISO
+  du serveur à la minute près, au lieu de comparer les chaînes.
+
+Limite connue : deux actions en conflit sur la même ligne (une mise à jour puis
+la clôture d'une sortie) gardent chacune l'`updatedAt` lu au moment du conflit.
+« Garder ma version partout » rejoue la première, ce qui fait bouger le jeton :
+la seconde revient en conflit au passage suivant. Une modale de plus, rien de
+perdu.
 
 ## Dépendances et identifiants temporaires (#622)
 
@@ -343,6 +388,10 @@ pour le futur écran `/sync`.
 | `tests/inertia/offline_photos.spec.ts`                         | réduction des photos, garde de quota (#969)                |
 | `tests/inertia/use_offline_photos.spec.ts`                     | mise en file avec pièces jointes, vignettes (#969)         |
 | `tests/functional/boats/offline_photo_replay.spec.ts`          | rejeu multipart et `rejectedType` des envois (#969)        |
+| `tests/functional/boats/incident_conflict.spec.ts`             | le verrou de l'édition d'un incident (#970)                |
+| `tests/inertia/conflict_fields.spec.ts`                        | lignes de la modale, regroupement des conflits (#970)      |
+| `tests/inertia/conflict_resolution_modal.spec.ts`              | modale en lot : groupes, choix un par un ou partout (#970) |
+| `tests/browser/offline_conflicts_batch.spec.ts`                | drain avec trois conflits, arbitrage en lot (#970)         |
 | `tests/browser/offline_photos.spec.ts`                         | photo prise hors-ligne puis synchronisée (#969)            |
 | `tests/browser/offline_queue.spec.ts`                          | **le raccord complet, dans un vrai navigateur** (#700)     |
 
@@ -365,7 +414,7 @@ le flash, et la couture devient observable — c'est le seul endroit où elle l'
 | création hors-ligne                | la saisie entre dans la file, **zéro ligne en base**                            |
 | retour en ligne                    | l'événement `online` déclenche la probe `/up` ; sa réussite vide la file (#953) |
 | bouton « Sync now »                | l'autre voie de déclenchement, isolée de la première                            |
-| édition serveur pendant la coupure | la modale de conflit s'ouvre et **la file se met en pause**                     |
+| édition serveur pendant la coupure | la modale de conflit s'ouvre ; l'action **reste en file** jusqu'à l'arbitrage   |
 | « Use server version »             | l'action est abandonnée, la ligne serveur intacte                               |
 | « Keep my changes »                | l'action est ré-enfilée avec `_expectedUpdatedAt` et franchit le verrou         |
 
@@ -380,6 +429,4 @@ Deux contraintes à connaître avant d'en écrire un autre :
 
 ## Constats ouverts
 
-| #   | Constat                                                                |
-| --- | ---------------------------------------------------------------------- |
-| —   | l'édition d'un incident s'enfile sans verrou optimiste (cf. ci-dessus) |
+Aucun depuis #970 : l'édition d'un incident porte son verrou optimiste.

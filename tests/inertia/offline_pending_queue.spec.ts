@@ -35,7 +35,7 @@ vi.mock('@inertiajs/vue3', () => ({
         'common.offline.queue.type.create-navigation-log': 'Nouvelle sortie',
         'common.offline.queue.type.create-fuel-log': 'Avitaillement',
         'common.offline.syncing': 'Synchronisation en cours…',
-        'common.offline.syncRejected': 'Refusée par le serveur — conservée dans les échecs',
+        'common.offline.syncSummary': 'Bilan : {synced}/{rejected}/{conflicted}',
         'common.offline.failed.title':
           '{count, plural, one {# action en échec} other {# actions en échec}}',
         'common.offline.failed.description': 'Ces saisies ont été refusées par le serveur.',
@@ -73,7 +73,7 @@ vi.mock('~/components/base/BaseButton.vue', () => ({
   },
 }))
 
-import { conflictedAction, useOfflineQueue } from '../../inertia/composables/use_offline_queue'
+import { conflicts, useOfflineQueue } from '../../inertia/composables/use_offline_queue'
 import OfflinePendingQueue from '../../inertia/components/OfflinePendingQueue.vue'
 
 function mountComponent() {
@@ -86,7 +86,7 @@ describe('OfflinePendingQueue', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
     mockPageProps.user = { id: 1 }
-    conflictedAction.value = null
+    conflicts.value = []
     global.indexedDB = new IDBFactory()
     // L'état de suspension (#950) est module-level : un drain à vide sur une
     // session valide le remet à zéro entre deux tests.

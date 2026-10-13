@@ -86,6 +86,30 @@ export type UpdateIncidentPayload = IncidentTargetColumns & {
   insuranceClaimed?: boolean
   insuranceClaimRef?: string | null
   status?: IncidentStatus
+  /**
+   * Verrou optimiste (#970) : `updatedAt` de l'incident tel que le formulaire
+   * l'a lu. Envoyé par le rejeu hors-ligne ; s'il a bougé, le service lève
+   * `BoatIncidentConflictError` au lieu d'écraser la version du serveur.
+   */
+  expectedUpdatedAt?: string
+}
+
+/**
+ * La version serveur d'un incident, dans la forme que la modale de conflit
+ * compare à la saisie locale (#970). Mêmes champs que
+ * `FIELDS_BY_TYPE['update-incident']`, plus l'`updatedAt` qui sert de nouveau
+ * jeton au rejeu.
+ */
+export interface ConflictIncidentSnapshot {
+  id: number
+  updatedAt: string
+  occurredAt: string
+  type: IncidentType
+  status: IncidentStatus
+  location: string | null
+  description: string
+  insuranceClaimed: boolean
+  insuranceClaimRef: string | null
 }
 
 export type BoatIncidentRow = Record<IncidentTargetField, number | null> & {
@@ -100,6 +124,8 @@ export type BoatIncidentRow = Record<IncidentTargetField, number | null> & {
   status: IncidentStatus
   closedAt: string | null
   createdAt: string
+  /** ISO — renvoyé en `_expectedUpdatedAt` au rejeu hors-ligne (#970). */
+  updatedAt: string
   target: IncidentTargetSummary | null
   /** Photos jointes (#814) — compteur seul, les médias vivent sur la page de détail. */
   photosCount: number

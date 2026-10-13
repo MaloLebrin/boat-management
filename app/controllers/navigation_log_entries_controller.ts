@@ -18,6 +18,7 @@ import {
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import { toConflictData } from '#transformers/offline_conflict_transformer'
 
 @inject()
 export default class NavigationLogEntriesController {
@@ -111,7 +112,7 @@ export default class NavigationLogEntriesController {
       // Conflit de verrou optimiste (#725) : la version du serveur part au
       // client, qui ouvre la modale d'arbitrage au lieu d'écraser en silence.
       if (error instanceof NavigationLogEntryConflictError) {
-        session.flash('conflictData', JSON.stringify(error.currentEntry))
+        session.flash('conflictData', toConflictData(error.currentEntry, boat))
         session.flash('conflictType', UPDATE_NAVIGATION_LOG_ENTRY_ACTION)
         response.redirect().back()
         return

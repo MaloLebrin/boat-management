@@ -1,4 +1,8 @@
-import { BoatIncidentNotFoundError, BoatIncidentValidationError } from '#exceptions/incident_errors'
+import {
+  BoatIncidentConflictError,
+  BoatIncidentNotFoundError,
+  BoatIncidentValidationError,
+} from '#exceptions/incident_errors'
 import IncidentChanged, { type IncidentChange } from '#events/incident_changed'
 import OwnerBoatChanged from '#events/owner_boat_changed'
 import BoatEngine from '#models/boat_engine'
@@ -16,6 +20,7 @@ import { inject } from '@adonisjs/core'
 import type { ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import { DateTime } from 'luxon'
 import type {
+  ConflictIncidentSnapshot,
   CreateIncidentPayload,
   IncidentTargetRef,
   UpdateIncidentPayload,
@@ -30,6 +35,24 @@ import { toUtcFromLocalInput } from '#shared/helpers/date'
 import { assertBoatInUserOrg } from '#utils/boat_utils'
 import MediaService from '#services/media_service'
 import { CloudinaryFolders } from '#services/cloudinary_service'
+
+/**
+ * La version serveur d'un incident, dans la forme que la modale de conflit
+ * compare à la saisie locale (#970).
+ */
+function buildConflictSnapshot(incident: BoatIncident): ConflictIncidentSnapshot {
+  return {
+    id: incident.id,
+    updatedAt: (incident.updatedAt ?? incident.createdAt).toISO()!,
+    occurredAt: incident.occurredAt.toISO()!,
+    type: incident.type as ConflictIncidentSnapshot['type'],
+    status: incident.status as ConflictIncidentSnapshot['status'],
+    location: incident.location,
+    description: incident.description,
+    insuranceClaimed: incident.insuranceClaimed,
+    insuranceClaimRef: incident.insuranceClaimRef,
+  }
+}
 
 const EQUIPMENT_MODELS = {
   engine: BoatEngine,
@@ -237,6 +260,15 @@ export default class BoatIncidentService {
       .first()
 
     if (!incident) throw new BoatIncidentNotFoundError()
+
+    // Verrou optimiste (#970) : une édition saisie en mer, rejouée des semaines
+    // plus tard, ne doit pas écraser ce que le quai a modifié entre-temps.
+    if (payload.expectedUpdatedAt !== undefined) {
+      const current = (incident.updatedAt ?? incident.createdAt).toISO()
+      if (current !== payload.expectedUpdatedAt) {
+        throw new BoatIncidentConflictError(buildConflictSnapshot(incident))
+      }
+    }
 
     // Clôturer, c'est arrêter le dossier assurance : il lui faut au moins une
     // preuve. On ne le vérifie qu'à la *transition* — un incident historique

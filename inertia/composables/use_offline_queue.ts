@@ -103,6 +103,9 @@ export interface ConflictState {
   serverData: Record<string, unknown>
 }
 
+/** `local` : renvoyer ma version par-dessus le serveur ; `server` : l'abandonner. */
+export type ConflictChoice = 'local' | 'server'
+
 /** Les `File` d'une action, regroupés par champ, tels que le multipart les attend. */
 export function attachmentFiles(attachments: QueuedAttachment[]): Record<string, File[]> {
   const byField: Record<string, File[]> = {}
@@ -193,8 +196,31 @@ const pendingActions = ref<QueuedAction[]>([])
 const failedCount = ref(0)
 const failedActions = ref<FailedAction[]>([])
 const isSyncing = ref(false)
-export const conflictedAction = ref<ConflictState | null>(null)
+/**
+ * Conflits en attente d'arbitrage (#970). Une action en conflit reste dans la
+ * file IndexedDB — un rechargement la rejoue et retrouve le conflit — mais le
+ * drain la saute et continue : après des semaines en mer, un conflit ne doit
+ * plus bloquer les dizaines de saisies qui le suivent. La modale les présente
+ * tous à la fin.
+ */
+export const conflicts = ref<ConflictState[]>([])
 let countInitialized = false
+
+/**
+ * Bilan d'une passe de synchronisation (#970), du premier rejeu jusqu'à ce que
+ * plus rien ne soit rejouable. Survit à une relance différée ou à une
+ * suspension : la passe reprend là où elle s'était arrêtée.
+ */
+export interface DrainReport {
+  synced: number
+  rejected: number
+  conflicted: number
+}
+let drainReport: DrainReport | null = null
+
+function isConflicted(action: QueuedAction): boolean {
+  return conflicts.value.some((conflict) => conflict.action.id === action.id)
+}
 
 /**
  * Motif de suspension de la file (#950). `auth` : la session a expiré pendant
@@ -386,6 +412,27 @@ export function useOfflineQueue() {
     }, retryDelayMs(retryAttempt.value))
   }
 
+  /**
+   * Fin de passe (#970) : un seul message pour toute la passe plutôt qu'un
+   * toast par action — après une traversée, la file en compte des dizaines.
+   */
+  function finishReport() {
+    const report = drainReport
+    drainReport = null
+    if (!report || report.synced + report.rejected + report.conflicted === 0) return
+    if (report.rejected === 0 && report.conflicted === 0) {
+      toast.success(t('common.offline.syncSuccess', { count: String(report.synced) }))
+      return
+    }
+    const summary = t('common.offline.syncSummary', {
+      synced: String(report.synced),
+      rejected: String(report.rejected),
+      conflicted: String(report.conflicted),
+    })
+    if (report.rejected > 0) toast.error(summary)
+    else toast.info(summary)
+  }
+
   async function drainQueue() {
     if (isSyncing.value || !isIndexedDbAvailable()) return
     cancelScheduledRetry()
@@ -397,27 +444,29 @@ export function useOfflineQueue() {
     isSyncing.value = true
     const db = await getDb()
     const actions = (await db.getAll(STORE_NAME)) as QueuedAction[]
-    if (!actions.length) {
+    const action = actions.find((candidate) => !isConflicted(candidate))
+    if (!action) {
       isSyncing.value = false
       retryAttempt.value = 0
+      finishReport()
       return
     }
 
-    const totalCount = actions.length
-    const action = actions[0]
-    toast.info(t('common.offline.syncing'))
+    if (!drainReport) {
+      drainReport = { synced: 0, rejected: 0, conflicted: 0 }
+      toast.info(t('common.offline.syncing'))
+    }
+    const report = drainReport
 
     // Track whether onSuccess or onError ran so onFinish can detect 5xx/network errors.
     let settled = false
 
     /** Fin de passe commune aux chemins de refus : la file continue. */
     async function afterRejection() {
+      report.rejected += 1
       await refreshCount()
       isSyncing.value = false
-      toast.error(t('common.offline.syncRejected'))
-      if (pendingCount.value > 0) {
-        await drainQueue()
-      }
+      await drainQueue()
     }
 
     const callbacks = {
@@ -439,8 +488,10 @@ export function useOfflineQueue() {
           | undefined
         if (flash?.conflictData && flash?.conflictType === action.type) {
           const serverData = JSON.parse(flash.conflictData as string) as Record<string, unknown>
-          conflictedAction.value = { action, serverData }
+          conflicts.value = [...conflicts.value, { action, serverData }]
+          report.conflicted += 1
           isSyncing.value = false
+          await drainQueue()
           return
         }
 
@@ -477,13 +528,10 @@ export function useOfflineQueue() {
         }
 
         await db.delete(STORE_NAME, action.id!)
+        report.synced += 1
         await refreshCount()
         isSyncing.value = false
-        if (pendingCount.value === 0) {
-          toast.success(t('common.offline.syncSuccess', { count: String(totalCount) }))
-        } else {
-          await drainQueue()
-        }
+        await drainQueue()
       },
       // Refus 4xx (validation…) : l'action part dans le store `failed` avec
       // les erreurs renvoyées — jamais détruite silencieusement (#487) — puis
@@ -529,29 +577,50 @@ export function useOfflineQueue() {
     }
   }
 
-  async function resolveConflict(choice: 'local' | 'server') {
-    if (!conflictedAction.value || !isIndexedDbAvailable()) return
-    const { action, serverData } = conflictedAction.value
-    const db = await getDb()
-
+  /** Tranche un conflit : la version locale repart avec le nouveau jeton, ou est abandonnée. */
+  async function settleConflict(db: QueueDb, conflict: ConflictState, choice: ConflictChoice) {
+    const { action, serverData } = conflict
     await db.delete(STORE_NAME, action.id!)
-
     if (choice === 'local') {
-      const serverUpdatedAt = serverData.updatedAt as string
       await requeue(db, {
         ...action,
-        payload: { ...action.payload, _expectedUpdatedAt: serverUpdatedAt },
+        payload: { ...action.payload, _expectedUpdatedAt: serverData.updatedAt as string },
       })
-      toast.info(t('common.offline.conflict.kept'))
-    } else {
-      toast.info(t('common.offline.conflict.discarded'))
     }
+    conflicts.value = conflicts.value.filter((candidate) => candidate !== conflict)
+  }
 
+  /** Relance la file si une version locale gardée attend d'être rejouée. */
+  async function afterSettlement() {
     await refreshCount()
-    conflictedAction.value = null
-    if (pendingCount.value > 0) {
+    if (pendingCount.value > conflicts.value.length) {
       await drainQueue()
     }
+  }
+
+  /** Arbitrage d'un conflit de la liste (#970). */
+  async function resolveConflict(actionId: number, choice: ConflictChoice) {
+    const conflict = conflicts.value.find((candidate) => candidate.action.id === actionId)
+    if (!conflict || !isIndexedDbAvailable()) return
+    const db = await getDb()
+    await settleConflict(db, conflict, choice)
+    toast.info(
+      t(choice === 'local' ? 'common.offline.conflict.kept' : 'common.offline.conflict.discarded')
+    )
+    await afterSettlement()
+  }
+
+  /** « Garder ma version partout » / « garder le serveur partout » (#970). */
+  async function resolveAllConflicts(choice: ConflictChoice) {
+    if (!conflicts.value.length || !isIndexedDbAvailable()) return
+    const db = await getDb()
+    const all = [...conflicts.value]
+    for (const conflict of all) {
+      await settleConflict(db, conflict, choice)
+    }
+    const key = choice === 'local' ? 'keptAll' : 'discardedAll'
+    toast.info(t(`common.offline.conflict.${key}`, { count: String(all.length) }))
+    await afterSettlement()
   }
 
   async function cancelAction(id: number) {
@@ -567,6 +636,8 @@ export function useOfflineQueue() {
       }
     }
     await db.delete(STORE_NAME, id)
+    // Annuler une action en conflit la retire aussi de la liste à arbitrer (#970).
+    conflicts.value = conflicts.value.filter((conflict) => conflict.action.id !== id)
     await refreshCount()
     toast.info(t('common.offline.queue.cancelled'))
   }
@@ -622,10 +693,11 @@ export function useOfflineQueue() {
     isSyncing,
     suspendedReason,
     retryAttempt,
-    conflictedAction,
+    conflicts,
     enqueue,
     drainQueue,
     resolveConflict,
+    resolveAllConflicts,
     cancelAction,
     retryFailedAction,
     discardFailedAction,

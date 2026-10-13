@@ -32,8 +32,14 @@ const { t } = useT()
 const { state: connectivity, reachableCount } = useConnectivity()
 const { isOpen: isAssistantOpen } = useAssistantPanel()
 const { isBoatOwner } = usePermissions()
-const { drainQueue, conflictedAction, resolveConflict, pendingCount, suspendedReason } =
-  useOfflineQueue()
+const {
+  drainQueue,
+  conflicts,
+  resolveConflict,
+  resolveAllConflicts,
+  pendingCount,
+  suspendedReason,
+} = useOfflineQueue()
 const { dismissAll: dismissToasts } = useFlashToasts()
 usePwaUpdate()
 
@@ -224,9 +230,10 @@ onBeforeUnmount(() => {
     />
 
     <ConflictResolutionModal
-      v-if="conflictedAction"
-      :conflict="conflictedAction"
+      v-if="conflicts.length > 0"
+      :conflicts="conflicts"
       @resolve="resolveConflict"
+      @resolve-all="resolveAllConflicts"
     />
   </div>
 </template>

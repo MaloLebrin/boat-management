@@ -413,15 +413,15 @@ Mock de `virtual:pwa-register/vue` via alias Vitest + mock de `vue-sonner`. Cas 
 
 ## Comportements et limites
 
-| Comportement                    | Note                                                                                                                                                                                                          |
-| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Pages non visitées**          | Servies par `public/offline.html` via `navigateFallback` Workbox — message bilingue + bouton "réessayer".                                                                                                     |
-| **Erreur 5xx / réseau**         | L'action reste en file et `isSyncing` est réinitialisé via `onFinish`. Elle sera rejouée à la prochaine reconnexion.                                                                                          |
-| **Erreur 4xx (validation)**     | L'action passe dans le store `failed` avec ses erreurs (#487). L'UI propose « Réessayer » ou « Abandonner » — rien n'est détruit sans action explicite.                                                       |
-| **Détection de conflit**        | Les actions PATCH incluent `_expectedUpdatedAt`. Le backend rejette (flash `conflict`) si la sortie a été modifiée entre-temps.                                                                               |
-| **Last-write-wins (créations)** | Les créations (POST) n'ont pas de conflit — chaque enregistrement est nouveau.                                                                                                                                |
-| **Refus métier en redirection** | Un contrôleur qui refuse par `flash('error')` + `redirect().back()` rend un **succès** côté Inertia. Le flash `rejectedType` (#622) range alors l'action dans `failed` au lieu de la détruire avec la saisie. |
-| **Dépendances entre actions**   | Une création `tempId` et ses actions `dependsOn` sont rejouées dans l'ordre, résolues par l'ID réel, et échouent ensemble (#622).                                                                             |
+| Comportement                    | Note                                                                                                                                                                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pages non visitées**          | Servies par `public/offline.html` via `navigateFallback` Workbox — message bilingue + bouton "réessayer".                                                                                                                 |
+| **Erreur 5xx / réseau**         | L'action reste en file et `isSyncing` est réinitialisé via `onFinish`. Elle sera rejouée à la prochaine reconnexion.                                                                                                      |
+| **Erreur 4xx (validation)**     | L'action passe dans le store `failed` avec ses erreurs (#487). L'UI propose « Réessayer » ou « Abandonner » — rien n'est détruit sans action explicite.                                                                   |
+| **Détection de conflit**        | Les éditions incluent `_expectedUpdatedAt`. Le backend flashe `conflictType`/`conflictData` si la ligne a bougé entre-temps. Les conflits sont mis de côté, la file continue, une seule modale les tranche en lot (#970). |
+| **Last-write-wins (créations)** | Les créations (POST) n'ont pas de conflit — chaque enregistrement est nouveau.                                                                                                                                            |
+| **Refus métier en redirection** | Un contrôleur qui refuse par `flash('error')` + `redirect().back()` rend un **succès** côté Inertia. Le flash `rejectedType` (#622) range alors l'action dans `failed` au lieu de la détruire avec la saisie.             |
+| **Dépendances entre actions**   | Une création `tempId` et ses actions `dependsOn` sont rejouées dans l'ordre, résolues par l'ID réel, et échouent ensemble (#622).                                                                                         |
 
 ---
 

@@ -80,8 +80,9 @@ vi.mock('~/composables/use_offline_queue', async () => {
       cancelAction: vi.fn(),
       retryFailedAction: vi.fn(),
       discardFailedAction: vi.fn(),
-      conflictedAction: vueRef(null),
+      conflicts: vueRef([]),
       resolveConflict: vi.fn(),
+      resolveAllConflicts: vi.fn(),
     }),
   }
 })

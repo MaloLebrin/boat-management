@@ -16,6 +16,11 @@ vi.mock('@inertiajs/vue3', () => ({
         'common.navigationLog.field.seaState': 'Sea state',
         'common.navigationLog.field.crewCount': 'Crew',
         'common.navigationLog.field.notes': 'Notes',
+        'common.offline.conflict.batchDescription': '{count} conflicts',
+        'common.offline.conflict.keepLocalAll': 'Keep mine everywhere',
+        'common.offline.conflict.keepServerAll': 'Use server everywhere',
+        'common.offline.queue.type.update-navigation-log': 'Trip edit',
+        'common.offline.queue.type.update-sheet-item': 'Sheet item',
       },
       locale: 'en',
     },
@@ -61,7 +66,7 @@ afterEach(() => {
   document.body.style.overflow = ''
 })
 
-const mountModal = (props = { conflict }) =>
+const mountModal = (props: { conflicts: (typeof conflict)[] } = { conflicts: [conflict] }) =>
   mount(ConflictResolutionModal, {
     props,
     global: {
@@ -93,7 +98,7 @@ describe('ConflictResolutionModal', () => {
     const buttons = wrapper.findAll('button')
     const keepLocalBtn = buttons.find((b) => b.text().includes('Keep mine'))
     await keepLocalBtn!.trigger('click')
-    expect(wrapper.emitted('resolve')).toEqual([['local']])
+    expect(wrapper.emitted('resolve')).toEqual([[1, 'local']])
   })
 
   test('emits resolve("server") when "Use server" is clicked', async () => {
@@ -101,13 +106,63 @@ describe('ConflictResolutionModal', () => {
     const buttons = wrapper.findAll('button')
     const keepServerBtn = buttons.find((b) => b.text().includes('Use server'))
     await keepServerBtn!.trigger('click')
-    expect(wrapper.emitted('resolve')).toEqual([['server']])
+    expect(wrapper.emitted('resolve')).toEqual([[1, 'server']])
   })
 
   test('does not show _expectedUpdatedAt as a field row', () => {
     const wrapper = mountModal()
     expect(wrapper.text()).not.toContain('_expectedUpdatedAt')
     expect(wrapper.text()).not.toContain('2026-06-25T10:00')
+  })
+
+  describe('résolution en lot (#970)', () => {
+    function conflictOn(id: number, boatId: number, boatName: string, type = conflict.action.type) {
+      return {
+        action: { ...conflict.action, id, type, url: `/boats/${boatId}/navigation-logs/${id}` },
+        serverData: { ...conflict.serverData, boatName },
+      }
+    }
+    const batch = [
+      conflictOn(1, 1, 'Albatros'),
+      conflictOn(2, 2, 'Borée'),
+      conflictOn(3, 1, 'Albatros'),
+      conflictOn(4, 1, 'Albatros', 'update-sheet-item'),
+    ]
+
+    test('groupe les conflits par bateau puis par type, dans l’ordre de la file', () => {
+      const wrapper = mountModal({ conflicts: batch })
+      const groups = wrapper.findAll('[data-testid="conflict-group"]')
+      expect(groups.map((g) => g.attributes('aria-label'))).toEqual([
+        'Albatros · Trip edit',
+        'Borée · Trip edit',
+        'Albatros · Sheet item',
+      ])
+      expect(groups[0].findAll('[data-testid="conflict-item"]')).toHaveLength(2)
+      expect(wrapper.text()).toContain('4 conflicts')
+    })
+
+    test('chaque conflit se tranche seul, avec son identifiant', async () => {
+      const wrapper = mountModal({ conflicts: batch })
+      const second = wrapper.findAll('[data-testid="conflict-item"]')[2]
+      await second
+        .findAll('button')
+        .find((b) => b.text() === 'Keep mine')!
+        .trigger('click')
+      expect(wrapper.emitted('resolve')).toEqual([[2, 'local']])
+    })
+
+    test.each([
+      ['Use server everywhere', 'server'],
+      ['Keep mine everywhere', 'local'],
+    ])('le pied de modale tranche tout d’un coup : %s', async (label, choice) => {
+      const wrapper = mountModal({ conflicts: batch })
+      await wrapper
+        .findAll('button')
+        .find((b) => b.text() === label)!
+        .trigger('click')
+      expect(wrapper.emitted('resolveAll')).toEqual([[choice]])
+      expect(wrapper.emitted('resolve')).toBeUndefined()
+    })
   })
 
   describe('accessibilité (#734)', () => {

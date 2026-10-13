@@ -34,7 +34,7 @@ const ROOT = fileURLToPath(new URL('../../../', import.meta.url))
 const CONTROLLERS_DIR = join(ROOT, 'app/controllers')
 const INERTIA_DIR = join(ROOT, 'inertia')
 const CONSTANTS_FILE = join(ROOT, 'shared/constants/offline_queue.ts')
-const CONFLICT_MODAL = join(ROOT, 'inertia/components/ConflictResolutionModal.vue')
+const CONFLICT_MODAL = join(ROOT, 'inertia/lib/conflict_fields.ts')
 
 /**
  * Types enfilés par le front que le serveur ne renvoie jamais. Toute entrée
