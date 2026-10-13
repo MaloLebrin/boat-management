@@ -9,12 +9,14 @@ const mockPromptInstall = vi.hoisted(() => vi.fn())
 const mockUsePwaUpdate = vi.hoisted(() => vi.fn())
 const mockUsePwaInstall = vi.hoisted(() => vi.fn())
 const mockCancelScheduledRetry = vi.hoisted(() => vi.fn())
+const mockDrainPendingQuestions = vi.hoisted(() => vi.fn())
 // État de connectivité (#953) piloté par le test : `reachableCount` simule une
 // probe `/up` réussie, `pendingCount` la file hors-ligne.
 const net = vi.hoisted(() => ({
   state: { value: 'online' } as { value: 'online' | 'degraded' | 'offline' },
   reachableCount: { value: 0 },
   pendingCount: { value: 0 },
+  isSyncing: { value: false },
 }))
 
 vi.mock('@adonisjs/inertia/vue', () => ({
@@ -65,6 +67,8 @@ vi.mock('~/composables/use_offline_queue', async () => {
   const { ref: vueRef } = await vi.importActual<typeof import('vue')>('vue')
   const pendingCount = vueRef(0)
   net.pendingCount = pendingCount
+  const isSyncing = vueRef(false)
+  net.isSyncing = isSyncing
   return {
     cancelScheduledRetry: mockCancelScheduledRetry,
     useOfflineQueue: () => ({
@@ -73,7 +77,7 @@ vi.mock('~/composables/use_offline_queue', async () => {
       pendingActions: ref([]),
       failedCount: ref(0),
       failedActions: ref([]),
-      isSyncing: ref(false),
+      isSyncing,
       suspendedReason: ref(null),
       retryAttempt: ref(0),
       enqueue: vi.fn(),
@@ -85,6 +89,10 @@ vi.mock('~/composables/use_offline_queue', async () => {
     }),
   }
 })
+
+vi.mock('~/composables/use_assistant_offline', () => ({
+  useAssistantOffline: () => ({ drainPendingQuestions: mockDrainPendingQuestions }),
+}))
 
 vi.mock('~/composables/use_pwa_update', () => ({
   usePwaUpdate: mockUsePwaUpdate,
@@ -115,6 +123,7 @@ describe('DefaultLayout — connectivité (#953)', () => {
     net.state.value = 'online'
     net.reachableCount.value = 0
     net.pendingCount.value = 0
+    net.isSyncing.value = false
   })
 
   test('aucun bandeau en ligne', () => {
@@ -153,6 +162,22 @@ describe('DefaultLayout — connectivité (#953)', () => {
     await nextTick()
 
     expect(mockDrainQueue).not.toHaveBeenCalled()
+    // File vide : les questions posées au copilote hors-ligne partent (#971).
+    expect(mockDrainPendingQuestions).toHaveBeenCalledOnce()
+  })
+
+  test('les questions au copilote attendent la fin de la file de saisies (#971)', async () => {
+    net.pendingCount.value = 2
+    mount(DefaultLayout, { slots: { default: '<div>Content</div>' } })
+    net.reachableCount.value += 1
+    net.isSyncing.value = true
+    await nextTick()
+    expect(mockDrainQueue).toHaveBeenCalledOnce()
+    expect(mockDrainPendingQuestions).not.toHaveBeenCalled()
+
+    net.isSyncing.value = false
+    await nextTick()
+    expect(mockDrainPendingQuestions).toHaveBeenCalledOnce()
   })
 
   test('le passage en dégradé annule la relance différée, sans drain', async () => {
