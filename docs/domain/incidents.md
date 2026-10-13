@@ -28,6 +28,7 @@ La fiche bateau expose trois props lues sur cette policy — `canCreateIncidents
 ## Routes → controllers → services
 
 - `POST /boats/:boatId/incidents` (`boats.incidents.store`), `PUT …/:incidentId` (`update`), `DELETE …/:incidentId` (`destroy`) → `BoatIncidentsController` → `BoatIncidentService`. Redirection vers `/boats/:id?tab=incidents` avec flash `flash.incidents.*`.
+- `occurredAt` est une heure murale, convertie en UTC avec `tzOffsetMinutes`. Le validateur accepte `YYYY-MM-DDTHH:mm`, la valeur d'un `<input type="datetime-local">`, ainsi que `YYYY-MM-DDTHH:mm:ss` et `YYYY-MM-DD HH:mm:ss`. Sans ces formats, `vine.date()` refusait le formulaire (#976).
 - **Audit (#816)** : le contrôleur journalise `incident.create`, `incident.update` (métadonnées `boatName`, `type`, `status` atteint) et `incident.delete` via `AuditLogService` — un refus métier ou un incident introuvable ne journalise rien. `incident.create` est aussi posé par le copilote (`report_incident`).
 - **Hors-ligne (#816)** : un refus métier de `store` (`descriptionRequired`, `multipleEquipment`, `equipmentNotFound`) flashe `rejectedType = create-incident`, un refus ou un incident introuvable en `update` flashe `update-incident` — sans quoi `drainQueue` lirait la redirection comme un succès et détruirait la saisie (cf. `docs/domain/offline-queue.md`). L'édition reste sans verrou optimiste (`conflictType`).
 - `GET /navigation/incidents` (`navigation.incidents`) → `NavigationController.incidents` → `NavigationService.getFleetIncidents`.
