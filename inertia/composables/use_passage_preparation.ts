@@ -10,6 +10,7 @@ import {
   type WarmPageMessage,
   type WarmPageResult,
 } from '~/lib/offline_cache'
+import { rememberPreparedBoat } from '~/lib/offline_boat_cache'
 import {
   passagePages,
   passagePageUrls,
@@ -167,6 +168,8 @@ export function usePassagePreparation(
   async function prepare() {
     if (isPreparing.value) return
     isPreparing.value = true
+    // Bateau que l'assistant hors-ligne visera hors d'une fiche (#982).
+    rememberPreparedBoat(boatId())
     for (const item of pages.value) item.status = 'idle'
     // Le clic est un geste utilisateur : on en profite pour demander la
     // persistance (#952), sans quoi le cache peut être évincé en mer.

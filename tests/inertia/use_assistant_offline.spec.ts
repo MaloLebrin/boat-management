@@ -16,6 +16,12 @@ const panel = vi.hoisted(() => ({
 }))
 vi.mock('~/composables/use_assistant_panel', () => ({ useAssistantPanel: () => panel }))
 
+const boatAnswer = vi.hoisted(() => ({ answer: vi.fn() }))
+vi.mock('~/composables/use_offline_boat_answer', () => ({
+  useOfflineBoatAnswer: () => boatAnswer,
+  resetOfflineBoatAnswer: vi.fn(),
+}))
+
 const pageProps = vi.hoisted(() => ({
   appT: {} as Record<string, string>,
   locale: 'fr',
@@ -61,6 +67,7 @@ function routerAnswers(flash: Record<string, unknown> = {}) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  boatAnswer.answer.mockResolvedValue(null)
   localStorage.clear()
   net.state.value = 'offline'
   panel.canUseAI.value = true
@@ -141,6 +148,53 @@ describe('ask — aide produit locale', () => {
 
     expect(pendingQuestions.value).toEqual([])
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toEqual([])
+  })
+})
+
+describe('ask — données du bateau en cache (#982)', () => {
+  test('une réponse sur le bateau passe avant l’aide produit, avec son lien', async () => {
+    boatAnswer.answer.mockResolvedValue({
+      content: 'Ylang — d’après les données du 12/10/2026\n\n1 incident ouvert :',
+      link: { href: '/boats/7?tab=incidents', label: 'Ouvrir la fiche de Ylang' },
+      fromBoatData: true,
+    })
+    const { ask, entries, pendingQuestions } = mountOffline()
+
+    await ask('incidents ouverts')
+
+    expect(boatAnswer.answer).toHaveBeenCalledWith('incidents ouverts', '/boats/7?tab=incidents')
+    const answer = entries.value[1]
+    expect(answer.message).toEqual({
+      role: 'assistant',
+      content: 'Ylang — d’après les données du 12/10/2026\n\n1 incident ouvert :',
+      source: 'fleet_data',
+    })
+    expect(answer.link).toEqual({
+      href: '/boats/7?tab=incidents',
+      label: 'Ouvrir la fiche de Ylang',
+    })
+    expect(answer.askLater).toEqual({
+      message: 'incidents ouverts',
+      pageUrl: '/boats/7?tab=incidents',
+    })
+    expect(pendingQuestions.value).toEqual([])
+  })
+
+  test('« quel bateau ? » : ni badge, ni lien, ni proposition de reposer', async () => {
+    boatAnswer.answer.mockResolvedValue({
+      content: 'De quel bateau parlez-vous ?',
+      fromBoatData: false,
+    })
+    const { ask, entries } = mountOffline()
+
+    await ask('dernier plein')
+
+    expect(entries.value[1].message).toEqual({
+      role: 'assistant',
+      content: 'De quel bateau parlez-vous ?',
+    })
+    expect(entries.value[1].link).toBeUndefined()
+    expect(entries.value[1].askLater).toBeUndefined()
   })
 })
 

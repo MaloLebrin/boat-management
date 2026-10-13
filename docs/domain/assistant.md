@@ -122,7 +122,7 @@ l'utilisateur lui-même.
 - `ASSISTANT_CONVERSATION_TOKEN_BUDGET` : 250 000 tokens par conversation (100 000 avant #642 — un tour outillé coûte deux à trois appels). Sans effet sur le quota mensuel de l'organisation.
 - La prop partagée `assistantConversation` (optional, enveloppée) porte aussi `aiUsage { used, limit }` — même paire que la page de facturation (`AiTokenQuotaService.getUsage` + `PLAN_LIMITS[plan].aiTokensPerMonth`). Rendue en pied de panneau, avertissement avec lien `/settings/billing` au-delà de 80 % (`ASSISTANT_AI_USAGE_WARNING_RATIO`). Le `tokensUsed` de la conversation reste privé (règle du transformer).
 
-## 8 bis. Hors-ligne (#971)
+## 8 bis. Hors-ligne (#971, #982)
 
 Sans réseau (état de connectivité ≠ `online`, #953), Mistral ne répondrait pas. Le panneau bascule alors sur `AssistantOfflinePane.vue`, avec le composable `inertia/composables/use_assistant_offline.ts`. Ce mode est offert à tous les plans : l'aide produit ne coûte rien, donc pas d'upsell hors-ligne.
 
@@ -135,7 +135,12 @@ Sans réseau (état de connectivité ≠ `online`, #953), Mistral ne répondrait
   - Un refus flashé (quota…) retire la question et arrête la passe.
   - Une coupure la garde pour la prochaine probe.
   - Une proposition d'action en attente de confirmation suspend l'envoi.
-- **Pas de contexte bateau hors-ligne** : les réponses factuelles depuis les pages en cache (échéances, heures moteur, dernier plein) restent à cadrer. Le panneau le dit en n'offrant que l'aide produit.
+- **Contexte du bateau (#982).** Avant l'aide produit, `use_offline_boat_answer.ts` tente une réponse factuelle depuis la fiche en cache. Pas de modèle : le spike #972 l'écarte, la valeur vient des données.
+  - **Intention** (`inertia/lib/offline_boat_context.ts`) : mots-clés normalisés, testés dans l'ordre échéances → incidents → carburant → heures moteur → journal de bord. Une question « comment faire » (« comment saisir un plein ») reste à l'aide produit. Une question non reconnue suit le chemin de #971.
+  - **Source** (`inertia/lib/offline_boat_cache.ts`) : rien de neuf n'est stocké. Le document `/boats/:id` le plus récent d'`inertia-pages` donne `boat` (nom, moteurs) via son objet page `data-page` ; les entrées `inertia-data` de la fiche (clé `__inertia=boats/show|…`) donnent `maintenanceTasks`, `fuelLogs`, `incidents` et `navigationLogs`, la plus récente l'emportant par prop.
+  - **Bateau visé** : celui que la question nomme, puis celui de la page (fiche et sous-pages), puis le dernier préparé (`localStorage` `fleetai:passage:last-boat`, écrit par « Préparer la traversée »), puis le seul en cache. Sinon l'assistant demande lequel et répond quand le nom arrive. Une fiche courante absente du cache est signalée plutôt que de répondre pour un autre bateau. Sans aucune fiche en cache, l'aide produit prend le relais.
+  - **Réponse** : texte en bulle `source: 'fleet_data'`, précédé de « {bateau} — d'après les données du JJ/MM/AAAA » (date de la réponse en cache, `useDateFormat`). Trois lignes au plus, et un lien vers la fiche, ou vers l'onglet carburant / incidents / journal, tous pré-chargés par #967.
+  - **Limite** : le niveau de la cuve n'est relevé que par les états des lieux, pas sur la fiche. La réponse carburant le dit quand la question porte sur le niveau.
 
 ## 9. Risque assumé
 
@@ -154,4 +159,5 @@ Sans réseau (état de connectivité ≠ `online`, #953), Mistral ne répondrait
 - `tests/unit/hygiene/assistant_action_capabilities.spec.ts` (#697) — la capability annoncée et la policy appliquée ne peuvent plus diverger en silence.
 - `tests/inertia/assistant_message.spec.ts` / `assistant_action_card` / `assistant_panel` — badge de source, cartes de proposition et de résultat par kind, chips de démarrage, pied de consommation.
 - `tests/unit/helpers/product_help_search.spec.ts` (#971) — parité de la recherche partagée avec le service, ordre de score, normalisation.
-- `tests/inertia/use_assistant_offline.spec.ts` / `assistant_offline_pane.spec.ts` (#971) — aide locale, mise en attente persistée, envoi au retour du réseau (ordre, quota, coupure, action en attente), panneau hors-ligne.
+- `tests/inertia/use_assistant_offline.spec.ts` / `assistant_offline_pane.spec.ts` (#971) — aide locale, mise en attente persistée, envoi au retour du réseau (ordre, quota, coupure, action en attente), panneau hors-ligne. Depuis #982, priorité de la réponse bateau et rendu de son lien.
+- `tests/inertia/offline_boat_context.spec.ts` / `offline_boat_cache.spec.ts` / `use_offline_boat_answer.spec.ts` (#982) — intention, lecture des caches (`data-page`, props différées, la plus récente l'emporte), choix du bateau, textes et fraîcheur.

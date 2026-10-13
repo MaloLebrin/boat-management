@@ -170,9 +170,9 @@
     "promptHeader": "Expert notes for this request:"
   },
   "offline": {
-    "banner": "Offline mode — answers limited to FleetAi help. Other questions will be sent once the network is back.",
-    "intro": "No network: I answer from the built-in FleetAi help (where to find information, how to log an incident, a trip, a refueling…). A question that needs the full assistant is kept and asked automatically once the network is back.",
-    "introHelpOnly": "No network: I answer from the built-in FleetAi help (where to find information, how to log an incident, a trip, a refueling…).",
+    "banner": "Offline mode — answers limited to cached boat data and FleetAi help. Other questions will be sent once the network is back.",
+    "intro": "No network: I answer from the cached boat data (due items, engine hours, last refueling, open incidents, logbook) and from the built-in FleetAi help. A question that needs the full assistant is kept and asked automatically once the network is back.",
+    "introHelpOnly": "No network: I answer from the cached boat data (due items, engine hours, last refueling, open incidents, logbook) and from the built-in FleetAi help.",
     "seeAlso": "See also: {titles}",
     "queued": "The built-in help has no answer for this. Your question is kept: it will be asked to the assistant as soon as the network is back, and you will be notified of the answer.",
     "noAnswer": "The built-in help has no answer for this. Try other words, or try again once the network is back.",
@@ -182,6 +182,31 @@
     "remove": "Remove",
     "removeAriaLabel": "Remove the pending question: {question}",
     "answered": "{count, plural, one {The assistant answered the question you asked offline} other {The assistant answered the # questions you asked offline}}",
-    "openPanel": "See the answer"
+    "openPanel": "See the answer",
+    "boat": {
+      "freshness": "{boat} — based on data from {date}",
+      "maintenanceTitle": "{count, plural, one {# open due item:} other {# open due items, nearest first:}}",
+      "maintenanceNone": "No open maintenance due item.",
+      "taskDate": "{title} — on {date}",
+      "taskHours": "{title} — at {hours} engine hours",
+      "engineHours": "{engine}: {hours} h",
+      "engineNoHours": "{engine}: hour meter not recorded",
+      "enginesNone": "No engine in service on this boat.",
+      "fuelLast": "Last refueling on {date}: {liters} L.",
+      "fuelHours": "Engine hours at refueling: {hours} h.",
+      "fuelNone": "No refueling recorded.",
+      "fuelLevelUnknown": "The tank level is not tracked on the boat page: only refuelings are.",
+      "incidentsTitle": "{count, plural, one {# open incident:} other {# open incidents, most recent first:}}",
+      "incidentLine": "{type} on {date} — {description}",
+      "incidentsNone": "No open incident.",
+      "logbookLast": "Last trip on {date}: {from} → {to}.",
+      "logbookOngoing": "Trip under way since {date}, departed from {from}.",
+      "logbookDistance": "Distance: {distance} NM.",
+      "logbookNone": "No trip in the logbook.",
+      "openBoat": "Open the {boat} page",
+      "notPrepared": "This data for {boat} was not cached. Prepare the passage from the boat page before leaving.",
+      "pageNotPrepared": "This boat's page is not cached: I don't have its data. Prepare the passage from its page before leaving.",
+      "whichBoat": "Which boat do you mean? Cached: {boats}."
+    }
   }
 }

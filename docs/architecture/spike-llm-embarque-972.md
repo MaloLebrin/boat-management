@@ -20,11 +20,11 @@ On ne lance pas de développement. Les raisons tiennent moins à la technique (e
 
 ### Ce qu'on fait à la place (issues proposées)
 
-| Proposition                                                                                                                                                                                                                           | Coût  | Valeur en mer                                    |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ------------------------------------------------ |
-| **Ajouter les checklists de diagnostic au pré-chargement traversée** (`/diagnostic`, la checklist globale et les fiches des moteurs du bateau) ; cocher hors-ligne passe par la file (#481).                                          | Petit | Forte : c'est le « diagnostic de panne » demandé |
-| **Contexte bateau hors-ligne pour l'assistant** (laissé « à cadrer » par #971) : répondre localement « prochaine échéance », « heures moteur », « dernier plein » à partir des props des pages déjà en cache. Recherche déterministe. | Moyen | Moyenne                                          |
-| **Réévaluer ce spike en avril 2027**, ou plus tôt si un des déclencheurs du §7 tombe.                                                                                                                                                 | —     | —                                                |
+| Proposition                                                                                                                                                                                                                                           | Coût  | Valeur en mer                                    |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ------------------------------------------------ |
+| **Ajouter les checklists de diagnostic au pré-chargement traversée** (`/diagnostic`, la checklist globale et les fiches des moteurs du bateau) ; cocher hors-ligne passe par la file (#481).                                                          | Petit | Forte : c'est le « diagnostic de panne » demandé |
+| **Contexte bateau hors-ligne pour l'assistant** (laissé « à cadrer » par #971, livré par #982) : répondre localement « prochaine échéance », « heures moteur », « dernier plein » à partir des props des pages déjà en cache. Recherche déterministe. | Moyen | Moyenne                                          |
+| **Réévaluer ce spike en avril 2027**, ou plus tôt si un des déclencheurs du §7 tombe.                                                                                                                                                                 | —     | —                                                |
 
 ## 3. État des plateformes (octobre 2026)
 

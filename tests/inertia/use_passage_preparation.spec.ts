@@ -167,6 +167,8 @@ describe('usePassagePreparation', () => {
     await run
 
     expect(storage.requestPersistentStorage).toHaveBeenCalledOnce()
+    // Bateau visé par l'assistant hors-ligne hors d'une fiche (#982).
+    expect(localStorage.getItem('fleetai:passage:last-boat')).toBe('4')
     expect(postMessage.mock.calls.map(([message]) => message)).toEqual(
       pages.value.map((page) => ({ type: WARM_PAGE_MESSAGE, url: page.url }))
     )

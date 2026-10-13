@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@adonisjs/inertia/vue'
 import { nextTick, ref, watch } from 'vue'
 import AssistantComposer from '~/components/assistant/AssistantComposer.vue'
 import AssistantMessage from '~/components/assistant/AssistantMessage.vue'
@@ -55,6 +56,14 @@ watch(
 
       <template v-for="entry in entries" :key="entry.id">
         <AssistantMessage :message="entry.message" />
+        <Link
+          v-if="entry.link"
+          :href="entry.link.href"
+          class="self-start text-xs font-medium text-lilac-300 hover:underline"
+          data-testid="assistant-offline-link"
+        >
+          {{ entry.link.label }}
+        </Link>
         <button
           v-if="entry.askLater"
           type="button"
