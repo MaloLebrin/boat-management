@@ -197,5 +197,6 @@
       "periodHint": "Filtrer sur la date de création des fiches clients.",
       "anonymizedHint": "Les clients anonymisés sont exclus de l'export."
     }
-  }
+  },
+  "offline.queue.type.toggle-diagnostic-step": "Étape de diagnostic de panne"
 }

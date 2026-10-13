@@ -29,7 +29,8 @@
     "localStateHint": "This sheet is not tied to any engine in your fleet: checkboxes are not saved and start fresh on your next visit.",
     "safetyTitle": "Safety",
     "seaCockTitle": "Open the sea cock before starting",
-    "seaCock": "This sheet involves starting the engine: make sure the raw water sea cock is open and that water comes out of the exhaust within the first few seconds. With no water, shut down immediately — the impeller is destroyed in seconds."
+    "seaCock": "This sheet involves starting the engine: make sure the raw water sea cock is open and that water comes out of the exhaust within the first few seconds. With no water, shut down immediately — the impeller is destroyed in seconds.",
+    "resetOffline": "Reset is unavailable offline"
   },
   "tab": {
     "title": "Troubleshooting",

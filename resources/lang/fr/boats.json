@@ -505,7 +505,9 @@
         "sheets": "Fiches d’entretien",
         "fuel": "Carburant",
         "incidents": "Incidents",
-        "planning": "Planning"
+        "planning": "Planning",
+        "diagnosticIndex": "Diagnostic de panne — liste des moteurs",
+        "diagnostic": "Diagnostic de panne — {engine}"
       },
       "pageStatus": {
         "loading": "En cours",

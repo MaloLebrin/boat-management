@@ -10,7 +10,12 @@ import {
   type WarmPageMessage,
   type WarmPageResult,
 } from '~/lib/offline_cache'
-import { passagePages, type PassagePage } from '~/lib/passage_preparation'
+import {
+  passagePages,
+  passagePageUrls,
+  type PassageEngine,
+  type PassagePage,
+} from '~/lib/passage_preparation'
 
 /**
  * « Préparer la traversée » (#967, épic « Mode traversée » #949).
@@ -129,17 +134,34 @@ function withoutTab(url: string): string {
   return parsed.pathname + parsed.search
 }
 
-export function usePassagePreparation(boatId: () => number) {
+/**
+ * Date de la plus ancienne copie d'une ligne ; `null` dès qu'une de ses pages
+ * manque — une checklist en cache sans ses fiches ne tient pas en mer.
+ */
+async function readRowCachedAt(item: PassagePage): Promise<Date | null> {
+  let oldest: Date | null = null
+  for (const url of passagePageUrls(item)) {
+    const cachedAt = await readCachedAt(url)
+    if (!cachedAt) return null
+    if (!oldest || cachedAt < oldest) oldest = cachedAt
+  }
+  return oldest
+}
+
+export function usePassagePreparation(
+  boatId: () => number,
+  engines: () => readonly PassageEngine[] = () => []
+) {
   const page = usePage()
   const pages = ref<PassagePageState[]>(
-    passagePages(boatId()).map((item) => ({ ...item, status: 'idle', cachedAt: null }))
+    passagePages(boatId(), engines()).map((item) => ({ ...item, status: 'idle', cachedAt: null }))
   )
   const isPreparing = ref(false)
   const serviceWorkerReady = ref(serviceWorkerController() !== null)
 
   async function refreshCachedDates() {
     serviceWorkerReady.value = serviceWorkerController() !== null
-    for (const item of pages.value) item.cachedAt = await readCachedAt(item.url)
+    for (const item of pages.value) item.cachedAt = await readRowCachedAt(item)
   }
 
   async function prepare() {
@@ -160,12 +182,16 @@ export function usePassagePreparation(boatId: () => number) {
           continue
         }
         item.status = 'loading'
-        const documentOk = await warmPageInServiceWorker(controller, item.url)
-        const dataKey = withoutTab(item.url)
-        if (!warmedData.has(dataKey)) {
-          warmedData.set(dataKey, await warmDeferredProps(dataKey, page.version ?? null))
+        let ok = true
+        for (const url of passagePageUrls(item)) {
+          const documentOk = await warmPageInServiceWorker(controller, url)
+          const dataKey = withoutTab(url)
+          if (!warmedData.has(dataKey)) {
+            warmedData.set(dataKey, await warmDeferredProps(dataKey, page.version ?? null))
+          }
+          ok = ok && documentOk && warmedData.get(dataKey) === true
         }
-        item.status = documentOk && warmedData.get(dataKey) ? 'done' : 'failed'
+        item.status = ok ? 'done' : 'failed'
       }
     } finally {
       await refreshCachedDates()

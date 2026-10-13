@@ -66,7 +66,7 @@ dans le SW :
 - **`self.skipWaiting()` + `clients.claim()`** (en natif, pas de workbox-core) — n'étaient plus
   injectés par `registerType: 'autoUpdate'` ;
 - **précache** : `precacheAndRoute(self.__WB_MANIFEST)` + `cleanupOutdatedCaches()` ;
-- **NetworkFirst** sur les navigations `/boats|/navigation|/planning` (3 s de timeout, 120 entrées,
+- **NetworkFirst** sur les navigations `/boats|/navigation|/planning|/diagnostic` (`/diagnostic` depuis #981) (3 s de timeout, 120 entrées,
   35 jours depuis #967, réponses 200) — restreint à `request.mode === 'navigate'` : les visites Inertia (XHR
   `X-Inertia`) répondent du JSON sur les mêmes URLs, les cacher sous la même clé servirait du JSON
   brut à une navigation hors-ligne ;
@@ -323,6 +323,7 @@ function handleSubmit() {
 | `BoatIncidentForm.vue`             | `create-incident`          | `POST /boats/:id/incidents`                                            | post    |
 | `BoatIncidentForm.vue`             | `update-incident`          | `PUT /boats/:id/incidents/:incidentId`                                 | put     |
 | `BoatMaintenanceSheetItemList.vue` | `update-sheet-item`        | `PUT /boats/:id/maintenance-sheets/:sheetId/items/:itemId`             | put     |
+| `DiagnosticStepList.vue`           | `toggle-diagnostic-step`   | `PATCH /boats/:id/engines/:engineId/diagnostic/steps`                  | patch   |
 | `InspectionDefectModal.vue`        | `create-inspection-defect` | `POST /boats/:id/reservations/:rid/inspections/:iid/equipment-actions` | post    |
 | `InspectionForm.vue`               | `create-inspection`        | `POST /boats/:id/reservations/:rid/inspections`                        | post    |
 | `InspectionForm.vue`               | `update-inspection`        | `PUT /boats/:id/reservations/:rid/inspections/:iid`                    | put     |

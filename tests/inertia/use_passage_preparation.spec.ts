@@ -17,6 +17,7 @@ import {
   warmDeferredProps,
 } from '../../inertia/composables/use_passage_preparation'
 import { WARM_PAGE_MESSAGE } from '../../inertia/lib/offline_cache'
+import { passagePages } from '../../inertia/lib/passage_preparation'
 
 const originalServiceWorker = Object.getOwnPropertyDescriptor(navigator, 'serviceWorker')
 
@@ -216,6 +217,64 @@ describe('usePassagePreparation', () => {
     }
     await run
     expect(pages.value.every((page) => page.status === 'failed')).toBe(true)
+  })
+
+  // #981 — une ligne de diagnostic porte la checklist et les fiches du moteur.
+  const outboard2t = { id: 9, kind: 'outboard', fuel: 'essence', strokeType: '2_stroke' }
+
+  test('les fiches d’un moteur sont pré-chargées sous sa ligne de diagnostic', async () => {
+    const postMessage = fakeServiceWorker()
+    const { pages, prepare } = usePassagePreparation(
+      () => 4,
+      () => [outboard2t]
+    )
+    await prepare()
+
+    const row = pages.value.find((page) => page.key === 'diagnostic')!
+    const warmed = postMessage.mock.calls.map(([message]) => message.url)
+    expect(warmed).toContain('/diagnostic')
+    expect(warmed).toEqual(expect.arrayContaining([row.url, ...row.extraUrls!]))
+    expect(row.status).toBe('done')
+  })
+
+  test('une fiche refusée fait échouer la ligne de son moteur', async () => {
+    const [, sheet] = passagePages(4, [outboard2t]).at(-1)!.extraUrls!
+    fakeServiceWorker([sheet!])
+    const { pages, prepare } = usePassagePreparation(
+      () => 4,
+      () => [outboard2t]
+    )
+    await prepare()
+
+    expect(pages.value.find((page) => page.key === 'diagnostic')!.status).toBe('failed')
+    expect(pages.value.find((page) => page.key === 'diagnosticIndex')!.status).toBe('done')
+  })
+
+  test('la date d’une ligne est celle de sa plus vieille copie, nulle si une fiche manque', async () => {
+    fakeServiceWorker()
+    const { pages, refreshCachedDates } = usePassagePreparation(
+      () => 4,
+      () => [outboard2t]
+    )
+    const row = pages.value.find((page) => page.key === 'diagnostic')!
+    const oldest = 'Sun, 11 Oct 2026 08:00:00 GMT'
+    const match = vi.fn(async (url: string) => {
+      const path = new URL(url).pathname
+      if (path === row.extraUrls![0]) return new Response('', { headers: { Date: oldest } })
+      return new Response('', { headers: { Date: 'Mon, 12 Oct 2026 10:00:00 GMT' } })
+    })
+    vi.stubGlobal('caches', { open: vi.fn().mockResolvedValue({ match }) })
+
+    await refreshCachedDates()
+    expect(row.cachedAt?.toUTCString()).toBe(oldest)
+
+    match.mockImplementation(async (url: string) =>
+      new URL(url).pathname === row.extraUrls![2]
+        ? undefined
+        : new Response('', { headers: { Date: oldest } })
+    )
+    await refreshCachedDates()
+    expect(pages.value.find((page) => page.key === 'diagnostic')!.cachedAt).toBeNull()
   })
 
   test('une préparation en cours ignore un second clic', async () => {

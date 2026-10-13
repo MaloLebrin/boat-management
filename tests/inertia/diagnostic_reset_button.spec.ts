@@ -2,6 +2,12 @@ import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 const deleteMock = vi.hoisted(() => vi.fn())
+const network = vi.hoisted(() => ({ online: true }))
+
+vi.mock('~/composables/use_network_status', async () => {
+  const { computed } = await import('vue')
+  return { useNetworkStatus: () => ({ isOnline: computed(() => network.online) }) }
+})
 
 vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({ props: { appT: {}, locale: 'fr' } }),
@@ -19,6 +25,15 @@ function mountButton() {
 describe('DiagnosticResetButton (#515)', () => {
   beforeEach(() => {
     deleteMock.mockClear()
+    network.online = true
+  })
+
+  test('hors-ligne, le bouton est désactivé : un DELETE ne passe pas par la file (#981)', () => {
+    network.online = false
+    const button = mountButton().get('button')
+
+    expect(button.attributes('disabled')).toBeDefined()
+    expect(button.attributes('title')).toBe('diagnostic.common.resetOffline')
   })
 
   test('confirmation acceptée → router.delete avec le scope', async () => {

@@ -69,6 +69,14 @@ export const UPDATE_INCIDENT_ACTION = 'update-incident'
 export const UPLOAD_PHOTOS_ACTION = 'upload-photos'
 
 /**
+ * Une étape cochée d'une checklist de diagnostic de panne (#981), pré-chargée
+ * par « Préparer la traversée ». Pas de verrou optimiste : le payload porte
+ * l'état voulu (`checked`), rejouer le dernier clic est idempotent. Les refus
+ * (moteur supprimé ou plus éligible, étape inconnue) reviennent en `rejectedType`.
+ */
+export const TOGGLE_DIAGNOSTIC_STEP_ACTION = 'toggle-diagnostic-step'
+
+/**
  * Le vocabulaire complet, dans l'ordre des déclarations ci-dessus. Il ferme
  * l'union `OfflineActionType` : une action enfilée avec un identifiant qui
  * n'est pas ici ne compile pas.
@@ -88,6 +96,7 @@ export const OFFLINE_ACTION_TYPES = [
   CREATE_INCIDENT_ACTION,
   UPDATE_INCIDENT_ACTION,
   UPLOAD_PHOTOS_ACTION,
+  TOGGLE_DIAGNOSTIC_STEP_ACTION,
 ] as const
 
 /** Union fermée des identifiants d'actions de la file hors-ligne (#726). */

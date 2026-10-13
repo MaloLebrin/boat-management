@@ -3,9 +3,11 @@ import {
   evaluatePassageChecklist,
   MIN_FREE_BYTES,
   passagePages,
+  passagePageUrls,
   type PassageChecklistInput,
 } from '../../inertia/lib/passage_preparation'
 import { SESSION_IDLE_DAYS } from '../../shared/constants/auth'
+import { sheetsForEngine } from '../../shared/helpers/diagnostic'
 
 // #967 — pages pré-chargées et check-list de départ.
 
@@ -19,6 +21,40 @@ describe('passagePages', () => {
       '/boats/7?tab=incidents',
       '/planning',
     ])
+  })
+
+  // #981 — diagnostic de panne disponible en mer.
+  const outboard2t = { id: 11, kind: 'outboard', fuel: 'essence', strokeType: '2_stroke' }
+  const electric = { id: 12, kind: 'electric', fuel: null, strokeType: null }
+  const diesel = { id: 13, kind: 'inboard', fuel: 'diesel', strokeType: null, family: null }
+
+  test('sans moteur éligible, aucune page de diagnostic', () => {
+    expect(passagePages(7, [electric]).map((page) => page.key)).not.toContain('diagnosticIndex')
+    expect(passagePages(7, [electric])).toHaveLength(6)
+  })
+
+  test('l’index, puis une ligne par moteur éligible avec ses fiches rangées dessous', () => {
+    const diagnostic = passagePages(7, [outboard2t, electric, diesel]).slice(6)
+
+    expect(diagnostic.map(({ key, url, engineId }) => ({ key, url, engineId }))).toEqual([
+      { key: 'diagnosticIndex', url: '/diagnostic', engineId: undefined },
+      { key: 'diagnostic', url: '/boats/7/engines/11/diagnostic', engineId: 11 },
+      { key: 'diagnostic', url: '/boats/7/engines/13/diagnostic', engineId: 13 },
+    ])
+    const sheets = sheetsForEngine(outboard2t)
+    expect(sheets.length).toBeGreaterThan(0)
+    expect(diagnostic[1].extraUrls).toEqual(
+      sheets.map((sheet) => `/boats/7/engines/11/diagnostic/sheets/${sheet.slug}`)
+    )
+    // Les fiches suivent la famille : le diesel n'a pas celles du 2 temps.
+    expect(diagnostic[2].extraUrls).not.toEqual(diagnostic[1].extraUrls)
+  })
+
+  test('passagePageUrls : la page puis ses fiches', () => {
+    expect(passagePageUrls({ key: 'boat', url: '/boats/7' })).toEqual(['/boats/7'])
+    expect(
+      passagePageUrls({ key: 'diagnostic', url: '/a', extraUrls: ['/a/sheets/x', '/a/sheets/y'] })
+    ).toEqual(['/a', '/a/sheets/x', '/a/sheets/y'])
   })
 })
 

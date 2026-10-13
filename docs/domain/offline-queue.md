@@ -85,6 +85,7 @@ un renommage casse désormais à la compilation plutôt qu'en mer.
 | `create-incident`             | `CREATE_INCIDENT_ACTION`             | —               | ✅             | —                      |
 | `update-incident`             | `UPDATE_INCIDENT_ACTION`             | ✅              | ✅             | ✅                     |
 | `upload-photos`               | `UPLOAD_PHOTOS_ACTION`               | —               | ✅             | —                      |
+| `toggle-diagnostic-step`      | `TOGGLE_DIAGNOSTIC_STEP_ACTION`      | —               | ✅             | —                      |
 
 `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` relit les sources — il
 n'importe pas les constantes, une garde qui partagerait sa source avec sa cible
@@ -300,6 +301,19 @@ chargées par un rechargement partiel XHR qui échouait hors-ligne.
   client (cookie httpOnly) : au-delà de 30 jours, c'est un avertissement qui
   invite à se reconnecter avec « Rester connecté », pas un échec.
 
+- **Diagnostic de panne (#981).** Pour chaque moteur éligible
+  (`isDiagnosticEligibleEngine`), l'écran ajoute l'index `/diagnostic` (une
+  fois), la checklist du moteur et les fiches de sa famille (`sheetsForEngine`).
+  Une seule ligne par moteur dans la modale : ses fiches (8 à 10) sont rangées
+  dessous (`extraUrls`), la ligne échoue si l'une d'elles échoue, et sa date est
+  celle de la plus vieille copie — `null` dès qu'une fiche manque.
+  `TERRAIN_PATH` couvre désormais `/diagnostic`. Une étape cochée hors-ligne
+  part en file (`toggle-diagnostic-step`, `PATCH`, une `dedupeKey` par moteur et
+  par étape) ; le payload porte l'état voulu, donc pas de verrou optimiste. Le
+  contrôleur flashe `rejectedType` sur ses trois refus (moteur supprimé, plus
+  éligible, étape inconnue). La réinitialisation (`DELETE`) n'entre pas dans la
+  file : le bouton est désactivé hors-ligne.
+
 Logique pure dans `inertia/lib/passage_preparation.ts`, branchement SW et
 caches dans `inertia/composables/use_passage_preparation.ts`.
 
@@ -374,7 +388,7 @@ pour le futur écran `/sync`.
 | `tests/browser/offline_navigation.spec.ts`                     | la même bascule, sur un vrai clic de lien (#968)           |
 | `tests/inertia/offline_cache.spec.ts`                          | clé `inertia-data`, garde de mise en cache (#967)          |
 | `tests/inertia/use_passage_preparation.spec.ts`                | pré-chargement : SW, props différées, échecs (#967)        |
-| `tests/inertia/passage_preparation.spec.ts`                    | pages préparées et check-list de départ (#967)             |
+| `tests/inertia/passage_preparation.spec.ts`                    | pages préparées (diagnostic #981) et check-list (#967)     |
 | `tests/inertia/passage_preparation_modal.spec.ts`              | écran de préparation (#967)                                |
 | `tests/unit/middleware/inertia_offline_protocol.spec.ts`       | les cinq clés traversent le middleware                     |
 | `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts`       | les deux moitiés du vocabulaire coïncident                 |

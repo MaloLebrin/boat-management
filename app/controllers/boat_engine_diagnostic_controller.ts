@@ -6,6 +6,7 @@ import {
   DiagnosticStepNotFoundError,
   EngineNotDiagnosticEligibleError,
 } from '#exceptions/diagnostic_errors'
+import { TOGGLE_DIAGNOSTIC_STEP_ACTION } from '#shared/constants/offline_queue'
 import { isSheetForEngine } from '#shared/helpers/diagnostic'
 import { resolveEngineFamily } from '#shared/helpers/engine_family'
 import { toAppLocale } from '#shared/helpers/locale_path'
@@ -195,16 +196,21 @@ export default class BoatEngineDiagnosticController {
         payload.checked
       )
     } catch (error) {
+      // Coché hors-ligne (#981), le rejeu doit savoir que l'action est refusée :
+      // sans `rejectedType`, `drainQueue` lirait la redirection comme un succès.
       if (error instanceof BoatEquipmentNotFoundError) {
         session.flash('error', i18n.t('flash.engine.notFound'))
+        session.flash('rejectedType', TOGGLE_DIAGNOSTIC_STEP_ACTION)
         return response.redirect(`/boats/${boat.id}`)
       }
       if (error instanceof EngineNotDiagnosticEligibleError) {
         session.flash('error', i18n.t('flash.diagnostic.notEligible'))
+        session.flash('rejectedType', TOGGLE_DIAGNOSTIC_STEP_ACTION)
         return response.redirect().back()
       }
       if (error instanceof DiagnosticStepNotFoundError) {
         session.flash('error', i18n.t('flash.diagnostic.stepNotFound'))
+        session.flash('rejectedType', TOGGLE_DIAGNOSTIC_STEP_ACTION)
         return response.redirect().back()
       }
       throw error

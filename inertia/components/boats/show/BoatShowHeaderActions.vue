@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import BaseDropdown from '~/components/base/BaseDropdown.vue'
 import PassagePreparationModal from '~/components/boats/show/PassagePreparationModal.vue'
 import { useT } from '~/composables/use_t'
+import type { BoatShowEngine } from '~/types/boat_show'
 
 const props = defineProps<{
   boatId: number
@@ -13,6 +14,8 @@ const props = defineProps<{
   /** Droit `incidents.create` : entrée « Un incident » (#813). */
   canCreateIncidents?: boolean
   canExport: boolean
+  /** Moteurs du bateau, pour pré-charger leur diagnostic de panne (#981). */
+  engines?: BoatShowEngine[]
 }>()
 
 const emit = defineEmits<{
@@ -141,5 +144,5 @@ const menuItemClass =
     </template>
   </BaseDropdown>
 
-  <PassagePreparationModal v-model:open="passageOpen" :boat-id="boatId" />
+  <PassagePreparationModal v-model:open="passageOpen" :boat-id="boatId" :engines="engines" />
 </template>

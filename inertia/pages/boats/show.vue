@@ -205,6 +205,7 @@ const tabContentProps = computed(() => {
             :can-create-navigation-logs="canCreateNavigationLogs"
             :can-create-incidents="canCreateIncidents"
             :can-export="canExport"
+            :engines="boat.engines"
             @add-event="openHistoryTab"
             @add-task="openTasksTab"
             @add-equipment="openEquipmentTab"
