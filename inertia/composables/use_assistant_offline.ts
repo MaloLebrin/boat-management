@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { connectivityState } from '~/composables/use_connectivity'
 import { useAssistantPanel } from '~/composables/use_assistant_panel'
+import { resetOfflineBoatAnswer, useOfflineBoatAnswer } from '~/composables/use_offline_boat_answer'
 import { useT } from '~/composables/use_t'
 import { tzOffsetMinutes } from '~/utils/local_datetime'
 import {
@@ -20,7 +21,9 @@ import { toAppLocale } from '#shared/helpers/locale_path'
  * Sans réseau, le panneau répond depuis la base de connaissance produit — la
  * même recherche que l'outil `search_product_help` du copilote, partagée dans
  * `shared/helpers/product_help_search.ts`. Une question qui demande le modèle
- * est mise de côté et posée d'elle-même au retour du réseau.
+ * est mise de côté et posée d'elle-même au retour du réseau. Depuis #982, une
+ * question factuelle sur le bateau (échéances, carburant…) est d'abord
+ * répondue depuis la fiche en cache.
  */
 
 const STORAGE_KEY = 'fleetai:assistant:pending-questions'
@@ -41,6 +44,8 @@ export interface OfflineAssistantEntry {
   id: number
   message: AssistantMessage
   askLater?: { message: string; pageUrl: string }
+  /** Onglet de la fiche d'où vient une réponse sur le bateau (#982). */
+  link?: { href: string; label: string }
 }
 
 const entries = ref<OfflineAssistantEntry[]>([])
@@ -66,8 +71,12 @@ function persistPending() {
   }
 }
 
-function pushEntry(message: AssistantMessage, askLater?: OfflineAssistantEntry['askLater']) {
-  entries.value = [...entries.value, { id: ++nextEntryId, message, askLater }]
+function pushEntry(
+  message: AssistantMessage,
+  askLater?: OfflineAssistantEntry['askLater'],
+  link?: OfflineAssistantEntry['link']
+) {
+  entries.value = [...entries.value, { id: ++nextEntryId, message, askLater, link }]
 }
 
 /**
@@ -85,6 +94,7 @@ export function resetAssistantOffline() {
   entries.value = []
   pendingQuestions.value = readPending()
   isDraining = false
+  resetOfflineBoatAnswer()
 }
 
 export function useAssistantOffline() {
@@ -92,6 +102,7 @@ export function useAssistantOffline() {
   const page = usePage()
   const panel = useAssistantPanel()
   const connectivity = connectivityState()
+  const boatAnswer = useOfflineBoatAnswer()
 
   /** Hors-ligne ou serveur injoignable (#953) : Mistral ne répondrait pas. */
   const isOffline = computed(() => connectivity.value !== 'online')
@@ -110,10 +121,27 @@ export function useAssistantOffline() {
     persistPending()
   }
 
-  /** Répond depuis l'aide produit locale ; sans réponse, met la question de côté. */
+  /**
+   * Répond depuis la fiche du bateau en cache (#982), sinon depuis l'aide
+   * produit locale ; sans réponse, met la question de côté.
+   */
   async function ask(message: string) {
     const pageUrl = page.url.slice(0, ASSISTANT_PAGE_URL_MAX_LENGTH)
     pushEntry({ role: 'user', content: message })
+
+    const fromBoat = await boatAnswer.answer(message, pageUrl)
+    if (fromBoat) {
+      pushEntry(
+        {
+          role: 'assistant',
+          content: fromBoat.content,
+          ...(fromBoat.fromBoatData ? { source: 'fleet_data' as const } : {}),
+        },
+        fromBoat.link && panel.canUseAI.value ? { message, pageUrl } : undefined,
+        fromBoat.link
+      )
+      return
+    }
 
     const [best, ...others] = await searchHelp(message, toAppLocale(locale.value))
     if (best) {

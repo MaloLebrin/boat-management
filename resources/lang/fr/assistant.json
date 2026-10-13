@@ -170,9 +170,9 @@
     "promptHeader": "Repères d'expert pour cette demande :"
   },
   "offline": {
-    "banner": "Mode hors-ligne — réponses limitées à l’aide FleetAi. Les autres questions partiront au retour du réseau.",
-    "intro": "Pas de réseau : je réponds depuis l’aide FleetAi embarquée (où trouver une info, comment saisir un incident, une sortie, un plein…). Une question qui demande l’assistant complet est gardée et posée automatiquement au retour du réseau.",
-    "introHelpOnly": "Pas de réseau : je réponds depuis l’aide FleetAi embarquée (où trouver une info, comment saisir un incident, une sortie, un plein…).",
+    "banner": "Mode hors-ligne — réponses limitées aux données du bateau en cache et à l’aide FleetAi. Les autres questions partiront au retour du réseau.",
+    "intro": "Pas de réseau : je réponds depuis les données du bateau mises en cache (échéances, heures moteur, dernier plein, incidents ouverts, journal de bord) et depuis l’aide FleetAi embarquée. Une question qui demande l’assistant complet est gardée et posée automatiquement au retour du réseau.",
+    "introHelpOnly": "Pas de réseau : je réponds depuis les données du bateau mises en cache (échéances, heures moteur, dernier plein, incidents ouverts, journal de bord) et depuis l’aide FleetAi embarquée.",
     "seeAlso": "Voir aussi : {titles}",
     "queued": "Je n’ai pas la réponse dans l’aide embarquée. Votre question est gardée : elle sera posée à l’assistant dès le retour du réseau, et vous serez prévenu de la réponse.",
     "noAnswer": "Je n’ai pas la réponse dans l’aide embarquée. Reformulez avec d’autres mots, ou réessayez une fois le réseau revenu.",
@@ -182,6 +182,31 @@
     "remove": "Retirer",
     "removeAriaLabel": "Retirer la question en attente : {question}",
     "answered": "{count, plural, one {L’assistant a répondu à votre question posée hors-ligne} other {L’assistant a répondu à vos # questions posées hors-ligne}}",
-    "openPanel": "Voir la réponse"
+    "openPanel": "Voir la réponse",
+    "boat": {
+      "freshness": "{boat} — d’après les données du {date}",
+      "maintenanceTitle": "{count, plural, one {# échéance ouverte :} other {# échéances ouvertes, les plus proches :}}",
+      "maintenanceNone": "Aucune échéance d’entretien ouverte.",
+      "taskDate": "{title} — le {date}",
+      "taskHours": "{title} — à {hours} h moteur",
+      "engineHours": "{engine} : {hours} h",
+      "engineNoHours": "{engine} : compteur non renseigné",
+      "enginesNone": "Aucun moteur en service sur ce bateau.",
+      "fuelLast": "Dernier plein le {date} : {liters} L.",
+      "fuelHours": "Compteur moteur au plein : {hours} h.",
+      "fuelNone": "Aucun plein enregistré.",
+      "fuelLevelUnknown": "Le niveau de la cuve n’est pas suivi sur la fiche : seuls les pleins le sont.",
+      "incidentsTitle": "{count, plural, one {# incident ouvert :} other {# incidents ouverts, les plus récents :}}",
+      "incidentLine": "{type} du {date} — {description}",
+      "incidentsNone": "Aucun incident ouvert.",
+      "logbookLast": "Dernière sortie le {date} : {from} → {to}.",
+      "logbookOngoing": "Sortie en cours depuis le {date}, partie de {from}.",
+      "logbookDistance": "Distance : {distance} NM.",
+      "logbookNone": "Aucune sortie au journal de bord.",
+      "openBoat": "Ouvrir la fiche de {boat}",
+      "notPrepared": "Ces données de {boat} n’ont pas été mises en cache. Préparez la traversée depuis la fiche du bateau avant de partir.",
+      "pageNotPrepared": "La fiche de ce bateau n’est pas en cache : je n’ai pas ses données. Préparez la traversée depuis sa fiche avant de partir.",
+      "whichBoat": "De quel bateau parlez-vous ? En cache : {boats}."
+    }
   }
 }

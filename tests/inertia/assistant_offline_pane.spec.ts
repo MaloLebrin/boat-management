@@ -21,6 +21,7 @@ const pageProps: Record<string, unknown> = {
     'assistant.offline.remove': 'Retirer',
     'assistant.upsell.title': 'Passez au plan Pro',
     'assistant.sources.product': 'Aide FleetAi',
+    'assistant.sources.fleet_data': 'Données de votre flotte',
   },
   locale: 'fr',
   currentPlan: 'pro',
@@ -30,6 +31,12 @@ const pageProps: Record<string, unknown> = {
 vi.mock('@inertiajs/vue3', () => ({
   usePage: () => ({ url: '/dashboard', props: pageProps }),
   router: { reload: vi.fn(), post: vi.fn() },
+}))
+
+const boatAnswer = vi.hoisted(() => ({ answer: vi.fn() }))
+vi.mock('~/composables/use_offline_boat_answer', () => ({
+  useOfflineBoatAnswer: () => boatAnswer,
+  resetOfflineBoatAnswer: vi.fn(),
 }))
 
 vi.mock('@adonisjs/inertia/vue', () => ({
@@ -48,6 +55,7 @@ async function askInPanel(wrapper: ReturnType<typeof mount>, question: string) {
 }
 
 beforeEach(() => {
+  boatAnswer.answer.mockResolvedValue(null)
   localStorage.clear()
   net.state.value = 'offline'
   pageProps.currentPlan = 'pro'
@@ -79,6 +87,24 @@ describe('AssistantPanel hors-ligne (#971)', () => {
     await askLater.trigger('click')
     expect(wrapper.find('[data-testid="assistant-ask-later"]').exists()).toBe(false)
     expect(wrapper.findAll('[data-testid="assistant-pending-question"]')).toHaveLength(1)
+  })
+
+  test('#982 — une réponse sur le bateau porte le badge flotte et le lien vers l’onglet', async () => {
+    boatAnswer.answer.mockResolvedValue({
+      content: 'Ylang — d’après les données du 12/10/2026\n\nDernier plein le 05/10/2026 : 80 L.',
+      link: { href: '/boats/7?tab=fuel', label: 'Ouvrir la fiche de Ylang' },
+      fromBoatData: true,
+    })
+    const wrapper = mount(AssistantPanel)
+
+    await askInPanel(wrapper, 'dernier plein')
+
+    expect(wrapper.text()).toContain('Dernier plein le 05/10/2026 : 80 L.')
+    expect(wrapper.text()).toContain('Données de votre flotte')
+    const link = wrapper.get('[data-testid="assistant-offline-link"]')
+    expect(link.attributes('href')).toBe('/boats/7?tab=fuel')
+    expect(link.text()).toBe('Ouvrir la fiche de Ylang')
+    expect(wrapper.find('[data-testid="assistant-ask-later"]').exists()).toBe(true)
   })
 
   test('une question sans réponse locale rejoint la liste d’attente, retirable', async () => {
