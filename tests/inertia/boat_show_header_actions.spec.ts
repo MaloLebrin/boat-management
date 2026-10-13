@@ -137,3 +137,28 @@ describe('BoatShowHeaderActions — regroupement des actions d’en-tête (#365)
     expect(links[2]!.attributes('href')).toBe('/boats/13/maintenance-log.pdf')
   })
 })
+
+describe('BoatShowHeaderActions — « Préparer la traversée » (#967)', () => {
+  test('the "⋯" menu opens the passage preparation modal', async () => {
+    const wrapper = mount(BoatShowHeaderActions, {
+      props: baseProps,
+      global: {
+        stubs: {
+          PassagePreparationModal: {
+            name: 'PassagePreparationModal',
+            props: ['open', 'boatId'],
+            template: '<div />',
+          },
+        },
+      },
+    })
+    const modal = () => wrapper.findComponent({ name: 'PassagePreparationModal' })
+    expect(modal().props('open')).toBe(false)
+
+    await wrapper.findAll('button')[1]!.trigger('click')
+    await wrapper.get('[data-testid="passage-open"]').trigger('click')
+
+    expect(modal().props('open')).toBe(true)
+    expect(modal().props('boatId')).toBe(13)
+  })
+})

@@ -12,9 +12,12 @@ FleetAi est une PWA installable sur mobile et desktop. Le mode hors-ligne permet
 vite-plugin-pwa (Workbox)
   └── Service Worker généré automatiquement
         ├── Précache : JS, CSS, images, polices (globPatterns)
-        └── Runtime cache (NetworkFirst) :
-              /boats/*, /navigation/*, /planning/*
-              → timeout 3 s → fallback cache (7 jours, 30 entrées max)
+        ├── Runtime cache `inertia-pages` (NetworkFirst, navigations) :
+        │     /boats/*, /navigation/*, /planning/*
+        │     → timeout 3 s → fallback cache (35 jours, 120 entrées max — #967)
+        └── Runtime cache `inertia-data` (NetworkFirst, props différées) :
+              rechargements partiels X-Inertia des mêmes pages
+              → timeout 3 s → fallback cache (35 jours, 240 entrées max — #967)
 
 IndexedDB (via `idb`)
   └── DB : fleetide-offline-queue (v2)
@@ -63,8 +66,8 @@ dans le SW :
 - **`self.skipWaiting()` + `clients.claim()`** (en natif, pas de workbox-core) — n'étaient plus
   injectés par `registerType: 'autoUpdate'` ;
 - **précache** : `precacheAndRoute(self.__WB_MANIFEST)` + `cleanupOutdatedCaches()` ;
-- **NetworkFirst** sur les navigations `/boats|/navigation|/planning` (3 s de timeout, 30 entrées,
-  7 jours, réponses 200) — restreint à `request.mode === 'navigate'` : les visites Inertia (XHR
+- **NetworkFirst** sur les navigations `/boats|/navigation|/planning` (3 s de timeout, 120 entrées,
+  35 jours depuis #967, réponses 200) — restreint à `request.mode === 'navigate'` : les visites Inertia (XHR
   `X-Inertia`) répondent du JSON sur les mêmes URLs, les cacher sous la même clé servirait du JSON
   brut à une navigation hors-ligne ;
 - **`NavigationRoute(NetworkOnly)`** sur toutes les autres navigations (denylist `/api`, `/up`) :
@@ -73,7 +76,9 @@ dans le SW :
 - **repli hors-ligne** : `setCatchHandler` sert le `/offline.html` précaché pour tout `document`
   dont la requête échoue.
 
-**Stratégie NetworkFirst** : le SW tente le réseau en priorité. Si la requête échoue ou dépasse 3 secondes, il sert le cache. Les pages non encore visitées (non cachées) tombent sur `offline.html`.
+**Stratégie NetworkFirst** : le SW tente le réseau en priorité. Si la requête échoue ou dépasse 3 secondes, il sert le cache. Les pages non encore visitées (non cachées) tombent sur `offline.html` — sauf si elles ont été pré-chargées par « Préparer la traversée » (#967, voir `docs/domain/offline-queue.md`).
+
+**Props différées (#967)** : une page servie depuis le cache arrive sans ses props `inertia.defer`, que le client réclame par un rechargement partiel (`X-Inertia-Partial-Component`/`-Data`). Le SW range ces réponses JSON dans `inertia-data`, sous une clé synthétique (`inertiaDataCacheKey`, `inertia/lib/offline_cache.ts`) qui ne peut pas répondre à une navigation et ignore `?tab=`. Seule une réponse Inertia 200 non redirigée y entre.
 
 CSP : `config/shield.ts` garde `defaultSrc: ["'self'"]`, qui couvre `worker-src` par cascade — un
 SW de même origine passe sans changement.

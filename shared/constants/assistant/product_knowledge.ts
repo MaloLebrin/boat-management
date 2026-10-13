@@ -2040,6 +2040,32 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: null,
   },
   {
+    id: 'passage-preparation',
+    title: {
+      en: 'Preparing a passage (offline pages)',
+      fr: 'Préparer une traversée (pages hors-ligne)',
+    },
+    body: {
+      en: 'Before a long passage without network, open the boat page, then the “⋯” menu and “Prepare for passage”. The app pre-loads the boat page, navigation log, maintenance sheets, fuel, incidents and planning so they open offline, even if you never visited them, and keeps them for 35 days. A checklist shows persistent storage, free space, cached pages and their date, entries still to sync, and whether your session lasts until your return date.',
+      fr: 'Avant une longue traversée sans réseau, ouvrez la fiche du bateau, puis le menu « ⋯ » et « Préparer la traversée ». L’app pré-charge la fiche, le journal de navigation, les fiches d’entretien, le carburant, les incidents et le planning : ils s’ouvrent hors-ligne même sans visite préalable, et restent 35 jours en cache. Une check-list indique le stockage persistant, l’espace libre, les pages en cache et leur date, les saisies à synchroniser et si votre session tiendra jusqu’à la date de retour.',
+    },
+    keywords: [
+      'traversee',
+      'passage',
+      'crossing',
+      'preparer',
+      'prepare',
+      'hors ligne',
+      'offline',
+      'cache',
+      'pre charger',
+      'preload',
+      'check list',
+      'checklist',
+    ],
+    navTarget: null,
+  },
+  {
     id: 'notifications',
     title: {
       en: 'Notifications: bell, page and push',

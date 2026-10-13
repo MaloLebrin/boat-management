@@ -9,7 +9,8 @@
  * - le précache vient du manifeste injecté (`self.__WB_MANIFEST`), dont
  *   `/offline.html` ajouté par `additionalManifestEntries` (#482) ;
  * - le NetworkFirst des pages terrain et le repli hors-ligne sont réécrits
- *   avec workbox-routing/strategies/expiration/cacheable-response.
+ *   avec workbox-routing/strategies/expiration/cacheable-response ;
+ * - les props différées et le pré-chargement de traversée (#967) s'y ajoutent.
  *
  * Le tsconfig Inertia charge la lib DOM : `self` y est un `Window`, d'où le
  * cast local vers `ServiceWorkerGlobalScope`.
@@ -19,7 +20,21 @@ import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 import { ExpirationPlugin } from 'workbox-expiration'
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute, setCatchHandler } from 'workbox-routing'
-import { NetworkFirst, NetworkOnly } from 'workbox-strategies'
+import { NetworkFirst, NetworkOnly, Strategy } from 'workbox-strategies'
+import type { StrategyHandler, StrategyOptions } from 'workbox-strategies'
+import {
+  DATA_CACHE,
+  DATA_MAX_ENTRIES,
+  inertiaDataCacheKey,
+  isCacheableInertiaData,
+  isWarmPageMessage,
+  NETWORK_TIMEOUT_SECONDS,
+  OFFLINE_CACHE_MAX_AGE_SECONDS,
+  PAGES_CACHE,
+  PAGES_MAX_ENTRIES,
+  TERRAIN_PATH,
+  type WarmPageResult,
+} from './lib/offline_cache'
 import { parsePushPayload } from './lib/push_payload'
 
 declare const self: ServiceWorkerGlobalScope & {
@@ -39,21 +54,100 @@ precacheAndRoute(self.__WB_MANIFEST)
 // Pages terrain en NetworkFirst : réseau d'abord (3 s), sinon la dernière
 // version visitée. Restreint aux navigations : les visites Inertia (XHR
 // X-Inertia) répondent du JSON sur les mêmes URLs — les cacher sous la même
-// clé servirait du JSON brut à une navigation hors-ligne.
+// clé servirait du JSON brut à une navigation hors-ligne. Rétention portée à
+// 35 jours pour couvrir une traversée (#967).
+const pagePlugins = [
+  new ExpirationPlugin({
+    maxEntries: PAGES_MAX_ENTRIES,
+    maxAgeSeconds: OFFLINE_CACHE_MAX_AGE_SECONDS,
+  }),
+  new CacheableResponsePlugin({ statuses: [200] }),
+]
+
+function isTerrainUrl(url: URL): boolean {
+  return url.origin === self.location.origin && TERRAIN_PATH.test(url.pathname)
+}
+
+registerRoute(
+  ({ request, url }) => request.mode === 'navigate' && isTerrainUrl(url),
+  new NetworkFirst({
+    cacheName: PAGES_CACHE,
+    networkTimeoutSeconds: NETWORK_TIMEOUT_SECONDS,
+    plugins: pagePlugins,
+  })
+)
+
+// Props différées des pages terrain (#967). Une page servie depuis le cache
+// arrive sans ses props `inertia.defer` : le client Inertia les réclame par un
+// rechargement partiel (X-Inertia-Partial-Data) qui échouait hors-ligne — la
+// fiche bateau restait vide. Ces réponses JSON vont dans leur propre cache,
+// sous une clé synthétique (`inertiaDataCacheKey`) qui ne peut pas répondre à
+// une navigation. Seule une réponse Inertia 200 non redirigée y entre.
+const inertiaDataPlugin: NonNullable<StrategyOptions['plugins']>[number] = {
+  cacheKeyWillBeUsed: async ({ request }) =>
+    inertiaDataCacheKey(request.url, {
+      component: request.headers.get('X-Inertia-Partial-Component'),
+      data: request.headers.get('X-Inertia-Partial-Data'),
+      except: request.headers.get('X-Inertia-Partial-Except'),
+    }),
+  cacheWillUpdate: async ({ response }) => (isCacheableInertiaData(response) ? response : null),
+}
+
 registerRoute(
   ({ request, url }) =>
-    request.mode === 'navigate' &&
-    url.origin === self.location.origin &&
-    /^\/(boats|navigation|planning)(\/|$)/.test(url.pathname),
+    request.method === 'GET' &&
+    request.headers.has('X-Inertia-Partial-Component') &&
+    isTerrainUrl(url),
   new NetworkFirst({
-    cacheName: 'inertia-pages',
-    networkTimeoutSeconds: 3,
+    cacheName: DATA_CACHE,
+    networkTimeoutSeconds: NETWORK_TIMEOUT_SECONDS,
     plugins: [
-      new ExpirationPlugin({ maxEntries: 30, maxAgeSeconds: 7 * 24 * 3600 }),
+      inertiaDataPlugin,
+      new ExpirationPlugin({
+        maxEntries: DATA_MAX_ENTRIES,
+        maxAgeSeconds: OFFLINE_CACHE_MAX_AGE_SECONDS,
+      }),
       new CacheableResponsePlugin({ statuses: [200] }),
     ],
   })
 )
+
+// Pré-chargement « Préparer la traversée » (#967) : réseau seul, puis mise en
+// cache avec les mêmes plugins que la route — pas de repli sur la copie
+// existante, sinon une page injoignable passerait pour préchargée.
+class FetchAndCache extends Strategy {
+  protected async _handle(request: Request, handler: StrategyHandler): Promise<Response> {
+    return handler.fetchAndCachePut(request)
+  }
+}
+
+const warmPages = new FetchAndCache({ cacheName: PAGES_CACHE, plugins: pagePlugins })
+
+async function warmPage(url: string, event: ExtendableEvent): Promise<boolean> {
+  const target = new URL(url, self.location.origin)
+  if (!isTerrainUrl(target)) return false
+  try {
+    // `redirect: 'manual'` : une session expirée redirige vers /login, la
+    // page de connexion ne doit pas être rangée sous l'URL du bateau.
+    const request = new Request(target.href, { credentials: 'same-origin', redirect: 'manual' })
+    const response = await warmPages.handle({ request, event })
+    return response.status === 200
+  } catch {
+    return false
+  }
+}
+
+self.addEventListener('message', (event) => {
+  if (!isWarmPageMessage(event.data)) return
+  const { url } = event.data
+  const port = event.ports[0]
+  event.waitUntil(
+    warmPage(url, event).then((ok) => {
+      const result: WarmPageResult = { url, ok }
+      port?.postMessage(result)
+    })
+  )
+})
 
 // Toute autre navigation passe par le SW en NetworkOnly : indispensable pour
 // que le repli ci-dessous s'applique — `setCatchHandler` ne rattrape que les

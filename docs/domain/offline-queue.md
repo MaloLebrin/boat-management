@@ -219,6 +219,44 @@ page : la suivante est un chargement de document, elle ne peut pas reboucler.
 La bascule ne dépend pas de l'état de connectivité : au moment du clic, la
 dernière probe peut dater de 5 minutes. L'absence de réponse fait foi.
 
+## Préparer la traversée (#967)
+
+Le SW ne gardait que les pages **déjà visitées**, 7 jours / 30 entrées : sur
+une traversée de 2 à 4 semaines, une page jamais ouverte tombait sur
+`/offline.html` et les premières visitées disparaissaient. Et même en cache,
+la fiche bateau s'ouvrait vide : ses onglets sont des props `inertia.defer`,
+chargées par un rechargement partiel XHR qui échouait hors-ligne.
+
+- **Rétention.** `inertia-pages` passe à 35 jours / 120 entrées (6 documents
+  par bateau préparé : une flotte de 15 bateaux plus les visites au fil de
+  l'eau). Constantes dans `inertia/lib/offline_cache.ts`, partagées par le SW
+  et l'écran.
+- **Props différées.** Nouveau cache `inertia-data` (NetworkFirst 3 s,
+  35 jours / 240 entrées) pour les GET `X-Inertia-Partial-Component` des pages
+  terrain, sous la clé `inertiaDataCacheKey` (URL + composant + props triées,
+  `?tab=` ignoré). Une réponse redirigée (session expirée) ou non Inertia n'y
+  entre jamais.
+- **Pré-chargement.** Menu « ⋯ » de la fiche bateau → « Préparer la
+  traversée » (`PassagePreparationModal.vue`). Pour la fiche, ses quatre
+  onglets terrain (journal, fiches d'entretien, carburant, incidents) et le
+  planning : le **document** est demandé au SW par message
+  (`passage:warm-page`, réseau seul puis mise en cache avec les plugins de la
+  route, `redirect: 'manual'` pour ne jamais ranger /login), puis les **props
+  différées** sont réclamées comme le ferait le client Inertia (visite
+  `X-Inertia`, puis un partiel par groupe de `deferredProps`) — une fois par
+  URL sans `?tab=`. Pages traitées une par une, statut par page ; un SW qui ne
+  répond pas en 30 s compte comme un échec.
+- **Check-list.** Stockage persistant (demandé au clic, #952), espace libre
+  (`refreshStorageEstimate`, alerte sous 50 Mo), pages en cache et date de
+  leur copie (en-tête `Date` lu dans `inertia-pages`), file hors-ligne vide
+  (en attente et en échec), session : la date de retour est comparée à
+  `SESSION_IDLE_DAYS` (30 j). Le remember-me (#951) n'est pas lisible côté
+  client (cookie httpOnly) : au-delà de 30 jours, c'est un avertissement qui
+  invite à se reconnecter avec « Rester connecté », pas un échec.
+
+Logique pure dans `inertia/lib/passage_preparation.ts`, branchement SW et
+caches dans `inertia/composables/use_passage_preparation.ts`.
+
 ## Stockage persistant (#952)
 
 Sans `navigator.storage.persist()`, le navigateur peut évincer la base
@@ -244,6 +282,10 @@ pour le futur écran `/sync`.
 | `tests/inertia/use_persistent_storage.spec.ts`                 | stockage persistant : absent, refusé, accordé (#952)       |
 | `tests/inertia/offline_navigation.spec.ts`                     | bascule en navigation pleine page sans réponse (#968)      |
 | `tests/browser/offline_navigation.spec.ts`                     | la même bascule, sur un vrai clic de lien (#968)           |
+| `tests/inertia/offline_cache.spec.ts`                          | clé `inertia-data`, garde de mise en cache (#967)          |
+| `tests/inertia/use_passage_preparation.spec.ts`                | pré-chargement : SW, props différées, échecs (#967)        |
+| `tests/inertia/passage_preparation.spec.ts`                    | pages préparées et check-list de départ (#967)             |
+| `tests/inertia/passage_preparation_modal.spec.ts`              | écran de préparation (#967)                                |
 | `tests/unit/middleware/inertia_offline_protocol.spec.ts`       | les cinq clés traversent le middleware                     |
 | `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts`       | les deux moitiés du vocabulaire coïncident                 |
 | `tests/functional/navigation/offline_conflict_payload.spec.ts` | `conflictData` porte les champs de la modale               |

@@ -488,6 +488,60 @@
     "moreMenu": {
       "label": "⋯",
       "aria": "More actions"
+    },
+    "passage": {
+      "open": "Prepare for passage",
+      "title": "Prepare for passage",
+      "subtitle": "Keep the boat's pages available without a network for several weeks.",
+      "noServiceWorker": "Pre-loading needs the app's offline mode: reload the page or install the app, then try again.",
+      "pagesTitle": "Pages available offline",
+      "prepare": "Pre-load pages",
+      "preparing": "Pre-loading…",
+      "cachedAt": "Cached since {date}",
+      "notCached": "Not cached yet",
+      "pages": {
+        "boat": "Boat page",
+        "navigationLogs": "Navigation log",
+        "sheets": "Maintenance sheets",
+        "fuel": "Fuel",
+        "incidents": "Incidents",
+        "planning": "Planning"
+      },
+      "pageStatus": {
+        "loading": "Loading",
+        "done": "Ready",
+        "failed": "Failed"
+      },
+      "checklistTitle": "Before you leave",
+      "returnDate": "Expected return date",
+      "returnDateHint": "Used to check that your session lasts until you are back.",
+      "status": {
+        "ok": "OK",
+        "warning": "Check",
+        "unknown": "Unknown"
+      },
+      "checklist": {
+        "storage": "Persistent storage",
+        "storageDetail": {
+          "ok": "The browser will not delete your entries or cached pages.",
+          "warning": "Denied: the browser may clear the cache under pressure. Install the app to get it.",
+          "unknown": "Requested when you pre-load the pages."
+        },
+        "quota": "Available space",
+        "quotaDetail": "{free} free on this device.",
+        "quotaUnknown": "This browser does not report available space.",
+        "pages": "Cached pages",
+        "pagesDetail": "{cached} of {total} pages available offline.",
+        "queue": "Offline entries",
+        "queueEmpty": "Everything is synced.",
+        "queuePending": "{count} entry(ies) to sync before you leave.",
+        "session": "Session",
+        "sessionDetail": {
+          "ok": "Your session will last until you are back.",
+          "warning": "Without a network, the session expires after {days} days. Sign in again with “Stay signed in” ({rememberDays} days) checked before you leave.",
+          "unknown": "Enter your return date to check the session."
+        }
+      }
     }
   },
   "specs": {
