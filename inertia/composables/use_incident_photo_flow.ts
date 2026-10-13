@@ -46,6 +46,11 @@ export interface IncidentPhotoFlowOptions {
   boatId: MaybeRefOrGetter<number>
   actionUrl: MaybeRefOrGetter<string>
   isEditing: MaybeRefOrGetter<boolean>
+  /**
+   * `updatedAt` de l'incident édité (#970) : renvoyé en `_expectedUpdatedAt`
+   * par le rejeu hors-ligne, il empêche d'écraser une édition faite à quai.
+   */
+  expectedUpdatedAt?: MaybeRefOrGetter<string | undefined>
   onDone: () => void
 }
 
@@ -109,14 +114,23 @@ export function useIncidentPhotoFlow(options: IncidentPhotoFlowOptions) {
     const isEditing = toValue(options.isEditing)
     const photos = isEditing ? [] : options.photos.value
     const tempId = photos.length > 0 ? newTempId() : undefined
+    const url = toValue(options.actionUrl)
+    const expectedUpdatedAt = toValue(options.expectedUpdatedAt)
 
     isUploadingPhotos.value = true
     try {
       await enqueue({
         type: isEditing ? UPDATE_INCIDENT_ACTION : CREATE_INCIDENT_ACTION,
-        url: toValue(options.actionUrl),
+        url,
         method: isEditing ? 'put' : 'post',
-        payload: options.form.data(),
+        // Verrou optimiste de l'édition (#970). Deux éditions hors-ligne du
+        // même incident fusionnent (`dedupeKey`) : rejouées l'une après
+        // l'autre, la seconde buterait sur le verrou posé par la première.
+        payload:
+          isEditing && expectedUpdatedAt
+            ? { ...options.form.data(), _expectedUpdatedAt: expectedUpdatedAt }
+            : options.form.data(),
+        ...(isEditing ? { dedupeKey: `${UPDATE_INCIDENT_ACTION}:${url}` } : {}),
         ...(tempId ? { tempId } : {}),
       })
       if (tempId) {

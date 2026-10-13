@@ -626,7 +626,18 @@ checklist, ajout/suppression de photos et de défauts, et le bouton Supprimer (`
   (`ports/show/Marina*.vue`), dégradés `canvas/mesh_gradient_shared.ts`, scène `AboutOriginSection.vue`,
   panneau `AuthNavyPanel.vue` et bandeaux hero navy — sombres dans les deux thèmes.
 
-## Galerie photo partagée
+## Modale de conflit hors-ligne
+
+`inertia/components/ConflictResolutionModal.vue` est montée par `inertia/layouts/default.vue` tant que
+`conflicts` (`use_offline_queue.ts`) n'est pas vide. Depuis #970, elle reçoit la liste entière :
+
+- un conflit seul : tableau champ par champ et deux boutons ;
+- plusieurs : sections par bateau puis par type (`data-testid="conflict-group"`, nommées « bateau ·
+  type »), chaque conflit (`conflict-item`) avec ses deux boutons, et au pied « Garder mes
+  modifications partout » / « Garder la version serveur partout ».
+
+Le tableau est `inertia/components/ConflictFieldTable.vue`. Les cartes de champs, libellés et
+regroupement sont dans `inertia/lib/conflict_fields.ts`. i18n : `common.offline.conflict.*`.
 
 `inertia/components/media/MediaPhotoGallery.vue` — galerie réutilisable pilotée par props
 (`uploadUrl`, `deleteUrlFor`, `photos`, `canUpload`, `canDelete`). Suppression via

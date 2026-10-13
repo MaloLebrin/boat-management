@@ -125,6 +125,8 @@ test.group('Conflit hors-ligne — la charge utile de la sortie', (group) => {
 
     response.assertFlashMessage('conflictType', 'update-navigation-log')
     const data = parseConflictData(response)
+    // La modale en lot groupe par bateau (#970) : le client n'a pas leurs noms.
+    assert.equal(data.boatName, boat.name)
 
     assertShowsFields(assert, data, UPDATE_LOG_FIELDS, 'update-navigation-log')
 
@@ -158,6 +160,8 @@ test.group('Conflit hors-ligne — la charge utile de la sortie', (group) => {
 
     response.assertFlashMessage('conflictType', 'close-navigation-log')
     const data = parseConflictData(response)
+    // La modale en lot groupe par bateau (#970) : le client n'a pas leurs noms.
+    assert.equal(data.boatName, boat.name)
 
     // La carte de clôture est la plus large des quatre : c'est celle qui casse
     // le plus discrètement si le modèle sérialisé maigrit.
@@ -195,6 +199,8 @@ test.group('Conflit hors-ligne — la charge utile de la sortie', (group) => {
 
     response.assertFlashMessage('conflictType', 'update-navigation-log-entry')
     const data = parseConflictData(response)
+    // La modale en lot groupe par bateau (#970) : le client n'a pas leurs noms.
+    assert.equal(data.boatName, boat.name)
 
     assertShowsFields(assert, data, UPDATE_LOG_ENTRY_FIELDS, 'update-navigation-log-entry')
     assert.equal(data.cogDeg, 215)
@@ -226,6 +232,8 @@ test.group('Conflit hors-ligne — la charge utile de la sortie', (group) => {
 
     response.assertFlashMessage('conflictType', 'update-sheet-item')
     const data = parseConflictData(response)
+    // La modale en lot groupe par bateau (#970) : le client n'a pas leurs noms.
+    assert.equal(data.boatName, boat.name)
 
     assertShowsFields(assert, data, SHEET_ITEM_FIELDS, 'update-sheet-item')
     assert.equal(data.isDone, false)

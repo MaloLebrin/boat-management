@@ -130,6 +130,7 @@ const { submit, photoError, isUploadingPhotos } = useIncidentPhotoFlow({
   boatId: () => props.boatId,
   actionUrl: () => actionUrl.value,
   isEditing: () => props.editingIncident !== null,
+  expectedUpdatedAt: () => props.editingIncident?.updatedAt,
   onDone: () => emit('close'),
 })
 

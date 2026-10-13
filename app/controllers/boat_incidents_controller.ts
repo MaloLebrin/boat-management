@@ -1,4 +1,8 @@
-import { BoatIncidentNotFoundError, BoatIncidentValidationError } from '#exceptions/incident_errors'
+import {
+  BoatIncidentConflictError,
+  BoatIncidentNotFoundError,
+  BoatIncidentValidationError,
+} from '#exceptions/incident_errors'
 import AuditLogService from '#services/audit_log_service'
 import BoatEquipmentActionService from '#services/boat_equipment_action_service'
 import BoatIncidentService from '#services/boat_incident_service'
@@ -10,6 +14,7 @@ import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_tr
 import { toIncident, toMaintenanceTaskRows } from '#transformers/boat_transformer'
 import { toBoatTaskEquipment } from '#transformers/maintenance_transformer'
 import { toMediaRow } from '#transformers/media_row_transformer'
+import { toConflictData } from '#transformers/offline_conflict_transformer'
 import { BoatNotFoundError } from '#exceptions/boat_errors'
 import EquipmentActionPolicy from '#policies/equipment_action_policy'
 import IncidentPolicy from '#policies/incident_policy'
@@ -203,9 +208,18 @@ export default class BoatIncidentsController {
           boatSafetyEquipmentId: payload.boatSafetyEquipmentId,
           boatGenericEquipmentId: payload.boatGenericEquipmentId,
           boatEnginePartId: payload.boatEnginePartId,
+          expectedUpdatedAt: payload._expectedUpdatedAt,
         }
       )
     } catch (error) {
+      // Édition rejouée sur un incident modifié entre-temps (#970) : la version
+      // du serveur part au client, qui arbitre au lieu d'écraser en silence.
+      if (error instanceof BoatIncidentConflictError) {
+        session.flash('conflictData', toConflictData(error.currentIncident, boat))
+        session.flash('conflictType', UPDATE_INCIDENT_ACTION)
+        response.redirect(`/boats/${boat.id}?tab=incidents`)
+        return
+      }
       if (error instanceof BoatIncidentNotFoundError) {
         session.flash('error', i18n.t('flash.incidents.notFound'))
         session.flash('rejectedType', UPDATE_INCIDENT_ACTION)

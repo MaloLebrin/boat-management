@@ -25,6 +25,7 @@ import type MediaRowTransformer from '#transformers/media_row_transformer'
 import type MediaTransformer from '#transformers/media_transformer'
 import type MouillageTransformer from '#transformers/mouillage_transformer'
 import type NotificationTransformer from '#transformers/notification_transformer'
+import type OfflineConflictTransformer from '#transformers/offline_conflict_transformer'
 import type OrganizationTransformer from '#transformers/organization_transformer'
 import type PontoonTransformer from '#transformers/pontoon_transformer'
 import type PortTransformer from '#transformers/port_transformer'
@@ -116,6 +117,10 @@ export namespace Data {
   export type Notification = InferData<NotificationTransformer>
   export namespace Notification {
     export type Variants = InferVariants<NotificationTransformer>
+  }
+  export type OfflineConflict = InferData<OfflineConflictTransformer>
+  export namespace OfflineConflict {
+    export type Variants = InferVariants<OfflineConflictTransformer>
   }
   export type Organization = InferData<OrganizationTransformer>
   export namespace Organization {

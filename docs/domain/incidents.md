@@ -29,7 +29,7 @@ La fiche bateau expose trois props lues sur cette policy — `canCreateIncidents
 
 - `POST /boats/:boatId/incidents` (`boats.incidents.store`), `PUT …/:incidentId` (`update`), `DELETE …/:incidentId` (`destroy`) → `BoatIncidentsController` → `BoatIncidentService`. Redirection vers `/boats/:id?tab=incidents` avec flash `flash.incidents.*`.
 - **Audit (#816)** : le contrôleur journalise `incident.create`, `incident.update` (métadonnées `boatName`, `type`, `status` atteint) et `incident.delete` via `AuditLogService` — un refus métier ou un incident introuvable ne journalise rien. `incident.create` est aussi posé par le copilote (`report_incident`).
-- **Hors-ligne (#816)** : un refus métier de `store` (`descriptionRequired`, `multipleEquipment`, `equipmentNotFound`) flashe `rejectedType = create-incident`, un refus ou un incident introuvable en `update` flashe `update-incident` — sans quoi `drainQueue` lirait la redirection comme un succès et détruirait la saisie (cf. `docs/domain/offline-queue.md`). L'édition reste sans verrou optimiste (`conflictType`).
+- **Hors-ligne (#816)** : un refus métier de `store` (`descriptionRequired`, `multipleEquipment`, `equipmentNotFound`) flashe `rejectedType = create-incident`, un refus ou un incident introuvable en `update` flashe `update-incident` — sans quoi `drainQueue` lirait la redirection comme un succès et détruirait la saisie (cf. `docs/domain/offline-queue.md`). Depuis #970, l'édition rejouée porte `_expectedUpdatedAt` : un incident modifié entre-temps flashe `conflictType = update-incident` et la ligne du serveur, arbitrée dans la modale de conflit.
 - `GET /navigation/incidents` (`navigation.incidents`) → `NavigationController.incidents` → `NavigationService.getFleetIncidents`.
 - Lecture sur la fiche bateau : prop **différée** `incidents` du groupe `navigation` (`BoatsController.show`).
 
@@ -94,4 +94,4 @@ Action confirmable `report_incident` (`incidents.create`), avec `boatEngineId` f
 
 ## Chantiers suivants
 
-- Verrou optimiste sur l'édition d'un incident (`conflictType` + `_expectedUpdatedAt`) — seule case encore vide du protocole hors-ligne pour ce domaine.
+- Aucun chantier ouvert sur le protocole hors-ligne de ce domaine depuis #970, qui a ajouté le verrou optimiste de l'édition.
