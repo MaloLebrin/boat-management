@@ -40,7 +40,7 @@
     "photos": "Photos (obligatoire)",
     "photoHint": "Au moins une photo est requise : c'est elle qui constitue le dossier assurance.",
     "photoRequired": "Ajoutez au moins une photo avant d'enregistrer.",
-    "photoOfflineNotice": "Hors connexion : l'incident part en file d'attente sans photo. Ajoutez-la depuis la page de l'incident au retour du réseau.",
+    "photoOfflineNotice": "Hors connexion : l'incident et ses photos partent en file d'attente et seront envoyés au retour du réseau.",
     "photoUploading": "Envoi des photos…",
     "photoUploadFailed": "L'incident a bien été créé, mais les photos n'ont pas pu être envoyées. Ajoutez-les depuis la page de l'incident.",
     "closedNeedsPhoto": "Ajoutez une photo à cet incident avant de le clôturer.",

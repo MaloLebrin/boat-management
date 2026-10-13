@@ -154,8 +154,8 @@ export default class BoatIncidentsController {
 
     // Le formulaire enchaîne l'envoi des photos, désormais obligatoires, sur
     // `…/incidents/:id/photos` : il lui faut l'id de la ligne créée. Même canal
-    // que les inspections et les journaux de navigation — inerte au rejeu
-    // hors-ligne, où l'action incident n'a ni `tempId` ni dépendant.
+    // que les inspections et les journaux de navigation. Au rejeu hors-ligne,
+    // il résout le `tempId` des photos enfilées derrière l'incident (#969).
     session.flash('createdResourceType', CREATE_INCIDENT_ACTION)
     session.flash('createdResourceId', String(incident.id))
     session.flash('success', i18n.t('flash.incidents.created'))

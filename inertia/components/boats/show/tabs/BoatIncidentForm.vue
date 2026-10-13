@@ -137,7 +137,7 @@ const { submit, photoError, isUploadingPhotos } = useIncidentPhotoFlow({
  * `.value` explicite plutôt que le déballage automatique du template : la même
  * expression reste juste que `isOnline` soit un `ref` ou un objet de test.
  */
-const photoPickerDisabled = computed(() => !isOnline.value || isUploadingPhotos.value)
+const photoPickerDisabled = computed(() => isUploadingPhotos.value)
 const photoNotice = computed(() => (isOnline.value ? null : t('incidents.form.photoOfflineNotice')))
 </script>
 
@@ -216,7 +216,8 @@ const photoNotice = computed(() => (isOnline.value ? null : t('incidents.form.ph
           class="sm:col-span-2"
         />
 
-        <!-- Photos : obligatoires à la déclaration, sauf hors-ligne. En édition,
+        <!-- Photos : obligatoires à la déclaration, sauf hors-ligne où elles partent
+             en file derrière l'incident (#969). En édition,
              elles se gèrent depuis la galerie de la page de détail. -->
         <div v-if="!editingIncident" class="sm:col-span-2">
           <p class="mb-1 block text-sm font-medium text-fg">{{ t('incidents.form.photos') }}</p>

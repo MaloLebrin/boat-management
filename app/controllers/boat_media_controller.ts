@@ -13,6 +13,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
 import { contentDisposition } from '#shared/helpers/content_disposition'
 import { contentTypeForMediaFormat, type MediaKind } from '#shared/constants/media'
+import { UPLOAD_PHOTOS_ACTION } from '#shared/constants/offline_queue'
 
 @inject()
 export default class BoatMediaController {
@@ -64,6 +65,9 @@ export default class BoatMediaController {
       )
     } else {
       session.flash('error', i18n.t('flash.media.photosAddFailed'))
+      // Lot rejoué depuis la file hors-ligne (#969) : sans marqueur, ce refus
+      // serait lu comme un succès et les photos détruites avec l'action.
+      session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
     }
     response.redirect(`/boats/${boat.id}?tab=photos`)
   }
@@ -255,6 +259,7 @@ export default class BoatMediaController {
     )
     if (!reservation) {
       session.flash('error', i18n.t('flash.reservation.notFound'))
+      session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
       response.redirect(`/boats/${boat.id}/reservations`)
       return
     }
@@ -268,6 +273,7 @@ export default class BoatMediaController {
     } catch (error) {
       if (error instanceof BoatInspectionNotFoundError) {
         session.flash('error', i18n.t('flash.inspections.notFound'))
+        session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
         response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
         return
       }
@@ -277,6 +283,7 @@ export default class BoatMediaController {
     // État des lieux signé (#889) : ses photos sont celles du PDF, figées.
     if (inspection.lockedAt) {
       session.flash('error', i18n.t('flash.inspections.locked'))
+      session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
       response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
       return
     }
@@ -317,6 +324,7 @@ export default class BoatMediaController {
       )
     } else {
       session.flash('error', i18n.t('flash.media.photosAddFailed'))
+      session.flash('rejectedType', UPLOAD_PHOTOS_ACTION)
     }
     response.redirect(`/boats/${boat.id}/reservations/${reservation.id}/inspection`)
   }

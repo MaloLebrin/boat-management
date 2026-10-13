@@ -60,6 +60,15 @@ export const CREATE_INCIDENT_ACTION = 'create-incident'
 export const UPDATE_INCIDENT_ACTION = 'update-incident'
 
 /**
+ * Les envois de photos (#969). Un seul identifiant pour toutes les galeries —
+ * bateau, équipements, incidents, états des lieux : les quatre contrôleurs
+ * d'envoi partagent le même validateur et le même refus (« aucune photo n'a pu
+ * être enregistrée »), qu'ils marquent de ce `rejectedType`. Les fichiers ne
+ * sont pas dans le payload : ils voyagent en pièces jointes de l'action.
+ */
+export const UPLOAD_PHOTOS_ACTION = 'upload-photos'
+
+/**
  * Le vocabulaire complet, dans l'ordre des déclarations ci-dessus. Il ferme
  * l'union `OfflineActionType` : une action enfilée avec un identifiant qui
  * n'est pas ici ne compile pas.
@@ -78,6 +87,7 @@ export const OFFLINE_ACTION_TYPES = [
   UPDATE_SHEET_ITEM_ACTION,
   CREATE_INCIDENT_ACTION,
   UPDATE_INCIDENT_ACTION,
+  UPLOAD_PHOTOS_ACTION,
 ] as const
 
 /** Union fermée des identifiants d'actions de la file hors-ligne (#726). */

@@ -84,6 +84,7 @@ un renommage casse désormais à la compilation plutôt qu'en mer.
 | `increment-engine-hours`      | `INCREMENT_ENGINE_HOURS_ACTION`      | —               | ✅             | —                      |
 | `create-incident`             | `CREATE_INCIDENT_ACTION`             | —               | ✅             | —                      |
 | `update-incident`             | `UPDATE_INCIDENT_ACTION`             | ❌              | ✅             | —                      |
+| `upload-photos`               | `UPLOAD_PHOTOS_ACTION`               | —               | ✅             | —                      |
 
 `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` relit les sources — il
 n'importe pas les constantes, une garde qui partagerait sa source avec sa cible
@@ -145,14 +146,14 @@ dépendants seront résolus au lieu de cascader en `dependencyBlocked`.
 `create-incident` les renvoie lui aussi, mais pour une autre raison : la photo
 étant devenue obligatoire à la déclaration, le formulaire enchaîne un POST
 multipart sur `…/incidents/:id/photos` et a besoin de l'id rendu par le flash
-(cf. `docs/domain/incidents.md`). Pour la file, c'est **neutre** : sans `tempId`,
-`drainQueue` ne lit jamais ces deux clés. Le bénéfice de #727 s'applique de la
-même façon si un `tempId` venait un jour s'y poser.
+(cf. `docs/domain/incidents.md`). Depuis #969, la file s'en sert aussi : un
+incident déclaré hors-ligne **avec** photos porte un `tempId`, et l'action
+`upload-photos` qui le suit en dépend — son URL `…/incidents/<tempId>/photos`
+est réécrite avec l'id réel au rejeu (voir « Photos hors-ligne »).
 
-La photo, elle, reste **exemptée hors-ligne** : la file ne transporte que du
-`FormDataConvertible`, et mieux vaut un incident déclaré sans photo sur un ponton
-qu'une saisie perdue. C'est le refus de clôture côté serveur
-(`photoRequiredToClose`) qui la réclame au retour du réseau.
+Hors-ligne, la photo reste **facultative** : mieux vaut un incident déclaré
+sans photo sur un ponton qu'une saisie perdue. C'est le refus de clôture côté
+serveur (`photoRequiredToClose`) qui la réclame au retour du réseau.
 
 ## Session expirée et erreurs transitoires (#950)
 
@@ -257,6 +258,50 @@ chargées par un rechargement partiel XHR qui échouait hors-ligne.
 Logique pure dans `inertia/lib/passage_preparation.ts`, branchement SW et
 caches dans `inertia/composables/use_passage_preparation.ts`.
 
+## Photos hors-ligne (#969)
+
+La file ne transportait que du `FormDataConvertible` (#621) : une photo
+d'avarie prise en mer ne pouvait pas être saisie dans l'app avant le retour du
+réseau. Une `QueuedAction` porte désormais des **pièces jointes**
+(`attachments: QueuedAttachment[]`, `{ field, name, type, data }`).
+
+- **Stockage.** Les octets sont gardés en `ArrayBuffer`, dans l'enregistrement
+  de l'action — pas en `Blob` : un `Blob` en IndexedDB a longtemps été perdu par
+  Safari iOS, et ne se clone pas hors navigateur (`fake-indexeddb`). Pas de
+  montée de version : le champ est optionnel. Les réécritures (`resolveTempId`,
+  passage en échec, reprise) reportent les pièces jointes via `optionalFields`.
+- **Rejeu.** `drainQueue` reconstruit les `File` (`attachmentFiles`), les ajoute
+  au payload sous leur `field` et passe `forceFormData` : la requête est celle
+  de l'envoi en ligne (`files[]`, format `brackets` d'Inertia). Rejeu réussi →
+  l'action et ses octets quittent la file.
+- **Réduction.** `inertia/lib/offline_photos.ts` : plus grand côté à 2048 px,
+  JPEG qualité 0,8 (`createImageBitmap` + canvas), soit ~0,5 Mo par photo. GIF
+  (animation) et HEIC (non décodable hors Safari) partent tels quels ; un
+  décodage impossible ou un résultat plus lourd rendent l'original. Une photo
+  encore au-dessus de `PHOTO_MAX_SIZE_MB` est refusée avant la mise en file.
+- **Quota.** `hasRoomFor` compare la taille du lot à
+  `navigator.storage.estimate()` en gardant 20 Mo de marge (caches du SW,
+  #967). Place insuffisante → toast `common.offline.photos.quotaExceeded`, rien
+  n'est enfilé. Sans estimation, la photo est acceptée ; un
+  `QuotaExceededError` réel reste attrapé (`saveFailed`).
+- **Branchements.** `useOfflinePhotos().queuePhotos({ url, files, dependsOn? })`
+  est appelé par `usePhotoUpload` (galerie du bateau, `MediaPhotoGallery` :
+  équipements, incidents, états des lieux) et par `useIncidentPhotoFlow` dès que
+  `isOnline` est faux — hors-ligne **ou** réseau dégradé (#953). Les boutons
+  restent actifs, un bandeau `role="status"` dit que les photos attendent.
+- **Vignettes.** `usePendingPhotos(uploadUrl)` lit `pendingActions`, crée une
+  URL d'objet par pièce jointe et la révoque quand la photo quitte la file ou
+  que la galerie disparaît ; `PendingPhotoTiles.vue` les affiche avec un badge
+  « En attente ».
+- **Refus.** Les quatre contrôleurs d'envoi (`BoatMediaController.storePhoto` et
+  `storeInspectionPhoto`, `BoatEquipmentMediaController.store`,
+  `BoatIncidentMediaController.store`) flashent `rejectedType = upload-photos`
+  quand **aucune** photo du lot n'a pu être enregistrée, et sur leurs refus
+  avant envoi : équipement ou incident disparu, réservation ou état des lieux
+  introuvable, état des lieux signé. Le lot part dans les échecs, octets
+  compris, et peut être repris. Un lot **partiel** reste un succès : les photos
+  refusées sont perdues, comme en ligne.
+
 ## Stockage persistant (#952)
 
 Sans `navigator.storage.persist()`, le navigateur peut évincer la base
@@ -295,6 +340,10 @@ pour le futur écran `/sync`.
 | `tests/functional/boats/offline_replay_markers.spec.ts`        | les mêmes marqueurs sur les quatre créations du terrain    |
 | `tests/functional/boats/maintenance_sheets.spec.ts`            | le conflit de ligne de fiche                               |
 | `tests/inertia/offline_pending_queue.spec.ts`                  | la lecture côté composant                                  |
+| `tests/inertia/offline_photos.spec.ts`                         | réduction des photos, garde de quota (#969)                |
+| `tests/inertia/use_offline_photos.spec.ts`                     | mise en file avec pièces jointes, vignettes (#969)         |
+| `tests/functional/boats/offline_photo_replay.spec.ts`          | rejeu multipart et `rejectedType` des envois (#969)        |
+| `tests/browser/offline_photos.spec.ts`                         | photo prise hors-ligne puis synchronisée (#969)            |
 | `tests/browser/offline_queue.spec.ts`                          | **le raccord complet, dans un vrai navigateur** (#700)     |
 
 > ⚠️ **Le flash ne franchit pas deux appels client en test.**

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CameraIcon, PhotoIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '~/components/base/BaseButton.vue'
+import PendingPhotoTiles from '~/components/media/PendingPhotoTiles.vue'
 import { usePhotoUpload } from '~/composables/use_photo_upload'
 import { useT } from '~/composables/use_t'
 import type { MediaRow } from '~/types/boat_show'
@@ -15,7 +16,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useT()
-const { form, fileInput, cameraInput, isOnline, onFileChange } = usePhotoUpload(
+const { form, fileInput, cameraInput, isOnline, isQueueing, onFileChange } = usePhotoUpload(
   () => props.uploadUrl
 )
 
@@ -37,7 +38,7 @@ function deletePhoto(mediaId: number) {
           variant="secondary"
           size="sm"
           type="button"
-          :disabled="form.processing || !isOnline"
+          :disabled="form.processing || isQueueing"
           @click="cameraInput?.click()"
         >
           <CameraIcon class="h-4 w-4 mr-1" />
@@ -47,7 +48,7 @@ function deletePhoto(mediaId: number) {
           variant="secondary"
           size="sm"
           type="button"
-          :disabled="form.processing || !isOnline"
+          :disabled="form.processing || isQueueing"
           @click="fileInput?.click()"
         >
           <PlusIcon class="h-4 w-4 mr-1" />
@@ -59,9 +60,9 @@ function deletePhoto(mediaId: number) {
     <p
       v-if="canUpload && !isOnline"
       class="mb-2 rounded-md border border-warning/40 bg-surface-muted px-3 py-2 text-sm text-fg"
-      role="alert"
+      role="status"
     >
-      {{ t('common.offline.photoUploadUnavailable') }}
+      {{ t('common.offline.photoQueuedNotice') }}
     </p>
 
     <input
@@ -84,6 +85,8 @@ function deletePhoto(mediaId: number) {
       class="hidden"
       @change="onFileChange"
     />
+
+    <PendingPhotoTiles v-if="canUpload" :upload-url="uploadUrl" class="mb-3" />
 
     <p v-if="photos.length === 0" class="text-sm text-fg-muted">
       {{ t('media.photos.empty') }}
@@ -115,8 +118,8 @@ function deletePhoto(mediaId: number) {
     <div
       v-if="canUpload && photos.length === 0"
       class="mt-2 rounded-lg border-2 border-dashed border-border bg-surface-muted/30 p-6 text-center"
-      :class="isOnline ? 'cursor-pointer hover:border-brand/50 transition-colors' : 'opacity-50'"
-      @click="isOnline ? fileInput?.click() : undefined"
+      :class="isQueueing ? 'opacity-50' : 'cursor-pointer hover:border-brand/50 transition-colors'"
+      @click="isQueueing ? undefined : fileInput?.click()"
     >
       <PhotoIcon class="mx-auto h-6 w-6 text-fg-subtle" />
     </div>

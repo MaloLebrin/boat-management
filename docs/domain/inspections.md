@@ -184,7 +184,8 @@ désactive « Signer et figer » tant que le réseau manque.
 
 Restent indisponibles tant que l'état des lieux n'est pas synchronisé, avec un
 message explicite : la **checklist** (les constats `PATCH .../items` n'ont pas de
-chemin hors-ligne) et l'**ajout de photos** (#621). Mécanique détaillée dans
+chemin hors-ligne) et l'**ajout de photos** (la galerie n'existe qu'une fois l'état des lieux
+synchronisé ; un état des lieux existant accepte des photos hors-ligne depuis #969). Mécanique détaillée dans
 `docs/frontend/pwa.md`, section « Dépendances entre actions ».
 
 ## Hors périmètre (#584)

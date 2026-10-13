@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import BoatIncidentForm from '../../inertia/components/boats/show/tabs/BoatIncidentForm.vue'
 import type { BoatIncidentRow } from '../../inertia/types/boat_show'
@@ -92,6 +92,12 @@ vi.mock('~/composables/use_network_status', () => ({
 
 vi.mock('~/composables/use_offline_queue', () => ({
   useOfflineQueue: () => ({ enqueue: mockEnqueue }),
+  newTempId: () => 'tmp_incident1',
+}))
+
+const mockQueuePhotos = vi.hoisted(() => vi.fn().mockResolvedValue(true))
+vi.mock('~/composables/use_offline_photos', () => ({
+  useOfflinePhotos: () => ({ queuePhotos: mockQueuePhotos }),
 }))
 
 vi.mock('~/utils/local_datetime', () => ({
@@ -262,12 +268,14 @@ describe('BoatIncidentForm', () => {
 
     await wrapper.find('form').trigger('submit')
 
+    // Sans photo, pas de jeton : aucune action fille ne l'attend.
     expect(mockEnqueue).toHaveBeenCalledWith({
       type: 'create-incident',
       url: '/boats/7/incidents',
       method: 'post',
       payload: expect.objectContaining({ type: 'other', tzOffsetMinutes: -600 }),
     })
+    expect(mockQueuePhotos).not.toHaveBeenCalled()
     expect(mockFormPost).not.toHaveBeenCalled()
     expect(wrapper.emitted('close')).toBeTruthy()
     // Exemption hors-ligne : aucune photo exigée, et le sélecteur l'explique.
@@ -275,6 +283,50 @@ describe('BoatIncidentForm', () => {
     expect(wrapper.find('[data-testid="photo-picker"]').attributes('data-notice')).toBe(
       'incidents.form.photoOfflineNotice'
     )
+  })
+
+  // #969 — hors-ligne, les photos ne sont plus perdues : elles suivent l'incident en file.
+  test('offline: photos are queued behind the incident, tied by its temp id', async () => {
+    mockIsOnline.value = false
+    const wrapper = mount(BoatIncidentForm, {
+      props: { boatId: 7, editingIncident: null },
+    })
+
+    const picker = wrapper.find('[data-testid="photo-picker"]')
+    expect(picker.attributes('data-disabled')).toBe('')
+    await wrapper.find('[data-testid="pick-photo"]').trigger('click')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(mockEnqueue).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'create-incident', tempId: 'tmp_incident1' })
+    )
+    expect(mockQueuePhotos).toHaveBeenCalledWith({
+      url: '/boats/7/incidents/tmp_incident1/photos',
+      files: [expect.any(File)],
+      dependsOn: 'tmp_incident1',
+    })
+    // L'incident part avant ses photos : la fille ne peut précéder sa création.
+    expect(mockEnqueue.mock.invocationCallOrder[0]).toBeLessThan(
+      mockQueuePhotos.mock.invocationCallOrder[0]
+    )
+    expect(mockRouterPost).not.toHaveBeenCalled()
+    expect(wrapper.emitted('close')).toBeTruthy()
+  })
+
+  test('offline: a photo refused by the queue does not hold back the incident', async () => {
+    mockIsOnline.value = false
+    mockQueuePhotos.mockResolvedValueOnce(false)
+    const wrapper = mount(BoatIncidentForm, {
+      props: { boatId: 7, editingIncident: null },
+    })
+
+    await wrapper.find('[data-testid="pick-photo"]').trigger('click')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(mockEnqueue).toHaveBeenCalledOnce()
+    expect(wrapper.emitted('close')).toBeTruthy()
   })
 
   test('offline edit: enqueues the update with put method', async () => {
@@ -293,6 +345,7 @@ describe('BoatIncidentForm', () => {
       })
     )
     expect(mockFormPut).not.toHaveBeenCalled()
+    expect(mockQueuePhotos).not.toHaveBeenCalled()
   })
 
   test('tzOffsetMinutes is frozen at submit time and not recomputed afterwards', async () => {
