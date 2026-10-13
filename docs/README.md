@@ -6,6 +6,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
 
 - **Démarrer**: `docs/dev/setup.md`
 - **Architecture**: `docs/architecture/overview.md`
+  - `docs/architecture/spike-llm-embarque-972.md` — spike LLM embarqué (WebGPU) pour l'assistant en traversée : no-go, protocole de mesure
 - **Fonctionnel (domaines)**:
   - `docs/domain/boats.md`
   - `docs/domain/maintenance-events.md`
