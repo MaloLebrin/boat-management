@@ -22,6 +22,7 @@ import {
 } from '#shared/constants/offline_queue'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import { toConflictData } from '#transformers/offline_conflict_transformer'
 
 @inject()
 export default class NavigationLogsController {
@@ -166,7 +167,7 @@ export default class NavigationLogsController {
         return
       }
       if (error instanceof NavigationLogConflictError) {
-        session.flash('conflictData', JSON.stringify(error.currentLog))
+        session.flash('conflictData', toConflictData(error.currentLog, boat))
         session.flash('conflictType', UPDATE_NAVIGATION_LOG_ACTION)
         response.redirect().back()
         return
@@ -221,7 +222,7 @@ export default class NavigationLogsController {
         return
       }
       if (error instanceof NavigationLogConflictError) {
-        session.flash('conflictData', JSON.stringify(error.currentLog))
+        session.flash('conflictData', toConflictData(error.currentLog, boat))
         session.flash('conflictType', CLOSE_NAVIGATION_LOG_ACTION)
         response.redirect(`/boats/${boat.id}?tab=navigation-logs`)
         return

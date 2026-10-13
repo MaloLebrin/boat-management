@@ -22,7 +22,10 @@ const mockPageProps = vi.hoisted(() => ({
     'common.offline.syncing': 'Synchronisation en cours…',
     'common.offline.syncSuccess':
       '{count, plural, one {# entrée synchronisée} other {# entrées synchronisées}}',
-    'common.offline.syncRejected': 'Refusée par le serveur — conservée dans les échecs',
+    'common.offline.syncSummary':
+      'Synchronisation terminée : {synced} envoyée(s), {rejected} refusée(s), {conflicted} en conflit',
+    'common.offline.conflict.keptAll': '{count} modifications seront renvoyées',
+    'common.offline.conflict.discardedAll': '{count} modifications locales abandonnées',
     'common.offline.conflict.kept': 'Vos modifications seront renvoyées',
     'common.offline.conflict.discarded': 'Modifications locales abandonnées',
     'common.offline.queue.cancelled': 'Action annulée',
@@ -57,7 +60,7 @@ import { router } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
 import {
   cancelScheduledRetry,
-  conflictedAction,
+  conflicts,
   groupByDependency,
   newTempId,
   useOfflineQueue,
@@ -173,7 +176,7 @@ describe('useOfflineQueue', () => {
     cancelScheduledRetry()
     mockPageProps.flash = {}
     mockPageProps.user = { id: 1 }
-    conflictedAction.value = null
+    conflicts.value = []
     // L'état de suspension (#950) est module-level : un drain à vide sur une
     // session valide le remet à zéro entre deux tests. Il ouvre la base en v2,
     // d'où la factory IndexedDB fraîche **après** (test de migration v1 → v2).
@@ -386,7 +389,13 @@ describe('useOfflineQueue', () => {
 
     expect(failedCount.value).toBe(1)
     expect(vi.mocked(router.post)).toHaveBeenCalledTimes(2)
-    expect(toast.success).toHaveBeenCalledOnce()
+    // Bilan de passe (#970) : le refus n'est pas noyé dans un « tout est synchronisé ».
+    await vi.waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        'Synchronisation terminée : 1 envoyée(s), 1 refusée(s), 0 en conflit'
+      )
+    )
+    expect(toast.success).not.toHaveBeenCalled()
   })
 
   test('retryFailedAction re-queues the action and keeps its payload', async () => {
@@ -621,7 +630,7 @@ describe('useOfflineQueue', () => {
     isSyncing.value = false
   })
 
-  test('drainQueue sets conflictedAction and pauses queue on conflict response', async () => {
+  test('drainQueue sets the conflict aside, keeps the action and reports it', async () => {
     const serverData = { id: 5, updatedAt: '2026-06-25T12:00:00.000Z', notes: 'Serveur' }
     makeRouterCallOnSuccessWithConflict('update-navigation-log', serverData)
     const { enqueue, drainQueue, pendingCount } = mountComposable()
@@ -639,15 +648,82 @@ describe('useOfflineQueue', () => {
 
     // Action stays in queue (not deleted)
     expect(pendingCount.value).toBe(1)
-    // isSyncing is reset so the modal can resolve
-    expect(conflictedAction.value).not.toBeNull()
-    expect(conflictedAction.value?.action.type).toBe('update-navigation-log')
-    expect(conflictedAction.value?.serverData).toEqual(serverData)
-    // No error toast
+    expect(conflicts.value).toHaveLength(1)
+    expect(conflicts.value[0].action.type).toBe('update-navigation-log')
+    expect(conflicts.value[0].serverData).toEqual(serverData)
+    await vi.waitFor(() =>
+      expect(toast.info).toHaveBeenCalledWith(
+        'Synchronisation terminée : 0 envoyée(s), 0 refusée(s), 1 en conflit'
+      )
+    )
     expect(toast.error).not.toHaveBeenCalled()
   })
 
-  test('resolveConflict("server") discards action and decrements pendingCount', async () => {
+  // #970 — après une longue coupure, un conflit ne bloque plus la file.
+  test('a conflict no longer blocks the actions queued after it', async () => {
+    const impl = (url: string, _data: unknown, options: any) => {
+      mockPageProps.flash = url.endsWith('/5')
+        ? {
+            conflictType: 'update-navigation-log',
+            conflictData: JSON.stringify({ id: 5, updatedAt: 'x', notes: 'Serveur' }),
+          }
+        : {}
+      options?.onSuccess?.()
+      return undefined as any
+    }
+    vi.mocked(router.post).mockImplementation(impl)
+    vi.mocked(router.patch).mockImplementation(impl)
+    const { enqueue, drainQueue, pendingCount } = mountComposable()
+
+    await enqueue({
+      type: 'update-navigation-log',
+      url: '/boats/1/navigation-logs/5',
+      method: 'patch',
+      payload: { notes: 'Local' },
+    })
+    await enqueue({
+      type: 'create-fuel-log',
+      url: '/boats/1/fuel-logs',
+      method: 'post',
+      payload: { quantityLiters: '40' },
+    })
+    await enqueue({
+      type: 'update-navigation-log',
+      url: '/boats/2/navigation-logs/5',
+      method: 'patch',
+      payload: { notes: 'Autre bateau' },
+    })
+
+    await drainQueue()
+    await vi.waitFor(() => expect(conflicts.value).toHaveLength(2), { timeout: 1000 })
+    await vi.waitFor(() => expect(toast.info).toHaveBeenCalledTimes(5))
+    expect(pendingCount.value).toBe(2)
+
+    expect(vi.mocked(router.post)).toHaveBeenCalledWith(
+      '/boats/1/fuel-logs',
+      expect.anything(),
+      expect.anything()
+    )
+    expect(conflicts.value.map((c) => c.action.url)).toEqual([
+      '/boats/1/navigation-logs/5',
+      '/boats/2/navigation-logs/5',
+    ])
+    // Un seul bilan pour toute la passe, pas un toast par action.
+    expect(toast.info).toHaveBeenCalledWith(
+      'Synchronisation terminée : 1 envoyée(s), 0 refusée(s), 2 en conflit'
+    )
+    expect(
+      vi.mocked(toast.info).mock.calls.filter(([m]) => m === 'Synchronisation en cours…')
+    ).toHaveLength(1)
+
+    // Une nouvelle passe ne rejoue pas les conflits en attente d'arbitrage.
+    vi.mocked(router.patch).mockClear()
+    await drainQueue()
+    await flushPromises()
+    expect(vi.mocked(router.patch)).not.toHaveBeenCalled()
+  })
+
+  test('resolveConflict(id, "server") discards action and decrements pendingCount', async () => {
     const serverData = { id: 5, updatedAt: '2026-06-25T12:00:00.000Z', notes: 'Serveur' }
     makeRouterCallOnSuccessWithConflict('update-navigation-log', serverData)
     const { enqueue, drainQueue, pendingCount, resolveConflict } = mountComposable()
@@ -660,17 +736,17 @@ describe('useOfflineQueue', () => {
     })
     await drainQueue()
     await flushPromises()
-    expect(conflictedAction.value).not.toBeNull()
+    expect(conflicts.value).toHaveLength(1)
 
-    await resolveConflict('server')
+    await resolveConflict(conflicts.value[0].action.id!, 'server')
     await flushPromises()
 
     expect(pendingCount.value).toBe(0)
-    expect(conflictedAction.value).toBeNull()
+    expect(conflicts.value).toEqual([])
     expect(toast.info).toHaveBeenCalledWith('Modifications locales abandonnées')
   })
 
-  test('resolveConflict("local") re-enqueues with server updatedAt as new _expectedUpdatedAt', async () => {
+  test('resolveConflict(id, "local") re-enqueues with server updatedAt as new _expectedUpdatedAt', async () => {
     const serverData = {
       id: 5,
       updatedAt: '2026-06-25T12:00:00.000Z',
@@ -687,18 +763,18 @@ describe('useOfflineQueue', () => {
     })
     await drainQueue()
     await flushPromises()
-    expect(conflictedAction.value).not.toBeNull()
+    expect(conflicts.value).toHaveLength(1)
 
     // Switch to normal success for the re-drain after resolving
     makeRouterCallOnSuccess()
     mockPageProps.flash = {}
 
-    await resolveConflict('local')
+    await resolveConflict(conflicts.value[0].action.id!, 'local')
     await flushPromises()
 
     // pendingCount should be 0 after re-drain succeeded
     await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
-    expect(conflictedAction.value).toBeNull()
+    expect(conflicts.value).toEqual([])
     expect(toast.info).toHaveBeenCalledWith('Vos modifications seront renvoyées')
 
     // Re-submitted with server's updatedAt as the new expected value
@@ -707,6 +783,87 @@ describe('useOfflineQueue', () => {
       expect.objectContaining({ _expectedUpdatedAt: '2026-06-25T12:00:00.000Z' }),
       expect.any(Object)
     )
+  })
+
+  describe('résolution en lot (#970)', () => {
+    async function drainIntoTwoConflicts() {
+      const impl = (url: string, _data: unknown, options: any) => {
+        mockPageProps.flash = {
+          conflictType: 'update-navigation-log',
+          conflictData: JSON.stringify({ id: 5, updatedAt: `server:${url}`, notes: 'Serveur' }),
+        }
+        options?.onSuccess?.()
+        return undefined as any
+      }
+      vi.mocked(router.patch).mockImplementation(impl)
+      const queue = mountComposable()
+      for (const boatId of [1, 2]) {
+        await queue.enqueue({
+          type: 'update-navigation-log',
+          url: `/boats/${boatId}/navigation-logs/5`,
+          method: 'patch',
+          payload: { notes: 'Local' },
+        })
+      }
+      await queue.drainQueue()
+      await vi.waitFor(() => expect(conflicts.value).toHaveLength(2), { timeout: 1000 })
+      await flushPromises()
+      vi.clearAllMocks()
+      return queue
+    }
+
+    test('« garder le serveur partout » abandonne toutes les versions locales', async () => {
+      const { resolveAllConflicts, pendingCount } = await drainIntoTwoConflicts()
+
+      await resolveAllConflicts('server')
+      await flushPromises()
+
+      expect(conflicts.value).toEqual([])
+      expect(pendingCount.value).toBe(0)
+      expect(vi.mocked(router.patch)).not.toHaveBeenCalled()
+      expect(toast.info).toHaveBeenCalledWith('2 modifications locales abandonnées')
+    })
+
+    test('« garder ma version partout » rejoue chaque action avec son nouveau jeton', async () => {
+      const { resolveAllConflicts, pendingCount } = await drainIntoTwoConflicts()
+      makeRouterCallOnSuccess()
+      mockPageProps.flash = {}
+
+      await resolveAllConflicts('local')
+      await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+
+      expect(conflicts.value).toEqual([])
+      expect(toast.info).toHaveBeenCalledWith('2 modifications seront renvoyées')
+      expect(vi.mocked(router.patch)).toHaveBeenCalledWith(
+        '/boats/1/navigation-logs/5',
+        expect.objectContaining({ _expectedUpdatedAt: 'server:/boats/1/navigation-logs/5' }),
+        expect.any(Object)
+      )
+      expect(vi.mocked(router.patch)).toHaveBeenCalledWith(
+        '/boats/2/navigation-logs/5',
+        expect.objectContaining({ _expectedUpdatedAt: 'server:/boats/2/navigation-logs/5' }),
+        expect.any(Object)
+      )
+    })
+
+    test('trancher un conflit laisse les autres en attente, sans relancer la file', async () => {
+      const { resolveConflict, pendingCount } = await drainIntoTwoConflicts()
+
+      await resolveConflict(conflicts.value[0].action.id!, 'server')
+      await flushPromises()
+
+      expect(conflicts.value.map((c) => c.action.url)).toEqual(['/boats/2/navigation-logs/5'])
+      expect(pendingCount.value).toBe(1)
+      expect(vi.mocked(router.patch)).not.toHaveBeenCalled()
+    })
+
+    test('annuler une action en conflit la retire de la liste à arbitrer', async () => {
+      const { cancelAction } = await drainIntoTwoConflicts()
+
+      await cancelAction(conflicts.value[1].action.id!)
+
+      expect(conflicts.value.map((c) => c.action.url)).toEqual(['/boats/1/navigation-logs/5'])
+    })
   })
 
   test('enqueue populates pendingActions with the queued item', async () => {

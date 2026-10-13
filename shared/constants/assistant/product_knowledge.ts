@@ -2118,6 +2118,32 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: null,
   },
   {
+    id: 'offline-conflicts',
+    title: {
+      en: 'Resolving sync conflicts after a passage',
+      fr: 'Arbitrer les conflits de synchronisation après une traversée',
+    },
+    body: {
+      en: 'After a long period offline, some entries may have been changed on the server in the meantime: a trip, a log point, a maintenance sheet item, an inspection or an incident. Synchronization no longer stops at the first conflict: everything else is sent, then a single window lists the conflicts grouped by boat and type, showing your version next to the server’s, field by field. Resolve each one, or all at once with “Keep my changes everywhere” or “Use server version everywhere”. A summary gives the number of entries sent, rejected and in conflict.',
+      fr: 'Après une longue période hors-ligne, certaines saisies ont pu être modifiées entre-temps sur le serveur : sortie, point de journal, item de fiche d’entretien, état des lieux ou incident. La synchronisation ne s’arrête plus au premier conflit : tout le reste part, puis une seule fenêtre liste les conflits groupés par bateau et par type, votre version face à celle du serveur, champ par champ. Tranchez-les un par un, ou d’un coup avec « Garder mes modifications partout » ou « Garder la version serveur partout ». Un bilan donne le nombre de saisies envoyées, refusées et en conflit.',
+    },
+    keywords: [
+      'conflit',
+      'conflict',
+      'synchronisation',
+      'sync',
+      'hors ligne',
+      'offline',
+      'version serveur',
+      'server version',
+      'arbitrer',
+      'resolve',
+      'traversee',
+      'bilan',
+    ],
+    navTarget: null,
+  },
+  {
     id: 'notifications',
     title: {
       en: 'Notifications: bell, page and push',

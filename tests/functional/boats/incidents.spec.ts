@@ -149,6 +149,47 @@ test.group('Incidents — POST /boats/:boatId/incidents (functional)', (group) =
     response.assertStatus(302)
     assert.isNull(await BoatIncident.query().where('boatId', boat.id).first())
   })
+  // #976 — la valeur réelle d'un `<input type="datetime-local">`, que le
+  // format par défaut de `vine.date()` refusait : le formulaire ne passait pas.
+  test("l'heure du formulaire (datetime-local) est acceptée, à la création comme à l'édition", async ({
+    client,
+    assert,
+  }) => {
+    const { admin, boat } = await adminWithBoat()
+
+    const created = await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(admin)
+      .json({ ...VALID_INCIDENT, occurredAt: '2026-06-01T10:00', tzOffsetMinutes: -120 })
+      .redirects(0)
+
+    created.assertFlashMessage('success', 'Incident reported.')
+    const incident = await BoatIncident.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(incident.occurredAt.toUTC().toISO(), '2026-06-01T08:00:00.000Z')
+
+    const updated = await client
+      .put(`/boats/${boat.id}/incidents/${incident.id}`)
+      .loginAs(admin)
+      .json({ occurredAt: '2026-06-02T09:30:00', tzOffsetMinutes: 0 })
+      .redirects(0)
+
+    updated.assertFlashMessage('success')
+    await incident.refresh()
+    assert.equal(incident.occurredAt.toUTC().toISO(), '2026-06-02T09:30:00.000Z')
+  })
+
+  test('une heure illisible reste refusée', async ({ client, assert }) => {
+    const { admin, boat } = await adminWithBoat()
+
+    const response = await client
+      .post(`/boats/${boat.id}/incidents`)
+      .loginAs(admin)
+      .json({ ...VALID_INCIDENT, occurredAt: '01/06/2026 10h' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    assert.isNull(await BoatIncident.query().where('boatId', boat.id).first())
+  })
 })
 
 test.group(

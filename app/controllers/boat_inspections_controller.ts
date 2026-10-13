@@ -37,6 +37,7 @@ import { toBoatEquipmentActionRow } from '#transformers/boat_equipment_action_tr
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import BoatContextService from '#services/boat_context_service'
+import { toConflictData } from '#transformers/offline_conflict_transformer'
 
 @inject()
 export default class BoatInspectionsController {
@@ -193,7 +194,7 @@ export default class BoatInspectionsController {
       // Le PUT rejoué vise une inspection modifiée entre-temps (#622) : la
       // modale de résolution tranche côté client, pas un last-write-wins.
       if (error instanceof BoatInspectionConflictError) {
-        session.flash('conflictData', JSON.stringify(error.currentInspection))
+        session.flash('conflictData', toConflictData(error.currentInspection, boat))
         session.flash('conflictType', UPDATE_INSPECTION_ACTION)
         return response.redirect().back()
       }

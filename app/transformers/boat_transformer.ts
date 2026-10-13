@@ -495,6 +495,8 @@ export function toIncident(i: BoatIncident, photosCount?: number): BoatIncidentR
     status: i.status as IncidentStatus,
     closedAt: i.closedAt ? i.closedAt.toISO() : null,
     createdAt: i.createdAt.toISO()!,
+    // le client renvoie cette valeur en `_expectedUpdatedAt` au rejeu hors-ligne (#970)
+    updatedAt: (i.updatedAt ?? i.createdAt).toISO()!,
     boatEngineId: i.boatEngineId,
     boatSailId: i.boatSailId,
     boatRigId: i.boatRigId,

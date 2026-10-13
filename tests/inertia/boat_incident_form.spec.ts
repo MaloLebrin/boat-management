@@ -150,6 +150,7 @@ const sampleIncident: BoatIncidentRow = {
   insuranceClaimRef: null,
   closedAt: null,
   createdAt: '2026-06-25T10:00:00.000Z',
+  updatedAt: '2026-06-26T08:00:00.000Z',
   boatEngineId: null,
   boatSailId: null,
   boatRigId: null,
@@ -342,8 +343,12 @@ describe('BoatIncidentForm', () => {
         type: 'update-incident',
         url: '/boats/7/incidents/42',
         method: 'put',
+        // Verrou optimiste (#970) et fusion des éditions successives du même incident
+        payload: expect.objectContaining({ _expectedUpdatedAt: '2026-06-26T08:00:00.000Z' }),
+        dedupeKey: 'update-incident:/boats/7/incidents/42',
       })
     )
+    expect(mockEnqueue.mock.calls[0][0]).not.toHaveProperty('tempId')
     expect(mockFormPut).not.toHaveBeenCalled()
     expect(mockQueuePhotos).not.toHaveBeenCalled()
   })
