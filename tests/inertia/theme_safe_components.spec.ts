@@ -88,6 +88,13 @@ const EXCEPTIONS: Component[] = [
     allow: [{ pattern: 'border-navy-600', count: 1, reason: NAVY_ON_NAVY }],
   },
   {
+    path: 'components/assistant/AssistantOfflinePane.vue',
+    allow: [
+      { pattern: 'border-navy-700', count: 2, reason: NAVY_ON_NAVY },
+      { pattern: 'border-navy-600', count: 1, reason: NAVY_ON_NAVY },
+    ],
+  },
+  {
     path: 'components/assistant/AssistantPanel.vue',
     allow: [{ pattern: 'border-navy-700', count: 3, reason: NAVY_ON_NAVY }],
   },

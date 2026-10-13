@@ -234,6 +234,18 @@ export const ASSISTANT_NAV_TARGETS = {
 
 export type AssistantNavTarget = keyof typeof ASSISTANT_NAV_TARGETS
 
+/**
+ * Entrée de la base de connaissance produit trouvée par une recherche (#642) :
+ * le contenu dans la locale de la conversation. Servie au modèle par l'outil
+ * `search_product_help`, et affichée telle quelle hors-ligne (#971).
+ */
+export interface ProductHelpHit {
+  id: string
+  title: string
+  body: string
+  navTarget: AssistantNavTarget | null
+}
+
 export function isAssistantNavTarget(value: unknown): value is AssistantNavTarget {
   return typeof value === 'string' && value in ASSISTANT_NAV_TARGETS
 }

@@ -2092,6 +2092,32 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     navTarget: null,
   },
   {
+    id: 'assistant-offline',
+    title: {
+      en: 'Using the assistant offline',
+      fr: 'Utiliser l’assistant hors-ligne',
+    },
+    body: {
+      en: 'Without network, at sea or on a boat Wi-Fi with no internet, the assistant panel switches to offline mode, with a clear banner. It answers from the built-in FleetAi help: where to find information, how to log an incident, a trip or a refueling, with a link to the right page. A question that needs the full assistant is kept on the device and asked automatically once the server is reachable again; a notification tells you when the answer is in. You can also re-ask a help answer later, and remove a pending question.',
+      fr: 'Sans réseau, en mer ou sur un Wi-Fi de bord sans internet, le panneau de l’assistant passe en mode hors-ligne, signalé par un bandeau. Il répond depuis l’aide FleetAi embarquée : où trouver une info, comment saisir un incident, une sortie ou un plein, avec un lien vers la bonne page. Une question qui demande l’assistant complet est gardée sur l’appareil et posée automatiquement dès que le serveur répond à nouveau ; une notification vous prévient de la réponse. Vous pouvez aussi reposer plus tard une réponse de l’aide, et retirer une question en attente.',
+    },
+    keywords: [
+      'assistant',
+      'copilote',
+      'copilot',
+      'hors ligne',
+      'offline',
+      'aide',
+      'help',
+      'question',
+      'en attente',
+      'pending',
+      'traversee',
+      'reseau',
+    ],
+    navTarget: null,
+  },
+  {
     id: 'offline-conflicts',
     title: {
       en: 'Resolving sync conflicts after a passage',

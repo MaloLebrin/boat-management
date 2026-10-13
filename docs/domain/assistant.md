@@ -62,7 +62,7 @@ Tolérance au petit modèle (`mistral-small-latest` par défaut) : arguments coe
 
 ## 4. Base de connaissance produit
 
-`shared/constants/assistant/product_knowledge.ts` : entrées curées FR/EN (titre, corps 400–800 caractères, mots-clés normalisés, `navTarget`, `planFlag`), rédigées depuis `docs/domain/*.md`, les FAQ marketing et `shared/types/plan.ts`. `AssistantProductHelpService.search` normalise la question (minuscules, accents), score mots-clés > titre > corps, renvoie les trois meilleures entrées — déterministe, donc testable. **Règle CLAUDE.md : toute nouvelle feature ajoute son entrée.**
+`shared/constants/assistant/product_knowledge.ts` : entrées curées FR/EN (titre, corps 400–800 caractères, mots-clés normalisés, `navTarget`, `planFlag`), rédigées depuis `docs/domain/*.md`, les FAQ marketing et `shared/types/plan.ts`. `searchProductHelp` (`shared/helpers/product_help_search.ts`, partagé depuis #971 ; `AssistantProductHelpService.search` l'enveloppe) normalise la question (minuscules, accents), score mots-clés > titre > corps, renvoie les trois meilleures entrées — déterministe, donc testable. **Règle CLAUDE.md : toute nouvelle feature ajoute son entrée.**
 
 ## 5. Contrat de sortie
 
@@ -122,6 +122,21 @@ l'utilisateur lui-même.
 - `ASSISTANT_CONVERSATION_TOKEN_BUDGET` : 250 000 tokens par conversation (100 000 avant #642 — un tour outillé coûte deux à trois appels). Sans effet sur le quota mensuel de l'organisation.
 - La prop partagée `assistantConversation` (optional, enveloppée) porte aussi `aiUsage { used, limit }` — même paire que la page de facturation (`AiTokenQuotaService.getUsage` + `PLAN_LIMITS[plan].aiTokensPerMonth`). Rendue en pied de panneau, avertissement avec lien `/settings/billing` au-delà de 80 % (`ASSISTANT_AI_USAGE_WARNING_RATIO`). Le `tokensUsed` de la conversation reste privé (règle du transformer).
 
+## 8 bis. Hors-ligne (#971)
+
+Sans réseau (état de connectivité ≠ `online`, #953), Mistral ne répondrait pas. Le panneau bascule alors sur `AssistantOfflinePane.vue`, avec le composable `inertia/composables/use_assistant_offline.ts`. Ce mode est offert à tous les plans : l'aide produit ne coûte rien, donc pas d'upsell hors-ligne.
+
+- **Bandeau** `role="status"` : « Mode hors-ligne — réponses limitées ».
+- **Aide produit locale.** La question passe par `searchProductHelp`, la même fonction que l'outil `search_product_help`. La parité est tenue par `tests/unit/helpers/product_help_search.spec.ts`.
+  - La meilleure entrée est rendue en bulle `source: 'product'`, avec son `navTarget` et un « Voir aussi » listant les autres titres trouvés.
+  - La base (~50 Ko gzippés) est chargée en **import dynamique** à la première question. Le service worker précache tous les `.js` : le chunk `product_help_search-*.js` est donc disponible sans réseau.
+- **Questions en attente.** Une question sans réponse locale est gardée dans `localStorage` (`fleetai:assistant:pending-questions`), avec sa page et son fuseau. Sous une réponse locale, un bouton « Poser aussi à l'assistant au retour du réseau » fait de même. La liste est affichée et chaque question peut être retirée. Sur un plan sans IA, rien n'est mis en attente.
+- **Retour du réseau.** `drainPendingQuestions` (layout `default.vue`) envoie les questions une à une sur la conversation active, ou en ouvre une (`POST /assistant/conversations`, qui archive l'active). Il ne part qu'après la file de saisies hors-ligne : une visite Inertia annule celle en cours, d'où le `watch(isSyncing)`. Un toast annonce les réponses, avec un bouton qui ouvre le panneau.
+  - Un refus flashé (quota…) retire la question et arrête la passe.
+  - Une coupure la garde pour la prochaine probe.
+  - Une proposition d'action en attente de confirmation suspend l'envoi.
+- **Pas de contexte bateau hors-ligne** : les réponses factuelles depuis les pages en cache (échéances, heures moteur, dernier plein) restent à cadrer. Le panneau le dit en n'offrant que l'aide produit.
+
 ## 9. Risque assumé
 
 `AiTokenQuotaService.withOrgLock` est un mutex en mémoire tenu pendant tout le tour : avec trois allers-retours, une question sérialise les appels IA de l'organisation pendant dix à vingt secondes. Le nombre de tours reste donc bas ; sujet à revoir si l'app passe à plusieurs processus.
@@ -138,3 +153,5 @@ l'utilisateur lui-même.
 - `tests/functional/assistant/action_confirmation_guard.spec.ts` (#697) — la matrice complète des refus : les neuf kinds face à un `boat_owner`, chacun avec un témoin en base (aucune des dix tables écrites par le copilote ne bouge, journal d'audit compris) ; le contre-exemple `mechanic`, qui confirme `create_task` et rien d'autre ; `create_reservation` de bout en bout ; et la **révocation d'un module entre la proposition et la confirmation**, pour les deux kinds à drapeau.
 - `tests/unit/hygiene/assistant_action_capabilities.spec.ts` (#697) — la capability annoncée et la policy appliquée ne peuvent plus diverger en silence.
 - `tests/inertia/assistant_message.spec.ts` / `assistant_action_card` / `assistant_panel` — badge de source, cartes de proposition et de résultat par kind, chips de démarrage, pied de consommation.
+- `tests/unit/helpers/product_help_search.spec.ts` (#971) — parité de la recherche partagée avec le service, ordre de score, normalisation.
+- `tests/inertia/use_assistant_offline.spec.ts` / `assistant_offline_pane.spec.ts` (#971) — aide locale, mise en attente persistée, envoi au retour du réseau (ordre, quota, coupure, action en attente), panneau hors-ligne.

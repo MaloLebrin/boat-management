@@ -3,8 +3,10 @@ import { Link } from '@adonisjs/inertia/vue'
 import { router, usePage } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import AssistantComposer from '~/components/assistant/AssistantComposer.vue'
+import AssistantOfflinePane from '~/components/assistant/AssistantOfflinePane.vue'
 import AssistantThread from '~/components/assistant/AssistantThread.vue'
 import AssistantUpsell from '~/components/assistant/AssistantUpsell.vue'
+import { useAssistantOffline } from '~/composables/use_assistant_offline'
 import { useAssistantPanel } from '~/composables/use_assistant_panel'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { useT } from '~/composables/use_t'
@@ -23,6 +25,8 @@ import {
 const { t } = useT()
 const { formatNumber } = useNumberFormat()
 const { conversation, aiUsage, starters, canUseAI, close, ensureLoaded } = useAssistantPanel()
+// Sans réseau, l'aide produit locale répond — plan Starter compris (#971).
+const { isOffline } = useAssistantOffline()
 
 /**
  * Pied de consommation (#642) : la paire { used, limit } du mois, discrète en
@@ -182,8 +186,10 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
       </div>
     </div>
 
+    <AssistantOfflinePane v-if="isOffline" />
+
     <!-- Plan starter : upsell, pas de chat -->
-    <AssistantUpsell v-if="!canUseAI" />
+    <AssistantUpsell v-else-if="!canUseAI" />
 
     <template v-else>
       <AssistantThread

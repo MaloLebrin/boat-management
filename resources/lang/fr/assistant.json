@@ -168,5 +168,20 @@
   },
   "playbooks": {
     "promptHeader": "Repères d'expert pour cette demande :"
+  },
+  "offline": {
+    "banner": "Mode hors-ligne — réponses limitées à l’aide FleetAi. Les autres questions partiront au retour du réseau.",
+    "intro": "Pas de réseau : je réponds depuis l’aide FleetAi embarquée (où trouver une info, comment saisir un incident, une sortie, un plein…). Une question qui demande l’assistant complet est gardée et posée automatiquement au retour du réseau.",
+    "introHelpOnly": "Pas de réseau : je réponds depuis l’aide FleetAi embarquée (où trouver une info, comment saisir un incident, une sortie, un plein…).",
+    "seeAlso": "Voir aussi : {titles}",
+    "queued": "Je n’ai pas la réponse dans l’aide embarquée. Votre question est gardée : elle sera posée à l’assistant dès le retour du réseau, et vous serez prévenu de la réponse.",
+    "noAnswer": "Je n’ai pas la réponse dans l’aide embarquée. Reformulez avec d’autres mots, ou réessayez une fois le réseau revenu.",
+    "askLater": "Poser aussi à l’assistant au retour du réseau",
+    "askLaterDone": "Question gardée : elle sera posée au retour du réseau",
+    "pendingTitle": "{count, plural, one {# question en attente du réseau} other {# questions en attente du réseau}}",
+    "remove": "Retirer",
+    "removeAriaLabel": "Retirer la question en attente : {question}",
+    "answered": "{count, plural, one {L’assistant a répondu à votre question posée hors-ligne} other {L’assistant a répondu à vos # questions posées hors-ligne}}",
+    "openPanel": "Voir la réponse"
   }
 }

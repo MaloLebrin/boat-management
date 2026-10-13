@@ -14,6 +14,7 @@ import OrganizationDeletionBanner from '~/components/layout/OrganizationDeletion
 import MobileBottomNav from '~/components/layout/MobileBottomNav.vue'
 import MobileSidebarDrawer from '~/components/layout/MobileSidebarDrawer.vue'
 import NotificationBell from '~/components/layout/NotificationBell.vue'
+import { useAssistantOffline } from '~/composables/use_assistant_offline'
 import { useAssistantPanel } from '~/composables/use_assistant_panel'
 import { useConnectivity } from '~/composables/use_connectivity'
 import { usePermissions } from '~/composables/use_permissions'
@@ -39,7 +40,9 @@ const {
   resolveAllConflicts,
   pendingCount,
   suspendedReason,
+  isSyncing,
 } = useOfflineQueue()
+const { drainPendingQuestions } = useAssistantOffline()
 const { dismissAll: dismissToasts } = useFlashToasts()
 usePwaUpdate()
 
@@ -48,6 +51,12 @@ usePwaUpdate()
 // non. Chaque probe réussie relance une file non vide (y compris au chargement).
 watch(reachableCount, () => {
   if (pendingCount.value > 0) drainQueue()
+  else drainPendingQuestions()
+})
+// Questions posées au copilote hors-ligne (#971) : elles partent après la file
+// de saisies, jamais en même temps — une visite Inertia annule celle en cours.
+watch(isSyncing, (syncing) => {
+  if (!syncing) drainPendingQuestions()
 })
 // Hors-ligne ou dégradé, une relance différée (#950) échouerait à coup sûr : la
 // prochaine probe réussie relancera le drain.

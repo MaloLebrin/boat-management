@@ -168,5 +168,20 @@
   },
   "playbooks": {
     "promptHeader": "Expert notes for this request:"
+  },
+  "offline": {
+    "banner": "Offline mode — answers limited to FleetAi help. Other questions will be sent once the network is back.",
+    "intro": "No network: I answer from the built-in FleetAi help (where to find information, how to log an incident, a trip, a refueling…). A question that needs the full assistant is kept and asked automatically once the network is back.",
+    "introHelpOnly": "No network: I answer from the built-in FleetAi help (where to find information, how to log an incident, a trip, a refueling…).",
+    "seeAlso": "See also: {titles}",
+    "queued": "The built-in help has no answer for this. Your question is kept: it will be asked to the assistant as soon as the network is back, and you will be notified of the answer.",
+    "noAnswer": "The built-in help has no answer for this. Try other words, or try again once the network is back.",
+    "askLater": "Also ask the assistant once back online",
+    "askLaterDone": "Question kept: it will be asked once the network is back",
+    "pendingTitle": "{count, plural, one {# question waiting for the network} other {# questions waiting for the network}}",
+    "remove": "Remove",
+    "removeAriaLabel": "Remove the pending question: {question}",
+    "answered": "{count, plural, one {The assistant answered the question you asked offline} other {The assistant answered the # questions you asked offline}}",
+    "openPanel": "See the answer"
   }
 }
