@@ -44,3 +44,7 @@ yarn-error.log
 # Test coverage reports
 coverage/
 .env.*.local
+
+# Généré par AdonisJS (indexEntities, indexPages, generateRegistry, indexPolicies)
+# à chaque `node ace build|serve|test` — ne pas versionner
+.adonisjs/

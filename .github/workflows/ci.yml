@@ -34,6 +34,10 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # `.adonisjs/` n'est plus versionné : les hooks d'`adonisrc.ts` ne le
+      # (re)génèrent que sur `node ace build|serve|test`, et `#generated/*`
+      # en dépend pour le typecheck
+      - run: pnpm run build
       - run: pnpm typecheck
 
   build:
