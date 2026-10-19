@@ -900,6 +900,8 @@ export default class MarketingContentService {
                 // Inventaire de pièces (#892) : la ligne suit le flag, plus un littéral.
                 this.pricingTable.flagRow(t, 'table_g2_r7', 'canManageInventory'),
                 this.pricingTable.flagRow(t, 'table_g2_r8', 'canManagePorts'),
+                // Instruments de bord Signal K (#988) : dès Pro.
+                this.pricingTable.flagRow(t, 'table_g2_r9', 'canConnectInstruments'),
               ] as PricingTableRow[],
             },
             {

@@ -551,6 +551,26 @@ par `BoatPositionHistory.closeOpenOfKind(boatId, kind)` et ne balaie que sa prop
 amarré qui émet des positions a donc deux lignes ouvertes, une par nature. `boats.spotId` reste la
 source de vérité de l'amarrage — détail dans `docs/domain/ports-and-marina.md`.
 
+### boat_instrument_sources (#988)
+
+Le serveur Signal K d'un bateau. Une ligne par bateau et par `kind` (unique `(boat_id, kind)`, `kind = 'signalk'`).
+
+- `id`, `boatId` (FK `boats`, `CASCADE`, indexée), `organizationId` (FK `organizations`, `CASCADE`, indexée — sert `OrgScopedPolicy`)
+- `baseUrl` — **origine** `https?://hôte[:port]`, sans chemin ni identifiants (`normalizeInstrumentBaseUrl`) : c'est aussi la valeur réinjectée dans la CSP
+- `tokenEncrypted` (texte nullable, **non sérialisé**) — jeton Signal K chiffré par `DataEncryptionService`
+- `vesselContext` (défaut `vessels.self`), `enabled` (défaut `true`)
+- `lastSeenAt` (dernier lot reçu), `lastError` (nullable)
+
+### boat_telemetry_samples (#988)
+
+Append-only. Un échantillon par chemin Signal K et par fenêtre d'agrégation du client.
+
+- `id` (bigint), `boatId` (FK `CASCADE`), `sourceId` (FK `boat_instrument_sources`, `CASCADE`)
+- `path` (string 96, liste blanche `INSTRUMENT_PATH_CATALOG`), `recordedAt` (timestamptz, horloge du client)
+- `value` (numeric 14,4, nullable — **unités SI** telles qu'émises par Signal K ; revient en chaîne de `pg`), `valueJson` (jsonb nullable — position, alarmes)
+- `createdAt`
+- unique `(source_id, path, recorded_at)` : le rejeu d'un lot est ignoré (`ON CONFLICT DO NOTHING`) ; index `(boat_id, path, recorded_at DESC)` pour « dernière valeur par chemin »
+
 ### boat_budget_entries
 
 - `id`, `boatId` (indexé)
@@ -1051,6 +1071,7 @@ fait un balayage complet de la table qu'elle est censée borner.
   saisie
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
+- `Boat 1..1 BoatInstrumentSource` via `boat_instrument_sources.boatId` ; `BoatInstrumentSource 1..n BoatTelemetrySample` via `sourceId` (toutes `CASCADE`, #988)
 - `Boat 1..n BoatPositionHistory` via `boat_position_history.boatId` (cascade) ; `Spot 0..n BoatPositionHistory` via `spotId` (`SET NULL`), sur les seules lignes `kind='berth'` (#722)
 - `Boat 1..n BoatPortStay`
 - `Port 1..n MarinaStay`, `Spot 1..n MarinaStay` (cascade) ; `Boat 0..n MarinaStay`, `Client 0..n MarinaStay`, `Invoice 0..1 MarinaStay` (SET NULL) (#891)

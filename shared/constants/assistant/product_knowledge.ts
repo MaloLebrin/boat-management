@@ -1319,6 +1319,36 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canManageInventory',
   },
   {
+    id: 'instruments-signalk',
+    title: {
+      en: 'Boat instruments via Signal K',
+      fr: 'Instruments de bord via Signal K',
+    },
+    body: {
+      en: 'On the Pro and Enterprise plans, a boat can be connected to the Signal K server running aboard (OpenPlotter, Raspberry Pi or a compatible gateway). An admin registers the server address, an optional read-only token and can disable or remove the source at any time. The FleetAi app, opened on a phone or tablet on the boat Wi-Fi, reads the instruments, averages them locally and sends batches to FleetAi whenever the network allows. Collected data covers engine hours and speed, position, speed and course, batteries, tanks, wind, depth, water temperature and alarms. Readings are stored in SI units and the latest known values stay available.',
+      fr: 'Sur les plans Pro et Entreprise, un bateau peut être relié au serveur Signal K installé à bord (OpenPlotter, Raspberry Pi ou passerelle compatible). Un admin enregistre l’adresse du serveur et un jeton en lecture seule facultatif, et peut désactiver ou retirer la source à tout moment. L’application FleetAi, ouverte sur un téléphone ou une tablette connectés au Wi-Fi du bord, lit les instruments, les moyenne localement et envoie des lots à FleetAi dès que le réseau le permet. Les données couvrent les heures et le régime moteur, la position, la vitesse et le cap, les batteries, les réservoirs, le vent, la profondeur, la température de l’eau et les alarmes. Les relevés sont stockés en unités SI et les dernières valeurs connues restent consultables.',
+    },
+    keywords: [
+      'instruments',
+      'signal k',
+      'signalk',
+      'capteurs',
+      'sensors',
+      'nmea',
+      'openplotter',
+      'telemetrie',
+      'telemetry',
+      'batterie',
+      'reservoir',
+      'regime',
+      'profondeur',
+      'wifi de bord',
+      'tableau de bord bateau',
+    ],
+    navTarget: null,
+    planFlag: 'canConnectInstruments',
+  },
+  {
     id: 'rental-contracts',
     title: {
       en: 'Rental contracts',

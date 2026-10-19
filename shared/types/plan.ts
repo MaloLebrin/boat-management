@@ -62,6 +62,12 @@ export interface PlanQuotas {
    * Capacité de tier pure, comme le reporting.
    */
   canManageInventory: boolean
+  /**
+   * Instruments de bord via Signal K (#986, #988) : enregistrer le serveur
+   * Signal K d'un bateau et ingérer sa télémétrie — dès le plan **Pro**.
+   * Capacité de tier pure, comme l'inventaire.
+   */
+  canConnectInstruments: boolean
 }
 
 export interface QuotaUsage {
@@ -113,6 +119,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canImportExpenses: false,
     canViewReports: false,
     canManageInventory: false,
+    canConnectInstruments: false,
   },
   pro: {
     maxBoats: 8,
@@ -134,6 +141,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canImportExpenses: true,
     canViewReports: true,
     canManageInventory: true,
+    canConnectInstruments: true,
   },
   enterprise: {
     maxBoats: null,
@@ -155,6 +163,7 @@ export const PLAN_LIMITS: Record<PlanTier, PlanQuotas> = {
     canImportExpenses: true,
     canViewReports: true,
     canManageInventory: true,
+    canConnectInstruments: true,
   },
 }
 
@@ -258,4 +267,10 @@ export function getUpgradeTier(current: PlanTier): PlanTier | null {
  * (`middleware.requireModulePlan({ feature })`) : chacune correspond à un
  * `assertCanManage*` de `QuotaService` et à un message `flash.quota.<feature>Exceeded`.
  */
-export type ModulePlanFeature = 'clients' | 'invoices' | 'pricing' | 'reservations' | 'inventory'
+export type ModulePlanFeature =
+  | 'clients'
+  | 'invoices'
+  | 'pricing'
+  | 'reservations'
+  | 'inventory'
+  | 'instruments'

@@ -44,3 +44,11 @@ test.group('Plan modules taxonomy', () => {
     assert.isFalse(isPlanModule(''))
   })
 })
+
+test.group('Plan flag canConnectInstruments (#988)', () => {
+  test('starter non, pro et entreprise oui', ({ assert }) => {
+    assert.isFalse(PLAN_LIMITS.starter.canConnectInstruments)
+    assert.isTrue(PLAN_LIMITS.pro.canConnectInstruments)
+    assert.isTrue(PLAN_LIMITS.enterprise.canConnectInstruments)
+  })
+})

@@ -15,6 +15,7 @@ export type QuotaFeature =
   | 'import'
   | 'import_expenses'
   | 'inventory'
+  | 'instruments'
 
 interface QuotaExceededOptions {
   limit: number | null

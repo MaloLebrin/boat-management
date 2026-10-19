@@ -60,6 +60,9 @@ export default class RequireModulePlanMiddleware {
       // Inventaire de pièces (#892) : capacité de tier pure, dès Pro.
       case 'inventory':
         return Promise.resolve().then(() => this.quotaService.assertCanManageInventory(org))
+      // Instruments de bord Signal K (#988) : capacité de tier pure, dès Pro.
+      case 'instruments':
+        return Promise.resolve().then(() => this.quotaService.assertCanConnectInstruments(org))
     }
   }
 }

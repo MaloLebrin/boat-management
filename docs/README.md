@@ -9,6 +9,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/architecture/spike-llm-embarque-972.md` — spike LLM embarqué (WebGPU) pour l'assistant en traversée : no-go, protocole de mesure
 - **Fonctionnel (domaines)**:
   - `docs/domain/boats.md`
+  - `docs/domain/instruments.md` — instruments de bord via Signal K (socle backend, #988)
   - `docs/domain/maintenance-events.md`
   - `docs/domain/maintenance-tasks.md`
   - `docs/domain/maintenance-sheets.md`

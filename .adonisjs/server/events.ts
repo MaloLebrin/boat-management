@@ -25,6 +25,7 @@ import PublicBookingRequested from '#events/public_booking_requested'
 import ReservationChanged from '#events/reservation_changed'
 import SimulatorLeadCreated from '#events/simulator_lead_created'
 import StorageThresholdCrossed from '#events/storage_threshold_crossed'
+import TelemetryIngested from '#events/telemetry_ingested'
 
 export const events = {
   AiKeyUndecryptable: AiKeyUndecryptable,
@@ -49,4 +50,5 @@ export const events = {
   ReservationChanged: ReservationChanged,
   SimulatorLeadCreated: SimulatorLeadCreated,
   StorageThresholdCrossed: StorageThresholdCrossed,
+  TelemetryIngested: TelemetryIngested,
 }
