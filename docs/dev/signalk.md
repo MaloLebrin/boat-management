@@ -21,7 +21,10 @@ pnpm signalk:down
 - Découverte : `curl -s http://localhost:3000/signalk | jq`
 - Instantané complet : `curl -s http://localhost:3000/signalk/v1/api/vessels/self | jq`
 - Flux : `websocat 'ws://localhost:3000/signalk/v1/stream?subscribe=all'` (ou la sonde ci-dessous)
-- Les données du serveur (plugins, réglages, compte admin) vivent dans le volume `3d-website_signalk_data` ; `docker volume rm 3d-website_signalk_data` remet à zéro.
+- Les données du serveur (plugins, réglages, compte admin) vivent dans le volume `3d-website_signalk_data` (nom Docker réel : `3d-website_3d-website_signalk_data`) ; le supprimer remet à zéro.
+- Première fois : l'image fait 1,2 Go.
+
+**Pourquoi le compose redéfinit `entrypoint`.** Le `startup.sh` de l'image officielle ajoute toujours `--securityenabled` : tant qu'aucun compte admin n'est créé, l'API répond 401 et le WebSocket s'ouvre mais n'émet aucun delta. Pire, ce premier démarrage écrit `"security": { "strategy": "./tokensecurity" }` dans le `settings.json` du volume, et la sécurité reste active même en relançant sans l'option. Le service lance donc le binaire directement (toujours sous `tini`), comme `npx signalk-server`. Si vous avez démarré une version antérieure du service, supprimez le volume avant de relancer.
 
 Sans Docker :
 
@@ -40,6 +43,8 @@ Page jetable du spike, servie par le serveur de dev hors production : <http://lo
 3. **Connecter** — WebSocket `subscribe=none` puis message d'abonnement aux chemins listés ; reconnexion exponentielle (1 s → 30 s), heartbeat 20 s, journal des fermetures (code, visibilité, réseau).
 4. **Wake Lock** — maintient l'écran allumé (Screen Wake Lock API) pour observer le flux en veille.
 5. **Copier le rapport** — JSON de l'environnement (protocole, contexte sécurisé, UA, mode standalone), des compteurs et de tout le journal, à coller dans le document d'épopée.
+
+Mesures faites avec la sonde le 19 octobre 2026 (serveur d'exemple, page HTTP) : tableau « Mesures locales » du document d'épopée. En résumé : REST en 150–400 ms, WebSocket ouvert en ~100 ms, ≈ 12 deltas/s en `policy: instant`, `close 1006` sous 2 s à l'arrêt du serveur, reconnexion automatique au créneau suivant du repli, et un serveur sécurisé sans jeton qui envoie `hello` puis **rien** — d'où la règle : sonder le REST avant le WebSocket.
 
 Les violations CSP (`securitypolicyviolation`) sont journalisées : en dev la CSP est en _report-only_, la connexion aboutit mais la violation `connect-src` apparaît — c'est ce que la PR 1 corrige par une extension de `connect-src` vers l'origine du serveur du bateau.
 

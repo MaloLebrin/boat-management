@@ -9,6 +9,7 @@
 - [ ] Matrice contenu mixte sur appareils réels (Chrome Android, iOS Safari + PWA installée) — à remplir avec la sonde, voir « Résultats du spike ».
 - [ ] Décision go/no-go iOS avant de démarrer la PR 3 (onglet) : conditionne le périmètre « PWA à bord » et l'ordre de la PR 7.
 - [ ] CSP appliquée (`reportOnly: false`) à vérifier sur staging avec le helper de la PR 1.
+- [x] Mesures locales (dev HTTP, serveur d'exemple) : faites, voir « Mesures locales ».
 
 ## Ce que l'on construit
 
@@ -100,9 +101,27 @@ Le problème : l'app est servie en HTTPS ; les navigateurs refusent `ws://` et `
 
 Cellules « Attendu » : connaissance des plateformes, **à confirmer** avec la sonde sur les appareils de l'exploitant, rapport JSON à coller sous cette matrice. Les cellules iOS décident du périmètre.
 
-### Mesures locales (Chrome intégré, page HTTP, serveur `signalk/signalk-server` avec trace d'exemple)
+### Mesures locales (19 octobre 2026)
 
-_À compléter à la fin du spike (section remplie par la vérification de la sonde contre le service compose)._
+Conditions : Chrome 152 (navigateur intégré), page HTTP `localhost:3333/dev/signalk-probe`, `signalk-server` 2.34.0 avec `--sample-nmea0183-data` (npx, puis le service compose `signalk`).
+
+| Mesure                                            | Résultat                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /signalk`                                    | 200 en 149 ms ; endpoints `signalk-http`, `signalk-ws` (plus `signalk-tcp` en npx).                                                                                                                                                                                                 |
+| `GET /signalk/v1/api/vessels/self`                | 200 en 375 ms, 13 chemins (navigation, environnement, performance). La trace d'exemple n'a **ni propulsion, ni électricité, ni réservoirs**.                                                                                                                                        |
+| WebSocket `subscribe=none` + message d'abonnement | ouvert en 103 ms (57 ms au second essai), `hello` puis deltas. **88 deltas en 7 s** avec `policy: instant`, `minPeriod: 500` sur 17 chemins (≈ 12/s) : l'agrégation côté client (PR 2) n'est pas optionnelle, et `policy: fixed` + `period` par chemin réduira déjà le débit.       |
+| CSP (report-only)                                 | une violation `connect-src` par requête REST et une pour le WebSocket, **même vers `localhost`** : l'extension de `connect-src` (PR 1) doit aussi s'appliquer en dev, sinon la console est illisible.                                                                               |
+| Arrêt du serveur (`kill`)                         | `close 1006` reçu moins de 2 s après ; repli 1 → 2 → 4 → 8 → 16 s comme prévu.                                                                                                                                                                                                      |
+| Redémarrage du serveur                            | serveur joignable à T+8 s, flux rouvert à T+13 s (première tentative après le retour, créneau de 16 s), compteur de reconnexions = 1, valeurs à nouveau fraîches. Plafonner le repli à ~30 s à bord est le bon ordre de grandeur.                                                   |
+| Serveur en `--securityenabled` sans compte admin  | REST **401** ; **le WebSocket s'ouvre, envoie `hello`, puis n'émet aucun delta** (abonnement ignoré en silence) → heartbeat 20 s → reconnexion en boucle. Le client doit sonder le REST **avant** le WebSocket et afficher « jeton requis » (`unauthorized`) plutôt que de boucler. |
+| Horodatage des deltas                             | `update.timestamp` porte l'heure de la **phrase NMEA** (09:59 pour la position GPS, 08:41 pour le reste, sur la même seconde de réception) et non l'heure de réception. Voir D9.                                                                                                    |
+| Valeurs nulles                                    | `navigation.headingTrue` / `headingMagnetic` arrivent à `null` : le normaliseur (PR 2) les ignore sans écraser la dernière valeur connue.                                                                                                                                           |
+| Image Docker officielle                           | `startup.sh` ajoute toujours `--securityenabled` et le premier démarrage écrit `security.strategy` dans `settings.json` du volume : le service compose lance le binaire directement (voir `docs/dev/signalk.md`).                                                                   |
+| Wake Lock                                         | API présente sur Chrome desktop ; comportement en veille à mesurer sur téléphone.                                                                                                                                                                                                   |
+
+### D9 — `recorded_at` est l'heure de réception, pas le timestamp Signal K
+
+Conséquence de la mesure ci-dessus : une passerelle qui rejoue ou retarde des phrases NMEA, un GPS sans heure valide ou une horloge de bord fausse donneraient des échantillons datés n'importe quand, et la contrainte unique `(source_id, path, recorded_at)` ne dédupliquerait plus rien de cohérent. Le client date chaque fenêtre d'agrégation avec **sa propre horloge** (arrondie à la fenêtre) ; le `timestamp` Signal K le plus récent de la fenêtre est conservé dans `value_json` quand il porte une information (position), sinon abandonné. Le serveur refuse un `recorded_at` dans le futur de plus de 5 min ou plus vieux que la rétention.
 
 ### Chemin recommandé
 
