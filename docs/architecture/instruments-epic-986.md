@@ -1,7 +1,7 @@
 # Instruments de bord via Signal K — épopée #986 : architecture, décisions, spike
 
 > Épopée : [#986](https://github.com/MaloLebrin/boat-management/issues/986) — acquisition des données des instruments du bateau (moteur, position, énergie, réservoirs, environnement, alarmes) depuis un serveur **Signal K** à bord, par la **PWA** connectée au Wi-Fi du bateau.
-> Spike : [#985](https://github.com/MaloLebrin/boat-management/issues/985) (ce document, la sonde `/dev/signalk-probe`, le service `signalk` du compose, `docs/dev/signalk.md`).
+> Spike : [#985](https://github.com/MaloLebrin/boat-management/issues/985), PR [#987](https://github.com/MaloLebrin/boat-management/pull/987) (ce document, la sonde `/dev/signalk-probe`, le service `signalk` du compose, `docs/dev/signalk.md`).
 > **8 PR, une issue chacune**, séquencées ci-dessous. Ce document tient les décisions structurantes et les résultats du spike ; il est mis à jour à chaque PR livrée, comme `pwa-terrain-epic-481.md`.
 
 ## Encore ouvert
@@ -150,13 +150,13 @@ Les chemins acceptés sont une **liste blanche** (`shared/constants/instruments.
 | #   | PR                                                                                                                                                                   | Issue                                                            | Dépend de |
 | --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | --------- |
 | 0   | Spike faisabilité, ce document, sonde, service `signalk` de dev                                                                                                      | [#985](https://github.com/MaloLebrin/boat-management/issues/985) | —         |
-| 1   | Socle backend : migrations, modèles, services, policy, validateurs, routes, gating `canConnectInstruments`, helper CSP, prop différée `instruments`                  | à créer                                                          | —         |
-| 2   | `inertia/lib/signalk/` (client, catalogue, unités, agrégateur, normaliseur) + `use_instrument_stream` / `use_telemetry_sync` + action `ingest-telemetry` silencieuse | à créer                                                          | 1         |
-| 3   | Onglet « Instruments » (bandeau de connexion, jauges par catégorie, dernières valeurs connues, formulaire de source admin), i18n, `passagePages()`                   | à créer                                                          | 2         |
-| 4   | Synchronisation métier : `runTime` → heures moteur, `navigation.position` → historique + points de journal                                                           | à créer                                                          | 1         |
-| 5   | Historique (`date_bin`), graphiques, rétention (job de purge)                                                                                                        | à créer                                                          | 3         |
-| 6   | Alertes et anomalies : règles, évaluation serveur + client, notifications et push                                                                                    | à créer                                                          | 4         |
-| 7   | Plugin Signal K qui pousse : `/api/instruments/ingest`, jeton par bateau, throttle                                                                                   | à créer                                                          | 1         |
+| 1   | Socle backend : migrations, modèles, services, policy, validateurs, routes, gating `canConnectInstruments`, helper CSP, prop différée `instruments`                  | [#988](https://github.com/MaloLebrin/boat-management/issues/988) | —         |
+| 2   | `inertia/lib/signalk/` (client, catalogue, unités, agrégateur, normaliseur) + `use_instrument_stream` / `use_telemetry_sync` + action `ingest-telemetry` silencieuse | [#989](https://github.com/MaloLebrin/boat-management/issues/989) | 1         |
+| 3   | Onglet « Instruments » (bandeau de connexion, jauges par catégorie, dernières valeurs connues, formulaire de source admin), i18n, `passagePages()`                   | [#990](https://github.com/MaloLebrin/boat-management/issues/990) | 2         |
+| 4   | Synchronisation métier : `runTime` → heures moteur, `navigation.position` → historique + points de journal                                                           | [#991](https://github.com/MaloLebrin/boat-management/issues/991) | 1         |
+| 5   | Historique (`date_bin`), graphiques, rétention (job de purge)                                                                                                        | [#992](https://github.com/MaloLebrin/boat-management/issues/992) | 3         |
+| 6   | Alertes et anomalies : règles, évaluation serveur + client, notifications et push                                                                                    | [#993](https://github.com/MaloLebrin/boat-management/issues/993) | 4         |
+| 7   | Plugin Signal K qui pousse : `/api/instruments/ingest`, jeton par bateau, throttle                                                                                   | [#994](https://github.com/MaloLebrin/boat-management/issues/994) | 1         |
 
 La PR 4 peut démarrer en parallèle de la PR 3 dès que la PR 1 est mergée.
 
