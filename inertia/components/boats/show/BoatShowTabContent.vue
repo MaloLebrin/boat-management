@@ -8,6 +8,7 @@ import BoatShowTabEquipment from '~/components/boats/show/tabs/BoatShowTabEquipm
 import BoatShowTabEquipmentActions from '~/components/boats/show/tabs/BoatShowTabEquipmentActions.vue'
 import BoatShowTabFuelLogs from '~/components/boats/show/tabs/BoatShowTabFuelLogs.vue'
 import BoatShowTabHistory from '~/components/boats/show/tabs/BoatShowTabHistory.vue'
+import BoatShowTabInstruments from '~/components/boats/show/tabs/BoatShowTabInstruments.vue'
 import BoatShowTabIncidents from '~/components/boats/show/tabs/BoatShowTabIncidents.vue'
 import BoatShowTabNavigationLogs from '~/components/boats/show/tabs/BoatShowTabNavigationLogs.vue'
 import BoatShowTabOverview from '~/components/boats/show/tabs/BoatShowTabOverview.vue'
@@ -36,6 +37,7 @@ import { isTabDataReady } from '~/utils/boat_show_tab_data'
 import type { BoatPricingRow } from '../../../../shared/types/boat_pricing'
 import type { SafetyComplianceReport } from '../../../../shared/types/safety'
 import type { CrewMemberOption } from '../../../../shared/types/crew'
+import type { InstrumentsTabProps } from '../../../../shared/types/instruments'
 
 // Les jeux de données d'onglet arrivent en props différées (#463) : `undefined`
 // signifie « pas encore chargé », et l'onglet concerné rend un skeleton.
@@ -51,6 +53,7 @@ const props = defineProps<{
   incidents?: BoatIncidentRow[]
   fuelLogs?: FuelLogRow[]
   navigationLogs?: NavigationLogRow[]
+  instruments?: InstrumentsTabProps
   portOptions?: NavigationLogPortOption[]
   crewMemberOptions?: CrewMemberOption[]
   aiSuggestions?: AiSuggestion[] | null
@@ -109,6 +112,7 @@ const showSkeleton = computed(
     !isTabDataReady(props.tab, {
       maintenance: isMaintenanceGroupLoaded.value,
       navigation: isNavigationGroupLoaded.value,
+      instruments: props.instruments !== undefined,
     })
 )
 </script>
@@ -254,6 +258,12 @@ const showSkeleton = computed(
         :position-history="positionHistory"
         :latest-gps-position="latestGpsPosition"
         :can-manage="canManageMaintenance"
+      />
+
+      <BoatShowTabInstruments
+        v-else-if="tab === 'instruments' && instruments"
+        :boat-id="boat.id"
+        :instruments="instruments"
       />
     </div>
   </Transition>

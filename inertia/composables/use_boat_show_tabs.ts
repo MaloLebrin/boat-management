@@ -18,6 +18,7 @@ export type BoatShowTabKey =
   | 'fuel'
   | 'incidents'
   | 'position'
+  | 'instruments'
 
 export type BoatShowGroupKey =
   | 'overview'
@@ -43,6 +44,8 @@ export function useBoatShowTabs(input: {
   boatDocuments: () => BoatDocumentRow[] | undefined
   incidents: () => BoatIncidentRow[] | undefined
   pricingEnabled: () => boolean
+  /** Plan Pro ou Entreprise (`canConnectInstruments`) : l'onglet Instruments n'existe pas sinon. */
+  instrumentsEnabled: () => boolean
   /**
    * Valeur brute du `?tab=` telle que vue par le serveur. Fournie en prop pour
    * que le rendu SSR parte du bon onglet : lire `window.location` seul faisait
@@ -116,6 +119,9 @@ export function useBoatShowTabs(input: {
           badge: openIncidents.value.length > 0 ? String(openIncidents.value.length) : undefined,
         },
         { key: 'position', label: t('boats.show.position.tab') },
+        ...(input.instrumentsEnabled()
+          ? [{ key: 'instruments' as const, label: t('instruments.tab') }]
+          : []),
       ],
     },
     {

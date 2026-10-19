@@ -287,7 +287,7 @@
       "item2_q": "Does FleetAi replace my mechanic?",
       "item2_a": "No. FleetAi helps you know when and what to schedule. Your mechanic remains essential for doing the work.",
       "item3_q": "My boats don't have connected sensors. Does it still work?",
-      "item3_a": "Yes. FleetAi is designed for manual entry of engine hours.",
+      "item3_a": "Yes. FleetAi is designed for manual entry of engine hours. If your boat has a Signal K server, the Pro and Enterprise plans can also read the instruments (engine, batteries, tanks, position) from the app, aboard.",
       "item4_q": "How much does FleetAi cost for {fleetBoats} boats?",
       "item4_a": "The Pro plan covers up to {proBoats} boats for {proMonthly}/month ({proAnnual}/month billed annually). Beyond that you add extra boats at {extraBoatPrice}/boat/month: {fleetBoats} boats comes to {fleetTotal}/month on Pro. The Enterprise plan ({enterpriseMonthly}/month) lifts the boat limit entirely. No hidden fees.",
       "item5_q": "Can I migrate from another tool?",

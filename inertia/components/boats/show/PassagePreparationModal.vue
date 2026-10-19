@@ -11,6 +11,7 @@ import {
   type PassagePageState,
   type PassagePageStatus,
 } from '~/composables/use_passage_preparation'
+import { usePlan } from '~/composables/use_plan'
 import { useT } from '~/composables/use_t'
 import type { BoatShowEngine } from '~/types/boat_show'
 import { engineDisplayTitle } from '~/utils/boat_enum_labels'
@@ -31,11 +32,13 @@ const props = withDefaults(
 const open = defineModel<boolean>('open', { required: true })
 
 const { t } = useT()
+const { effectiveQuotas } = usePlan()
 const { formatDateTime } = useDateFormat()
 const { pages, isPreparing, serviceWorkerReady, prepare, refreshCachedDates } =
   usePassagePreparation(
     () => props.boatId,
-    () => props.engines
+    () => props.engines,
+    () => ({ instruments: effectiveQuotas.value?.canConnectInstruments === true })
   )
 
 watch(open, (isOpen) => {

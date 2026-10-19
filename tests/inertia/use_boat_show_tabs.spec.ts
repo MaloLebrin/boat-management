@@ -18,11 +18,13 @@ function mountComposable(input: {
   boatDocuments?: BoatDocumentRow[]
   incidents?: BoatIncidentRow[]
   pricingEnabled?: boolean
+  instrumentsEnabled?: boolean
 }) {
   const maintenanceTasks = input.maintenanceTasks ?? []
   const boatDocuments = input.boatDocuments ?? []
   const incidents = input.incidents ?? []
   const pricingEnabled = input.pricingEnabled ?? false
+  const instrumentsEnabled = input.instrumentsEnabled ?? false
 
   let result: ReturnType<typeof useBoatShowTabs> | undefined
 
@@ -34,6 +36,7 @@ function mountComposable(input: {
           boatDocuments: () => boatDocuments,
           incidents: () => incidents,
           pricingEnabled: () => pricingEnabled,
+          instrumentsEnabled: () => instrumentsEnabled,
         })
         return {}
       },
@@ -179,5 +182,47 @@ describe('useBoatShowTabs — grouping (#365)', () => {
     expect(tab.value).toBe('equipment')
     expect(activeGroupKey.value).toBe('equipment')
     expect(window.location.search).toBe('?tab=equipment')
+  })
+})
+
+describe('useBoatShowTabs — onglet Instruments (#990)', () => {
+  const originalUrl = window.location.href
+
+  afterEach(() => {
+    window.history.replaceState({}, '', originalUrl)
+  })
+
+  test('absent sans le flag de plan, après Position avec', () => {
+    const without = mountComposable({ instrumentsEnabled: false })
+    expect(without.groupTabs.value.map((g) => g.key)).toContain('navigation')
+    window.history.replaceState({}, '', '?tab=navigation-logs')
+    const navigation = mountComposable({ instrumentsEnabled: false })
+    expect(navigation.activeGroupSubTabs.value.map((t) => t.key)).toEqual([
+      'navigation-logs',
+      'fuel',
+      'incidents',
+      'position',
+    ])
+
+    const withFlag = mountComposable({ instrumentsEnabled: true })
+    expect(withFlag.activeGroupSubTabs.value.map((t) => t.key)).toEqual([
+      'navigation-logs',
+      'fuel',
+      'incidents',
+      'position',
+      'instruments',
+    ])
+  })
+
+  test('?tab=instruments sans le flag retombe sur l’aperçu', () => {
+    window.history.replaceState({}, '', '?tab=instruments')
+    expect(mountComposable({ instrumentsEnabled: false }).tab.value).toBe('overview')
+  })
+
+  test('?tab=instruments avec le flag ouvre l’onglet dans le groupe navigation', () => {
+    window.history.replaceState({}, '', '?tab=instruments')
+    const { tab, activeGroupKey } = mountComposable({ instrumentsEnabled: true })
+    expect(tab.value).toBe('instruments')
+    expect(activeGroupKey.value).toBe('navigation')
   })
 })

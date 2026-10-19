@@ -46,7 +46,7 @@
             },
             {
               "q": "Mes bateaux n'ont pas de capteurs connectés. Ça marche quand même ?",
-              "a": "Oui. FleetAi est conçu pour la saisie manuelle des heures moteur."
+              "a": "Oui. FleetAi est conçu pour la saisie manuelle des heures moteur. Si ton bateau a un serveur Signal K, les plans Pro et Entreprise lisent aussi les instruments (moteur, batteries, réservoirs, position) depuis l’app, à bord."
             },
             {
               "q": "Puis-je migrer depuis un autre outil ?",
