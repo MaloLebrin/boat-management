@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Sonde Signal K — spike instruments de bord (#985)</title>
+    <!--
+      Page jetable du spike #985. Autonome (aucune dépendance) pour pouvoir être
+      servie depuis n'importe quel hôte statique en HTTPS et mesurer, sur un vrai
+      téléphone, ce qu'un navigateur laisse passer vers un serveur Signal K du
+      LAN du bateau : contenu mixte, Local Network Access, TLS auto-signé,
+      cycle de vie du WebSocket en veille, Screen Wake Lock.
+      `__CSP_NONCE__` est remplacé par le contrôleur de dev (sinon laissé tel quel).
+    -->
+    <style nonce="__CSP_NONCE__">
+      :root {
+        color-scheme: light dark;
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        line-height: 1.4;
+      }
+      body {
+        margin: 0;
+        padding: 12px 16px 48px;
+        max-width: 960px;
+        margin-inline: auto;
+      }
+      h1 {
+        font-size: 1.2rem;
+        margin: 0 0 8px;
+      }
+      h2 {
+        font-size: 1rem;
+        margin: 20px 0 6px;
+      }
+      fieldset {
+        border: 1px solid #8884;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin: 0 0 12px;
+      }
+      label {
+        display: block;
+        font-size: 0.85rem;
+        margin: 6px 0 2px;
+      }
+      input,
+      textarea {
+        width: 100%;
+        box-sizing: border-box;
+        font: inherit;
+        padding: 6px 8px;
+        border: 1px solid #8886;
+        border-radius: 6px;
+        background: transparent;
+        color: inherit;
+      }
+      textarea {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 0.8rem;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      button {
+        font: inherit;
+        padding: 8px 12px;
+        min-height: 44px;
+        border-radius: 8px;
+        border: 1px solid #8886;
+        background: #8882;
+        color: inherit;
+        cursor: pointer;
+      }
+      button[disabled] {
+        opacity: 0.5;
+        cursor: default;
+      }
+      .status {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        border: 1px solid #8886;
+      }
+      .status[data-state='open'] {
+        background: #2e7d3233;
+      }
+      .status[data-state='connecting'],
+      .status[data-state='reconnecting'] {
+        background: #ef6c0033;
+      }
+      .status[data-state='error'],
+      .status[data-state='closed'] {
+        background: #c6282833;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 3px 6px;
+        border-bottom: 1px solid #8883;
+        font-variant-numeric: tabular-nums;
+      }
+      td.num {
+        text-align: right;
+      }
+      pre {
+        font-size: 0.75rem;
+        max-height: 40vh;
+        overflow: auto;
+        background: #8881;
+        padding: 8px;
+        border-radius: 6px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      dl {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 2px 12px;
+        font-size: 0.85rem;
+        margin: 0;
+      }
+      dt {
+        opacity: 0.7;
+      }
+      dd {
+        margin: 0;
+      }
+      .stale {
+        opacity: 0.5;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sonde Signal K — spike instruments de bord (#985)</h1>
+    <p>
+      Renseigner l'URL du serveur Signal K (ex. <code>http://localhost:3000</code>,
+      <code>https://openplotter.local:3443</code>), puis enchaîner <em>Découvrir</em>,
+      <em>Instantané</em>, <em>Connecter</em>. Tout est journalisé ;
+      <em>Copier le rapport</em> produit le JSON à coller dans
+      <code>docs/architecture/instruments-epic-986.md</code>.
+    </p>
+
+    <h2>Environnement de la page</h2>
+    <dl id="env"></dl>
+
+    <fieldset>
+      <legend>Serveur</legend>
+      <label for="baseUrl">URL de base Signal K</label>
+      <input id="baseUrl" type="url" placeholder="http://localhost:3000" autocomplete="off" />
+      <label for="token"
+        >Jeton (optionnel — <code>Authorization: Bearer</code> en REST, <code>?token=</code> en
+        WS)</label
+      >
+      <input id="token" type="password" autocomplete="off" />
+      <label for="paths">Chemins abonnés (un par ligne, <code>*</code> accepté)</label>
+      <textarea id="paths" rows="6"></textarea>
+      <div class="row">
+        <button id="discover" type="button">1. Découvrir (GET /signalk)</button>
+        <button id="snapshot" type="button">2. Instantané (vessels/self)</button>
+        <button id="connect" type="button">3. Connecter (WebSocket)</button>
+        <button id="disconnect" type="button" disabled>Déconnecter</button>
+        <button id="wakelock" type="button">Wake Lock : off</button>
+      </div>
+      <p>
+        État : <span id="state" class="status" data-state="idle">idle</span> · deltas reçus :
+        <span id="deltaCount">0</span> · reconnexions : <span id="reconnectCount">0</span> · dernier
+        delta : <span id="lastDelta">—</span>
+      </p>
+    </fieldset>
+
+    <h2>Dernières valeurs</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Chemin</th>
+          <th class="num">Brut (SI)</th>
+          <th class="num">Affichage</th>
+          <th>Source</th>
+          <th>Âge</th>
+        </tr>
+      </thead>
+      <tbody id="values"></tbody>
+    </table>
+
+    <h2>Journal</h2>
+    <div class="row">
+      <button id="copyReport" type="button">Copier le rapport</button>
+      <button id="clearLog" type="button">Vider le journal</button>
+    </div>
+    <pre id="log"></pre>
+
+    <script nonce="__CSP_NONCE__">
+      'use strict'
+
+      // ---------------------------------------------------------------- état
+      const DEFAULT_PATHS = [
+        'navigation.position',
+        'navigation.speedOverGround',
+        'navigation.courseOverGroundTrue',
+        'navigation.headingTrue',
+        'navigation.speedThroughWater',
+        'propulsion.*.revolutions',
+        'propulsion.*.runTime',
+        'propulsion.*.temperature',
+        'electrical.batteries.*.voltage',
+        'electrical.batteries.*.current',
+        'electrical.batteries.*.capacity.stateOfCharge',
+        'tanks.*.*.currentLevel',
+        'environment.wind.speedApparent',
+        'environment.wind.angleApparent',
+        'environment.depth.belowTransducer',
+        'environment.water.temperature',
+        'notifications.*',
+      ]
+      const STORAGE_KEY = 'signalk-probe'
+      const events = []
+      const latest = new Map()
+      let socket = null
+      let wantConnection = false
+      let reconnectAttempt = 0
+      let reconnectTimer = null
+      let heartbeatTimer = null
+      let deltaCount = 0
+      let reconnectCount = 0
+      let lastDeltaAt = null
+      let wakeLock = null
+
+      const $ = (id) => document.getElementById(id)
+
+      // ------------------------------------------------------------ journal
+      function log(kind, message, data) {
+        const entry = {
+          t: new Date().toISOString(),
+          kind,
+          message,
+          ...(data === undefined ? {} : { data }),
+        }
+        events.push(entry)
+        if (events.length > 2000) events.shift()
+        const line = `${entry.t.slice(11, 23)} [${kind}] ${message}${data === undefined ? '' : ' ' + safeJson(data)}`
+        const pre = $('log')
+        pre.textContent += line + '\n'
+        pre.scrollTop = pre.scrollHeight
+      }
+
+      function safeJson(value) {
+        try {
+          return JSON.stringify(value)
+        } catch {
+          return String(value)
+        }
+      }
+
+      function setState(state, detail) {
+        const el = $('state')
+        el.dataset.state = state
+        el.textContent = detail ? `${state} (${detail})` : state
+        log('state', state, detail)
+      }
+
+      // -------------------------------------------------------- environnement
+      function describeEnvironment() {
+        const env = {
+          href: location.href,
+          protocol: location.protocol,
+          isSecureContext: window.isSecureContext,
+          userAgent: navigator.userAgent,
+          standalone:
+            window.matchMedia('(display-mode: standalone)').matches ||
+            navigator.standalone === true,
+          online: navigator.onLine,
+          wakeLockSupported: 'wakeLock' in navigator,
+          serviceWorkerSupported: 'serviceWorker' in navigator,
+          visibility: document.visibilityState,
+        }
+        const dl = $('env')
+        dl.innerHTML = ''
+        for (const [key, value] of Object.entries(env)) {
+          const dt = document.createElement('dt')
+          dt.textContent = key
+          const dd = document.createElement('dd')
+          dd.textContent = String(value)
+          dl.append(dt, dd)
+        }
+        return env
+      }
+
+      // ------------------------------------------------------- utilitaires
+      function baseUrl() {
+        const raw = $('baseUrl').value.trim()
+        const url = new URL(raw)
+        if (url.pathname !== '/' || url.search || url.hash || url.username) {
+          throw new Error('URL de base attendue sans chemin, paramètres ni identifiants')
+        }
+        return url
+      }
+
+      function restHeaders() {
+        const token = $('token').value.trim()
+        return token ? { Authorization: `Bearer ${token}` } : {}
+      }
+
+      /**
+       * `fetch` en trois tentatives : classique, puis avec `targetAddressSpace`
+       * (Local Network Access de Chromium, valeurs successives des brouillons :
+       * `private` puis `local`). Un échec « classique » en page HTTPS vers une
+       * URL `http://` du LAN est le symptôme de contenu mixte que l'on mesure.
+       */
+      async function probeFetch(url, init) {
+        const attempts = [
+          { label: 'fetch', init },
+          {
+            label: 'fetch targetAddressSpace=private',
+            init: { ...init, targetAddressSpace: 'private' },
+          },
+          {
+            label: 'fetch targetAddressSpace=local',
+            init: { ...init, targetAddressSpace: 'local' },
+          },
+        ]
+        let lastError = null
+        for (const attempt of attempts) {
+          try {
+            const started = performance.now()
+            const res = await fetch(url, attempt.init)
+            log('http', `${attempt.label} ${res.status} ${url}`, {
+              ms: Math.round(performance.now() - started),
+            })
+            return res
+          } catch (error) {
+            lastError = error
+            log('http-error', `${attempt.label} ${url}`, {
+              name: error.name,
+              message: error.message,
+            })
+          }
+        }
+        throw lastError
+      }
+
+      function convert(path, value) {
+        if (typeof value !== 'number') return ''
+        if (/speed|Speed/.test(path)) return `${(value * 1.943844).toFixed(1)} kn`
+        if (/temperature/.test(path)) return `${(value - 273.15).toFixed(1)} °C`
+        if (/angle|course|heading|direction/i.test(path))
+          return `${((value * 180) / Math.PI).toFixed(0)}°`
+        if (/revolutions/.test(path)) return `${Math.round(value * 60)} tr/min`
+        if (/runTime/.test(path)) return `${(value / 3600).toFixed(1)} h`
+        if (/currentLevel|stateOfCharge/.test(path)) return `${(value * 100).toFixed(0)} %`
+        if (/pressure/i.test(path)) return `${(value / 100000).toFixed(2)} bar`
+        if (/depth/.test(path)) return `${value.toFixed(1)} m`
+        if (/voltage/.test(path)) return `${value.toFixed(2)} V`
+        if (/current$/.test(path)) return `${value.toFixed(1)} A`
+        return ''
+      }
+
+      function renderValues() {
+        const tbody = $('values')
+        tbody.innerHTML = ''
+        const now = Date.now()
+        const rows = [...latest.entries()].sort(([a], [b]) => a.localeCompare(b))
+        for (const [path, { value, source, timestamp, receivedAt }] of rows) {
+          const tr = document.createElement('tr')
+          const ageS = Math.round((now - receivedAt) / 1000)
+          if (ageS > 30) tr.className = 'stale'
+          const raw = typeof value === 'number' ? value.toFixed(4) : safeJson(value)
+          tr.innerHTML = `<td>${path}</td><td class="num">${raw}</td><td class="num">${convert(path, value)}</td><td>${source ?? ''}</td><td>${ageS}s${timestamp ? ' · ' + timestamp.slice(11, 19) : ''}</td>`
+          tbody.append(tr)
+        }
+      }
+
+      function ingestDelta(delta) {
+        if (!delta || !Array.isArray(delta.updates)) return
+        const receivedAt = Date.now()
+        for (const update of delta.updates) {
+          const source =
+            update.$source ??
+            (update.source
+              ? `${update.source.label ?? ''}${update.source.talker ? '.' + update.source.talker : ''}`
+              : undefined)
+          for (const { path, value } of update.values ?? []) {
+            if (!path) continue
+            latest.set(path, { value, source, timestamp: update.timestamp, receivedAt })
+          }
+        }
+        deltaCount += 1
+        lastDeltaAt = receivedAt
+        $('deltaCount').textContent = String(deltaCount)
+        $('lastDelta').textContent = new Date(receivedAt).toISOString().slice(11, 19)
+      }
+
+      // ------------------------------------------------------------- REST
+      async function discover() {
+        try {
+          const url = new URL('/signalk', baseUrl())
+          const res = await probeFetch(url, { headers: restHeaders() })
+          const body = await res.json()
+          log('discover', 'endpoints', body)
+          const ws = body?.endpoints?.v1?.['signalk-ws']
+          const http = body?.endpoints?.v1?.['signalk-http']
+          if (ws) log('discover', `signalk-ws annoncé : ${ws}`)
+          if (http) log('discover', `signalk-http annoncé : ${http}`)
+          if (body?.server) log('discover', `serveur ${body.server.id} ${body.server.version}`)
+        } catch (error) {
+          log('discover-error', error.message)
+        }
+      }
+
+      async function snapshot() {
+        try {
+          const url = new URL('/signalk/v1/api/vessels/self', baseUrl())
+          const res = await probeFetch(url, { headers: restHeaders() })
+          if (res.status === 401) {
+            log('snapshot', '401 : sécurité Signal K active, jeton requis')
+            return
+          }
+          const body = await res.json()
+          const count = flattenSnapshot(body)
+          log('snapshot', `${count} chemins dans l'instantané`, {
+            name: body.name,
+            mmsi: body.mmsi,
+            uuid: body.uuid,
+          })
+          renderValues()
+        } catch (error) {
+          log('snapshot-error', error.message)
+        }
+      }
+
+      function flattenSnapshot(node, prefix = '') {
+        let count = 0
+        if (!node || typeof node !== 'object') return 0
+        if ('value' in node && ('timestamp' in node || '$source' in node)) {
+          latest.set(prefix, {
+            value: node.value,
+            source: node.$source,
+            timestamp: node.timestamp,
+            receivedAt: Date.now(),
+          })
+          return 1
+        }
+        for (const [key, child] of Object.entries(node)) {
+          if (['meta', 'values', 'timestamp', '$source', 'pgn', 'sentence'].includes(key)) continue
+          count += flattenSnapshot(child, prefix ? `${prefix}.${key}` : key)
+        }
+        return count
+      }
+
+      // -------------------------------------------------------- WebSocket
+      function wsUrl() {
+        const base = baseUrl()
+        const scheme = base.protocol === 'https:' ? 'wss:' : 'ws:'
+        const url = new URL(`${scheme}//${base.host}/signalk/v1/stream`)
+        url.searchParams.set('subscribe', 'none')
+        const token = $('token').value.trim()
+        if (token) url.searchParams.set('token', token)
+        return url
+      }
+
+      function subscriptionMessage() {
+        const paths = $('paths')
+          .value.split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean)
+        return {
+          context: 'vessels.self',
+          subscribe: paths.map((path) => ({
+            path,
+            period: 1000,
+            format: 'delta',
+            policy: 'instant',
+            minPeriod: 500,
+          })),
+        }
+      }
+
+      function connect() {
+        wantConnection = true
+        openSocket()
+        $('connect').disabled = true
+        $('disconnect').disabled = false
+      }
+
+      function openSocket() {
+        let url
+        try {
+          url = wsUrl()
+        } catch (error) {
+          setState('error', error.message)
+          return
+        }
+        setState(reconnectAttempt ? 'reconnecting' : 'connecting', url.host)
+        const started = performance.now()
+        try {
+          socket = new WebSocket(url.toString())
+        } catch (error) {
+          // SecurityError synchrone = contenu mixte (ws:// depuis une page https).
+          log('ws-error', 'constructeur WebSocket', { name: error.name, message: error.message })
+          setState('error', error.name)
+          scheduleReconnect()
+          return
+        }
+        socket.addEventListener('open', () => {
+          log('ws', 'open', {
+            ms: Math.round(performance.now() - started),
+            attempt: reconnectAttempt,
+          })
+          if (reconnectAttempt > 0) reconnectCount += 1
+          $('reconnectCount').textContent = String(reconnectCount)
+          reconnectAttempt = 0
+          setState('open', url.host)
+          socket.send(JSON.stringify(subscriptionMessage()))
+          log('ws', 'subscribe envoyé', subscriptionMessage())
+          armHeartbeat()
+        })
+        socket.addEventListener('message', (event) => {
+          let payload
+          try {
+            payload = JSON.parse(event.data)
+          } catch {
+            log('ws', 'message non JSON', String(event.data).slice(0, 200))
+            return
+          }
+          if (payload.name && payload.version && !payload.updates) {
+            log('ws', 'hello', payload)
+            return
+          }
+          ingestDelta(payload)
+          armHeartbeat()
+        })
+        socket.addEventListener('error', () => {
+          // L'événement `error` ne porte aucun détail en navigateur : le code de
+          // fermeture qui suit est la seule information exploitable.
+          log('ws-error', 'event error (voir close)')
+        })
+        socket.addEventListener('close', (event) => {
+          log('ws', 'close', {
+            code: event.code,
+            reason: event.reason,
+            wasClean: event.wasClean,
+            visibility: document.visibilityState,
+            online: navigator.onLine,
+          })
+          clearTimeout(heartbeatTimer)
+          socket = null
+          if (wantConnection) {
+            setState('reconnecting', `close ${event.code}`)
+            scheduleReconnect()
+          } else {
+            setState('closed')
+          }
+        })
+      }
+
+      function armHeartbeat() {
+        clearTimeout(heartbeatTimer)
+        heartbeatTimer = setTimeout(() => {
+          log('ws', 'aucun message depuis 20 s — fermeture pour reconnexion')
+          socket?.close(4000, 'heartbeat')
+        }, 20_000)
+      }
+
+      function scheduleReconnect() {
+        clearTimeout(reconnectTimer)
+        reconnectAttempt += 1
+        const delay = Math.min(30_000, 1000 * 2 ** (reconnectAttempt - 1))
+        log('ws', `reconnexion dans ${delay} ms`, { attempt: reconnectAttempt })
+        reconnectTimer = setTimeout(() => {
+          if (wantConnection && !socket) openSocket()
+        }, delay)
+      }
+
+      function disconnect() {
+        wantConnection = false
+        clearTimeout(reconnectTimer)
+        clearTimeout(heartbeatTimer)
+        reconnectAttempt = 0
+        socket?.close(1000, 'user')
+        socket = null
+        setState('closed')
+        $('connect').disabled = false
+        $('disconnect').disabled = true
+      }
+
+      // ------------------------------------------------------- Wake Lock
+      async function toggleWakeLock() {
+        if (wakeLock) {
+          await wakeLock.release()
+          wakeLock = null
+          $('wakelock').textContent = 'Wake Lock : off'
+          log('wakelock', 'released')
+          return
+        }
+        if (!('wakeLock' in navigator)) {
+          log('wakelock', 'non supporté')
+          return
+        }
+        try {
+          wakeLock = await navigator.wakeLock.request('screen')
+          wakeLock.addEventListener('release', () => {
+            log('wakelock', 'release (système)', { visibility: document.visibilityState })
+            wakeLock = null
+            $('wakelock').textContent = 'Wake Lock : off'
+          })
+          $('wakelock').textContent = 'Wake Lock : ON'
+          log('wakelock', 'acquired')
+        } catch (error) {
+          log('wakelock', 'échec', { name: error.name, message: error.message })
+        }
+      }
+
+      // ---------------------------------------------------------- rapport
+      async function copyReport() {
+        const report = {
+          generatedAt: new Date().toISOString(),
+          environment: describeEnvironment(),
+          baseUrl: $('baseUrl').value.trim(),
+          tokenProvided: Boolean($('token').value.trim()),
+          counters: {
+            deltaCount,
+            reconnectCount,
+            lastDeltaAt: lastDeltaAt ? new Date(lastDeltaAt).toISOString() : null,
+          },
+          latestPaths: [...latest.keys()].sort(),
+          events,
+        }
+        const text = JSON.stringify(report, null, 2)
+        try {
+          await navigator.clipboard.writeText(text)
+          log('report', `copié (${text.length} caractères)`)
+        } catch (error) {
+          log('report', 'presse-papiers indisponible, rapport ci-dessous', {
+            message: error.message,
+          })
+          $('log').textContent += '\n' + text + '\n'
+        }
+      }
+
+      // ------------------------------------------------------- démarrage
+      function restoreForm() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}')
+          $('baseUrl').value = saved.baseUrl ?? 'http://localhost:3000'
+          $('paths').value = (saved.paths ?? DEFAULT_PATHS).join('\n')
+        } catch {
+          $('baseUrl').value = 'http://localhost:3000'
+          $('paths').value = DEFAULT_PATHS.join('\n')
+        }
+      }
+
+      function persistForm() {
+        try {
+          localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({
+              baseUrl: $('baseUrl').value.trim(),
+              paths: $('paths')
+                .value.split('\n')
+                .map((l) => l.trim())
+                .filter(Boolean),
+            })
+          )
+        } catch {
+          /* stockage indisponible : sans conséquence */
+        }
+      }
+
+      restoreForm()
+      describeEnvironment()
+      log('env', 'page chargée', describeEnvironment())
+
+      $('discover').addEventListener('click', discover)
+      $('snapshot').addEventListener('click', snapshot)
+      $('connect').addEventListener('click', connect)
+      $('disconnect').addEventListener('click', disconnect)
+      $('wakelock').addEventListener('click', toggleWakeLock)
+      $('copyReport').addEventListener('click', copyReport)
+      $('clearLog').addEventListener('click', () => {
+        events.length = 0
+        $('log').textContent = ''
+      })
+      for (const id of ['baseUrl', 'paths']) $(id).addEventListener('change', persistForm)
+
+      document.addEventListener('visibilitychange', () => {
+        log('visibility', document.visibilityState, {
+          socketOpen: socket?.readyState === WebSocket.OPEN,
+          wakeLock: Boolean(wakeLock),
+        })
+        if (document.visibilityState === 'visible' && wantConnection && !socket) openSocket()
+      })
+      window.addEventListener('online', () => log('network', 'online'))
+      window.addEventListener('offline', () => log('network', 'offline'))
+      window.addEventListener('pagehide', () => log('lifecycle', 'pagehide'))
+      window.addEventListener('pageshow', (event) =>
+        log('lifecycle', 'pageshow', { persisted: event.persisted })
+      )
+      document.addEventListener('securitypolicyviolation', (event) => {
+        log('csp', `${event.violatedDirective} → ${event.blockedURI}`, {
+          disposition: event.disposition,
+        })
+      })
+
+      setInterval(renderValues, 1000)
+    </script>
+  </body>
+</html>

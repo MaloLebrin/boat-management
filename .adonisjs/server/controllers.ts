@@ -58,6 +58,7 @@ export const controllers = {
   dev: {
     MailPreviews: () => import('#controllers/dev/mail_previews_controller'),
     PdfPreviews: () => import('#controllers/dev/pdf_previews_controller'),
+    SignalkProbe: () => import('#controllers/dev/signalk_probe_controller'),
   },
   EmailVerification: () => import('#controllers/email_verification_controller'),
   Engines: () => import('#controllers/engines_controller'),

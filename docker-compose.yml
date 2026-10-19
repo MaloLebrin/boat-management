@@ -35,5 +35,31 @@ services:
       timeout: 3s
       retries: 20
 
+  # Serveur Signal K de développement (#985) — rejoue une trace NMEA 0183
+  # d'exemple en boucle. Profil `instruments` : ne démarre qu'avec
+  # `pnpm signalk:up`. Interface d'admin et API : http://localhost:3000
+  # (voir docs/dev/signalk.md).
+  signalk:
+    profiles: [instruments]
+    image: signalk/signalk-server:latest
+    container_name: 3d-website-signalk
+    init: true
+    command: ['--sample-nmea0183-data']
+    ports:
+      - '3000:3000'
+    volumes:
+      - 3d-website_signalk_data:/home/node/.signalk
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'node -e "fetch(''http://localhost:3000/signalk'').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"',
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
 volumes:
   3d-website_pg_data:
+  3d-website_signalk_data:
