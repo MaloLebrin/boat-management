@@ -275,7 +275,8 @@
               ["Photos d'équipement & d'intervention", true, true, true],
               ["Carnet d'entretien PDF", false, true, true],
               ["Suivi pièces & stock", false, true, true],
-              ["Cartographie marina (pontons, mouillages, places)", false, false, true]
+              ["Cartographie marina (pontons, mouillages, places)", false, false, true],
+              ["Instruments de bord (Signal K)", false, true, true]
             ]
           },
           {
