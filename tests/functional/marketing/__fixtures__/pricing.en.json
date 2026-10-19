@@ -275,7 +275,8 @@
               ["Equipment & job photos", true, true, true],
               ["PDF maintenance log", false, true, true],
               ["Parts & stock tracking", false, true, true],
-              ["Marina mapping (pontoons, moorings, berths)", false, false, true]
+              ["Marina mapping (pontoons, moorings, berths)", false, false, true],
+              ["Onboard instruments (Signal K)", false, true, true]
             ]
           },
           {

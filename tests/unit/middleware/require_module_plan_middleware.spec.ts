@@ -25,12 +25,21 @@ function makeMiddleware(denied: ModulePlanFeature[] = []) {
     assertCanManageInvoices: deny('invoices'),
     assertCanManagePricing: deny('pricing'),
     assertCanManageReservations: deny('reservations'),
+    assertCanManageInventory: deny('inventory'),
+    assertCanConnectInstruments: deny('instruments'),
   } as unknown as QuotaService
   return { middleware: new RequireModulePlanMiddleware(quotaService), asserted }
 }
 
 test.group('RequireModulePlanMiddleware (unit)', () => {
-  for (const feature of ['clients', 'invoices', 'pricing', 'reservations'] as const) {
+  for (const feature of [
+    'clients',
+    'invoices',
+    'pricing',
+    'reservations',
+    'inventory',
+    'instruments',
+  ] as const) {
     test(`lets the request through when the ${feature} module is available`, async ({ assert }) => {
       const { middleware, asserted } = makeMiddleware()
       const { ctx, redirects, flashes } = ctxForUser()

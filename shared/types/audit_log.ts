@@ -36,6 +36,10 @@ export const AUDIT_ACTIONS = [
   // Disponibilité (#870) : changement de statut, et réservation confirmée posée
   // malgré une indisponibilité (forçage admin, motif en métadonnée).
   'boat.status_change',
+  // Instruments de bord (#988) : serveur Signal K enregistré ou révoqué —
+  // le jeton n'est jamais dans la métadonnée, seulement sa présence.
+  'boat.instrument_source_update',
+  'boat.instrument_source_delete',
   'reservation.force_unavailable',
   // Argent de la location (#875) : encaissements et caution.
   'reservation.payment_recorded',
@@ -206,6 +210,8 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'boat.restore',
     'boat.force_delete',
     'boat.status_change',
+    'boat.instrument_source_update',
+    'boat.instrument_source_delete',
   ],
   member: [
     'member.add',

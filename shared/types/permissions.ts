@@ -30,6 +30,7 @@ export type Capability =
   | 'equipmentActions.edit'
   | 'equipmentActions.delete'
   | 'import.run'
+  | 'instruments.manage'
   | 'incidents.view'
   | 'incidents.create'
   | 'incidents.edit'
@@ -101,6 +102,10 @@ const ADMIN_ONLY_CAPABILITIES: Capability[] = [
   'equipmentActions.delete',
   'incidents.delete',
   'inspections.delete',
+  // Instruments de bord (#988) : enregistrer ou révoquer le serveur Signal K
+  // d'un bateau et son jeton. Un member lit les jauges et pousse la
+  // télémétrie (`boats.edit`) ; brancher une source reste à l'admin.
+  'instruments.manage',
   // Inventaire (#892) : supprimer un article efface son journal de mouvements,
   // supprimer un fournisseur ou un bon de commande, la trace d'un achat.
   'inventory.delete',

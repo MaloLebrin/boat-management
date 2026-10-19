@@ -10,6 +10,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/architecture/instruments-epic-986.md` — épopée instruments de bord via Signal K : architecture cible, décisions (CSP par réponse, jeton chiffré, idempotence, heures moteur par delta), matrice contenu mixte du spike, carte des 8 PR
 - **Fonctionnel (domaines)**:
   - `docs/domain/boats.md`
+  - `docs/domain/instruments.md` — instruments de bord via Signal K (socle backend, #988)
   - `docs/domain/maintenance-events.md`
   - `docs/domain/maintenance-tasks.md`
   - `docs/domain/maintenance-sheets.md`

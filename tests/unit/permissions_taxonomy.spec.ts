@@ -18,6 +18,7 @@ const ADMIN_ONLY: Capability[] = [
   'equipmentActions.delete',
   'incidents.delete',
   'inspections.delete',
+  'instruments.manage',
   'inventory.delete',
   'invoices.delete',
   'maintenance.delete',

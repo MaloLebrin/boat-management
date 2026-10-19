@@ -827,6 +827,48 @@ export class BoatInspectionSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatInstrumentSourceSchema extends BaseModel {
+  static $columns = [
+    'baseUrl',
+    'boatId',
+    'createdAt',
+    'enabled',
+    'id',
+    'kind',
+    'lastError',
+    'lastSeenAt',
+    'organizationId',
+    'tokenEncrypted',
+    'updatedAt',
+    'vesselContext',
+  ] as const
+  $columns = BoatInstrumentSourceSchema.$columns
+  @column()
+  declare baseUrl: string
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare enabled: boolean
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare kind: string
+  @column()
+  declare lastError: string | null
+  @column.dateTime()
+  declare lastSeenAt: DateTime | null
+  @column()
+  declare organizationId: number
+  @column()
+  declare tokenEncrypted: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare vesselContext: string
+}
+
 export class BoatMaintenanceEventSchema extends BaseModel {
   static $columns = [
     'boatEngineId',
@@ -1534,6 +1576,36 @@ export class BoatStatusChangeSchema extends BaseModel {
   declare toStatus: string
   @column()
   declare userId: number | null
+}
+
+export class BoatTelemetrySampleSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'id',
+    'path',
+    'recordedAt',
+    'sourceId',
+    'value',
+    'valueJson',
+  ] as const
+  $columns = BoatTelemetrySampleSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: bigint | number
+  @column()
+  declare path: string
+  @column.dateTime()
+  declare recordedAt: DateTime
+  @column()
+  declare sourceId: number
+  @column()
+  declare value: string | null
+  @column()
+  declare valueJson: any | null
 }
 
 export class BoatSchema extends BaseModel {

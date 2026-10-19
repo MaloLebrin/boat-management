@@ -14,6 +14,7 @@ const FEATURES: QuotaFeature[] = [
   'reservations',
   'invoices',
   'ports',
+  'instruments',
 ]
 
 function error(feature: QuotaFeature, alreadyOverLimit = false) {

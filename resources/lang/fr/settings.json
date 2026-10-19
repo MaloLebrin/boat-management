@@ -518,6 +518,8 @@
       "boat_restore": "Bateau restauré",
       "boat_force_delete": "Bateau supprimé définitivement",
       "boat_status_change": "Statut du bateau modifié",
+      "boat_instrument_source_update": "Source d'instruments du bateau enregistrée",
+      "boat_instrument_source_delete": "Source d'instruments du bateau révoquée",
       "reservation_force_unavailable": "Réservation forcée sur un bateau indisponible",
       "reservation_payment_recorded": "Encaissement enregistré sur une réservation",
       "reservation_security_deposit_held": "Caution bloquée",

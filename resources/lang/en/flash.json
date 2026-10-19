@@ -353,7 +353,8 @@
     "importExpensesExceeded": "Expense import is reserved to the Pro and Enterprise plans. Upgrade to Pro to load your expense statements.",
     "storageExceeded": "You have reached the storage limit of your plan. Upgrade to upload new files.",
     "storageOverflow": "Your storage usage exceeds your current plan limit. Free up space or upgrade your plan.",
-    "inventoryExceeded": "The parts inventory (central stock, suppliers, purchase orders) is available on the Pro and Enterprise plans."
+    "inventoryExceeded": "The parts inventory (central stock, suppliers, purchase orders) is available on the Pro and Enterprise plans.",
+    "instrumentsExceeded": "Connecting a boat's instruments (Signal K) is available on the Pro and Enterprise plans."
   },
   "organization": {
     "required": "You must belong to an organization to perform this action."
@@ -610,6 +611,17 @@
       "tooLong": "Warning: the boat is longer than the berth.",
       "spotHasBoat": "Warning: a fleet boat is assigned to this berth."
     }
+  },
+  "instruments": {
+    "saved": "Instruments source saved.",
+    "removed": "Instruments source removed.",
+    "invalidBaseUrl": "The server address must be an origin such as https://signalk.local:3443 — no path, parameters or credentials.",
+    "notConfigured": "This boat has no instruments source.",
+    "disabled": "The instruments source of this boat is disabled.",
+    "batchTooLarge": "The telemetry batch is too large.",
+    "pathNotAllowed": "The telemetry batch contains an unsupported instrument path.",
+    "recordedAtInvalid": "The telemetry batch carries an invalid or future timestamp. Check the device clock.",
+    "valueInvalid": "The telemetry batch contains an invalid value."
   },
   "inventory": {
     "itemCreated": "Item added to the inventory.",

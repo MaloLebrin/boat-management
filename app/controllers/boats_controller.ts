@@ -29,6 +29,8 @@ import {
 } from '#transformers/boat_transformer'
 import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
+import { emptyInstrumentsTabProps } from '#transformers/instrument_transformer'
+import { applyInstrumentCsp } from '#utils/csp_connect_src'
 import BoatIncidentService from '#services/boat_incident_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
 import BoatMaintenanceSheetService from '#services/boat_maintenance_sheet_service'
@@ -37,6 +39,8 @@ import BoatContextService from '#services/boat_context_service'
 import BoatHullService from '#services/boat_hull_service'
 import BoatAvailabilityService from '#services/boat_availability_service'
 import BoatStatusService from '#services/boat_status_service'
+import InstrumentSourceService from '#services/instrument_source_service'
+import TelemetryReadService from '#services/telemetry_read_service'
 import { toBoatStatusChangeRow } from '#transformers/boat_status_transformer'
 import {
   RegistrationNumberTakenError,
@@ -51,6 +55,7 @@ import { toAppLocale } from '#shared/helpers/locale_path'
 import type { AiSuggestion } from '#shared/types/ai'
 import BoatPolicy from '#policies/boat_policy'
 import EquipmentActionPolicy from '#policies/equipment_action_policy'
+import InstrumentSourcePolicy from '#policies/instrument_source_policy'
 import FuelLogPolicy from '#policies/fuel_log_policy'
 import IncidentPolicy from '#policies/incident_policy'
 import NavigationLogPolicy from '#policies/navigation_log_policy'
@@ -89,7 +94,9 @@ export default class BoatsController {
     private sailLoftService: SailLoftService,
     private safetyComplianceService: BoatSafetyComplianceService,
     private availabilityService: BoatAvailabilityService,
-    private statusService: BoatStatusService
+    private statusService: BoatStatusService,
+    private instrumentSourceService: InstrumentSourceService,
+    private telemetryReadService: TelemetryReadService
   ) {}
 
   async index({ inertia, auth, request, bouncer, response }: HttpContext) {
@@ -255,6 +262,8 @@ export default class BoatsController {
       canCreateNavigationLogs,
       canUpdateNavigationLogs,
       canDeleteNavigationLogs,
+      canManageInstruments,
+      canIngestTelemetry,
     ] = await Promise.all([
       this.mediaService.listForEntity('boat', boat.id),
       this.boatService.getPositionHistory(boat.id),
@@ -271,7 +280,21 @@ export default class BoatsController {
       bouncer.with(NavigationLogPolicy).allows('create', boat),
       bouncer.with(NavigationLogPolicy).allows('update', boat),
       bouncer.with(NavigationLogPolicy).allows('delete'),
+      bouncer.with(InstrumentSourcePolicy).allows('manage', boat),
+      bouncer.with(InstrumentSourcePolicy).allows('ingest', boat),
     ])
+
+    // Instruments de bord (#988) : la source est chargée **dans** la réponse
+    // initiale parce que la CSP doit déjà ouvrir `connect-src` vers le
+    // serveur Signal K du bateau quand la page arrive (D2). Les données,
+    // elles, sont différées dans leur propre groupe.
+    const instrumentsEnabled = user.organization
+      ? this.quotaService.canConnectInstruments(user.organization)
+      : false
+    const instrumentSource = instrumentsEnabled
+      ? await this.instrumentSourceService.findForBoat(boat)
+      : null
+    if (instrumentSource?.enabled) applyInstrumentCsp({ response }, instrumentSource)
 
     // Le formulaire moteur est monté depuis cette page (carte Moteurs et
     // modale d'ajout d'équipement) : il lui faut le catalogue (#573). Les
@@ -417,6 +440,18 @@ export default class BoatsController {
       crewMemberOptions: inertia.defer(
         deferJson(() => this.crewService.listOptionsForOrganization(user.organization)),
         'navigation'
+      ),
+
+      // Groupe « instruments » (#988) : source Signal K (jeton révélé à qui
+      // peut ingérer seulement, D3), dernières valeurs et série récente. Sans
+      // le flag de plan, la prop résout une coquille vide — jamais `null` (#478).
+      instruments: inertia.defer(
+        deferJson(() => {
+          const can = { manage: canManageInstruments, ingest: canIngestTelemetry }
+          if (!instrumentsEnabled) return emptyInstrumentsTabProps(can)
+          return this.telemetryReadService.tabProps(boat, instrumentSource, can)
+        }),
+        'instruments'
       ),
     })
   }

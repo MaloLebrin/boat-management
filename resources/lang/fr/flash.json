@@ -353,7 +353,8 @@
     "importExpensesExceeded": "L'import des dépenses est réservé aux plans Pro et Entreprise. Passez au plan Pro pour charger vos relevés de dépenses.",
     "storageExceeded": "Vous avez atteint la limite de stockage de votre plan. Passez à un plan supérieur pour uploader de nouveaux fichiers.",
     "storageOverflow": "Votre usage de stockage dépasse la limite de votre plan actuel. Libérez de l'espace ou passez à un plan supérieur.",
-    "inventoryExceeded": "L'inventaire de pièces (stock central, fournisseurs, bons de commande) est réservé aux plans Pro et Entreprise."
+    "inventoryExceeded": "L'inventaire de pièces (stock central, fournisseurs, bons de commande) est réservé aux plans Pro et Entreprise.",
+    "instrumentsExceeded": "La connexion aux instruments de bord (Signal K) est réservée aux plans Pro et Entreprise."
   },
   "organization": {
     "required": "Vous devez appartenir à une organisation pour effectuer cette action."
@@ -610,6 +611,17 @@
       "tooLong": "Attention : le bateau est plus long que la place.",
       "spotHasBoat": "Attention : un bateau de la flotte est attribué à cette place."
     }
+  },
+  "instruments": {
+    "saved": "Source d'instruments enregistrée.",
+    "removed": "Source d'instruments révoquée.",
+    "invalidBaseUrl": "L'adresse du serveur doit être une origine du type https://signalk.local:3443 — sans chemin, paramètres ni identifiants.",
+    "notConfigured": "Ce bateau n'a pas de source d'instruments.",
+    "disabled": "La source d'instruments de ce bateau est désactivée.",
+    "batchTooLarge": "Le lot de télémétrie est trop volumineux.",
+    "pathNotAllowed": "Le lot de télémétrie contient un chemin d'instrument non pris en charge.",
+    "recordedAtInvalid": "Le lot de télémétrie porte un horodatage invalide ou dans le futur. Vérifiez l'horloge de l'appareil.",
+    "valueInvalid": "Le lot de télémétrie contient une valeur invalide."
   },
   "inventory": {
     "itemCreated": "Article ajouté à l'inventaire.",

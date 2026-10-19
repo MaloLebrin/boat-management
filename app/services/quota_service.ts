@@ -159,6 +159,22 @@ export default class QuotaService {
     }
   }
 
+  /** Instruments de bord via Signal K (#988) — capacité de tier pure, dès Pro. */
+  canConnectInstruments(org: Organization | null): boolean {
+    this.#assertOrganization(org)
+    return PLAN_LIMITS[org.plan].canConnectInstruments
+  }
+
+  assertCanConnectInstruments(org: Organization | null): void {
+    if (!this.canConnectInstruments(org)) {
+      throw new QuotaExceededError('instruments', {
+        limit: null,
+        current: 0,
+        upgradeTo: getUpgradeTier(org!.plan),
+      })
+    }
+  }
+
   // Les capacités clients/pricing/invoices peuvent venir du tier OU d'un
   // module add-on (épic #327) : elles passent par les quotas effectifs.
   // Les autres checks restent tier-only tant qu'aucun module ne les accorde.
