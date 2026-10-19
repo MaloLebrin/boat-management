@@ -77,6 +77,14 @@ export interface QueuedAction {
    * `field`. Supprimées avec l'action une fois le rejeu réussi.
    */
   attachments?: QueuedAttachment[]
+  /**
+   * Action de fond (#989) : ni toast à l'ajout, ni comptée dans le bilan de
+   * synchronisation. Un lot de télémétrie toutes les cinq minutes noierait
+   * l'utilisateur sous les messages. Elle reste comptée dans le panneau de
+   * la file (`OfflinePendingQueue`) et un refus la range dans `failed`
+   * comme toute autre action.
+   */
+  silent?: boolean
 }
 
 /**
@@ -123,6 +131,7 @@ function optionalFields(action: QueuedAction) {
     ...(action.tempId ? { tempId: action.tempId } : {}),
     ...(action.dependsOn ? { dependsOn: action.dependsOn } : {}),
     ...(action.attachments?.length ? { attachments: action.attachments } : {}),
+    ...(action.silent ? { silent: true } : {}),
   }
 }
 
@@ -374,7 +383,7 @@ export function useOfflineQueue() {
 
     await db.add(STORE_NAME, { ...action, createdAt: new Date().toISOString() })
     await refreshCount()
-    toast.info(t('common.offline.savedQueue'))
+    if (!action.silent) toast.info(t('common.offline.savedQueue'))
     // Première saisie mise en file : on demande que l'origine ne soit pas
     // évincée avant le retour du réseau (#952). Sans effet si déjà accordé.
     void requestPersistentStorage()
@@ -454,7 +463,7 @@ export function useOfflineQueue() {
 
     if (!drainReport) {
       drainReport = { synced: 0, rejected: 0, conflicted: 0 }
-      toast.info(t('common.offline.syncing'))
+      if (!action.silent) toast.info(t('common.offline.syncing'))
     }
     const report = drainReport
 
@@ -528,7 +537,7 @@ export function useOfflineQueue() {
         }
 
         await db.delete(STORE_NAME, action.id!)
-        report.synced += 1
+        if (!action.silent) report.synced += 1
         await refreshCount()
         isSyncing.value = false
         await drainQueue()

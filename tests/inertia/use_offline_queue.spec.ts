@@ -1524,3 +1524,73 @@ describe('useOfflineQueue', () => {
     })
   })
 })
+
+describe('useOfflineQueue — actions silencieuses (#989)', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks()
+    vi.useRealTimers()
+    cancelScheduledRetry()
+    mockPageProps.flash = {}
+    mockPageProps.user = { id: 1 }
+    conflicts.value = []
+    global.indexedDB = new IDBFactory()
+    await mountComposable().drainQueue()
+    global.indexedDB = new IDBFactory()
+    vi.clearAllMocks()
+  })
+
+  const telemetry = {
+    type: 'ingest-telemetry' as const,
+    url: '/boats/1/telemetry',
+    method: 'post' as const,
+    payload: { sourceId: 1, batchId: 'b', samples: [] },
+    silent: true,
+  }
+
+  test('enqueue silencieux : pas de toast, mais compté dans la file', async () => {
+    const { enqueue, pendingCount, pendingActions } = mountComposable()
+
+    await enqueue(telemetry)
+
+    expect(toast.info).not.toHaveBeenCalled()
+    expect(pendingCount.value).toBe(1)
+    expect(pendingActions.value[0].silent).toBe(true)
+  })
+
+  test('le rejeu d’une action silencieuse ne toaste ni synchro ni bilan', async () => {
+    const { enqueue, drainQueue, pendingCount } = mountComposable()
+    await enqueue(telemetry)
+    makeRouterCallOnSuccess()
+
+    await drainQueue()
+    await vi.waitFor(() => expect(pendingCount.value).toBe(0), { timeout: 1000 })
+
+    expect(router.post).toHaveBeenCalledWith(
+      '/boats/1/telemetry',
+      telemetry.payload,
+      expect.anything()
+    )
+    expect(pendingCount.value).toBe(0)
+    expect(toast.info).not.toHaveBeenCalled()
+    expect(toast.success).not.toHaveBeenCalled()
+  })
+
+  test('un refus métier range le lot dans failed et le signale', async () => {
+    const { enqueue, drainQueue, failedCount, pendingCount } = mountComposable()
+    await enqueue(telemetry)
+    makeRouterCallOnSuccessWithRejection('ingest-telemetry', 'La source est désactivée')
+
+    await drainQueue()
+    await vi.waitFor(() => expect(failedCount.value).toBe(1), { timeout: 1000 })
+
+    expect(pendingCount.value).toBe(0)
+    expect(failedCount.value).toBe(1)
+    expect(toast.error).toHaveBeenCalled()
+  })
+
+  test('une action ordinaire garde ses toasts', async () => {
+    const { enqueue } = mountComposable()
+    await enqueue({ ...telemetry, silent: undefined })
+    expect(toast.info).toHaveBeenCalledOnce()
+  })
+})
