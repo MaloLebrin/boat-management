@@ -380,6 +380,9 @@ export interface ApiDefinition {
     index: typeof routes['pdf_previews.index']
     show: typeof routes['pdf_previews.show']
   }
+  signalkProbe: {
+    show: typeof routes['signalk_probe.show']
+  }
   notifications: {
     index: typeof routes['notifications.index']
     markAllAsRead: typeof routes['notifications.markAllAsRead']

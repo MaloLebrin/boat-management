@@ -1314,6 +1314,12 @@ const routes = {
     tokens: [{"old":"/dev/pdfs/:id","type":0,"val":"dev","end":""},{"old":"/dev/pdfs/:id","type":0,"val":"pdfs","end":""},{"old":"/dev/pdfs/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['pdf_previews.show']['types'],
   },
+  'signalk_probe.show': {
+    methods: ["GET","HEAD"],
+    pattern: '/dev/signalk-probe',
+    tokens: [{"old":"/dev/signalk-probe","type":0,"val":"dev","end":""},{"old":"/dev/signalk-probe","type":0,"val":"signalk-probe","end":""}],
+    types: placeholder as Registry['signalk_probe.show']['types'],
+  },
   'notifications.index': {
     methods: ["GET","HEAD"],
     pattern: '/notifications',

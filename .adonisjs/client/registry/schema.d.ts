@@ -2623,6 +2623,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dev/pdf_previews_controller').default['show']>>>
     }
   }
+  'signalk_probe.show': {
+    methods: ["GET","HEAD"]
+    pattern: '/dev/signalk-probe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/dev/signalk_probe_controller').default['show']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dev/signalk_probe_controller').default['show']>>>
+    }
+  }
   'notifications.index': {
     methods: ["GET","HEAD"]
     pattern: '/notifications'

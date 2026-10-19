@@ -7,6 +7,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
 - **Démarrer**: `docs/dev/setup.md`
 - **Architecture**: `docs/architecture/overview.md`
   - `docs/architecture/spike-llm-embarque-972.md` — spike LLM embarqué (WebGPU) pour l'assistant en traversée : no-go, protocole de mesure
+  - `docs/architecture/instruments-epic-986.md` — épopée instruments de bord via Signal K : architecture cible, décisions (CSP par réponse, jeton chiffré, idempotence, heures moteur par delta), matrice contenu mixte du spike, carte des 8 PR
 - **Fonctionnel (domaines)**:
   - `docs/domain/boats.md`
   - `docs/domain/maintenance-events.md`
@@ -31,6 +32,7 @@ Cette documentation décrit **fonctionnellement** et **techniquement** le projet
   - `docs/frontend/ui-map.md`
   - `docs/frontend/i18n.md` — internationalisation, `useT()`, ajouter une langue
 - **Tests**: `docs/dev/testing.md`
+- **Serveur Signal K de dev**: `docs/dev/signalk.md` — service compose `signalk` (`pnpm signalk:up`), sonde `/dev/signalk-probe`, TLS et jetons Signal K, unités SI
 - **Hébergement & déploiement**: `docs/dev/hosting.md` — image GHCR, migrations au déploiement, docker-compose.prod.yml, healthcheck `/up`
 - **Codes promo**: `docs/dev/promo-codes.md` — créer, tester, suivre et désactiver un code dans le Dashboard Stripe, produits visés, dépannage des messages d'erreur
 - **Runbook d'exploitation**: `docs/dev/runbook.md` — sauvegardes PostgreSQL (service `backup`, copie hors site), restauration (`scripts/db_restore.sh`), test trimestriel, RPO/RTO
