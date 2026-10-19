@@ -86,6 +86,7 @@ un renommage casse désormais à la compilation plutôt qu'en mer.
 | `update-incident`             | `UPDATE_INCIDENT_ACTION`             | ✅              | ✅             | ✅                     |
 | `upload-photos`               | `UPLOAD_PHOTOS_ACTION`               | —               | ✅             | —                      |
 | `toggle-diagnostic-step`      | `TOGGLE_DIAGNOSTIC_STEP_ACTION`      | —               | ✅             | —                      |
+| `ingest-telemetry`            | `INGEST_TELEMETRY_ACTION`            | —               | ✅             | —                      |
 
 `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` relit les sources — il
 n'importe pas les constantes, une garde qui partagerait sa source avec sa cible
@@ -444,3 +445,9 @@ Deux contraintes à connaître avant d'en écrire un autre :
 ## Constats ouverts
 
 Aucun depuis #970 : l'édition d'un incident porte son verrou optimiste.
+
+## Actions silencieuses : la télémétrie des instruments (#989)
+
+`QueuedAction.silent` (booléen optionnel, reporté à chaque réécriture par `optionalFields`) supprime le bruit d'une action **de fond** : pas de toast à l'ajout, pas de toast « synchronisation en cours », et un succès n'entre pas dans le bilan de fin de passe. Elle reste comptée dans `OfflinePendingQueue` (libellé `common.offline.queue.type.ingest-telemetry`), et un refus la range dans `failed` avec le toast d'erreur du bilan, comme toute autre action.
+
+`ingest-telemetry` (`POST /boats/:boatId/telemetry`) en est le seul usage. Pas de `dedupeKey` : il **remplace** le payload d'une action existante, ce qui perdrait des échantillons — le rejeu est rendu idempotent par la contrainte unique du serveur. Le contrôleur répond sans flash en cas de succès, et pose `rejectedType = ingest-telemetry` sur un refus (source supprimée ou désactivée, chemin inconnu, horloge dans le futur, lot trop gros). Détail : [`instruments.md`](instruments.md).

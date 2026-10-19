@@ -198,5 +198,6 @@
       "anonymizedHint": "Anonymized clients are excluded from the export."
     }
   },
-  "offline.queue.type.toggle-diagnostic-step": "Breakdown diagnosis step"
+  "offline.queue.type.toggle-diagnostic-step": "Breakdown diagnosis step",
+  "offline.queue.type.ingest-telemetry": "Instruments telemetry"
 }

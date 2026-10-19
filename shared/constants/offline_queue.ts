@@ -77,6 +77,17 @@ export const UPLOAD_PHOTOS_ACTION = 'upload-photos'
 export const TOGGLE_DIAGNOSTIC_STEP_ACTION = 'toggle-diagnostic-step'
 
 /**
+ * Un lot de télémétrie des instruments de bord (#989, épopée #986). Enfilé en
+ * mode silencieux par `use_telemetry_sync` quand le réseau est dégradé ; le
+ * serveur le rejoue de façon idempotente (unique `(source_id, path,
+ * recorded_at)`), donc ni verrou optimiste ni `dedupeKey` — un `dedupeKey`
+ * remplacerait le payload et perdrait des échantillons. Les refus (source
+ * supprimée ou désactivée, chemin inconnu, horloge fausse) reviennent en
+ * `rejectedType`.
+ */
+export const INGEST_TELEMETRY_ACTION = 'ingest-telemetry'
+
+/**
  * Le vocabulaire complet, dans l'ordre des déclarations ci-dessus. Il ferme
  * l'union `OfflineActionType` : une action enfilée avec un identifiant qui
  * n'est pas ici ne compile pas.
@@ -97,6 +108,7 @@ export const OFFLINE_ACTION_TYPES = [
   UPDATE_INCIDENT_ACTION,
   UPLOAD_PHOTOS_ACTION,
   TOGGLE_DIAGNOSTIC_STEP_ACTION,
+  INGEST_TELEMETRY_ACTION,
 ] as const
 
 /** Union fermée des identifiants d'actions de la file hors-ligne (#726). */

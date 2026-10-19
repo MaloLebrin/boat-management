@@ -14,14 +14,13 @@ import {
   TelemetryValueOutOfRangeError,
 } from '#exceptions/instrument_errors'
 import { ingestTelemetryValidator } from '#validators/instruments'
+import { INGEST_TELEMETRY_ACTION } from '#shared/constants/offline_queue'
 
 /**
  * Ingestion de télémétrie par la PWA à bord (#988, D1/D5). Un succès répond
  * **sans flash** : un lot toutes les cinq minutes toasterait sans arrêt. Un
- * refus métier flashe son message ; le `rejectedType` qui range l'action
- * dans `failed` côté file hors-ligne arrive avec l'action `ingest-telemetry`
- * (PR 2, #989) — `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts`
- * refuse un marqueur que le front n'enfile pas encore.
+ * refus métier flashe son message **et** `rejectedType` : la file hors-ligne
+ * range alors l'action dans `failed` au lieu de la supprimer comme un succès.
  */
 @inject()
 export default class BoatTelemetryController {
@@ -50,6 +49,7 @@ export default class BoatTelemetryController {
       const key = rejectionFlashKey(error)
       if (key === null) throw error
       session.flash('error', i18n.t(key))
+      session.flash('rejectedType', INGEST_TELEMETRY_ACTION)
       return response.redirect().back()
     }
   }

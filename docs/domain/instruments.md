@@ -69,7 +69,32 @@ Sans le flag de plan, la prop résout `{ source: null, latest: [], recent: {}, c
 
 ## File hors-ligne
 
-L'action `INGEST_TELEMETRY_ACTION` (`ingest-telemetry`) et son `rejectedType` arrivent en **PR 2** : `tests/unit/hygiene/offline_protocol_vocabulary.spec.ts` refuse un type que le serveur renvoie sans que le front l'enfile (et une constante que personne n'emploie). Le contrôleur d'ingestion flashe donc seulement `error` pour l'instant.
+L'action `INGEST_TELEMETRY_ACTION` (`ingest-telemetry`) est enfilée par `use_telemetry_sync` (PR 2, #989) en mode **silencieux** (`silent: true`, voir [`offline-queue.md`](offline-queue.md)). Le contrôleur d'ingestion pose `rejectedType = ingest-telemetry` avec le flash `error` sur tout refus métier : l'action part dans `failed` au lieu d'être supprimée comme un succès.
+
+## Client (PR 2, #989) — `inertia/lib/signalk/` et composables
+
+Bibliothèque pure, sans Vue : `WebSocket` et `fetch` sont injectés.
+
+| Fichier                | Rôle                                                                                                                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `types.ts`             | `SignalKDelta`, `SignalKUpdate`, `SubscriptionSpec`, états `idle \| connecting \| open \| reconnecting \| closed \| error`, clés d'erreur `unreachable \| unauthorized \| tls \| protocol` |
+| `client.ts`            | `createSignalKClient` : découverte `GET /signalk`, sonde `GET …/vessels/self`, `WebSocket(…/stream?subscribe=none&token=…)` puis abonnement, heartbeat 20 s, repli plafonné à 30 s         |
+| `units.ts`             | SI → affichage : m/s→nœuds, K→°C, rad→°, ratio→%, Pa→bar, s→h, **Hz→tr/min**, `toDisplayUnit(unité du catalogue, valeur)`                                                                  |
+| `path_catalog.ts`      | cadence par chemin (`intervalS`, `last \| mean \| max`) et abonnements générés depuis le catalogue partagé (jokers `propulsion.*.runTime`)                                                 |
+| `sample_normalizer.ts` | delta → échantillons du catalogue ; écarte `null`, non-finis, chemins inconnus et autres navires ; réduit position et alarmes                                                              |
+| `aggregator.ts`        | une valeur par chemin et par fenêtre, datée au début de la fenêtre (**horloge du client**, D9) ; hors-ligne fenêtres de 5 min ; `coarsen` fond les plus anciens lots en demi-heures        |
+| `instrument_store.ts`  | fenêtre en cours + lots gardés, dans IndexedDB `fleetide-instruments` (survit à un rechargement)                                                                                           |
+
+Points tirés des mesures du spike (#985) :
+
+- un serveur `--securityenabled` sans compte répond 401 en REST mais **ouvre le WebSocket sans émettre de delta** : le client sonde le REST avant le flux et s'arrête sur `unauthorized` ;
+- la découverte renvoie des URL `http://`/`ws://` : le client en garde le chemin mais reprend l'origine configurée (sinon contenu mixte en HTTPS) ;
+- `policy: fixed` avec une période par chemin ramène le débit du serveur à celui conservé (12 deltas/s en `instant`) ; les alarmes restent `instant`.
+
+Composables :
+
+- `use_instrument_stream` : valeurs les plus récentes par chemin, état de connexion, `staleSince` (`staleAfterS`, 120 s par défaut), Screen Wake Lock, **coupure du flux page masquée** et reprise au retour. Aucun effet côté serveur.
+- `use_telemetry_sync` : agrège puis envoie. **En ligne** : `router.post` avec `only: ['instruments']` (la redirection ne rend que la prop différée). **Hors-ligne ou échec transitoire** : `enqueue` silencieux, un lot par demi-heure hors-ligne. À 96 lots de télémétrie en attente, les nouveaux lots sont fondus et gardés en mémoire/IndexedDB plutôt qu'empilés. Un refus ou une erreur de validation n'est pas renvoyé : le même lot donnerait le même refus.
 
 ## Fichiers
 
@@ -84,4 +109,5 @@ app/events/telemetry_ingested.ts
 app/exceptions/instrument_errors.ts
 app/utils/csp_connect_src.ts
 shared/types/instruments.ts, shared/constants/instruments.ts, shared/helpers/instruments.ts
+inertia/lib/signalk/*, inertia/composables/use_instrument_stream.ts, use_telemetry_sync.ts
 ```

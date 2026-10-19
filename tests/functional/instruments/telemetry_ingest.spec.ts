@@ -123,6 +123,7 @@ test.group('Instruments — POST boats/:boatId/telemetry', (group) => {
       samples: [sample('design.length', 5, 1)],
     })
     assert.include(String(unknownPath.flashMessage('error')), 'unsupported')
+    unknownPath.assertFlashMessage('rejectedType', 'ingest-telemetry')
 
     const future = await post({
       sourceId: source!.id,
