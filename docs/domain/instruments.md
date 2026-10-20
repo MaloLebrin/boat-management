@@ -96,6 +96,19 @@ Composables :
 - `use_instrument_stream` : valeurs les plus récentes par chemin, état de connexion, `staleSince` (`staleAfterS`, 120 s par défaut), Screen Wake Lock, **coupure du flux page masquée** et reprise au retour. Aucun effet côté serveur.
 - `use_telemetry_sync` : agrège puis envoie. **En ligne** : `router.post` avec `only: ['instruments']` (la redirection ne rend que la prop différée). **Hors-ligne ou échec transitoire** : `enqueue` silencieux, un lot par demi-heure hors-ligne. À 96 lots de télémétrie en attente, les nouveaux lots sont fondus et gardés en mémoire/IndexedDB plutôt qu'empilés. Un refus ou une erreur de validation n'est pas renvoyé : le même lot donnerait le même refus.
 
+## Onglet « Instruments » (PR 3, #990)
+
+Visible en Pro et Entreprise (`effectiveQuotas.canConnectInstruments`), groupe `navigation`, après Position. Il lit la prop différée `instruments` (groupe `instruments`, skeleton tant qu'elle manque) et s'organise ainsi :
+
+- **Admin** (`instruments.manage`) : formulaire de la source (adresse, jeton en écriture seule, contexte, activation) et retrait confirmé.
+- **Membre** (`boats.edit`) : reçoit le jeton, ouvre le flux et envoie les lots tant que l'écran est ouvert.
+- **Lecteur** (sans `boats.edit`) : dernières valeurs connues seulement, sans flux ni jeton.
+- **Hors flux** : les jauges restent alimentées par `latest` (« dernière valeur connue, date »), avec un badge « périmé » au-delà de deux minutes ; en direct, le flux remplace la valeur du serveur.
+
+L'acquisition ne tourne que l'onglet ouvert : le flux est coupé quand la page passe en arrière-plan. « Préparer la traversée » pré-charge `?tab=instruments` quand le plan l'ouvre, ce qui permet de rouvrir l'onglet hors-ligne avec les dernières valeurs et le jeton en cache.
+
+**Réserve — go/no-go iOS.** La matrice contenu mixte mesurée sur téléphone (document d'épopée, « Encore ouvert ») n'était pas consignée à l'ouverture de cette PR. L'onglet reste utile quel que soit le résultat (dernières valeurs, historique, configuration), mais le flux depuis un iPhone dépend de cette mesure : un serveur à certificat de confiance (nom DNS) est le seul chemin sans manipulation sur l'appareil.
+
 ## Fichiers
 
 ```

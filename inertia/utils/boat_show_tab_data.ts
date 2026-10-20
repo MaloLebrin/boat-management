@@ -1,15 +1,16 @@
 import type { BoatShowTabKey } from '~/composables/use_boat_show_tabs'
 
 /**
- * Les données d'onglet de la fiche bateau arrivent en deux groupes de props
+ * Les données d'onglet de la fiche bateau arrivent en trois groupes de props
  * différées (#463). Tant que le groupe dont dépend l'onglet actif n'est pas
  * arrivé, l'onglet affiche un skeleton au lieu de rien du tout.
  */
-export type BoatShowDeferredGroup = 'maintenance' | 'navigation'
+export type BoatShowDeferredGroup = 'maintenance' | 'navigation' | 'instruments'
 
 export interface BoatShowDeferredGroupsLoaded {
   maintenance: boolean
   navigation: boolean
+  instruments: boolean
 }
 
 const TAB_DEFERRED_GROUP: Record<BoatShowTabKey, BoatShowDeferredGroup | null> = {
@@ -28,6 +29,7 @@ const TAB_DEFERRED_GROUP: Record<BoatShowTabKey, BoatShowDeferredGroup | null> =
   'fuel': 'navigation',
   'incidents': 'navigation',
   'position': null,
+  'instruments': 'instruments',
 }
 
 export function deferredGroupOfTab(tab: BoatShowTabKey): BoatShowDeferredGroup | null {

@@ -17,6 +17,7 @@ export type PassagePageKey =
   | 'sheets'
   | 'fuel'
   | 'incidents'
+  | 'instruments'
   | 'planning'
   | 'diagnosticIndex'
   | 'diagnostic'
@@ -44,7 +45,8 @@ export type PassageEngine = DiagnosticEngine & { id: number }
  */
 export function passagePages(
   boatId: number,
-  engines: readonly PassageEngine[] = []
+  engines: readonly PassageEngine[] = [],
+  options: { instruments?: boolean } = {}
 ): PassagePage[] {
   const boat = `/boats/${boatId}`
   return [
@@ -53,6 +55,10 @@ export function passagePages(
     { key: 'sheets', url: `${boat}?tab=sheets` },
     { key: 'fuel', url: `${boat}?tab=fuel` },
     { key: 'incidents', url: `${boat}?tab=incidents` },
+    // Onglet Instruments (#990) : seulement si le plan l'ouvre, sinon `?tab=` retombe sur l'aperçu.
+    ...(options.instruments
+      ? [{ key: 'instruments' as const, url: `${boat}?tab=instruments` }]
+      : []),
     { key: 'planning', url: '/planning' },
     ...diagnosticPages(boatId, engines),
   ]

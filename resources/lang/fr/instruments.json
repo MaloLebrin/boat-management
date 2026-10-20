@@ -1,0 +1,100 @@
+{
+  "tab": "Instruments",
+  "noData": "Aucune mesure pour l’instant. Ouvrez cet écran à bord, sur le Wi-Fi du bateau, pour lancer la collecte.",
+  "category": {
+    "propulsion": "Moteurs",
+    "navigation": "Navigation",
+    "environment": "Environnement",
+    "electrical": "Batteries",
+    "tanks": "Réservoirs",
+    "notifications": "Alarmes"
+  },
+  "path": {
+    "propulsion_runTime": "Heures moteur",
+    "propulsion_revolutions": "Régime moteur",
+    "propulsion_temperature": "Température moteur",
+    "propulsion_coolantTemperature": "Température liquide de refroidissement",
+    "propulsion_oilPressure": "Pression d’huile",
+    "propulsion_fuel_rate": "Consommation de carburant",
+    "navigation_position": "Position",
+    "navigation_speedOverGround": "Vitesse fond",
+    "navigation_courseOverGroundTrue": "Cap fond",
+    "navigation_headingTrue": "Cap vrai",
+    "navigation_headingMagnetic": "Cap magnétique",
+    "navigation_speedThroughWater": "Vitesse surface",
+    "electrical_batteries_voltage": "Tension batterie",
+    "electrical_batteries_current": "Courant batterie",
+    "electrical_batteries_capacity_stateOfCharge": "Niveau de charge",
+    "electrical_batteries_temperature": "Température batterie",
+    "tanks_currentLevel": "Niveau du réservoir",
+    "tanks_capacity": "Capacité du réservoir",
+    "environment_wind_speedApparent": "Vent apparent",
+    "environment_wind_speedTrue": "Vent réel",
+    "environment_wind_angleApparent": "Angle du vent apparent",
+    "environment_wind_angleTrueWater": "Angle du vent réel",
+    "environment_wind_directionTrue": "Direction du vent",
+    "environment_depth_belowTransducer": "Profondeur sous la sonde",
+    "environment_depth_belowKeel": "Profondeur sous la quille",
+    "environment_depth_belowSurface": "Profondeur sous la surface",
+    "environment_water_temperature": "Température de l’eau",
+    "environment_outside_temperature": "Température extérieure",
+    "environment_outside_pressure": "Pression atmosphérique",
+    "notifications": "Alarme"
+  },
+  "gauge": {
+    "stale": "Périmé",
+    "live": "En direct",
+    "lastKnown": "Dernière valeur connue, {date}"
+  },
+  "alarms": {
+    "none": "Aucune alarme active.",
+    "state": {
+      "emergency": "Urgence",
+      "alarm": "Alarme",
+      "alert": "Alerte",
+      "warn": "Avertissement"
+    }
+  },
+  "banner": {
+    "disabled": "Source désactivée",
+    "readOnly": "Dernières valeurs connues",
+    "state": {
+      "idle": "Non connecté",
+      "connecting": "Connexion au serveur de bord…",
+      "open": "Connecté au serveur de bord",
+      "reconnecting": "Connexion perdue, nouvelle tentative…",
+      "closed": "Déconnecté",
+      "error": "Connexion impossible"
+    },
+    "error": {
+      "unreachable": "Le serveur est injoignable. Vérifiez que cet appareil est sur le Wi-Fi du bateau.",
+      "unauthorized": "Le serveur exige un jeton. Demandez à un administrateur de saisir un jeton en lecture seule.",
+      "tls": "La connexion sécurisée a échoué. Le certificat du serveur n’est probablement pas reconnu par cet appareil.",
+      "protocol": "Le serveur ne répond pas comme un serveur Signal K. Vérifiez son adresse."
+    },
+    "screenOpen": "La collecte se poursuit tant que cet écran reste ouvert.",
+    "lastDelta": "Dernière donnée reçue {date}.",
+    "lastSeen": "Dernier lot reçu par FleetAi {date}."
+  },
+  "empty": {
+    "title": "Aucun instrument connecté",
+    "manage": "Enregistrez le serveur Signal K du bateau pour y lire les moteurs, batteries, réservoirs et capteurs.",
+    "readOnly": "Aucun serveur Signal K n’est enregistré pour ce bateau. Demandez à un administrateur de le connecter."
+  },
+  "form": {
+    "title": "Serveur Signal K",
+    "baseUrl": "Adresse du serveur",
+    "baseUrlHint": "Origine seulement, par exemple https://signalk.local:3443 — sans chemin ni identifiants.",
+    "token": "Jeton d’accès",
+    "tokenHint": "Facultatif. Un jeton en lecture seule si le serveur en exige un.",
+    "tokenSet": "Un jeton est enregistré. Laissez vide pour le conserver.",
+    "clearToken": "Supprimer le jeton enregistré",
+    "vesselContext": "Contexte du navire",
+    "vesselContextHint": "Laissez vessels.self sauf indication contraire du serveur.",
+    "enabled": "Source activée",
+    "save": "Enregistrer",
+    "remove": "Retirer la source",
+    "removeTitle": "Retirer la source d’instruments ?",
+    "removeMessage": "Les mesures déjà collectées pour ce bateau sont supprimées avec elle."
+  }
+}

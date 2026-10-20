@@ -418,7 +418,7 @@
           },
           {
             "q": "My boats don't have connected sensors. Does it still work?",
-            "a": "Yes. FleetAi is designed for manual entry of engine hours."
+            "a": "Yes. FleetAi is designed for manual entry of engine hours. If your boat has a Signal K server, the Pro and Enterprise plans can also read the instruments (engine, batteries, tanks, position) from the app, aboard."
           },
           {
             "q": "How much does FleetAi cost for 15 boats?",

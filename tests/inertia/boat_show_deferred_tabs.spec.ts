@@ -182,12 +182,52 @@ describe('boat_show_tab_data', () => {
   })
 
   test("un onglet sans groupe est prêt même si rien n'est chargé", () => {
-    const nothingLoaded = { maintenance: false, navigation: false }
+    const nothingLoaded = { maintenance: false, navigation: false, instruments: false }
 
     expect(isTabDataReady('specs', nothingLoaded)).toBe(true)
     // Les photos arrivent avec la prop `boat`, non différée (#811)
     expect(isTabDataReady('photos', nothingLoaded)).toBe(true)
     expect(isTabDataReady('history', nothingLoaded)).toBe(false)
-    expect(isTabDataReady('history', { maintenance: true, navigation: false })).toBe(true)
+    expect(
+      isTabDataReady('history', { maintenance: true, navigation: false, instruments: false })
+    ).toBe(true)
+  })
+})
+
+describe('boats/show — groupe différé « instruments » (#990)', () => {
+  test("l'onglet Instruments attend son propre groupe, pas les deux autres", () => {
+    expect(deferredGroupOfTab('instruments')).toBe('instruments')
+    const others = { maintenance: true, navigation: true, instruments: false }
+    expect(isTabDataReady('instruments', others)).toBe(false)
+    expect(isTabDataReady('instruments', { ...others, instruments: true })).toBe(true)
+    // Et les autres onglets n'attendent pas les instruments.
+    expect(
+      isTabDataReady('history', { maintenance: true, navigation: false, instruments: false })
+    ).toBe(true)
+  })
+
+  test('skeleton tant que la prop instruments est absente', () => {
+    const wrapper = mount(BoatShowTabContent, {
+      props: tabContentProps({ tab: 'instruments' }),
+      shallow: true,
+    })
+    expect(wrapper.find('[data-testid="tab-content-skeleton"]').exists()).toBe(true)
+  })
+
+  test('une fois la prop arrivée, l’onglet est monté avec le bateau et la prop', () => {
+    const instruments = {
+      source: null,
+      latest: [],
+      recent: {},
+      can: { manage: false, ingest: false },
+    }
+    const wrapper = mount(BoatShowTabContent, {
+      props: tabContentProps({ tab: 'instruments', instruments }),
+      shallow: true,
+    })
+    const tab = wrapper.findComponent({ name: 'BoatShowTabInstruments' })
+    expect(tab.exists()).toBe(true)
+    expect(tab.props('boatId')).toBe(13)
+    expect(tab.props('instruments')).toEqual(instruments)
   })
 })

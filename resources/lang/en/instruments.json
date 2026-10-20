@@ -1,0 +1,100 @@
+{
+  "tab": "Instruments",
+  "noData": "No reading yet. Open this screen aboard, on the boat's Wi-Fi, to start collecting.",
+  "category": {
+    "propulsion": "Engines",
+    "navigation": "Navigation",
+    "environment": "Environment",
+    "electrical": "Batteries",
+    "tanks": "Tanks",
+    "notifications": "Alarms"
+  },
+  "path": {
+    "propulsion_runTime": "Engine hours",
+    "propulsion_revolutions": "Engine speed",
+    "propulsion_temperature": "Engine temperature",
+    "propulsion_coolantTemperature": "Coolant temperature",
+    "propulsion_oilPressure": "Oil pressure",
+    "propulsion_fuel_rate": "Fuel rate",
+    "navigation_position": "Position",
+    "navigation_speedOverGround": "Speed over ground",
+    "navigation_courseOverGroundTrue": "Course over ground",
+    "navigation_headingTrue": "True heading",
+    "navigation_headingMagnetic": "Magnetic heading",
+    "navigation_speedThroughWater": "Speed through water",
+    "electrical_batteries_voltage": "Battery voltage",
+    "electrical_batteries_current": "Battery current",
+    "electrical_batteries_capacity_stateOfCharge": "State of charge",
+    "electrical_batteries_temperature": "Battery temperature",
+    "tanks_currentLevel": "Tank level",
+    "tanks_capacity": "Tank capacity",
+    "environment_wind_speedApparent": "Apparent wind speed",
+    "environment_wind_speedTrue": "True wind speed",
+    "environment_wind_angleApparent": "Apparent wind angle",
+    "environment_wind_angleTrueWater": "True wind angle",
+    "environment_wind_directionTrue": "Wind direction",
+    "environment_depth_belowTransducer": "Depth below transducer",
+    "environment_depth_belowKeel": "Depth below keel",
+    "environment_depth_belowSurface": "Depth below surface",
+    "environment_water_temperature": "Water temperature",
+    "environment_outside_temperature": "Outside temperature",
+    "environment_outside_pressure": "Barometric pressure",
+    "notifications": "Alarm"
+  },
+  "gauge": {
+    "stale": "Stale",
+    "live": "Live",
+    "lastKnown": "Last known value, {date}"
+  },
+  "alarms": {
+    "none": "No active alarm.",
+    "state": {
+      "emergency": "Emergency",
+      "alarm": "Alarm",
+      "alert": "Alert",
+      "warn": "Warning"
+    }
+  },
+  "banner": {
+    "disabled": "Source disabled",
+    "readOnly": "Last known values",
+    "state": {
+      "idle": "Not connected",
+      "connecting": "Connecting to the boat server…",
+      "open": "Connected to the boat server",
+      "reconnecting": "Connection lost, retrying…",
+      "closed": "Disconnected",
+      "error": "Connection impossible"
+    },
+    "error": {
+      "unreachable": "The server cannot be reached. Check that this device is on the boat's Wi-Fi.",
+      "unauthorized": "The server requires a token. Ask an administrator to enter a read-only token.",
+      "tls": "The secure connection failed. The server's certificate is probably not trusted by this device.",
+      "protocol": "The server does not answer like a Signal K server. Check its address."
+    },
+    "screenOpen": "Collecting while this screen stays open.",
+    "lastDelta": "Last data received {date}.",
+    "lastSeen": "Last batch received by FleetAi {date}."
+  },
+  "empty": {
+    "title": "No instruments connected",
+    "manage": "Register the boat's Signal K server to read its engines, batteries, tanks and sensors here.",
+    "readOnly": "No Signal K server is registered for this boat. Ask an administrator to connect it."
+  },
+  "form": {
+    "title": "Signal K server",
+    "baseUrl": "Server address",
+    "baseUrlHint": "Origin only, e.g. https://signalk.local:3443 — no path or credentials.",
+    "token": "Access token",
+    "tokenHint": "Optional. A read-only token if the server requires one.",
+    "tokenSet": "A token is saved. Leave empty to keep it.",
+    "clearToken": "Remove the saved token",
+    "vesselContext": "Vessel context",
+    "vesselContextHint": "Leave vessels.self unless the server says otherwise.",
+    "enabled": "Source enabled",
+    "save": "Save",
+    "remove": "Remove the source",
+    "removeTitle": "Remove the instruments source?",
+    "removeMessage": "The readings already collected for this boat are deleted with it."
+  }
+}

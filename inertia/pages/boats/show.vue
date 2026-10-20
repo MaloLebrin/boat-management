@@ -12,6 +12,7 @@ import BoatAvailabilityControl from '~/components/boats/show/availability/BoatAv
 import type { BoatAvailabilitySummary, BoatStatusChangeRow } from '#shared/types/boat_status'
 import NavigationActiveCard from '~/components/boats/show/tabs/NavigationActiveCard.vue'
 import { useBoatShowTabs } from '~/composables/use_boat_show_tabs'
+import { usePlan } from '~/composables/use_plan'
 import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
@@ -31,9 +32,11 @@ import type {
 import type { BoatPricingRow } from '../../../shared/types/boat_pricing'
 import type { SafetyComplianceReport } from '../../../shared/types/safety'
 import type { CrewMemberOption } from '../../../shared/types/crew'
+import type { InstrumentsTabProps } from '../../../shared/types/instruments'
 import { boatCategoryLabel, propulsionLabel } from '~/utils/boat_enum_labels'
 
 const { t } = useT()
+const { effectiveQuotas } = usePlan()
 
 // Les props des groupes « maintenance » et « navigation » sont différées côté
 // serveur (#463) : elles valent `undefined` le temps que leur groupe arrive,
@@ -48,6 +51,8 @@ const props = defineProps<{
   incidents?: BoatIncidentRow[]
   fuelLogs?: FuelLogRow[]
   navigationLogs?: NavigationLogRow[]
+  /** Groupe différé « instruments » (#990) : source Signal K, dernières valeurs, droits. */
+  instruments?: InstrumentsTabProps
   portOptions?: NavigationLogPortOption[]
   crewMemberOptions?: CrewMemberOption[]
   aiSuggestions?: AiSuggestion[] | null
@@ -97,6 +102,7 @@ const {
   boatDocuments: () => props.boatDocuments,
   incidents: () => props.incidents,
   pricingEnabled: () => props.pricingEnabled,
+  instrumentsEnabled: () => effectiveQuotas.value?.canConnectInstruments === true,
   initialTabParam: () => props.initialTab,
 })
 

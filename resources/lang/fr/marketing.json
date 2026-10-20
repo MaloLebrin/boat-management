@@ -287,7 +287,7 @@
       "item2_q": "FleetAi remplace-t-il mon mécano ?",
       "item2_a": "Non. FleetAi t'aide à savoir quand et quoi planifier. Ton mécano reste indispensable pour faire les opérations.",
       "item3_q": "Mes bateaux n'ont pas de capteurs connectés. Ça marche quand même ?",
-      "item3_a": "Oui. FleetAi est conçu pour la saisie manuelle des heures moteur.",
+      "item3_a": "Oui. FleetAi est conçu pour la saisie manuelle des heures moteur. Si ton bateau a un serveur Signal K, les plans Pro et Entreprise lisent aussi les instruments (moteur, batteries, réservoirs, position) depuis l’app, à bord.",
       "item4_q": "Combien coûte FleetAi pour {fleetBoats} bateaux ?",
       "item4_a": "Le plan Pro couvre jusqu'à {proBoats} bateaux pour {proMonthly}/mois ({proAnnual}/mois en annuel). Au-delà, tu ajoutes des bateaux supplémentaires à {extraBoatPrice}/bateau/mois : {fleetBoats} bateaux reviennent à {fleetTotal}/mois en Pro. Le plan Entreprise ({enterpriseMonthly}/mois) passe en bateaux illimités. Pas de frais cachés.",
       "item5_q": "Puis-je migrer depuis un autre outil ?",

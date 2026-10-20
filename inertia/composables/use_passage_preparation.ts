@@ -151,11 +151,16 @@ async function readRowCachedAt(item: PassagePage): Promise<Date | null> {
 
 export function usePassagePreparation(
   boatId: () => number,
-  engines: () => readonly PassageEngine[] = () => []
+  engines: () => readonly PassageEngine[] = () => [],
+  options: () => { instruments?: boolean } = () => ({})
 ) {
   const page = usePage()
   const pages = ref<PassagePageState[]>(
-    passagePages(boatId(), engines()).map((item) => ({ ...item, status: 'idle', cachedAt: null }))
+    passagePages(boatId(), engines(), options()).map((item) => ({
+      ...item,
+      status: 'idle',
+      cachedAt: null,
+    }))
   )
   const isPreparing = ref(false)
   const serviceWorkerReady = ref(serviceWorkerController() !== null)
