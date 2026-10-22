@@ -22,6 +22,10 @@ test.group('Shield config (unit)', () => {
     assert.include(shieldConfig.csrf.exceptRoutes as string[], '/webhooks/stripe/connect')
   })
 
+  test('the plugin ingest API route is exempt from CSRF verification (#994)', ({ assert }) => {
+    assert.include(shieldConfig.csrf.exceptRoutes as string[], '/api/instruments/ingest')
+  })
+
   test('CSP declares frame-ancestors none and form-action self (#779)', ({ assert }) => {
     const directives = shieldConfig.csp.directives as Record<string, string[] | undefined>
     assert.deepEqual(directives.frameAncestors, ["'none'"])

@@ -1354,6 +1354,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'seuil',
       'batterie faible',
       'petit fond',
+      'plugin signal k',
+      'jeton plugin',
     ],
     navTarget: null,
     planFlag: 'canConnectInstruments',

@@ -24,6 +24,9 @@ export interface InstrumentSourceRow {
   enabled: boolean
   /** Un jeton est enregistré (sa valeur ne sort que dans `InstrumentSourceConnection`). */
   hasToken: boolean
+  /** Un jeton d'ingestion du plugin existe (#994) — sa valeur n'est montrée qu'à la génération. */
+  hasIngestToken: boolean
+  ingestTokenIssuedAt: string | null
   lastSeenAt: string | null
   lastError: string | null
 }

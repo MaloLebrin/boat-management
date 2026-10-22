@@ -628,7 +628,10 @@
     "ruleDuplicate": "Une règle existe déjà pour cet instrument et cet opérateur.",
     "ruleLimit": "Nombre maximal de règles atteint pour ce bateau.",
     "rulePathInvalid": "Cet instrument ne peut pas porter de règle de seuil.",
-    "ruleNotFound": "Cette règle d’alerte n’existe plus."
+    "ruleNotFound": "Cette règle d’alerte n’existe plus.",
+    "ingestTokenIssued": "Jeton du plugin généré. Copiez-le maintenant : il ne sera plus affiché.",
+    "ingestTokenRevoked": "Jeton du plugin révoqué.",
+    "ingestTokenNone": "Aucun jeton de plugin à révoquer."
   },
   "inventory": {
     "itemCreated": "Article ajouté à l'inventaire.",

@@ -924,6 +924,8 @@ export class BoatInstrumentSourceSchema extends BaseModel {
     'createdAt',
     'enabled',
     'id',
+    'ingestTokenHash',
+    'ingestTokenIssuedAt',
     'kind',
     'lastError',
     'lastSeenAt',
@@ -943,6 +945,10 @@ export class BoatInstrumentSourceSchema extends BaseModel {
   declare enabled: boolean
   @column({ isPrimary: true })
   declare id: number
+  @column()
+  declare ingestTokenHash: string | null
+  @column.dateTime()
+  declare ingestTokenIssuedAt: DateTime | null
   @column()
   declare kind: string
   @column()

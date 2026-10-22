@@ -147,6 +147,10 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       | string
       | undefined
     const createdResourceId = session?.flashMessages.get('createdResourceId') as string | undefined
+    // Jeton d'ingestion du plugin Signal K (#994) : montré une seule fois, à sa génération.
+    const instrumentIngestToken = session?.flashMessages.get('instrumentIngestToken') as
+      | string
+      | undefined
 
     // #451 — la clé de session posée par `/demo` survivait au logout et suivait le
     // navigateur d'un compte à l'autre : la bannière « Session démo » s'affichait
@@ -211,6 +215,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
         rejectedType,
         createdResourceType,
         createdResourceId,
+        instrumentIngestToken,
       }),
       demoSessionStartedAt: ctx.inertia.always(demoSessionStartedAt),
       demoSessionDurationMs: ctx.inertia.always(

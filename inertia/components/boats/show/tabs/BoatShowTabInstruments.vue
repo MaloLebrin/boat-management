@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import InstrumentPluginTokenCard from '~/components/boats/show/tabs/instruments/InstrumentPluginTokenCard.vue'
 import InstrumentAlertRulesEditor from '~/components/boats/show/tabs/instruments/InstrumentAlertRulesEditor.vue'
 import InstrumentAlertsList from '~/components/boats/show/tabs/instruments/InstrumentAlertsList.vue'
 import InstrumentAlarmsList from '~/components/boats/show/tabs/instruments/InstrumentAlarmsList.vue'
@@ -118,6 +119,11 @@ onBeforeUnmount(() => {
       :boat-id="boatId"
       :rules="instruments.rules"
       :paths="rulePaths"
+    />
+    <InstrumentPluginTokenCard
+      v-if="instruments.can.manage && source"
+      :boat-id="boatId"
+      :source="source"
     />
     <InstrumentSourceForm v-if="instruments.can.manage" :boat-id="boatId" :source="source" />
   </div>

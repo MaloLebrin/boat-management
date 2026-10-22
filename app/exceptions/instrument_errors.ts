@@ -93,3 +93,8 @@ export class InstrumentAlertRuleLimitError extends Error {
 export class InstrumentAlertRuleNotFoundError extends Error {
   name = 'InstrumentAlertRuleNotFoundError'
 }
+
+/** Le jeton d'ingestion du plugin est absent, mal formé ou inconnu (#994). */
+export class InstrumentIngestTokenInvalidError extends Error {
+  name = 'InstrumentIngestTokenInvalidError'
+}

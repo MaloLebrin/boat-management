@@ -628,7 +628,10 @@
     "ruleDuplicate": "A rule already exists for this instrument and operator.",
     "ruleLimit": "Maximum number of rules reached for this boat.",
     "rulePathInvalid": "This instrument cannot carry a threshold rule.",
-    "ruleNotFound": "This alert rule no longer exists."
+    "ruleNotFound": "This alert rule no longer exists.",
+    "ingestTokenIssued": "Plugin token generated. Copy it now: it will not be shown again.",
+    "ingestTokenRevoked": "Plugin token revoked.",
+    "ingestTokenNone": "No plugin token to revoke."
   },
   "inventory": {
     "itemCreated": "Item added to the inventory.",

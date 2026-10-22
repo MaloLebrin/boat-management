@@ -41,3 +41,26 @@ export const ingestTelemetryValidator = vine.create(
       .maxLength(TELEMETRY_MAX_BATCH_SIZE),
   })
 )
+
+/**
+ * Lot du plugin (#994) : le contrat de `ingestTelemetryValidator`, mais
+ * `sourceId` est facultatif — le jeton désigne déjà la source. S'il est
+ * fourni, il doit être celui de la source authentifiée.
+ */
+export const ingestTelemetryApiValidator = vine.create(
+  vine.object({
+    sourceId: vine.number().positive().withoutDecimals().optional(),
+    batchId: vine.string().trim().minLength(1).maxLength(64),
+    samples: vine
+      .array(
+        vine.object({
+          path: vine.string().trim().minLength(1).maxLength(TELEMETRY_PATH_MAX_LENGTH),
+          recordedAt: vine.string().trim().regex(ISO_DATETIME),
+          value: vine.number().nullable().optional(),
+          valueJson: vine.any().nullable().optional(),
+        })
+      )
+      .minLength(1)
+      .maxLength(TELEMETRY_MAX_BATCH_SIZE),
+  })
+)

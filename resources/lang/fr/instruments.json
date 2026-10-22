@@ -149,5 +149,21 @@
       "rule": "{path} {operator} {threshold} {unit}",
       "limit": "Limite de règles atteinte."
     }
+  },
+  "plugin": {
+    "title": "Plugin Signal K",
+    "description": "Pour un bateau sans écran allumé, le plugin installé sur le serveur Signal K pousse lui-même les relevés vers FleetAi avec un jeton propre à ce bateau.",
+    "endpoint": "Adresse d’ingestion",
+    "token": "Jeton du plugin",
+    "tokenOnce": "Copiez ce jeton maintenant : il ne sera plus affiché.",
+    "status": "Un jeton est actif depuis le {date}.",
+    "none": "Aucun jeton généré.",
+    "generate": "Générer un jeton",
+    "rotate": "Régénérer le jeton",
+    "rotateTitle": "Régénérer le jeton ?",
+    "rotateMessage": "L’ancien jeton cesse de fonctionner immédiatement : le plugin devra être reconfiguré.",
+    "revoke": "Révoquer le jeton",
+    "revokeTitle": "Révoquer le jeton ?",
+    "revokeMessage": "Le plugin ne pourra plus envoyer de relevés tant qu’un nouveau jeton n’est pas généré."
   }
 }

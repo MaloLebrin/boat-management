@@ -561,6 +561,7 @@ Le serveur Signal K d'un bateau. Une ligne par bateau et par `kind` (unique `(bo
 - `tokenEncrypted` (texte nullable, **non sérialisé**) — jeton Signal K chiffré par `DataEncryptionService`
 - `vesselContext` (défaut `vessels.self`), `enabled` (défaut `true`)
 - `lastSeenAt` (dernier lot reçu), `lastError` (nullable)
+- `ingestTokenHash` (string 64, nullable, **unique**, **non sérialisé**) — sha256 du jeton d'ingestion du plugin Signal K (#994) ; `ingestTokenIssuedAt` (timestamptz nullable) — date d'émission du jeton en cours
 
 ### boat_telemetry_samples (#988)
 

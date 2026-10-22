@@ -80,6 +80,8 @@ const source = {
   vesselContext: 'vessels.self',
   enabled: true,
   hasToken: true,
+  hasIngestToken: false,
+  ingestTokenIssuedAt: null,
   lastSeenAt: '2026-10-19T09:00:00Z',
   lastError: null,
   token: 'tok',
@@ -418,12 +420,14 @@ describe('BoatShowTabInstruments', () => {
 
     expect(wrapper.findAll('[data-testid="instrument-alert"]')).toHaveLength(1)
     expect(wrapper.find('[data-testid="instrument-alert-rules"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="instrument-plugin-token"]').exists()).toBe(true)
   })
 
   test('sans droit de gestion ou sans source : pas d’éditeur de règles (#993)', async () => {
     const reader = mountTab(props({ can: { manage: false, ingest: true } }))
     await flushPromises()
     expect(reader.find('[data-testid="instrument-alert-rules"]').exists()).toBe(false)
+    expect(reader.find('[data-testid="instrument-plugin-token"]').exists()).toBe(false)
     expect(reader.find('[data-testid="instrument-alerts"]').exists()).toBe(true)
 
     const noSource = mountTab(props({ source: null, latest: [] }))

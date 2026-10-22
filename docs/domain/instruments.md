@@ -10,11 +10,14 @@ Acquérir sans saisie les données des instruments d'un bateau (moteur, position
 
 ## Routes (`start/routes/instruments.ts`, auth + plan)
 
-| Méthode | Pattern                            | Nom                              | Policy (`InstrumentSourcePolicy`) |
-| ------- | ---------------------------------- | -------------------------------- | --------------------------------- |
-| PUT     | `/boats/:boatId/instrument-source` | `boats.instrumentSource.upsert`  | `manage` (`instruments.manage`)   |
-| DELETE  | `/boats/:boatId/instrument-source` | `boats.instrumentSource.destroy` | `manage`                          |
-| POST    | `/boats/:boatId/telemetry`         | `boats.telemetry.store`          | `ingest` (`boats.edit`)           |
+| Méthode | Pattern                                         | Nom                                   | Policy (`InstrumentSourcePolicy`) |
+| ------- | ----------------------------------------------- | ------------------------------------- | --------------------------------- |
+| PUT     | `/boats/:boatId/instrument-source`              | `boats.instrumentSource.upsert`       | `manage` (`instruments.manage`)   |
+| DELETE  | `/boats/:boatId/instrument-source`              | `boats.instrumentSource.destroy`      | `manage`                          |
+| POST    | `/boats/:boatId/telemetry`                      | `boats.telemetry.store`               | `ingest` (`boats.edit`)           |
+| POST    | `/boats/:boatId/instrument-source/ingest-token` | `boats.instrumentIngestToken.store`   | `manage` (#994)                   |
+| DELETE  | `/boats/:boatId/instrument-source/ingest-token` | `boats.instrumentIngestToken.destroy` | `manage` (#994)                   |
+| POST    | `/api/instruments/ingest`                       | `api.instruments.ingest`              | jeton Bearer de la source (#994)  |
 
 `view` (`boats.view`) couvre la lecture. `instruments.manage` est une capacité **admin seulement** : un member lit les jauges et pousse la télémétrie, mais ne branche pas de serveur.
 
@@ -31,7 +34,7 @@ Entrée unique, agnostique du transport (D1) : le contrôleur Inertia de la PWA 
 
 Erreurs (`app/exceptions/instrument_errors.ts`) : `InstrumentSourceNotFoundError`, `InstrumentSourceDisabledError`, `InvalidInstrumentBaseUrlError`, `TelemetryBatchTooLargeError`, `TelemetryPathNotAllowedError`, `TelemetryRecordedAtInvalidError`, `TelemetryValueOutOfRangeError`, `TelemetryValueKindMismatchError`.
 
-### Contrat du lot (`TelemetryBatchPayload`, aussi celui du futur plugin)
+### Contrat du lot (`TelemetryBatchPayload`, aussi celui du plugin — #994)
 
 ```json
 {
@@ -157,6 +160,17 @@ Sur `navigation.position` (valeur `{ latitude, longitude }` validée : finie, |l
 - **Interface** : `InstrumentAlertsList.vue` (alertes ouvertes), `InstrumentAlertRulesEditor.vue` (admin, sous la liste), pastille du nombre d'alertes sur l'onglet Instruments (`instrumentAlertCount` de `useBoatShowTabs`), ligne « Instrument » dans « À traiter » du tableau de bord (`DashboardAttentionService.fetchInstrumentAlerts`, `counts.instrumentAlerts`, gravité `critical` → danger).
 - **Routes** : `POST /boats/:boatId/instrument-alert-rules`, `PUT …/:ruleId`, `DELETE …/:ruleId` (redirections Inertia, plan Pro/Entreprise). Lecture : `rules` et `openAlerts` dans la prop différée `instruments`. Audit : `boat.instrument_alert_rule_update` / `_delete`.
 - Limites connues : la fusion client ne lève pas une alerte du serveur que le flux voit revenir à la normale (le serveur la lève au prochain lot) ; la pastille de groupe « Navigation » affiche la première pastille disponible (incidents avant instruments).
+
+## Plugin Signal K — `POST /api/instruments/ingest` (PR 7, #994)
+
+Repli universel sans navigateur (D1) : un plugin installé sur le serveur Signal K du bord pousse lui-même les lots. Le plugin vit **hors de ce dépôt** ; ce qui suit est son contrat.
+
+- **Jeton par bateau.** Un admin le génère depuis la carte « Plugin Signal K » de l'onglet (`POST /boats/:boatId/instrument-source/ingest-token`). Il est tiré au hasard (32 octets, préfixe `fai_ing_`), **affiché une seule fois** (flash `instrumentIngestToken`, partagé dans `page.props.flash`) ; la base ne garde que son **sha256** (`boat_instrument_sources.ingest_token_hash`, unique, `serializeAs: null`) et la date d'émission. Régénérer remplace — donc révoque — l'ancien ; `DELETE` le révoque. Une source sans jeton refuse tout appel plugin.
+- **Requête.** `POST {APP_URL}/api/instruments/ingest`, `Authorization: Bearer fai_ing_…`, `Content-Type: application/json`, corps = `TelemetryBatchPayload` ci-dessus (≤ 500 échantillons, `recordedAt` ISO 8601, valeurs en SI, mêmes chemins du catalogue). **`sourceId` est facultatif** (le jeton désigne la source) ; s'il est fourni il doit être celui de la source (sinon 422 `source_mismatch`).
+- **Réponses (toujours JSON, jamais de redirection).** `200 { accepted, ignored }` — un lot rejoué est un succès (`ignored`, D4) ; `401 { error: 'unauthorized' }` (jeton absent, inconnu, mal formé ou révoqué — même réponse, `WWW-Authenticate: Bearer`) ; `403 { error: 'plan_not_allowed' }` (organisation rétrogradée sous Pro) ; `404 source_not_found` ; `409 { error: 'source_disabled' }` ; `422` `validation_failed` (forme, > 500 échantillons), `path_not_allowed` (+ `path`), `recorded_at_invalid` (illisible ou futur au-delà de 5 min), `value_invalid`, `source_mismatch` ; `429 { error: 'rate_limited', retryAfter }` avec `Retry-After`. Un lot est accepté ou refusé **en entier**.
+- **Pile.** `start/routes/api.ts` → limiteur par IP (120/min, borne la devinette de jeton) → `InstrumentIngestTokenMiddleware` (Bearer → hash → `ctx.instrumentSource`, plan vérifié par `QuotaService.canConnectInstruments`) → limiteur par source (30/min) → `InstrumentIngestController.store` → `TelemetryIngestService.ingest(source, batch, { origin: 'plugin' })`, donc les mêmes effets (`TelemetryIngested` : heures moteur, position, alertes). Middleware nommé `instrumentIngestToken` dans `start/kernel.ts`.
+- **Hors session.** Aucune session ni CSRF : `/api/instruments/ingest` est dans `config/shield.ts` `exceptRoutes`, et `/api/**` répond toujours en JSON (`app/exceptions/handler.ts`). Le Service Worker exclut déjà `/api/`.
+- Audit : `boat.instrument_ingest_token_issue` / `_revoke`. Aucune clé de chiffrement : un sha256 suffit pour un jeton à haute entropie, et la valeur en clair n'est jamais relisible.
 
 ## Fichiers
 
