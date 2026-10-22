@@ -148,3 +148,15 @@ export function matchesCatalogPattern(pattern: string, path: string): boolean {
 }
 
 const PATTERN_CACHE = new Map<string, RegExp>()
+
+/** Préfixe des jetons d'ingestion du plugin (#994) : repérable dans un dépôt ou un journal. */
+export const INSTRUMENT_INGEST_TOKEN_PREFIX = 'fai_ing_'
+
+/** Entropie d'un jeton d'ingestion, en octets (encodés en base64url). */
+export const INSTRUMENT_INGEST_TOKEN_BYTES = 32
+
+/** Garde-fou sur la longueur d'un en-tête `Bearer` avant tout hachage. */
+export const INSTRUMENT_INGEST_TOKEN_MAX_LENGTH = 128
+
+/** Chemin de l'API d'ingestion du plugin. */
+export const INSTRUMENT_INGEST_PATH = '/api/instruments/ingest'

@@ -148,7 +148,13 @@ test.group('Protocole hors-ligne — les cinq clés traversent le middleware', (
       rejectedType: 'create-inspection',
       createdResourceType: 'create-inspection',
       createdResourceId: '42',
+      instrumentIngestToken: undefined,
     })
+  })
+
+  test('le jeton du plugin Signal K flashé ressort dans les props (#994)', async ({ assert }) => {
+    const result = await share({ instrumentIngestToken: 'fai_ing_secret' })
+    assert.equal(flashOf(result).instrumentIngestToken, 'fai_ing_secret')
   })
 
   test('sans flash, les clés existent et valent `undefined`', async ({ assert }) => {
@@ -157,7 +163,7 @@ test.group('Protocole hors-ligne — les cinq clés traversent le middleware', (
     // stable — c'est elle qui est typée dans `SharedProps`.
     const flash = flashOf(await share({}))
 
-    for (const key of [...PROTOCOL_KEYS, ...TOAST_KEYS]) {
+    for (const key of [...PROTOCOL_KEYS, ...TOAST_KEYS, 'instrumentIngestToken']) {
       assert.isTrue(key in flash, `« ${key} » a disparu de l'objet flash`)
       assert.isUndefined(flash[key])
     }

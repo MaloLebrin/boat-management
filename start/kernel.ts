@@ -64,4 +64,6 @@ export const middleware = router.named({
   // d'e-mail sortant, invitation, paiement. L'app reste ouverte sans
   // vérification — voir `require_verified_email_middleware.ts`.
   requireVerifiedEmail: () => import('#middleware/require_verified_email_middleware'),
+  // Jeton Bearer du plugin Signal K (#994) : routes `/api/instruments/*`, sans session.
+  instrumentIngestToken: () => import('#middleware/instrument_ingest_token_middleware'),
 })

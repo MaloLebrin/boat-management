@@ -106,6 +106,19 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       })
       return ctx.response.status(429).send(page)
     }
+    // `/api/**` (plugin Signal K, #994) : un client machine reçoit un 429 JSON,
+    // `Retry-After` compris, même sans en-tête `Accept`.
+    if (
+      error instanceof limiterErrors.E_TOO_MANY_REQUESTS &&
+      ctx.request.url().startsWith('/api/')
+    ) {
+      for (const [name, value] of Object.entries(error.getDefaultHeaders())) {
+        ctx.response.header(name, String(value))
+      }
+      return ctx.response
+        .status(429)
+        .json({ error: 'rate_limited', retryAfter: error.response.availableIn })
+    }
     if (error instanceof QuotaExceededError) {
       ctx.session.flash('error', ctx.i18n.t(quotaFlashKey(error)))
       // Upsell (issue #418) : le toast d'erreur quota expose une action « Voir les
@@ -155,6 +168,8 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * précisément un POST qui expire ou qui dépasse un quota.
    */
   private rendersHtmlErrorPage(ctx: HttpContext): boolean {
+    // `/api/**` (plugin Signal K, #994) répond toujours en JSON, quel que soit l'`Accept`.
+    if (ctx.request.url().startsWith('/api/')) return false
     if (!('inertia' in ctx)) return false
     const accepted = ctx.request.accepts(['html', 'application/vnd.api+json', 'json'])
     return accepted === 'html' || accepted === null
