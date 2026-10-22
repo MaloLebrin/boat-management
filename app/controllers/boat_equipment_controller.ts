@@ -9,7 +9,10 @@ import { toTaskEquipmentSource } from '#transformers/maintenance_transformer'
 import { maintenanceTaskPermissions } from '#utils/maintenance_task_permissions'
 import AiAnalysisService from '#services/ai_analysis_service'
 import BoatEquipmentService from '#services/boat_equipment_service'
-import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import {
+  BoatEngineInstrumentKeyTakenError,
+  BoatEquipmentNotFoundError,
+} from '#exceptions/boat_errors'
 import BoatEngineDiagnosticService from '#services/boat_engine_diagnostic_service'
 import BoatEnginePartService from '#services/boat_engine_part_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -70,7 +73,19 @@ export default class BoatEquipmentController {
     await bouncer.with(BoatPolicy).authorize('edit', boat)
 
     const body = (await request.validateUsing(storeBoatEngineValidator)) as BoatEngineFormBody
-    await this.equipmentService.createEngine(loaded.user, boat, equipmentBodyToEnginePayload(body))
+    try {
+      await this.equipmentService.createEngine(
+        loaded.user,
+        boat,
+        equipmentBodyToEnginePayload(body)
+      )
+    } catch (error) {
+      if (error instanceof BoatEngineInstrumentKeyTakenError) {
+        session.flash('error', i18n.t('flash.engine.instrumentKeyTaken'))
+        return response.redirect().back()
+      }
+      throw error
+    }
 
     session.flash('success', i18n.t('flash.engine.added'))
     response.redirect(`/boats/${boat.id}`)
@@ -121,6 +136,7 @@ export default class BoatEquipmentController {
         powerHp: engine.powerHp,
         hours: engine.hours,
         installHours: engine.installHours,
+        instrumentKey: engine.instrumentKey,
         status: engine.status,
       },
       ...catalog,
@@ -150,6 +166,10 @@ export default class BoatEquipmentController {
         session.flash('error', i18n.t('flash.engine.notFound'))
         response.redirect(`/boats/${boat.id}`)
         return
+      }
+      if (error instanceof BoatEngineInstrumentKeyTakenError) {
+        session.flash('error', i18n.t('flash.engine.instrumentKeyTaken'))
+        return response.redirect().back()
       }
       throw error
     }
@@ -505,6 +525,7 @@ export default class BoatEquipmentController {
         powerHp: engine.powerHp,
         hours: engine.hours,
         installHours: engine.installHours,
+        instrumentKey: engine.instrumentKey,
         status: engine.status,
         notes: engine.notes,
         documents: engineMedia.filter((m) => m.kind === 'document').map(toMediaRow),

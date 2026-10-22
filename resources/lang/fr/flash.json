@@ -10,7 +10,8 @@
     "added": "Moteur ajouté.",
     "updated": "Moteur mis à jour.",
     "removed": "Moteur supprimé.",
-    "notFound": "Moteur introuvable."
+    "notFound": "Moteur introuvable.",
+    "instrumentKeyTaken": "Un autre moteur de ce bateau utilise déjà cet identifiant d’instrument."
   },
   "sail": {
     "added": "Voile ajoutée.",

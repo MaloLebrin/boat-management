@@ -51,6 +51,8 @@
     "closeBtn": "Clôturer"
   },
   "entries": {
+    "fromInstruments": "Instruments",
+    "fromInstrumentsTitle": "Point enregistré automatiquement par les instruments du bord",
     "addPoint": "+ Ajouter un point",
     "addTitle": "Nouveau point de log",
     "submitPoint": "Enregistrer le point",

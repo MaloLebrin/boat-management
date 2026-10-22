@@ -109,6 +109,36 @@ L'acquisition ne tourne que l'onglet ouvert : le flux est coupé quand la page p
 
 **Réserve — go/no-go iOS.** La matrice contenu mixte mesurée sur téléphone (document d'épopée, « Encore ouvert ») n'était pas consignée à l'ouverture de cette PR. L'onglet reste utile quel que soit le résultat (dernières valeurs, historique, configuration), mais le flux depuis un iPhone dépend de cette mesure : un serveur à certificat de confiance (nom DNS) est le seul chemin sans manipulation sur l'appareil.
 
+## Synchronisation métier (PR 4, #991)
+
+`TelemetryIngested` est écouté par `OnTelemetryIngested` (`app/listeners/`), enregistré dans `start/events.ts`. Un lot entièrement rejoué (`accepted === 0`) est ignoré ; une panne de synchro est journalisée et **jamais propagée** à l'ingestion (les échantillons sont déjà écrits). Le listener lit la **dernière valeur en base** de chaque chemin utile (`TelemetryReadService.latestForPaths`) : un lot reçu en retard ne peut pas ramener le bateau en arrière.
+
+### Heures moteur (`EngineHoursSyncService`, D6)
+
+`boat_engines.instrument_key` (unique par bateau, saisi dans le formulaire moteur — un segment `[A-Za-z0-9_-]`, 40 caractères max) désigne le `<id>` de `propulsion.<id>.runTime`. `instrument_run_time_s` est la **base** du dernier `runTime` synchronisé. Décision (`decideRunTimeSync`) :
+
+| Situation                    | Effet                                                                                              |
+| ---------------------------- | -------------------------------------------------------------------------------------------------- |
+| pas de base                  | pose la base, `hours` inchangé (le compteur absolu du calculateur n'est jamais copié dans `hours`) |
+| `runTime` < base             | reset du calculateur : re-base, `hours` inchangé, warning journalisé                               |
+| ≥ 1 h entière depuis la base | `hours += floor((runTime − base)/3600)`, base avancée de `n × 3600` (le reliquat attend)           |
+| sinon                        | rien                                                                                               |
+
+L'écriture passe par `BoatEngineService.incrementHoursFromInstruments` (monotone, sans utilisateur) dans une transaction avec verrou de ligne : deux lots simultanés ne comptent pas deux fois la même heure. Changer l'`instrument_key` d'un moteur efface sa base ; une clé déjà prise sur le bateau est refusée (`BoatEngineInstrumentKeyTakenError`, flash `flash.engine.instrumentKeyTaken`). `runTime` négatif ou non fini : ignoré.
+
+### Position et journal (`PositionSyncService`)
+
+Sur `navigation.position` (valeur `{ latitude, longitude }` validée : finie, |lat| ≤ 90, |lon| ≤ 180), avec SOG (m/s → nœuds) et COG (rad → °) les plus récents :
+
+- `BoatPositionService.storeInstrumentPosition` : fix plus ancien que la ligne `kind='position'` ouverte → ignoré ; ligne ouverte, **rafraîchie il y a moins de 5 min** et **à moins de 100 m** (`haversineDistanceMeters`) → **mise à jour en place** ; sinon `closeOpenOfKind('position')` puis insertion `source: 'gps'` (`startedAt` = horloge du client). Réglages dans `shared/constants/instrument_sync.ts`.
+- Sortie `in_progress` (et fix postérieur au départ) : un `navigation_log_entries` **toutes les 10 min** au plus, `source: 'instruments'`, avec cog/sog, `twd_deg` (`environment.wind.directionTrue`), `twa_deg` (`environment.wind.angleTrueWater`) et `weather_snapshot` (`depthM`, `waterTemperatureC`, `windSpeedKn` quand connus).
+
+### Interface
+
+- Formulaire moteur : champ « Identifiant instruments » (`instrumentKey`).
+- Clôture de trajet : `NavigationLogCloseForm` préremplit `engineHoursEnd` avec les heures du moteur tenu par les instruments (moteur unique, ou celui choisi) ; un moteur à saisie manuelle n'écrase pas ce qui est tapé.
+- Journal : badge « Instruments » sur les points automatiques.
+
 ## Fichiers
 
 ```
@@ -118,7 +148,8 @@ app/controllers/instrument_sources_controller.ts, boat_telemetry_controller.ts
 app/policies/instrument_source_policy.ts
 app/transformers/instrument_transformer.ts
 app/validators/instruments.ts
-app/events/telemetry_ingested.ts
+app/events/telemetry_ingested.ts, app/listeners/on_telemetry_ingested.ts
+app/services/engine_hours_sync_service.ts, position_sync_service.ts
 app/exceptions/instrument_errors.ts
 app/utils/csp_connect_src.ts
 shared/types/instruments.ts, shared/constants/instruments.ts, shared/helpers/instruments.ts

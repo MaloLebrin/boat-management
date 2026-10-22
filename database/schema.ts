@@ -454,6 +454,8 @@ export class BoatEngineSchema extends BaseModel {
     'hours',
     'id',
     'installHours',
+    'instrumentKey',
+    'instrumentRunTimeS',
     'kind',
     'manufacturedAt',
     'model',
@@ -484,6 +486,10 @@ export class BoatEngineSchema extends BaseModel {
   declare id: number
   @column()
   declare installHours: number | null
+  @column()
+  declare instrumentKey: string | null
+  @column()
+  declare instrumentRunTimeS: number | null
   @column()
   declare kind: string
   @column.date()
@@ -2769,6 +2775,7 @@ export class NavigationLogEntrySchema extends BaseModel {
     'recordedAt',
     'sailConfig',
     'sogKn',
+    'source',
     'twaDeg',
     'twdDeg',
     'updatedAt',
@@ -2797,6 +2804,8 @@ export class NavigationLogEntrySchema extends BaseModel {
   declare recordedAt: DateTime
   @column()
   declare sailConfig: string | null
+  @column()
+  declare source: string
   @column()
   declare sogKn: string | null
   @column()

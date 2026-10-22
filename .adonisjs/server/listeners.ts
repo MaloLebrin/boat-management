@@ -24,6 +24,7 @@ export const listeners = {
   OnPublicBookingRequested: () => import('#listeners/on_public_booking_requested'),
   OnReservationChanged: () => import('#listeners/on_reservation_changed'),
   OnSimulatorLeadCreated: () => import('#listeners/on_simulator_lead_created'),
+  OnTelemetryIngested: () => import('#listeners/on_telemetry_ingested'),
   SendAiTokenQuotaNotification: () => import('#listeners/send_ai_token_quota_notification'),
   SendStorageQuotaNotification: () => import('#listeners/send_storage_quota_notification'),
 }

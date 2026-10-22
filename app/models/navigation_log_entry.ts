@@ -2,6 +2,7 @@ import NavigationLog from '#models/navigation_log'
 import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import type { NavigationLogEntrySource } from '#shared/types/navigation_log'
 
 export default class NavigationLogEntry extends BaseModel {
   static table = 'navigation_log_entries'
@@ -38,6 +39,10 @@ export default class NavigationLogEntry extends BaseModel {
 
   @column()
   declare note: string | null
+
+  /** `manual` (saisie, rafale GPS) ou `instruments` (point posé par la synchro Signal K, #991). */
+  @column()
+  declare source: NavigationLogEntrySource
 
   // Réservés à l'itération météo (cache GRIB offline) — jamais écrits aujourd'hui.
   @column()

@@ -30,3 +30,52 @@ export function normalizeInstrumentBaseUrl(raw: string): string | null {
 
   return url.origin
 }
+
+const SECONDS_PER_HOUR = 3600
+const MS_TO_KNOTS = 1.943_84
+
+/**
+ * Ce que la synchronisation des heures moteur doit faire d'un `runTime` lu sur
+ * le calculateur (#991, D6) :
+ *
+ * - `init` — aucune base : on la pose, sans incrémenter (le compteur absolu du
+ *   calculateur n'a rien à voir avec `hours`, saisi à l'installation) ;
+ * - `rebase` — `runTime` sous la base : le calculateur a été remis à zéro ou
+ *   remplacé, on repart de la nouvelle valeur ;
+ * - `increment` — au moins une heure entière écoulée depuis la base ;
+ * - `none` — moins d'une heure : le reliquat attend le lot suivant.
+ */
+export type RunTimeSyncDecision =
+  | { action: 'init'; baseS: number }
+  | { action: 'rebase'; baseS: number }
+  | { action: 'increment'; hours: number }
+  | { action: 'none' }
+
+export function decideRunTimeSync(runTimeS: number, baseS: number | null): RunTimeSyncDecision {
+  const current = Math.floor(runTimeS)
+  if (baseS === null) return { action: 'init', baseS: current }
+  if (current < baseS) return { action: 'rebase', baseS: current }
+  const hours = Math.floor((current - baseS) / SECONDS_PER_HOUR)
+  return hours > 0 ? { action: 'increment', hours } : { action: 'none' }
+}
+
+/** Chemin Signal K du compteur d'heures d'un moteur. */
+export function engineRunTimePath(instrumentKey: string): string {
+  return `propulsion.${instrumentKey}.runTime`
+}
+
+/** m/s → nœuds, arrondi au centième. */
+export function metersPerSecondToKnots(value: number): number {
+  return Math.round(value * MS_TO_KNOTS * 100) / 100
+}
+
+/** Radians → degrés entiers dans [0, 360). */
+export function radiansToDegrees(value: number): number {
+  const degrees = Math.round((value * 180) / Math.PI) % 360
+  return degrees < 0 ? degrees + 360 : degrees
+}
+
+/** Kelvin → °C, arrondi au dixième. */
+export function kelvinToCelsius(value: number): number {
+  return Math.round((value - 273.15) * 10) / 10
+}

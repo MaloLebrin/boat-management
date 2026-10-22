@@ -14,6 +14,7 @@ export function toBoatEngineDetail(engine: BoatEngine) {
     powerKw: engine.powerKw,
     hours: engine.hours,
     installHours: engine.installHours,
+    instrumentKey: engine.instrumentKey,
     strokeType: engine.strokeType,
     // Famille de motorisation (#574) — décide de la nomenclature de pièces.
     family: engine.family,

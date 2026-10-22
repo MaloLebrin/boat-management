@@ -22,8 +22,8 @@ describe('toNavigationEngineOptions', () => {
     ])
 
     expect(options).toEqual([
-      { id: 1, label: 'Yanmar 4JH' },
-      { id: 2, label: 'Volvo D2' },
+      { id: 1, label: 'Yanmar 4JH', instrumentHours: null },
+      { id: 2, label: 'Volvo D2', instrumentHours: null },
     ])
   })
 
@@ -40,7 +40,7 @@ describe('toNavigationEngineOptions', () => {
   test('falls back to #id when brand and model are empty', () => {
     const options = toNavigationEngineOptions(t, [engine({ id: 9, brand: null, model: null })])
 
-    expect(options).toEqual([{ id: 9, label: '#9' }])
+    expect(options).toEqual([{ id: 9, label: '#9', instrumentHours: null }])
   })
 
   test('appends the serial number to the label when the engine has one (#601)', () => {
@@ -48,7 +48,9 @@ describe('toNavigationEngineOptions', () => {
       engine({ id: 1, brand: 'Yanmar', model: '4JH', serialNumber: 'SN-42' }),
     ])
 
-    expect(options).toEqual([{ id: 1, label: 'Yanmar 4JH · translated:boats.engines.sn SN-42' }])
+    expect(options).toEqual([
+      { id: 1, label: 'Yanmar 4JH · translated:boats.engines.sn SN-42', instrumentHours: null },
+    ])
   })
 
   test('appends the engine cycle between the name and the serial number', () => {
@@ -62,8 +64,13 @@ describe('toNavigationEngineOptions', () => {
         id: 1,
         label:
           'Yanmar 4JH · translated:boats.options.strokeTypeShort.2_stroke · translated:boats.engines.sn SN-42',
+        instrumentHours: null,
       },
-      { id: 2, label: '#2 · translated:boats.options.strokeTypeShort.4_stroke' },
+      {
+        id: 2,
+        label: '#2 · translated:boats.options.strokeTypeShort.4_stroke',
+        instrumentHours: null,
+      },
     ])
   })
 
@@ -72,6 +79,16 @@ describe('toNavigationEngineOptions', () => {
       engine({ id: 1, kind: 'outboard', fuel: 'essence' }),
     ])
 
-    expect(options).toEqual([{ id: 1, label: 'Yanmar 4JH' }])
+    expect(options).toEqual([{ id: 1, label: 'Yanmar 4JH', instrumentHours: null }])
+  })
+
+  test('exposes the hours only for engines whose hours come from the instruments (#991)', () => {
+    const options = toNavigationEngineOptions(t, [
+      engine({ id: 1, hours: 812, instrumentKey: 'port' }),
+      engine({ id: 2, hours: 640, instrumentKey: null }),
+      engine({ id: 3, hours: null, instrumentKey: 'starboard' }),
+    ])
+
+    expect(options.map((o) => o.instrumentHours)).toEqual([812, null, null])
   })
 })

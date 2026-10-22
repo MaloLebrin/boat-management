@@ -76,6 +76,11 @@ export type BoatEnginePayload = {
   manufacturedAt?: Date | string | DateTime | null
   powerHp?: number | null
   installHours?: number | null
+  /**
+   * `<id>` Signal K du moteur (`propulsion.<id>.runTime`, #991). `null` = pas
+   * de synchronisation des heures par les instruments.
+   */
+  instrumentKey?: string | null
   status?: string | null
 }
 

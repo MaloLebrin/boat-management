@@ -10,6 +10,7 @@ import NavigationLogEntry from '#models/navigation_log_entry'
 import type Boat from '#models/boat'
 import type {
   ConflictLogEntrySnapshot,
+  InstrumentNavigationLogEntryPayload,
   CreateNavigationLogEntryPayload,
   UpdateNavigationLogEntryPayload,
 } from '#shared/types/navigation_log'
@@ -66,6 +67,36 @@ export default class NavigationLogEntryService {
       .where('navigationLogId', log.id)
       .orderBy('recordedAt', 'asc')
       .orderBy('id', 'asc')
+  }
+
+  /** Le dernier point posé par les instruments sur cette sortie (#991), pour espacer les suivants. */
+  async lastInstrumentEntry(log: NavigationLog) {
+    return await NavigationLogEntry.query()
+      .where('navigationLogId', log.id)
+      .where('source', 'instruments')
+      .orderBy('recordedAt', 'desc')
+      .first()
+  }
+
+  /**
+   * Point de journal automatique (#991) : posé par la synchronisation, jamais
+   * par un utilisateur — d'où l'absence de contrôle de statut (l'appelant a
+   * déjà choisi la sortie `in_progress`) et la `source` figée.
+   */
+  async createFromInstruments(log: NavigationLog, payload: InstrumentNavigationLogEntryPayload) {
+    return await NavigationLogEntry.create({
+      navigationLogId: log.id,
+      organizationId: log.organizationId,
+      recordedAt: payload.recordedAt,
+      latitude: String(payload.latitude),
+      longitude: String(payload.longitude),
+      cogDeg: payload.cogDeg,
+      sogKn: toDecimalString(payload.sogKn),
+      twdDeg: payload.twdDeg,
+      twaDeg: payload.twaDeg,
+      weatherSnapshot: payload.weatherSnapshot,
+      source: 'instruments',
+    })
   }
 
   async createForLog(

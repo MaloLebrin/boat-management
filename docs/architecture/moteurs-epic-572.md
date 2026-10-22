@@ -22,6 +22,8 @@ corpus de trois marques codées en dur. Le seeder sandbox créait pourtant déj�
 
 ### Suivis dans la foulée
 
+> **Instruments de bord (#991).** `boat_engines.instrument_key` (identifiant Signal K, unique par bateau) et `instrument_run_time_s` (base du dernier `runTime`) permettent à la télémétrie de faire avancer `hours` par heures entières, sans jamais copier le compteur absolu du calculateur. Voir `docs/domain/instruments.md`.
+
 | PR                                                             | Issue | Contenu                                                                                                                                                                   |
 | -------------------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | —                                                              | —     | Marques trouvables sous leurs alias dans la combobox (Mariner, Evinrude, VP…) — `listBrands()` ne servait pas `aliases`, la liste était aveugle aux anciens noms.         |
