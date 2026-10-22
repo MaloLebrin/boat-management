@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import InstrumentAlertRulesEditor from '~/components/boats/show/tabs/instruments/InstrumentAlertRulesEditor.vue'
+import InstrumentAlertsList from '~/components/boats/show/tabs/instruments/InstrumentAlertsList.vue'
 import InstrumentAlarmsList from '~/components/boats/show/tabs/instruments/InstrumentAlarmsList.vue'
 import InstrumentCategoryGrid from '~/components/boats/show/tabs/instruments/InstrumentCategoryGrid.vue'
 import InstrumentConnectionBanner from '~/components/boats/show/tabs/instruments/InstrumentConnectionBanner.vue'
@@ -11,6 +13,8 @@ import { useInstrumentStream } from '~/composables/use_instrument_stream'
 import { useT } from '~/composables/use_t'
 import { useTelemetrySync } from '~/composables/use_telemetry_sync'
 import { buildReadings } from '~/lib/signalk/display'
+import { mergeInstrumentAlerts } from '~/utils/instrument_alerts'
+import { alertRuleSpecs } from '#shared/helpers/instrument_alerts'
 import type { InstrumentSeries, InstrumentsTabProps } from '#shared/types/instruments'
 
 const props = defineProps<{ boatId: number; instruments: InstrumentsTabProps }>()
@@ -33,6 +37,7 @@ const sync = useTelemetrySync({
 })
 const stream = useInstrumentStream({
   source: () => (canStream.value ? source.value : null),
+  alertRules: () => alertRuleSpecs(props.instruments.rules),
   onSamples: (samples) => sync.push(samples),
 })
 
@@ -40,6 +45,18 @@ const now = ref(Date.now())
 let clock: ReturnType<typeof setInterval> | null = null
 
 const readings = computed(() => buildReadings(props.instruments.latest, stream.latestByPath.value))
+const alerts = computed(() =>
+  mergeInstrumentAlerts(props.instruments.openAlerts, stream.localAlerts.value)
+)
+/** Les instruments numériques déjà reçus : les seuls sur lesquels poser une règle. */
+const rulePaths = computed(() =>
+  readings.value
+    .filter((reading) => reading.value !== null)
+    .map((reading) => ({
+      value: reading.path,
+      label: `${t(reading.labelKey)} · ${reading.instance}`,
+    }))
+)
 const alarmReadings = computed(() =>
   readings.value.filter((reading) => reading.category === 'notifications')
 )
@@ -91,10 +108,17 @@ onBeforeUnmount(() => {
         :paths="historyPaths"
         :series="page.props.instrumentSeries"
       />
+      <InstrumentAlertsList :alerts="alerts" />
       <InstrumentAlarmsList :readings="alarmReadings" />
     </template>
     <InstrumentEmptyState v-else :can-manage="instruments.can.manage" />
 
+    <InstrumentAlertRulesEditor
+      v-if="instruments.can.manage && source"
+      :boat-id="boatId"
+      :rules="instruments.rules"
+      :paths="rulePaths"
+    />
     <InstrumentSourceForm v-if="instruments.can.manage" :boat-id="boatId" :source="source" />
   </div>
 </template>

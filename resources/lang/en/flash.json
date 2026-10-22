@@ -622,7 +622,13 @@
     "batchTooLarge": "The telemetry batch is too large.",
     "pathNotAllowed": "The telemetry batch contains an unsupported instrument path.",
     "recordedAtInvalid": "The telemetry batch carries an invalid or future timestamp. Check the device clock.",
-    "valueInvalid": "The telemetry batch contains an invalid value."
+    "valueInvalid": "The telemetry batch contains an invalid value.",
+    "ruleSaved": "Alert rule saved.",
+    "ruleDeleted": "Alert rule deleted.",
+    "ruleDuplicate": "A rule already exists for this instrument and operator.",
+    "ruleLimit": "Maximum number of rules reached for this boat.",
+    "rulePathInvalid": "This instrument cannot carry a threshold rule.",
+    "ruleNotFound": "This alert rule no longer exists."
   },
   "inventory": {
     "itemCreated": "Item added to the inventory.",

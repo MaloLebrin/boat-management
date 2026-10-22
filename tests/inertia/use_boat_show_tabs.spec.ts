@@ -226,3 +226,37 @@ describe('useBoatShowTabs — onglet Instruments (#990)', () => {
     expect(activeGroupKey.value).toBe('navigation')
   })
 })
+
+describe('useBoatShowTabs — pastille des alertes d’instruments (#993)', () => {
+  function badgeFor(count: number | undefined) {
+    let result!: ReturnType<typeof useBoatShowTabs>
+    mount(
+      defineComponent({
+        setup() {
+          result = useBoatShowTabs({
+            maintenanceTasks: () => [],
+            boatDocuments: () => [],
+            incidents: () => [],
+            pricingEnabled: () => false,
+            instrumentsEnabled: () => true,
+            ...(count === undefined ? {} : { instrumentAlertCount: () => count }),
+          })
+          return {}
+        },
+        template: '<div />',
+      })
+    )
+    return result.activeGroupSubTabs.value.length === 0
+      ? undefined
+      : result.groupTabs.value.find((group) => group.key === 'navigation')?.badge
+  }
+
+  test('affiche le nombre d’alertes ouvertes sur le groupe navigation', () => {
+    expect(badgeFor(3)).toBe('3')
+  })
+
+  test('aucune pastille sans alerte ni compteur', () => {
+    expect(badgeFor(0)).toBeUndefined()
+    expect(badgeFor(undefined)).toBeUndefined()
+  })
+})

@@ -109,5 +109,45 @@
       "24h": "24 heures",
       "7d": "7 jours"
     }
+  },
+  "alerts": {
+    "title": "Alertes",
+    "none": "Aucune alerte ouverte.",
+    "openedAt": "Ouverte {date}",
+    "lastValue": "Dernière valeur : {value}",
+    "local": "Détectée à bord",
+    "builtin": {
+      "battery_low": "Batterie faible",
+      "engine_hot": "Température moteur élevée",
+      "shallow_water": "Petit fond",
+      "signalk_alarm": "Alarme Signal K"
+    },
+    "severity": {
+      "warning": "Avertissement",
+      "critical": "Critique"
+    },
+    "operator": {
+      "lt": "inférieur à",
+      "gt": "supérieur à"
+    },
+    "editor": {
+      "title": "Règles d’alerte",
+      "description": "Les règles intégrées (batterie, température moteur, petit fond, alarmes Signal K) sont toujours actives. Ajoutez vos propres seuils ci-dessous.",
+      "path": "Instrument",
+      "operator": "Condition",
+      "threshold": "Seuil ({unit})",
+      "hysteresis": "Marge de retour ({unit})",
+      "hysteresisHint": "L’alerte ne se lève qu’une fois la valeur revenue au-delà de cette marge.",
+      "severity": "Gravité",
+      "enabled": "Active",
+      "add": "Ajouter la règle",
+      "save": "Enregistrer",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer cette règle ?",
+      "empty": "Aucune règle personnalisée.",
+      "pathPlaceholder": "Choisir un instrument",
+      "rule": "{path} {operator} {threshold} {unit}",
+      "limit": "Limite de règles atteinte."
+    }
   }
 }

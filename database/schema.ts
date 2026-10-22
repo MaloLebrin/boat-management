@@ -833,6 +833,90 @@ export class BoatInspectionSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatInstrumentAlertRuleSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'createdAt',
+    'enabled',
+    'hysteresis',
+    'id',
+    'operator',
+    'organizationId',
+    'path',
+    'severity',
+    'threshold',
+    'updatedAt',
+  ] as const
+  $columns = BoatInstrumentAlertRuleSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare enabled: boolean
+  @column()
+  declare hysteresis: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare operator: string
+  @column()
+  declare organizationId: number
+  @column()
+  declare path: string
+  @column()
+  declare severity: string
+  @column()
+  declare threshold: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class BoatInstrumentAlertSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'clearedAt',
+    'createdAt',
+    'id',
+    'lastValue',
+    'message',
+    'openedAt',
+    'organizationId',
+    'path',
+    'ruleId',
+    'ruleKey',
+    'severity',
+    'updatedAt',
+  ] as const
+  $columns = BoatInstrumentAlertSchema.$columns
+  @column()
+  declare boatId: number
+  @column.dateTime()
+  declare clearedAt: DateTime | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare lastValue: string | null
+  @column()
+  declare message: string | null
+  @column.dateTime()
+  declare openedAt: DateTime
+  @column()
+  declare organizationId: number
+  @column()
+  declare path: string
+  @column()
+  declare ruleId: number | null
+  @column()
+  declare ruleKey: string
+  @column()
+  declare severity: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatInstrumentSourceSchema extends BaseModel {
   static $columns = [
     'baseUrl',

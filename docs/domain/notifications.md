@@ -144,11 +144,14 @@ matrice complète validée par `updateNotificationPreferencesValidator`).
 
 ### Événements d'équipe (#888)
 
-| Event                | Émis depuis                                              | `type`                                                         | `actionUrl`                        |
-| -------------------- | -------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------- |
-| `ReservationChanged` | `BoatReservationService.create` / `update` (statut)      | `reservation.created` / `reservation.confirmed` / `.cancelled` | `/boats/:id/reservations`          |
-| `IncidentChanged`    | `BoatIncidentService.createForBoat` / passage à `closed` | `incident.created` (`error`) / `incident.resolved`             | `/boats/:id/incidents/:incidentId` |
-| `InvoicePaid`        | `InvoiceService.markAsPaid` (règlement manuel)           | `invoice.paid`                                                 | `/invoices/:id`                    |
+| Event                | Émis depuis                                              | `type`                                                                                       | `actionUrl`                        |
+| -------------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `ReservationChanged` | `BoatReservationService.create` / `update` (statut)      | `reservation.created` / `reservation.confirmed` / `.cancelled`                               | `/boats/:id/reservations`          |
+| `IncidentChanged`    | `BoatIncidentService.createForBoat` / passage à `closed` | `incident.created` (`error`) / `incident.resolved`                                           | `/boats/:id/incidents/:incidentId` |
+| `InvoicePaid`        | `InvoiceService.markAsPaid` (règlement manuel)           | `invoice.paid`                                                                               | `/invoices/:id`                    |
+| `TelemetryIngested`  | `InstrumentAlertService.evaluate` (listener, #993)       | `instrument.alert_opened` (`warning`/`error`, push) / `instrument.alert_cleared` (`success`) | `/boats/:id?tab=instruments`       |
+
+Alertes des instruments (#993) : mêmes destinataires, famille `fleet`, l'ouverture est poussable, la levée in-app seulement ; voir `docs/domain/instruments.md`.
 
 Destinataires : toute l'équipe (`admin`, `member`, `mechanic` — `NotificationAudienceService.staffOf`),
 **auteur exclu**, triée ensuite par les préférences. Le scan quotidien ajoute

@@ -70,3 +70,26 @@ export class TelemetryValueKindMismatchError extends Error {
     super(`Telemetry path "${path}" expects a ${expected} value`)
   }
 }
+
+/** Chemin d'une règle d'alerte : hors catalogue, ou non numérique (#993). */
+export class InstrumentAlertPathInvalidError extends Error {
+  name = 'InstrumentAlertPathInvalidError'
+
+  constructor(readonly path: string) {
+    super(`Alert rule path "${path}" is not a numeric catalog path`)
+  }
+}
+
+/** Une règle existe déjà pour ce chemin et cet opérateur sur le bateau (#993). */
+export class InstrumentAlertRuleDuplicateError extends Error {
+  name = 'InstrumentAlertRuleDuplicateError'
+}
+
+/** Plafond de règles par bateau atteint (#993). */
+export class InstrumentAlertRuleLimitError extends Error {
+  name = 'InstrumentAlertRuleLimitError'
+}
+
+export class InstrumentAlertRuleNotFoundError extends Error {
+  name = 'InstrumentAlertRuleNotFoundError'
+}

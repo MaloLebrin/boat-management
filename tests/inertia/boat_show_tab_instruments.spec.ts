@@ -48,6 +48,7 @@ vi.mock('~/composables/use_instrument_stream', () => ({
     errorKey: { value: null },
     latestByPath: streamState.latest,
     lastDeltaAt: { value: null },
+    localAlerts: { value: {} },
     staleSince: { value: {} },
     start: streamState.start,
     stop: streamState.stop,
@@ -108,6 +109,8 @@ function props(overrides: Partial<InstrumentsTabProps> = {}): InstrumentsTabProp
       },
     ],
     recent: {},
+    rules: [],
+    openAlerts: [],
     can: { manage: true, ingest: true },
     ...overrides,
   }
@@ -392,6 +395,39 @@ describe('BoatShowTabInstruments', () => {
   test('source sans aucune mesure : message d’attente', async () => {
     const wrapper = mountTab(props({ latest: [] }))
     expect(wrapper.text()).toContain('instruments.noData')
+  })
+
+  test('alertes ouvertes et éditeur de règles pour l’admin (#993)', async () => {
+    const wrapper = mountTab(
+      props({
+        openAlerts: [
+          {
+            id: 1,
+            ruleKey: 'builtin:battery_low',
+            path: 'electrical.batteries.house.capacity.stateOfCharge',
+            severity: 'warning',
+            openedAt: '2026-10-19T09:00:00Z',
+            clearedAt: null,
+            lastValue: 0.1,
+            message: null,
+          },
+        ],
+      })
+    )
+    await flushPromises()
+
+    expect(wrapper.findAll('[data-testid="instrument-alert"]')).toHaveLength(1)
+    expect(wrapper.find('[data-testid="instrument-alert-rules"]').exists()).toBe(true)
+  })
+
+  test('sans droit de gestion ou sans source : pas d’éditeur de règles (#993)', async () => {
+    const reader = mountTab(props({ can: { manage: false, ingest: true } }))
+    await flushPromises()
+    expect(reader.find('[data-testid="instrument-alert-rules"]').exists()).toBe(false)
+    expect(reader.find('[data-testid="instrument-alerts"]').exists()).toBe(true)
+
+    const noSource = mountTab(props({ source: null, latest: [] }))
+    expect(noSource.find('[data-testid="instrument-alert-rules"]').exists()).toBe(false)
   })
 })
 

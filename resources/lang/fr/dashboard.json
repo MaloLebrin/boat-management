@@ -96,13 +96,15 @@
       "maintenance": "Maintenance",
       "incident": "Incident",
       "document": "Document",
-      "invoice": "Facture"
+      "invoice": "Facture",
+      "instrument": "Instrument"
     },
     "chips": {
       "maintenance": "{count, plural, one {# tâche} other {# tâches}}",
       "incidents": "{count, plural, one {# incident} other {# incidents}}",
       "documents": "{count, plural, one {# document} other {# documents}}",
-      "invoices": "{count, plural, one {# facture impayée} other {# factures impayées}}"
+      "invoices": "{count, plural, one {# facture impayée} other {# factures impayées}}",
+      "instruments": "{count, plural, one {# alerte} other {# alertes}}"
     },
     "kind": {
       "overdue": "En retard",
@@ -112,7 +114,8 @@
       "incidentInProgress": "En cours",
       "documentExpired": "Expiré",
       "documentExpiring": "Expire bientôt",
-      "invoiceOverdue": "Impayée"
+      "invoiceOverdue": "Impayée",
+      "instrumentAlert": "Alerte d’instrument"
     },
     "detail": {
       "dueAt": "Dû le {date}",
@@ -121,7 +124,8 @@
       "expiresAt": "Expire le {date}",
       "expiredOn": "Expiré le {date}",
       "invoice": "Facture {number} · {total}",
-      "invoiceDue": "Échéance le {date}"
+      "invoiceDue": "Échéance le {date}",
+      "instrumentOpenedOn": "Ouverte le {date}"
     }
   },
   "atSea": {

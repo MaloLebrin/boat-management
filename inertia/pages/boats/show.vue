@@ -103,6 +103,7 @@ const {
   incidents: () => props.incidents,
   pricingEnabled: () => props.pricingEnabled,
   instrumentsEnabled: () => effectiveQuotas.value?.canConnectInstruments === true,
+  instrumentAlertCount: () => props.instruments?.openAlerts.length ?? 0,
   initialTabParam: () => props.initialTab,
 })
 

@@ -26,6 +26,9 @@ export const PUSHABLE_NOTIFICATION_TYPES: readonly NotificationType[] = [
   'reservation.cancelled',
   'reservation.starts_tomorrow',
   'incident.created',
+  // Alerte d'instrument ouverte (#993) : batterie basse, surchauffe, petit fond.
+  // La levée reste in-app : personne n'a à agir.
+  'instrument.alert_opened',
   // Facture réglée en ligne par le client (#876) : de l'argent arrivé.
   'invoice.paid_online',
   // Facture passée en retard (#878) : de l'argent qui n'est pas arrivé. Les

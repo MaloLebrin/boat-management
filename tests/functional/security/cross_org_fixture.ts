@@ -45,6 +45,7 @@ import { BoatInspectionFactory } from '#database/factories/boat_inspection_facto
 import { NotificationFactory } from '#database/factories/notification_factory'
 import { PricingSeasonFactory } from '#database/factories/pricing_season_factory'
 import { OrganizationInvitationFactory } from '#database/factories/organization_invitation_factory'
+import { BoatInstrumentAlertRuleFactory } from '#database/factories/boat_instrument_alert_rule_factory'
 import { createMemberUser } from '#tests/functional/helpers'
 import InventoryItem from '#models/inventory_item'
 import PurchaseOrder from '#models/purchase_order'
@@ -65,6 +66,7 @@ export interface CrossOrgIds {
   partId: number
   mediaId: number
   incidentId: number
+  alertRuleId: number
   taskId: number
   eventId: number
   fuelLogId: number
@@ -317,6 +319,11 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
     unitCost: 10,
   })
 
+  const alertRule = await BoatInstrumentAlertRuleFactory.merge({
+    boatId: boat.id,
+    organizationId: orgId,
+  }).create()
+
   return {
     boatId: boat.id,
     engineId: engine.id,
@@ -324,6 +331,7 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
     partId: part.id,
     mediaId: media.id,
     incidentId: incident.id,
+    alertRuleId: alertRule.id,
     taskId: task.id,
     eventId: event.id,
     fuelLogId: fuelLog.id,

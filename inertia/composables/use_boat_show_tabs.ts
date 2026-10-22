@@ -46,6 +46,8 @@ export function useBoatShowTabs(input: {
   pricingEnabled: () => boolean
   /** Plan Pro ou Entreprise (`canConnectInstruments`) : l'onglet Instruments n'existe pas sinon. */
   instrumentsEnabled: () => boolean
+  /** Alertes d'instruments ouvertes (#993) : pastille de l'onglet Instruments. */
+  instrumentAlertCount?: () => number
   /**
    * Valeur brute du `?tab=` telle que vue par le serveur. Fournie en prop pour
    * que le rendu SSR parte du bon onglet : lire `window.location` seul faisait
@@ -69,6 +71,11 @@ export function useBoatShowTabs(input: {
   const openIncidents = computed(() =>
     (input.incidents() ?? []).filter((i) => i.status === 'open' || i.status === 'in_progress')
   )
+
+  const instrumentAlertBadge = computed(() => {
+    const count = input.instrumentAlertCount?.() ?? 0
+    return count > 0 ? String(count) : undefined
+  })
 
   const groups = computed<Group[]>(() => [
     {
@@ -120,7 +127,13 @@ export function useBoatShowTabs(input: {
         },
         { key: 'position', label: t('boats.show.position.tab') },
         ...(input.instrumentsEnabled()
-          ? [{ key: 'instruments' as const, label: t('instruments.tab') }]
+          ? [
+              {
+                key: 'instruments' as const,
+                label: t('instruments.tab'),
+                badge: instrumentAlertBadge.value,
+              },
+            ]
           : []),
       ],
     },

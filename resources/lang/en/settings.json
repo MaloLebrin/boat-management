@@ -520,6 +520,8 @@
       "boat_status_change": "Boat status changed",
       "boat_instrument_source_update": "Boat instruments source saved",
       "boat_instrument_source_delete": "Boat instruments source removed",
+      "boat_instrument_alert_rule_update": "Instrument alert rule saved",
+      "boat_instrument_alert_rule_delete": "Instrument alert rule deleted",
       "reservation_force_unavailable": "Reservation forced on an unavailable boat",
       "reservation_payment_recorded": "Reservation payment recorded",
       "reservation_security_deposit_held": "Security deposit held",

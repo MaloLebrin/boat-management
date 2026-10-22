@@ -233,6 +233,16 @@
         "title": "New invoice {number}",
         "body": "The manager has sent you invoice {number}."
       }
+    },
+    "instrument": {
+      "alert_opened": {
+        "title": "Alert on {boatName}: {label}",
+        "body": "An instrument alert just opened on {boatName}: {label}."
+      },
+      "alert_cleared": {
+        "title": "Alert cleared on {boatName}",
+        "body": "{label} is back to normal on {boatName}."
+      }
     }
   },
   "title": "Notifications",
@@ -295,7 +305,9 @@
     "owner.maintenance_done": "Work completed",
     "owner.incident_created": "Incident on your boat",
     "owner.document_expiring": "Document to renew",
-    "owner.invoice_sent": "Invoice received"
+    "owner.invoice_sent": "Invoice received",
+    "instrument.alert_opened": "Instrument alert",
+    "instrument.alert_cleared": "Instrument alert cleared"
   },
   "families": {
     "fleet": {

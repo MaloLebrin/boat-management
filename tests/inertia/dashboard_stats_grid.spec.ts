@@ -53,6 +53,7 @@ function mountGrid(
         documentsExpired: 0,
         documentsExpiring: 0,
         invoicesOverdue: 0,
+        instrumentAlerts: 0,
         total: 0,
         ...over.counts,
       },

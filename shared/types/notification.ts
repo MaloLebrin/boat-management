@@ -53,6 +53,8 @@ export type NotificationType =
   | 'owner.incident_created'
   | 'owner.document_expiring'
   | 'owner.invoice_sent'
+  | 'instrument.alert_opened'
+  | 'instrument.alert_cleared'
   | 'export.ready'
   | 'export.failed'
   | (string & {}) // extensible pour les futurs types sans casser le type

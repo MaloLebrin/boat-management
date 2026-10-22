@@ -144,7 +144,7 @@ export default class TelemetryReadService {
     boat: Pick<Boat, 'id'>,
     source: BoatInstrumentSource | null,
     can: InstrumentsTabCapabilities
-  ): Promise<InstrumentsTabProps> {
+  ): Promise<Omit<InstrumentsTabProps, 'rules' | 'openAlerts'>> {
     const [latest, recent] = await Promise.all([this.latestForBoat(boat), this.recentForBoat(boat)])
     return {
       source: source ? this.sourceService.toConnection(source, { revealToken: can.ingest }) : null,

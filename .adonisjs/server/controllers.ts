@@ -69,6 +69,7 @@ export const controllers = {
   Health: () => import('#controllers/health_controller'),
   Home: () => import('#controllers/home_controller'),
   InspectionDocuments: () => import('#controllers/inspection_documents_controller'),
+  InstrumentAlertRules: () => import('#controllers/instrument_alert_rules_controller'),
   InstrumentSources: () => import('#controllers/instrument_sources_controller'),
   Inventory: () => import('#controllers/inventory_controller'),
   InvoicePaymentLinks: () => import('#controllers/invoice_payment_links_controller'),

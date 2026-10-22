@@ -43,6 +43,8 @@ import BoatAvailabilityService from '#services/boat_availability_service'
 import BoatStatusService from '#services/boat_status_service'
 import InstrumentSourceService from '#services/instrument_source_service'
 import TelemetryReadService from '#services/telemetry_read_service'
+import InstrumentAlertService from '#services/instrument_alert_service'
+import InstrumentAlertRuleService from '#services/instrument_alert_rule_service'
 import { toBoatStatusChangeRow } from '#transformers/boat_status_transformer'
 import {
   RegistrationNumberTakenError,
@@ -98,7 +100,9 @@ export default class BoatsController {
     private availabilityService: BoatAvailabilityService,
     private statusService: BoatStatusService,
     private instrumentSourceService: InstrumentSourceService,
-    private telemetryReadService: TelemetryReadService
+    private telemetryReadService: TelemetryReadService,
+    private instrumentAlertService: InstrumentAlertService,
+    private instrumentAlertRuleService: InstrumentAlertRuleService
   ) {}
 
   async index({ inertia, auth, request, bouncer, response }: HttpContext) {
@@ -448,10 +452,15 @@ export default class BoatsController {
       // peut ingérer seulement, D3), dernières valeurs et série récente. Sans
       // le flag de plan, la prop résout une coquille vide — jamais `null` (#478).
       instruments: inertia.defer(
-        deferJson(() => {
+        deferJson(async () => {
           const can = { manage: canManageInstruments, ingest: canIngestTelemetry }
           if (!instrumentsEnabled) return emptyInstrumentsTabProps(can)
-          return this.telemetryReadService.tabProps(boat, instrumentSource, can)
+          const [tab, rules, openAlerts] = await Promise.all([
+            this.telemetryReadService.tabProps(boat, instrumentSource, can),
+            this.instrumentAlertRuleService.listForBoat(boat),
+            this.instrumentAlertService.openForBoat(boat),
+          ])
+          return { ...tab, rules, openAlerts }
         }),
         'instruments'
       ),

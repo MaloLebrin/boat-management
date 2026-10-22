@@ -622,7 +622,13 @@
     "batchTooLarge": "Le lot de télémétrie est trop volumineux.",
     "pathNotAllowed": "Le lot de télémétrie contient un chemin d'instrument non pris en charge.",
     "recordedAtInvalid": "Le lot de télémétrie porte un horodatage invalide ou dans le futur. Vérifiez l'horloge de l'appareil.",
-    "valueInvalid": "Le lot de télémétrie contient une valeur invalide."
+    "valueInvalid": "Le lot de télémétrie contient une valeur invalide.",
+    "ruleSaved": "Règle d’alerte enregistrée.",
+    "ruleDeleted": "Règle d’alerte supprimée.",
+    "ruleDuplicate": "Une règle existe déjà pour cet instrument et cet opérateur.",
+    "ruleLimit": "Nombre maximal de règles atteint pour ce bateau.",
+    "rulePathInvalid": "Cet instrument ne peut pas porter de règle de seuil.",
+    "ruleNotFound": "Cette règle d’alerte n’existe plus."
   },
   "inventory": {
     "itemCreated": "Article ajouté à l'inventaire.",
