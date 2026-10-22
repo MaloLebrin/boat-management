@@ -233,6 +233,16 @@
         "title": "Nouvelle facture {number}",
         "body": "Le gestionnaire vous a adressé la facture {number}."
       }
+    },
+    "instrument": {
+      "alert_opened": {
+        "title": "Alerte sur {boatName} : {label}",
+        "body": "Une alerte d’instrument vient de s’ouvrir sur {boatName} : {label}."
+      },
+      "alert_cleared": {
+        "title": "Alerte levée sur {boatName}",
+        "body": "{label} est revenu à la normale sur {boatName}."
+      }
     }
   },
   "title": "Notifications",
@@ -295,7 +305,9 @@
     "owner.maintenance_done": "Travaux réalisés",
     "owner.incident_created": "Incident sur votre bateau",
     "owner.document_expiring": "Document à renouveler",
-    "owner.invoice_sent": "Facture reçue"
+    "owner.invoice_sent": "Facture reçue",
+    "instrument.alert_opened": "Alerte d’instrument",
+    "instrument.alert_cleared": "Alerte d’instrument levée"
   },
   "families": {
     "fleet": {

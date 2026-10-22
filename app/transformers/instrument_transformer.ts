@@ -1,6 +1,10 @@
+import type BoatInstrumentAlert from '#models/boat_instrument_alert'
+import type BoatInstrumentAlertRule from '#models/boat_instrument_alert_rule'
 import type BoatInstrumentSource from '#models/boat_instrument_source'
 import type { JsonValue } from '#shared/types/notification'
 import type {
+  InstrumentAlertRow,
+  InstrumentAlertRuleRow,
   InstrumentSourceConnection,
   InstrumentSourceRow,
   InstrumentsTabCapabilities,
@@ -54,5 +58,30 @@ export function toIso(value: Date | string): string {
 
 /** La prop différée sans source ni donnée — jamais `null` (#478). */
 export function emptyInstrumentsTabProps(can: InstrumentsTabCapabilities): InstrumentsTabProps {
-  return { source: null, latest: [], recent: {}, can }
+  return { source: null, latest: [], recent: {}, rules: [], openAlerts: [], can }
+}
+
+export function toAlertRuleRow(rule: BoatInstrumentAlertRule): InstrumentAlertRuleRow {
+  return {
+    id: rule.id,
+    path: rule.path,
+    operator: rule.operator,
+    threshold: Number(rule.threshold),
+    hysteresis: Number(rule.hysteresis),
+    severity: rule.severity,
+    enabled: rule.enabled,
+  }
+}
+
+export function toAlertRow(alert: BoatInstrumentAlert): InstrumentAlertRow {
+  return {
+    id: alert.id,
+    ruleKey: alert.ruleKey,
+    path: alert.path,
+    severity: alert.severity,
+    openedAt: alert.openedAt.toISO()!,
+    clearedAt: alert.clearedAt?.toISO() ?? null,
+    lastValue: alert.lastValue === null ? null : Number(alert.lastValue),
+    message: alert.message,
+  }
 }

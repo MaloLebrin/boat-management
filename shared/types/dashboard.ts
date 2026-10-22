@@ -110,11 +110,20 @@ export interface DashboardAttentionInvoice extends DashboardAttentionBase {
   dueAt: string | null
 }
 
+export interface DashboardAttentionInstrument extends DashboardAttentionBase {
+  kind: 'instrument'
+  alertId: number
+  ruleKey: string
+  path: string
+  openedAt: string
+}
+
 export type DashboardAttentionItem =
   | DashboardAttentionMaintenance
   | DashboardAttentionIncident
   | DashboardAttentionDocument
   | DashboardAttentionInvoice
+  | DashboardAttentionInstrument
 
 export interface DashboardAttentionCounts {
   maintenanceOverdue: number
@@ -126,6 +135,8 @@ export interface DashboardAttentionCounts {
   documentsExpired: number
   documentsExpiring: number
   invoicesOverdue: number
+  /** Alertes d'instruments ouvertes (#993). */
+  instrumentAlerts: number
   total: number
 }
 

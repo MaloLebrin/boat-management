@@ -6,6 +6,7 @@ import { useT } from '~/composables/use_t'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useNumberFormat } from '~/composables/use_number_format'
 import { maintenanceSubjectLabel } from '~/utils/boat_enum_labels'
+import { instrumentAlertLabel } from '~/utils/instrument_alert_label'
 
 const props = defineProps<{ item: DashboardAttentionItem }>()
 
@@ -73,6 +74,18 @@ const view = computed(() => {
           item.status === 'expired'
             ? t('dashboard.attention.detail.expiredOn', { date: formatDate(item.expiresAt) })
             : t('dashboard.attention.detail.expiresAt', { date: formatDate(item.expiresAt) }),
+      }
+    case 'instrument':
+      return {
+        title: item.boatName,
+        label: instrumentAlertLabel(t, item.ruleKey, item.path),
+        pill: {
+          text: t('dashboard.attention.kind.instrumentAlert'),
+          tone: (item.severity === 'danger' ? 'danger' : 'warning') as PillTone,
+        },
+        detail: t('dashboard.attention.detail.instrumentOpenedOn', {
+          date: formatDate(item.openedAt),
+        }),
       }
     default:
       return {

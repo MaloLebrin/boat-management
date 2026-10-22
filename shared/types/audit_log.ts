@@ -40,6 +40,8 @@ export const AUDIT_ACTIONS = [
   // le jeton n'est jamais dans la métadonnée, seulement sa présence.
   'boat.instrument_source_update',
   'boat.instrument_source_delete',
+  'boat.instrument_alert_rule_update',
+  'boat.instrument_alert_rule_delete',
   'reservation.force_unavailable',
   // Argent de la location (#875) : encaissements et caution.
   'reservation.payment_recorded',
@@ -212,6 +214,8 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'boat.status_change',
     'boat.instrument_source_update',
     'boat.instrument_source_delete',
+    'boat.instrument_alert_rule_update',
+    'boat.instrument_alert_rule_delete',
   ],
   member: [
     'member.add',

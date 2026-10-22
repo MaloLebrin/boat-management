@@ -37,6 +37,8 @@ const FAMILY_BY_PREFIX: Record<string, NotificationFamily> = {
   document: 'fleet',
   safety_equipment: 'fleet',
   incident: 'fleet',
+  // Alertes des instruments de bord (#993) : un événement de terrain.
+  instrument: 'fleet',
   // Portail propriétaire (#890) : tout ce qui touche son bateau, facture comprise
   // — `billing` est coupée par défaut chez le propriétaire, qui n'y reçoit rien d'autre.
   owner: 'fleet',

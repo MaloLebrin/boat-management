@@ -572,6 +572,24 @@ Append-only. Un échantillon par chemin Signal K et par fenêtre d'agrégation d
 - `createdAt`
 - unique `(source_id, path, recorded_at)` : le rejeu d'un lot est ignoré (`ON CONFLICT DO NOTHING`) ; index `(boat_id, path, recorded_at DESC)` pour « dernière valeur par chemin »
 
+### boat_instrument_alert_rules (#993)
+
+Règle de seuil définie par un admin sur un chemin numérique. Unique `(boat_id, path, operator)`.
+
+- `id`, `boatId` (FK `boats`, `CASCADE`, indexée), `organizationId` (FK `organizations`, `CASCADE`, indexée)
+- `path` (string 96, chemin concret du catalogue, numérique), `operator` (`lt` | `gt`)
+- `threshold`, `hysteresis` (numeric 14,4, **unités SI** — chaînes côté Lucid), `severity` (`warning` | `critical`, défaut `warning`), `enabled` (défaut `true`)
+- `createdAt`, `updatedAt`
+
+### boat_instrument_alerts (#993)
+
+Alerte ouverte (`clearedAt` null) ou levée (historique). Index unique partiel `(boat_id, rule_key, path) WHERE cleared_at IS NULL` : une seule alerte ouverte par règle et par chemin.
+
+- `id`, `boatId` (FK `CASCADE`), `organizationId` (FK `CASCADE`, indexée), `ruleId` (FK `boat_instrument_alert_rules`, `CASCADE`, nullable — null pour une règle intégrée)
+- `ruleKey` (string 60 : `rule:<id>` ou `builtin:<clé>`), `path` (string 96), `severity` (`warning` | `critical`)
+- `openedAt`, `clearedAt` (nullable), `lastValue` (numeric 14,4 nullable, SI), `message` (string 255 nullable — message d'une alarme Signal K)
+- `createdAt`, `updatedAt` ; index `(boat_id, opened_at)`
+
 ### boat_budget_entries
 
 - `id`, `boatId` (indexé)
@@ -1073,7 +1091,7 @@ fait un balayage complet de la table qu'elle est censée borner.
   saisie
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
-- `Boat 1..1 BoatInstrumentSource` via `boat_instrument_sources.boatId` ; `BoatInstrumentSource 1..n BoatTelemetrySample` via `sourceId` (toutes `CASCADE`, #988)
+- `Boat 1..1 BoatInstrumentSource` via `boat_instrument_sources.boatId` ; `BoatInstrumentSource 1..n BoatTelemetrySample` via `sourceId` (toutes `CASCADE`, #988) ; `Boat 1..n BoatInstrumentAlertRule` et `Boat 1..n BoatInstrumentAlert` via `boatId`, `BoatInstrumentAlertRule 1..n BoatInstrumentAlert` via `ruleId` (`CASCADE`, #993)
 - `Boat 1..n BoatPositionHistory` via `boat_position_history.boatId` (cascade) ; `Spot 0..n BoatPositionHistory` via `spotId` (`SET NULL`), sur les seules lignes `kind='berth'` (#722)
 - `Boat 1..n BoatPortStay`
 - `Port 1..n MarinaStay`, `Spot 1..n MarinaStay` (cascade) ; `Boat 0..n MarinaStay`, `Client 0..n MarinaStay`, `Invoice 0..1 MarinaStay` (SET NULL) (#891)

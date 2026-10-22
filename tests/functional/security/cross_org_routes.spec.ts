@@ -116,6 +116,7 @@ function valueFor(name: string, pattern: string, ids: CrossOrgIds): string | nul
     partId: ids.partId,
     mediaId: ids.mediaId,
     incidentId: ids.incidentId,
+    ruleId: ids.alertRuleId,
     taskId: ids.taskId,
     eventId: ids.eventId,
     documentId: ids.documentId,

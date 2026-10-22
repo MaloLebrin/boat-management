@@ -1,5 +1,6 @@
 import BoatDocument from '#models/boat_document'
 import BoatIncident from '#models/boat_incident'
+import BoatInstrumentAlert from '#models/boat_instrument_alert'
 import Invoice from '#models/invoice'
 import type User from '#models/user'
 import { ATTENTION_DISPLAY_CAP, ATTENTION_FETCH_PER_KIND } from '#shared/constants/dashboard'
@@ -11,6 +12,7 @@ import type {
   DashboardAttentionCounts,
   DashboardAttentionDocument,
   DashboardAttentionIncident,
+  DashboardAttentionInstrument,
   DashboardAttentionInvoice,
   DashboardAttentionItem,
   DashboardAttentionMaintenance,
@@ -55,18 +57,20 @@ export default class DashboardAttentionService {
           documentsExpired: 0,
           documentsExpiring: 0,
           invoicesOverdue: 0,
+          instrumentAlerts: 0,
           total: maintenanceOverdue + maintenanceSoon,
         },
         opts.canViewInvoices
       )
     }
 
-    const [incidents, documents, invoices] = await Promise.all([
+    const [incidents, documents, invoices, instruments] = await Promise.all([
       this.fetchIncidents(orgId),
       this.fetchDocuments(orgId, today),
       opts.canViewInvoices
         ? this.fetchInvoices(orgId, today)
         : Promise.resolve({ items: [], total: 0 }),
+      this.fetchInstrumentAlerts(orgId),
     ])
 
     const counts: DashboardAttentionCounts = {
@@ -77,6 +81,7 @@ export default class DashboardAttentionService {
       documentsExpired: documents.expired,
       documentsExpiring: documents.expiring,
       invoicesOverdue: invoices.total,
+      instrumentAlerts: instruments.total,
       total: 0,
     }
     counts.total =
@@ -85,10 +90,17 @@ export default class DashboardAttentionService {
       counts.incidentsOpen +
       counts.documentsExpired +
       counts.documentsExpiring +
-      counts.invoicesOverdue
+      counts.invoicesOverdue +
+      counts.instrumentAlerts
 
     return this.build(
-      [...maintenance, ...incidents.items, ...documents.items, ...invoices.items],
+      [
+        ...maintenance,
+        ...incidents.items,
+        ...documents.items,
+        ...invoices.items,
+        ...instruments.items,
+      ],
       counts,
       opts.canViewInvoices
     )
@@ -271,6 +283,38 @@ export default class DashboardAttentionService {
         clientName: invoice.clientName,
         total: Number.parseFloat(invoice.total),
         dueAt: invoice.dueAt?.toISODate() ?? null,
+      })),
+    }
+  }
+
+  /** Alertes d'instruments ouvertes (#993), la plus ancienne d'abord ; total par fonction fenêtre. */
+  private async fetchInstrumentAlerts(
+    orgId: number
+  ): Promise<{ items: DashboardAttentionInstrument[]; total: number }> {
+    const rows = await BoatInstrumentAlert.query()
+      .where('organizationId', orgId)
+      .whereNull('clearedAt')
+      .preload('boat', (q) => q.select(['id', 'name']))
+      .select('*')
+      .select(db.raw('count(*) over() as window_total'))
+      .orderBy('openedAt', 'asc')
+      .orderBy('id', 'asc')
+      .limit(ATTENTION_FETCH_PER_KIND)
+
+    return {
+      total: Number(rows[0]?.$extras.window_total ?? 0),
+      items: rows.map((alert) => ({
+        kind: 'instrument',
+        key: `instrument:${alert.id}`,
+        severity: alert.severity === 'critical' ? 'danger' : 'warning',
+        boatId: alert.boatId,
+        boatName: alert.boat?.name ?? `#${alert.boatId}`,
+        date: alert.openedAt.toISODate(),
+        href: `/boats/${alert.boatId}?tab=instruments`,
+        alertId: alert.id,
+        ruleKey: alert.ruleKey,
+        path: alert.path,
+        openedAt: alert.openedAt.toISO()!,
       })),
     }
   }

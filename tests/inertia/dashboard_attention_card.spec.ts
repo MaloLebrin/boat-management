@@ -36,6 +36,7 @@ const counts = (over: Partial<DashboardAttentionCounts> = {}): DashboardAttentio
   documentsExpired: 0,
   documentsExpiring: 0,
   invoicesOverdue: 0,
+  instrumentAlerts: 0,
   total: 0,
   ...over,
 })
@@ -111,6 +112,7 @@ describe('DashboardAttentionCard (#832)', () => {
         incidentsOpen: 1,
         documentsExpired: 1,
         invoicesOverdue: 1,
+        instrumentAlerts: 0,
         total: 4,
       }),
       canViewInvoices: true,
@@ -157,6 +159,7 @@ describe('DashboardAttentionCard (#832)', () => {
         maintenanceSoon: 3,
         incidentsOpen: 1,
         invoicesOverdue: 4,
+        instrumentAlerts: 0,
         total: 10,
       }),
       canViewInvoices: false,
@@ -199,5 +202,43 @@ describe('DashboardAttentionCard (#832)', () => {
     expect(w.text()).toContain('dashboard.attention.empty')
     expect(w.find('[data-testid="dashboard-attention-more"]').exists()).toBe(false)
     expect(w.find('a[href="/planning"]').text()).toContain('dashboard.viewPlanning')
+  })
+
+  test('renders an instrument alert row and chip (#993)', () => {
+    const item: DashboardAttentionItem = {
+      kind: 'instrument',
+      key: 'instrument:5',
+      severity: 'danger',
+      boatId: 4,
+      boatName: 'Albatros',
+      date: '2026-10-22',
+      href: '/boats/4?tab=instruments',
+      alertId: 5,
+      ruleKey: 'builtin:shallow_water',
+      path: 'environment.depth.belowKeel',
+      openedAt: '2026-10-22T08:00:00.000Z',
+    }
+    const custom: DashboardAttentionItem = {
+      ...item,
+      key: 'instrument:6',
+      severity: 'warning',
+      alertId: 6,
+      ruleKey: 'rule:2',
+      path: 'propulsion.port.temperature',
+    }
+    const w = mountCard({
+      items: [item, custom],
+      counts: counts({ instrumentAlerts: 2, total: 2 }),
+      canViewInvoices: false,
+    })
+
+    const rows = w.findAll('[data-testid="dashboard-attention-row"]')
+    expect(rows).toHaveLength(2)
+    expect(rows[0].attributes('data-kind')).toBe('instrument')
+    expect(rows[0].attributes('href')).toBe('/boats/4?tab=instruments')
+    expect(rows[0].text()).toContain('instruments.alerts.builtin.shallow_water')
+    expect(rows[0].text()).toContain('dashboard.attention.kind.instrumentAlert')
+    expect(rows[1].text()).toContain('propulsion.port.temperature')
+    expect(w.find('[data-testid="dashboard-attention-chip-instruments"]').exists()).toBe(true)
   })
 })

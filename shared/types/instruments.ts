@@ -93,6 +93,10 @@ export interface InstrumentsTabProps {
   latest: TelemetryLatestValue[]
   /** Chemins numériques des `TELEMETRY_RECENT_WINDOW_MIN` dernières minutes. */
   recent: Record<string, TelemetryRecentPoint[]>
+  /** Règles du bateau (#993) — vide hors source ou sans droit de lecture. */
+  rules: InstrumentAlertRuleRow[]
+  /** Alertes ouvertes, la plus récente d'abord (#993). */
+  openAlerts: InstrumentAlertRow[]
   can: InstrumentsTabCapabilities
 }
 
@@ -163,4 +167,75 @@ export interface InstrumentSeries {
 export interface InstrumentSeriesQuery {
   range: TelemetrySeriesRange
   paths: string[]
+}
+
+/** Alertes des instruments (#993). */
+export type InstrumentAlertOperator = 'lt' | 'gt'
+export type InstrumentAlertSeverity = 'warning' | 'critical'
+
+/**
+ * Une règle évaluable, côté serveur comme côté client. `pathPattern` est un
+ * motif du catalogue (règle intégrée) ou un chemin concret (règle admin) ;
+ * `threshold` et `hysteresis` sont en unités SI.
+ */
+export interface InstrumentAlertRuleSpec {
+  /** `builtin:<id>` ou `rule:<id>` — stable, c'est la clé de l'alerte ouverte. */
+  key: string
+  pathPattern: string
+  kind: 'threshold' | 'signalk_alarm'
+  operator: InstrumentAlertOperator
+  threshold: number
+  hysteresis: number
+  severity: InstrumentAlertSeverity
+}
+
+export interface InstrumentAlertSample {
+  path: string
+  value: number | null
+  valueJson: JsonValue | null
+}
+
+export type InstrumentAlertDecision = 'open' | 'keep' | 'clear' | 'none'
+
+/** Un changement d'état décidé par `evaluateAlerts`. */
+export interface InstrumentAlertTransition {
+  ruleKey: string
+  path: string
+  decision: Exclude<InstrumentAlertDecision, 'none'>
+  severity: InstrumentAlertSeverity
+  value: number | null
+  /** État Signal K (`alarm`, `emergency`…) ou message de l'alarme, sinon `null`. */
+  message: string | null
+}
+
+/** Règle administrable d'un bateau, en unités SI. */
+export interface InstrumentAlertRuleRow {
+  id: number
+  path: string
+  operator: InstrumentAlertOperator
+  threshold: number
+  hysteresis: number
+  severity: InstrumentAlertSeverity
+  enabled: boolean
+}
+
+export interface InstrumentAlertRow {
+  id: number
+  ruleKey: string
+  path: string
+  severity: InstrumentAlertSeverity
+  openedAt: string
+  clearedAt: string | null
+  lastValue: number | null
+  message: string | null
+}
+
+/** Formulaire d'une règle : `threshold` et `hysteresis` dans l'unité d'affichage du chemin. */
+export interface UpsertInstrumentAlertRulePayload {
+  path: string
+  operator: InstrumentAlertOperator
+  threshold: number
+  hysteresis?: number
+  severity: InstrumentAlertSeverity
+  enabled?: boolean
 }

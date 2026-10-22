@@ -6,6 +6,7 @@ import { BoatFactory } from '#database/factories/boat_factory'
 import { BoatIncidentFactory } from '#database/factories/boat_incident_factory'
 import { BoatDocumentFactory } from '#database/factories/boat_document_factory'
 import { InvoiceFactory } from '#database/factories/invoice_factory'
+import { BoatInstrumentAlertFactory } from '#database/factories/boat_instrument_alert_factory'
 import type { DashboardStats, DashboardUrgentMaintenanceRow } from '#shared/types/dashboard'
 
 const TODAY = DateTime.now().startOf('day')
@@ -96,6 +97,7 @@ test.group('DashboardAttentionService (#832)', () => {
       documentsExpired: 1,
       documentsExpiring: 1,
       invoicesOverdue: 0,
+      instrumentAlerts: 0,
       total: 8,
     })
     assert.isFalse(result.canViewInvoices)
@@ -210,5 +212,59 @@ test.group('DashboardAttentionService (#832)', () => {
     assert.equal(first.kind, 'maintenance')
     assert.equal(first.href, '/planning?task=1')
     assert.equal(result.counts.total, 2)
+  })
+
+  test('lists open instrument alerts (#993): critical = danger, cleared ones are ignored', async ({
+    assert,
+  }) => {
+    const user = await UserFactory.with('organization').create()
+    const orgId = user.organizationId!
+    const boat = await BoatFactory.merge({ organizationId: orgId }).create()
+    const other = await UserFactory.with('organization').create()
+    const otherBoat = await BoatFactory.merge({ organizationId: other.organizationId! }).create()
+    const base = { boatId: boat.id, organizationId: orgId }
+
+    const critical = await BoatInstrumentAlertFactory.merge({
+      ...base,
+      ruleKey: 'builtin:shallow_water',
+      path: 'environment.depth.belowKeel',
+      severity: 'critical',
+      openedAt: TODAY.minus({ hours: 2 }),
+    }).create()
+    await BoatInstrumentAlertFactory.merge({
+      ...base,
+      ruleKey: 'builtin:battery_low',
+      path: 'electrical.batteries.house.capacity.stateOfCharge',
+      severity: 'warning',
+      openedAt: TODAY.minus({ hours: 1 }),
+    }).create()
+    await BoatInstrumentAlertFactory.merge({
+      ...base,
+      ruleKey: 'builtin:engine_hot',
+      path: 'propulsion.port.coolantTemperature',
+      clearedAt: TODAY,
+    }).create()
+    await BoatInstrumentAlertFactory.merge({
+      boatId: otherBoat.id,
+      organizationId: other.organizationId!,
+      ruleKey: 'builtin:battery_low',
+      path: 'electrical.batteries.house.capacity.stateOfCharge',
+    }).create()
+
+    const result = await new DashboardAttentionService().getForUser(user, [], stats(0, 0), {
+      canViewInvoices: false,
+      today: todayIso,
+    })
+
+    assert.equal(result.counts.instrumentAlerts, 2)
+    assert.equal(result.counts.total, 2)
+    assert.deepEqual(
+      result.items.map((item) => `${item.kind}:${item.severity}`),
+      ['instrument:danger', 'instrument:warning']
+    )
+    const first = result.items[0]
+    assert.equal(first.kind, 'instrument')
+    assert.equal(first.href, `/boats/${boat.id}?tab=instruments`)
+    if (first.kind === 'instrument') assert.equal(first.alertId, critical.id)
   })
 })

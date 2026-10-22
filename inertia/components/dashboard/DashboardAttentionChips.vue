@@ -9,7 +9,7 @@ const props = defineProps<{ counts: DashboardAttentionCounts; canViewInvoices: b
 const { t } = useT()
 
 interface Chip {
-  key: 'maintenance' | 'incidents' | 'documents' | 'invoices'
+  key: 'maintenance' | 'incidents' | 'documents' | 'instruments' | 'invoices'
   count: number
   /** Danger dès qu'une partie du compteur est en retard / expirée. */
   danger: boolean
@@ -31,6 +31,12 @@ const chips = computed<Chip[]>(() => {
       key: 'documents',
       count: c.documentsExpired + c.documentsExpiring,
       danger: c.documentsExpired > 0,
+      href: null,
+    },
+    {
+      key: 'instruments',
+      count: c.instrumentAlerts,
+      danger: c.instrumentAlerts > 0,
       href: null,
     },
   ]

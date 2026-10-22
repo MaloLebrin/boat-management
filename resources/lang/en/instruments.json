@@ -109,5 +109,45 @@
       "24h": "24 hours",
       "7d": "7 days"
     }
+  },
+  "alerts": {
+    "title": "Alerts",
+    "none": "No open alert.",
+    "openedAt": "Opened {date}",
+    "lastValue": "Last value: {value}",
+    "local": "Detected on board",
+    "builtin": {
+      "battery_low": "Low battery",
+      "engine_hot": "High engine temperature",
+      "shallow_water": "Shallow water",
+      "signalk_alarm": "Signal K alarm"
+    },
+    "severity": {
+      "warning": "Warning",
+      "critical": "Critical"
+    },
+    "operator": {
+      "lt": "below",
+      "gt": "above"
+    },
+    "editor": {
+      "title": "Alert rules",
+      "description": "Built-in rules (battery, engine temperature, shallow water, Signal K alarms) are always on. Add your own thresholds below.",
+      "path": "Instrument",
+      "operator": "Condition",
+      "threshold": "Threshold ({unit})",
+      "hysteresis": "Return margin ({unit})",
+      "hysteresisHint": "The alert only clears once the value is back beyond this margin.",
+      "severity": "Severity",
+      "enabled": "Active",
+      "add": "Add rule",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this rule?",
+      "empty": "No custom rule.",
+      "pathPlaceholder": "Choose an instrument",
+      "rule": "{path} {operator} {threshold} {unit}",
+      "limit": "Rule limit reached."
+    }
   }
 }

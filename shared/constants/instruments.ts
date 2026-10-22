@@ -136,3 +136,15 @@ export const TELEMETRY_SERIES_DEFAULT_RANGE = '24h'
 
 /** Nombre maximal de courbes demandées d'un coup. */
 export const TELEMETRY_SERIES_MAX_PATHS = 6
+
+/** Vrai si `path` est accepté par le motif du catalogue (`<id>` = un segment libre). */
+export function matchesCatalogPattern(pattern: string, path: string): boolean {
+  let regexp = PATTERN_CACHE.get(pattern)
+  if (!regexp) {
+    regexp = patternToRegExp(pattern)
+    PATTERN_CACHE.set(pattern, regexp)
+  }
+  return regexp.test(path)
+}
+
+const PATTERN_CACHE = new Map<string, RegExp>()

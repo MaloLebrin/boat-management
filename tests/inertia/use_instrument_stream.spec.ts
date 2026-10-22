@@ -181,4 +181,55 @@ describe('useInstrumentStream (#989)', () => {
 
     expect(sockets[0].closed).toBe(true)
   })
+
+  test('évalue les règles à chaque delta : ouvre, maintient puis lève l’alerte à bord (#993)', async () => {
+    const { transport, sockets } = makeTransport()
+    const rule = {
+      key: 'builtin:shallow_water',
+      pathPattern: 'environment.depth.belowKeel',
+      kind: 'threshold' as const,
+      operator: 'lt' as const,
+      threshold: 1.5,
+      hysteresis: 0.5,
+      severity: 'critical' as const,
+    }
+    const { stream } = mountStream({ transport, alertRules: () => [rule] })
+    stream.start()
+    await vi.advanceTimersByTimeAsync(0)
+    sockets[0].open()
+    const depth = (value: number) =>
+      sockets[0].message({
+        context: 'vessels.self',
+        updates: [{ values: [{ path: 'environment.depth.belowKeel', value }] }],
+      })
+    const key = 'builtin:shallow_water|environment.depth.belowKeel'
+
+    depth(3)
+    expect(Object.keys(stream.localAlerts.value)).toEqual([])
+
+    depth(1)
+    expect(stream.localAlerts.value[key]).toMatchObject({ severity: 'critical', value: 1 })
+    const openedAt = stream.localAlerts.value[key].openedAt
+
+    await vi.advanceTimersByTimeAsync(1000)
+    depth(1.8) // dans la marge : maintenue, même instant d'ouverture
+    expect(stream.localAlerts.value[key].openedAt).toBe(openedAt)
+    expect(stream.localAlerts.value[key].value).toBe(1.8)
+
+    depth(2.2)
+    expect(stream.localAlerts.value).toEqual({})
+  })
+
+  test('sans règle, aucune alerte locale', async () => {
+    const { transport, sockets } = makeTransport()
+    const { stream } = mountStream({ transport })
+    stream.start()
+    await vi.advanceTimersByTimeAsync(0)
+    sockets[0].open()
+    sockets[0].message({
+      context: 'vessels.self',
+      updates: [{ values: [{ path: 'environment.depth.belowKeel', value: 0.1 }] }],
+    })
+    expect(stream.localAlerts.value).toEqual({})
+  })
 })
