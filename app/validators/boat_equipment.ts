@@ -41,6 +41,13 @@ const enginePayload = vine.object({
   manufacturedAt: vine.string().trim().optional(),
   powerHp: vine.string().trim().optional(),
   installHours: vine.string().trim().optional(),
+  // `<id>` Signal K (#991) : un segment de chemin, sans point ni espace.
+  instrumentKey: vine
+    .string()
+    .trim()
+    .maxLength(40)
+    .regex(/^[A-Za-z0-9_-]*$/)
+    .optional(),
   status: vine.enum(equipmentStatuses).optional(),
 })
 
@@ -60,6 +67,7 @@ export type BoatEngineFormBody = {
   manufacturedAt?: string
   powerHp?: string
   installHours?: string
+  instrumentKey?: string
   status?: string
 }
 
@@ -195,6 +203,7 @@ export function equipmentBodyToEnginePayload(body: BoatEngineFormBody): BoatEngi
     manufacturedAt: emptyToNull(body.manufacturedAt),
     powerHp: parseOptionalPositiveFloat(body.powerHp),
     installHours: parseOptionalNonNegativeInt(body.installHours),
+    instrumentKey: emptyToNull(body.instrumentKey),
     status: (body.status ?? 'operational') as EquipmentStatus,
   }
 }

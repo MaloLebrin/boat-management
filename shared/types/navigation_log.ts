@@ -99,6 +99,21 @@ export interface UpdateNavigationLogEntryPayload {
   note?: string | null
 }
 
+/** Point de journal posé par la synchronisation des instruments Signal K (#991). */
+export interface InstrumentNavigationLogEntryPayload {
+  recordedAt: DateTime
+  latitude: number
+  longitude: number
+  cogDeg: number | null
+  sogKn: number | null
+  twdDeg: number | null
+  twaDeg: number | null
+  weatherSnapshot: Record<string, number> | null
+}
+
+/** Origine d'un point de journal : saisie/rafale GPS, ou synchronisation des instruments (#991). */
+export type NavigationLogEntrySource = 'manual' | 'instruments'
+
 export interface NavigationLogEntryRow {
   id: number
   navigationLogId: number
@@ -113,6 +128,7 @@ export interface NavigationLogEntryRow {
   /** Réservés à l'itération météo (GRIB) — toujours null aujourd'hui. */
   twdDeg: number | null
   twaDeg: number | null
+  source: NavigationLogEntrySource
   createdAt: string
   updatedAt: string
 }
@@ -145,6 +161,11 @@ export interface NavigationLogPortOption {
 export interface NavigationLogEngineOption {
   id: number
   label: string
+  /**
+   * Heures du moteur quand elles sont tenues par les instruments (#991) — la
+   * clôture de trajet les préremplit. `null` : moteur à saisie manuelle.
+   */
+  instrumentHours: number | null
 }
 
 /**

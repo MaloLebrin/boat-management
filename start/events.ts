@@ -21,6 +21,7 @@ import OwnerBoatChanged from '#events/owner_boat_changed'
 import OwnerRequestChanged from '#events/owner_request_changed'
 import PublicBookingRequested from '#events/public_booking_requested'
 import PublicBookingDecided from '#events/public_booking_decided'
+import TelemetryIngested from '#events/telemetry_ingested'
 
 emitter.listen(SimulatorLeadCreated, [() => import('#listeners/on_simulator_lead_created')])
 emitter.listen(ContactMessageReceived, [() => import('#listeners/on_contact_message_received')])
@@ -60,3 +61,5 @@ emitter.listen(OwnerRequestChanged, [() => import('#listeners/on_owner_request_c
 emitter.listen(InvoiceSent, [() => import('#listeners/on_invoice_sent')])
 emitter.listen(PublicBookingRequested, [() => import('#listeners/on_public_booking_requested')])
 emitter.listen(PublicBookingDecided, [() => import('#listeners/on_public_booking_decided')])
+// Instruments Signal K (#991) : heures moteur et position issues de la télémétrie.
+emitter.listen(TelemetryIngested, [() => import('#listeners/on_telemetry_ingested')])

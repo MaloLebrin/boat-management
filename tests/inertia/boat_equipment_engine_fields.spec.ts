@@ -212,3 +212,21 @@ test('un type sans gamme au catalogue ne priorise rien', async () => {
   expect(options.map((o) => o.label)).toEqual(['Volvo Penta', 'Yamaha'])
   expect(options.every((o) => o.group === undefined)).toBe(true)
 })
+
+test('l’identifiant instruments est un champ du formulaire, vide par défaut (#991)', () => {
+  const wrapper = mountFields()
+
+  expect(wrapper.find('input[name="instrumentKey"]').exists()).toBe(true)
+  expect(value(wrapper, 'input[name="instrumentKey"]')).toBe('')
+})
+
+test('l’identifiant instruments du moteur édité est repris dans le champ (#991)', () => {
+  const wrapper = mountFields({
+    id: 3,
+    kind: 'inboard',
+    status: 'operational',
+    instrumentKey: 'port',
+  })
+
+  expect(value(wrapper, 'input[name="instrumentKey"]')).toBe('port')
+})

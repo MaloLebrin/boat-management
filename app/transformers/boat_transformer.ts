@@ -20,7 +20,11 @@ import type { SheetType } from '#shared/types/maintenance'
 import type { BoatPricingRow } from '#shared/types/boat_pricing'
 import type { EngineFuel } from '#shared/constants/boats/boat_form_options'
 import type { FuelLogRow } from '#shared/types/fuel_log'
-import type { NavigationLogEntryRow, NavigationLogRow } from '#shared/types/navigation_log'
+import type {
+  NavigationLogEntryRow,
+  NavigationLogEntrySource,
+  NavigationLogRow,
+} from '#shared/types/navigation_log'
 import type { BoatOwnerBoatSummary } from '#shared/types/boat'
 import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { SafetyComplianceReport } from '#shared/types/safety'
@@ -195,6 +199,7 @@ export function toNavigationLogEntryRows(entries: NavigationLogEntry[]): Navigat
     note: entry.note,
     twdDeg: entry.twdDeg,
     twaDeg: entry.twaDeg,
+    source: entry.source as NavigationLogEntrySource,
     createdAt: entry.createdAt.toISO()!,
     updatedAt: (entry.updatedAt ?? entry.createdAt).toISO()!,
   }))
@@ -333,6 +338,8 @@ function toEngine(e: Boat['engines'][number]) {
     manufacturedAt: e.manufacturedAt ? e.manufacturedAt.toISODate() : null,
     powerHp: e.powerHp,
     hours: e.hours,
+    // Synchro des heures par les instruments (#991) : prérempli à la clôture d'un trajet.
+    instrumentKey: e.instrumentKey,
     status: e.status,
   }
 }

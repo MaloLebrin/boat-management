@@ -42,7 +42,15 @@ function formatCoords(entry: NavigationLogEntryRow): string | null {
     >
       <div class="flex items-start justify-between gap-4">
         <div class="min-w-0 space-y-0.5">
-          <p class="font-medium text-fg">{{ formatDateTime(entry.recordedAt) }}</p>
+          <p class="font-medium text-fg">
+            {{ formatDateTime(entry.recordedAt) }}
+            <span
+              v-if="entry.source === 'instruments'"
+              class="ml-2 rounded-full bg-brand-soft px-2 py-0.5 text-xs font-normal text-brand"
+              :title="t('navigation_logs.entries.fromInstrumentsTitle')"
+              >{{ t('navigation_logs.entries.fromInstruments') }}</span
+            >
+          </p>
           <p class="text-xs text-fg-muted">
             <template v-if="entry.sogKn !== null && entry.sogKn > 0 && entry.cogDeg !== null">
               {{ t('navigation_logs.entries.cog') }} {{ entry.cogDeg }}° ·

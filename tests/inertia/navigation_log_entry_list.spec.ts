@@ -35,6 +35,7 @@ function entry(overrides: Partial<NavigationLogEntryRow> = {}): NavigationLogEnt
     note: 'envoi du spi',
     twdDeg: null,
     twaDeg: null,
+    source: 'manual',
     createdAt: '2026-08-29T10:00:05.000Z',
     updatedAt: '2026-08-29T10:00:05.000Z',
     ...overrides,
@@ -88,6 +89,21 @@ describe('NavigationLogEntryList', () => {
       expect.objectContaining({ preserveScroll: true })
     )
     vi.unstubAllGlobals()
+  })
+
+  test('badge « instruments » sur un point automatique seulement (#991)', () => {
+    const wrapper = mount(NavigationLogEntryList, {
+      props: {
+        boatId: 7,
+        logId: 5,
+        entries: [entry({ id: 1 }), entry({ id: 2, source: 'instruments' })],
+        canEdit: false,
+      },
+    })
+
+    const badges = wrapper.findAll('span[title]')
+    expect(badges).toHaveLength(1)
+    expect(badges[0].text()).toContain('navigation_logs.entries.fromInstruments')
   })
 
   test('état vide', () => {

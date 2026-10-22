@@ -23,10 +23,24 @@ export function toNavigationEngineOptions(
   t: (key: string) => string,
   engines: Pick<
     BoatShowEngine,
-    'id' | 'brand' | 'model' | 'serialNumber' | 'status' | 'kind' | 'fuel' | 'strokeType' | 'family'
+    | 'id'
+    | 'brand'
+    | 'model'
+    | 'serialNumber'
+    | 'status'
+    | 'kind'
+    | 'fuel'
+    | 'strokeType'
+    | 'family'
+    | 'hours'
+    | 'instrumentKey'
   >[]
 ): NavigationLogEngineOption[] {
   return engines
     .filter((e) => !INACTIVE_ENGINE_STATUSES.includes(e.status))
-    .map((e) => ({ id: e.id, label: engineLabel(t, e) }))
+    .map((e) => ({
+      id: e.id,
+      label: engineLabel(t, e),
+      instrumentHours: e.instrumentKey ? e.hours : null,
+    }))
 }

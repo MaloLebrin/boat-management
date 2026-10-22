@@ -85,7 +85,9 @@
       "strokeType": "Engine cycle",
       "family": "Motorisation",
       "familyHint": "Engine and transmission: this pair decides which spare parts are offered. Fill it in if you know it.",
-      "installHours": "Hours at installation"
+      "installHours": "Hours at installation",
+      "instrumentKey": "Instrument identifier",
+      "instrumentKeyHint": "The engine’s id in Signal K (propulsion.ID.runTime), e.g. port or 0. Leave empty to keep hours manual."
     },
     "catalog": {
       "brandPlaceholder": "e.g. Volvo Penta…",

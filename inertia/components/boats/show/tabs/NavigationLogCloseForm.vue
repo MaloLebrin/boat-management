@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -52,6 +52,20 @@ const engineSelectOptions = computed(() =>
   engineOptions.value.map((e) => ({ value: String(e.id), label: e.label }))
 )
 
+/**
+ * Le moteur dont les heures viennent des instruments (#991) : l'unique moteur
+ * actif, ou celui que l'on choisit. Ses heures sont déjà à jour, on les propose.
+ */
+function instrumentHoursOf(engineId: string | number): number | null {
+  const id =
+    engineId === ''
+      ? engineOptions.value.length === 1
+        ? engineOptions.value[0].id
+        : null
+      : Number(engineId)
+  return engineOptions.value.find((e) => e.id === id)?.instrumentHours ?? null
+}
+
 const form = useForm({
   arrivedAt: defaultArrivedAt,
   // `arrivedAt` is a naive wall-clock: the server needs the browser offset to
@@ -60,7 +74,7 @@ const form = useForm({
   arrivalPortId: '' as string | number,
   arrivalPortName: '',
   distanceNm: null as number | null,
-  engineHoursEnd: null as number | null,
+  engineHoursEnd: instrumentHoursOf('') as number | null,
   boatEngineId: '' as string | number,
   fuelConsumedLiters: null as number | null,
   windForceBeaufort: props.log.windForceBeaufort,
@@ -68,6 +82,14 @@ const form = useForm({
   crewCount: props.log.crewCount,
   notes: props.log.notes ?? '',
 })
+
+watch(
+  () => form.boatEngineId,
+  (engineId) => {
+    const hours = instrumentHoursOf(engineId)
+    if (hours !== null) form.engineHoursEnd = hours
+  }
+)
 
 function handleSubmit() {
   form.tzOffsetMinutes = tzOffsetMinutes()

@@ -43,6 +43,27 @@ export default class TelemetryReadService {
     return result.rows.map(toTelemetryLatestValue)
   }
 
+  /** Dernière valeur de chacun des `paths` donnés — la même requête, bornée aux chemins utiles. */
+  async latestForPaths(
+    boat: Pick<Boat, 'id'>,
+    paths: readonly string[]
+  ): Promise<Map<string, TelemetryLatestValue>> {
+    if (paths.length === 0) return new Map()
+    const result = await db.rawQuery<{ rows: TelemetryLatestRow[] }>(
+      `select distinct on (path) path, recorded_at, value, value_json
+       from boat_telemetry_samples
+       where boat_id = ? and path = any(?)
+       order by path, recorded_at desc`,
+      [boat.id, [...paths]]
+    )
+    return new Map(
+      result.rows.map((row) => {
+        const latest = toTelemetryLatestValue(row)
+        return [latest.path, latest] as const
+      })
+    )
+  }
+
   /**
    * Points numériques des `windowMin` dernières minutes, par chemin, du plus
    * ancien au plus récent. Les valeurs structurées (`value_json`) n'y sont

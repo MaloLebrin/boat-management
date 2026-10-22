@@ -29,6 +29,8 @@ export type BoatEquipmentEngineFieldsModel = {
   powerHp: number | null
   hours: number | null
   installHours: number | null
+  /** `<id>` Signal K du moteur (#991), `null` = heures saisies à la main. */
+  instrumentKey?: string | null
   status: 'operational' | 'in_maintenance' | 'out_of_service' | 'retired'
 }
 
@@ -61,6 +63,7 @@ const family = ref('')
 const fuel = ref('')
 const strokeType = ref('')
 const installHours = ref('')
+const instrumentKey = ref('')
 const brand = ref('')
 const model = ref('')
 const serialNumber = ref('')
@@ -76,6 +79,7 @@ function syncFromProps() {
   strokeType.value = e?.strokeType ?? ''
   installHours.value =
     e?.installHours === null || e?.installHours === undefined ? '' : String(e.installHours)
+  instrumentKey.value = e?.instrumentKey ?? ''
   brand.value = e?.brand ?? ''
   model.value = e?.model ?? ''
   serialNumber.value = e?.serialNumber ?? ''
@@ -92,6 +96,7 @@ useEngineFormDraft(
     fuel,
     strokeType,
     installHours,
+    instrumentKey,
     brand,
     model,
     serialNumber,
@@ -234,6 +239,17 @@ function applyCatalogModel(catalogModel: EngineModelOption) {
       type="number"
       inputmode="numeric"
       v-model="installHours"
+      :errors="errors"
+    />
+
+    <BaseInput
+      id="instrumentKey"
+      name="instrumentKey"
+      class="col-span-2"
+      :label="t('boats.engines.fields.instrumentKey')"
+      :hint="t('boats.engines.fields.instrumentKeyHint')"
+      maxlength="40"
+      v-model="instrumentKey"
       :errors="errors"
     />
 

@@ -1,4 +1,7 @@
-import { BoatEquipmentNotFoundError } from '#exceptions/boat_errors'
+import {
+  BoatEngineInstrumentKeyTakenError,
+  BoatEquipmentNotFoundError,
+} from '#exceptions/boat_errors'
 import type Boat from '#models/boat'
 import BoatEngine from '#models/boat_engine'
 import BoatEnginePart from '#models/boat_engine_part'
@@ -10,6 +13,7 @@ import { engineFamilyFromSignals } from '#shared/helpers/engine_family'
 import type { BoatEnginePayload } from '#shared/types/boat'
 import { assertBoatInUserOrg, toDateOrNull } from '#utils/boat_utils'
 import { inject } from '@adonisjs/core'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 export type { BoatEnginePayload }
 
@@ -30,8 +34,21 @@ export default class BoatEngineService {
     return payload.family ?? engineFamilyFromSignals(payload)
   }
 
+  /**
+   * `instrumentKey` désigne un moteur de façon unique sur un bateau (#991) :
+   * deux moteurs sous la même clé se partageraient le même `runTime`.
+   */
+  private async assertInstrumentKeyFree(boatId: number, key: string | null, exceptId?: number) {
+    if (key === null) return
+    const query = BoatEngine.query().where('boatId', boatId).where('instrumentKey', key)
+    if (exceptId !== undefined) query.whereNot('id', exceptId)
+    if (await query.first()) throw new BoatEngineInstrumentKeyTakenError()
+  }
+
   async create(user: User, boat: Boat, payload: BoatEnginePayload) {
     assertBoatInUserOrg(user, boat)
+    const instrumentKey = payload.instrumentKey ?? null
+    await this.assertInstrumentKeyFree(boat.id, instrumentKey)
 
     return await BoatEngine.create({
       boatId: boat.id,
@@ -52,6 +69,7 @@ export default class BoatEngineService {
       // incrementHours() and navigation log closures, never via update().
       hours: payload.installHours ?? null,
       installHours: payload.installHours ?? null,
+      instrumentKey,
     })
   }
 
@@ -60,6 +78,12 @@ export default class BoatEngineService {
 
     const engine = await BoatEngine.query().where('id', engineId).where('boatId', boat.id).first()
     if (!engine) throw new BoatEquipmentNotFoundError()
+
+    const instrumentKey = payload.instrumentKey ?? null
+    await this.assertInstrumentKeyFree(boat.id, instrumentKey, engine.id)
+    // Un autre moteur du calculateur : l'ancienne base de `runTime` ne vaut plus rien (D6).
+    if (instrumentKey !== engine.instrumentKey) engine.instrumentRunTimeS = null
+    engine.instrumentKey = instrumentKey
 
     // `hours` and `installHours` are intentionally not editable here: the
     // install baseline is fixed once at creation, and the running total only
@@ -133,6 +157,25 @@ export default class BoatEngineService {
     if (!engine) throw new BoatEquipmentNotFoundError()
 
     engine.hours = (engine.hours ?? 0) + Math.round(incrementBy)
+    await engine.save()
+    return engine
+  }
+
+  /**
+   * Heures entières lues sur le calculateur (#991, D6). Même écriture monotone
+   * que `incrementHours`, mais sans utilisateur ni vérification d'organisation :
+   * l'appelant est la synchronisation, déjà bornée au bateau de la source.
+   * La base de `runTime` avance de `hoursToAdd × 3600` — le reliquat de moins
+   * d'une heure reste à lire au lot suivant.
+   */
+  async incrementHoursFromInstruments(
+    engine: BoatEngine,
+    hoursToAdd: number,
+    trx?: TransactionClientContract
+  ) {
+    if (trx) engine.useTransaction(trx)
+    engine.hours = (engine.hours ?? 0) + hoursToAdd
+    engine.instrumentRunTimeS = (engine.instrumentRunTimeS ?? 0) + hoursToAdd * 3600
     await engine.save()
     return engine
   }

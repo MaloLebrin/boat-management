@@ -1,3 +1,4 @@
+import type { DateTime } from 'luxon'
 import type { JsonValue } from '#shared/types/notification'
 
 /**
@@ -125,4 +126,23 @@ export interface InstrumentPathSpec {
   siUnit: string | null
   /** Unité d'affichage cible (conversion côté client, PR 2). */
   displayUnit: string | null
+}
+
+/** Un fix issu des instruments, prêt pour `boat_position_history` (#991). */
+export interface InstrumentPositionInput {
+  latitude: number
+  longitude: number
+  /** Vitesse fond en nœuds, `null` si le lot n'en portait pas. */
+  sogKn: number | null
+  /** Cap fond en degrés, `null` si le lot n'en portait pas. */
+  cogDeg: number | null
+  recordedAt: DateTime
+}
+
+/** Ce que la synchronisation a fait des heures d'un moteur. */
+export interface EngineHoursSyncOutcome {
+  engineId: number
+  action: 'init' | 'rebase' | 'increment' | 'none'
+  /** Heures ajoutées à `hours` (0 hors `increment`). */
+  hoursAdded: number
 }

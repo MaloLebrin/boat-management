@@ -10,7 +10,8 @@
     "added": "Engine added.",
     "updated": "Engine updated.",
     "removed": "Engine removed.",
-    "notFound": "Engine not found."
+    "notFound": "Engine not found.",
+    "instrumentKeyTaken": "Another engine on this boat already uses this instrument identifier."
   },
   "sail": {
     "added": "Sail added.",

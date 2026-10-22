@@ -85,7 +85,9 @@
       "strokeType": "Cycle moteur",
       "family": "Motorisation",
       "familyHint": "Moteur et transmission : c'est ce couple qui détermine les pièces détachées proposées. À préciser si vous le connaissez.",
-      "installHours": "Heures à l'installation"
+      "installHours": "Heures à l'installation",
+      "instrumentKey": "Identifiant instruments",
+      "instrumentKeyHint": "L’identifiant du moteur dans Signal K (propulsion.ID.runTime), par ex. port ou 0. Laissez vide pour garder des heures saisies à la main."
     },
     "catalog": {
       "brandPlaceholder": "Ex. Volvo Penta…",

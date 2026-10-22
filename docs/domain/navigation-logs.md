@@ -52,19 +52,20 @@ un check applicatif en amont pour l'erreur lisible (`NavigationLogInProgressErro
 
 ### `navigation_log_entries` (le point de log)
 
-| Colonne                                    | Type                         | Contrainte                                                                                            |
-| ------------------------------------------ | ---------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `id`                                       | integer PK                   | —                                                                                                     |
-| `navigation_log_id`                        | FK → navigation_logs         | CASCADE                                                                                               |
-| `organization_id`                          | FK → organizations           | CASCADE                                                                                               |
-| `recorded_at`                              | datetime                     | NOT NULL, index composite `(navigation_log_id, recorded_at)`                                          |
-| `latitude` / `longitude`                   | decimal(9,6) / decimal(10,6) | nullable — point manuel sans GPS possible, mais toujours fournis **ensemble** (`coordinatesUnpaired`) |
-| `gps_accuracy_m`                           | decimal(7,1)                 | nullable                                                                                              |
-| `cog_deg`                                  | integer                      | nullable, 0–359 — null quand la vitesse est quasi nulle                                               |
-| `sog_kn`                                   | decimal(5,2)                 | nullable                                                                                              |
-| `sail_config`                              | string(255)                  | nullable (texte libre : « GV 1 ris + solent »)                                                        |
-| `note`                                     | text                         | nullable (max 2000)                                                                                   |
-| `twd_deg` / `twa_deg` / `weather_snapshot` | integer / integer / jsonb    | **réservés météo** — nullable, jamais écrits aujourd'hui (itération GRIB NOAA offline à venir)        |
+| Colonne                                    | Type                         | Contrainte                                                                                                                 |
+| ------------------------------------------ | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `id`                                       | integer PK                   | —                                                                                                                          |
+| `navigation_log_id`                        | FK → navigation_logs         | CASCADE                                                                                                                    |
+| `organization_id`                          | FK → organizations           | CASCADE                                                                                                                    |
+| `recorded_at`                              | datetime                     | NOT NULL, index composite `(navigation_log_id, recorded_at)`                                                               |
+| `latitude` / `longitude`                   | decimal(9,6) / decimal(10,6) | nullable — point manuel sans GPS possible, mais toujours fournis **ensemble** (`coordinatesUnpaired`)                      |
+| `gps_accuracy_m`                           | decimal(7,1)                 | nullable                                                                                                                   |
+| `cog_deg`                                  | integer                      | nullable, 0–359 — null quand la vitesse est quasi nulle                                                                    |
+| `sog_kn`                                   | decimal(5,2)                 | nullable                                                                                                                   |
+| `sail_config`                              | string(255)                  | nullable (texte libre : « GV 1 ris + solent »)                                                                             |
+| `note`                                     | text                         | nullable (max 2000)                                                                                                        |
+| `twd_deg` / `twa_deg` / `weather_snapshot` | integer / integer / jsonb    | nullable — écrits **uniquement** par la synchro des instruments (#991) ; la météo GRIB NOAA offline viendra plus tard      |
+| `source`                                   | string(20)                   | NOT NULL, défaut `manual` ; `instruments` pour un point posé par la synchro Signal K (badge « Instruments » dans la liste) |
 
 Convention Lucid du repo : les décimaux sont typés `string` sur les modèles et convertis en
 `number` par le transformer (`toNavigationLogRows`, `toNavigationLogEntryRows` dans
@@ -87,6 +88,10 @@ Références : `inertia/composables/use_gps_burst.ts`, `shared/helpers/geo.ts`.
   enregistrable sans coordonnées (états `idle | acquiring | done | error` exposés à l'UI).
 - Les helpers vivent dans `shared/helpers/geo.ts` (et non `inertia/utils/`) : l'itération
   météo réutilisera côté backend le même code (TWA = TWD − COG, distance auto de sortie).
+
+## Points automatiques des instruments (#991)
+
+Avec une source Signal K, `PositionSyncService` ajoute un point à la sortie `in_progress` du bateau toutes les 10 minutes au plus (`source: 'instruments'`, `NavigationLogEntryService.createFromInstruments`). Ces points suivent les règles des autres : éditables sur une sortie en cours. La clôture préremplit `engineHoursEnd` quand le moteur est tenu par les instruments. Détail : `docs/domain/instruments.md`.
 
 ## Règles métier (services)
 

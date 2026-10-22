@@ -8,6 +8,11 @@ export class BoatEquipmentNotFoundError extends Error {
   name = 'BoatEquipmentNotFoundError'
 }
 
+/** L'identifiant Signal K (`instrumentKey`) est déjà porté par un autre moteur du bateau (#991). */
+export class BoatEngineInstrumentKeyTakenError extends Error {
+  name = 'BoatEngineInstrumentKeyTakenError'
+}
+
 export class RegistrationNumberTakenError extends Error {
   name = 'RegistrationNumberTakenError'
 }

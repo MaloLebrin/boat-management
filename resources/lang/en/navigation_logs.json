@@ -51,6 +51,8 @@
     "closeBtn": "Close trip"
   },
   "entries": {
+    "fromInstruments": "Instruments",
+    "fromInstrumentsTitle": "Point recorded automatically from the boat’s instruments",
     "addPoint": "+ Add a log point",
     "addTitle": "New log point",
     "submitPoint": "Save point",
