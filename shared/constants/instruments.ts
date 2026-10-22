@@ -120,3 +120,19 @@ export function telemetryPathSpec(path: string): InstrumentPathSpec | null {
 export function isAllowedTelemetryPath(path: string): boolean {
   return telemetryPathSpec(path) !== null
 }
+
+/**
+ * Plages de l'historique (#992) : durée couverte et largeur d'un seau
+ * `date_bin`. Les seaux restent à 60–168 points par courbe, quelle que soit la
+ * plage — un graphique lisible et une réponse légère.
+ */
+export const TELEMETRY_SERIES_RANGES = {
+  '1h': { minutes: 60, binMinutes: 1 },
+  '24h': { minutes: 24 * 60, binMinutes: 15 },
+  '7d': { minutes: 7 * 24 * 60, binMinutes: 60 },
+} as const
+
+export const TELEMETRY_SERIES_DEFAULT_RANGE = '24h'
+
+/** Nombre maximal de courbes demandées d'un coup. */
+export const TELEMETRY_SERIES_MAX_PATHS = 6

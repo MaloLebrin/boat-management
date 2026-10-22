@@ -1,20 +1,28 @@
 <script setup lang="ts">
+import { usePage } from '@inertiajs/vue3'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import InstrumentAlarmsList from '~/components/boats/show/tabs/instruments/InstrumentAlarmsList.vue'
 import InstrumentCategoryGrid from '~/components/boats/show/tabs/instruments/InstrumentCategoryGrid.vue'
 import InstrumentConnectionBanner from '~/components/boats/show/tabs/instruments/InstrumentConnectionBanner.vue'
+import InstrumentHistoryPanel from '~/components/boats/show/tabs/instruments/InstrumentHistoryPanel.vue'
 import InstrumentEmptyState from '~/components/boats/show/tabs/instruments/InstrumentEmptyState.vue'
 import InstrumentSourceForm from '~/components/boats/show/tabs/instruments/InstrumentSourceForm.vue'
 import { useInstrumentStream } from '~/composables/use_instrument_stream'
 import { useT } from '~/composables/use_t'
 import { useTelemetrySync } from '~/composables/use_telemetry_sync'
 import { buildReadings } from '~/lib/signalk/display'
-import type { InstrumentsTabProps } from '#shared/types/instruments'
+import type { InstrumentSeries, InstrumentsTabProps } from '#shared/types/instruments'
 
 const props = defineProps<{ boatId: number; instruments: InstrumentsTabProps }>()
 
 const { t } = useT()
 const source = computed(() => props.instruments.source)
+
+/** Historique (#992) : prop optionnelle de la page, servie par `router.reload({ only })`. */
+const page = usePage<{ instrumentSeries?: InstrumentSeries }>()
+const historyPaths = computed(() =>
+  readings.value.filter((reading) => reading.value !== null).map((reading) => reading.path)
+)
 
 /** Sans le droit d'ingérer, le visiteur lit les dernières valeurs sans ouvrir de flux (D3). */
 const canStream = computed(() => Boolean(source.value?.enabled) && props.instruments.can.ingest)
@@ -78,6 +86,11 @@ onBeforeUnmount(() => {
       />
       <InstrumentCategoryGrid v-if="readings.length > 0" :readings="readings" :now="now" />
       <p v-else class="text-sm text-fg-muted">{{ t('instruments.noData') }}</p>
+      <InstrumentHistoryPanel
+        v-if="historyPaths.length > 0"
+        :paths="historyPaths"
+        :series="page.props.instrumentSeries"
+      />
       <InstrumentAlarmsList :readings="alarmReadings" />
     </template>
     <InstrumentEmptyState v-else :can-manage="instruments.can.manage" />

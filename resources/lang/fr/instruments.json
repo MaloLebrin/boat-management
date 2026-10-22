@@ -96,5 +96,18 @@
     "remove": "Retirer la source",
     "removeTitle": "Retirer la source d’instruments ?",
     "removeMessage": "Les mesures déjà collectées pour ce bateau sont supprimées avec elle."
+  },
+  "history": {
+    "title": "Historique",
+    "noPaths": "Aucune mesure numérique à tracer pour l'instant.",
+    "pick": "Choisissez jusqu'à {max} mesures à tracer.",
+    "selectOne": "Sélectionnez une mesure pour voir son historique.",
+    "empty": "Aucune donnée sur cette période.",
+    "loading": "Chargement…",
+    "range": {
+      "1h": "1 heure",
+      "24h": "24 heures",
+      "7d": "7 jours"
+    }
   }
 }

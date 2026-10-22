@@ -1,3 +1,10 @@
+import {
+  TELEMETRY_SERIES_MAX_PATHS,
+  TELEMETRY_SERIES_RANGES,
+  telemetryPathSpec,
+} from '#shared/constants/instruments'
+import type { InstrumentSeriesQuery, TelemetrySeriesRange } from '#shared/types/instruments'
+
 /**
  * Normalise l'adresse d'un serveur Signal K en **origine** (`https?://hôte[:port]`),
  * ou `null` si elle n'en est pas une (#988, D2).
@@ -78,4 +85,23 @@ export function radiansToDegrees(value: number): number {
 /** Kelvin → °C, arrondi au dixième. */
 export function kelvinToCelsius(value: number): number {
   return Math.round((value - 273.15) * 10) / 10
+}
+
+/**
+ * Lit `range` et `paths[]` dans la requête de `boats.show` (#992). Une demande
+ * invalide — plage inconnue, aucun chemin numérique du catalogue — vaut « pas
+ * d'historique » : la page ne doit jamais échouer pour un paramètre de plus.
+ */
+export function parseSeriesQuery(qs: Record<string, unknown>): InstrumentSeriesQuery | null {
+  const range = qs.range
+  if (typeof range !== 'string' || !(range in TELEMETRY_SERIES_RANGES)) return null
+
+  const raw = Array.isArray(qs.paths) ? qs.paths : typeof qs.paths === 'string' ? [qs.paths] : []
+  const paths = [...new Set(raw)]
+    .filter((path): path is string => typeof path === 'string')
+    .filter((path) => telemetryPathSpec(path)?.valueKind === 'number')
+    .slice(0, TELEMETRY_SERIES_MAX_PATHS)
+  if (paths.length === 0) return null
+
+  return { range: range as TelemetrySeriesRange, paths }
 }

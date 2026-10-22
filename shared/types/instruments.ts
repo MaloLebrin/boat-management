@@ -146,3 +146,21 @@ export interface EngineHoursSyncOutcome {
   /** Heures ajoutées à `hours` (0 hors `increment`). */
   hoursAdded: number
 }
+
+/** Plage de l'historique (#992). */
+export type TelemetrySeriesRange = '1h' | '24h' | '7d'
+
+/** Un seau d'historique : `[début du seau ISO, moyenne]`, en unité SI. */
+export type TelemetrySeriesPoint = [string, number]
+
+/** Séries agrégées par chemin, du plus ancien au plus récent. */
+export interface InstrumentSeries {
+  range: TelemetrySeriesRange
+  series: Record<string, TelemetrySeriesPoint[]>
+}
+
+/** Demande d'historique lue dans la requête de `boats.show`. */
+export interface InstrumentSeriesQuery {
+  range: TelemetrySeriesRange
+  paths: string[]
+}
