@@ -96,5 +96,18 @@
     "remove": "Remove the source",
     "removeTitle": "Remove the instruments source?",
     "removeMessage": "The readings already collected for this boat are deleted with it."
+  },
+  "history": {
+    "title": "History",
+    "noPaths": "No numeric reading to plot yet.",
+    "pick": "Pick up to {max} readings to plot.",
+    "selectOne": "Select a reading to see its history.",
+    "empty": "No data over this period.",
+    "loading": "Loading…",
+    "range": {
+      "1h": "1 hour",
+      "24h": "24 hours",
+      "7d": "7 days"
+    }
   }
 }

@@ -139,6 +139,13 @@ Sur `navigation.position` (valeur `{ latitude, longitude }` validée : finie, |l
 - Clôture de trajet : `NavigationLogCloseForm` préremplit `engineHoursEnd` avec les heures du moteur tenu par les instruments (moteur unique, ou celui choisi) ; un moteur à saisie manuelle n'écrase pas ce qui est tapé.
 - Journal : badge « Instruments » sur les points automatiques.
 
+## Historique et rétention (PR 5, #992)
+
+- `TelemetryReadService.series(boat, paths, range, now?)` : moyenne par seau `date_bin` (origine fixe `2000-01-01 UTC`, les bornes ne glissent pas d'une requête à l'autre). Plages (`TELEMETRY_SERIES_RANGES`) : `1h` → seaux d'1 min, `24h` → 15 min, `7d` → 1 h. Seul `value` (numérique) est agrégé ; le seau en cours est inclus.
+- Prop **optionnelle** `instrumentSeries` de `boats.show` (`inertia.optional`) : absente de la visite, servie par `router.reload({ only: ['instrumentSeries'], data: { range, paths } })`. `parseSeriesQuery` (`shared/helpers/instruments.ts`) ignore plage inconnue, chemins hors catalogue ou non numériques ; 6 chemins maximum. Sans le flag de plan ou sans demande valide : `{ range: '24h', series: {} }`, jamais `null`.
+- Interface : `InstrumentHistoryPanel.vue` (sélecteur de plage, cases par mesure, une courbe par mesure — pas d'axe double) + `InstrumentLineChart.vue` (chart.js, couleurs lues dans les tokens par `useChartPalette`, suit le thème). Valeurs converties en unité d'affichage côté client.
+- Rétention : `TelemetryRetentionService.purgeExpired()` appelé par le job `PurgeTelemetrySamples` (cron `15 1 * * *`). Durées par plan dans `TELEMETRY_SAMPLE_RETENTION_DAYS` (`shared/constants/data_retention.ts`) : starter 30 j (bateau rétrogradé), pro 90 j, entreprise 365 j — à revoir avec le coût de stockage réel.
+
 ## Fichiers
 
 ```
@@ -149,7 +156,8 @@ app/policies/instrument_source_policy.ts
 app/transformers/instrument_transformer.ts
 app/validators/instruments.ts
 app/events/telemetry_ingested.ts, app/listeners/on_telemetry_ingested.ts
-app/services/engine_hours_sync_service.ts, position_sync_service.ts
+app/services/engine_hours_sync_service.ts, position_sync_service.ts, telemetry_retention_service.ts
+app/jobs/purge_telemetry_samples.ts
 app/exceptions/instrument_errors.ts
 app/utils/csp_connect_src.ts
 shared/types/instruments.ts, shared/constants/instruments.ts, shared/helpers/instruments.ts

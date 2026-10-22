@@ -29,6 +29,8 @@ import {
 } from '#transformers/boat_transformer'
 import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
+import { TELEMETRY_SERIES_DEFAULT_RANGE } from '#shared/constants/instruments'
+import { parseSeriesQuery } from '#shared/helpers/instruments'
 import { emptyInstrumentsTabProps } from '#transformers/instrument_transformer'
 import { applyInstrumentCsp } from '#utils/csp_connect_src'
 import BoatIncidentService from '#services/boat_incident_service'
@@ -452,6 +454,15 @@ export default class BoatsController {
           return this.telemetryReadService.tabProps(boat, instrumentSource, can)
         }),
         'instruments'
+      ),
+      // Historique (#992) : jamais servi à la visite, seulement à un
+      // `router.reload({ only: ['instrumentSeries'], data: { range, paths } })`.
+      instrumentSeries: inertia.optional(
+        deferJson(async () => {
+          const query = instrumentsEnabled ? parseSeriesQuery(request.qs()) : null
+          if (!query) return { range: TELEMETRY_SERIES_DEFAULT_RANGE, series: {} }
+          return this.telemetryReadService.series(boat, query.paths, query.range)
+        })
       ),
     })
   }

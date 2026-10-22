@@ -1,3 +1,5 @@
+import type { PlanTier } from '#shared/types/plan'
+
 /**
  * Durées de conservation des données personnelles (#775).
  *
@@ -66,3 +68,20 @@ export const PUBLIC_BOOKING_REQUEST_RETENTION_DAYS = 30
  * la ligne, au lieu de constater son absence.
  */
 export const EXPIRED_TOKEN_GRACE_DAYS = 7
+
+/**
+ * Relevés des instruments de bord (#992), par plan de l'organisation.
+ *
+ * Signal K produit une ligne par chemin et par fenêtre d'agrégation (de 10 s à
+ * 5 min) : la table grossit vite, et l'historique ne sert qu'à lire des
+ * tendances — les heures moteur, la position et le journal de bord ont déjà
+ * leurs propres tables (#991). Pro 90 jours, Entreprise 365 ; `starter` n'a pas
+ * accès aux instruments, mais un bateau rétrogradé garde 30 jours de lecture
+ * plutôt qu'une purge brutale. Chiffres à revoir avec le coût de stockage
+ * réel après quelques semaines de données.
+ */
+export const TELEMETRY_SAMPLE_RETENTION_DAYS: Record<PlanTier, number> = {
+  starter: 30,
+  pro: 90,
+  enterprise: 365,
+}

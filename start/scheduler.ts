@@ -13,6 +13,7 @@ import ScanFleetNotifications from '#jobs/scan_fleet_notifications'
 import GenerateAiSuggestions from '#jobs/generate_ai_suggestions'
 import ReconcileMedia from '#jobs/reconcile_media'
 import SyncExternalCalendars from '#jobs/sync_external_calendars'
+import PurgeTelemetrySamples from '#jobs/purge_telemetry_samples'
 import PurgeTrashedBoats from '#jobs/purge_trashed_boats'
 import PurgeDeletedAccounts from '#jobs/purge_deleted_accounts'
 import PurgeDeletedOrganizations from '#jobs/purge_deleted_organizations'
@@ -62,6 +63,14 @@ await PurgeExpiredExports.schedule({})
   .cron('30 1 * * *')
   .timezone('Europe/Paris')
   .id('daily-purge-expired-exports')
+  .run()
+
+// À 01:15 : les relevés d'instruments (#992) sont la table la plus volumineuse ;
+// avant les exports de 01:30, sans croiser le reset mensuel de 01:00.
+await PurgeTelemetrySamples.schedule({})
+  .cron('15 1 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-purge-telemetry-samples')
   .run()
 
 await ResetAiTokenUsage.schedule({})
