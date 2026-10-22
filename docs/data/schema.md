@@ -280,6 +280,7 @@ plomberie).
 ### boat_engines
 
 - `id`, `boatId`
+- `instrumentKey` (string 40, **nullable**, unique `(boatId, instrumentKey)`) — `<id>` Signal K du moteur (`propulsion.<id>.runTime`, #991) ; `instrumentRunTimeS` (integer, nullable) — base du dernier `runTime` synchronisé, en secondes
 - `kind`, `status`
 - `family` (string 40, **nullable**, indexée) — famille de motorisation (#574), moteur **et**
   transmission (`outboard_2t`, `inboard_diesel_saildrive`, `sterndrive`…). C'est elle qui décide de
@@ -816,6 +817,7 @@ Pivot équipage d'une sortie (#101, IDOR scellé en #157).
 
 Une ligne = un **point de log** consigné en cours de sortie (rafale GPS au tap → COG/SOG).
 
+- `source` (string 20, NOT NULL, défaut `manual`) — `manual` ou `instruments` (point posé par la synchro Signal K, #991)
 - `id`, `navigationLogId` (CASCADE), `organizationId` (CASCADE, indexé)
 - `recordedAt` (index composite `(navigationLogId, recordedAt)`)
 - `latitude` / `longitude` (nullables — point sans GPS possible, toujours fournis ensemble), `gpsAccuracyM`
