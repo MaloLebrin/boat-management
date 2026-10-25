@@ -172,6 +172,17 @@ Repli universel sans navigateur (D1) : un plugin installé sur le serveur Signal
 - **Hors session.** Aucune session ni CSRF : `/api/instruments/ingest` est dans `config/shield.ts` `exceptRoutes`, et `/api/**` répond toujours en JSON (`app/exceptions/handler.ts`). Le Service Worker exclut déjà `/api/`.
 - Audit : `boat.instrument_ingest_token_issue` / `_revoke`. Aucune clé de chiffrement : un sha256 suffit pour un jeton à haute entropie, et la valeur en clair n'est jamais relisible.
 
+## Prévisions météo du bord (#1010)
+
+L'onglet Instruments affiche les prévisions du serveur Signal K du bord. Elles ne sont **pas** des chemins `vessels.self` : elles viennent de l'API Weather v2, servie par un plugin fournisseur installé sur le serveur (Open-Meteo, Meteoblue…).
+
+- **Lecture directe depuis la PWA**, sur le Wi-Fi du bord (aucun passage par le plugin d'ingestion, aucune route ni table côté FleetAi). `inertia/lib/signalk/weather.ts` appelle `GET {baseUrl}/signalk/v2/api/weather/_providers` (fournisseur par défaut, sinon le premier), puis `GET …/forecasts/point?lat&lon&count=72[&provider=id]` avec la dernière position du bateau (flux, sinon dernière valeur du serveur). Le jeton de la source est envoyé en `Authorization: Bearer`. L'origine est déjà dans la CSP `connect-src` (`applyInstrumentCsp`).
+- **Parseur tolérant** : forme tirée de la spécification Signal K v2 (`date`, `wind.speedTrue/gust/directionTrue`, `outside.pressure/temperature/precipitationVolume`, `water.waves.significantHeight/period` avec repli sur `water.swell`). Toute valeur absente ou non finie devient `null` ; une mesure sans aucun point n'a pas de courbe. **Réserve : la forme n'a pas été mesurée sur un serveur réel** (le spike #985 ne couvrait pas l'API Weather) — à confirmer sur un Signal K avec un fournisseur, et le paramètre `provider` aussi.
+- **Erreurs** (`WeatherErrorKey`) : `no_position`, `unsupported` (404 : API absente), `no_provider`, `unauthorized` (401/403), `unreachable`, `invalid` (réponse sans prévision). Elles s'ajoutent au cache affiché, sans le remplacer.
+- **Stockage : affichage seul.** La dernière réponse est gardée dans `localStorage` (`fleetai:signalk-forecast:<boatId>`), lisible hors-ligne. **Périmée 12 h après sa récupération** (`WEATHER_STALE_AFTER_MS`) : bandeau « périmée » avec la date ; les créneaux passés sont masqués. Récupération automatique au montage si le cache a plus de 30 min, ou via « Actualiser ».
+- **Contenu** : plage 24 / 48 / 72 h ; résumé (vent et rafales max en nœuds, vagues max, pression min–max en hPa, pluie cumulée en mm) et une courbe par mesure disponible (vent, rafales, vagues, pression, pluie, température), réutilisant `InstrumentLineChart`.
+- Fichiers : `shared/types/weather.ts`, `shared/constants/weather.ts`, `inertia/lib/signalk/weather.ts`, `inertia/composables/use_signalk_forecast.ts`, `InstrumentForecastPanel/Summary/Charts.vue`, clés `instruments.forecast.*`.
+
 ## Fichiers
 
 ```

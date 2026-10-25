@@ -165,5 +165,38 @@
     "revoke": "Révoquer le jeton",
     "revokeTitle": "Révoquer le jeton ?",
     "revokeMessage": "Le plugin ne pourra plus envoyer de relevés tant qu’un nouveau jeton n’est pas généré."
+  },
+  "forecast": {
+    "title": "Prévisions météo",
+    "range": "{hours} h",
+    "refresh": "Actualiser",
+    "loading": "Chargement…",
+    "source": "Source : {provider} · récupérées le {date}",
+    "stale": "Prévisions périmées (récupérées le {date}). Reconnectez-vous au Wi-Fi du bord pour les actualiser.",
+    "none": "Aucune prévision pour l'instant.",
+    "empty": "Le serveur ne fournit aucune mesure sur cette période.",
+    "summary": {
+      "wind": "Vent max",
+      "gust": "Rafales max",
+      "wave": "Vagues max",
+      "pressure": "Pression",
+      "rain": "Pluie cumulée"
+    },
+    "metric": {
+      "wind": "Vent",
+      "gust": "Rafales",
+      "wave": "Vagues",
+      "pressure": "Pression",
+      "rain": "Pluie",
+      "temperature": "Température"
+    },
+    "error": {
+      "no_position": "Position du bateau inconnue : les prévisions se chargent dès qu'elle est reçue.",
+      "unsupported": "Ce serveur Signal K n'expose pas l'API météo (version 2 requise).",
+      "no_provider": "Aucun fournisseur météo n'est installé sur le serveur Signal K (par exemple Open-Meteo).",
+      "unauthorized": "Le serveur refuse l'accès aux prévisions : vérifiez le jeton de la source.",
+      "unreachable": "Serveur Signal K injoignable : les dernières prévisions connues restent affichées.",
+      "invalid": "Le fournisseur météo a répondu sans prévision exploitable."
+    }
   }
 }

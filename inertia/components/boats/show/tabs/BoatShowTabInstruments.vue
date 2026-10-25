@@ -7,13 +7,16 @@ import InstrumentAlertsList from '~/components/boats/show/tabs/instruments/Instr
 import InstrumentAlarmsList from '~/components/boats/show/tabs/instruments/InstrumentAlarmsList.vue'
 import InstrumentCategoryGrid from '~/components/boats/show/tabs/instruments/InstrumentCategoryGrid.vue'
 import InstrumentConnectionBanner from '~/components/boats/show/tabs/instruments/InstrumentConnectionBanner.vue'
+import InstrumentForecastPanel from '~/components/boats/show/tabs/instruments/InstrumentForecastPanel.vue'
 import InstrumentHistoryPanel from '~/components/boats/show/tabs/instruments/InstrumentHistoryPanel.vue'
 import InstrumentEmptyState from '~/components/boats/show/tabs/instruments/InstrumentEmptyState.vue'
 import InstrumentSourceForm from '~/components/boats/show/tabs/instruments/InstrumentSourceForm.vue'
 import { useInstrumentStream } from '~/composables/use_instrument_stream'
 import { useT } from '~/composables/use_t'
+import { useSignalKForecast } from '~/composables/use_signalk_forecast'
 import { useTelemetrySync } from '~/composables/use_telemetry_sync'
 import { buildReadings } from '~/lib/signalk/display'
+import { parsePosition } from '~/lib/signalk/weather'
 import { mergeInstrumentAlerts } from '~/utils/instrument_alerts'
 import { alertRuleSpecs } from '#shared/helpers/instrument_alerts'
 import type { InstrumentSeries, InstrumentsTabProps } from '#shared/types/instruments'
@@ -46,6 +49,15 @@ const now = ref(Date.now())
 let clock: ReturnType<typeof setInterval> | null = null
 
 const readings = computed(() => buildReadings(props.instruments.latest, stream.latestByPath.value))
+/** Dernière position connue (flux, sinon dernière valeur du serveur) : point des prévisions. */
+const boatPosition = computed(() =>
+  parsePosition(readings.value.find((reading) => reading.path === 'navigation.position')?.valueJson)
+)
+const forecast = useSignalKForecast({
+  boatId: () => props.boatId,
+  source: () => source.value,
+  position: () => boatPosition.value,
+})
 const alerts = computed(() =>
   mergeInstrumentAlerts(props.instruments.openAlerts, stream.localAlerts.value)
 )
@@ -108,6 +120,14 @@ onBeforeUnmount(() => {
         v-if="historyPaths.length > 0"
         :paths="historyPaths"
         :series="page.props.instrumentSeries"
+      />
+      <InstrumentForecastPanel
+        :snapshot="forecast.snapshot.value"
+        :error="forecast.error.value"
+        :loading="forecast.loading.value"
+        :stale="forecast.stale.value"
+        :now="forecast.now.value"
+        @refresh="forecast.refresh()"
       />
       <InstrumentAlertsList :alerts="alerts" />
       <InstrumentAlarmsList :readings="alarmReadings" />
