@@ -25,6 +25,10 @@ const strokeTypeChoices = [...engineStrokeTypes, '', '__none__'] as string[]
  */
 const familyChoices = [...ENGINE_FAMILIES, '', '__none__'] as string[]
 
+/** `<id>` Signal K (#991) : un segment de chemin, sans point ni espace. */
+const INSTRUMENT_KEY_PATTERN = /^[A-Za-z0-9_-]*$/
+const INSTRUMENT_KEY_MAX_LENGTH = 40
+
 const enginePayload = vine.object({
   kind: vine.enum(engineKinds),
   fuel: vine.string().trim().maxLength(32).in(fuelChoices).optional(),
@@ -41,12 +45,11 @@ const enginePayload = vine.object({
   manufacturedAt: vine.string().trim().optional(),
   powerHp: vine.string().trim().optional(),
   installHours: vine.string().trim().optional(),
-  // `<id>` Signal K (#991) : un segment de chemin, sans point ni espace.
   instrumentKey: vine
     .string()
     .trim()
-    .maxLength(40)
-    .regex(/^[A-Za-z0-9_-]*$/)
+    .maxLength(INSTRUMENT_KEY_MAX_LENGTH)
+    .regex(INSTRUMENT_KEY_PATTERN)
     .optional(),
   status: vine.enum(equipmentStatuses).optional(),
 })
@@ -134,6 +137,19 @@ export const updateEquipmentNotesValidator = vine.create(
 
 export const incrementEngineHoursValidator = vine.create(
   vine.object({ hoursIncrement: vine.number().positive() })
+)
+
+/** Liaison d'un moteur à son calculateur (#1020) : `null` ou vide détache le moteur. */
+export const updateEngineInstrumentKeyValidator = vine.create(
+  vine.object({
+    instrumentKey: vine
+      .string()
+      .trim()
+      .maxLength(INSTRUMENT_KEY_MAX_LENGTH)
+      .regex(INSTRUMENT_KEY_PATTERN)
+      .optional()
+      .nullable(),
+  })
 )
 
 export type BoatRigFormBody = {

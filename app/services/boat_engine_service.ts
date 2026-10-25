@@ -73,17 +73,36 @@ export default class BoatEngineService {
     })
   }
 
+  /**
+   * Pose la clé sans enregistrer. Un autre moteur du calculateur : l'ancienne
+   * base de `runTime` ne vaut plus rien (D6).
+   */
+  private async applyInstrumentKey(boat: Boat, engine: BoatEngine, key: string | null) {
+    await this.assertInstrumentKeyFree(boat.id, key, engine.id)
+    if (key !== engine.instrumentKey) engine.instrumentRunTimeS = null
+    engine.instrumentKey = key
+  }
+
+  /** Relie (ou détache, avec `null`) un moteur à son identifiant Signal K (#1020). */
+  async setInstrumentKey(user: User, boat: Boat, engineId: number, key: string | null) {
+    assertBoatInUserOrg(user, boat)
+
+    const engine = await BoatEngine.query().where('id', engineId).where('boatId', boat.id).first()
+    if (!engine) throw new BoatEquipmentNotFoundError()
+
+    const normalized = key === null || key.trim() === '' ? null : key.trim()
+    await this.applyInstrumentKey(boat, engine, normalized)
+    await engine.save()
+    return engine
+  }
+
   async update(user: User, boat: Boat, engineId: number, payload: BoatEnginePayload) {
     assertBoatInUserOrg(user, boat)
 
     const engine = await BoatEngine.query().where('id', engineId).where('boatId', boat.id).first()
     if (!engine) throw new BoatEquipmentNotFoundError()
 
-    const instrumentKey = payload.instrumentKey ?? null
-    await this.assertInstrumentKeyFree(boat.id, instrumentKey, engine.id)
-    // Un autre moteur du calculateur : l'ancienne base de `runTime` ne vaut plus rien (D6).
-    if (instrumentKey !== engine.instrumentKey) engine.instrumentRunTimeS = null
-    engine.instrumentKey = instrumentKey
+    await this.applyInstrumentKey(boat, engine, payload.instrumentKey ?? null)
 
     // `hours` and `installHours` are intentionally not editable here: the
     // install baseline is fixed once at creation, and the running total only

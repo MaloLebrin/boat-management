@@ -11,6 +11,7 @@
     "updated": "Moteur mis à jour.",
     "removed": "Moteur supprimé.",
     "notFound": "Moteur introuvable.",
+    "instrumentKeySaved": "Moteur relié à l’identifiant d’instrument.",
     "instrumentKeyTaken": "Un autre moteur de ce bateau utilise déjà cet identifiant d’instrument."
   },
   "sail": {

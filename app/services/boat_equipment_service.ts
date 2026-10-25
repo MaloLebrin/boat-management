@@ -53,6 +53,10 @@ export default class BoatEquipmentService {
     return this.engineService.updateNotes(user, boat, engineId, notes)
   }
 
+  async setEngineInstrumentKey(user: User, boat: Boat, engineId: number, key: string | null) {
+    return this.engineService.setInstrumentKey(user, boat, engineId, key)
+  }
+
   async incrementEngineHours(user: User, boat: Boat, engineId: number, incrementBy: number) {
     return this.engineService.incrementHours(user, boat, engineId, incrementBy)
   }

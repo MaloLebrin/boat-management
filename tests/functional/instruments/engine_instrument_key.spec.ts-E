@@ -1,0 +1,275 @@
+import { test } from '@japa/runner'
+import { truncateDb } from '#tests/utils/db'
+import BoatEngine from '#models/boat_engine'
+import { createAdminUser, createBoatOwnerUser } from '#tests/functional/helpers'
+import { boatWithSource } from '#tests/functional/instruments/helpers'
+import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+
+/** Formulaire moteur (#991) : l'identifiant Signal K, unique par bateau. */
+
+test.group('Instruments — instrumentKey du moteur', (group) => {
+  group.each.setup(() => truncateDb())
+
+  const body = (instrumentKey: string) => ({
+    kind: 'inboard',
+    status: 'operational',
+    instrumentKey,
+  })
+
+  test('crée un moteur avec son identifiant, normalisé', async ({ client, assert }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+
+    const response = await client
+      .post(`/boats/${boat.id}/engines`)
+      .loginAs(admin)
+      .form(body('  port '))
+      .redirects(0)
+
+    response.assertStatus(302)
+    const engine = await BoatEngine.query().where('boatId', boat.id).firstOrFail()
+    assert.equal(engine.instrumentKey, 'port')
+  })
+
+  test('un identifiant vide est enregistré à null', async ({ client, assert }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+
+    await client.post(`/boats/${boat.id}/engines`).loginAs(admin).form(body('')).redirects(0)
+
+    const engine = await BoatEngine.query().where('boatId', boat.id).firstOrFail()
+    assert.isNull(engine.instrumentKey)
+  })
+
+  test('refuse un identifiant déjà pris sur le bateau, à la création', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+    await BoatEngineFactory.merge({ boatId: boat.id, instrumentKey: 'port' }).create()
+
+    const response = await client
+      .post(`/boats/${boat.id}/engines`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}`)
+      .form(body('port'))
+      .redirects(0)
+
+    response.assertStatus(302)
+    assert.exists(response.flashMessages().error)
+    const count = await BoatEngine.query().where('boatId', boat.id).count('* as n')
+    assert.equal(Number(count[0].$extras.n), 1)
+  })
+
+  test('refuse un identifiant déjà pris à la modification, mais pas le sien', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+    await BoatEngineFactory.merge({ boatId: boat.id, instrumentKey: 'port' }).create()
+    const second = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      instrumentKey: 'starboard',
+      instrumentRunTimeS: 7_200,
+    }).create()
+
+    const taken = await client
+      .put(`/boats/${boat.id}/engines/${second.id}`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}`)
+      .form(body('port'))
+      .redirects(0)
+    assert.exists(taken.flashMessages().error)
+    const unchanged = await BoatEngine.findOrFail(second.id)
+    assert.equal(unchanged.instrumentKey, 'starboard')
+
+    // Même clé : la base de runTime est conservée.
+    await client
+      .put(`/boats/${boat.id}/engines/${second.id}`)
+      .loginAs(admin)
+      .form(body('starboard'))
+      .redirects(0)
+    const kept = await BoatEngine.findOrFail(second.id)
+    assert.equal(kept.instrumentRunTimeS, 7_200)
+
+    // Autre clé libre : la base est effacée (autre moteur du calculateur).
+    await client
+      .put(`/boats/${boat.id}/engines/${second.id}`)
+      .loginAs(admin)
+      .form(body('1'))
+      .redirects(0)
+    const moved = await BoatEngine.findOrFail(second.id)
+    assert.equal(moved.instrumentKey, '1')
+    assert.isNull(moved.instrumentRunTimeS)
+  })
+
+  test('refuse un identifiant qui n’est pas un segment de chemin', async ({ client, assert }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+
+    await client
+      .post(`/boats/${boat.id}/engines`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}`)
+      .form(body('port.main'))
+      .redirects(0)
+
+    const count = await BoatEngine.query().where('boatId', boat.id).count('* as n')
+    assert.equal(Number(count[0].$extras.n), 0)
+  })
+
+  test('PATCH instrument-key relie le moteur et revient au referer', async ({ client, assert }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, instrumentKey: null }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/engines/${engine.id}/instrument-key`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}?tab=instruments`)
+      .json({ instrumentKey: ' port ' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    response.assertRedirectsTo(`/boats/${boat.id}?tab=instruments`)
+    assert.exists(response.flashMessages().success)
+    const reloaded4981 = await BoatEngine.findOrFail(engine.id)
+    assert.equal(reloaded4981.instrumentKey, 'port')
+  })
+
+  test('PATCH instrument-key refuse une clé déjà prise par un autre moteur', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+    await BoatEngineFactory.merge({ boatId: boat.id, instrumentKey: 'port' }).create()
+    const second = await BoatEngineFactory.merge({ boatId: boat.id, instrumentKey: null }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/engines/${second.id}/instrument-key`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}`)
+      .json({ instrumentKey: 'port' })
+      .redirects(0)
+
+    response.assertStatus(302)
+    assert.exists(response.flashMessages().error)
+    assert.isUndefined(response.flashMessages().success)
+    const reloaded5844 = await BoatEngine.findOrFail(second.id)
+    assert.isNull(reloaded5844.instrumentKey)
+  })
+
+  test('PATCH instrument-key null détache le moteur et efface la base de runTime', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      instrumentKey: 'port',
+      instrumentRunTimeS: 7_200,
+    }).create()
+
+    await client
+      .patch(`/boats/${boat.id}/engines/${engine.id}/instrument-key`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}`)
+      .json({ instrumentKey: null })
+      .redirects(0)
+
+    const reloaded = await BoatEngine.findOrFail(engine.id)
+    assert.isNull(reloaded.instrumentKey)
+    assert.isNull(reloaded.instrumentRunTimeS)
+  })
+
+  test('PATCH instrument-key avec la même clé conserve la base de runTime', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+    const engine = await BoatEngineFactory.merge({
+      boatId: boat.id,
+      instrumentKey: 'port',
+      instrumentRunTimeS: 7_200,
+    }).create()
+
+    await client
+      .patch(`/boats/${boat.id}/engines/${engine.id}/instrument-key`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}`)
+      .json({ instrumentKey: 'port' })
+      .redirects(0)
+
+    const reloaded7254 = await BoatEngine.findOrFail(engine.id)
+    assert.equal(reloaded7254.instrumentRunTimeS, 7_200)
+  })
+
+  test('PATCH instrument-key refuse un identifiant qui n’est pas un segment de chemin', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, instrumentKey: null }).create()
+
+    await client
+      .patch(`/boats/${boat.id}/engines/${engine.id}/instrument-key`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}`)
+      .json({ instrumentKey: 'port.main' })
+      .redirects(0)
+
+    const reloaded7895 = await BoatEngine.findOrFail(engine.id)
+    assert.isNull(reloaded7895.instrumentKey)
+  })
+
+  test('PATCH instrument-key est refusé sans la capacité boats.edit', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const owner = await createBoatOwnerUser(admin.organizationId!)
+    const { boat } = await boatWithSource(admin, false)
+    const engine = await BoatEngineFactory.merge({ boatId: boat.id, instrumentKey: null }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/engines/${engine.id}/instrument-key`)
+      .loginAs(owner)
+      .header('referer', `/boats/${boat.id}`)
+      .json({ instrumentKey: 'port' })
+      .redirects(0)
+
+    // Bouncer renvoie les méthodes de formulaire en 302 + flash (Inertia), jamais un 403 brut.
+    response.assertStatus(302)
+    assert.isUndefined(response.flashMessages().success)
+    const reloaded8770 = await BoatEngine.findOrFail(engine.id)
+    assert.isNull(reloaded8770.instrumentKey)
+  })
+
+  test('PATCH instrument-key sur un moteur d’un autre bateau : introuvable', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin, false)
+    const other = await boatWithSource(admin, false)
+    const engine = await BoatEngineFactory.merge({ boatId: other.boat.id }).create()
+
+    const response = await client
+      .patch(`/boats/${boat.id}/engines/${engine.id}/instrument-key`)
+      .loginAs(admin)
+      .header('referer', `/boats/${boat.id}`)
+      .json({ instrumentKey: 'port' })
+      .redirects(0)
+
+    response.assertRedirectsTo(`/boats/${boat.id}`)
+    assert.exists(response.flashMessages().error)
+    const reloaded9541 = await BoatEngine.findOrFail(engine.id)
+    assert.isNull(reloaded9541.instrumentKey)
+  })
+})
