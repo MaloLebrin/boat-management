@@ -217,3 +217,24 @@ export const SIGNALK_PLUGIN_ENV_ENDPOINT = 'FLEETAI_ENDPOINT'
 
 /** Marqueur du script remplacé par `${origine}${INSTRUMENT_INGEST_PATH}` au service. */
 export const SIGNALK_PLUGIN_ENDPOINT_MARKER = '__FLEETAI_INGEST_ENDPOINT__'
+
+/** Assistant « Connecter mon bateau » (#1023). */
+export const INSTRUMENT_SETUP_POLL_INTERVAL_MS = 10_000
+/** Attente maximale du premier lot du plugin avant « Toujours rien ? ». */
+export const INSTRUMENT_SETUP_POLL_MAX_MS = 10 * 60_000
+/** Un `lastSeenAt` plus récent que cela compte comme « connecté ». */
+export const INSTRUMENT_SETUP_RECENT_MS = 10 * 60_000
+export const INSTRUMENT_SETUP_STORAGE_PREFIX = 'fleetai:instrument-setup:'
+
+/** Adresse LAN proposée selon le matériel (vide : rien de plausible à proposer). */
+export const INSTRUMENT_SETUP_DEFAULT_URLS = {
+  none: '',
+  cerbo: 'http://venus.local:3000',
+  signalk: 'http://openplotter.local:3000',
+} as const
+
+/**
+ * Adresse enregistrée quand l'admin n'en donne pas sur le chemin plugin : la
+ * source exige une origine (`base_url` NOT NULL), mais seul le plugin pousse.
+ */
+export const INSTRUMENT_SETUP_PLUGIN_PLACEHOLDER_URL = 'http://signalk.local:3000'

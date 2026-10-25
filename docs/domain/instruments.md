@@ -127,6 +127,17 @@ L'acquisition ne tourne que l'onglet ouvert : le flux est coupé quand la page p
 
 **Réserve — go/no-go iOS.** La matrice contenu mixte mesurée sur téléphone (document d'épopée, « Encore ouvert ») n'était pas consignée à l'ouverture de cette PR. L'onglet reste utile quel que soit le résultat (dernières valeurs, historique, configuration), mais le flux depuis un iPhone dépend de cette mesure : un serveur à certificat de confiance (nom DNS) est le seul chemin sans manipulation sur l'appareil.
 
+### Assistant « Connecter mon bateau » (#1023)
+
+`setup/InstrumentSetupWizard.vue` (dossier `inertia/components/boats/show/tabs/instruments/setup/`) remplace `InstrumentEmptyState` pour qui a `can.manage` ; le lecteur garde l'état vide. Une source déjà connectée à l'ouverture de l'onglet masque l'assistant (bouton « Rouvrir »).
+
+- **Progression dérivée** (`use_instrument_setup.ts`) : matériel (choix ou source existante) → chemin (choix, ou déduit : jeton de plugin → `plugin`, source seule → `app`) → connexion (`lastSeenAt` ≤ 10 min, ou flux ouvert avec une source) → moteurs reliés (tous ont un `instrumentKey`, ou aucun moteur) → terminé. Stockage : `localStorage` `fleetai:instrument-setup:<boatId>` = `{ hardware, path, dismissed, pendingTest }`, lu au montage seulement, sous `try/catch`.
+- **Chemin plugin** : `PUT instrument-source` (adresse par défaut `http://signalk.local:3000` si vide — la colonne `base_url` est NOT NULL), `POST …/ingest-token`, commande `signalkPluginInstallCommand(origin, jeton)`. L'attente du premier lot relance `router.reload({ only: ['instruments'] })` toutes les 10 s, 10 min au plus ; succès quand `source.lastSeenAt` dépasse l'instant d'ouverture.
+- **Chemin application** : pré-vol `probeSignalKServer({ preflight: true })` (adresse invalide / contenu mixte, sans réseau), `PUT`, puis sonde complète. Une nouvelle origine impose un rechargement complet (CSP par document, D10) : le drapeau `pendingTest` relance la sonde au retour.
+- **Moteurs** : `PATCH /boats/:boatId/engines/:engineId/instrument-key` (`{ instrumentKey }`, `null` détache) ; identifiants proposés = `propulsion.<id>` des dernières valeurs + inventaire de la sonde.
+- **Lien public** : `inertia/lib/signalk/install_page.ts` (`installSignalKPath`) — constante locale en attendant `MARKETING_SLUGS.installSignalK` (#1022).
+- Le formulaire de source et la carte du plugin sont sous un `<details>` « Paramètres avancés ».
+
 ## Synchronisation métier (PR 4, #991)
 
 `TelemetryIngested` est écouté par `OnTelemetryIngested` (`app/listeners/`), enregistré dans `start/events.ts`. Un lot entièrement rejoué (`accepted === 0`) est ignoré ; une panne de synchro est journalisée et **jamais propagée** à l'ingestion (les échantillons sont déjà écrits). Le listener lit la **dernière valeur en base** de chaque chemin utile (`TelemetryReadService.latestForPaths`) : un lot reçu en retard ne peut pas ramener le bateau en arrière.

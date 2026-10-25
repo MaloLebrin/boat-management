@@ -1430,6 +1430,32 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canConnectInstruments',
   },
   {
+    id: 'instruments-signalk-setup-wizard',
+    title: {
+      en: 'Connect my boat assistant (Instruments tab)',
+      fr: 'Assistant « Connecter mon bateau » (onglet Instruments)',
+    },
+    body: {
+      en: 'In the boat’s Instruments tab, an admin without a source sees the “Connect my boat” assistant, step by step. 1) Onboard hardware: nothing, a Cerbo GX or a Signal K server. 2) Path: the plugin (recommended, the onboard server pushes the readings) or the app aboard. 3) Plugin: address, ingestion token, install command to paste, then the page waits for the first batch (10 minutes max). App: address and read-only token, then “Save and test” reports the server version, vessel, engines, batteries, tanks and position, or the fix for the error. 4) Link each engine to its Signal K identifier. 5) Done: readings in, built-in alert rules active. The assistant can be hidden and reopened; the manual form stays under Advanced settings.',
+      fr: 'Dans l’onglet Instruments du bateau, un admin sans source voit l’assistant « Connecter mon bateau », pas à pas. 1) Matériel à bord : rien, un Cerbo GX ou un serveur Signal K. 2) Chemin : le plugin (recommandé, le serveur de bord pousse les relevés) ou l’application à bord. 3) Plugin : adresse, jeton d’ingestion, commande d’installation à coller, puis la page attend le premier lot (10 minutes au plus). Application : adresse et jeton en lecture seule, puis « Enregistrer et tester » indique la version du serveur, le navire, les moteurs, batteries, réservoirs et la position, ou le remède à l’erreur. 4) Relier chaque moteur à son identifiant Signal K. 5) Terminé : mesures reçues, règles d’alerte intégrées actives. Il se masque et se rouvre ; le formulaire manuel reste sous Paramètres avancés.',
+    },
+    keywords: [
+      'assistant',
+      'assistant connexion',
+      'connecter mon bateau',
+      'connect my boat',
+      'tester la connexion',
+      'enregistrer et tester',
+      'pas a pas',
+      'installer signal k',
+      'premier lot',
+      'relier les moteurs',
+      'cerbo',
+    ],
+    navTarget: null,
+    planFlag: 'canConnectInstruments',
+  },
+  {
     id: 'rental-contracts',
     title: {
       en: 'Rental contracts',
