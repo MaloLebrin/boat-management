@@ -126,7 +126,12 @@
       "wind": "Wind",
       "windUnit": "kn",
       "alert": "Engine temperature high",
-      "synced": "Synced"
+      "synced": "Synced",
+      "alertsTitle": "Open alerts",
+      "batteryLow": "Low battery",
+      "shallow": "Shallow water",
+      "critical": "Critical",
+      "warning": "Warning"
     }
   }
 }

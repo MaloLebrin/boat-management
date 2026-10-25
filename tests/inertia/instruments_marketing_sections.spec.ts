@@ -6,6 +6,7 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 }))
 
 import InstrumentsCardsSection from '../../inertia/components/marketing/instruments/InstrumentsCardsSection.vue'
+import InstrumentsAlertsSection from '../../inertia/components/marketing/instruments/InstrumentsAlertsSection.vue'
 import InstrumentsCompatibilitySection from '../../inertia/components/marketing/instruments/InstrumentsCompatibilitySection.vue'
 import type { InstrumentsMarketingContentProps } from '../../shared/types/marketing_instruments'
 
@@ -47,6 +48,25 @@ describe('InstrumentsCardsSection (#995)', () => {
     expect(rendered[0].text()).toContain('Régime et heures')
   })
 
+  test('affiche le pictogramme de la carte quand il est fourni', () => {
+    const wrapper = mount(InstrumentsCardsSection, {
+      props: {
+        eyebrow: 'e',
+        title: 't',
+        titleHighlight: 'h',
+        subtitle: 's',
+        items: [
+          { title: 'Moteur', description: 'd', icon: 'engine' },
+          { title: 'Sans icône', description: 'd' },
+        ],
+      },
+    })
+
+    const icons = wrapper.findAll('[data-testid="instruments-card-icon"]')
+    expect(icons).toHaveLength(1)
+    expect(icons[0].find('svg').exists()).toBe(true)
+  })
+
   test('trois colonnes par défaut, deux à la demande', () => {
     const base = {
       eyebrow: 'e',
@@ -84,6 +104,53 @@ describe('InstrumentsCardsSection (#995)', () => {
     })
 
     expect(wrapper.find('[data-testid="instruments-install"]').exists()).toBe(true)
+  })
+})
+
+describe('InstrumentsAlertsSection (#995)', () => {
+  const alerts: InstrumentsMarketingContentProps['alerts'] = {
+    eyebrow: 'Alertes',
+    title: 'Prévenu avant que',
+    titleHighlight: 'ça tourne mal.',
+    subtitle: 'Quatre règles actives.',
+    items: [
+      {
+        title: 'Batterie faible',
+        description: 'Sous 20 %',
+        icon: 'power',
+        severity: 'warning',
+        severityLabel: 'Avertissement',
+      },
+      {
+        title: 'Petits fonds',
+        description: 'Sous 1,5 m',
+        icon: 'depth',
+        severity: 'critical',
+        severityLabel: 'Critique',
+      },
+    ],
+    customTitle: 'Et tes propres règles',
+    customDescription: 'Jusqu’à 20 règles',
+    team: 'L’équipe est prévenue.',
+  }
+
+  test('rend une carte par règle avec sa gravité', () => {
+    const wrapper = mount(InstrumentsAlertsSection, { props: { content: alerts } })
+
+    const renderedCards = wrapper.findAll('[data-testid="instruments-alert-card"]')
+    expect(renderedCards).toHaveLength(2)
+    expect(renderedCards[0].find('[data-severity]').attributes('data-severity')).toBe('warning')
+    expect(renderedCards[1].find('[data-severity]').attributes('data-severity')).toBe('critical')
+    expect(renderedCards[1].text()).toContain('Critique')
+    expect(renderedCards[1].text()).toContain('Sous 1,5 m')
+  })
+
+  test('affiche les règles propres au bateau et la notification de l’équipe', () => {
+    const wrapper = mount(InstrumentsAlertsSection, { props: { content: alerts } })
+
+    expect(wrapper.text()).toContain('Et tes propres règles')
+    expect(wrapper.text()).toContain('Jusqu’à 20 règles')
+    expect(wrapper.text()).toContain('L’équipe est prévenue.')
   })
 })
 

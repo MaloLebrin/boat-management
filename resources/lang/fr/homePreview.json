@@ -126,7 +126,12 @@
       "wind": "Vent",
       "windUnit": "nds",
       "alert": "Température moteur élevée",
-      "synced": "Synchronisé"
+      "synced": "Synchronisé",
+      "alertsTitle": "Alertes en cours",
+      "batteryLow": "Batterie faible",
+      "shallow": "Petits fonds",
+      "critical": "Critique",
+      "warning": "Avertissement"
     }
   }
 }

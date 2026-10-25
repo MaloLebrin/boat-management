@@ -4,6 +4,10 @@ import { marketingPath } from '#shared/helpers/locale_path'
 import type { MarketingPage } from '#shared/helpers/locale_path'
 import { TELEMETRY_SAMPLE_RETENTION_DAYS } from '#shared/constants/data_retention'
 import {
+  BUILTIN_ALERT_RULES,
+  INSTRUMENT_ALERT_MAX_RULES_PER_BOAT,
+} from '#shared/constants/instrument_alerts'
+import {
   INSTRUMENTS_MARKETING_BENEFIT_COUNT,
   INSTRUMENTS_MARKETING_CATEGORY_COUNT,
   INSTRUMENTS_MARKETING_FAQ_COUNT,
@@ -75,6 +79,7 @@ test.group('Instruments connectés — contenu SEO (#995)', () => {
       assert.lengthOf(content.steps.items, 3)
       assert.lengthOf(content.categories.items, INSTRUMENTS_MARKETING_CATEGORY_COUNT)
       assert.lengthOf(content.benefits.items, INSTRUMENTS_MARKETING_BENEFIT_COUNT)
+      assert.lengthOf(content.alerts.items, BUILTIN_ALERT_RULES.length)
       assert.lengthOf(content.compatibility.supported, 3)
       assert.lengthOf(content.compatibility.unsupported, 3)
       assert.lengthOf(content.install.items, 3)
@@ -121,6 +126,35 @@ test.group('Instruments connectés — contenu SEO (#995)', () => {
 
       assert.isDefined(retention, 'aucune carte de sécurité ne cite la conservation Entreprise')
       assert.include(retention!.description, String(TELEMETRY_SAMPLE_RETENTION_DAYS.pro))
+    })
+
+    test(`[${locale}] chaque carte porte un pictogramme et les alertes citent les seuils réels`, async ({
+      client,
+      assert,
+    }) => {
+      const { content } = await fetchProps<InstrumentsPageProps>(
+        client,
+        marketingPath('instruments', locale)
+      )
+      const cards = [
+        ...content.categories.items,
+        ...content.benefits.items,
+        ...content.install.items,
+        ...content.security.items,
+      ]
+
+      for (const card of cards) assert.isDefined(card.icon, `pas d'icône pour « ${card.title} »`)
+      assert.deepEqual(
+        content.alerts.items.map((item) => item.severity),
+        BUILTIN_ALERT_RULES.map((rule) => rule.severity)
+      )
+      assert.include(content.alerts.items[0].description, '20')
+      assert.include(content.alerts.items[1].description, '95')
+      assert.include(content.alerts.customDescription, String(INSTRUMENT_ALERT_MAX_RULES_PER_BOAT))
+      for (const item of content.alerts.items) {
+        assert.notMatch(item.description, /\{[a-zA-Z]+\}/)
+        assert.isNotEmpty(item.severityLabel)
+      }
     })
 
     test(`[${locale}] la FAQ iPhone ne promet rien que le spike n'a pas validé`, async ({

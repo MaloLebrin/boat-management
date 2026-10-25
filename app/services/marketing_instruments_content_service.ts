@@ -1,6 +1,10 @@
 import { marketingPath, toAppLocale } from '#shared/helpers/locale_path'
 import type { MarketingPage } from '#shared/helpers/locale_path'
 import { TELEMETRY_SAMPLE_RETENTION_DAYS } from '#shared/constants/data_retention'
+import {
+  BUILTIN_ALERT_RULES,
+  INSTRUMENT_ALERT_MAX_RULES_PER_BOAT,
+} from '#shared/constants/instrument_alerts'
 import type { MarketingI18n } from '#shared/types/marketing'
 import {
   INSTRUMENTS_MARKETING_BENEFIT_COUNT,
@@ -9,8 +13,10 @@ import {
   INSTRUMENTS_MARKETING_SECURITY_COUNT,
 } from '#shared/types/marketing_instruments'
 import type {
+  InstrumentsMarketingAlertCard,
   InstrumentsMarketingCardsSection,
   InstrumentsMarketingContentProps,
+  InstrumentsMarketingIcon,
 } from '#shared/types/marketing_instruments'
 
 /** Cartes de maillage interne : clé de copie `features.shared.cards.*` + page cible. */
@@ -23,6 +29,23 @@ const CROSS_LINKS: ReadonlyArray<{ card: string; page: MarketingPage }> = [
 const STEP_COUNT = 3
 const INSTALL_COUNT = 3
 const COMPAT_COUNT = 3
+
+/** Pictogrammes par section, dans l'ordre des cartes. */
+const ICONS = {
+  categories: ['engine', 'navigation', 'power', 'tanks', 'environment', 'alarm'],
+  benefits: ['clock', 'chart', 'alarm', 'position'],
+  install: ['server', 'lock', 'key'],
+  security: ['eye', 'key', 'users', 'archive'],
+  alerts: ['power', 'temperature', 'depth', 'alarm'],
+} as const satisfies Record<string, readonly InstrumentsMarketingIcon[]>
+
+const KELVIN_OFFSET = 273.15
+
+function builtinRule(key: string) {
+  const rule = BUILTIN_ALERT_RULES.find((candidate) => candidate.key === key)
+  if (!rule) throw new Error(`Règle d'alerte intégrée introuvable : ${key}`)
+  return rule
+}
 
 /**
  * Contenu éditorial de la page « Instruments de bord connectés » (#995) —
@@ -46,7 +69,8 @@ export default class MarketingInstrumentsContentService {
     const cards = (
       section: string,
       prefix: string,
-      count: number
+      count: number,
+      icons: readonly InstrumentsMarketingIcon[]
     ): InstrumentsMarketingCardsSection => ({
       eyebrow: t(`${section}_eyebrow`),
       title: t(`${section}_title`),
@@ -55,7 +79,41 @@ export default class MarketingInstrumentsContentService {
       items: Array.from({ length: count }, (_, index) => ({
         title: t(`${prefix}${index + 1}_title`),
         description: t(`${prefix}${index + 1}_desc`),
+        icon: icons[index],
       })),
+    })
+
+    const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 })
+    const battery = builtinRule('builtin:battery_low')
+    const engine = builtinRule('builtin:engine_hot')
+    const depth = builtinRule('builtin:shallow_water')
+    // Les seuils affichés viennent des règles réellement évaluées : la page ne
+    // peut pas promettre 20 % si la règle passe à 15 %.
+    const alertParams = {
+      batteryLow: number.format(battery.threshold * 100),
+      batteryClear: number.format((battery.threshold + battery.hysteresis) * 100),
+      engineHot: number.format(engine.threshold - KELVIN_OFFSET),
+      engineClear: number.format(engine.threshold - engine.hysteresis - KELVIN_OFFSET),
+      depthLow: number.format(depth.threshold),
+      depthClear: number.format(depth.threshold + depth.hysteresis),
+      maxRules: String(INSTRUMENT_ALERT_MAX_RULES_PER_BOAT),
+    }
+    const alertText = (key: string) => i18n.t(`marketing.features.instruments.${key}`, alertParams)
+    const alertRules = [
+      'builtin:battery_low',
+      'builtin:engine_hot',
+      'builtin:shallow_water',
+      'builtin:signalk_alarm',
+    ]
+    const alertCards: InstrumentsMarketingAlertCard[] = alertRules.map((key, index) => {
+      const severity = builtinRule(key).severity
+      return {
+        title: alertText(`alert${index + 1}_title`),
+        description: alertText(`alert${index + 1}_desc`),
+        icon: ICONS.alerts[index],
+        severity,
+        severityLabel: alertText(`severity_${severity}`),
+      }
     })
 
     return {
@@ -82,8 +140,23 @@ export default class MarketingInstrumentsContentService {
           description: t(`step${index + 1}_desc`),
         })),
       },
-      categories: cards('categories', 'cat', INSTRUMENTS_MARKETING_CATEGORY_COUNT),
-      benefits: cards('benefits', 'benefit', INSTRUMENTS_MARKETING_BENEFIT_COUNT),
+      categories: cards(
+        'categories',
+        'cat',
+        INSTRUMENTS_MARKETING_CATEGORY_COUNT,
+        ICONS.categories
+      ),
+      benefits: cards('benefits', 'benefit', INSTRUMENTS_MARKETING_BENEFIT_COUNT, ICONS.benefits),
+      alerts: {
+        eyebrow: alertText('alerts_eyebrow'),
+        title: alertText('alerts_title'),
+        titleHighlight: alertText('alerts_title_highlight'),
+        subtitle: alertText('alerts_subtitle'),
+        items: alertCards,
+        customTitle: alertText('alerts_custom_title'),
+        customDescription: alertText('alerts_custom_desc'),
+        team: alertText('alerts_team'),
+      },
       compatibility: {
         eyebrow: t('compat_eyebrow'),
         title: t('compat_title'),
@@ -100,10 +173,10 @@ export default class MarketingInstrumentsContentService {
         planNote: t('compat_plan_note'),
       },
       install: {
-        ...cards('install', 'install', INSTALL_COUNT),
+        ...cards('install', 'install', INSTALL_COUNT, ICONS.install),
         helpCta: { label: t('install_help_label'), href: marketingPath('help', locale) },
       },
-      security: cards('security', 'security', INSTRUMENTS_MARKETING_SECURITY_COUNT),
+      security: cards('security', 'security', INSTRUMENTS_MARKETING_SECURITY_COUNT, ICONS.security),
       crossLinks: {
         eyebrow: shared('cross_eyebrow'),
         title: shared('cross_title'),

@@ -110,8 +110,23 @@ const cases: MockCase[] = [
   {
     name: 'HomeMockInstruments',
     component: HomeMockInstruments,
-    en: ['Instruments', 'Live', 'Engine hours', 'Engine temperature high', 'Depth', 'rpm'],
-    fr: ['En direct', 'Heures moteur', 'Température moteur élevée', 'Profondeur', 'tr/min'],
+    en: [
+      'Instruments',
+      'Live',
+      'Engine hours',
+      'Engine temperature high',
+      'Low battery',
+      'Open alerts',
+      'rpm',
+    ],
+    fr: [
+      'En direct',
+      'Heures moteur',
+      'Température moteur élevée',
+      'Batterie faible',
+      'Alertes en cours',
+      'tr/min',
+    ],
   },
   {
     name: 'HomeMockUpcomingTasks',

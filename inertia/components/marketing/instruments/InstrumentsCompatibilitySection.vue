@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CheckIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { useScrollReveal } from '~/composables/use_scroll_reveal'
 import type { InstrumentsMarketingContentProps } from '#shared/types/marketing_instruments'
 
 /**
@@ -7,10 +9,17 @@ import type { InstrumentsMarketingContentProps } from '#shared/types/marketing_i
  * coche et croix héritent des tokens `success` / `danger`.
  */
 defineProps<{ content: InstrumentsMarketingContentProps['compatibility'] }>()
+
+const { isVisible } = useScrollReveal()
 </script>
 
 <template>
-  <section class="bg-paper px-6 py-16 lg:px-8 lg:py-20" data-testid="instruments-compatibility">
+  <section
+    ref="el"
+    class="reveal bg-paper px-6 py-16 lg:px-8 lg:py-20"
+    :class="{ visible: isVisible }"
+    data-testid="instruments-compatibility"
+  >
     <div class="mx-auto max-w-5xl">
       <div class="max-w-2xl">
         <p class="font-mono text-xs font-semibold uppercase tracking-widest text-coral-600">
@@ -23,7 +32,10 @@ defineProps<{ content: InstrumentsMarketingContentProps['compatibility'] }>()
         <p class="mt-3 text-fg-muted">{{ content.subtitle }}</p>
       </div>
 
-      <div class="mt-10 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div
+        class="stagger mt-10 grid grid-cols-1 gap-4 md:grid-cols-2"
+        :class="{ visible: isVisible }"
+      >
         <div class="rounded-xl border border-border bg-surface p-6">
           <h3 class="font-semibold text-success">{{ content.supportedTitle }}</h3>
           <ul class="mt-4 space-y-3 text-sm text-fg-muted">
@@ -33,7 +45,7 @@ defineProps<{ content: InstrumentsMarketingContentProps['compatibility'] }>()
               class="flex items-start gap-3"
               data-testid="instruments-supported"
             >
-              <span class="mt-0.5 font-bold text-success" aria-hidden="true">✓</span>
+              <CheckIcon class="mt-0.5 h-5 w-5 shrink-0 text-success" aria-hidden="true" />
               <span>{{ line }}</span>
             </li>
           </ul>
@@ -47,7 +59,7 @@ defineProps<{ content: InstrumentsMarketingContentProps['compatibility'] }>()
               class="flex items-start gap-3"
               data-testid="instruments-unsupported"
             >
-              <span class="mt-0.5 font-bold text-danger" aria-hidden="true">✕</span>
+              <XMarkIcon class="mt-0.5 h-5 w-5 shrink-0 text-danger" aria-hidden="true" />
               <span>{{ line }}</span>
             </li>
           </ul>

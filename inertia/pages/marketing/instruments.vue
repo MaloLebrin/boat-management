@@ -15,6 +15,7 @@ import FeatureCrossLinksSection from '~/components/marketing/features/FeatureCro
 import FeatureFinalCtaSection from '~/components/marketing/features/FeatureFinalCtaSection.vue'
 import GuideFaqSection from '~/components/marketing/guide/GuideFaqSection.vue'
 import InstrumentsCardsSection from '~/components/marketing/instruments/InstrumentsCardsSection.vue'
+import InstrumentsAlertsSection from '~/components/marketing/instruments/InstrumentsAlertsSection.vue'
 import InstrumentsCompatibilitySection from '~/components/marketing/instruments/InstrumentsCompatibilitySection.vue'
 import { marketingUrl, SITE_URL, type AppLocale } from '#shared/helpers/locale_path'
 import type { InstrumentsMarketingContentProps } from '#shared/types/marketing_instruments'
@@ -141,8 +142,11 @@ const webAppSchema = computed(() =>
   <InstrumentsCardsSection
     v-bind="content.benefits"
     bg-class="bg-paper"
+    :columns="2"
     test-id="instruments-benefits"
   />
+
+  <InstrumentsAlertsSection :content="content.alerts" />
 
   <InstrumentsCompatibilitySection :content="content.compatibility" />
 
