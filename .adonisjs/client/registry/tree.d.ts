@@ -249,6 +249,7 @@ export interface ApiDefinition {
     updateEngineStatus: typeof routes['boat_equipment.update_engine_status']
     updateEngineNotes: typeof routes['boat_equipment.update_engine_notes']
     incrementEngineHours: typeof routes['boat_equipment.increment_engine_hours']
+    updateEngineInstrumentKey: typeof routes['boat_equipment.update_engine_instrument_key']
     destroyEngine: typeof routes['boat_equipment.destroy_engine']
     storeSail: typeof routes['boat_equipment.store_sail']
     editSail: typeof routes['boat_equipment.edit_sail']
@@ -490,6 +491,9 @@ export interface ApiDefinition {
     update: typeof routes['suppliers.update']
     destroy: typeof routes['suppliers.destroy']
   }
+  install: {
+    signalkPlugin: typeof routes['install.signalkPlugin']
+  }
   newAccount: {
     create: typeof routes['new_account.create']
   }
@@ -546,6 +550,7 @@ export interface ApiDefinition {
       fleet: typeof routes['marketing.en.fleet']
       aiAssistant: typeof routes['marketing.en.aiAssistant']
       instruments: typeof routes['marketing.en.instruments']
+      installSignalK: typeof routes['marketing.en.installSignalK']
       simulator: typeof routes['marketing.en.simulator']
       guide: typeof routes['marketing.en.guide']
       diagnosisAi: typeof routes['marketing.en.diagnosisAi']
@@ -565,6 +570,7 @@ export interface ApiDefinition {
       fleet: typeof routes['marketing.fr.fleet']
       aiAssistant: typeof routes['marketing.fr.aiAssistant']
       instruments: typeof routes['marketing.fr.instruments']
+      installSignalK: typeof routes['marketing.fr.installSignalK']
       simulator: typeof routes['marketing.fr.simulator']
       guide: typeof routes['marketing.fr.guide']
       diagnosisAi: typeof routes['marketing.fr.diagnosisAi']

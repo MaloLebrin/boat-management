@@ -43,6 +43,9 @@ router
       .get('/connected-boat-instruments', [MarketingFeaturesController, 'instruments'])
       .as('marketing.en.instruments')
     router
+      .get('/install-signal-k-on-board', [MarketingFeaturesController, 'installSignalK'])
+      .as('marketing.en.installSignalK')
+    router
       .get('/maintenance-cost-simulator', [MarketingController, 'simulator'])
       .as('marketing.en.simulator')
     router.get('/boat-maintenance-cost', [MarketingController, 'guide']).as('marketing.en.guide')
@@ -78,6 +81,9 @@ router
     router
       .get('/instruments-bateau-connectes', [MarketingFeaturesController, 'instruments'])
       .as('marketing.fr.instruments')
+    router
+      .get('/installer-signal-k-a-bord', [MarketingFeaturesController, 'installSignalK'])
+      .as('marketing.fr.installSignalK')
     router
       .get('/simulateur-cout-entretien', [MarketingController, 'simulator'])
       .as('marketing.fr.simulator')

@@ -20,7 +20,7 @@ export interface PublicNavGroup {
  *
  * Header desktop à quatre entrées : Produit ▾ (fonctionnalités + outils
  * gratuits), Diagnostic IA (lien direct, lead magnet du moment), Tarifs,
- * Ressources ▾ (guide, aide).
+ * Ressources ▾ (guide, installation Signal K, aide).
  */
 export function usePublicNav(locale: Ref<AppLocale>) {
   /** Groupes du menu « Produit » : pages fonctionnalité, puis outils gratuits. */
@@ -62,6 +62,10 @@ export function usePublicNav(locale: Ref<AppLocale>) {
     {
       links: [
         { labelKey: 'public.nav.guide', href: marketingPath('guide', locale.value) },
+        {
+          labelKey: 'public.nav.installSignalK',
+          href: marketingPath('installSignalK', locale.value),
+        },
         { labelKey: 'public.nav.help', href: marketingPath('help', locale.value) },
       ],
     },

@@ -170,3 +170,15 @@ n'existe (voir recommandations).
    (contenu marketing majoritairement statique aujourd'hui, donc faible priorité).
 6. **`og:locale` / `og:locale:alternate`** dans le shell ou par page pour signaler la
    langue des aperçus sociaux.
+
+## Pages ajoutées depuis l'audit
+
+- **Guide « Installer Signal K à bord »** (#1022) — `/en/install-signal-k-on-board`,
+  `/fr/installer-signal-k-a-bord`. Applique d'emblée les recommandations : URLs
+  absolues pour `canonical`/`hreflang`/`x-default`/`og:url`, `og:locale` +
+  `og:locale:alternate`, JSON-LD `HowTo` (deux `HowToSection`, étapes ancrées),
+  `FAQPage` et `BreadcrumbList` à trois niveaux. Présente dans le sitemap
+  (priorité 0,7, `monthly`), le menu « Ressources », la section Ressources de
+  l'aide et le CTA d'installation de la page instruments. Titre ≤ 60 caractères
+  avec « Signal K », description ≤ 160 ; vérifié par
+  `tests/functional/marketing/install_signalk_seo.spec.ts`.

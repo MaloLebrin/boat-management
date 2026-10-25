@@ -264,6 +264,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/engines/:engineId/hours","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/hours","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/hours","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/hours","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/hours","type":0,"val":"hours","end":""}],
     types: placeholder as Registry['boat_equipment.increment_engine_hours']['types'],
   },
+  'boat_equipment.update_engine_instrument_key': {
+    methods: ["PATCH"],
+    pattern: '/boats/:boatId/engines/:engineId/instrument-key',
+    tokens: [{"old":"/boats/:boatId/engines/:engineId/instrument-key","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/engines/:engineId/instrument-key","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/engines/:engineId/instrument-key","type":0,"val":"engines","end":""},{"old":"/boats/:boatId/engines/:engineId/instrument-key","type":1,"val":"engineId","end":""},{"old":"/boats/:boatId/engines/:engineId/instrument-key","type":0,"val":"instrument-key","end":""}],
+    types: placeholder as Registry['boat_equipment.update_engine_instrument_key']['types'],
+  },
   'boat_equipment.destroy_engine': {
     methods: ["DELETE"],
     pattern: '/boats/:boatId/engines/:engineId',
@@ -1710,6 +1716,12 @@ const routes = {
     tokens: [{"old":"/boats/:boatId/telemetry","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/telemetry","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/telemetry","type":0,"val":"telemetry","end":""}],
     types: placeholder as Registry['boats.telemetry.store']['types'],
   },
+  'install.signalkPlugin': {
+    methods: ["GET","HEAD"],
+    pattern: '/install/signalk-plugin.sh',
+    tokens: [{"old":"/install/signalk-plugin.sh","type":0,"val":"install","end":""},{"old":"/install/signalk-plugin.sh","type":0,"val":"signalk-plugin.sh","end":""}],
+    types: placeholder as Registry['install.signalkPlugin']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',
@@ -1902,6 +1914,12 @@ const routes = {
     tokens: [{"old":"/en/connected-boat-instruments","type":0,"val":"en","end":""},{"old":"/en/connected-boat-instruments","type":0,"val":"connected-boat-instruments","end":""}],
     types: placeholder as Registry['marketing.en.instruments']['types'],
   },
+  'marketing.en.installSignalK': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/install-signal-k-on-board',
+    tokens: [{"old":"/en/install-signal-k-on-board","type":0,"val":"en","end":""},{"old":"/en/install-signal-k-on-board","type":0,"val":"install-signal-k-on-board","end":""}],
+    types: placeholder as Registry['marketing.en.installSignalK']['types'],
+  },
   'marketing.en.simulator': {
     methods: ["GET","HEAD"],
     pattern: '/en/maintenance-cost-simulator',
@@ -1991,6 +2009,12 @@ const routes = {
     pattern: '/fr/instruments-bateau-connectes',
     tokens: [{"old":"/fr/instruments-bateau-connectes","type":0,"val":"fr","end":""},{"old":"/fr/instruments-bateau-connectes","type":0,"val":"instruments-bateau-connectes","end":""}],
     types: placeholder as Registry['marketing.fr.instruments']['types'],
+  },
+  'marketing.fr.installSignalK': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/installer-signal-k-a-bord',
+    tokens: [{"old":"/fr/installer-signal-k-a-bord","type":0,"val":"fr","end":""},{"old":"/fr/installer-signal-k-a-bord","type":0,"val":"installer-signal-k-a-bord","end":""}],
+    types: placeholder as Registry['marketing.fr.installSignalK']['types'],
   },
   'marketing.fr.simulator': {
     methods: ["GET","HEAD"],

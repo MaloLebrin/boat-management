@@ -1762,6 +1762,11 @@ export default class MarketingContentService {
               description: card('parts_desc'),
               href: marketingPath('partsAi', locale),
             },
+            {
+              title: card('installSignalK_title'),
+              description: card('installSignalK_desc'),
+              href: marketingPath('installSignalK', locale),
+            },
           ],
         },
         finalCta: {

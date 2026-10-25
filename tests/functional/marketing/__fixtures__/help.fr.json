@@ -127,6 +127,11 @@
           "title": "Recherche de pièces IA",
           "description": "Retrouve la référence exacte d'une pièce moteur à partir de son numéro de série. Gratuit, sans compte.",
           "href": "/fr/reference-piece-moteur-ia"
+        },
+        {
+          "title": "Installer Signal K à bord",
+          "description": "Matériel, plugin ou appli, adresse HTTPS et dépannage : le guide complet pour mettre ton bateau en ligne.",
+          "href": "/fr/installer-signal-k-a-bord"
         }
       ]
     },
