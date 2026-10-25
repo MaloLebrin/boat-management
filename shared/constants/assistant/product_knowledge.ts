@@ -1393,6 +1393,35 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
     planFlag: 'canConnectInstruments',
   },
   {
+    id: 'instruments-signalk-plugin-install',
+    title: {
+      en: 'Install the Signal K plugin with one command',
+      fr: 'Installer le plugin Signal K en une commande',
+    },
+    body: {
+      en: 'Without a browser on board, an admin can push the readings from the Signal K server itself. In the Instruments tab, the Signal K plugin card generates an ingestion token, shown once. Then, in a terminal on the Raspberry (OpenPlotter) or any Linux Signal K server, logged in as the user running Signal K (not root), paste the install command: curl -fsSL on the FleetAi install script, piped to bash, with the token in the FLEETAI_TOKEN variable. The script checks Node, npm and signalk-server, installs the signalk-fleetai plugin, writes its configuration without ever printing the token, and restarts Signal K when it runs as a service. It can be run again safely, and it does not install Signal K itself. Alternative: the Signal K admin Appstore.',
+      fr: 'Sans navigateur à bord, un admin peut faire pousser les relevés par le serveur Signal K lui-même. Dans l’onglet Instruments, la carte « Plugin Signal K » génère un jeton d’ingestion, affiché une seule fois. Dans un terminal du Raspberry (OpenPlotter) ou de tout serveur Signal K sous Linux, connecté avec l’utilisateur qui fait tourner Signal K (pas en root), collez la commande d’installation : un curl -fsSL sur le script d’installation FleetAi, relayé à bash, avec le jeton dans la variable FLEETAI_TOKEN. Le script installe le plugin signalk-fleetai, écrit sa configuration sans jamais afficher le jeton et redémarre Signal K s’il tourne en service. Relançable sans risque ; n’installe pas Signal K. Alternative : l’Appstore de l’admin Signal K.',
+    },
+    keywords: [
+      'script',
+      'script installation',
+      'installer le plugin',
+      'installation plugin',
+      'install plugin',
+      'plugin signal k',
+      'signalk-fleetai',
+      'jeton plugin',
+      'curl',
+      'raspberry',
+      'openplotter',
+      'appstore signal k',
+      'ligne de commande',
+      'terminal',
+    ],
+    navTarget: null,
+    planFlag: 'canConnectInstruments',
+  },
+  {
     id: 'rental-contracts',
     title: {
       en: 'Rental contracts',

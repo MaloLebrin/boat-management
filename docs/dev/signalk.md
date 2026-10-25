@@ -34,6 +34,27 @@ npx signalk-server --sample-nmea0183-data
 
 La trace d'exemple ne contient **ni moteur, ni batteries, ni réservoirs**. Pour ces chemins, installer depuis l'admin (Appstore) le plugin `signalk-simulator` ou brancher une trace NMEA 2000 (`--sample-n2k-data` rejoue une trace avec propulsion et électricité, mais le port 3000 doit être libre et le conteneur relancé avec cette commande).
 
+## Tester le script d'installation du plugin
+
+Le script servi sur `/install/signalk-plugin.sh` (#1021) se teste sans Raspberry, en dry-run (ni `npm install` ni `systemctl`) contre un dossier de configuration jetable :
+
+```bash
+export SIGNALK_NODE_CONFIG_DIR="$(mktemp -d)"
+curl -fsSL http://localhost:3333/install/signalk-plugin.sh \
+  | FLEETAI_DRY_RUN=1 FLEETAI_ALLOW_ROOT=1 FLEETAI_TOKEN=fai_ing_test bash
+cat "$SIGNALK_NODE_CONFIG_DIR/plugin-config-data/signalk-fleetai.json"
+```
+
+Le script exige `signalk-server` dans le `PATH` : `npx signalk-server` ne suffit pas, installez-le (`npm i -g signalk-server`) ou placez un exécutable factice. Pour un test réel contre le service compose, copiez le script dans le conteneur (le volume de données est le dossier de configuration) :
+
+```bash
+pnpm signalk:up
+docker compose --profile instruments cp resources/install/signalk-plugin.sh signalk:/tmp/
+docker compose --profile instruments exec -e SIGNALK_NODE_CONFIG_DIR=/home/node/.signalk -e FLEETAI_ALLOW_ROOT=1 -e FLEETAI_TOKEN=fai_ing_test signalk bash /tmp/signalk-plugin.sh
+```
+
+Tant que `signalk-fleetai` (#1024) n'est pas publié sur npm, l'étape `npm install` échoue : utilisez `FLEETAI_DRY_RUN=1`. Les tests automatisés (`tests/unit/install/`) couvrent les refus et la fusion de configuration.
+
 ## La sonde `/dev/signalk-probe`
 
 Page jetable du spike, servie par le serveur de dev hors production : <http://localhost:3333/dev/signalk-probe>. Elle est autonome (`scripts/spike/signalk_probe.html`, sans Edge ni Vite) et sert à mesurer ce qu'un navigateur laisse passer vers un serveur Signal K :

@@ -192,3 +192,28 @@ export const INSTRUMENT_INGEST_TOKEN_MAX_LENGTH = 128
 
 /** Chemin de l'API d'ingestion du plugin. */
 export const INSTRUMENT_INGEST_PATH = '/api/instruments/ingest'
+
+/**
+ * Plugin Signal K (#1021) — vocabulaire figé que partagent le script
+ * d'installation, la page publique (#1022), l'assistant (#1023) et le plugin
+ * lui-même (#1024, dépôt séparé). Une garde d'hygiène relit le script sur
+ * disque et le compare à ces valeurs.
+ */
+
+/** Nom du paquet npm du plugin. */
+export const SIGNALK_PLUGIN_PACKAGE = 'signalk-fleetai'
+
+/** Chemin public du script d'installation (servi par `InstallScriptsController`). */
+export const SIGNALK_PLUGIN_INSTALL_PATH = '/install/signalk-plugin.sh'
+
+/** Fichier de configuration du plugin, relatif au dossier de configuration Signal K. */
+export const SIGNALK_PLUGIN_CONFIG_FILE = 'plugin-config-data/signalk-fleetai.json'
+
+/** Variable d'environnement portant le jeton d'ingestion. */
+export const SIGNALK_PLUGIN_ENV_TOKEN = 'FLEETAI_TOKEN'
+
+/** Variable d'environnement portant l'URL d'ingestion (défaut : celle de l'instance servante). */
+export const SIGNALK_PLUGIN_ENV_ENDPOINT = 'FLEETAI_ENDPOINT'
+
+/** Marqueur du script remplacé par `${origine}${INSTRUMENT_INGEST_PATH}` au service. */
+export const SIGNALK_PLUGIN_ENDPOINT_MARKER = '__FLEETAI_INGEST_ENDPOINT__'

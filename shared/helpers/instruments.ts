@@ -1,4 +1,6 @@
 import {
+  SIGNALK_PLUGIN_ENV_TOKEN,
+  SIGNALK_PLUGIN_INSTALL_PATH,
   TELEMETRY_SERIES_MAX_PATHS,
   TELEMETRY_SERIES_RANGES,
   telemetryPathSpec,
@@ -104,4 +106,14 @@ export function parseSeriesQuery(qs: Record<string, unknown>): InstrumentSeriesQ
   if (paths.length === 0) return null
 
   return { range: range as TelemetrySeriesRange, paths }
+}
+
+/**
+ * Commande à coller dans un terminal du serveur Signal K (#1021). `origin` est
+ * l'origine de l'instance FleetAi (`https://hôte`), sans `/` final. Sans jeton,
+ * un emplacement `fai_ing_…` à remplacer ; le jeton n'est jamais journalisé par le script.
+ */
+export function signalkPluginInstallCommand(origin: string, token: string | null): string {
+  const base = origin.replace(/\/+$/, '')
+  return `curl -fsSL ${base}${SIGNALK_PLUGIN_INSTALL_PATH} | ${SIGNALK_PLUGIN_ENV_TOKEN}=${token ?? 'fai_ing_…'} bash`
 }
