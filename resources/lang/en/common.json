@@ -150,6 +150,7 @@
   "theme.system": "System theme",
   "theme.light": "Light theme",
   "theme.dark": "Dark theme",
+  "theme.toggle": "Switch theme",
   "formErrors": {
     "title": "The form contains errors"
   },

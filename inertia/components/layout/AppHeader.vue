@@ -4,8 +4,8 @@ import { Link } from '@adonisjs/inertia/vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import AppHeaderMobileDrawer from '~/components/layout/AppHeaderMobileDrawer.vue'
-import AppHeaderProductMenu from '~/components/layout/AppHeaderProductMenu.vue'
-import ThemeSwitcher from '~/components/layout/ThemeSwitcher.vue'
+import AppHeaderNavMenu from '~/components/layout/AppHeaderNavMenu.vue'
+import ThemeToggle from '~/components/layout/ThemeToggle.vue'
 import { useT } from '~/composables/use_t'
 import { usePublicNav } from '~/composables/use_public_nav'
 import { buildLocaleSwitchHref, type AppLocale } from '#shared/helpers/locale_path'
@@ -23,7 +23,7 @@ const locale = computed<'en' | 'fr'>(() => page.props.locale ?? 'en')
 const isAuthed = computed(() => Boolean(page.props.user))
 
 // Nav publique partagée avec le drawer mobile (source unique : use_public_nav).
-const { productGroups, toolLinks, topLinks } = usePublicNav(locale)
+const { productGroups, featuredLinks, topLinks, resourceGroups } = usePublicNav(locale)
 
 const otherLocale = computed<AppLocale>(() => (locale.value === 'en' ? 'fr' : 'en'))
 
@@ -109,18 +109,20 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         </span>
       </Link>
 
-      <!-- 7 items (dropdown + outils gratuits + liens directs) : trop large
-           pour 768 px, la nav complète n'apparaît qu'à partir de lg. -->
+      <!-- Quatre entrées : Produit ▾, Diagnostic IA, Tarifs, Ressources ▾. Avec
+           les actions à droite, c'est encore trop large pour 768 px : la nav
+           complète n'apparaît qu'à partir de lg. -->
       <nav class="hidden items-center gap-0 lg:flex xl:gap-1">
-        <AppHeaderProductMenu :groups="productGroups" />
+        <AppHeaderNavMenu label-key="public.nav.product" :groups="productGroups" />
         <Link
-          v-for="link in [...toolLinks, ...topLinks]"
+          v-for="link in [...featuredLinks, ...topLinks]"
           :key="link.href"
           :href="link.href"
-          class="whitespace-nowrap rounded-(--radius-control) px-1.5 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg xl:px-3"
+          class="whitespace-nowrap rounded-(--radius-control) px-2 py-2 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) ease-premium hover:bg-paper hover:text-fg xl:px-3"
         >
           {{ t(link.labelKey) }}
         </Link>
+        <AppHeaderNavMenu label-key="public.nav.resources" :groups="resourceGroups" />
       </nav>
 
       <div class="flex items-center gap-2">
@@ -131,7 +133,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         >
           {{ locale === 'en' ? 'FR' : 'EN' }}
         </button>
-        <ThemeSwitcher class="hidden sm:flex" />
+        <ThemeToggle class="hidden sm:inline-flex" />
         <template v-if="isAuthed">
           <Link href="/dashboard">
             <BaseButton size="sm">Dashboard</BaseButton>

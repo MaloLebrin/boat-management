@@ -5,7 +5,13 @@ import { onBeforeUnmount, ref, watch } from 'vue'
 import { useT } from '~/composables/use_t'
 import type { PublicNavGroup } from '~/composables/use_public_nav'
 
+/**
+ * Menu déroulant du header public : un bouton libellé par `labelKey`, un
+ * panneau de groupes de liens (intertitre facultatif par groupe). Utilisé pour
+ * « Produit » et « Ressources » ; le drawer mobile rend les mêmes groupes à plat.
+ */
 defineProps<{
+  labelKey: string
   groups: PublicNavGroup[]
 }>()
 
@@ -62,7 +68,7 @@ onBeforeUnmount(() => {
       aria-haspopup="true"
       @click="toggle"
     >
-      {{ t('public.nav.product') }}
+      {{ t(labelKey) }}
       <svg
         class="h-4 w-4 transition-transform duration-(--motion-fast)"
         :class="{ 'rotate-180': isOpen }"
@@ -79,8 +85,11 @@ onBeforeUnmount(() => {
       v-if="isOpen"
       class="absolute left-0 top-full z-50 mt-2 w-72 rounded-xl border border-bone bg-cream p-3 shadow-xl"
     >
-      <div v-for="group in groups" :key="group.labelKey" class="pb-1">
-        <p class="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+      <div v-for="(group, index) in groups" :key="group.labelKey ?? index" class="pb-1">
+        <p
+          v-if="group.labelKey"
+          class="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wider text-fg-subtle"
+        >
           {{ t(group.labelKey) }}
         </p>
         <Link
