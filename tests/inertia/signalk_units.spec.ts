@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 import {
   hzToRpm,
   kelvinToCelsius,
+  metersToNauticalMiles,
   msToKnots,
   normalizeDegrees,
   paToBar,
@@ -21,6 +22,12 @@ describe('unités Signal K (#989)', () => {
     expect(paToBar(101_325)).toBeCloseTo(1.01325)
     expect(ratioToPercent(0.625)).toBe(62.5)
     expect(secondsToHours(7200)).toBe(2)
+  })
+
+  test('distance : 1852 m = 1 mille nautique, la puissance reste en watts', () => {
+    expect(metersToNauticalMiles(1852)).toBe(1)
+    expect(toDisplayUnit('NM', 18_520)).toBe(10)
+    expect(toDisplayUnit('W', 750)).toBe(750)
   })
 
   test('revolutions est en hertz : 25 Hz = 1500 tr/min', () => {
