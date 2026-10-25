@@ -1325,8 +1325,8 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       fr: 'Instruments de bord via Signal K',
     },
     body: {
-      en: 'On the Pro and Enterprise plans, a boat can be connected to its onboard Signal K server (OpenPlotter, Raspberry Pi…). An admin registers the address and an optional read-only token. The app, opened on the boat Wi-Fi, reads engines, position, batteries, tanks, wind, depth and alarms, averages them and sends batches when the network allows. The Instruments tab shows live gauges and alarms, keeps the last values offline and shows the server forecast (24-72 h). AIS vessels are listed by distance with CPA/TCPA, or on a map, and kept 7 days (Pro) or 30 days (Enterprise). An http:// address is blocked by the browser on FleetAi (mixed content): use https:// or the plugin.',
-      fr: 'Sur les plans Pro et Entreprise, un bateau peut être relié à son serveur Signal K de bord (OpenPlotter, Raspberry Pi…). Un admin enregistre l’adresse et un jeton facultatif. L’application, ouverte sur le Wi-Fi du bord, lit moteur, position, batteries, réservoirs, vent, profondeur et alarmes, les moyenne et envoie des lots dès que le réseau le permet. L’onglet Instruments affiche jauges et alarmes en direct, garde les dernières valeurs hors-ligne et montre les prévisions du serveur (24 à 72 h). Les navires AIS sont listés par distance avec CPA/TCPA, ou sur une carte, et gardés 7 jours (Pro) ou 30 jours (Entreprise). Une adresse http:// est bloquée par le navigateur (contenu mixte) : utilisez https:// ou le plugin.',
+      en: 'On the Pro and Enterprise plans, a boat can be connected to its onboard Signal K server (OpenPlotter, Raspberry Pi…). An admin registers the address and an optional read-only token. The app, opened on the boat Wi-Fi, reads engines, position, batteries, tanks, wind, depth and alarms, averages them and sends batches when the network allows. The Instruments tab shows live gauges and alarms, keeps the last values offline and shows the server forecast (24-72 h). AIS vessels are listed by distance with CPA/TCPA, or on a map, and kept 7 days (Pro) or 30 days (Enterprise). Without a browser on board, the signalk-fleetai plugin (Signal K Appstore or one-line script) pushes the readings itself. An http:// address is blocked by the browser (mixed content): use https:// or the plugin.',
+      fr: 'Sur les plans Pro et Entreprise, un bateau peut être relié à son serveur Signal K de bord (OpenPlotter, Raspberry Pi…). Un admin enregistre l’adresse et un jeton facultatif. L’application, ouverte sur le Wi-Fi du bord, lit moteur, position, batteries, réservoirs, vent, profondeur et alarmes, les moyenne et envoie des lots dès que le réseau le permet. L’onglet Instruments affiche jauges et alarmes en direct, garde les dernières valeurs hors-ligne et montre les prévisions du serveur (24 à 72 h). Les navires AIS sont listés par distance avec CPA/TCPA, ou sur une carte, et gardés 7 jours (Pro) ou 30 jours (Entreprise). Sans navigateur à bord, le plugin signalk-fleetai (Appstore Signal K) pousse les relevés. Une adresse http:// est bloquée (contenu mixte) : utilisez https:// ou le plugin.',
     },
     keywords: [
       'instruments',
@@ -1359,6 +1359,9 @@ export const PRODUCT_KNOWLEDGE: ProductHelpEntry[] = [
       'pression huile',
       'regime moteur',
       'plugin signal k',
+      'signalk-fleetai',
+      'appstore',
+      'appstore signal k',
       'jeton plugin',
       'ais',
       'cibles ais',
