@@ -10,6 +10,7 @@ import {
   WifiIcon,
 } from '@heroicons/vue/24/outline'
 import { useT } from '~/composables/use_t'
+import HomeMockAisTargets from './HomeMockAisTargets.vue'
 import HomeMockAlerts from './HomeMockAlerts.vue'
 import HomeMockDial from './HomeMockDial.vue'
 import HomeMockGauge from './HomeMockGauge.vue'
@@ -23,7 +24,7 @@ import HomeMockStat from './HomeMockStat.vue'
  * valeurs qui bougent, les aiguilles oscillent, la courbe avance et les
  * réservoirs brillent. Chaque widget correspond à une mesure réellement lue par
  * l'onglet ; l'histoire est cohérente (moteur chaud, batterie qui baisse, d'où
- * les deux alertes). Libellés et unités passent par
+ * les alertes) et le radar AIS signale un navire qui croise devant (#1009). Libellés et unités passent par
  * `homePreview.mock.instruments.*` ; `prefers-reduced-motion` coupe les
  * minuteurs et ramène les animations CSS à 1 ms.
  */
@@ -186,7 +187,10 @@ const levels = [
 
       <HomeMockInstrumentsHistory />
 
-      <HomeMockAlerts :delay="STEP * 12" />
+      <div class="grid grid-cols-2 gap-1.5">
+        <HomeMockAisTargets :delay="STEP * 12" />
+        <HomeMockAlerts :delay="STEP * 13" />
+      </div>
     </div>
   </div>
 </template>

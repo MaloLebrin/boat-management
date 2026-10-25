@@ -3,15 +3,22 @@ import { ExclamationCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/2
 import { useT } from '~/composables/use_t'
 
 /**
- * Alertes en cours de la maquette Instruments (#995) : deux lignes qui glissent
- * l'une après l'autre ; l'icône de l'alerte critique pulse. Cohérent avec les
- * jauges (moteur chaud, batterie basse).
+ * Alertes en cours de la maquette Instruments (#995) : trois lignes qui glissent
+ * l'une après l'autre ; l'icône des alertes critiques pulse. Cohérent avec les
+ * jauges (moteur chaud, batterie basse) et le radar AIS (navire qui croise
+ * devant, #1009).
  */
 defineProps<{ delay?: number }>()
 
 const { t } = useT()
 
 const alerts = [
+  {
+    key: 'aisCollision',
+    icon: ExclamationCircleIcon,
+    tone: 'bg-coral-100 text-coral-700',
+    level: 'critical',
+  },
   {
     key: 'alert',
     icon: ExclamationCircleIcon,

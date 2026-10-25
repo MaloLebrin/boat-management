@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({ t: (key: string) => key }),
@@ -11,6 +11,7 @@ import HomeMockGauge from '../../inertia/components/marketing/home/HomeMockGauge
 import HomeMockDial from '../../inertia/components/marketing/home/HomeMockDial.vue'
 import HomeMockInstruments from '../../inertia/components/marketing/home/HomeMockInstruments.vue'
 import HomeMockInstrumentsHistory from '../../inertia/components/marketing/home/HomeMockInstrumentsHistory.vue'
+import HomeMockAisTargets from '../../inertia/components/marketing/home/HomeMockAisTargets.vue'
 
 function stubReducedMotion(reduced: boolean) {
   vi.stubGlobal(
@@ -157,11 +158,38 @@ describe('widgets de la maquette Instruments (#995)', () => {
     })
   })
 
-  test('la maquette complète rend tous ses widgets et les deux alertes', () => {
+  test('le radar AIS liste trois navires par distance, le plus proche en risque de collision', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(1)
+    const wrapper = mount(HomeMockAisTargets)
+    const rows = wrapper.findAll('[data-testid="mock-instruments-ais-row"]')
+
+    expect(rows).toHaveLength(3)
+    expect(rows[0].text()).toContain('Atlantis Star')
+    expect(rows[0].text()).toContain('1.4 homePreview.mock.instruments.aisNm')
+    expect(rows[0].text()).toContain('homePreview.mock.instruments.aisDanger')
+    expect(rows[0].text()).toContain('homePreview.mock.instruments.aisCpa')
+    expect(rows[1].text()).toContain('homePreview.mock.instruments.aisWatch')
+    expect(rows[2].text()).toContain('homePreview.mock.instruments.aisDiverging')
+    expect(rows[2].text()).not.toContain('aisDanger')
+    expect(wrapper.find('.mock-radar-ping').exists()).toBe(true)
+    expect(wrapper.find('.mock-radar-sweep').exists()).toBe(true)
+
+    // Pas de +0,06 rappelés vers la base : la distance converge vers 1,58 NM.
+    vi.advanceTimersByTime(1400 * 12)
+    await nextTick()
+    expect(rows[0].text()).toContain('1.6 ')
+    expect(rows[1].text()).toContain('2.8 ')
+  })
+
+  test('la maquette complète rend tous ses widgets, le radar AIS et les trois alertes', () => {
     const wrapper = mount(HomeMockInstruments)
 
     expect(wrapper.findAll('[data-testid="mock-instruments-tile"]')).toHaveLength(12)
-    expect(wrapper.findAll('[data-testid="mock-instruments-alerts"] li')).toHaveLength(2)
+    expect(wrapper.findAll('[data-testid="mock-instruments-alerts"] li')).toHaveLength(3)
+    expect(wrapper.find('[data-testid="mock-instruments-alerts"] li').text()).toContain(
+      'aisCollision'
+    )
+    expect(wrapper.find('[data-testid="mock-instruments-ais"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="mock-history"]').exists()).toBe(true)
   })
 })

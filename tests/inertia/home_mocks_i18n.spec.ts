@@ -124,6 +124,10 @@ const cases: MockCase[] = [
       '24 h history',
       'Open alerts',
       'rpm',
+      'AIS vessels',
+      'Collision risk',
+      'Watch',
+      'Diverging',
     ],
     fr: [
       'En direct',
@@ -138,6 +142,10 @@ const cases: MockCase[] = [
       'Historique 24 h',
       'Alertes en cours',
       'tr/min',
+      'Navires AIS',
+      'Risque de collision',
+      'À surveiller',
+      'S’éloigne',
     ],
   },
   {
