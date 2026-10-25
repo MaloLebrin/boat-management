@@ -60,7 +60,7 @@ defineProps<{
       <p class="relative mt-2 text-sm text-white/60">{{ ctaSubtitle }}</p>
       <BaseButton
         href="/signup"
-        class="relative mt-5 w-full justify-center bg-white! text-navy-900! hover:bg-cream!"
+        class="relative mt-5 w-full justify-center bg-white! text-navy-900! hover:bg-white/90!"
       >
         {{ ctaButton }}
       </BaseButton>

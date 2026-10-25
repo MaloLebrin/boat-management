@@ -51,7 +51,7 @@ const demoForm = useForm({})
       <p class="mt-4 text-lg text-white/60">{{ subtitle }}</p>
       <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
         <Link href="/signup">
-          <BaseButton size="lg" class="bg-cream! text-navy-900! hover:bg-cream/90!">
+          <BaseButton size="lg" class="bg-white! text-navy-900! hover:bg-white/90!">
             {{ primaryCta }}
           </BaseButton>
         </Link>
