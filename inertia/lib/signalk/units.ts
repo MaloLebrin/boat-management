@@ -34,7 +34,9 @@ const CONVERTERS: Record<string, (value: number) => number> = {
   'rpm': hzToRpm,
   'L': cubicMetersToLiters,
   'L/h': cubicMetersPerSecondToLitersPerHour,
+  'NM': metersToNauticalMiles,
   'V': (value) => value,
+  'W': (value) => value,
   'A': (value) => value,
   'm': (value) => value,
 }

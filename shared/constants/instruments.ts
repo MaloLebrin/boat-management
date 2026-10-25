@@ -42,6 +42,12 @@ export const INSTRUMENT_PATH_CATALOG: readonly InstrumentPathSpec[] = [
   numeric('propulsion.<id>.coolantTemperature', 'propulsion', 'K', '°C'),
   numeric('propulsion.<id>.oilPressure', 'propulsion', 'Pa', 'bar'),
   numeric('propulsion.<id>.fuel.rate', 'propulsion', 'm3/s', 'L/h'),
+  numeric('propulsion.<id>.oilTemperature', 'propulsion', 'K', '°C'),
+  numeric('propulsion.<id>.exhaustTemperature', 'propulsion', 'K', '°C'),
+  numeric('propulsion.<id>.coolantPressure', 'propulsion', 'Pa', 'bar'),
+  numeric('propulsion.<id>.boostPressure', 'propulsion', 'Pa', 'bar'),
+  numeric('propulsion.<id>.engineLoad', 'propulsion', 'ratio', '%'),
+  numeric('propulsion.<id>.alternatorVoltage', 'propulsion', 'V', 'V'),
 
   // Navigation
   json('navigation.position', 'navigation'),
@@ -50,16 +56,32 @@ export const INSTRUMENT_PATH_CATALOG: readonly InstrumentPathSpec[] = [
   numeric('navigation.headingTrue', 'navigation', 'rad', '°'),
   numeric('navigation.headingMagnetic', 'navigation', 'rad', '°'),
   numeric('navigation.speedThroughWater', 'navigation', 'm/s', 'kn'),
+  numeric('navigation.log', 'navigation', 'm', 'NM'),
+  numeric('navigation.trip.log', 'navigation', 'm', 'NM'),
 
   // Énergie — une batterie par `<id>` (`house`, `start`, `0`…).
   numeric('electrical.batteries.<id>.voltage', 'electrical', 'V', 'V'),
   numeric('electrical.batteries.<id>.current', 'electrical', 'A', 'A'),
   numeric('electrical.batteries.<id>.capacity.stateOfCharge', 'electrical', 'ratio', '%'),
   numeric('electrical.batteries.<id>.temperature', 'electrical', 'K', '°C'),
+  numeric('electrical.batteries.<id>.capacity.timeRemaining', 'electrical', 's', 'h'),
+  numeric('electrical.batteries.<id>.capacity.stateOfHealth', 'electrical', 'ratio', '%'),
+
+  // Production et conversion — un appareil par `<id>` (contrôleur solaire,
+  // chargeur, onduleur), comme les batteries.
+  numeric('electrical.solar.<id>.panelVoltage', 'electrical', 'V', 'V'),
+  numeric('electrical.solar.<id>.panelCurrent', 'electrical', 'A', 'A'),
+  numeric('electrical.solar.<id>.current', 'electrical', 'A', 'A'),
+  numeric('electrical.chargers.<id>.voltage', 'electrical', 'V', 'V'),
+  numeric('electrical.chargers.<id>.current', 'electrical', 'A', 'A'),
+  numeric('electrical.inverters.<id>.dc.voltage', 'electrical', 'V', 'V'),
+  numeric('electrical.inverters.<id>.dc.current', 'electrical', 'A', 'A'),
+  numeric('electrical.inverters.<id>.ac.realPower', 'electrical', 'W', 'W'),
 
   // Réservoirs — `<type>` (`fuel`, `freshWater`, `blackWater`…) puis `<id>`.
   numeric('tanks.<type>.<id>.currentLevel', 'tanks', 'ratio', '%'),
   numeric('tanks.<type>.<id>.capacity', 'tanks', 'm3', 'L'),
+  numeric('tanks.<type>.<id>.currentVolume', 'tanks', 'm3', 'L'),
 
   // Environnement
   numeric('environment.wind.speedApparent', 'environment', 'm/s', 'kn'),
@@ -73,6 +95,16 @@ export const INSTRUMENT_PATH_CATALOG: readonly InstrumentPathSpec[] = [
   numeric('environment.water.temperature', 'environment', 'K', '°C'),
   numeric('environment.outside.temperature', 'environment', 'K', '°C'),
   numeric('environment.outside.pressure', 'environment', 'Pa', 'hPa'),
+  numeric('environment.wind.speedOverGround', 'environment', 'm/s', 'kn'),
+  numeric('environment.wind.angleTrueGround', 'environment', 'rad', '°'),
+  numeric('environment.wind.directionMagnetic', 'environment', 'rad', '°'),
+  numeric('environment.outside.relativeHumidity', 'environment', 'ratio', '%'),
+  numeric('environment.inside.temperature', 'environment', 'K', '°C'),
+  numeric('environment.inside.relativeHumidity', 'environment', 'ratio', '%'),
+  // Zones nommées du bord (`engineRoom`, `mainCabin`, `refrigerator`…).
+  numeric('environment.inside.<zone>.temperature', 'environment', 'K', '°C'),
+  numeric('environment.inside.<zone>.relativeHumidity', 'environment', 'ratio', '%'),
+  numeric('environment.tide.heightNow', 'environment', 'm', 'm'),
 
   // Alarmes Signal K : valeur structurée `{ state, message, method }`, sous
   // n'importe quel chemin (`notifications.<chemin>`).

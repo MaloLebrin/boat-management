@@ -5,7 +5,7 @@
     "propulsion": "Engines",
     "navigation": "Navigation",
     "environment": "Environment",
-    "electrical": "Batteries",
+    "electrical": "Power",
     "tanks": "Tanks",
     "notifications": "Alarms"
   },
@@ -39,7 +39,33 @@
     "environment_water_temperature": "Water temperature",
     "environment_outside_temperature": "Outside temperature",
     "environment_outside_pressure": "Barometric pressure",
-    "notifications": "Alarm"
+    "notifications": "Alarm",
+    "propulsion_oilTemperature": "Engine oil temperature",
+    "propulsion_exhaustTemperature": "Exhaust temperature",
+    "propulsion_coolantPressure": "Coolant pressure",
+    "propulsion_boostPressure": "Boost pressure",
+    "propulsion_engineLoad": "Engine load",
+    "propulsion_alternatorVoltage": "Alternator voltage",
+    "navigation_log": "Total distance travelled",
+    "navigation_trip_log": "Trip distance",
+    "electrical_batteries_capacity_timeRemaining": "Time remaining",
+    "electrical_batteries_capacity_stateOfHealth": "Battery state of health",
+    "electrical_solar_panelVoltage": "Solar panel voltage",
+    "electrical_solar_panelCurrent": "Solar panel current",
+    "electrical_solar_current": "Solar controller current",
+    "electrical_chargers_voltage": "Charger voltage",
+    "electrical_chargers_current": "Charger current",
+    "electrical_inverters_dc_voltage": "Inverter DC voltage",
+    "electrical_inverters_dc_current": "Inverter DC current",
+    "electrical_inverters_ac_realPower": "Inverter power",
+    "tanks_currentVolume": "Tank volume",
+    "environment_wind_speedOverGround": "Wind over ground",
+    "environment_wind_angleTrueGround": "Wind angle over ground",
+    "environment_wind_directionMagnetic": "Magnetic wind direction",
+    "environment_outside_relativeHumidity": "Outside humidity",
+    "environment_inside_temperature": "Inside temperature",
+    "environment_inside_relativeHumidity": "Inside humidity",
+    "environment_tide_heightNow": "Tide height"
   },
   "gauge": {
     "stale": "Stale",
@@ -120,6 +146,10 @@
       "battery_low": "Low battery",
       "engine_hot": "High engine temperature",
       "shallow_water": "Shallow water",
+      "fuel_low": "Low fuel",
+      "battery_voltage_low": "Low battery voltage",
+      "oil_pressure_low": "Low oil pressure",
+      "engine_overrev": "Engine over-revving",
       "signalk_alarm": "Signal K alarm"
     },
     "severity": {
@@ -189,6 +219,39 @@
     "risk": {
       "watch": "Watch",
       "danger": "Risk"
+    }
+  },
+  "forecast": {
+    "title": "Weather forecast",
+    "range": "{hours} h",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "source": "Source: {provider} · fetched {date}",
+    "stale": "Forecast is out of date (fetched {date}). Reconnect to the boat Wi-Fi to refresh it.",
+    "none": "No forecast yet.",
+    "empty": "The server provides no data for this period.",
+    "summary": {
+      "wind": "Max wind",
+      "gust": "Max gusts",
+      "wave": "Max waves",
+      "pressure": "Pressure",
+      "rain": "Total rain"
+    },
+    "metric": {
+      "wind": "Wind",
+      "gust": "Gusts",
+      "wave": "Waves",
+      "pressure": "Pressure",
+      "rain": "Rain",
+      "temperature": "Temperature"
+    },
+    "error": {
+      "no_position": "Boat position unknown: the forecast loads as soon as it is received.",
+      "unsupported": "This Signal K server does not expose the weather API (version 2 required).",
+      "no_provider": "No weather provider is installed on the Signal K server (for example Open-Meteo).",
+      "unauthorized": "The server refuses access to the forecast: check the source token.",
+      "unreachable": "Signal K server unreachable: the last known forecast stays displayed.",
+      "invalid": "The weather provider answered without a usable forecast."
     }
   }
 }

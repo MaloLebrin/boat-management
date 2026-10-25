@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { normalizeDelta } from '../../inertia/lib/signalk/sample_normalizer'
 import { ruleForPath, subscriptionSpecs } from '../../inertia/lib/signalk/path_catalog'
+import { fractionDigits, toReading } from '../../inertia/lib/signalk/display'
 import { INSTRUMENT_PATH_CATALOG } from '../../shared/constants/instruments'
 
 const delta = (values: Array<{ path: string; value: unknown }>, context = 'vessels.self') => ({
@@ -76,6 +77,33 @@ describe('normalizeDelta (#989)', () => {
         selfContext: 'vessels.urn:mrn:imo:mmsi:1',
       })
     ).toHaveLength(1)
+  })
+})
+
+describe('mesures ajoutées en #1006', () => {
+  test('une zone intérieure est abonnée par joker et lue avec sa zone', () => {
+    const paths = subscriptionSpecs().map((spec) => spec.path)
+    expect(paths).toContain('environment.inside.*.temperature')
+    expect(paths).toContain('electrical.solar.*.panelVoltage')
+
+    const reading = toReading('environment.inside.refrigerator.temperature', {
+      value: 277.15,
+      valueJson: null,
+      at: 0,
+      live: true,
+    })
+    expect(reading?.instance).toBe('refrigerator')
+    expect(reading?.displayUnit).toBe('°C')
+    expect(reading?.value).toBeCloseTo(4)
+    expect(reading?.labelKey).toBe('instruments.path.environment_inside_temperature')
+  })
+
+  test('distance en milles, puissance en watts sans décimale', () => {
+    expect(
+      toReading('navigation.log', { value: 3704, valueJson: null, at: 0, live: false })?.value
+    ).toBe(2)
+    expect(fractionDigits('W')).toBe(0)
+    expect(fractionDigits('NM')).toBe(1)
   })
 })
 
