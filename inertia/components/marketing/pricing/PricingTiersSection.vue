@@ -128,7 +128,7 @@ function isFree(tier: Tier, billing: 'monthly' | 'annual'): boolean {
               :class="[
                 'w-full',
                 tier.featured
-                  ? 'bg-white! text-navy-900! hover:bg-cream!'
+                  ? 'bg-white! text-navy-900! hover:bg-white/90!'
                   : tier.ctaVariant === 'secondary'
                     ? ''
                     : 'bg-navy-900! text-white! hover:bg-navy-800!',

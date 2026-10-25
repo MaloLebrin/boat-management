@@ -208,7 +208,7 @@ const profileKeys: ProfileKey[] = ['loueurs', 'ecoles', 'marinas', 'armateurs']
 
           <!-- CTA -->
           <div class="mt-8">
-            <BaseButton href="/signup" class="w-full bg-white! text-navy-900! hover:bg-cream!">
+            <BaseButton href="/signup" class="w-full bg-white! text-navy-900! hover:bg-white/90!">
               {{ ctaLabel }}
             </BaseButton>
           </div>

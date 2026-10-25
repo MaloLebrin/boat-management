@@ -128,7 +128,7 @@ function collapseAllGroups() {
                 <BaseButton
                   href="/signup"
                   size="sm"
-                  :class="['mt-2', idx === 1 ? 'bg-white! text-navy-900! hover:bg-cream!' : '']"
+                  :class="['mt-2', idx === 1 ? 'bg-white! text-navy-900! hover:bg-white/90!' : '']"
                   :variant="idx === 1 ? 'primary' : 'secondary'"
                 >
                   {{ plan.cta }}
