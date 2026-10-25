@@ -52,7 +52,7 @@ const { isVisible } = useScrollReveal()
         <li
           v-for="item in items"
           :key="item.title"
-          class="group rounded-xl border border-border bg-surface p-5 transition duration-300 hover:-translate-y-1 hover:border-coral-300 hover:shadow-md"
+          class="group rounded-xl border border-border bg-surface p-5 transition duration-300 hover:-translate-y-1 hover:border-coral-400 hover:shadow-md"
           data-testid="instruments-card"
         >
           <span

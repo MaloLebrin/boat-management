@@ -150,6 +150,16 @@ test.group('Instruments connectés — contenu SEO (#995)', () => {
       )
       assert.include(content.alerts.items[0].description, '20')
       assert.include(content.alerts.items[1].description, '95')
+      const byKey = Object.fromEntries(
+        BUILTIN_ALERT_RULES.map((rule, index) => [
+          rule.key,
+          content.alerts.items[index].description,
+        ])
+      )
+      assert.include(byKey['builtin:fuel_low'], '15')
+      assert.match(byKey['builtin:battery_voltage_low'], /11[.,]8/)
+      assert.include(byKey['builtin:oil_pressure_low'], '1')
+      assert.match(byKey['builtin:engine_overrev'], /3\D?500/)
       assert.include(content.alerts.customDescription, String(INSTRUMENT_ALERT_MAX_RULES_PER_BOAT))
       for (const item of content.alerts.items) {
         assert.notMatch(item.description, /\{[a-zA-Z]+\}/)

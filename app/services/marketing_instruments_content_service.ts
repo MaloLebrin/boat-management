@@ -36,10 +36,23 @@ const ICONS = {
   benefits: ['clock', 'chart', 'alarm', 'position'],
   install: ['server', 'lock', 'key'],
   security: ['eye', 'key', 'users', 'archive'],
-  alerts: ['power', 'temperature', 'depth', 'alarm'],
 } as const satisfies Record<string, readonly InstrumentsMarketingIcon[]>
 
 const KELVIN_OFFSET = 273.15
+const PA_PER_BAR = 100_000
+const HZ_TO_RPM = 60
+
+/** Pictogramme de chaque règle intégrée (clé sans le préfixe `builtin:`). */
+const ALERT_ICONS: Record<string, InstrumentsMarketingIcon> = {
+  battery_low: 'power',
+  engine_hot: 'temperature',
+  shallow_water: 'depth',
+  fuel_low: 'tanks',
+  battery_voltage_low: 'power',
+  oil_pressure_low: 'engine',
+  engine_overrev: 'engine',
+  signalk_alarm: 'alarm',
+}
 
 function builtinRule(key: string) {
   const rule = BUILTIN_ALERT_RULES.find((candidate) => candidate.key === key)
@@ -84,35 +97,44 @@ export default class MarketingInstrumentsContentService {
     })
 
     const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 })
-    const battery = builtinRule('builtin:battery_low')
-    const engine = builtinRule('builtin:engine_hot')
-    const depth = builtinRule('builtin:shallow_water')
+    const threshold = (key: string) => builtinRule(key).threshold
+    const clearing = (key: string) => {
+      const rule = builtinRule(key)
+      return rule.operator === 'lt'
+        ? rule.threshold + rule.hysteresis
+        : rule.threshold - rule.hysteresis
+    }
     // Les seuils affichés viennent des règles réellement évaluées : la page ne
     // peut pas promettre 20 % si la règle passe à 15 %.
     const alertParams = {
-      batteryLow: number.format(battery.threshold * 100),
-      batteryClear: number.format((battery.threshold + battery.hysteresis) * 100),
-      engineHot: number.format(engine.threshold - KELVIN_OFFSET),
-      engineClear: number.format(engine.threshold - engine.hysteresis - KELVIN_OFFSET),
-      depthLow: number.format(depth.threshold),
-      depthClear: number.format(depth.threshold + depth.hysteresis),
+      count: String(BUILTIN_ALERT_RULES.length),
+      batteryLow: number.format(threshold('builtin:battery_low') * 100),
+      batteryClear: number.format(clearing('builtin:battery_low') * 100),
+      engineHot: number.format(threshold('builtin:engine_hot') - KELVIN_OFFSET),
+      engineClear: number.format(clearing('builtin:engine_hot') - KELVIN_OFFSET),
+      depthLow: number.format(threshold('builtin:shallow_water')),
+      depthClear: number.format(clearing('builtin:shallow_water')),
+      fuelLow: number.format(threshold('builtin:fuel_low') * 100),
+      fuelClear: number.format(clearing('builtin:fuel_low') * 100),
+      voltLow: number.format(threshold('builtin:battery_voltage_low')),
+      voltClear: number.format(clearing('builtin:battery_voltage_low')),
+      oilLow: number.format(threshold('builtin:oil_pressure_low') / PA_PER_BAR),
+      oilClear: number.format(clearing('builtin:oil_pressure_low') / PA_PER_BAR),
+      rpmHigh: number.format(threshold('builtin:engine_overrev') * HZ_TO_RPM),
+      rpmClear: number.format(clearing('builtin:engine_overrev') * HZ_TO_RPM),
       maxRules: String(INSTRUMENT_ALERT_MAX_RULES_PER_BOAT),
     }
     const alertText = (key: string) => i18n.t(`marketing.features.instruments.${key}`, alertParams)
-    const alertRules = [
-      'builtin:battery_low',
-      'builtin:engine_hot',
-      'builtin:shallow_water',
-      'builtin:signalk_alarm',
-    ]
-    const alertCards: InstrumentsMarketingAlertCard[] = alertRules.map((key, index) => {
-      const severity = builtinRule(key).severity
+    // Une carte par règle intégrée, dans l'ordre de `BUILTIN_ALERT_RULES` : une
+    // règle ajoutée sans sa copie ressort en clé brute, ce que le test SEO refuse.
+    const alertCards: InstrumentsMarketingAlertCard[] = BUILTIN_ALERT_RULES.map((rule) => {
+      const slug = rule.key.replace('builtin:', '')
       return {
-        title: alertText(`alert${index + 1}_title`),
-        description: alertText(`alert${index + 1}_desc`),
-        icon: ICONS.alerts[index],
-        severity,
-        severityLabel: alertText(`severity_${severity}`),
+        title: alertText(`alert_${slug}_title`),
+        description: alertText(`alert_${slug}_desc`),
+        icon: ALERT_ICONS[slug] ?? 'alarm',
+        severity: rule.severity,
+        severityLabel: alertText(`severity_${rule.severity}`),
       }
     })
 

@@ -83,7 +83,7 @@ const levels = [
       class="flex items-center justify-between bg-gradient-to-r from-navy-800 to-navy-900 px-4 py-2 text-white"
     >
       <p class="flex items-center gap-1.5 font-semibold">
-        <SignalIcon class="h-3.5 w-3.5 text-coral-300" aria-hidden="true" />
+        <SignalIcon class="h-3.5 w-3.5 text-coral-400" aria-hidden="true" />
         {{ label('title') }}
       </p>
       <span class="flex items-center gap-2">
