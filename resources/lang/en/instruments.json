@@ -195,5 +195,38 @@
     "revoke": "Revoke the token",
     "revokeTitle": "Revoke the token?",
     "revokeMessage": "The plugin can no longer send readings until a new token is generated."
+  },
+  "forecast": {
+    "title": "Weather forecast",
+    "range": "{hours} h",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "source": "Source: {provider} · fetched {date}",
+    "stale": "Forecast is out of date (fetched {date}). Reconnect to the boat Wi-Fi to refresh it.",
+    "none": "No forecast yet.",
+    "empty": "The server provides no data for this period.",
+    "summary": {
+      "wind": "Max wind",
+      "gust": "Max gusts",
+      "wave": "Max waves",
+      "pressure": "Pressure",
+      "rain": "Total rain"
+    },
+    "metric": {
+      "wind": "Wind",
+      "gust": "Gusts",
+      "wave": "Waves",
+      "pressure": "Pressure",
+      "rain": "Rain",
+      "temperature": "Temperature"
+    },
+    "error": {
+      "no_position": "Boat position unknown: the forecast loads as soon as it is received.",
+      "unsupported": "This Signal K server does not expose the weather API (version 2 required).",
+      "no_provider": "No weather provider is installed on the Signal K server (for example Open-Meteo).",
+      "unauthorized": "The server refuses access to the forecast: check the source token.",
+      "unreachable": "Signal K server unreachable: the last known forecast stays displayed.",
+      "invalid": "The weather provider answered without a usable forecast."
+    }
   }
 }
