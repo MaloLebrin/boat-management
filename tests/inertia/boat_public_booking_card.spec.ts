@@ -47,6 +47,15 @@ describe('BoatPublicBookingCard (#881)', () => {
     )
   })
 
+  test('the link is copied through the shared copy field', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const wrapper = mount(BoatPublicBookingCard, { props: { boatId: 5, settings: open } })
+    await wrapper.find('[data-testid="base-copy-field-button"]').trigger('click')
+    expect(writeText).toHaveBeenCalledWith(open.url)
+    vi.unstubAllGlobals()
+  })
+
   test('a closed page says so, without a link', () => {
     const wrapper = mount(BoatPublicBookingCard, {
       props: { boatId: 5, settings: { ...open, enabled: false } },

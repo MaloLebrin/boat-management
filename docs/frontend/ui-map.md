@@ -24,6 +24,7 @@ Référence: `inertia/app.ts`.
   - `components/auth/signup/SignupTermsCheckbox.vue` — case `acceptTerms` avec son propre emplacement d'erreur ; les mentions CGU / confidentialité sont des `<Link>` localisés (`/fr/cgu`•`/en/terms`, `/fr/confidentialite`•`/en/privacy`) ouverts dans un nouvel onglet pour ne pas perdre le formulaire (#455)
   - `components/auth/signup/SignupSectionHeader.vue` — en-tête numéroté « 01 / 02 »
 - Puces du plan gratuit sous le bouton (`STARTER_FEATURES`) : construites depuis `PLAN_LIMITS.starter` (bateaux, membres) avec des clés ICU au pluriel — la page annonçait « utilisateurs illimités » alors que Starter en autorise 1 (#455)
+- `composables/use_clipboard.ts` + `components/base/BaseCopyField.vue` + `components/base/BaseCodeBlock.vue` (#1018) : toute copie dans le presse-papiers passe par là — jamais de `navigator.clipboard` écrit à la main. `BaseCopyField` = `BaseInput` en lecture seule + bouton Copier (adresse, lien, jeton ; `secret` masque la valeur) ; `BaseCodeBlock` = commande/code multi-lignes à coller (`wrap`, slot `caption`). Clés `common.clipboard.*`.
 - `components/base/BaseFormErrorSummary.vue` en tête de formulaire : reçoit `handled-keys` (les champs qui affichent déjà leur erreur sous l'input) et rend en bandeau `danger` **toutes les autres** erreurs. Sans lui, un champ de validator sans input rend l'échec invisible — c'est exactement le bug #448. Réutilisable sur tout formulaire Inertia.
 
 ### Dashboard

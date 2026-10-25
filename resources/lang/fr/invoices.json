@@ -188,8 +188,6 @@
     "title": "Paiement en ligne",
     "linkHint": "Votre client règle cette facture par carte depuis ce lien, déjà présent dans l'e-mail et le PDF. La facture passe à « Payée » dès que Stripe confirme le paiement.",
     "linkLabel": "Lien de paiement",
-    "copy": "Copier le lien",
-    "copied": "Lien copié",
     "noLinkHint": "Cette facture a été envoyée sans lien de paiement. Créez-le pour que votre client puisse la régler en ligne.",
     "createLink": "Créer le lien de paiement",
     "public": {

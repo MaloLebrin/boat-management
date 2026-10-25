@@ -16,7 +16,9 @@ import BaseBadge from '~/components/base/BaseBadge.vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseCheckbox from '~/components/base/BaseCheckbox.vue'
+import BaseCodeBlock from '~/components/base/BaseCodeBlock.vue'
 import BaseCombobox from '~/components/base/BaseCombobox.vue'
+import BaseCopyField from '~/components/base/BaseCopyField.vue'
 import BaseDropdown from '~/components/base/BaseDropdown.vue'
 import BaseEmptyState from '~/components/base/BaseEmptyState.vue'
 import BaseField from '~/components/base/BaseField.vue'
@@ -364,6 +366,19 @@ const tableRows = computed(() => {
               label="Notes"
               placeholder="Ex. vérification annuelle…"
             />
+            <BaseCopyField
+              id="copyUrl"
+              model-value="https://app.fleetai.test/book/acme/ondine"
+              label="Champ à copier"
+              hint="Lecture seule + bouton Copier"
+            />
+            <BaseCodeBlock
+              label="Bloc de commande"
+              language="bash"
+              code="curl -fsSL https://app.fleetai.test/install.sh | sh"
+            >
+              <template #caption>À coller dans un terminal.</template>
+            </BaseCodeBlock>
             <BaseRadio
               v-model="radioValue"
               label="Priorité"
