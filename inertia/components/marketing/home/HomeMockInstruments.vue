@@ -154,6 +154,7 @@ const levels = [
 
       <div class="grid grid-cols-2 gap-1.5">
         <HomeMockDial
+          variant="compass"
           :label="label('heading')"
           value="212"
           unit="°"
@@ -162,6 +163,7 @@ const levels = [
           :delay="STEP * 7"
         />
         <HomeMockDial
+          variant="wind"
           :label="label('apparentWind')"
           value="14"
           :unit="label('windUnit')"

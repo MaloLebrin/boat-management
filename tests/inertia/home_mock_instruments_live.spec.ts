@@ -116,13 +116,33 @@ describe('widgets de la maquette Instruments (#995)', () => {
     expect(wrapper.find('.mock-arc').attributes('style')).toContain('0.02 1')
   })
 
-  test('le cadran tourne l’aiguille vers son angle', () => {
+  test('le cap est une rose qui tourne en sens inverse du cap', () => {
     const wrapper = mount(HomeMockDial, {
-      props: { label: 'Cap', value: '212', unit: '°', angle: 212, sway: 0 },
+      props: { variant: 'compass', label: 'Cap', value: '212', unit: '°', angle: 212, sway: 0 },
     })
 
     expect(wrapper.text()).toContain('212')
-    expect(wrapper.find('.mock-needle').attributes('style')).toContain('rotate(212deg)')
+    expect(wrapper.find('.mock-rotor').attributes('style')).toContain('rotate(-212deg)')
+    expect(wrapper.find('text').text()).toBe('N')
+    expect(wrapper.get('[data-testid="mock-dial-degrees"]').text()).toBe('212°')
+  })
+
+  test('le vent est une flèche d’angle autour d’un bateau, sans rose', () => {
+    const wrapper = mount(HomeMockDial, {
+      props: {
+        variant: 'wind',
+        label: 'Vent apparent',
+        value: '14',
+        unit: 'nds',
+        angle: 48,
+        sway: 0,
+      },
+    })
+
+    expect(wrapper.find('.mock-rotor').attributes('style')).toContain('rotate(48deg)')
+    expect(wrapper.find('text').exists()).toBe(false)
+    expect(wrapper.get('[data-testid="mock-dial-degrees"]').text()).toBe('48°')
+    expect(wrapper.attributes('data-variant')).toBe('wind')
   })
 
   test('la courbe fait avancer son flux sans changer sa taille', () => {
