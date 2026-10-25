@@ -50,7 +50,17 @@ Des règles prêtes à l'emploi (batterie sous 20 %, température moteur élevé
 
 ## Alternative sans navigateur : le plugin
 
-Un plugin installé sur le serveur Signal K peut envoyer lui-même les relevés. L'administrateur génère un **jeton d'ingestion** depuis la carte « Plugin Signal K » de l'onglet Instruments : il n'est affiché qu'**une seule fois**, FleetAi n'en garde que l'empreinte, et on peut le régénérer ou le révoquer à tout moment. Le plugin lui-même est maintenu hors de ce dépôt ; le contrat de l'API est dans `docs/domain/instruments.md`.
+Un plugin installé sur le serveur Signal K peut envoyer lui-même les relevés. L'administrateur génère un **jeton d'ingestion** depuis la carte « Plugin Signal K » de l'onglet Instruments : il n'est affiché qu'**une seule fois**, FleetAi n'en garde que l'empreinte, et on peut le régénérer ou le révoquer à tout moment. Le plugin lui-même (`signalk-fleetai`) est maintenu hors de ce dépôt ; le contrat de l'API est dans `docs/domain/instruments.md`.
+
+**Installation en une commande.** Depuis un terminal du Raspberry (OpenPlotter) ou de tout serveur Signal K sous Linux, avec l'utilisateur qui fait tourner Signal K (pas en root) :
+
+```bash
+curl -fsSL https://fleetai.app/install/signalk-plugin.sh | FLEETAI_TOKEN=fai_ing_… bash
+```
+
+Remplace `fai_ing_…` par ton jeton. Le script vérifie Node, npm et `signalk-server`, installe le plugin dans le dossier de configuration (`~/.signalk` ou `$SIGNALK_NODE_CONFIG_DIR`), écrit sa configuration (sans jamais afficher le jeton) puis redémarre Signal K s'il tourne comme service. Il peut être relancé sans risque : tes réglages (par exemple la période d'envoi) sont conservés. Il **n'installe pas Signal K** : s'il est absent, il t'oriente vers l'installateur officiel ou l'image OpenPlotter.
+
+**Alternative sans terminal.** Dans l'admin Signal K, _Appstore_ → cherche `signalk-fleetai` → _Install_, redémarre le serveur, puis _Plugin Config_ → FleetAi : colle l'adresse d'ingestion et le jeton.
 
 ## Problèmes fréquents
 

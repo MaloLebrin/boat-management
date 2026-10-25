@@ -154,7 +154,9 @@ self.addEventListener('message', (event) => {
 // requêtes gérées par une route, une navigation sans route irait directement
 // au réseau et échouerait hors-ligne sans repli. Enregistrée après le
 // NetworkFirst : le routeur Workbox prend la première route qui matche.
-registerRoute(new NavigationRoute(new NetworkOnly(), { denylist: [/^\/api\//, /^\/up\b/] }))
+registerRoute(
+  new NavigationRoute(new NetworkOnly(), { denylist: [/^\/api\//, /^\/install\//, /^\/up\b/] })
+)
 
 // Repli hors-ligne : toute navigation qui échoue (page jamais visitée, réseau
 // coupé) sert le /offline.html précaché — équivalent du navigateFallback de

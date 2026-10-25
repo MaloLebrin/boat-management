@@ -1,5 +1,8 @@
 import { test } from '@japa/runner'
-import { normalizeInstrumentBaseUrl } from '#shared/helpers/instruments'
+import {
+  normalizeInstrumentBaseUrl,
+  signalkPluginInstallCommand,
+} from '#shared/helpers/instruments'
 import { isAllowedTelemetryPath, telemetryPathSpec } from '#shared/constants/instruments'
 
 test.group('normalizeInstrumentBaseUrl (#988)', () => {
@@ -114,5 +117,21 @@ test.group('INSTRUMENT_PATH_CATALOG (#988)', () => {
   test('distingue numérique et structuré', ({ assert }) => {
     assert.equal(telemetryPathSpec('navigation.position')?.valueKind, 'json')
     assert.equal(telemetryPathSpec('navigation.speedOverGround')?.valueKind, 'number')
+  })
+})
+
+test.group('signalkPluginInstallCommand (#1021)', () => {
+  test('compose la commande curl | bash avec le jeton', ({ assert }) => {
+    assert.equal(
+      signalkPluginInstallCommand('https://fleetai.app', 'fai_ing_abc'),
+      'curl -fsSL https://fleetai.app/install/signalk-plugin.sh | FLEETAI_TOKEN=fai_ing_abc bash'
+    )
+  })
+
+  test('sans jeton : emplacement à remplacer, et sans / final en double', ({ assert }) => {
+    assert.equal(
+      signalkPluginInstallCommand('http://localhost:3333/', null),
+      'curl -fsSL http://localhost:3333/install/signalk-plugin.sh | FLEETAI_TOKEN=fai_ing_… bash'
+    )
   })
 })

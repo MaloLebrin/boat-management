@@ -3,4 +3,5 @@ Allow: /
 Disallow: /dashboard
 Disallow: /login
 Disallow: /signup
+Disallow: /install/
 Sitemap: https://fleetai.app/sitemap.xml
