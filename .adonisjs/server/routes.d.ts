@@ -280,6 +280,14 @@ export type ScannedRoutes = {
     'inventory.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.instrumentSource.upsert': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.instrumentSource.destroy': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.instrumentAlertRules.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.instrumentAlertRules.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'ruleId': ParamValue} }
+    'boats.instrumentAlertRules.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'ruleId': ParamValue} }
+    'boats.instrumentIngestToken.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.instrumentIngestToken.destroy': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.telemetry.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'new_account.create': { paramsTuple?: []; params?: {} }
     'signup.store': { paramsTuple?: []; params?: {} }
     'session.create': { paramsTuple?: []; params?: {} }
@@ -311,6 +319,7 @@ export type ScannedRoutes = {
     'marketing.en.maintenance': { paramsTuple?: []; params?: {} }
     'marketing.en.fleet': { paramsTuple?: []; params?: {} }
     'marketing.en.aiAssistant': { paramsTuple?: []; params?: {} }
+    'marketing.en.instruments': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
     'marketing.en.guide': { paramsTuple?: []; params?: {} }
     'marketing.en.diagnosisAi': { paramsTuple?: []; params?: {} }
@@ -325,6 +334,7 @@ export type ScannedRoutes = {
     'marketing.fr.maintenance': { paramsTuple?: []; params?: {} }
     'marketing.fr.fleet': { paramsTuple?: []; params?: {} }
     'marketing.fr.aiAssistant': { paramsTuple?: []; params?: {} }
+    'marketing.fr.instruments': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
     'marketing.fr.guide': { paramsTuple?: []; params?: {} }
     'marketing.fr.diagnosisAi': { paramsTuple?: []; params?: {} }
@@ -453,6 +463,7 @@ export type ScannedRoutes = {
     'push.subscriptions.store': { paramsTuple?: []; params?: {} }
     'push.subscriptions.destroyByEndpoint': { paramsTuple?: []; params?: {} }
     'push.subscriptions.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'api.instruments.ingest': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'event_stream': { paramsTuple?: []; params?: {} }
@@ -553,6 +564,7 @@ export type ScannedRoutes = {
     'marketing.en.maintenance': { paramsTuple?: []; params?: {} }
     'marketing.en.fleet': { paramsTuple?: []; params?: {} }
     'marketing.en.aiAssistant': { paramsTuple?: []; params?: {} }
+    'marketing.en.instruments': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
     'marketing.en.guide': { paramsTuple?: []; params?: {} }
     'marketing.en.diagnosisAi': { paramsTuple?: []; params?: {} }
@@ -567,6 +579,7 @@ export type ScannedRoutes = {
     'marketing.fr.maintenance': { paramsTuple?: []; params?: {} }
     'marketing.fr.fleet': { paramsTuple?: []; params?: {} }
     'marketing.fr.aiAssistant': { paramsTuple?: []; params?: {} }
+    'marketing.fr.instruments': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
     'marketing.fr.guide': { paramsTuple?: []; params?: {} }
     'marketing.fr.diagnosisAi': { paramsTuple?: []; params?: {} }
@@ -717,6 +730,7 @@ export type ScannedRoutes = {
     'marketing.en.maintenance': { paramsTuple?: []; params?: {} }
     'marketing.en.fleet': { paramsTuple?: []; params?: {} }
     'marketing.en.aiAssistant': { paramsTuple?: []; params?: {} }
+    'marketing.en.instruments': { paramsTuple?: []; params?: {} }
     'marketing.en.simulator': { paramsTuple?: []; params?: {} }
     'marketing.en.guide': { paramsTuple?: []; params?: {} }
     'marketing.en.diagnosisAi': { paramsTuple?: []; params?: {} }
@@ -731,6 +745,7 @@ export type ScannedRoutes = {
     'marketing.fr.maintenance': { paramsTuple?: []; params?: {} }
     'marketing.fr.fleet': { paramsTuple?: []; params?: {} }
     'marketing.fr.aiAssistant': { paramsTuple?: []; params?: {} }
+    'marketing.fr.instruments': { paramsTuple?: []; params?: {} }
     'marketing.fr.simulator': { paramsTuple?: []; params?: {} }
     'marketing.fr.guide': { paramsTuple?: []; params?: {} }
     'marketing.fr.diagnosisAi': { paramsTuple?: []; params?: {} }
@@ -864,6 +879,9 @@ export type ScannedRoutes = {
     'suppliers.store': { paramsTuple?: []; params?: {} }
     'inventory.store': { paramsTuple?: []; params?: {} }
     'inventory.adjust': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.instrumentAlertRules.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.instrumentIngestToken.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.telemetry.store': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'signup.store': { paramsTuple?: []; params?: {} }
     'login.store': { paramsTuple?: []; params?: {} }
     'login.two_factor.store': { paramsTuple?: []; params?: {} }
@@ -922,6 +940,7 @@ export type ScannedRoutes = {
     'invoices.reminders.store': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoices.pay.public.checkout': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'push.subscriptions.store': { paramsTuple?: []; params?: {} }
+    'api.instruments.ingest': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'dashboard.layout.update': { paramsTuple?: []; params?: {} }
@@ -951,6 +970,8 @@ export type ScannedRoutes = {
     'purchaseOrders.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'suppliers.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.instrumentSource.upsert': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.instrumentAlertRules.update': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'ruleId': ParamValue} }
     'settings.sessions.notifications': { paramsTuple?: []; params?: {} }
     'settings.org.two_factor': { paramsTuple?: []; params?: {} }
     'settings.notifications.preferences': { paramsTuple?: []; params?: {} }
@@ -1026,6 +1047,9 @@ export type ScannedRoutes = {
     'purchaseOrders.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'suppliers.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'inventory.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'boats.instrumentSource.destroy': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
+    'boats.instrumentAlertRules.destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'boatId': ParamValue,'ruleId': ParamValue} }
+    'boats.instrumentIngestToken.destroy': { paramsTuple: [ParamValue]; params: {'boatId': ParamValue} }
     'settings.two_factor.cancel': { paramsTuple?: []; params?: {} }
     'settings.two_factor.destroy': { paramsTuple?: []; params?: {} }
     'settings.sessions.destroy_others': { paramsTuple?: []; params?: {} }

@@ -29,6 +29,8 @@ const fleetHref = computed(() => marketingPath('fleet', locale.value))
 
 const aiAssistantHref = computed(() => marketingPath('aiAssistant', locale.value))
 
+const instrumentsHref = computed(() => marketingPath('instruments', locale.value))
+
 const helpHref = computed(() => marketingPath('help', locale.value))
 
 const diagnosisAiHref = computed(() => marketingPath('diagnosisAi', locale.value))
@@ -78,6 +80,9 @@ const contactHref = computed(() => marketingPath('contact', locale.value))
             }}</Link>
             <Link :href="aiAssistantHref" class="transition-colors hover:text-fg">{{
               t('public.footer.aiAssistant')
+            }}</Link>
+            <Link :href="instrumentsHref" class="transition-colors hover:text-fg">{{
+              t('public.footer.instruments')
             }}</Link>
             <Link :href="pricingHref" class="transition-colors hover:text-fg">{{
               t('public.footer.pricing')

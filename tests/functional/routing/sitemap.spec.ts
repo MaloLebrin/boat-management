@@ -21,6 +21,8 @@ test.group('Sitemap (functional)', () => {
       'https://fleetai.app/fr/cout-entretien-bateau',
       'https://fleetai.app/en/engine-diagnosis-ai',
       'https://fleetai.app/fr/diagnostic-panne-ia',
+      'https://fleetai.app/en/connected-boat-instruments',
+      'https://fleetai.app/fr/instruments-bateau-connectes',
       'https://fleetai.app/en/engine-part-finder-ai',
       'https://fleetai.app/fr/reference-piece-moteur-ia',
       'https://fleetai.app/en/about',

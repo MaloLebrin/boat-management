@@ -8,6 +8,7 @@ import HomeMockPlanning from './HomeMockPlanning.vue'
 import HomeMockFleetide from './HomeMockFleetide.vue'
 import HomeMockDashboard from './HomeMockDashboard.vue'
 import HomeMockUpcomingTasks from './HomeMockUpcomingTasks.vue'
+import HomeMockInstruments from './HomeMockInstruments.vue'
 import type { FeatureCta, FeatureMockType } from '#shared/types/marketing'
 
 interface FeatureData {
@@ -36,6 +37,7 @@ const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
   fleetide: HomeMockFleetide,
   dashboard: HomeMockDashboard,
   upcomingTasks: HomeMockUpcomingTasks,
+  instruments: HomeMockInstruments,
 }
 </script>
 

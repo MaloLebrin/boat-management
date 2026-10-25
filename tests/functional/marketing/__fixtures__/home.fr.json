@@ -166,6 +166,18 @@
             "Actions en un clic",
             "Propulsé par Mistral AI"
           ]
+        },
+        {
+          "eyebrow": "INSTRUMENTS DE BORD",
+          "title": "Ton bateau remplit son carnet",
+          "titleHighlight": "tout seul.",
+          "body": "Branche le serveur Signal K du bord : les heures moteur avancent automatiquement et FleetAi te prévient quand une batterie faiblit ou qu'un moteur chauffe.",
+          "bullets": [
+            "Jauges en direct sur le Wi-Fi du bateau",
+            "Heures moteur et échéances mises à jour",
+            "Historique et graphiques",
+            "Alertes de seuil pour toute l'équipe"
+          ]
         }
       ],
       "personas": {

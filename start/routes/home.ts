@@ -45,6 +45,7 @@ const LOCALIZED_PAGES = [
   { page: 'maintenance', priority: '0.8', changefreq: 'monthly' },
   { page: 'fleet', priority: '0.8', changefreq: 'monthly' },
   { page: 'aiAssistant', priority: '0.8', changefreq: 'monthly' },
+  { page: 'instruments', priority: '0.8', changefreq: 'monthly' },
   { page: 'simulator', priority: '0.8', changefreq: 'monthly' },
   { page: 'guide', priority: '0.7', changefreq: 'monthly' },
   // Tunnels d'acquisition (diagnostic, pièces), pages enrichies en contenu indexable : priorité relevée.

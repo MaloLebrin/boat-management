@@ -210,6 +210,18 @@ export default class MarketingContentService {
               i18n.t('marketing.home.features.item3_bullet4'),
             ],
           },
+          {
+            eyebrow: i18n.t('marketing.home.features.item4_eyebrow'),
+            title: i18n.t('marketing.home.features.item4_title'),
+            titleHighlight: i18n.t('marketing.home.features.item4_highlight'),
+            body: i18n.t('marketing.home.features.item4_body'),
+            bullets: [
+              i18n.t('marketing.home.features.item4_bullet1'),
+              i18n.t('marketing.home.features.item4_bullet2'),
+              i18n.t('marketing.home.features.item4_bullet3'),
+              i18n.t('marketing.home.features.item4_bullet4'),
+            ],
+          },
         ],
         personas: {
           title: i18n.t('marketing.home.personas.title'),
@@ -1055,6 +1067,7 @@ export default class MarketingContentService {
             { q: t('faq_q7'), a: t('faq_a7', { count: String(PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) }) },
             { q: t('faq_q8'), a: t('faq_a8') },
             { q: t('faq_q9'), a: t('faq_a9', { count: String(PUBLIC_DIAGNOSIS_LIFETIME_LIMIT) }) },
+            { q: t('faq_q10'), a: t('faq_a10') },
           ],
         },
         finalCta: {

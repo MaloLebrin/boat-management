@@ -436,6 +436,10 @@
           {
             "q": "Puis-je essayer l'IA sans compte ?",
             "a": "Oui. Le diagnostic de panne moteur est ouvert à tout le monde depuis le site : tu décris ta panne, l'assistant te pose quelques questions puis t'oriente vers les causes probables, de la moins chère à la plus chère à vérifier. C'est gratuit et sans inscription, dans la limite de 2 diagnostics — les plans Pro et Entreprise, eux, n'ont pas de plafond de conversations, seulement leur quota de tokens IA mensuel."
+          },
+          {
+            "q": "Faut-il le plan Pro pour les instruments connectés ?",
+            "a": "Oui, le plan Pro ou Entreprise. Les instruments de bord (serveur Signal K, jauges, historique, alertes) sont inclus dans ces plans, sans supplément. Le plan Starter reste gratuit et garde le carnet d'entretien avec la saisie manuelle des heures moteur."
           }
         ]
       },

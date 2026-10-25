@@ -40,6 +40,9 @@ router
       .get('/ai-boat-assistant', [MarketingFeaturesController, 'aiAssistant'])
       .as('marketing.en.aiAssistant')
     router
+      .get('/connected-boat-instruments', [MarketingFeaturesController, 'instruments'])
+      .as('marketing.en.instruments')
+    router
       .get('/maintenance-cost-simulator', [MarketingController, 'simulator'])
       .as('marketing.en.simulator')
     router.get('/boat-maintenance-cost', [MarketingController, 'guide']).as('marketing.en.guide')
@@ -72,6 +75,9 @@ router
     router
       .get('/assistant-ia-bateau', [MarketingFeaturesController, 'aiAssistant'])
       .as('marketing.fr.aiAssistant')
+    router
+      .get('/instruments-bateau-connectes', [MarketingFeaturesController, 'instruments'])
+      .as('marketing.fr.instruments')
     router
       .get('/simulateur-cout-entretien', [MarketingController, 'simulator'])
       .as('marketing.fr.simulator')

@@ -113,6 +113,35 @@
       "taskSailChange": "Sail replacement - Jun 8",
       "taskGpsCheck": "GPS check - Jun 14",
       "taskHullCleaning": "Hull cleaning - Jun 20"
+    },
+    "instruments": {
+      "title": "Instruments",
+      "live": "Live",
+      "engineHours": "Engine hours",
+      "rpm": "Revs",
+      "rpmUnit": "rpm",
+      "voltage": "Battery",
+      "tank": "Fuel",
+      "depth": "Depth",
+      "wind": "Wind",
+      "windUnit": "kn",
+      "alert": "Engine temperature high",
+      "synced": "Synced",
+      "alertsTitle": "Open alerts",
+      "batteryLow": "Low battery",
+      "shallow": "Shallow water",
+      "critical": "Critical",
+      "warning": "Warning",
+      "coolant": "Coolant",
+      "oilPressure": "Oil pressure",
+      "speed": "Speed over ground",
+      "heading": "Heading",
+      "apparentWind": "Apparent wind",
+      "waterTank": "Fresh water",
+      "blackWater": "Black water",
+      "waterTemp": "Water",
+      "history": "24 h history",
+      "historySeries": "Battery voltage"
     }
   }
 }

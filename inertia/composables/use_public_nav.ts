@@ -26,6 +26,7 @@ export function usePublicNav(locale: Ref<AppLocale>) {
         { labelKey: 'public.nav.maintenance', href: marketingPath('maintenance', locale.value) },
         { labelKey: 'public.nav.fleet', href: marketingPath('fleet', locale.value) },
         { labelKey: 'public.nav.aiAssistant', href: marketingPath('aiAssistant', locale.value) },
+        { labelKey: 'public.nav.instruments', href: marketingPath('instruments', locale.value) },
       ],
     },
   ])

@@ -123,6 +123,7 @@ const FEATURE_HREFS = [
   '/fr/carnet-entretien-bateau',
   '/fr/gestion-flotte-bateaux',
   '/fr/assistant-ia-bateau',
+  '/fr/instruments-bateau-connectes',
 ]
 
 // Les outils gratuits sont des tunnels d'acquisition : liens directs du
@@ -171,6 +172,7 @@ test('le footer public renvoie vers les pages fonctionnalité et l’aide', () =
     '/fr/carnet-entretien-bateau',
     '/fr/gestion-flotte-bateaux',
     '/fr/assistant-ia-bateau',
+    '/fr/instruments-bateau-connectes',
     '/fr/aide',
   ]) {
     expect(w.findAll(`a[href="${href}"]`).length).toBe(1)

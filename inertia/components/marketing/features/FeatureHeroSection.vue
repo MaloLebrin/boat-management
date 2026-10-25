@@ -6,6 +6,7 @@ import HomeMockPlanning from '~/components/marketing/home/HomeMockPlanning.vue'
 import HomeMockFleetide from '~/components/marketing/home/HomeMockFleetide.vue'
 import HomeMockDashboard from '~/components/marketing/home/HomeMockDashboard.vue'
 import HomeMockUpcomingTasks from '~/components/marketing/home/HomeMockUpcomingTasks.vue'
+import HomeMockInstruments from '~/components/marketing/home/HomeMockInstruments.vue'
 import type { FeatureCta, FeatureMockType } from '#shared/types/marketing'
 
 defineProps<{
@@ -26,6 +27,7 @@ const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
   fleetide: HomeMockFleetide,
   dashboard: HomeMockDashboard,
   upcomingTasks: HomeMockUpcomingTasks,
+  instruments: HomeMockInstruments,
 }
 </script>
 

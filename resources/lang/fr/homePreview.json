@@ -113,6 +113,35 @@
       "taskSailChange": "Changement voile - 8 juin",
       "taskGpsCheck": "Contrôle GPS - 14 juin",
       "taskHullCleaning": "Carénage - 20 juin"
+    },
+    "instruments": {
+      "title": "Instruments",
+      "live": "En direct",
+      "engineHours": "Heures moteur",
+      "rpm": "Régime",
+      "rpmUnit": "tr/min",
+      "voltage": "Batterie",
+      "tank": "Carburant",
+      "depth": "Profondeur",
+      "wind": "Vent",
+      "windUnit": "nds",
+      "alert": "Température moteur élevée",
+      "synced": "Synchronisé",
+      "alertsTitle": "Alertes en cours",
+      "batteryLow": "Batterie faible",
+      "shallow": "Petits fonds",
+      "critical": "Critique",
+      "warning": "Avertissement",
+      "coolant": "Refroidissement",
+      "oilPressure": "Pression d’huile",
+      "speed": "Vitesse fond",
+      "heading": "Cap",
+      "apparentWind": "Vent apparent",
+      "waterTank": "Eau douce",
+      "blackWater": "Eaux noires",
+      "waterTemp": "Eau",
+      "history": "Historique 24 h",
+      "historySeries": "Tension batterie"
     }
   }
 }
