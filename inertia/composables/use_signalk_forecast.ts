@@ -6,6 +6,7 @@ import {
   writeForecastCache,
   type WeatherStorage,
 } from '~/lib/signalk/weather'
+import { isMixedContent } from '~/lib/signalk/url_security'
 import type { SignalKTransport } from '~/lib/signalk/types'
 import type { InstrumentSourceConnection } from '#shared/types/instruments'
 import type { WeatherErrorKey, WeatherForecastSnapshot } from '#shared/types/weather'
@@ -18,6 +19,8 @@ export interface SignalKForecastOptions {
   source: () => Pick<InstrumentSourceConnection, 'baseUrl' | 'token' | 'enabled'> | null
   position: () => { latitude: number; longitude: number } | null
   transport?: SignalKTransport
+  /** `location.protocol` de la page (contenu mixte, #1019). */
+  pageProtocol?: () => string | undefined
   storage?: WeatherStorage | null
 }
 
@@ -50,6 +53,8 @@ export function useSignalKForecast(options: SignalKForecastOptions) {
   async function refresh() {
     const source = options.source()
     if (!source?.enabled) return
+    // Contenu mixte : le navigateur bloquerait l'appel, le cache local reste affiché.
+    if (isMixedContent(source.baseUrl, options.pageProtocol?.())) return
     const position = options.position()
     if (!position) {
       error.value = 'no_position'

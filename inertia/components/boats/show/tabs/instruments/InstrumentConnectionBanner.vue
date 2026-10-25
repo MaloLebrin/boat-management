@@ -12,6 +12,8 @@ const props = defineProps<{
   /** Ce visiteur ne peut pas ingérer : il lit les dernières valeurs, sans flux. */
   readOnly: boolean
   enabled: boolean
+  /** Adresse en contenu mixte, mais le plugin pousse les mesures (#1019). */
+  pluginOnly?: boolean
   /** Dernier lot reçu par FleetAi, côté serveur (ISO). */
   lastSeenAt: string | null
 }>()
@@ -20,7 +22,7 @@ const { t } = useT()
 const { formatDateTime } = useDateFormat()
 
 const variant = computed(() => {
-  if (props.readOnly || !props.enabled) return 'info' as const
+  if (props.readOnly || !props.enabled || props.pluginOnly) return 'info' as const
   if (props.state === 'open') return 'success' as const
   if (props.state === 'error') return 'danger' as const
   if (props.state === 'reconnecting') return 'warning' as const
@@ -30,11 +32,12 @@ const variant = computed(() => {
 const title = computed(() => {
   if (!props.enabled) return t('instruments.banner.disabled')
   if (props.readOnly) return t('instruments.banner.readOnly')
+  if (props.pluginOnly) return t('instruments.banner.pluginOnly')
   return t(`instruments.banner.state.${props.state}`)
 })
 
 const detail = computed(() => {
-  if (!props.enabled || props.readOnly) return null
+  if (!props.enabled || props.readOnly || props.pluginOnly) return null
   if (props.errorKey) return t(`instruments.banner.error.${props.errorKey}`)
   if (props.state === 'open') return t('instruments.banner.screenOpen')
   return null

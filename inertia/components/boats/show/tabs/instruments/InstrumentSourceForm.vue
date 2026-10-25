@@ -7,6 +7,7 @@ import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
 import BaseToggle from '~/components/base/BaseToggle.vue'
 import { useT } from '~/composables/use_t'
+import { needsFullReloadForCsp } from '~/lib/signalk/probe'
 import type { InstrumentSourceRow } from '#shared/types/instruments'
 
 const props = defineProps<{ boatId: number; source: InstrumentSourceRow | null }>()
@@ -24,6 +25,7 @@ const form = useForm({
 })
 
 function submit() {
+  const previousBaseUrl = props.source?.baseUrl ?? null
   // Jeton absent = conservé ; `null` = effacé ; chaîne = remplacé.
   form
     .transform((data) => ({
@@ -34,7 +36,14 @@ function submit() {
     }))
     .put(`/boats/${props.boatId}/instrument-source`, {
       preserveScroll: true,
-      onSuccess: () => form.reset('token', 'clearToken'),
+      onSuccess: () => {
+        form.reset('token', 'clearToken')
+        // La CSP est posée par document : une nouvelle origine n'est autorisée
+        // qu'après un rechargement complet (D10), pas après une visite Inertia.
+        if (needsFullReloadForCsp(previousBaseUrl, form.baseUrl)) {
+          window.location.assign(`/boats/${props.boatId}?tab=instruments`)
+        }
+      },
     })
 }
 

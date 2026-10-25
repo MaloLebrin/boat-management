@@ -18,6 +18,7 @@ import { useT } from '~/composables/use_t'
 import { useSignalKForecast } from '~/composables/use_signalk_forecast'
 import { useTelemetrySync } from '~/composables/use_telemetry_sync'
 import { buildReadings } from '~/lib/signalk/display'
+import { isMixedContent } from '~/lib/signalk/probe'
 import { parsePosition } from '~/lib/signalk/weather'
 import { mergeInstrumentAlerts } from '~/utils/instrument_alerts'
 import { alertRuleSpecs } from '#shared/helpers/instrument_alerts'
@@ -36,7 +37,24 @@ const historyPaths = computed(() =>
 )
 
 /** Sans le droit d'ingérer, le visiteur lit les dernières valeurs sans ouvrir de flux (D3). */
-const canStream = computed(() => Boolean(source.value?.enabled) && props.instruments.can.ingest)
+const canStream = computed(
+  () => Boolean(source.value?.enabled) && props.instruments.can.ingest && !mixedContent.value
+)
+
+/** Protocole de la page, connu au montage seulement (SSR : pas de `window`). */
+const pageProtocol = ref<string | undefined>(undefined)
+/** Adresse `http:` sur une page `https:` : le navigateur bloque le flux (#1019). */
+const mixedContent = computed(() =>
+  source.value ? isMixedContent(source.value.baseUrl, pageProtocol.value) : false
+)
+/** Mixte, mais le plugin pousse les mesures : FleetAi les lit sans flux ici. */
+const pluginOnly = computed(() => mixedContent.value && Boolean(source.value?.hasIngestToken))
+const bannerState = computed(() =>
+  mixedContent.value && !pluginOnly.value ? ('error' as const) : stream.connectionState.value
+)
+const bannerError = computed(() =>
+  mixedContent.value && !pluginOnly.value ? ('mixed_content' as const) : stream.errorKey.value
+)
 
 const sync = useTelemetrySync({
   boatId: () => props.boatId,
@@ -51,6 +69,7 @@ const stream = useInstrumentStream({
   alertRules: () => alertRuleSpecs(props.instruments.rules),
   onSamples: (samples) => sync.push(samples),
   onAisDelta: ais.handleDelta,
+  pageProtocol: () => pageProtocol.value,
 })
 
 const now = ref(Date.now())
@@ -65,6 +84,7 @@ const forecast = useSignalKForecast({
   boatId: () => props.boatId,
   source: () => source.value,
   position: () => boatPosition.value,
+  pageProtocol: () => pageProtocol.value,
 })
 const alerts = computed(() =>
   mergeInstrumentAlerts(props.instruments.openAlerts, stream.localAlerts.value)
@@ -122,6 +142,7 @@ async function startStreaming() {
 }
 
 onMounted(() => {
+  pageProtocol.value = window.location.protocol
   clock = setInterval(() => (now.value = Date.now()), 5000)
   void startStreaming()
 })
@@ -135,8 +156,9 @@ onBeforeUnmount(() => {
   <div class="space-y-8" data-testid="tab-instruments">
     <template v-if="source">
       <InstrumentConnectionBanner
-        :state="stream.connectionState.value"
-        :error-key="stream.errorKey.value"
+        :state="bannerState"
+        :error-key="bannerError"
+        :plugin-only="pluginOnly"
         :last-delta-at="stream.lastDeltaAt.value"
         :read-only="!instruments.can.ingest"
         :enabled="source.enabled"

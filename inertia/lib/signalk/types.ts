@@ -1,3 +1,4 @@
+import type { InstrumentProbeErrorKey } from '#shared/types/instruments'
 import type { JsonValue } from '#shared/types/notification'
 
 /**
@@ -46,7 +47,7 @@ export type SignalKConnectionState =
   | 'error'
 
 /** Pourquoi la connexion ne marche pas — porté par l'UI (PR 3). */
-export type SignalKErrorKey = 'unreachable' | 'unauthorized' | 'tls' | 'protocol'
+export type SignalKErrorKey = Exclude<InstrumentProbeErrorKey, 'invalid_url'>
 
 /** Sous-ensemble de l'API `WebSocket` utilisé par le client. */
 export interface WebSocketLike {

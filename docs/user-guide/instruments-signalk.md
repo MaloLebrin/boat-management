@@ -54,10 +54,11 @@ Un plugin installé sur le serveur Signal K peut envoyer lui-même les relevés.
 
 ## Problèmes fréquents
 
-| Symptôme                        | Cause probable                                                                                             |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| « Serveur injoignable »         | le téléphone n'est pas sur le Wi-Fi du bateau, ou l'adresse est fausse                                     |
-| « Non autorisé »                | jeton absent, expiré, ou compte sans lecture                                                               |
-| Erreur de certificat            | certificat auto-signé non accepté sur cet appareil, ou nom de domaine qui ne correspond pas                |
-| Jauges figées avec « périmé »   | plus de nouvelles valeurs depuis plus de deux minutes : écran verrouillé, serveur éteint ou hors de portée |
-| Aucune valeur dans l'historique | l'écran est resté fermé : l'acquisition ne tourne que page ouverte, ou via le plugin                       |
+| Symptôme                                                      | Cause probable                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| « Serveur injoignable »                                       | le téléphone n'est pas sur le Wi-Fi du bateau, ou l'adresse est fausse                                                                                                                                               |
+| « Le navigateur bloque les adresses http:// » (contenu mixte) | l'adresse du serveur commence par `http://` alors que FleetAi est en HTTPS : utilise une adresse `https://` (section 2) ou laisse le plugin envoyer les données (le bandeau indique alors « Lecture par le plugin ») |
+| « Non autorisé »                                              | jeton absent, expiré, ou compte sans lecture                                                                                                                                                                         |
+| Erreur de certificat                                          | certificat auto-signé non accepté sur cet appareil, ou nom de domaine qui ne correspond pas                                                                                                                          |
+| Jauges figées avec « périmé »                                 | plus de nouvelles valeurs depuis plus de deux minutes : écran verrouillé, serveur éteint ou hors de portée                                                                                                           |
+| Aucune valeur dans l'historique                               | l'écran est resté fermé : l'acquisition ne tourne que page ouverte, ou via le plugin                                                                                                                                 |

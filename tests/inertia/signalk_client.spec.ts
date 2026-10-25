@@ -3,6 +3,7 @@ import {
   SIGNALK_HEARTBEAT_MS,
   SIGNALK_MAX_RETRY_MS,
   createSignalKClient,
+  parseDiscovery,
   rebaseOnOrigin,
 } from '../../inertia/lib/signalk/client'
 import { aisSubscriptionSpecs } from '../../inertia/lib/signalk/path_catalog'
@@ -64,7 +65,9 @@ interface Setup {
   client: ReturnType<typeof createSignalKClient>
 }
 
-function setup(options: { baseUrl?: string; token?: string | null; ais?: boolean } = {}): Setup {
+function setup(
+  options: { baseUrl?: string; token?: string | null; ais?: boolean; pageProtocol?: string } = {}
+): Setup {
   const ctx: Setup = {
     states: [],
     deltas: [],
@@ -92,6 +95,7 @@ function setup(options: { baseUrl?: string; token?: string | null; ais?: boolean
     token: options.token === undefined ? 'secret-token' : options.token,
     context: 'vessels.self',
     transport,
+    pageProtocol: options.pageProtocol,
     aisSubscriptions: options.ais ? aisSubscriptionSpecs() : undefined,
     onDelta: (delta) => ctx.deltas.push(delta),
     onState: (state, key) => ctx.states.push([state, key]),
@@ -112,6 +116,38 @@ describe('createSignalKClient (#989)', () => {
     expect(rebaseOnOrigin('http://x:3000/signalk/v1/api/', 'http://192.168.1.5:3000', false)).toBe(
       'http://192.168.1.5:3000/signalk/v1/api/'
     )
+  })
+
+  test('contenu mixte (#1019) : page https + serveur http → erreur terminale, zéro requête', async () => {
+    const ctx = setup({ baseUrl: 'http://192.168.1.20:3000', pageProtocol: 'https:' })
+    ctx.client.connect()
+    await flush()
+    await vi.advanceTimersByTimeAsync(SIGNALK_MAX_RETRY_MS * 2)
+
+    expect(ctx.requests).toHaveLength(0)
+    expect(ctx.sockets).toHaveLength(0)
+    expect(ctx.states.at(-1)).toEqual(['error', 'mixed_content'])
+    expect(ctx.states.some(([state]) => state === 'reconnecting')).toBe(false)
+  })
+
+  test('contenu mixte : localhost reste autorisé, et une page http aussi', async () => {
+    const local = setup({ baseUrl: 'http://localhost:3000', pageProtocol: 'https:' })
+    local.client.connect()
+    await flush()
+    expect(local.requests.length).toBeGreaterThan(0)
+
+    const plain = setup({ baseUrl: 'http://192.168.1.20:3000', pageProtocol: 'http:' })
+    plain.client.connect()
+    await flush()
+    expect(plain.requests.length).toBeGreaterThan(0)
+  })
+
+  test('parseDiscovery est exportée et reprend l’origine configurée', () => {
+    expect(parseDiscovery(DISCOVERY, 'https://sk.example:3443')).toEqual({
+      httpUrl: 'https://sk.example:3443/signalk/v1/api/',
+      wsUrl: 'wss://sk.example:3443/signalk/v1/stream',
+    })
+    expect(parseDiscovery({}, 'https://sk.example')).toBeNull()
   })
 
   test('AIS (#1009) : un second abonnement sur vessels.* après celui du bateau', async () => {

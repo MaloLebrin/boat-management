@@ -1,6 +1,7 @@
 import { AIS_SUBSCRIBE_CONTEXT } from '#shared/constants/ais'
 import { retryDelayMs } from '#shared/helpers/offline_retry'
 import { subscriptionSpecs } from './path_catalog'
+import { isMixedContent } from './url_security'
 import type {
   SignalKConnectionState,
   SignalKDelta,
@@ -43,11 +44,28 @@ export interface SignalKClientOptions {
   onState: (state: SignalKConnectionState, errorKey: SignalKErrorKey | null) => void
   transport: SignalKTransport
   heartbeatMs?: number
+  /** `location.protocol` de la page : `https:` + adresse `http:` = contenu mixte (#1019). */
+  pageProtocol?: string
 }
 
 interface DiscoveryBody {
   endpoints?: Record<string, Record<string, unknown> | undefined>
+  server?: { version?: unknown }
 }
+
+type Fetch = SignalKTransport['fetch']
+
+export type DiscoverResult =
+  | { ok: true; discovery: SignalKDiscovery; serverVersion: string | null }
+  | { ok: false; error: SignalKErrorKey; status: number | null }
+
+export type VesselsSelfResult =
+  | { ok: true; body: unknown }
+  | {
+      ok: false
+      error: Extract<SignalKErrorKey, 'unauthorized' | 'unreachable'>
+      status: number | null
+    }
 
 /** Reprend le chemin d'une URL découverte mais l'origine (et le schéma) configurés. */
 export function rebaseOnOrigin(discovered: string, baseUrl: string, socket: boolean): string {
@@ -58,7 +76,7 @@ export function rebaseOnOrigin(discovered: string, baseUrl: string, socket: bool
   return `${scheme}//${base.host}${path.pathname}${path.search}`
 }
 
-function parseDiscovery(body: unknown, baseUrl: string): SignalKDiscovery | null {
+export function parseDiscovery(body: unknown, baseUrl: string): SignalKDiscovery | null {
   const v1 = (body as DiscoveryBody | null)?.endpoints?.v1
   const http = v1?.['signalk-http']
   const ws = v1?.['signalk-ws']
@@ -70,6 +88,53 @@ function parseDiscovery(body: unknown, baseUrl: string): SignalKDiscovery | null
     }
   } catch {
     return null
+  }
+}
+
+/** `GET {baseUrl}/signalk` : découverte REST et lecture de la version du serveur. */
+export async function discoverSignalK(
+  fetchFn: Fetch,
+  baseUrl: string,
+  headers: Record<string, string>
+): Promise<DiscoverResult> {
+  let response
+  try {
+    response = await fetchFn(`${baseUrl}/signalk`, { headers })
+  } catch {
+    // `fetch` ne distingue pas un certificat refusé d'un hôte absent : TLS
+    // n'est évoqué que pour un serveur en https, c'est le cas qui l'explique.
+    return { ok: false, error: baseUrl.startsWith('https:') ? 'tls' : 'unreachable', status: null }
+  }
+  if (response.status === 401 || response.status === 403) {
+    return { ok: false, error: 'unauthorized', status: response.status }
+  }
+  if (!response.ok) return { ok: false, error: 'unreachable', status: response.status }
+  const body = await response.json().catch(() => null)
+  const discovery = parseDiscovery(body, baseUrl)
+  if (!discovery) return { ok: false, error: 'protocol', status: response.status }
+  const version = (body as DiscoveryBody).server?.version
+  return {
+    ok: true,
+    discovery,
+    serverVersion: typeof version === 'string' ? version : null,
+  }
+}
+
+/** `GET …/vessels/self` : 401 ici, c'est « jeton requis » — pas un flux muet. */
+export async function probeVesselsSelf(
+  fetchFn: Fetch,
+  httpUrl: string,
+  headers: Record<string, string>
+): Promise<VesselsSelfResult> {
+  try {
+    const response = await fetchFn(`${httpUrl}vessels/self`, { headers })
+    if (response.status === 401 || response.status === 403) {
+      return { ok: false, error: 'unauthorized', status: response.status }
+    }
+    if (!response.ok) return { ok: false, error: 'unreachable', status: response.status }
+    return { ok: true, body: await response.json().catch(() => null) }
+  } catch {
+    return { ok: false, error: 'unreachable', status: null }
   }
 }
 
@@ -123,61 +188,41 @@ export function createSignalKClient(options: SignalKClientOptions) {
     retryTimer = setTimeout(() => void open(), delay)
   }
 
-  async function discover(): Promise<SignalKDiscovery | SignalKErrorKey> {
-    let response
-    try {
-      response = await options.transport.fetch(`${options.baseUrl}/signalk`, { headers: headers() })
-    } catch {
-      // `fetch` ne distingue pas un certificat refusé d'un hôte absent : TLS
-      // n'est évoqué que pour un serveur en https, c'est le cas qui l'explique.
-      return options.baseUrl.startsWith('https:') ? 'tls' : 'unreachable'
-    }
-    if (response.status === 401 || response.status === 403) return 'unauthorized'
-    if (!response.ok) return 'unreachable'
-    const discovery = parseDiscovery(await response.json().catch(() => null), options.baseUrl)
-    return discovery ?? 'protocol'
-  }
-
-  /** `GET …/vessels/self` : 401 ici, c'est « jeton requis » — pas un flux muet. */
-  async function probe(httpUrl: string): Promise<SignalKErrorKey | null> {
-    try {
-      const response = await options.transport.fetch(`${httpUrl}vessels/self`, {
-        headers: headers(),
-      })
-      if (response.status === 401 || response.status === 403) return 'unauthorized'
-      return response.ok ? null : 'unreachable'
-    } catch {
-      return 'unreachable'
-    }
-  }
-
   async function open() {
     if (stopped) return
     const current = ++generation
-    setState(attempt === 0 ? 'connecting' : 'reconnecting')
-
-    const discovery = await discover()
-    if (current !== generation || stopped) return
-    if (typeof discovery === 'string') {
-      // Un refus d'authentification ne se règle pas en réessayant.
-      if (discovery === 'unauthorized' || discovery === 'protocol') {
-        clearTimers()
-        setState('error', discovery)
-        return
-      }
-      scheduleReconnect(discovery)
+    if (isMixedContent(options.baseUrl, options.pageProtocol)) {
+      // Le navigateur bloquerait chaque requête : inutile d'en tenter une.
+      clearTimers()
+      setState('error', 'mixed_content')
       return
     }
+    setState(attempt === 0 ? 'connecting' : 'reconnecting')
 
-    const probeError = await probe(discovery.httpUrl)
+    const fetchFn = options.transport.fetch
+    const found = await discoverSignalK(fetchFn, options.baseUrl, headers())
     if (current !== generation || stopped) return
-    if (probeError === 'unauthorized') {
+    if (!found.ok) {
+      // Un refus d'authentification ne se règle pas en réessayant.
+      if (found.error === 'unauthorized' || found.error === 'protocol') {
+        clearTimers()
+        setState('error', found.error)
+        return
+      }
+      scheduleReconnect(found.error)
+      return
+    }
+    const discovery = found.discovery
+
+    const probed = await probeVesselsSelf(fetchFn, discovery.httpUrl, headers())
+    if (current !== generation || stopped) return
+    if (!probed.ok && probed.error === 'unauthorized') {
       clearTimers()
       setState('error', 'unauthorized')
       return
     }
-    if (probeError) {
-      scheduleReconnect(probeError)
+    if (!probed.ok) {
+      scheduleReconnect(probed.error)
       return
     }
 
