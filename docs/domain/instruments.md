@@ -57,6 +57,18 @@ Valeurs en **SI** (D8) : `revolutions` en Hz, `runTime` en secondes, niveaux et 
 
 Liste blanche fermée `INSTRUMENT_PATH_CATALOG` (`shared/constants/instruments.ts`) : `propulsion.<id>.*`, `navigation.*`, `electrical.batteries.<id>.*`, `tanks.<type>.<id>.*`, `environment.*`, `notifications.<chemin>` (valeur structurée). `isAllowedTelemetryPath()` en est le prédicat, partagé avec le client.
 
+Catalogue étendu en #1006 (spécification Signal K 1.7, clés `vessels.<id>`), toujours pour le bateau lui-même (`vessels.self`) :
+
+| Famille       | Chemins ajoutés                                                                                                                                                                                                                                        | Affichage       |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------- |
+| Moteur        | `propulsion.<id>.oilTemperature`, `exhaustTemperature`, `coolantPressure`, `boostPressure`, `engineLoad`, `alternatorVoltage`                                                                                                                          | °C, bar, %, V   |
+| Navigation    | `navigation.log`, `navigation.trip.log`                                                                                                                                                                                                                | NM              |
+| Énergie       | `batteries.<id>.capacity.timeRemaining`, `.stateOfHealth` ; `solar.<id>.panelVoltage\|panelCurrent\|current` ; `chargers.<id>.voltage\|current` ; `inverters.<id>.dc.voltage\|dc.current\|ac.realPower`                                                | h, %, V, A, W   |
+| Réservoirs    | `tanks.<type>.<id>.currentVolume`                                                                                                                                                                                                                      | L               |
+| Environnement | `wind.speedOverGround`, `wind.angleTrueGround`, `wind.directionMagnetic`, `outside.relativeHumidity`, `inside.temperature`, `inside.relativeHumidity`, `inside.<zone>.temperature\|relativeHumidity` (`engineRoom`, `refrigerator`…), `tide.heightNow` | kn, °, %, °C, m |
+
+Le vent réel (`wind.speedTrue`, `angleTrueWater`) et apparent (`speedApparent`, `angleApparent`) étaient déjà au catalogue. Nouvelles unités d'affichage : `NM` (mètres ÷ 1852) et `W`. La catégorie « Batteries » de l'onglet devient « Énergie ». **Pas encore pris en charge** (hors flux `vessels.self`, voir l'issue de suivi) : les prévisions météo (API Weather de Signal K v2, via un plugin fournisseur) et l'AIS (autres contextes `vessels.urn:mrn:imo:mmsi:*`).
+
 ## Fiche bateau et CSP
 
 `BoatsController.show()` charge la source **dans la réponse initiale** (la CSP doit déjà être ouverte à l'arrivée de la page) quand le plan l'autorise, puis `applyInstrumentCsp` relit l'en-tête posé par Shield et ajoute `https://hôte:port wss://hôte:port` à `connect-src` (plus `http://` et `ws://` hors production). Sans en-tête (test) ou sans source activée, rien ne change. La valeur est sûre parce que `baseUrl` est une origine validée.

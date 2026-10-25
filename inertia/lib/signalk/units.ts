@@ -13,6 +13,7 @@ export const ratioToPercent = (value: number) => value * 100
 export const paToBar = (value: number) => value / 100_000
 export const paToHectopascal = (value: number) => value / 100
 export const secondsToHours = (value: number) => value / 3600
+export const metersToNauticalMiles = (value: number) => value / 1852
 export const hzToRpm = (value: number) => value * 60
 export const cubicMetersToLiters = (value: number) => value * 1000
 export const cubicMetersPerSecondToLitersPerHour = (value: number) => value * 3_600_000
@@ -33,7 +34,9 @@ const CONVERTERS: Record<string, (value: number) => number> = {
   'rpm': hzToRpm,
   'L': cubicMetersToLiters,
   'L/h': cubicMetersPerSecondToLitersPerHour,
+  'NM': metersToNauticalMiles,
   'V': (value) => value,
+  'W': (value) => value,
   'A': (value) => value,
   'm': (value) => value,
 }

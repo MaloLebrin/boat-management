@@ -104,6 +104,7 @@ const TO_SI: Record<string, (value: number) => number> = {
   'rpm': (v) => v / 60,
   'L': (v) => v / 1000,
   'L/h': (v) => v / 3_600_000,
+  'NM': (v) => v * 1852,
 }
 
 /** Unité d'affichage → SI (l'inverse de `toDisplayUnit` côté client). */
