@@ -120,6 +120,10 @@
       "battery_low": "Batterie faible",
       "engine_hot": "Température moteur élevée",
       "shallow_water": "Petit fond",
+      "fuel_low": "Carburant bas",
+      "battery_voltage_low": "Tension batterie basse",
+      "oil_pressure_low": "Pression d’huile basse",
+      "engine_overrev": "Régime moteur trop haut",
       "signalk_alarm": "Alarme Signal K"
     },
     "severity": {

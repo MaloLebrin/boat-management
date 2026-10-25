@@ -120,6 +120,10 @@
       "battery_low": "Low battery",
       "engine_hot": "High engine temperature",
       "shallow_water": "Shallow water",
+      "fuel_low": "Low fuel",
+      "battery_voltage_low": "Low battery voltage",
+      "oil_pressure_low": "Low oil pressure",
+      "engine_overrev": "Engine over-revving",
       "signalk_alarm": "Signal K alarm"
     },
     "severity": {
