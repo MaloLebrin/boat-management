@@ -1,6 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { readFileSync } from 'node:fs'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { ref } from 'vue'
 import type { InstrumentsTabProps } from '../../shared/types/instruments'
 
@@ -325,6 +325,43 @@ describe('InstrumentSourceForm', () => {
     expect(put.mock.calls[0][1]).toMatchObject({ token: 'nouveau' })
   })
 
+  describe('rechargement complet après changement d’origine (#1019)', () => {
+    const original = window.location
+    const assign = vi.fn()
+    beforeEach(() => {
+      assign.mockClear()
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: { ...original, assign },
+      })
+    })
+    afterEach(() => {
+      Object.defineProperty(window, 'location', { configurable: true, value: original })
+    })
+
+    async function save(src: typeof source | null, baseUrl: string) {
+      const wrapper = mount(InstrumentSourceForm, { props: { boatId: 9, source: src } })
+      await wrapper.find('input[name="baseUrl"]').setValue(baseUrl)
+      await wrapper.find('form').trigger('submit')
+      put.mock.calls.at(-1)?.[2].onSuccess()
+    }
+
+    test('origine différente : location.assign vers l’onglet instruments', async () => {
+      await save(source, 'https://autre.local:3443')
+      expect(assign).toHaveBeenCalledWith('/boats/9?tab=instruments')
+    })
+
+    test('première source : rechargement aussi', async () => {
+      await save(null, 'https://sk.local:3443')
+      expect(assign).toHaveBeenCalledWith('/boats/9?tab=instruments')
+    })
+
+    test('même origine : visite Inertia seulement', async () => {
+      await save(source, 'https://sk.local:3443/')
+      expect(assign).not.toHaveBeenCalled()
+    })
+  })
+
   test('retirer demande confirmation puis supprime', async () => {
     const wrapper = mount(InstrumentSourceForm, {
       props: { boatId: 9, source },
@@ -433,6 +470,51 @@ describe('BoatShowTabInstruments', () => {
 
     const noSource = mountTab(props({ source: null, latest: [] }))
     expect(noSource.find('[data-testid="instrument-alert-rules"]').exists()).toBe(false)
+  })
+})
+
+describe('BoatShowTabInstruments — contenu mixte (#1019)', () => {
+  const original = window.location
+  function pageOn(protocol: string) {
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: { ...original, protocol, assign: vi.fn() },
+    })
+  }
+  afterEach(() => {
+    Object.defineProperty(window, 'location', { configurable: true, value: original })
+  })
+  const mountTab = (value: InstrumentsTabProps) =>
+    mount(BoatShowTabInstruments, { props: { boatId: 9, instruments: value } })
+  const mixed = { ...source, baseUrl: 'http://192.168.1.20:3000' }
+
+  test('source http sur page https : flux non démarré, erreur contenu mixte', async () => {
+    pageOn('https:')
+    const wrapper = mountTab(props({ source: mixed }))
+    await flushPromises()
+
+    expect(streamState.start).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="instrument-banner"]').text()).toContain(
+      'instruments.banner.error.mixed_content'
+    )
+  })
+
+  test('mixte avec jeton de plugin : bandeau « lecture par le plugin »', async () => {
+    pageOn('https:')
+    const wrapper = mountTab(props({ source: { ...mixed, hasIngestToken: true } }))
+    await flushPromises()
+
+    expect(streamState.start).not.toHaveBeenCalled()
+    const banner = wrapper.find('[data-testid="instrument-banner"]').text()
+    expect(banner).toContain('instruments.banner.pluginOnly')
+    expect(banner).not.toContain('mixed_content')
+  })
+
+  test('même adresse http sur une page http : le flux démarre', async () => {
+    pageOn('http:')
+    mountTab(props({ source: mixed }))
+    await flushPromises()
+    expect(streamState.start).toHaveBeenCalled()
   })
 })
 

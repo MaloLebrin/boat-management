@@ -1,0 +1,11 @@
+# 2026-10-25 — Instruments : contenu mixte détecté et rechargement complet après changement d'adresse (#1019)
+
+Épopée #986, socle de l'assistant d'installation (#1023). Corrige deux défauts de l'onglet Instruments.
+
+- **Contenu mixte.** Une adresse `http://…` saisie depuis la page HTTPS échouait au `fetch` et le bandeau parlait de Wi-Fi du bateau. Le client Signal K (`inertia/lib/signalk/client.ts`) reçoit l'option `pageProtocol` et lève `mixed_content` **avant tout fetch** (hors `localhost`/`127.0.0.1`) : erreur terminale, sans reconnexion. L'onglet ne démarre ni flux ni prévisions pour cette source ; le bandeau explique la cause, ou affiche « Lecture par le plugin » quand un jeton de plugin existe.
+- **CSP par document.** `applyInstrumentCsp` n'agit que sur la réponse HTML de `boats.show` : après enregistrement d'une nouvelle origine, la page gardait l'ancienne `connect-src` et, en production, le flux restait bloqué. `InstrumentSourceForm` fait maintenant `window.location.assign('/boats/:id?tab=instruments')` quand l'origine change ou qu'il n'y avait pas de source (décision D10).
+- **Sonde de diagnostic.** Nouveau `inertia/lib/signalk/probe.ts` : `isMixedContent`, `needsFullReloadForCsp`, `inventoryFromVessel` et `probeSignalKServer` (erreurs `invalid_url | mixed_content | unreachable | unauthorized | tls | protocol`, inventaire moteurs/batteries/réservoirs/position, mode `preflight` sans requête). Pas encore d'écran : il arrive avec #1023. `parseDiscovery`, `discoverSignalK` et `probeVesselsSelf` sont désormais exportées du client.
+- **Types.** `InstrumentProbeErrorKey`, `InstrumentProbeInventory`, `InstrumentProbeResult` dans `shared/types/instruments.ts` ; `SignalKErrorKey` en est dérivé.
+- **i18n.** `instruments.banner.error.mixed_content` et `instruments.banner.pluginOnly` (EN + FR).
+- **Tests.** Vitest : `signalk_client.spec.ts` (zéro requête en contenu mixte), `signalk_probe.spec.ts` (table complète, inventaire d'un `vessels/self` réaliste, `preflight`), `boat_show_tab_instruments.spec.ts` (flux non démarré, bandeau `pluginOnly`, `location.assign` selon l'origine).
+- **Docs.** D10 dans `docs/architecture/instruments-epic-986.md`, § client de `docs/domain/instruments.md`, « problèmes fréquents » du guide, base de connaissance du copilote.

@@ -93,11 +93,13 @@
       "error": "Connexion impossible"
     },
     "error": {
+      "mixed_content": "Le navigateur bloque les adresses http:// depuis cette page sécurisée. Utilisez une adresse https://, ou laissez le plugin FleetAi envoyer les données.",
       "unreachable": "Le serveur est injoignable. Vérifiez que cet appareil est sur le Wi-Fi du bateau.",
       "unauthorized": "Le serveur exige un jeton. Demandez à un administrateur de saisir un jeton en lecture seule.",
       "tls": "La connexion sécurisée a échoué. Le certificat du serveur n’est probablement pas reconnu par cet appareil.",
       "protocol": "Le serveur ne répond pas comme un serveur Signal K. Vérifiez son adresse."
     },
+    "pluginOnly": "Lecture par le plugin : aucune jauge en direct depuis ce navigateur",
     "screenOpen": "La collecte se poursuit tant que cet écran reste ouvert.",
     "lastDelta": "Dernière donnée reçue {date}.",
     "lastSeen": "Dernier lot reçu par FleetAi {date}."

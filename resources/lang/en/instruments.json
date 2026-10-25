@@ -93,11 +93,13 @@
       "error": "Connection impossible"
     },
     "error": {
+      "mixed_content": "The browser blocks http:// addresses from this secure page. Use an https:// address, or let the FleetAi plugin send the data.",
       "unreachable": "The server cannot be reached. Check that this device is on the boat's Wi-Fi.",
       "unauthorized": "The server requires a token. Ask an administrator to enter a read-only token.",
       "tls": "The secure connection failed. The server's certificate is probably not trusted by this device.",
       "protocol": "The server does not answer like a Signal K server. Check its address."
     },
+    "pluginOnly": "Read by the plugin: no live gauges from this browser",
     "screenOpen": "Collecting while this screen stays open.",
     "lastDelta": "Last data received {date}.",
     "lastSeen": "Last batch received by FleetAi {date}."

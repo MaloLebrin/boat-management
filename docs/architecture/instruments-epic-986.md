@@ -123,6 +123,12 @@ Conditions : Chrome 152 (navigateur intégré), page HTTP `localhost:3333/dev/si
 
 Conséquence de la mesure ci-dessus : une passerelle qui rejoue ou retarde des phrases NMEA, un GPS sans heure valide ou une horloge de bord fausse donneraient des échantillons datés n'importe quand, et la contrainte unique `(source_id, path, recorded_at)` ne dédupliquerait plus rien de cohérent. Le client date chaque fenêtre d'agrégation avec **sa propre horloge** (arrondie à la fenêtre) ; le `timestamp` Signal K le plus récent de la fenêtre est conservé dans `value_json` quand il porte une information (position), sinon abandonné. Le serveur refuse un `recorded_at` dans le futur de plus de 5 min ou plus vieux que la rétention.
 
+### D10 — CSP par document, rechargement complet après changement d'origine (#1019)
+
+`applyInstrumentCsp` n'agit que sur la **réponse HTML** de `boats.show`. Une visite Inertia (XHR) ne remplace pas le document : après `PUT /boats/:id/instrument-source`, la page garde la `connect-src` de son chargement. En production (`reportOnly: false`), le flux vers une nouvelle origine est bloqué jusqu'à un rechargement complet. `InstrumentSourceForm` fait donc `window.location.assign('/boats/:id?tab=instruments')` quand `needsFullReloadForCsp(ancienne, nouvelle)` vaut vrai (origine différente, ou aucune source avant) — même mécanisme que `offline_navigation.ts`. `base_url` reste `NOT NULL` : le rendre nullable est écarté (schéma généré, composables, util CSP, validateur, ~13 specs) ; le plugin exige de toute façon une source active.
+
+Corollaire : une page `https:` ne peut pas appeler une adresse `http:` (contenu mixte, hors `localhost`/`127.0.0.1`). Le client lève `mixed_content` **avant tout fetch**, erreur terminale sans reconnexion ; si un jeton de plugin existe, l'onglet affiche « lecture par le plugin » au lieu d'une erreur.
+
 ### Chemin recommandé
 
 1. **Nom DNS + certificat de confiance** sur le serveur Signal K (Let's Encrypt par défi DNS-01, le nom résout vers l'IP LAN du bateau) : fonctionne partout sans toucher aux appareils. À documenter côté utilisateur (une fois par bateau), et c'est ce que proposent déjà certaines distributions (OpenPlotter + Caddy).

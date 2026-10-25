@@ -245,3 +245,33 @@ export interface UpsertInstrumentAlertRulePayload {
   severity: InstrumentAlertSeverity
   enabled?: boolean
 }
+
+/** Pourquoi la sonde (ou le flux) d'un serveur Signal K échoue (#1019). */
+export type InstrumentProbeErrorKey =
+  | 'invalid_url'
+  | 'mixed_content'
+  | 'unreachable'
+  | 'unauthorized'
+  | 'tls'
+  | 'protocol'
+
+/** Ce que le serveur expose — de quoi vérifier avant de regarder des jauges vides. */
+export interface InstrumentProbeInventory {
+  serverVersion: string | null
+  vesselName: string | null
+  /** Identifiants sous `propulsion.*` (ex. `port`, `starboard`). */
+  engineIds: string[]
+  /** Identifiants sous `electrical.batteries.*`. */
+  batteryIds: string[]
+  /** `type.id` sous `tanks.*` (ex. `fuel.0`). */
+  tankIds: string[]
+  hasPosition: boolean
+}
+
+/**
+ * Résultat d'une sonde. `inventory` vaut `null` pour une pré-vérification
+ * locale (`preflight`) : adresse valide, aucune requête émise.
+ */
+export type InstrumentProbeResult =
+  | { ok: true; inventory: InstrumentProbeInventory | null }
+  | { ok: false; error: InstrumentProbeErrorKey; status: number | null }

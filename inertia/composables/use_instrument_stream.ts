@@ -51,6 +51,8 @@ export interface InstrumentStreamOptions {
   onAisDelta?: (delta: SignalKDelta) => void
   staleAfterS?: number
   transport?: SignalKTransport
+  /** `location.protocol` de la page (contenu mixte, #1019). */
+  pageProtocol?: () => string | undefined
 }
 
 function browserTransport(): SignalKTransport {
@@ -150,6 +152,7 @@ export function useInstrumentStream(options: InstrumentStreamOptions) {
       context: source.vesselContext,
       aisSubscriptions: options.onAisDelta ? aisSubscriptionSpecs() : undefined,
       transport: options.transport ?? browserTransport(),
+      pageProtocol: options.pageProtocol?.(),
       onState: (state, key) => {
         connectionState.value = state
         errorKey.value = key
