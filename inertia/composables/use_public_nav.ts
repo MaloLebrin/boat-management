@@ -8,17 +8,22 @@ export interface PublicNavLink {
 }
 
 export interface PublicNavGroup {
-  labelKey: string
+  /** Intertitre du groupe ; absent quand le menu n'a qu'un groupe sans titre. */
+  labelKey?: string
   links: PublicNavLink[]
 }
 
 /**
- * Source unique des liens de navigation publique : le dropdown « Produit » du
+ * Source unique des liens de navigation publique : les menus déroulants du
  * header desktop et le drawer mobile consomment les mêmes groupes, les hrefs
  * viennent de `marketingPath` (jamais d'interpolation de locale, #475).
+ *
+ * Header desktop à quatre entrées : Produit ▾ (fonctionnalités + outils
+ * gratuits), Diagnostic IA (lien direct, lead magnet du moment), Tarifs,
+ * Ressources ▾ (guide, aide).
  */
 export function usePublicNav(locale: Ref<AppLocale>) {
-  /** Groupes du menu « Produit » : uniquement les pages fonctionnalité. */
+  /** Groupes du menu « Produit » : pages fonctionnalité, puis outils gratuits. */
   const productGroups = computed<PublicNavGroup[]>(() => [
     {
       labelKey: 'public.nav.productFeaturesGroup',
@@ -29,24 +34,38 @@ export function usePublicNav(locale: Ref<AppLocale>) {
         { labelKey: 'public.nav.instruments', href: marketingPath('instruments', locale.value) },
       ],
     },
+    {
+      labelKey: 'public.nav.productToolsGroup',
+      links: [
+        { labelKey: 'public.nav.simulator', href: marketingPath('simulator', locale.value) },
+        { labelKey: 'public.nav.diagnosisAi', href: marketingPath('diagnosisAi', locale.value) },
+        { labelKey: 'public.nav.partsAi', href: marketingPath('partsAi', locale.value) },
+      ],
+    },
   ])
 
   /**
-   * Outils gratuits d'acquisition : liens directs du header, hors dropdown —
-   * ils doivent rester visibles sans clic (tunnels d'acquisition).
+   * Outil d'acquisition mis en avant : lien direct du header, visible sans
+   * clic (#609). Il reste aussi listé dans « Outils gratuits ».
    */
-  const toolLinks = computed<PublicNavLink[]>(() => [
-    { labelKey: 'public.nav.simulator', href: marketingPath('simulator', locale.value) },
+  const featuredLinks = computed<PublicNavLink[]>(() => [
     { labelKey: 'public.nav.diagnosisAi', href: marketingPath('diagnosisAi', locale.value) },
-    { labelKey: 'public.nav.partsAi', href: marketingPath('partsAi', locale.value) },
   ])
 
-  /** Liens de premier niveau, à droite des outils gratuits. */
+  /** Liens de premier niveau. */
   const topLinks = computed<PublicNavLink[]>(() => [
     { labelKey: 'public.nav.pricing', href: marketingPath('pricing', locale.value) },
-    { labelKey: 'public.nav.guide', href: marketingPath('guide', locale.value) },
-    { labelKey: 'public.nav.help', href: marketingPath('help', locale.value) },
   ])
 
-  return { productGroups, toolLinks, topLinks }
+  /** Groupe unique du menu « Ressources » (sans intertitre). */
+  const resourceGroups = computed<PublicNavGroup[]>(() => [
+    {
+      links: [
+        { labelKey: 'public.nav.guide', href: marketingPath('guide', locale.value) },
+        { labelKey: 'public.nav.help', href: marketingPath('help', locale.value) },
+      ],
+    },
+  ])
+
+  return { productGroups, featuredLinks, topLinks, resourceGroups }
 }

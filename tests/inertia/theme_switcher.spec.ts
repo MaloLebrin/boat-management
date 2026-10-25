@@ -16,6 +16,8 @@ vi.mock('~/composables/use_theme', () => ({
 
 const themeSwitcherModule = await import('../../inertia/components/layout/ThemeSwitcher.vue')
 const themeCardModule = await import('../../inertia/components/settings/me/ThemeCard.vue')
+const themeToggleModule = await import('../../inertia/components/layout/ThemeToggle.vue')
+const ThemeToggle = themeToggleModule.default
 const ThemeSwitcher = themeSwitcherModule.default
 const ThemeCard = themeCardModule.default
 
@@ -78,5 +80,27 @@ describe('ThemeCard', () => {
     const w = mount(ThemeCard)
     const pressed = w.findAll('button').map((b) => b.attributes('aria-pressed'))
     expect(pressed).toEqual(['false', 'true', 'false'])
+  })
+})
+
+describe('ThemeToggle (header public)', () => {
+  test('rend un seul bouton, libellé par la préférence courante', () => {
+    preference.value = 'dark'
+    const w = mount(ThemeToggle)
+    const buttons = w.findAll('button')
+    expect(buttons).toHaveLength(1)
+    expect(buttons[0].attributes('aria-label')).toBe('common.theme.toggle · common.theme.dark')
+    expect(buttons[0].attributes('data-preference')).toBe('dark')
+  })
+
+  test.each([
+    ['system', 'light'],
+    ['light', 'dark'],
+    ['dark', 'system'],
+  ])('passe de %s à %s au clic', async (current, expected) => {
+    preference.value = current
+    const w = mount(ThemeToggle)
+    await w.get('button').trigger('click')
+    expect(setTheme).toHaveBeenCalledWith(expected)
   })
 })

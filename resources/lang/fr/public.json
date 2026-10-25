@@ -13,7 +13,8 @@
     "aiAssistant": "Assistant IA",
     "simulator": "Simulateur de coût",
     "help": "Aide",
-    "instruments": "Instruments connectés"
+    "instruments": "Instruments connectés",
+    "resources": "Ressources"
   },
   "actions": {
     "login": "Connexion",

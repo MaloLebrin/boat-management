@@ -20,14 +20,14 @@ const emit = defineEmits<{
 const { t } = useT()
 const closeButtonEl = ref<HTMLButtonElement | null>(null)
 
-// Mêmes groupes et liens que le header desktop (source unique : use_public_nav).
-// Les outils gratuits, liens directs sur desktop, gardent ici leur intertitre.
+// Mêmes groupes et liens que le header desktop (source unique : use_public_nav) :
+// les groupes « Produit » sous intertitres, puis Tarifs et les ressources à plat.
 const localeRef = computed(() => props.locale)
-const { productGroups, toolLinks, topLinks } = usePublicNav(localeRef)
+const { productGroups, topLinks, resourceGroups } = usePublicNav(localeRef)
 
-const drawerGroups = computed(() => [
-  ...productGroups.value,
-  { labelKey: 'public.nav.productToolsGroup', links: toolLinks.value },
+const flatLinks = computed(() => [
+  ...topLinks.value,
+  ...resourceGroups.value.flatMap((group) => group.links),
 ])
 
 watch(
@@ -116,10 +116,13 @@ watch(
         </button>
       </div>
 
-      <!-- Nav links : fonctionnalités puis outils gratuits sous intertitres, puis liens de premier niveau -->
+      <!-- Nav links : fonctionnalités puis outils gratuits sous intertitres, puis Tarifs, guide et aide -->
       <nav class="flex-1 overflow-y-auto px-4 py-5">
-        <div v-for="group in drawerGroups" :key="group.labelKey" class="mb-4">
-          <p class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-fg-subtle">
+        <div v-for="(group, index) in productGroups" :key="group.labelKey ?? index" class="mb-4">
+          <p
+            v-if="group.labelKey"
+            class="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-fg-subtle"
+          >
             {{ t(group.labelKey) }}
           </p>
           <Link
@@ -134,7 +137,7 @@ watch(
         </div>
         <div class="space-y-1 border-t border-bone pt-4">
           <Link
-            v-for="link in topLinks"
+            v-for="link in flatLinks"
             :key="link.href"
             :href="link.href"
             class="block rounded-(--radius-control) px-3 py-2.5 text-sm font-medium text-fg-muted transition-colors duration-(--motion-fast) hover:bg-paper hover:text-fg"
