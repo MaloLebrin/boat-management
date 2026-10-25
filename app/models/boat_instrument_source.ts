@@ -20,6 +20,11 @@ export default class BoatInstrumentSource extends BoatInstrumentSourceSchema {
   @column({ serializeAs: null })
   declare tokenEncrypted: string | null
 
+  // sha256 du jeton d'ingestion du plugin (#994) : jamais sérialisé, le jeton
+  // lui-même n'est montré qu'une fois, à sa génération.
+  @column({ serializeAs: null })
+  declare ingestTokenHash: string | null
+
   @belongsTo(() => Boat)
   declare boat: BelongsTo<typeof Boat>
 

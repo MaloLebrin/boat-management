@@ -250,3 +250,24 @@ export function twoFactorAccountLimiter() {
 export function twoFactorAccountKey(userId: number): string {
   return `two_factor_account_${userId}`
 }
+
+/**
+ * Plugin Signal K (#994). Deux compteurs : par IP **avant** l'authentification
+ * (borne la devinette de jeton), puis par source **après** — un plugin qui
+ * emballe sa boucle ne peut pas saturer la base. Un lot toutes les cinq
+ * minutes est l'usage normal ; 30 par minute laissent passer un rattrapage
+ * après une coupure sans ouvrir la porte à un flux continu.
+ */
+export const instrumentIngestIpThrottle = limiter.define('instrument_ingest_ip', (ctx) => {
+  return limiter
+    .allowRequests(120)
+    .every('1 minute')
+    .usingKey(`instrument_ingest_ip_${ctx.request.ip()}`)
+})
+
+export const instrumentIngestThrottle = limiter.define('instrument_ingest_source', (ctx) => {
+  return limiter
+    .allowRequests(30)
+    .every('1 minute')
+    .usingKey(`instrument_ingest_source_${ctx.instrumentSource.id}`)
+})

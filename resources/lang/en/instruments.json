@@ -149,5 +149,21 @@
       "rule": "{path} {operator} {threshold} {unit}",
       "limit": "Rule limit reached."
     }
+  },
+  "plugin": {
+    "title": "Signal K plugin",
+    "description": "For a boat with no screen on, the plugin installed on the Signal K server pushes readings to FleetAi itself, with a token specific to this boat.",
+    "endpoint": "Ingest address",
+    "token": "Plugin token",
+    "tokenOnce": "Copy this token now: it will not be shown again.",
+    "status": "A token has been active since {date}.",
+    "none": "No token generated.",
+    "generate": "Generate a token",
+    "rotate": "Regenerate the token",
+    "rotateTitle": "Regenerate the token?",
+    "rotateMessage": "The old token stops working immediately: the plugin will need to be reconfigured.",
+    "revoke": "Revoke the token",
+    "revokeTitle": "Revoke the token?",
+    "revokeMessage": "The plugin can no longer send readings until a new token is generated."
   }
 }

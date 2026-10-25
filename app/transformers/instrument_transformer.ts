@@ -21,6 +21,8 @@ export function toInstrumentSourceRow(source: BoatInstrumentSource): InstrumentS
     vesselContext: source.vesselContext,
     enabled: source.enabled,
     hasToken: source.tokenEncrypted !== null,
+    hasIngestToken: source.ingestTokenHash !== null,
+    ingestTokenIssuedAt: source.ingestTokenIssuedAt?.toISO() ?? null,
     lastSeenAt: source.lastSeenAt?.toISO() ?? null,
     lastError: source.lastError,
   }
