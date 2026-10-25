@@ -254,3 +254,14 @@ describe('InstrumentAlertRulesEditor (#993)', () => {
     expect(wrapper.text()).toContain('instruments.alerts.editor.limit')
   })
 })
+
+describe('libellés des règles intégrées (#1005)', () => {
+  test.each(['en', 'fr'])('chaque règle intégrée a un libellé %s', async (locale) => {
+    const { BUILTIN_ALERT_RULES } = await import('../../shared/constants/instrument_alerts')
+    const module = await import(`../../resources/lang/${locale}/instruments.json`)
+    const json = module.default as { alerts: { builtin: Record<string, string> } }
+    for (const rule of BUILTIN_ALERT_RULES) {
+      expect(json.alerts.builtin[rule.key.slice('builtin:'.length)]).toBeTruthy()
+    }
+  })
+})
