@@ -50,7 +50,7 @@ Des règles prêtes à l'emploi (batterie sous 20 %, température moteur élevé
 
 ## Alternative sans navigateur : le plugin
 
-Un plugin installé sur le serveur Signal K peut envoyer lui-même les relevés. L'administrateur génère un **jeton d'ingestion** depuis la carte « Plugin Signal K » de l'onglet Instruments : il n'est affiché qu'**une seule fois**, FleetAi n'en garde que l'empreinte, et on peut le régénérer ou le révoquer à tout moment. Le plugin lui-même (`signalk-fleetai`) est maintenu hors de ce dépôt ; le contrat de l'API est dans `docs/domain/instruments.md`.
+Un plugin installé sur le serveur Signal K peut envoyer lui-même les relevés. L'administrateur génère un **jeton d'ingestion** depuis la carte « Plugin Signal K » de l'onglet Instruments : il n'est affiché qu'**une seule fois**, FleetAi n'en garde que l'empreinte, et on peut le régénérer ou le révoquer à tout moment. Le plugin lui-même (`signalk-fleetai`, [code source](https://github.com/MaloLebrin/signalk-fleetai)) est maintenu hors de ce dépôt ; le contrat de l'API est dans `docs/domain/instruments.md`. Il lit seulement : il n'écrit jamais dans Signal K, n'envoie que les chemins du catalogue FleetAi, garde les lots sur disque tant que le bord n'a pas Internet et les rejoue dans l'ordre. Son état se lit dans l'admin Signal K (_Plugin Config_ → FleetAi) : « Last batch accepted … ago », « Waiting for network (N batches) », ou « Token rejected » si le jeton a été régénéré ou révoqué — il faut alors coller le nouveau jeton et réactiver le plugin.
 
 **Installation en une commande.** Depuis un terminal du Raspberry (OpenPlotter) ou de tout serveur Signal K sous Linux, avec l'utilisateur qui fait tourner Signal K (pas en root) :
 

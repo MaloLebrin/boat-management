@@ -1,0 +1,127 @@
+{
+  "batchId": "7b1d2b4e-3c7a-4f0e-9a6d-2f5c8e1a9b3d",
+  "samples": [
+    {
+      "path": "propulsion.port.runTime",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 4521600
+    },
+    {
+      "path": "propulsion.port.revolutions",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 41.6667
+    },
+    {
+      "path": "propulsion.port.temperature",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 358.15
+    },
+    {
+      "path": "propulsion.port.oilPressure",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 310000
+    },
+    {
+      "path": "navigation.position",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "valueJson": { "latitude": 43.2951, "longitude": 5.3741 }
+    },
+    {
+      "path": "navigation.speedOverGround",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 3.0224
+    },
+    {
+      "path": "navigation.courseOverGroundTrue",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 3.7633
+    },
+    { "path": "navigation.headingTrue", "recordedAt": "2026-10-25T10:00:00.000Z", "value": 3.7524 },
+    {
+      "path": "navigation.speedThroughWater",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 3.1304
+    },
+    { "path": "navigation.log", "recordedAt": "2026-10-25T10:00:00.000Z", "value": 1852000 },
+    {
+      "path": "electrical.batteries.house.voltage",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 12.64
+    },
+    {
+      "path": "electrical.batteries.house.current",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": -8.2
+    },
+    {
+      "path": "electrical.batteries.house.capacity.stateOfCharge",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 0.82
+    },
+    {
+      "path": "electrical.solar.0.panelVoltage",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 18.3
+    },
+    {
+      "path": "tanks.fuel.0.currentLevel",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 0.61
+    },
+    {
+      "path": "tanks.freshWater.0.currentLevel",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 0.35
+    },
+    {
+      "path": "environment.wind.speedApparent",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 7.3
+    },
+    {
+      "path": "environment.wind.angleApparent",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 0.7854
+    },
+    {
+      "path": "environment.depth.belowTransducer",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 12.4
+    },
+    {
+      "path": "environment.water.temperature",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 291.15
+    },
+    {
+      "path": "environment.outside.pressure",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 101325
+    },
+    {
+      "path": "environment.inside.engineRoom.temperature",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "value": 318.15
+    },
+    {
+      "path": "notifications.navigation.anchor",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "valueJson": { "state": "alarm", "message": "Anchor drag", "method": ["sound", "visual"] }
+    },
+    {
+      "path": "ais.244630000",
+      "recordedAt": "2026-10-25T10:00:00.000Z",
+      "valueJson": {
+        "name": "CARGO SHIP",
+        "latitude": 43.3012,
+        "longitude": 5.3902,
+        "sogMs": 5.1,
+        "cogRad": 1.2,
+        "shipType": 70,
+        "shipTypeName": "Cargo",
+        "cpaM": 800,
+        "tcpaS": 600
+      }
+    }
+  ]
+}

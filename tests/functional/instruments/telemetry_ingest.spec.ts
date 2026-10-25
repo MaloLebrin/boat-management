@@ -1,6 +1,8 @@
 import { test } from '@japa/runner'
 import { DateTime } from 'luxon'
+import app from '@adonisjs/core/services/app'
 import emitter from '@adonisjs/core/services/emitter'
+import db from '@adonisjs/lucid/services/db'
 import { truncateDb } from '#tests/utils/db'
 import BoatInstrumentSource from '#models/boat_instrument_source'
 import BoatTelemetrySample from '#models/boat_telemetry_sample'
@@ -12,8 +14,11 @@ import {
 } from '#tests/functional/helpers'
 import { asInstrumentsReload, boatWithSource } from '#tests/functional/instruments/helpers'
 import { BoatTelemetrySampleFactory } from '#database/factories/boat_telemetry_sample_factory'
-import { TELEMETRY_MAX_BATCH_SIZE } from '#shared/constants/instruments'
-import type { InstrumentsTabProps } from '#shared/types/instruments'
+import InstrumentIngestTokenService from '#services/instrument_ingest_token_service'
+import { TELEMETRY_MAX_BATCH_SIZE, telemetryPathSpec } from '#shared/constants/instruments'
+import { parseAisPath, parseAisTargetValue } from '#shared/helpers/ais'
+import type { InstrumentsTabProps, TelemetrySampleInput } from '#shared/types/instruments'
+import pluginBatch from '../../fixtures/signalk_plugin_batch.json' with { type: 'json' }
 
 /**
  * Ingestion de télémétrie par la PWA (#988) : insertion, idempotence des
@@ -305,5 +310,99 @@ test.group('Instruments — POST boats/:boatId/telemetry', (group) => {
 
     await client.delete(`/boats/${boat.id}/instrument-source`).loginAs(admin).redirects(0)
     assert.equal(await count(), 0)
+  })
+})
+
+/**
+ * Contrat du plugin `signalk-fleetai` (#1024) : le fixture est un lot type tel
+ * que le plugin l'envoie (`docs/architecture/signalk-fleetai-plugin-brief.md`).
+ * S'il cesse d'être accepté, c'est le plugin publié qui casse — à faire
+ * évoluer ici d'abord.
+ */
+test.group('Instruments — contrat du plugin signalk-fleetai (#1024)', (group) => {
+  group.each.setup(() => truncateDb())
+
+  const samples = pluginBatch.samples as TelemetrySampleInput[]
+
+  test('le lot type respecte la forme : uuid, ≤ 500, sans sourceId, chemins du catalogue', ({
+    assert,
+  }) => {
+    assert.match(
+      pluginBatch.batchId,
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+    )
+    assert.notProperty(pluginBatch, 'sourceId')
+    assert.isAtMost(samples.length, TELEMETRY_MAX_BATCH_SIZE)
+    assert.isAbove(samples.length, 0)
+
+    for (const entry of samples) {
+      const mmsi = parseAisPath(entry.path)
+      if (mmsi !== null) {
+        assert.isNotNull(parseAisTargetValue(entry.valueJson), entry.path)
+        continue
+      }
+      const spec = telemetryPathSpec(entry.path)
+      assert.isNotNull(spec, `chemin hors catalogue : ${entry.path}`)
+      if (spec!.valueKind === 'number') {
+        assert.isNumber(entry.value, entry.path)
+        assert.isUndefined(entry.valueJson, entry.path)
+      } else {
+        assert.isObject(entry.valueJson, entry.path)
+        assert.isUndefined(entry.value, entry.path)
+      }
+      // `recordedAt` est l'horloge du serveur arrondie au début de fenêtre, en UTC.
+      assert.match(entry.recordedAt, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\.000Z$/)
+    }
+    // Un seul échantillon par chemin et par fenêtre.
+    assert.equal(new Set(samples.map((s) => `${s.path}@${s.recordedAt}`)).size, samples.length)
+  })
+
+  test('POST /api/instruments/ingest accepte le lot type en entier, puis ignore son rejeu', async ({
+    client,
+    assert,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat, source } = await boatWithSource(admin)
+    const tokenService = await app.container.make(InstrumentIngestTokenService)
+    const token = await tokenService.issueForBoat({ id: boat.id })
+    const aisCount = samples.filter((s) => parseAisPath(s.path) !== null).length
+
+    const first = await client
+      .post('/api/instruments/ingest')
+      .header('Authorization', `Bearer ${token}`)
+      .json(pluginBatch)
+    first.assertStatus(200)
+    assert.deepEqual(first.body(), { accepted: samples.length, ignored: 0 })
+    assert.equal(await count(source!.id), samples.length - aisCount)
+    const sightings = await db.from('boat_ais_sightings').where('boat_id', boat.id).count('* as n')
+    assert.equal(Number(sightings[0].n), aisCount)
+
+    const reloaded = await BoatInstrumentSource.findOrFail(source!.id)
+    assert.isNotNull(reloaded.lastSeenAt)
+
+    const replay = await client
+      .post('/api/instruments/ingest')
+      .header('Authorization', `Bearer ${token}`)
+      .json(pluginBatch)
+    replay.assertStatus(200)
+    assert.deepEqual(replay.body(), { accepted: 0, ignored: samples.length })
+    assert.equal(await count(source!.id), samples.length - aisCount)
+  })
+
+  test('un jeton révoqué répond 401 unauthorized en JSON, ce que le plugin traduit en arrêt', async ({
+    client,
+  }) => {
+    const admin = await createAdminUser()
+    const { boat } = await boatWithSource(admin)
+    const tokenService = await app.container.make(InstrumentIngestTokenService)
+    const token = await tokenService.issueForBoat({ id: boat.id })
+    await tokenService.revokeForBoat({ id: boat.id })
+
+    const response = await client
+      .post('/api/instruments/ingest')
+      .header('Authorization', `Bearer ${token}`)
+      .json(pluginBatch)
+    response.assertStatus(401)
+    response.assertBodyContains({ error: 'unauthorized' })
   })
 })
