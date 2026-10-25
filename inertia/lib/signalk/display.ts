@@ -123,6 +123,7 @@ export function fractionDigits(unit: string | null): number {
     case '°':
     case 'L':
     case 'hPa':
+    case 'W':
       return 0
     case 'bar':
     case 'V':

@@ -148,6 +148,72 @@ test.group('evaluateAlerts (#993)', () => {
     assert.equal(alarm.severity, 'critical')
   })
 
+  test('les règles intégrées carburant, tension, huile et régime s’ouvrent puis se lèvent avec hystérésis', ({
+    assert,
+  }) => {
+    const sample = (path: string, value: number) => ({ path, value, valueJson: null })
+    const paths = {
+      builtin_fuel: 'tanks.fuel.main.currentLevel',
+      volt: 'electrical.batteries.house.voltage',
+      oil: 'propulsion.port.oilPressure',
+      rev: 'propulsion.port.revolutions',
+    }
+    const opened = evaluateAlerts({
+      rules: BUILTIN_ALERT_RULES,
+      samples: [
+        sample(paths.builtin_fuel, 0.1),
+        sample(paths.volt, 11.5),
+        sample(paths.oil, 50_000),
+        sample(paths.rev, 4000 / 60),
+      ],
+      open: new Set(),
+    })
+    assert.sameMembers(
+      opened.map((t) => t.ruleKey),
+      [
+        'builtin:fuel_low',
+        'builtin:battery_voltage_low',
+        'builtin:oil_pressure_low',
+        'builtin:engine_overrev',
+      ]
+    )
+    assert.isTrue(opened.every((t) => t.decision === 'open'))
+    const open = new Set(opened.map((t) => alertOpenKey(t.ruleKey, t.path)))
+    const kept = evaluateAlerts({
+      rules: BUILTIN_ALERT_RULES,
+      samples: [
+        sample(paths.builtin_fuel, 0.17),
+        sample(paths.volt, 12),
+        sample(paths.oil, 120_000),
+        sample(paths.rev, 3400 / 60),
+      ],
+      open,
+    })
+    assert.isTrue(kept.every((t) => t.decision === 'keep'))
+    const cleared = evaluateAlerts({
+      rules: BUILTIN_ALERT_RULES,
+      samples: [
+        sample(paths.builtin_fuel, 0.3),
+        sample(paths.volt, 12.6),
+        sample(paths.oil, 300_000),
+        sample(paths.rev, 2000 / 60),
+      ],
+      open,
+    })
+    assert.lengthOf(cleared, 4)
+    assert.isTrue(cleared.every((t) => t.decision === 'clear'))
+  })
+
+  test('un réservoir d’eau n’ouvre pas l’alerte carburant', ({ assert }) => {
+    assert.isEmpty(
+      evaluateAlerts({
+        rules: BUILTIN_ALERT_RULES,
+        samples: [{ path: 'tanks.freshWater.main.currentLevel', value: 0.05, valueJson: null }],
+        open: new Set(),
+      })
+    )
+  })
+
   test('le message retombe sur l’état quand l’alarme n’en porte pas', ({ assert }) => {
     const [transition] = evaluateAlerts({
       rules: BUILTIN_ALERT_RULES,
