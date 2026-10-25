@@ -207,7 +207,8 @@ const EXCEPTIONS: Component[] = [
       { pattern: 'stroke="#faf6ee"', count: 1, reason: DECORATIVE_SVG },
       { pattern: 'fill="#faf6ee"', count: 2, reason: DECORATIVE_SVG },
       { pattern: 'fill="#e2674f"', count: 1, reason: DECORATIVE_SVG },
-      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton crème ${NAVY_BAND}` },
+      { pattern: 'bg-white', count: 1, reason: `bouton blanc ${NAVY_BAND}` },
+      { pattern: 'text-navy-900', count: 1, reason: `encre du bouton blanc ${NAVY_BAND}` },
     ],
   },
   {
