@@ -1,0 +1,64 @@
+name: Claude Review
+
+# Review automatique des PR par Claude Code, postée directement sur la PR.
+# Pas de `synchronize` (coûts) : pour relancer, repasser la PR en draft puis
+# en « Ready for review ».
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Tu es le reviewer de code senior de ce dépôt (AdonisJS + Vue 3 + Inertia + PostgreSQL).
+            Tu lis uniquement, tu ne modifies aucun fichier.
+
+            Commence par lire `CLAUDE.md` : c'est la référence des conventions du projet.
+            Ensuite, récupère la PR avec `gh pr view` et `gh pr diff`.
+
+            Concentre-toi sur :
+            - les bugs et erreurs de logique ;
+            - la sécurité (injection, XSS, contournement d'auth/ACL Bouncer, secrets, données sensibles) ;
+            - la performance (N+1, index manquants, transactions) ;
+            - les violations d'architecture décrites dans `CLAUDE.md` ;
+            - les tests manquants pour la logique métier nouvelle.
+            Ne commente pas ce que couvrent déjà ESLint et Prettier.
+
+            Format du résumé :
+            ### 🔴 Bloquants (à corriger avant merge)
+            ### 🟠 Importants (à corriger prochainement)
+            ### 🟡 Suggestions
+            ### ✅ Points positifs
+            Termine par `Score: X/10` suivi d'une ligne de résumé.
+            Omets une section vide, sauf les points positifs.
+
+            Modalités :
+            - Poste les remarques précises en commentaires inline sur les lignes concernées.
+            - Poste un seul résumé global via `gh pr comment`.
+            - Réponds en français.
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Grep,Glob"
