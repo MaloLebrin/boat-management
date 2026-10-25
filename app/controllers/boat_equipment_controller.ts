@@ -29,6 +29,7 @@ import {
   equipmentBodyToRigPayload,
   equipmentBodyToSailPayload,
   incrementEngineHoursValidator,
+  updateEngineInstrumentKeyValidator,
   storeBoatEngineValidator,
   storeBoatSailValidator,
   updateBoatEngineValidator,
@@ -668,6 +669,48 @@ export default class BoatEquipmentController {
       throw error
     }
 
+    response.redirect().back()
+  }
+
+  async updateEngineInstrumentKey({
+    request,
+    response,
+    auth,
+    params,
+    bouncer,
+    session,
+    i18n,
+  }: HttpContext) {
+    await auth.authenticate()
+    const loaded = await this.boatContext.resolveBoat({ auth, response, params })
+    if (!loaded) return
+
+    const { boat } = loaded
+    await bouncer.with(BoatPolicy).authorize('edit', boat)
+
+    const { instrumentKey } = await request.validateUsing(updateEngineInstrumentKeyValidator)
+
+    try {
+      await this.equipmentService.setEngineInstrumentKey(
+        loaded.user,
+        boat,
+        Number(params.engineId),
+        instrumentKey ?? null
+      )
+    } catch (error) {
+      if (error instanceof BoatEquipmentNotFoundError) {
+        session.flash('error', i18n.t('flash.engine.notFound'))
+        response.redirect(`/boats/${boat.id}`)
+        return
+      }
+      if (error instanceof BoatEngineInstrumentKeyTakenError) {
+        session.flash('error', i18n.t('flash.engine.instrumentKeyTaken'))
+        return response.redirect().back()
+      }
+      throw error
+    }
+
+    session.flash('success', i18n.t('flash.engine.instrumentKeySaved'))
     response.redirect().back()
   }
 

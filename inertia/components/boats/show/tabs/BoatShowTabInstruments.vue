@@ -23,8 +23,14 @@ import { mergeInstrumentAlerts } from '~/utils/instrument_alerts'
 import { alertRuleSpecs } from '#shared/helpers/instrument_alerts'
 import { sortAisTargets, withDistances } from '#shared/helpers/ais'
 import type { InstrumentSeries, InstrumentsTabProps } from '#shared/types/instruments'
+import type { BoatShowEngine } from '~/types/boat_show'
 
-const props = defineProps<{ boatId: number; instruments: InstrumentsTabProps }>()
+const props = defineProps<{
+  boatId: number
+  instruments: InstrumentsTabProps
+  /** Moteurs du bateau : l'assistant d'installation y relie les identifiants Signal K (#1023). */
+  engines?: BoatShowEngine[]
+}>()
 
 const { t } = useT()
 const source = computed(() => props.instruments.source)

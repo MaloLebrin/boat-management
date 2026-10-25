@@ -141,6 +141,8 @@ L'acquisition ne tourne que l'onglet ouvert : le flux est coupé quand la page p
 
 L'écriture passe par `BoatEngineService.incrementHoursFromInstruments` (monotone, sans utilisateur) dans une transaction avec verrou de ligne : deux lots simultanés ne comptent pas deux fois la même heure. Changer l'`instrument_key` d'un moteur efface sa base ; une clé déjà prise sur le bateau est refusée (`BoatEngineInstrumentKeyTakenError`, flash `flash.engine.instrumentKeyTaken`). `runTime` négatif ou non fini : ignoré.
 
+**Liaison sans le formulaire complet (#1020).** `PATCH /boats/:boatId/engines/:engineId/instrument-key` (corps `{ instrumentKey: string | null }`, même regex et même plafond que le formulaire) relie ou détache un moteur — `null` ou chaîne vide détache. Droit `boats.edit` ; `BoatEngineService.setInstrumentKey` partage avec `update` la vérification d'unicité et la remise à zéro de la base `instrument_run_time_s` (uniquement si la clé change). Réponse : redirection vers le referer avec flash `flash.engine.instrumentKeySaved`, ou `flash.engine.instrumentKeyTaken` si la clé est déjà prise. Sert à l'assistant d'installation (#1023), qui reçoit `engines` dans `BoatShowTabInstruments`.
+
 ### Position et journal (`PositionSyncService`)
 
 Sur `navigation.position` (valeur `{ latitude, longitude }` validée : finie, |lat| ≤ 90, |lon| ≤ 180), avec SOG (m/s → nœuds) et COG (rad → °) les plus récents :

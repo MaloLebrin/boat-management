@@ -11,6 +11,7 @@
     "updated": "Engine updated.",
     "removed": "Engine removed.",
     "notFound": "Engine not found.",
+    "instrumentKeySaved": "Engine linked to the instrument identifier.",
     "instrumentKeyTaken": "Another engine on this boat already uses this instrument identifier."
   },
   "sail": {

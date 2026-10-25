@@ -264,6 +264,7 @@ const showSkeleton = computed(
         v-else-if="tab === 'instruments' && instruments"
         :boat-id="boat.id"
         :instruments="instruments"
+        :engines="boat.engines"
       />
     </div>
   </Transition>

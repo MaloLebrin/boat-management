@@ -99,6 +99,10 @@ router
       controllers.BoatEquipment,
       'incrementEngineHours',
     ])
+    router.patch('boats/:boatId/engines/:engineId/instrument-key', [
+      controllers.BoatEquipment,
+      'updateEngineInstrumentKey',
+    ])
     router.delete('boats/:boatId/engines/:engineId', [controllers.BoatEquipment, 'destroyEngine'])
 
     router.post('boats/:boatId/engines/:engineId/documents', [
