@@ -232,6 +232,57 @@ export class AuditLogSchema extends BaseModel {
   declare userId: number | null
 }
 
+export class BoatAisSightingSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'cogRad',
+    'cpaM',
+    'createdAt',
+    'id',
+    'latitude',
+    'longitude',
+    'mmsi',
+    'name',
+    'recordedAt',
+    'shipType',
+    'shipTypeName',
+    'sogMs',
+    'sourceId',
+    'tcpaS',
+  ] as const
+  $columns = BoatAisSightingSchema.$columns
+  @column()
+  declare boatId: number
+  @column()
+  declare cogRad: string | null
+  @column()
+  declare cpaM: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: bigint | number
+  @column()
+  declare latitude: string
+  @column()
+  declare longitude: string
+  @column()
+  declare mmsi: string
+  @column()
+  declare name: string | null
+  @column.dateTime()
+  declare recordedAt: DateTime
+  @column()
+  declare shipType: number | null
+  @column()
+  declare shipTypeName: string | null
+  @column()
+  declare sogMs: string | null
+  @column()
+  declare sourceId: number
+  @column()
+  declare tcpaS: string | null
+}
+
 export class BoatBrandSchema extends BaseModel {
   static $columns = [
     'aliases',

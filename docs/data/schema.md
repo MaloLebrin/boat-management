@@ -573,6 +573,14 @@ Append-only. Un échantillon par chemin Signal K et par fenêtre d'agrégation d
 - `createdAt`
 - unique `(source_id, path, recorded_at)` : le rejeu d'un lot est ignoré (`ON CONFLICT DO NOTHING`) ; index `(boat_id, path, recorded_at DESC)` pour « dernière valeur par chemin »
 
+### boat_ais_sightings (#1009)
+
+Cibles AIS relevées par les instruments (navires tiers : MMSI, nom, position). Append-only, rétention courte (`AIS_SIGHTING_RETENTION_DAYS`, purge par `PurgeTelemetrySamples`).
+
+- `boat_id` → `boats` (cascade), `source_id` → `boat_instrument_sources` (cascade), `mmsi` (9), `recorded_at` (horloge du client)
+- `name`, `latitude`/`longitude` (`numeric(9,6)`), `sog_ms`, `cog_rad`, `ship_type`, `ship_type_name`, `cpa_m`, `tcpa_s`, `created_at`
+- Unique `(source_id, mmsi, recorded_at)` ; index `(boat_id, recorded_at)`
+
 ### boat_instrument_alert_rules (#993)
 
 Règle de seuil définie par un admin sur un chemin numérique. Unique `(boat_id, path, operator)`.

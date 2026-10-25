@@ -1,9 +1,11 @@
 import { computed, getCurrentInstance, onBeforeUnmount, ref } from 'vue'
+import { aisSubscriptionSpecs } from '~/lib/signalk/path_catalog'
 import { createSignalKClient, type SignalKClient } from '~/lib/signalk/client'
 import { normalizeDelta } from '~/lib/signalk/sample_normalizer'
 import type {
   NormalizedSample,
   SignalKConnectionState,
+  SignalKDelta,
   SignalKErrorKey,
   SignalKTransport,
   WebSocketLike,
@@ -45,6 +47,8 @@ export interface InstrumentStreamOptions {
   onSamples?: (samples: NormalizedSample[]) => void
   /** Règles évaluées à chaque delta : retour immédiat à bord, même hors ligne (#993). */
   alertRules?: () => InstrumentAlertRuleSpec[]
+  /** Reçoit les deltas des autres navires (AIS, #1009) ; active l'abonnement `vessels.*`. */
+  onAisDelta?: (delta: SignalKDelta) => void
   staleAfterS?: number
   transport?: SignalKTransport
 }
@@ -144,12 +148,14 @@ export function useInstrumentStream(options: InstrumentStreamOptions) {
       baseUrl: source.baseUrl,
       token: source.token,
       context: source.vesselContext,
+      aisSubscriptions: options.onAisDelta ? aisSubscriptionSpecs() : undefined,
       transport: options.transport ?? browserTransport(),
       onState: (state, key) => {
         connectionState.value = state
         errorKey.value = key
       },
       onDelta: (delta, self) => {
+        options.onAisDelta?.(delta)
         const samples = normalizeDelta(delta, { context: source.vesselContext, selfContext: self })
         if (samples.length === 0) return
         const receivedAt = Date.now()

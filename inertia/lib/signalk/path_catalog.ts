@@ -1,3 +1,5 @@
+import { AIS_DISPLAY_REFRESH_MS, AIS_SIGHTING_WINDOW_S } from '#shared/constants/ais'
+import { parseAisPath } from '#shared/helpers/ais'
 import { INSTRUMENT_PATH_CATALOG, telemetryPathSpec } from '#shared/constants/instruments'
 import type { SubscriptionSpec } from './types'
 
@@ -71,6 +73,8 @@ const RULES: Record<string, PathRule> = {
 
 /** Les angles et les moyennes de directions n'ont pas de sens : dernière valeur. */
 export function ruleForPath(path: string): PathRule {
+  // Cible AIS (#1009) : un relevé par fenêtre, le dernier état connu.
+  if (parseAisPath(path) !== null) return { intervalS: AIS_SIGHTING_WINDOW_S, aggregate: 'last' }
   const spec = telemetryPathSpec(path)
   if (!spec) return DEFAULT_RULE
   return RULES[spec.pattern] ?? DEFAULT_RULE
@@ -95,4 +99,27 @@ export function subscriptionSpecs(): SubscriptionSpec[] {
     const period = Math.max(1000, Math.round((rule.intervalS * 1000) / 2))
     return { path: wildcardPath(spec.pattern), period, minPeriod: 500, policy: 'fixed' }
   })
+}
+
+/** Champs lus sur chaque navire AIS (#1009), sous le contexte `vessels.*`. */
+const AIS_SUBSCRIBED_PATHS = [
+  'navigation.position',
+  'navigation.speedOverGround',
+  'navigation.courseOverGroundTrue',
+  'navigation.closestApproach',
+  'design.aisShipType',
+  'name',
+]
+
+/**
+ * Abonnements AIS : le serveur ramène lui-même le débit à une mise à jour par
+ * cible et par rafraîchissement d'affichage (`fixed`).
+ */
+export function aisSubscriptionSpecs(): SubscriptionSpec[] {
+  return AIS_SUBSCRIBED_PATHS.map((path) => ({
+    path,
+    period: AIS_DISPLAY_REFRESH_MS,
+    minPeriod: 1000,
+    policy: 'fixed',
+  }))
 }

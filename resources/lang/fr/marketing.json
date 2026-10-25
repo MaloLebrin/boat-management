@@ -1096,6 +1096,7 @@
     "s6_b3": "Liens de partage d'une estimation : 6 mois après leur création, au terme desquels le lien cesse de fonctionner.",
     "s6_b4": "Liens de réinitialisation de mot de passe et invitations non acceptées : une semaine après leur expiration.",
     "s6_b5": "Demandes de réservation envoyées depuis la page en ligne d'un loueur et jamais confirmées : 30 jours après leur envoi.",
+    "s6_b6": "Navires croisés relevés par le serveur Signal K d’un bateau (numéro MMSI, nom, position, cap et vitesse) : 7 jours (plan Pro) ou 30 jours (plan Entreprise) après leur relevé.",
     "s7_title": "Sécurité",
     "s7_body": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées : chiffrement des mots de passe, connexions sécurisées (HTTPS), contrôle d'accès et sauvegardes régulières.",
     "s8_title": "Vos droits",

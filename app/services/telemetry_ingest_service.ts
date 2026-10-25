@@ -3,6 +3,7 @@ import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import type BoatInstrumentSource from '#models/boat_instrument_source'
+import AisTargetService from '#services/ais_target_service'
 import InstrumentSourceService from '#services/instrument_source_service'
 import TelemetryIngested from '#events/telemetry_ingested'
 import {
@@ -20,8 +21,11 @@ import {
   TELEMETRY_VALUE_ABS_MAX,
   telemetryPathSpec,
 } from '#shared/constants/instruments'
+import { isAisPathFamily, parseAisPath } from '#shared/helpers/ais'
+import type { AisSightingInsert } from '#shared/types/ais'
 import type {
   TelemetryBatchPayload,
+  TelemetrySampleInput,
   TelemetryIngestMeta,
   TelemetryIngestResult,
 } from '#shared/types/instruments'
@@ -57,7 +61,10 @@ const UNIQUE_COLUMNS = ['source_id', 'path', 'recorded_at']
  */
 @inject()
 export default class TelemetryIngestService {
-  constructor(private sourceService: InstrumentSourceService) {}
+  constructor(
+    private sourceService: InstrumentSourceService,
+    private aisTargetService: AisTargetService
+  ) {}
 
   /**
    * Vérifie un lot et le traduit en lignes SQL, sans toucher la base. Lève à
@@ -82,13 +89,7 @@ export default class TelemetryIngestService {
       const spec = telemetryPathSpec(sample.path)
       if (!spec) throw new TelemetryPathNotAllowedError(sample.path)
 
-      const recordedAt = DateTime.fromISO(sample.recordedAt, { setZone: true })
-      if (!recordedAt.isValid) {
-        throw new TelemetryRecordedAtInvalidError(sample.recordedAt, 'unparsable')
-      }
-      if (recordedAt > futureLimit) {
-        throw new TelemetryRecordedAtInvalidError(sample.recordedAt, 'future')
-      }
+      const recordedAt = this.parseRecordedAt(sample.recordedAt, futureLimit)
 
       let value: number | null = null
       let valueJson: string | null = null
@@ -111,12 +112,56 @@ export default class TelemetryIngestService {
         boat_id: source.boatId,
         source_id: source.id,
         path: sample.path,
-        recorded_at: recordedAt.toUTC().toISO()!,
+        recorded_at: recordedAt,
         value,
         value_json: valueJson,
         created_at: createdAt,
       }
     })
+  }
+
+  /** `recordedAt` lisible et pas plus loin dans le futur que la tolérance (D9) ; rend l'instant en UTC. */
+  private parseRecordedAt(raw: string, futureLimit: DateTime): string {
+    const recordedAt = DateTime.fromISO(raw, { setZone: true })
+    if (!recordedAt.isValid) throw new TelemetryRecordedAtInvalidError(raw, 'unparsable')
+    if (recordedAt > futureLimit) throw new TelemetryRecordedAtInvalidError(raw, 'future')
+    return recordedAt.toUTC().toISO()!
+  }
+
+  /**
+   * Sépare les cibles AIS (`ais.<mmsi>`, #1009) des mesures du bateau : elles
+   * ont leur table et leur rétention. Un chemin `ais.*` qui n'est pas un MMSI
+   * reste du côté des mesures et y est refusé par la liste blanche.
+   */
+  partition(samples: TelemetrySampleInput[]): {
+    measures: TelemetrySampleInput[]
+    ais: TelemetrySampleInput[]
+  } {
+    const measures: TelemetrySampleInput[] = []
+    const ais: TelemetrySampleInput[] = []
+    for (const sample of samples) {
+      if (isAisPathFamily(sample.path) && parseAisPath(sample.path) !== null) ais.push(sample)
+      else measures.push(sample)
+    }
+    return { measures, ais }
+  }
+
+  /** Les cibles AIS d'un lot en lignes SQL, avec les mêmes contrôles de date que les mesures. */
+  prepareAis(
+    source: TelemetrySourceLike,
+    samples: TelemetrySampleInput[],
+    now: DateTime = DateTime.now()
+  ): AisSightingInsert[] {
+    const futureLimit = now.plus({ minutes: TELEMETRY_FUTURE_TOLERANCE_MIN })
+    const normalized = new Map<TelemetrySampleInput, string>(
+      samples.map((sample) => [sample, this.parseRecordedAt(sample.recordedAt, futureLimit)])
+    )
+    return this.aisTargetService.prepare(
+      source,
+      samples,
+      (sample) => normalized.get(sample)!,
+      now.toISO()!
+    )
   }
 
   /** Découpe en `INSERT` de taille bornée, dans l'ordre du lot. */
@@ -133,7 +178,13 @@ export default class TelemetryIngestService {
     batch: TelemetryBatchPayload,
     meta: TelemetryIngestMeta
   ): Promise<TelemetryIngestResult> {
-    const rows = this.prepare(source, batch)
+    // Un lot est accepté ou refusé en entier : tout est vérifié avant la première écriture.
+    if (batch.samples.length > TELEMETRY_MAX_BATCH_SIZE) {
+      throw new TelemetryBatchTooLargeError(batch.samples.length, TELEMETRY_MAX_BATCH_SIZE)
+    }
+    const { measures, ais } = this.partition(batch.samples)
+    const rows = this.prepare(source, { ...batch, samples: measures })
+    const aisRows = this.prepareAis(source, ais)
 
     let accepted = 0
     for (const chunk of this.chunk(rows)) {
@@ -148,7 +199,11 @@ export default class TelemetryIngestService {
       accepted += inserted.length
     }
 
-    const result: TelemetryIngestResult = { accepted, ignored: rows.length - accepted }
+    const aisAccepted = await this.aisTargetService.insert(aisRows)
+    const result: TelemetryIngestResult = {
+      accepted: accepted + aisAccepted,
+      ignored: rows.length - accepted + (aisRows.length - aisAccepted),
+    }
     await this.sourceService.touchLastSeen(source)
 
     const paths = [...new Set(rows.map((row) => row.path))]

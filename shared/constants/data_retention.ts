@@ -85,3 +85,15 @@ export const TELEMETRY_SAMPLE_RETENTION_DAYS: Record<PlanTier, number> = {
   pro: 90,
   enterprise: 365,
 }
+
+/**
+ * Durée de conservation des cibles AIS relevées (#1009). Ce sont des tiers
+ * (MMSI, nom, position de navires croisés) : conservation courte, bien en
+ * deçà des mesures du bateau. Le plan Starter n'a pas d'instruments ; la
+ * valeur ne couvre qu'un bateau rétrogradé.
+ */
+export const AIS_SIGHTING_RETENTION_DAYS: Record<PlanTier, number> = {
+  starter: 1,
+  pro: 7,
+  enterprise: 30,
+}

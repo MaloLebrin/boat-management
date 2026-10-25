@@ -4,6 +4,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import InstrumentPluginTokenCard from '~/components/boats/show/tabs/instruments/InstrumentPluginTokenCard.vue'
 import InstrumentAlertRulesEditor from '~/components/boats/show/tabs/instruments/InstrumentAlertRulesEditor.vue'
 import InstrumentAlertsList from '~/components/boats/show/tabs/instruments/InstrumentAlertsList.vue'
+import InstrumentAisPanel from '~/components/boats/show/tabs/instruments/InstrumentAisPanel.vue'
 import InstrumentAlarmsList from '~/components/boats/show/tabs/instruments/InstrumentAlarmsList.vue'
 import InstrumentCategoryGrid from '~/components/boats/show/tabs/instruments/InstrumentCategoryGrid.vue'
 import InstrumentConnectionBanner from '~/components/boats/show/tabs/instruments/InstrumentConnectionBanner.vue'
@@ -11,6 +12,7 @@ import InstrumentForecastPanel from '~/components/boats/show/tabs/instruments/In
 import InstrumentHistoryPanel from '~/components/boats/show/tabs/instruments/InstrumentHistoryPanel.vue'
 import InstrumentEmptyState from '~/components/boats/show/tabs/instruments/InstrumentEmptyState.vue'
 import InstrumentSourceForm from '~/components/boats/show/tabs/instruments/InstrumentSourceForm.vue'
+import { useAisTargets } from '~/composables/use_ais_targets'
 import { useInstrumentStream } from '~/composables/use_instrument_stream'
 import { useT } from '~/composables/use_t'
 import { useSignalKForecast } from '~/composables/use_signalk_forecast'
@@ -19,6 +21,7 @@ import { buildReadings } from '~/lib/signalk/display'
 import { parsePosition } from '~/lib/signalk/weather'
 import { mergeInstrumentAlerts } from '~/utils/instrument_alerts'
 import { alertRuleSpecs } from '#shared/helpers/instrument_alerts'
+import { sortAisTargets, withDistances } from '#shared/helpers/ais'
 import type { InstrumentSeries, InstrumentsTabProps } from '#shared/types/instruments'
 
 const props = defineProps<{ boatId: number; instruments: InstrumentsTabProps }>()
@@ -39,10 +42,15 @@ const sync = useTelemetrySync({
   boatId: () => props.boatId,
   sourceId: () => source.value?.id ?? null,
 })
+const ais = useAisTargets({
+  own: () => ownPosition.value,
+  onSamples: (samples) => sync.push(samples),
+})
 const stream = useInstrumentStream({
   source: () => (canStream.value ? source.value : null),
   alertRules: () => alertRuleSpecs(props.instruments.rules),
   onSamples: (samples) => sync.push(samples),
+  onAisDelta: ais.handleDelta,
 })
 
 const now = ref(Date.now())
@@ -70,6 +78,24 @@ const rulePaths = computed(() =>
       label: `${t(reading.labelKey)} · ${reading.instance}`,
     }))
 )
+/** Position du bateau : le flux d'abord, sinon la dernière valeur connue du serveur. */
+const ownPosition = computed(() => {
+  const json = readings.value.find((reading) => reading.path === 'navigation.position')?.valueJson
+  if (json === null || json === undefined || typeof json !== 'object' || Array.isArray(json)) {
+    return null
+  }
+  const { latitude, longitude } = json
+  return typeof latitude === 'number' && typeof longitude === 'number'
+    ? { latitude, longitude }
+    : null
+})
+/** En direct tant que le flux a livré des cibles ; sinon les derniers relevés du serveur. */
+const aisLive = computed(() => ais.targets.value.length > 0)
+const aisTargets = computed(() =>
+  aisLive.value
+    ? ais.targets.value
+    : sortAisTargets(withDistances(props.instruments.aisTargets, ownPosition.value))
+)
 const alarmReadings = computed(() =>
   readings.value.filter((reading) => reading.category === 'notifications')
 )
@@ -87,10 +113,12 @@ const connectionKey = computed(() =>
 
 async function startStreaming() {
   stream.stop()
+  ais.stop()
   await sync.stop()
   if (!canStream.value) return
   await sync.start()
   stream.start()
+  ais.start()
 }
 
 onMounted(() => {
@@ -120,6 +148,12 @@ onBeforeUnmount(() => {
         v-if="historyPaths.length > 0"
         :paths="historyPaths"
         :series="page.props.instrumentSeries"
+      />
+      <InstrumentAisPanel
+        v-if="aisTargets.length > 0 || canStream"
+        :targets="aisTargets"
+        :own="ownPosition"
+        :live="aisLive"
       />
       <InstrumentForecastPanel
         :snapshot="forecast.snapshot.value"

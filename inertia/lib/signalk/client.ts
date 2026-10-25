@@ -1,3 +1,4 @@
+import { AIS_SUBSCRIBE_CONTEXT } from '#shared/constants/ais'
 import { retryDelayMs } from '#shared/helpers/offline_retry'
 import { subscriptionSpecs } from './path_catalog'
 import type {
@@ -36,6 +37,8 @@ export interface SignalKClientOptions {
   context: string
   /** Abonnements ; par défaut ceux du catalogue. */
   subscriptions?: SubscriptionSpec[]
+  /** Abonnements aux autres navires (`vessels.*`, AIS #1009) ; absent = pas d'AIS. */
+  aisSubscriptions?: SubscriptionSpec[]
   onDelta: (delta: SignalKDelta, self: string | null) => void
   onState: (state: SignalKConnectionState, errorKey: SignalKErrorKey | null) => void
   transport: SignalKTransport
@@ -191,6 +194,11 @@ export function createSignalKClient(options: SignalKClientOptions) {
           subscribe: options.subscriptions ?? subscriptionSpecs(),
         })
       )
+      if (options.aisSubscriptions && options.aisSubscriptions.length > 0) {
+        ws.send(
+          JSON.stringify({ context: AIS_SUBSCRIBE_CONTEXT, subscribe: options.aisSubscriptions })
+        )
+      }
       setState('open')
       heartbeatTimer = setInterval(
         () => {

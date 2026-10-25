@@ -113,6 +113,7 @@ function props(overrides: Partial<InstrumentsTabProps> = {}): InstrumentsTabProp
     recent: {},
     rules: [],
     openAlerts: [],
+    aisTargets: [],
     can: { manage: true, ingest: true },
     ...overrides,
   }
@@ -432,6 +433,55 @@ describe('BoatShowTabInstruments', () => {
 
     const noSource = mountTab(props({ source: null, latest: [] }))
     expect(noSource.find('[data-testid="instrument-alert-rules"]').exists()).toBe(false)
+  })
+})
+
+describe('BoatShowTabInstruments — AIS (#1009)', () => {
+  const target = {
+    mmsi: '244630000',
+    seenAt: '2026-10-19T09:50:00.000Z',
+    name: 'ALBATROS',
+    latitude: 43.01,
+    longitude: 5,
+    sogMs: 2,
+    cogRad: 1,
+    shipType: 36,
+    shipTypeName: 'Sailing',
+    cpaM: null,
+    tcpaS: null,
+    distanceM: null,
+  }
+  const mountTab = (value: InstrumentsTabProps) =>
+    mount(BoatShowTabInstruments, { props: { boatId: 9, instruments: value } })
+
+  test('hors flux, les derniers relevés du serveur sont listés, distance calculée', async () => {
+    streamState.latest.value = {
+      'navigation.position': {
+        value: null,
+        valueJson: { latitude: 43, longitude: 5 },
+        receivedAt: NOW,
+      },
+    }
+    const wrapper = mountTab(props({ aisTargets: [target] }))
+    await flushPromises()
+
+    const panel = wrapper.get('[data-testid="instrument-ais"]')
+    expect(panel.text()).toContain('ALBATROS')
+    expect(panel.text()).toContain('instruments.ais.lastKnown')
+    expect(panel.text()).toContain('0.60')
+  })
+
+  test('un lecteur sans flux et sans cible ne voit pas le panneau', async () => {
+    const wrapper = mountTab(props({ can: { manage: false, ingest: false }, aisTargets: [] }))
+    await flushPromises()
+    expect(wrapper.find('[data-testid="instrument-ais"]').exists()).toBe(false)
+  })
+
+  test('le flux et l’enregistrement des cibles démarrent et s’arrêtent avec la connexion', async () => {
+    const wrapper = mountTab(props())
+    await flushPromises()
+    expect(wrapper.find('[data-testid="instrument-ais"]').exists()).toBe(true)
+    expect(streamState.start).toHaveBeenCalled()
   })
 })
 

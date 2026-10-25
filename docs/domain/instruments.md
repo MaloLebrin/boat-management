@@ -184,6 +184,19 @@ Repli universel sans navigateur (D1) : un plugin installé sur le serveur Signal
 - **Hors session.** Aucune session ni CSRF : `/api/instruments/ingest` est dans `config/shield.ts` `exceptRoutes`, et `/api/**` répond toujours en JSON (`app/exceptions/handler.ts`). Le Service Worker exclut déjà `/api/`.
 - Audit : `boat.instrument_ingest_token_issue` / `_revoke`. Aucune clé de chiffrement : un sha256 suffit pour un jeton à haute entropie, et la valeur en clair n'est jamais relisible.
 
+## Cibles AIS (#1009)
+
+Les autres navires que le serveur Signal K reçoit par AIS (contextes `vessels.urn:mrn:imo:mmsi:<mmsi>`) s'affichent dans l'onglet, **sont historisés** avec une rétention courte, et réutilisent le tuyau de la télémétrie sans le modifier. Un bateau reste une seule source ; l'AIS n'a ni table de sources ni jeton propres.
+
+- **Tuyau inchangé.** Une cible voyage comme un échantillon de chemin synthétique `ais.<mmsi>` (neuf chiffres) dont `valueJson` porte `{ name, latitude, longitude, sogMs, cogRad, shipType, shipTypeName, cpaM, tcpaS }` (SI, `shared/types/ais.ts`). Agrégateur, `coarsen`, `chunkSamples`, file hors ligne (`ingest-telemetry`), route PWA et route plugin sont ceux des mesures : un plugin Signal K peut donc pousser des cibles dans le même lot. `ais.*` n'est **pas** dans `INSTRUMENT_PATH_CATALOG` (pas de jauge, pas de règle d'alerte).
+- **Serveur.** `TelemetryIngestService.partition()` isole les `ais.<mmsi>` ; `prepareAis` applique les contrôles de date des mesures (illisible ou futur > 5 min) et `AisTargetService.prepare` exige une position valide (sinon `TelemetryValueKindMismatchError`, comme tout lot invalide : le lot est refusé **en entier**). Insertion par tranches de 100 dans `boat_ais_sightings`, `ON CONFLICT (source_id, mmsi, recorded_at) DO NOTHING` ; les cibles comptent dans `accepted`/`ignored`. Elles ne figurent pas dans `paths` de `TelemetryIngested` : heures moteur, position et alertes ne les voient pas. Le plafond de 500 échantillons vaut pour le lot entier.
+- **Client.** `createSignalKClient({ aisSubscriptions })` envoie, après l'abonnement du bateau, un second `subscribe` sur le contexte `vessels.*` (position, SOG, COG, `closestApproach`, `design.aisShipType`, `name`, `fixed` toutes les 5 s). `ais_tracker.ts` retient par MMSI l'état le plus récent de chaque champ (un `null` Signal K ne remplace rien), oublie une cible muette depuis 10 min et plafonne à 500 cibles suivies. `use_ais_targets` n'interroge le suivi que toutes les **5 s** : l'écran affiche les 50 cibles les plus proches (`AIS_MAX_TARGETS`) et chaque cible **nouvellement vue** produit un échantillon, que l'agrégateur réduit à un relevé par fenêtre de 5 min (`ruleForPath`). Une cible muette n'est pas réenregistrée.
+- **CPA/TCPA.** Lus dans `navigation.closestApproach` (`distance` m, `timeTo` s) quand le serveur les fournit — FleetAi ne les recalcule pas. `aisRisk` : `danger` si CPA ≤ 926 m (0,5 NM) **et** TCPA ≤ 20 min, `watch` si une seule condition tient, `none` sinon ou si le TCPA est négatif (les navires s'éloignent).
+- **Lecture.** Prop différée `instruments.aisTargets` : dernier relevé de chaque MMSI vu dans les 30 dernières minutes (50 au plus, `AisTargetService.recentForBoat`), sans distance — l'onglet la calcule depuis la position du bateau. L'écran montre le direct dès que le flux a livré une cible, sinon ces derniers relevés (« derniers relevés enregistrés »). Liste triée par distance (NM, nds, cap, CPA/TCPA, badge de risque) ou carte Leaflet (flèche orientée sur le cap, couleur selon le risque).
+- **Données de tiers et RGPD.** MMSI, nom et position de navires croisés : rétention `AIS_SIGHTING_RETENTION_DAYS` (Starter 1 j — bateau rétrogradé —, Pro 7 j, Entreprise 30 j), purgée avec les mesures par `PurgeTelemetrySamples` (`TelemetryRetentionService`). Lisibles par l'équipe du bateau seulement (prop de la fiche, mêmes droits que les mesures), jamais exposées publiquement ni dans les exports. Mentionné dans la politique de confidentialité (`s6_b6`).
+- **Table `boat_ais_sightings`** (migration `1893000000000`) : `boat_id`, `source_id` (cascade), `mmsi` (9), `recorded_at` (horloge du client, D9), `name`, `latitude`, `longitude`, `sog_ms`, `cog_rad`, `ship_type`, `ship_type_name`, `cpa_m`, `tcpa_s`, `created_at` ; unique `(source_id, mmsi, recorded_at)`, index `(boat_id, recorded_at)`.
+- **Limites.** Aucune alerte de collision (le badge n'est qu'un indicateur de lecture) ; pas de trace d'une cible sur plusieurs relevés à l'écran (la table la permet) ; l'AIS dépend de ce que reçoit le serveur Signal K du bord.
+
 ## Prévisions météo du bord (#1010)
 
 L'onglet Instruments affiche les prévisions du serveur Signal K du bord. Elles ne sont **pas** des chemins `vessels.self` : elles viennent de l'API Weather v2, servie par un plugin fournisseur installé sur le serveur (Open-Meteo, Meteoblue…).
@@ -206,9 +219,11 @@ app/transformers/instrument_transformer.ts
 app/validators/instruments.ts
 app/events/telemetry_ingested.ts, app/listeners/on_telemetry_ingested.ts
 app/services/engine_hours_sync_service.ts, position_sync_service.ts, telemetry_retention_service.ts
+app/services/ais_target_service.ts, app/models/boat_ais_sighting.ts (#1009)
 app/jobs/purge_telemetry_samples.ts
 app/exceptions/instrument_errors.ts
 app/utils/csp_connect_src.ts
 shared/types/instruments.ts, shared/constants/instruments.ts, shared/helpers/instruments.ts
-inertia/lib/signalk/*, inertia/composables/use_instrument_stream.ts, use_telemetry_sync.ts
+shared/types/ais.ts, shared/constants/ais.ts, shared/helpers/ais.ts (#1009)
+inertia/lib/signalk/* (dont ais_tracker.ts), inertia/composables/use_instrument_stream.ts, use_telemetry_sync.ts, use_ais_targets.ts
 ```

@@ -196,6 +196,31 @@
     "revokeTitle": "Révoquer le jeton ?",
     "revokeMessage": "Le plugin ne pourra plus envoyer de relevés tant qu’un nouveau jeton n’est pas généré."
   },
+  "ais": {
+    "title": "Navires AIS à proximité",
+    "live": "Cibles reçues en direct du serveur Signal K, rafraîchies toutes les 5 secondes.",
+    "lastKnown": "Derniers relevés enregistrés (30 dernières minutes). Ouvrez l’écran à bord pour le direct.",
+    "none": "Aucune cible AIS pour le moment.",
+    "viewList": "Liste",
+    "viewMap": "Carte",
+    "mapLabel": "Carte des navires AIS autour du bateau",
+    "knots": "nds",
+    "nm": "NM",
+    "diverging": "S’éloigne",
+    "cpaValue": "{cpa} NM dans {minutes} min",
+    "col": {
+      "vessel": "Navire",
+      "distance": "Distance",
+      "speed": "Vitesse",
+      "course": "Cap fond",
+      "cpa": "CPA / TCPA",
+      "seen": "Vu à"
+    },
+    "risk": {
+      "watch": "À surveiller",
+      "danger": "Risque"
+    }
+  },
   "forecast": {
     "title": "Prévisions météo",
     "range": "{hours} h",
