@@ -165,5 +165,30 @@
     "revoke": "Revoke the token",
     "revokeTitle": "Revoke the token?",
     "revokeMessage": "The plugin can no longer send readings until a new token is generated."
+  },
+  "ais": {
+    "title": "Nearby AIS vessels",
+    "live": "Targets received live from the Signal K server, refreshed every 5 seconds.",
+    "lastKnown": "Last recorded sightings (past 30 minutes). Open this screen aboard for the live view.",
+    "none": "No AIS target for now.",
+    "viewList": "List",
+    "viewMap": "Map",
+    "mapLabel": "Map of AIS vessels around the boat",
+    "knots": "kn",
+    "nm": "NM",
+    "diverging": "Moving apart",
+    "cpaValue": "{cpa} NM in {minutes} min",
+    "col": {
+      "vessel": "Vessel",
+      "distance": "Distance",
+      "speed": "Speed",
+      "course": "Course over ground",
+      "cpa": "CPA / TCPA",
+      "seen": "Seen at"
+    },
+    "risk": {
+      "watch": "Watch",
+      "danger": "Risk"
+    }
   }
 }

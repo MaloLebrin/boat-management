@@ -3,6 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import type Boat from '#models/boat'
 import type BoatInstrumentSource from '#models/boat_instrument_source'
+import AisTargetService from '#services/ais_target_service'
 import InstrumentSourceService from '#services/instrument_source_service'
 import { TELEMETRY_RECENT_WINDOW_MIN, TELEMETRY_SERIES_RANGES } from '#shared/constants/instruments'
 import {
@@ -38,7 +39,10 @@ interface SeriesRow {
  */
 @inject()
 export default class TelemetryReadService {
-  constructor(private sourceService: InstrumentSourceService) {}
+  constructor(
+    private sourceService: InstrumentSourceService,
+    private aisTargetService: AisTargetService
+  ) {}
 
   /** Dernière valeur de chaque chemin — `DISTINCT ON (path)` sur l'index `(boat_id, path, recorded_at desc)`. */
   async latestForBoat(boat: Pick<Boat, 'id'>): Promise<TelemetryLatestValue[]> {
@@ -145,11 +149,16 @@ export default class TelemetryReadService {
     source: BoatInstrumentSource | null,
     can: InstrumentsTabCapabilities
   ): Promise<Omit<InstrumentsTabProps, 'rules' | 'openAlerts'>> {
-    const [latest, recent] = await Promise.all([this.latestForBoat(boat), this.recentForBoat(boat)])
+    const [latest, recent, aisTargets] = await Promise.all([
+      this.latestForBoat(boat),
+      this.recentForBoat(boat),
+      this.aisTargetService.recentForBoat(boat),
+    ])
     return {
       source: source ? this.sourceService.toConnection(source, { revealToken: can.ingest }) : null,
       latest,
       recent,
+      aisTargets,
       can,
     }
   }

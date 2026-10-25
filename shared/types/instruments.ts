@@ -1,4 +1,5 @@
 import type { DateTime } from 'luxon'
+import type { AisTarget } from '#shared/types/ais'
 import type { JsonValue } from '#shared/types/notification'
 
 /**
@@ -100,6 +101,8 @@ export interface InstrumentsTabProps {
   rules: InstrumentAlertRuleRow[]
   /** Alertes ouvertes, la plus récente d'abord (#993). */
   openAlerts: InstrumentAlertRow[]
+  /** Dernier relevé de chaque cible AIS vue récemment (#1009), sans distance. */
+  aisTargets: AisTarget[]
   can: InstrumentsTabCapabilities
 }
 

@@ -11,8 +11,11 @@ class FakeSocket implements WebSocketLike {
   onclose: ((event: { code?: number }) => void) | null = null
   onerror: ((event: unknown) => void) | null = null
   closed = false
+  sent: string[] = []
   constructor(readonly url: string) {}
-  send() {}
+  send(data: string) {
+    this.sent.push(data)
+  }
   close() {
     this.closed = true
   }
@@ -231,5 +234,39 @@ describe('useInstrumentStream (#989)', () => {
       updates: [{ values: [{ path: 'environment.depth.belowKeel', value: 0.1 }] }],
     })
     expect(stream.localAlerts.value).toEqual({})
+  })
+
+  test('AIS (#1009) : abonnement vessels.* et deltas des cibles transmis sans polluer les mesures', async () => {
+    const { transport, sockets } = makeTransport()
+    const onAisDelta = vi.fn()
+    const onSamples = vi.fn()
+    const { stream } = mountStream({ transport, onAisDelta, onSamples })
+
+    stream.start()
+    await vi.advanceTimersByTimeAsync(0)
+    sockets[0].open()
+    expect(sockets[0].sent.map((raw) => JSON.parse(raw).context)).toEqual([
+      'vessels.self',
+      'vessels.*',
+    ])
+
+    sockets[0].message({
+      context: 'vessels.urn:mrn:imo:mmsi:244630000',
+      updates: [
+        { values: [{ path: 'navigation.position', value: { latitude: 43, longitude: 5 } }] },
+      ],
+    })
+    expect(onAisDelta).toHaveBeenCalledTimes(1)
+    expect(onSamples).not.toHaveBeenCalled()
+    expect(stream.latestByPath.value).toEqual({})
+  })
+
+  test('sans onAisDelta, un seul abonnement (pas d’AIS)', async () => {
+    const { transport, sockets } = makeTransport()
+    const { stream } = mountStream({ transport })
+    stream.start()
+    await vi.advanceTimersByTimeAsync(0)
+    sockets[0].open()
+    expect(sockets[0].sent).toHaveLength(1)
   })
 })

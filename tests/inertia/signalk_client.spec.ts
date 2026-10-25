@@ -5,6 +5,7 @@ import {
   createSignalKClient,
   rebaseOnOrigin,
 } from '../../inertia/lib/signalk/client'
+import { aisSubscriptionSpecs } from '../../inertia/lib/signalk/path_catalog'
 import type {
   SignalKConnectionState,
   SignalKDelta,
@@ -63,7 +64,7 @@ interface Setup {
   client: ReturnType<typeof createSignalKClient>
 }
 
-function setup(options: { baseUrl?: string; token?: string | null } = {}): Setup {
+function setup(options: { baseUrl?: string; token?: string | null; ais?: boolean } = {}): Setup {
   const ctx: Setup = {
     states: [],
     deltas: [],
@@ -91,6 +92,7 @@ function setup(options: { baseUrl?: string; token?: string | null } = {}): Setup
     token: options.token === undefined ? 'secret-token' : options.token,
     context: 'vessels.self',
     transport,
+    aisSubscriptions: options.ais ? aisSubscriptionSpecs() : undefined,
     onDelta: (delta) => ctx.deltas.push(delta),
     onState: (state, key) => ctx.states.push([state, key]),
   })
@@ -110,6 +112,37 @@ describe('createSignalKClient (#989)', () => {
     expect(rebaseOnOrigin('http://x:3000/signalk/v1/api/', 'http://192.168.1.5:3000', false)).toBe(
       'http://192.168.1.5:3000/signalk/v1/api/'
     )
+  })
+
+  test('AIS (#1009) : un second abonnement sur vessels.* après celui du bateau', async () => {
+    const ctx = setup({ ais: true })
+    ctx.client.connect()
+    await flush()
+    ctx.sockets[0].open()
+
+    expect(ctx.sockets[0].sent).toHaveLength(2)
+    expect(JSON.parse(ctx.sockets[0].sent[0]).context).toBe('vessels.self')
+    const ais = JSON.parse(ctx.sockets[0].sent[1])
+    expect(ais.context).toBe('vessels.*')
+    expect(ais.subscribe.map((spec: { path: string }) => spec.path)).toEqual(
+      expect.arrayContaining([
+        'navigation.position',
+        'navigation.speedOverGround',
+        'navigation.courseOverGroundTrue',
+        'navigation.closestApproach',
+        'design.aisShipType',
+        'name',
+      ])
+    )
+    expect(ais.subscribe[0]).toMatchObject({ policy: 'fixed', period: 5000 })
+  })
+
+  test('sans option AIS, un seul abonnement', async () => {
+    const ctx = setup()
+    ctx.client.connect()
+    await flush()
+    ctx.sockets[0].open()
+    expect(ctx.sockets[0].sent).toHaveLength(1)
   })
 
   test('découverte, sonde, WebSocket sans abonnement puis abonnement à l’ouverture', async () => {

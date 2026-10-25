@@ -221,6 +221,7 @@ describe('boats/show — groupe différé « instruments » (#990)', () => {
       recent: {},
       rules: [],
       openAlerts: [],
+      aisTargets: [],
       can: { manage: false, ingest: false },
     }
     const wrapper = mount(BoatShowTabContent, {

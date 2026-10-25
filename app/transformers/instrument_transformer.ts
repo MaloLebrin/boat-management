@@ -60,7 +60,7 @@ export function toIso(value: Date | string): string {
 
 /** La prop différée sans source ni donnée — jamais `null` (#478). */
 export function emptyInstrumentsTabProps(can: InstrumentsTabCapabilities): InstrumentsTabProps {
-  return { source: null, latest: [], recent: {}, rules: [], openAlerts: [], can }
+  return { source: null, latest: [], recent: {}, rules: [], openAlerts: [], aisTargets: [], can }
 }
 
 export function toAlertRuleRow(rule: BoatInstrumentAlertRule): InstrumentAlertRuleRow {

@@ -256,6 +256,7 @@ test.group('Instruments — prop différée de boats.show', (group) => {
       recent: {},
       rules: [],
       openAlerts: [],
+      aisTargets: [],
       can: { manage: true, ingest: true },
     })
   })
