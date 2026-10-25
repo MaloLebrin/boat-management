@@ -79,6 +79,18 @@ describe('InstrumentPluginTokenCard (#994)', () => {
     expect(wrapper.text()).toContain('instruments.plugin.tokenOnce')
   })
 
+  test('l’adresse d’ingestion et le jeton frais se copient', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    flash.value = { instrumentIngestToken: 'fai_ing_secret' }
+    const wrapper = mountCard(source({ hasIngestToken: true, ingestTokenIssuedAt: '2026-10-22' }))
+    const buttons = wrapper.findAll('[data-testid="base-copy-field-button"]')
+    expect(buttons).toHaveLength(2)
+    await buttons[1].trigger('click')
+    expect(writeText).toHaveBeenCalledWith('fai_ing_secret')
+    vi.unstubAllGlobals()
+  })
+
   test('avec un jeton : date d’émission, rotation et révocation confirmées', async () => {
     const wrapper = mount(InstrumentPluginTokenCard, {
       props: {

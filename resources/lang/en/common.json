@@ -1,4 +1,7 @@
 {
+  "clipboard.copy": "Copy",
+  "clipboard.copied": "Copied!",
+  "clipboard.unavailable": "Copy is not available in this browser — select the text manually.",
   "yes": "Yes",
   "no": "No",
   "viewPlans": "View plans",
