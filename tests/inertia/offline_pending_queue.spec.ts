@@ -82,6 +82,24 @@ function mountComponent() {
   })
 }
 
+/**
+ * Attend la fin de la passe de rejeu, pas seulement l'arrivée des échecs :
+ * `failedCount` monte dans `afterRejection`, *avant* que `isSyncing` retombe et
+ * que le drain récursif se termine. Les boutons Réessayer/Abandonner sont
+ * `:disabled="isSyncing"` — un clic trop tôt tombe sur un bouton désactivé et
+ * est ignoré (flake observé en CI sous charge).
+ */
+async function waitForDrainSettled(failedTotal: number) {
+  const { failedCount, isSyncing } = useOfflineQueue()
+  await vi.waitFor(
+    () => {
+      expect(failedCount.value).toBe(failedTotal)
+      expect(isSyncing.value).toBe(false)
+    },
+    { timeout: 3000 }
+  )
+}
+
 describe('OfflinePendingQueue', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
@@ -235,7 +253,7 @@ describe('OfflinePendingQueue', () => {
         options?.onError?.({ departedAt: 'La date de départ est invalide' })
         return undefined as any
       })
-      const { enqueue, drainQueue, failedCount } = useOfflineQueue()
+      const { enqueue, drainQueue } = useOfflineQueue()
       await enqueue({
         type: 'create-navigation-log',
         url: '/boats/1/navigation-logs',
@@ -243,7 +261,7 @@ describe('OfflinePendingQueue', () => {
         payload: { departedAt: 'invalid' },
       })
       await drainQueue()
-      await vi.waitFor(() => expect(failedCount.value).toBe(1), { timeout: 1000 })
+      await waitForDrainSettled(1)
     }
 
     test('renders the failed section with the rejection reason and both actions', async () => {
@@ -350,9 +368,9 @@ describe('OfflinePendingQueue', () => {
         return undefined as any
       })
       await seedInspectionGroup()
-      const { drainQueue, failedCount } = useOfflineQueue()
+      const { drainQueue } = useOfflineQueue()
       await drainQueue()
-      await vi.waitFor(() => expect(failedCount.value).toBe(2), { timeout: 1000 })
+      await waitForDrainSettled(2)
 
       const wrapper = mountComponent()
       await flushPromises()
@@ -376,14 +394,14 @@ describe('OfflinePendingQueue', () => {
       await seedInspectionGroup()
       const { drainQueue, failedCount } = useOfflineQueue()
       await drainQueue()
-      await vi.waitFor(() => expect(failedCount.value).toBe(2), { timeout: 5000 })
+      await waitForDrainSettled(2)
 
       const wrapper = mountComponent()
       await flushPromises()
       const buttons = wrapper.findAll('li button')
       await buttons[buttons.length - 1].trigger('click')
 
-      await vi.waitFor(() => expect(failedCount.value).toBe(0), { timeout: 5000 })
+      await vi.waitFor(() => expect(failedCount.value).toBe(0), { timeout: 3000 })
     })
   })
 })

@@ -77,6 +77,46 @@ test.group('Instruments — évaluation des alertes (#993)', (group) => {
     SendPushNotification.dispatch = originalDispatch
   })
 
+  test('règles carburant, tension, huile et régime : alertes ouvertes puis levées', async ({
+    client,
+    assert,
+  }) => {
+    capturePushes()
+    const { admin, boat, source } = await setup()
+    const fuel = 'tanks.fuel.main.currentLevel'
+    const volt = 'electrical.batteries.house.voltage'
+    const oil = 'propulsion.port.oilPressure'
+    const rev = 'propulsion.port.revolutions'
+
+    await post(client, admin, boat, source, [
+      numeric(fuel, 0.1),
+      numeric(volt, 11.5),
+      numeric(oil, 50_000),
+      numeric(rev, 4000 / 60),
+    ])
+    const opened = await BoatInstrumentAlert.query().where('boatId', boat.id).whereNull('clearedAt')
+    assert.sameMembers(
+      opened.map((a) => a.ruleKey),
+      [
+        'builtin:fuel_low',
+        'builtin:battery_voltage_low',
+        'builtin:oil_pressure_low',
+        'builtin:engine_overrev',
+      ]
+    )
+
+    await post(client, admin, boat, source, [
+      numeric(fuel, 0.4),
+      numeric(volt, 12.8),
+      numeric(oil, 300_000),
+      numeric(rev, 2000 / 60),
+    ])
+    const stillOpen = await BoatInstrumentAlert.query()
+      .where('boatId', boat.id)
+      .whereNull('clearedAt')
+    assert.lengthOf(stillOpen, 0)
+  })
+
   test('règle intégrée → alerte ouverte → notification et push à l’équipe', async ({
     client,
     assert,
@@ -220,12 +260,13 @@ test.group('Instruments — évaluation des alertes (#993)', (group) => {
     await BoatInstrumentAlertRuleFactory.merge({
       boatId: boat.id,
       organizationId: admin.organizationId!,
-      path: 'electrical.batteries.house.voltage',
+      path: 'electrical.batteries.house.current',
+      operator: 'lt',
       threshold: '12.0000',
       enabled: false,
     }).create()
 
-    await post(client, admin, boat, source, [numeric('electrical.batteries.house.voltage', 11)])
+    await post(client, admin, boat, source, [numeric('electrical.batteries.house.current', 11)])
     assert.isNull(await BoatInstrumentAlert.query().where('boatId', boat.id).first())
   })
 

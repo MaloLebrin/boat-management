@@ -45,6 +45,54 @@ test.group('INSTRUMENT_PATH_CATALOG (#988)', () => {
     }
   })
 
+  test('accepte les mesures de la spécification Signal K ajoutées en #1006', ({ assert }) => {
+    for (const path of [
+      'propulsion.port.oilTemperature',
+      'propulsion.0.exhaustTemperature',
+      'propulsion.port.coolantPressure',
+      'propulsion.port.boostPressure',
+      'propulsion.port.engineLoad',
+      'propulsion.port.alternatorVoltage',
+      'navigation.log',
+      'navigation.trip.log',
+      'electrical.batteries.house.capacity.timeRemaining',
+      'electrical.batteries.house.capacity.stateOfHealth',
+      'electrical.solar.0.panelVoltage',
+      'electrical.solar.0.panelCurrent',
+      'electrical.solar.0.current',
+      'electrical.chargers.main.voltage',
+      'electrical.chargers.main.current',
+      'electrical.inverters.0.dc.voltage',
+      'electrical.inverters.0.dc.current',
+      'electrical.inverters.0.ac.realPower',
+      'tanks.fuel.0.currentVolume',
+      'environment.wind.speedOverGround',
+      'environment.wind.angleTrueGround',
+      'environment.wind.directionMagnetic',
+      'environment.outside.relativeHumidity',
+      'environment.inside.temperature',
+      'environment.inside.relativeHumidity',
+      'environment.inside.refrigerator.temperature',
+      'environment.inside.engineRoom.relativeHumidity',
+      'environment.tide.heightNow',
+    ]) {
+      assert.isTrue(isAllowedTelemetryPath(path), path)
+      assert.equal(telemetryPathSpec(path)?.valueKind, 'number', path)
+    }
+  })
+
+  test('une zone intérieure ne se confond pas avec la mesure sans zone', ({ assert }) => {
+    assert.equal(
+      telemetryPathSpec('environment.inside.temperature')?.pattern,
+      'environment.inside.temperature'
+    )
+    assert.equal(
+      telemetryPathSpec('environment.inside.refrigerator.temperature')?.pattern,
+      'environment.inside.<zone>.temperature'
+    )
+    assert.isFalse(isAllowedTelemetryPath('environment.inside.a.b.temperature'))
+  })
+
   test('refuse le reste', ({ assert }) => {
     for (const path of [
       '',
@@ -53,6 +101,9 @@ test.group('INSTRUMENT_PATH_CATALOG (#988)', () => {
       'propulsion..runTime',
       'electrical.batteries.house.unknown',
       'design.length',
+      'electrical.solar.0.unknown',
+      'environment.inside.refrigerator.pressure',
+      'navigation.trip.lastReset',
       'x'.repeat(97),
       'notifications.',
     ]) {
