@@ -156,7 +156,7 @@ const cpa = (target: MockTarget) =>
       </g>
       <polygon
         points="0,-4 3,3.5 -3,3.5"
-        class="fill-navy-800"
+        class="fill-fg"
         :transform="`translate(${CENTER} ${CENTER}) rotate(212)`"
       />
     </svg>
