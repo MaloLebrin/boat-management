@@ -131,7 +131,17 @@
       "batteryLow": "Low battery",
       "shallow": "Shallow water",
       "critical": "Critical",
-      "warning": "Warning"
+      "warning": "Warning",
+      "coolant": "Coolant",
+      "oilPressure": "Oil pressure",
+      "speed": "Speed over ground",
+      "heading": "Heading",
+      "apparentWind": "Apparent wind",
+      "waterTank": "Fresh water",
+      "blackWater": "Black water",
+      "waterTemp": "Water",
+      "history": "24 h history",
+      "historySeries": "Battery voltage"
     }
   }
 }

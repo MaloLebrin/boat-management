@@ -8,6 +8,7 @@ Date : 2026-10-25
 - Mise en avant : lien « Instruments connectés » dans le menu Produit, le drawer mobile et le footer ; quatrième bloc de la home (avec maquette de l'onglet Instruments) ; entrée dans le sitemap (priorité 0,8) ; question « Faut-il le plan Pro pour les instruments connectés ? » dans la FAQ tarifs.
 - La FAQ de la page répond honnêtement sur l'iPhone : la configuration avec certificat auto-signé n'est pas encore validée sur appareil.
 - La page est plus complète et animée : section **Alertes** (les quatre règles intégrées avec leurs seuils réels, règles propres au bateau, notification de l'équipe), quatrième bénéfice « Position et journal de bord », huitième question de FAQ, pictogramme sur chaque carte, apparition progressive des sections au défilement.
+- La maquette du hero montre treize widgets (régime, heures, refroidissement, pression d'huile, vitesse fond, profondeur, température de l'eau, batterie, deux cadrans cap et vent apparent, trois niveaux de réservoirs) et une courbe d'historique qui se dessine, tous issus de mesures réellement lues par l'onglet.
 - La maquette de l'onglet Instruments gagne des icônes par mesure, une liste d'alertes en cours (critique / avertissement), des tuiles qui entrent l'une après l'autre et des jauges qui se remplissent.
 - Guide d'installation pas à pas : `docs/user-guide/instruments-signalk.md`.
 

@@ -131,7 +131,17 @@
       "batteryLow": "Batterie faible",
       "shallow": "Petits fonds",
       "critical": "Critique",
-      "warning": "Avertissement"
+      "warning": "Avertissement",
+      "coolant": "Refroidissement",
+      "oilPressure": "Pression d’huile",
+      "speed": "Vitesse fond",
+      "heading": "Cap",
+      "apparentWind": "Vent apparent",
+      "waterTank": "Eau douce",
+      "blackWater": "Eaux noires",
+      "waterTemp": "Eau",
+      "history": "Historique 24 h",
+      "historySeries": "Tension batterie"
     }
   }
 }
