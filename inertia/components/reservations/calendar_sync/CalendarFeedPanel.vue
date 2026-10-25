@@ -4,7 +4,7 @@ import { router, useForm } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCheckbox from '~/components/base/BaseCheckbox.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
-import BaseInput from '~/components/base/BaseInput.vue'
+import BaseCopyField from '~/components/base/BaseCopyField.vue'
 import { useT } from '~/composables/use_t'
 import type { CalendarFeedRow } from '#shared/types/calendar_sync'
 
@@ -35,19 +35,7 @@ watch(
   }
 )
 
-const copied = ref(false)
 const confirming = ref<'regenerate' | 'revoke' | null>(null)
-
-async function copy() {
-  if (!props.feed) return
-  try {
-    await navigator.clipboard.writeText(props.feed.url)
-    copied.value = true
-    setTimeout(() => (copied.value = false), 2000)
-  } catch {
-    // Presse-papiers refusé : l'adresse reste sélectionnable dans le champ.
-  }
-}
 
 function create() {
   form.post(props.endpoint, { preserveScroll: true })
@@ -69,14 +57,12 @@ function onConfirm() {
 
     <div v-if="feed" class="mt-3 space-y-2">
       <div class="flex flex-wrap items-end gap-2">
-        <BaseInput id="calendar-feed-url" class="min-w-0 flex-1" :model-value="feed.url" readonly />
-        <BaseButton size="sm" variant="secondary" type="button" @click="copy">
-          {{
-            copied
-              ? t('reservations.calendarSync.export.copied')
-              : t('reservations.calendarSync.export.copy')
-          }}
-        </BaseButton>
+        <BaseCopyField
+          id="calendar-feed-url"
+          class="min-w-0 flex-1"
+          :model-value="feed.url"
+          :aria-label="t('reservations.calendarSync.export.title')"
+        />
         <!-- `webcal://` ouvre l'agenda du système : une ancre, pas une visite Inertia. -->
         <BaseButton size="sm" variant="ghost" :href="feed.webcalUrl" external-href>
           {{ t('reservations.calendarSync.export.subscribe') }}

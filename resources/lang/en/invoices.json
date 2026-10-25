@@ -188,8 +188,6 @@
     "title": "Online payment",
     "linkHint": "Your customer pays this invoice by card from this link, already included in the email and the PDF. The invoice switches to “Paid” as soon as Stripe confirms the payment.",
     "linkLabel": "Payment link",
-    "copy": "Copy link",
-    "copied": "Link copied",
     "noLinkHint": "This invoice was sent without a payment link. Create it so your customer can pay online.",
     "createLink": "Create payment link",
     "public": {

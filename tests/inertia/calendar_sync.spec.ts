@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 import CalendarFeedPanel from '../../inertia/components/reservations/calendar_sync/CalendarFeedPanel.vue'
 import ExternalCalendarList from '../../inertia/components/reservations/calendar_sync/ExternalCalendarList.vue'
@@ -51,7 +51,7 @@ const STUBS = {
     props: ['id', 'modelValue', 'label', 'placeholder', 'error', 'readonly', 'type', 'required'],
     emits: ['update:modelValue'],
     template:
-      '<input :id="id" :value="modelValue" :readonly="readonly" @input="$emit(\'update:modelValue\', $event.target.value)" />',
+      '<div><input :id="id" :value="modelValue" :readonly="readonly" @input="$emit(\'update:modelValue\', $event.target.value)" /><slot name="trailing" /></div>',
   },
   BaseCheckbox: {
     props: ['id', 'modelValue', 'label', 'hint'],
@@ -110,6 +110,20 @@ describe('CalendarFeedPanel', () => {
       '/reservations/calendar-feed',
       expect.anything()
     )
+  })
+
+  test('the address is copied through the shared copy field', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const w = mount(CalendarFeedPanel, {
+      props: { feed: FEED, endpoint: '/boats/7/calendar-feed', canManage: false },
+      global: { stubs: STUBS },
+    })
+    await w.find('[data-testid="base-copy-field-button"]').trigger('click')
+    expect(writeText).toHaveBeenCalledWith(FEED.url)
+    await flushPromises()
+    expect(w.text()).toContain('common.clipboard.copied')
+    vi.unstubAllGlobals()
   })
 
   test('regenerating asks first, then posts again', async () => {

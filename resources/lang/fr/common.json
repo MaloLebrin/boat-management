@@ -1,4 +1,7 @@
 {
+  "clipboard.copy": "Copier",
+  "clipboard.copied": "Copié !",
+  "clipboard.unavailable": "La copie n’est pas disponible dans ce navigateur — sélectionnez le texte manuellement.",
   "yes": "Oui",
   "no": "Non",
   "viewPlans": "Voir les offres",

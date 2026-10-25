@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
+import BaseCopyField from '~/components/base/BaseCopyField.vue'
 import { useT } from '~/composables/use_t'
 import { isInvoicePayableOnline } from '#shared/helpers/invoice_lifecycle'
 import type { InvoiceDetail } from '#shared/types/invoice'
@@ -20,7 +21,6 @@ const props = defineProps<{
 const { t } = useT()
 
 const busy = ref(false)
-const copied = ref(false)
 
 const visible = computed(
   () =>
@@ -39,16 +39,6 @@ function createLink() {
     }
   )
 }
-
-async function copyLink() {
-  if (!props.invoice.onlinePaymentUrl) return
-  try {
-    await navigator.clipboard.writeText(props.invoice.onlinePaymentUrl)
-    copied.value = true
-  } catch {
-    copied.value = false
-  }
-}
 </script>
 
 <template>
@@ -57,18 +47,11 @@ async function copyLink() {
 
     <template v-if="invoice.onlinePaymentUrl">
       <p class="mb-3 text-sm text-fg-muted">{{ t('invoices.onlinePayment.linkHint') }}</p>
-      <div class="flex flex-wrap items-center gap-2">
-        <input
-          :value="invoice.onlinePaymentUrl"
-          :aria-label="t('invoices.onlinePayment.linkLabel')"
-          readonly
-          class="min-w-0 flex-1 rounded-md border border-border bg-surface-muted px-3 py-1.5 text-sm text-fg"
-          data-testid="invoice-online-payment-url"
-        />
-        <BaseButton variant="secondary" size="sm" @click="copyLink">
-          {{ copied ? t('invoices.onlinePayment.copied') : t('invoices.onlinePayment.copy') }}
-        </BaseButton>
-      </div>
+      <BaseCopyField
+        :model-value="invoice.onlinePaymentUrl"
+        :aria-label="t('invoices.onlinePayment.linkLabel')"
+        data-testid="invoice-online-payment-url"
+      />
     </template>
     <template v-else>
       <p class="mb-3 text-sm text-fg-muted">{{ t('invoices.onlinePayment.noLinkHint') }}</p>

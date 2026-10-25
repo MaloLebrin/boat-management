@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { router } from '@inertiajs/vue3'
-import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
-import BaseInput from '~/components/base/BaseInput.vue'
+import BaseCopyField from '~/components/base/BaseCopyField.vue'
 import BaseToggle from '~/components/base/BaseToggle.vue'
 import { useT } from '~/composables/use_t'
 import type { BoatPublicBookingSettings } from '#shared/types/public_booking'
@@ -20,7 +19,6 @@ const props = defineProps<{
 
 const { t } = useT()
 const saving = ref(false)
-const copied = ref(false)
 
 function toggle(enabled: boolean) {
   router.patch(
@@ -32,17 +30,6 @@ function toggle(enabled: boolean) {
       onFinish: () => (saving.value = false),
     }
   )
-}
-
-async function copy() {
-  if (!props.settings.url) return
-  try {
-    await navigator.clipboard.writeText(props.settings.url)
-    copied.value = true
-    setTimeout(() => (copied.value = false), 2000)
-  } catch {
-    // Presse-papiers refusé : l'adresse reste sélectionnable dans le champ.
-  }
 }
 </script>
 
@@ -65,17 +52,12 @@ async function copy() {
 
     <div v-if="settings.enabled && settings.url" class="mt-4 space-y-2">
       <div class="flex flex-wrap items-end gap-2">
-        <BaseInput
+        <BaseCopyField
           id="public-booking-url"
           class="min-w-0 flex-1"
           :model-value="settings.url"
-          readonly
+          :aria-label="t('reservations.publicBooking.title')"
         />
-        <BaseButton size="sm" variant="secondary" type="button" @click="copy">
-          {{
-            copied ? t('reservations.publicBooking.copied') : t('reservations.publicBooking.copy')
-          }}
-        </BaseButton>
         <!-- eslint-disable vue/no-restricted-v-bind -- nouvel onglet : `<Link target="_blank">` naviguerait dans l'onglet courant (voir CLAUDE.md) -->
         <a
           :href="settings.url"

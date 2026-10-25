@@ -101,6 +101,20 @@ describe('InvoiceOnlinePaymentCard (#876)', () => {
     expect((input.element as HTMLInputElement).value).toBe('https://app.test/pay/tok_1')
   })
 
+  test('the link is copied through the shared clipboard field', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    const wrapper = mount(InvoiceOnlinePaymentCard, {
+      props: {
+        invoice: makeInvoice({ onlinePaymentUrl: 'https://app.test/pay/tok_1' }),
+        canAcceptOnlinePayments: true,
+      },
+    })
+    await wrapper.find('[data-testid="base-copy-field-button"]').trigger('click')
+    expect(writeText).toHaveBeenCalledWith('https://app.test/pay/tok_1')
+    vi.unstubAllGlobals()
+  })
+
   test('offers to create the link when the org accepts online payments', async () => {
     const wrapper = mount(InvoiceOnlinePaymentCard, {
       props: { invoice: makeInvoice(), canAcceptOnlinePayments: true },

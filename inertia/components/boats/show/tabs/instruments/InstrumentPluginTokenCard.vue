@@ -4,7 +4,7 @@ import { computed, ref } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import BaseConfirmModal from '~/components/base/BaseConfirmModal.vue'
-import BaseInput from '~/components/base/BaseInput.vue'
+import BaseCopyField from '~/components/base/BaseCopyField.vue'
 import { useDateFormat } from '~/composables/use_date_format'
 import { useInstrumentIngestToken } from '~/composables/use_instrument_ingest_token'
 import { useT } from '~/composables/use_t'
@@ -49,21 +49,18 @@ function onConfirm() {
     <p class="mb-4 text-sm text-fg-muted">{{ t('instruments.plugin.description') }}</p>
 
     <div class="space-y-4">
-      <BaseInput
+      <BaseCopyField
         :model-value="endpoint"
         :label="t('instruments.plugin.endpoint')"
         name="ingestEndpoint"
-        readonly
       />
 
       <div v-if="freshToken" data-testid="instrument-plugin-fresh-token">
-        <BaseInput
+        <BaseCopyField
           :model-value="freshToken"
           :label="t('instruments.plugin.token')"
           :hint="t('instruments.plugin.tokenOnce')"
           name="ingestToken"
-          autocomplete="off"
-          readonly
         />
       </div>
 
