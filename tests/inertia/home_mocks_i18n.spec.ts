@@ -47,6 +47,7 @@ vi.mock('@inertiajs/vue3', async () => {
 
 import HomeMockBoatDetail from '../../inertia/components/marketing/home/HomeMockBoatDetail.vue'
 import HomeMockDashboard from '../../inertia/components/marketing/home/HomeMockDashboard.vue'
+import HomeMockInstruments from '../../inertia/components/marketing/home/HomeMockInstruments.vue'
 import HomeMockFleetide from '../../inertia/components/marketing/home/HomeMockFleetide.vue'
 import HomeMockPlanning from '../../inertia/components/marketing/home/HomeMockPlanning.vue'
 import HomeMockUpcomingTasks from '../../inertia/components/marketing/home/HomeMockUpcomingTasks.vue'
@@ -104,6 +105,39 @@ const cases: MockCase[] = [
       'Contrôle gréement (retard 3j)',
       'Voir détails',
       'Tâche créée pour',
+    ],
+  },
+  {
+    name: 'HomeMockInstruments',
+    component: HomeMockInstruments,
+    en: [
+      'Instruments',
+      'Live',
+      'Engine hours',
+      'Engine temperature high',
+      'Low battery',
+      'Heading',
+      'Fresh water',
+      'Apparent wind',
+      'Oil pressure',
+      'Battery voltage',
+      '24 h history',
+      'Open alerts',
+      'rpm',
+    ],
+    fr: [
+      'En direct',
+      'Heures moteur',
+      'Température moteur élevée',
+      'Batterie faible',
+      'Cap',
+      'Eau douce',
+      'Vent apparent',
+      'Pression d’huile',
+      'Tension batterie',
+      'Historique 24 h',
+      'Alertes en cours',
+      'tr/min',
     ],
   },
   {

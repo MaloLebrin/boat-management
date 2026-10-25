@@ -75,7 +75,13 @@ export interface LegalDocument {
 export type FeaturePageKey = 'maintenance' | 'fleet' | 'aiAssistant'
 
 /** Mocks produit réutilisés des sections de la home (`HomeMock*`). */
-export type FeatureMockType = 'boatDetail' | 'planning' | 'fleetide' | 'dashboard' | 'upcomingTasks'
+export type FeatureMockType =
+  | 'boatDetail'
+  | 'planning'
+  | 'fleetide'
+  | 'dashboard'
+  | 'upcomingTasks'
+  | 'instruments'
 
 export interface FeatureCta {
   label: string

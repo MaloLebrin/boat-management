@@ -3319,6 +3319,102 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/inventory_controller').default['adjust']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boats.instrumentSource.upsert': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/instrument-source'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/instruments').upsertInstrumentSourceValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/instruments').upsertInstrumentSourceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/instrument_sources_controller').default['upsert']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/instrument_sources_controller').default['upsert']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'boats.instrumentSource.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/instrument-source'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/instrument_sources_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/instrument_sources_controller').default['destroy']>>>
+    }
+  }
+  'boats.instrumentAlertRules.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/instrument-alert-rules'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/instrument_alert_rules_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/instrument_alert_rules_controller').default['store']>>>
+    }
+  }
+  'boats.instrumentAlertRules.update': {
+    methods: ["PUT"]
+    pattern: '/boats/:boatId/instrument-alert-rules/:ruleId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; ruleId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/instrument_alert_rules_controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/instrument_alert_rules_controller').default['update']>>>
+    }
+  }
+  'boats.instrumentAlertRules.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/instrument-alert-rules/:ruleId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; ruleId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/instrument_alert_rules_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/instrument_alert_rules_controller').default['destroy']>>>
+    }
+  }
+  'boats.instrumentIngestToken.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/instrument-source/ingest-token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/instrument_ingest_tokens_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/instrument_ingest_tokens_controller').default['store']>>>
+    }
+  }
+  'boats.instrumentIngestToken.destroy': {
+    methods: ["DELETE"]
+    pattern: '/boats/:boatId/instrument-source/ingest-token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/instrument_ingest_tokens_controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/instrument_ingest_tokens_controller').default['destroy']>>>
+    }
+  }
+  'boats.telemetry.store': {
+    methods: ["POST"]
+    pattern: '/boats/:boatId/telemetry'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/instruments').ingestTelemetryValidator)>>
+      paramsTuple: [ParamValue]
+      params: { boatId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/instruments').ingestTelemetryValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_telemetry_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_telemetry_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'
@@ -3691,6 +3787,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['aiAssistant']>>>
     }
   }
+  'marketing.en.instruments': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/connected-boat-instruments'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['instruments']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['instruments']>>>
+    }
+  }
   'marketing.en.simulator': {
     methods: ["GET","HEAD"]
     pattern: '/en/maintenance-cost-simulator'
@@ -3857,6 +3965,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['aiAssistant']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['aiAssistant']>>>
+    }
+  }
+  'marketing.fr.instruments': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/instruments-bateau-connectes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['instruments']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['instruments']>>>
     }
   }
   'marketing.fr.simulator': {
@@ -5393,6 +5513,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/push_subscriptions_controller').default['destroy']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/push_subscriptions_controller').default['destroy']>>>
+    }
+  }
+  'api.instruments.ingest': {
+    methods: ["POST"]
+    pattern: '/api/instruments/ingest'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/instruments').ingestTelemetryApiValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/instruments').ingestTelemetryApiValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/instrument_ingest_controller').default['store']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/instrument_ingest_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
 }

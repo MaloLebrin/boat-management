@@ -1662,6 +1662,54 @@ const routes = {
     tokens: [{"old":"/inventory/:id/adjust","type":0,"val":"inventory","end":""},{"old":"/inventory/:id/adjust","type":1,"val":"id","end":""},{"old":"/inventory/:id/adjust","type":0,"val":"adjust","end":""}],
     types: placeholder as Registry['inventory.adjust']['types'],
   },
+  'boats.instrumentSource.upsert': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/instrument-source',
+    tokens: [{"old":"/boats/:boatId/instrument-source","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/instrument-source","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/instrument-source","type":0,"val":"instrument-source","end":""}],
+    types: placeholder as Registry['boats.instrumentSource.upsert']['types'],
+  },
+  'boats.instrumentSource.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/instrument-source',
+    tokens: [{"old":"/boats/:boatId/instrument-source","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/instrument-source","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/instrument-source","type":0,"val":"instrument-source","end":""}],
+    types: placeholder as Registry['boats.instrumentSource.destroy']['types'],
+  },
+  'boats.instrumentAlertRules.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/instrument-alert-rules',
+    tokens: [{"old":"/boats/:boatId/instrument-alert-rules","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/instrument-alert-rules","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/instrument-alert-rules","type":0,"val":"instrument-alert-rules","end":""}],
+    types: placeholder as Registry['boats.instrumentAlertRules.store']['types'],
+  },
+  'boats.instrumentAlertRules.update': {
+    methods: ["PUT"],
+    pattern: '/boats/:boatId/instrument-alert-rules/:ruleId',
+    tokens: [{"old":"/boats/:boatId/instrument-alert-rules/:ruleId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/instrument-alert-rules/:ruleId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/instrument-alert-rules/:ruleId","type":0,"val":"instrument-alert-rules","end":""},{"old":"/boats/:boatId/instrument-alert-rules/:ruleId","type":1,"val":"ruleId","end":""}],
+    types: placeholder as Registry['boats.instrumentAlertRules.update']['types'],
+  },
+  'boats.instrumentAlertRules.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/instrument-alert-rules/:ruleId',
+    tokens: [{"old":"/boats/:boatId/instrument-alert-rules/:ruleId","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/instrument-alert-rules/:ruleId","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/instrument-alert-rules/:ruleId","type":0,"val":"instrument-alert-rules","end":""},{"old":"/boats/:boatId/instrument-alert-rules/:ruleId","type":1,"val":"ruleId","end":""}],
+    types: placeholder as Registry['boats.instrumentAlertRules.destroy']['types'],
+  },
+  'boats.instrumentIngestToken.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/instrument-source/ingest-token',
+    tokens: [{"old":"/boats/:boatId/instrument-source/ingest-token","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/instrument-source/ingest-token","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/instrument-source/ingest-token","type":0,"val":"instrument-source","end":""},{"old":"/boats/:boatId/instrument-source/ingest-token","type":0,"val":"ingest-token","end":""}],
+    types: placeholder as Registry['boats.instrumentIngestToken.store']['types'],
+  },
+  'boats.instrumentIngestToken.destroy': {
+    methods: ["DELETE"],
+    pattern: '/boats/:boatId/instrument-source/ingest-token',
+    tokens: [{"old":"/boats/:boatId/instrument-source/ingest-token","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/instrument-source/ingest-token","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/instrument-source/ingest-token","type":0,"val":"instrument-source","end":""},{"old":"/boats/:boatId/instrument-source/ingest-token","type":0,"val":"ingest-token","end":""}],
+    types: placeholder as Registry['boats.instrumentIngestToken.destroy']['types'],
+  },
+  'boats.telemetry.store': {
+    methods: ["POST"],
+    pattern: '/boats/:boatId/telemetry',
+    tokens: [{"old":"/boats/:boatId/telemetry","type":0,"val":"boats","end":""},{"old":"/boats/:boatId/telemetry","type":1,"val":"boatId","end":""},{"old":"/boats/:boatId/telemetry","type":0,"val":"telemetry","end":""}],
+    types: placeholder as Registry['boats.telemetry.store']['types'],
+  },
   'new_account.create': {
     methods: ["GET","HEAD"],
     pattern: '/signup',
@@ -1848,6 +1896,12 @@ const routes = {
     tokens: [{"old":"/en/ai-boat-assistant","type":0,"val":"en","end":""},{"old":"/en/ai-boat-assistant","type":0,"val":"ai-boat-assistant","end":""}],
     types: placeholder as Registry['marketing.en.aiAssistant']['types'],
   },
+  'marketing.en.instruments': {
+    methods: ["GET","HEAD"],
+    pattern: '/en/connected-boat-instruments',
+    tokens: [{"old":"/en/connected-boat-instruments","type":0,"val":"en","end":""},{"old":"/en/connected-boat-instruments","type":0,"val":"connected-boat-instruments","end":""}],
+    types: placeholder as Registry['marketing.en.instruments']['types'],
+  },
   'marketing.en.simulator': {
     methods: ["GET","HEAD"],
     pattern: '/en/maintenance-cost-simulator',
@@ -1931,6 +1985,12 @@ const routes = {
     pattern: '/fr/assistant-ia-bateau',
     tokens: [{"old":"/fr/assistant-ia-bateau","type":0,"val":"fr","end":""},{"old":"/fr/assistant-ia-bateau","type":0,"val":"assistant-ia-bateau","end":""}],
     types: placeholder as Registry['marketing.fr.aiAssistant']['types'],
+  },
+  'marketing.fr.instruments': {
+    methods: ["GET","HEAD"],
+    pattern: '/fr/instruments-bateau-connectes',
+    tokens: [{"old":"/fr/instruments-bateau-connectes","type":0,"val":"fr","end":""},{"old":"/fr/instruments-bateau-connectes","type":0,"val":"instruments-bateau-connectes","end":""}],
+    types: placeholder as Registry['marketing.fr.instruments']['types'],
   },
   'marketing.fr.simulator': {
     methods: ["GET","HEAD"],
@@ -2699,6 +2759,12 @@ const routes = {
     pattern: '/push/subscriptions/:id',
     tokens: [{"old":"/push/subscriptions/:id","type":0,"val":"push","end":""},{"old":"/push/subscriptions/:id","type":0,"val":"subscriptions","end":""},{"old":"/push/subscriptions/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['push.subscriptions.destroy']['types'],
+  },
+  'api.instruments.ingest': {
+    methods: ["POST"],
+    pattern: '/api/instruments/ingest',
+    tokens: [{"old":"/api/instruments/ingest","type":0,"val":"api","end":""},{"old":"/api/instruments/ingest","type":0,"val":"instruments","end":""},{"old":"/api/instruments/ingest","type":0,"val":"ingest","end":""}],
+    types: placeholder as Registry['api.instruments.ingest']['types'],
   },
 } as const satisfies Record<string, AdonisEndpoint>
 

@@ -6,14 +6,15 @@ L'acquisition repose sur un **tunnel simulateur → signup** : un visiteur sans 
 
 Deux vecteurs complémentaires :
 
-| Vecteur              | Mécanisme                                                                                  | État                       |
-| -------------------- | ------------------------------------------------------------------------------------------ | -------------------------- |
-| SEO organique        | Page guide + simulateur public indexés sur requêtes coût entretien bateau                  | ✅ en place                |
-| Conversion visiteur  | Tunnel simulateur → signup → bateau auto-créé                                              | ✅ en place                |
-| Lead magnet          | Capture email visiteur non prêt à s'inscrire                                               | ✅ implémenté (2026-06-09) |
-| CTA visuel           | Réduire le poids du bouton "Recalculer" face à la CTA signup                               | ✅ implémenté (2026-06-09) |
-| Signup contextualisé | Bandeau "votre bateau sera ajouté" sur la page signup                                      | ✅ implémenté (2026-06-09) |
-| Chat diagnostic IA   | Tunnel diagnostic de panne → signup (`?from=diagnostic`), 2 conversations gratuites (#602) | ✅ implémenté (2026-08-30) |
+| Vecteur              | Mécanisme                                                                                               | État                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------- |
+| SEO organique        | Page guide + simulateur public indexés sur requêtes coût entretien bateau                               | ✅ en place                |
+| Conversion visiteur  | Tunnel simulateur → signup → bateau auto-créé                                                           | ✅ en place                |
+| Lead magnet          | Capture email visiteur non prêt à s'inscrire                                                            | ✅ implémenté (2026-06-09) |
+| CTA visuel           | Réduire le poids du bouton "Recalculer" face à la CTA signup                                            | ✅ implémenté (2026-06-09) |
+| Signup contextualisé | Bandeau "votre bateau sera ajouté" sur la page signup                                                   | ✅ implémenté (2026-06-09) |
+| Page instruments     | Page SEO « Instruments de bord connectés » (Signal K, NMEA 2000), CTA `/signup?from=instruments` (#995) | ✅ implémenté (2026-10-25) |
+| Chat diagnostic IA   | Tunnel diagnostic de panne → signup (`?from=diagnostic`), 2 conversations gratuites (#602)              | ✅ implémenté (2026-08-30) |
 
 ---
 
@@ -147,3 +148,22 @@ Le tunnel d'acquisition complet est en place. Prochaines étapes envisageables :
 - Taux de capture email (leads / visiteurs ayant vu les résultats)
 - Taux de déduplication email (upserts / inserts)
 - Drop-off entre page signup et complétion inscription
+
+---
+
+## Page « Instruments de bord connectés » (#995)
+
+Pages `/en/connected-boat-instruments` et `/fr/instruments-bateau-connectes` (sitemap, menu Produit, footer, 4ᵉ bloc de la home). Elle vend une fonctionnalité des plans **Pro et Entreprise** : le CTA principal mène à `/signup?from=instruments` (le paramètre n'a pas encore de bandeau contextuel côté inscription), le CTA secondaire aux tarifs.
+
+**Positionnement.** « Tes instruments de bord dans FleetAi, sans rien saisir » : l'argument est l'entretien (heures moteur automatiques, historique, alertes), pas le tableau de bord de navigation, pour ne pas se mesurer aux traceurs.
+
+**Mots-clés visés** (titre à mot-clé, sans la marque, ≤ 60 caractères) : « Signal K », « NMEA 2000 application », « heures moteur automatiques », « suivi batterie bateau à distance », « instruments de bord connectés ».
+
+**Promesses à ne pas dépasser** (garde-fou : une promesse sans fonctionnalité est une régression, voir #866) :
+
+- lecture seule, aucune commande envoyée au bateau ;
+- Signal K uniquement (pas de passerelle Wi-Fi NMEA brute, pas de cloud constructeur) ;
+- iPhone : la configuration avec certificat auto-signé n'est pas validée sur appareil, la FAQ le dit ;
+- les durées de conservation affichées sont lues dans `TELEMETRY_SAMPLE_RETENTION_DAYS`, pas recopiées.
+
+Guide d'installation pas à pas : [`docs/user-guide/instruments-signalk.md`](../user-guide/instruments-signalk.md).

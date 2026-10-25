@@ -171,6 +171,17 @@ test.group('Marketing pages contract (functional)', (group) => {
     )
   })
 
+  test('GET /en/connected-boat-instruments renders marketing/instruments', async ({
+    client,
+    assert,
+  }) => {
+    assertPageContract(
+      assert,
+      await client.get('/en/connected-boat-instruments').withInertia(),
+      'marketing/instruments'
+    )
+  })
+
   test('GET a share link renders marketing/simulator_share', async ({ client, assert }) => {
     const share = await SimulatorShareFactory.merge({ locale: 'en' }).create()
 

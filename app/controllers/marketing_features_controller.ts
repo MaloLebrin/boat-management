@@ -1,4 +1,6 @@
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import MarketingInstrumentsContentService from '#services/marketing_instruments_content_service'
 import { marketingPath, toAppLocale } from '#shared/helpers/locale_path'
 import type { MarketingPage } from '#shared/helpers/locale_path'
 import type { FeatureMockType, FeaturePageKey, FeaturePageProps } from '#shared/types/marketing'
@@ -52,7 +54,10 @@ const FEATURE_CROSS_LINKS: Record<FeaturePageKey, Array<{ card: string; page: Ma
   ],
 }
 
+@inject()
 export default class MarketingFeaturesController {
+  constructor(private instrumentsContentService: MarketingInstrumentsContentService) {}
+
   async maintenance({ inertia, i18n }: HttpContext) {
     return inertia.render('marketing/feature', this.buildFeaturePageData(i18n, 'maintenance'))
   }
@@ -63,6 +68,17 @@ export default class MarketingFeaturesController {
 
   async aiAssistant({ inertia, i18n }: HttpContext) {
     return inertia.render('marketing/feature', this.buildFeaturePageData(i18n, 'aiAssistant'))
+  }
+
+  /**
+   * Page « Instruments de bord connectés » (#995) : gabarit propre
+   * (`marketing/instruments`), le contenu vient d'un service dédié.
+   */
+  async instruments({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/instruments', {
+      locale: toAppLocale(i18n.locale),
+      content: this.instrumentsContentService.build(i18n),
+    })
   }
 
   private buildFeaturePageData(i18n: MarketingI18n, feature: FeaturePageKey): FeaturePageProps {

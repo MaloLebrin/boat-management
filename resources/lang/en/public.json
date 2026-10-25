@@ -12,7 +12,8 @@
     "fleet": "Planning & fleet",
     "aiAssistant": "AI assistant",
     "simulator": "Cost simulator",
-    "help": "Help"
+    "help": "Help",
+    "instruments": "Connected instruments"
   },
   "actions": {
     "login": "Login",
@@ -41,7 +42,8 @@
     "maintenance": "Maintenance log",
     "fleet": "Planning & fleet",
     "aiAssistant": "AI assistant",
-    "help": "Help & support"
+    "help": "Help & support",
+    "instruments": "Connected instruments"
   },
   "booking": {
     "poweredBy": "Online booking powered by FleetAi",
