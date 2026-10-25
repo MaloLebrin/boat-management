@@ -237,7 +237,7 @@ const activePersona = ref<Persona>('loueurs')
 // (maillage interne, refonte 2026-09). Libellé hors de buildHomePageData pour
 // laisser le builder et PageProps inchangés (sections conservées réactivables).
 const featureCtas = computed(() =>
-  (['maintenance', 'fleet', 'aiAssistant'] as const).map((pageKey) => ({
+  (['maintenance', 'fleet', 'aiAssistant', 'instruments'] as const).map((pageKey) => ({
     label: appT('public.actions.learnMore'),
     href: marketingPath(pageKey, locale.value),
   }))
@@ -284,7 +284,7 @@ const faqSchema = computed(() =>
 // Le produit : plan Starter gratuit, liste des fonctionnalités reprise des
 // libellés de la nav publique (pas de chaîne recopiée).
 const featureList = computed(() =>
-  (['maintenance', 'fleet', 'aiAssistant', 'diagnosisAi'] as const).map((key) =>
+  (['maintenance', 'fleet', 'aiAssistant', 'instruments', 'diagnosisAi'] as const).map((key) =>
     appT(`public.footer.${key}`)
   )
 )
@@ -397,6 +397,18 @@ const softwareSchema = computed(() =>
     mock-type="fleetide"
     bg-class="bg-paper"
     is-ai
+  />
+  <!-- Instruments de bord connectés (#995) : renvoie vers sa page dédiée. -->
+  <HomeFeatureSection
+    :eyebrow="t.home.features[3].eyebrow"
+    :title="t.home.features[3].title"
+    :title-highlight="t.home.features[3].titleHighlight"
+    :body="t.home.features[3].body"
+    :bullets="t.home.features[3].bullets"
+    :cta="featureCtas[3]"
+    mock-type="instruments"
+    bg-class="bg-cream"
+    reversed
   />
 
   <!-- 7. How it works — lève l'objection migration / temps de mise en route -->

@@ -166,6 +166,18 @@
             "One-click actions",
             "Powered by Mistral AI"
           ]
+        },
+        {
+          "eyebrow": "BOAT INSTRUMENTS",
+          "title": "Your boat fills in its own log",
+          "titleHighlight": "by itself.",
+          "body": "Connect the onboard Signal K server: engine hours advance automatically and FleetAi warns you when a battery runs low or an engine runs hot.",
+          "bullets": [
+            "Live gauges over the boat's Wi-Fi",
+            "Engine hours and due dates kept up to date",
+            "History and charts",
+            "Threshold alerts for the whole team"
+          ]
         }
       ],
       "personas": {

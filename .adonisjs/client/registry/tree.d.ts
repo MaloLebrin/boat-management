@@ -225,6 +225,22 @@ export interface ApiDefinition {
       destroy: typeof routes['boats.externalCalendars.destroy']
     }
     assign: typeof routes['boats.assign']
+    instrumentSource: {
+      upsert: typeof routes['boats.instrumentSource.upsert']
+      destroy: typeof routes['boats.instrumentSource.destroy']
+    }
+    instrumentAlertRules: {
+      store: typeof routes['boats.instrumentAlertRules.store']
+      update: typeof routes['boats.instrumentAlertRules.update']
+      destroy: typeof routes['boats.instrumentAlertRules.destroy']
+    }
+    instrumentIngestToken: {
+      store: typeof routes['boats.instrumentIngestToken.store']
+      destroy: typeof routes['boats.instrumentIngestToken.destroy']
+    }
+    telemetry: {
+      store: typeof routes['boats.telemetry.store']
+    }
   }
   boatEquipment: {
     storeEngine: typeof routes['boat_equipment.store_engine']
@@ -529,6 +545,7 @@ export interface ApiDefinition {
       maintenance: typeof routes['marketing.en.maintenance']
       fleet: typeof routes['marketing.en.fleet']
       aiAssistant: typeof routes['marketing.en.aiAssistant']
+      instruments: typeof routes['marketing.en.instruments']
       simulator: typeof routes['marketing.en.simulator']
       guide: typeof routes['marketing.en.guide']
       diagnosisAi: typeof routes['marketing.en.diagnosisAi']
@@ -547,6 +564,7 @@ export interface ApiDefinition {
       maintenance: typeof routes['marketing.fr.maintenance']
       fleet: typeof routes['marketing.fr.fleet']
       aiAssistant: typeof routes['marketing.fr.aiAssistant']
+      instruments: typeof routes['marketing.fr.instruments']
       simulator: typeof routes['marketing.fr.simulator']
       guide: typeof routes['marketing.fr.guide']
       diagnosisAi: typeof routes['marketing.fr.diagnosisAi']
@@ -760,6 +778,11 @@ export interface ApiDefinition {
       store: typeof routes['push.subscriptions.store']
       destroyByEndpoint: typeof routes['push.subscriptions.destroyByEndpoint']
       destroy: typeof routes['push.subscriptions.destroy']
+    }
+  }
+  api: {
+    instruments: {
+      ingest: typeof routes['api.instruments.ingest']
     }
   }
 }

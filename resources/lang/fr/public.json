@@ -12,7 +12,8 @@
     "fleet": "Planning & flotte",
     "aiAssistant": "Assistant IA",
     "simulator": "Simulateur de coût",
-    "help": "Aide"
+    "help": "Aide",
+    "instruments": "Instruments connectés"
   },
   "actions": {
     "login": "Connexion",
@@ -41,7 +42,8 @@
     "maintenance": "Carnet d'entretien",
     "fleet": "Planning & flotte",
     "aiAssistant": "Assistant IA",
-    "help": "Aide & support"
+    "help": "Aide & support",
+    "instruments": "Instruments connectés"
   },
   "booking": {
     "poweredBy": "Réservation en ligne propulsée par FleetAi",

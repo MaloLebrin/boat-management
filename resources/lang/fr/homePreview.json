@@ -113,6 +113,20 @@
       "taskSailChange": "Changement voile - 8 juin",
       "taskGpsCheck": "Contrôle GPS - 14 juin",
       "taskHullCleaning": "Carénage - 20 juin"
+    },
+    "instruments": {
+      "title": "Instruments",
+      "live": "En direct",
+      "engineHours": "Heures moteur",
+      "rpm": "Régime",
+      "rpmUnit": "tr/min",
+      "voltage": "Batterie",
+      "tank": "Carburant",
+      "depth": "Profondeur",
+      "wind": "Vent",
+      "windUnit": "nds",
+      "alert": "Température moteur élevée",
+      "synced": "Synchronisé"
     }
   }
 }

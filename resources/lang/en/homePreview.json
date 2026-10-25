@@ -113,6 +113,20 @@
       "taskSailChange": "Sail replacement - Jun 8",
       "taskGpsCheck": "GPS check - Jun 14",
       "taskHullCleaning": "Hull cleaning - Jun 20"
+    },
+    "instruments": {
+      "title": "Instruments",
+      "live": "Live",
+      "engineHours": "Engine hours",
+      "rpm": "Revs",
+      "rpmUnit": "rpm",
+      "voltage": "Battery",
+      "tank": "Fuel",
+      "depth": "Depth",
+      "wind": "Wind",
+      "windUnit": "kn",
+      "alert": "Engine temperature high",
+      "synced": "Synced"
     }
   }
 }
