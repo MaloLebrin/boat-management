@@ -141,7 +141,15 @@
       "blackWater": "Black water",
       "waterTemp": "Water",
       "history": "24 h history",
-      "historySeries": "Battery voltage"
+      "historySeries": "Battery voltage",
+      "aisTitle": "AIS vessels",
+      "aisCount": "{count} targets",
+      "aisNm": "NM",
+      "aisCpa": "CPA {cpa} NM · {minutes} min",
+      "aisDiverging": "Diverging",
+      "aisDanger": "Risk",
+      "aisWatch": "Watch",
+      "aisCollision": "Collision risk: Atlantis Star crossing at 0.3 NM in 8 min"
     }
   }
 }

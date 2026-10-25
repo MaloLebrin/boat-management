@@ -141,7 +141,15 @@
       "blackWater": "Eaux noires",
       "waterTemp": "Eau",
       "history": "Historique 24 h",
-      "historySeries": "Tension batterie"
+      "historySeries": "Tension batterie",
+      "aisTitle": "Navires AIS",
+      "aisCount": "{count} cibles",
+      "aisNm": "NM",
+      "aisCpa": "CPA {cpa} NM · {minutes} min",
+      "aisDiverging": "S’éloigne",
+      "aisDanger": "Risque",
+      "aisWatch": "À surveiller",
+      "aisCollision": "Risque de collision : Atlantis Star croise à 0,3 NM dans 8 min"
     }
   }
 }

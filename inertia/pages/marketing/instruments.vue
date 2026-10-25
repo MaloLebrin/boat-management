@@ -10,6 +10,7 @@ import { computed } from 'vue'
 import { useT } from '~/composables/use_t'
 import { jsonLd } from '~/utils/json_ld'
 import FeatureHeroSection from '~/components/marketing/features/FeatureHeroSection.vue'
+import InstrumentsHeroBackdrop from '~/components/marketing/instruments/InstrumentsHeroBackdrop.vue'
 import FeatureStepsSection from '~/components/marketing/features/FeatureStepsSection.vue'
 import FeatureCrossLinksSection from '~/components/marketing/features/FeatureCrossLinksSection.vue'
 import FeatureFinalCtaSection from '~/components/marketing/features/FeatureFinalCtaSection.vue'
@@ -128,7 +129,11 @@ const webAppSchema = computed(() =>
     :secondary-cta="content.hero.secondaryCta"
     :reassurance="content.hero.reassurance"
     mock-type="instruments"
-  />
+  >
+    <template #backdrop>
+      <InstrumentsHeroBackdrop />
+    </template>
+  </FeatureHeroSection>
 
   <FeatureStepsSection
     :eyebrow="content.steps.eyebrow"

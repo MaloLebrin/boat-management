@@ -21,6 +21,13 @@ defineProps<{
   isAi?: boolean
 }>()
 
+/**
+ * Slot `backdrop` : fond décoratif optionnel (SVG animé, dégradé…) posé en
+ * absolu derrière le contenu — la section est `relative` + `overflow-hidden`
+ * et le contenu passe au-dessus. Voir `InstrumentsHeroBackdrop`.
+ */
+defineSlots<{ backdrop?: () => unknown }>()
+
 const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
   boatDetail: HomeMockBoatDetail,
   planning: HomeMockPlanning,
@@ -32,8 +39,9 @@ const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
 </script>
 
 <template>
-  <section class="bg-cream px-6 pb-16 pt-16 lg:px-8 lg:pb-20 lg:pt-24">
-    <div class="mx-auto max-w-3xl text-center">
+  <section class="relative overflow-hidden bg-cream px-6 pb-16 pt-16 lg:px-8 lg:pb-20 lg:pt-24">
+    <slot name="backdrop" />
+    <div class="relative mx-auto max-w-3xl text-center">
       <p
         class="font-mono text-xs font-semibold uppercase tracking-widest"
         :class="isAi ? 'text-violet-700' : 'text-coral-600'"
@@ -62,7 +70,7 @@ const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
       <p class="mt-4 text-xs text-fg-subtle">{{ reassurance }}</p>
     </div>
 
-    <div class="mx-auto mt-12 max-w-4xl">
+    <div class="relative mx-auto mt-12 max-w-4xl">
       <HomeBrowserFrame>
         <!-- upcomingTasks est un panneau à défilement infini (flex-1) conçu
              pour vivre dans le dashboard : hors de lui, il lui faut un

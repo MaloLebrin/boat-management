@@ -8,6 +8,8 @@ vi.mock('@adonisjs/inertia/vue', () => ({
 import InstrumentsCardsSection from '../../inertia/components/marketing/instruments/InstrumentsCardsSection.vue'
 import InstrumentsAlertsSection from '../../inertia/components/marketing/instruments/InstrumentsAlertsSection.vue'
 import InstrumentsCompatibilitySection from '../../inertia/components/marketing/instruments/InstrumentsCompatibilitySection.vue'
+import InstrumentsHeroBackdrop from '../../inertia/components/marketing/instruments/InstrumentsHeroBackdrop.vue'
+import FeatureHeroSection from '../../inertia/components/marketing/features/FeatureHeroSection.vue'
 import type { InstrumentsMarketingContentProps } from '../../shared/types/marketing_instruments'
 
 const cards = [
@@ -174,5 +176,42 @@ describe('InstrumentsCompatibilitySection (#995)', () => {
     expect(wrapper.text()).toContain('Inclus dans les plans Pro et Entreprise.')
     expect(wrapper.text()).toContain('Compatible')
     expect(wrapper.text()).toContain('Pas pris en charge')
+  })
+})
+
+describe('InstrumentsHeroBackdrop (#995)', () => {
+  test('rend un réseau décoratif masqué aux lecteurs d’écran', () => {
+    const wrapper = mount(InstrumentsHeroBackdrop)
+    const root = wrapper.get('[data-testid="instruments-hero-backdrop"]')
+
+    expect(root.attributes('aria-hidden')).toBe('true')
+    expect(root.classes()).toContain('pointer-events-none')
+    expect(wrapper.findAll('line.backdrop-link').length).toBeGreaterThan(0)
+    expect(wrapper.findAll('circle.backdrop-ring')).toHaveLength(6)
+    expect(wrapper.findAll('animateMotion').length).toBeGreaterThan(0)
+  })
+
+  test('FeatureHeroSection place le fond derrière le contenu via le slot backdrop', () => {
+    const wrapper = mount(FeatureHeroSection, {
+      props: {
+        eyebrow: 'e',
+        title: 't',
+        titleHighlight: 'h',
+        subtitle: 's',
+        primaryCta: { label: 'p', href: '/signup' },
+        secondaryCta: { label: 's', href: '/fr/tarifs' },
+        reassurance: 'r',
+        mockType: 'instruments',
+      },
+      slots: { backdrop: InstrumentsHeroBackdrop },
+      global: { stubs: { HomeMockInstruments: true } },
+    })
+
+    const section = wrapper.get('section')
+    expect(section.classes()).toContain('relative')
+    expect(section.classes()).toContain('overflow-hidden')
+    expect(section.element.firstElementChild?.getAttribute('data-testid')).toBe(
+      'instruments-hero-backdrop'
+    )
   })
 })
