@@ -128,6 +128,7 @@ const webAppSchema = computed(() =>
     :primary-cta="content.hero.primaryCta"
     :secondary-cta="content.hero.secondaryCta"
     :reassurance="content.hero.reassurance"
+    :badge="content.hero.comingSoon"
     mock-type="instruments"
   >
     <template #backdrop>

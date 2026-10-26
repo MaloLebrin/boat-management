@@ -19,6 +19,8 @@ defineProps<{
   reassurance: string
   mockType: FeatureMockType
   isAi?: boolean
+  /** Pastille optionnelle sous l'accroche (ex. « Bientôt disponible »). */
+  badge?: string
 }>()
 
 /**
@@ -48,6 +50,14 @@ const mockComponents: Record<FeatureMockType, typeof HomeMockBoatDetail> = {
       >
         {{ eyebrow }}
       </p>
+      <span
+        v-if="badge"
+        data-testid="feature-hero-badge"
+        class="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-100 px-3.5 py-1 text-xs font-semibold text-amber-700"
+      >
+        <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-amber-600" />
+        {{ badge }}
+      </span>
       <h1 class="mt-4 font-display text-4xl leading-tight tracking-tight text-fg lg:text-5xl">
         {{ title }}
         <em :class="isAi ? 'text-violet-700' : 'text-coral-500'">{{ titleHighlight }}</em>

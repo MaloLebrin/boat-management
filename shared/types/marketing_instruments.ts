@@ -65,6 +65,8 @@ export interface InstrumentsMarketingContentProps {
     primaryCta: FeatureCta
     secondaryCta: FeatureCta
     reassurance: string
+    /** Pastille « Bientôt disponible » : la fonctionnalité est annoncée, pas encore ouverte. */
+    comingSoon: string
   }
   steps: {
     eyebrow: string
