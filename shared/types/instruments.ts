@@ -298,3 +298,33 @@ export interface InstrumentSetupStored {
   /** Un test de connexion attend le rechargement complet (CSP par document). */
   pendingTest: boolean
 }
+
+/** Réponse de `POST /api/instruments/pairing` (#1032) : seul moment où les deux codes existent en clair. */
+export interface InstrumentPairingCreated {
+  deviceCode: string
+  /** Affiché `ABCD-1234` : tiret après le quatrième symbole. */
+  userCode: string
+  expiresIn: number
+  interval: number
+}
+
+/** Réponse de `POST /api/instruments/pairing/poll` : le jeton n'est présent qu'à la livraison, une seule fois. */
+export type InstrumentPairingPollResult =
+  | { status: 'pending'; interval: number }
+  | { status: 'expired' }
+  | { status: 'approved'; token: string }
+
+/** Ce que le client voit d'un appairage qu'il vient de rattacher (flash `instrumentPairing`). */
+export interface InstrumentPairingRow {
+  id: number
+  deviceLabel: string | null
+  hardwareKind: string | null
+  pluginVersion: string | null
+}
+
+/** Champs facultatifs que le boîtier déclare à la création de l'appairage (#1032). */
+export interface CreateInstrumentPairingPayload {
+  deviceLabel?: string | null
+  hardwareKind?: string | null
+  pluginVersion?: string | null
+}

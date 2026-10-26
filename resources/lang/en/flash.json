@@ -632,7 +632,12 @@
     "ruleNotFound": "This alert rule no longer exists.",
     "ingestTokenIssued": "Plugin token generated. Copy it now: it will not be shown again.",
     "ingestTokenRevoked": "Plugin token revoked.",
-    "ingestTokenNone": "No plugin token to revoke."
+    "ingestTokenNone": "No plugin token to revoke.",
+    "pairingAttached": "Device {device} paired. It fetches its token automatically: the first readings arrive in a few moments.",
+    "pairingDeviceDefault": "FleetAi",
+    "pairingCodeInvalid": "This code is unknown or has expired. Check the code shown by the device, or wait for it to show a new one.",
+    "pairingAlreadyUsed": "This code has already been used. Wait for the device to show a new one.",
+    "pairingRateLimited": "Too many code attempts. Try again in {minutes} min."
   },
   "inventory": {
     "itemCreated": "Item added to the inventory.",

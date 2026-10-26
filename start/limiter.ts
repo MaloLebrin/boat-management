@@ -271,3 +271,28 @@ export const instrumentIngestThrottle = limiter.define('instrument_ingest_source
     .every('1 minute')
     .usingKey(`instrument_ingest_source_${ctx.instrumentSource.id}`)
 })
+
+/**
+ * Appairage par code du boîtier Signal K (#1032). Routes sans authentification,
+ * donc deux compteurs par IP, séparés. Création : un boîtier en demande un
+ * nouveau toutes les dix minutes ; 10 par dix minutes laissent passer plusieurs
+ * boîtiers derrière la même box de marina sans ouvrir la porte au remplissage de
+ * la table. Interrogation : un appel toutes les 5 s par boîtier (12/min) ; 120
+ * par minute couvrent une dizaine de boîtiers par IP et bornent la devinette.
+ */
+export const instrumentPairingCreateThrottle = limiter.define(
+  'instrument_pairing_create',
+  (ctx) => {
+    return limiter
+      .allowRequests(10)
+      .every('10 minutes')
+      .usingKey(`instrument_pairing_create_${ctx.request.ip()}`)
+  }
+)
+
+export const instrumentPairingPollThrottle = limiter.define('instrument_pairing_poll', (ctx) => {
+  return limiter
+    .allowRequests(120)
+    .every('1 minute')
+    .usingKey(`instrument_pairing_poll_${ctx.request.ip()}`)
+})

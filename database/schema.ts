@@ -2415,6 +2415,54 @@ export class ExternalCalendarSchema extends BaseModel {
   declare url: string
 }
 
+export class InstrumentPairingSchema extends BaseModel {
+  static $columns = [
+    'approvedAt',
+    'boatId',
+    'claimedByUserId',
+    'consumedAt',
+    'createdAt',
+    'deviceCodeHash',
+    'deviceLabel',
+    'expiresAt',
+    'hardwareKind',
+    'id',
+    'organizationId',
+    'pluginVersion',
+    'updatedAt',
+    'userCodeHash',
+  ] as const
+  $columns = InstrumentPairingSchema.$columns
+  @column.dateTime()
+  declare approvedAt: DateTime | null
+  @column()
+  declare boatId: number | null
+  @column()
+  declare claimedByUserId: number | null
+  @column.dateTime()
+  declare consumedAt: DateTime | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare deviceCodeHash: string
+  @column()
+  declare deviceLabel: string | null
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column()
+  declare hardwareKind: string | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare organizationId: number | null
+  @column()
+  declare pluginVersion: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userCodeHash: string
+}
+
 export class InventoryItemSchema extends BaseModel {
   static $columns = [
     'averageCost',

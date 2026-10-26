@@ -1,10 +1,12 @@
 import type BoatInstrumentAlert from '#models/boat_instrument_alert'
 import type BoatInstrumentAlertRule from '#models/boat_instrument_alert_rule'
 import type BoatInstrumentSource from '#models/boat_instrument_source'
+import type InstrumentPairing from '#models/instrument_pairing'
 import type { JsonValue } from '#shared/types/notification'
 import type {
   InstrumentAlertRow,
   InstrumentAlertRuleRow,
+  InstrumentPairingRow,
   InstrumentSourceConnection,
   InstrumentSourceRow,
   InstrumentsTabCapabilities,
@@ -85,5 +87,14 @@ export function toAlertRow(alert: BoatInstrumentAlert): InstrumentAlertRow {
     clearedAt: alert.clearedAt?.toISO() ?? null,
     lastValue: alert.lastValue === null ? null : Number(alert.lastValue),
     message: alert.message,
+  }
+}
+
+export function toInstrumentPairingRow(pairing: InstrumentPairing): InstrumentPairingRow {
+  return {
+    id: pairing.id,
+    deviceLabel: pairing.deviceLabel,
+    hardwareKind: pairing.hardwareKind,
+    pluginVersion: pairing.pluginVersion,
   }
 }

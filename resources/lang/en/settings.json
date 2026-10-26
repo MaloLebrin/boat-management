@@ -524,6 +524,7 @@
       "boat_instrument_alert_rule_delete": "Instrument alert rule deleted",
       "boat_instrument_ingest_token_issue": "Plugin ingest token generated",
       "boat_instrument_ingest_token_revoke": "Plugin ingest token revoked",
+      "boat_instrument_pairing_attach": "Signal K device paired by code",
       "reservation_force_unavailable": "Reservation forced on an unavailable boat",
       "reservation_payment_recorded": "Reservation payment recorded",
       "reservation_security_deposit_held": "Security deposit held",
