@@ -255,5 +255,130 @@
       "unreachable": "Serveur Signal K injoignable : les dernières prévisions connues restent affichées.",
       "invalid": "Le fournisseur météo a répondu sans prévision exploitable."
     }
+  },
+  "setup": {
+    "title": "Connecter mon bateau",
+    "subtitle": "Quelques étapes pour afficher moteurs, batteries et position de votre bateau.",
+    "inProgress": "Assistant de connexion",
+    "expand": "Déplier",
+    "collapse": "Replier",
+    "reopen": "Rouvrir l’assistant de connexion",
+    "advanced": "Paramètres avancés",
+    "stepDone": "Étape terminée",
+    "steps": {
+      "hardware": "Matériel à bord",
+      "path": "Chemin de connexion",
+      "connect": "Connexion",
+      "engines": "Relier les moteurs",
+      "done": "Terminé"
+    },
+    "hardware": {
+      "intro": "Qu’y a-t-il à bord aujourd’hui ?",
+      "guide": "Voir les kits et le guide d’installation",
+      "none": {
+        "title": "Rien pour l’instant",
+        "desc": "Aucun serveur de bord : le guide vous indique quoi acheter."
+      },
+      "cerbo": {
+        "title": "Un Cerbo GX (Victron)",
+        "desc": "Le serveur Signal K s’y active en quelques réglages."
+      },
+      "signalk": {
+        "title": "Un serveur Signal K",
+        "desc": "OpenPlotter, Raspberry Pi ou autre : il est déjà installé."
+      }
+    },
+    "path": {
+      "plugin": {
+        "title": "Plugin (recommandé)",
+        "desc": "Le serveur de bord envoie lui-même les relevés à FleetAi, même sans écran allumé.",
+        "limit": "Une commande à coller sur le serveur de bord."
+      },
+      "app": {
+        "title": "Application à bord",
+        "desc": "Cette application, ouverte sur le Wi-Fi du bateau, lit le serveur et transmet les relevés.",
+        "limit": "Ne collecte que tant que l’écran reste ouvert."
+      }
+    },
+    "plugin": {
+      "address": "Adresse du serveur Signal K (facultatif)",
+      "addressHint": "Utile si vous passez plus tard à la lecture directe depuis l’application. Laissez vide pour utiliser une adresse par défaut.",
+      "save": "Enregistrer le bateau",
+      "generate": "Générer un jeton",
+      "commandIntro": "Dans un terminal du serveur de bord, connecté avec l’utilisateur qui fait tourner Signal K, collez cette commande :",
+      "commandLabel": "Commande d’installation",
+      "tokenLost": "Le jeton n’est affiché qu’une fois. Pour obtenir de nouveau la commande complète, générez un nouveau jeton (l’ancien cessera de fonctionner).",
+      "regenerate": "Régénérer le jeton",
+      "manualTitle": "Installer à la main depuis l’Appstore",
+      "manualBody": "Dans l’administration Signal K, ouvrez Appstore, cherchez le plugin signalk-fleetai, installez-le, puis renseignez l’adresse de FleetAi et le jeton dans sa configuration."
+    },
+    "browser": {
+      "securityNote": "Utilisez un jeton en lecture seule : l’application n’a jamais besoin d’écrire sur le serveur.",
+      "readOnlyNote": "Créez pour cela un compte en lecture seule dans la sécurité de Signal K.",
+      "httpsNote": "Depuis ce site sécurisé, une adresse http:// est bloquée par le navigateur : préférez https://.",
+      "httpsLink": "Voir comment activer HTTPS",
+      "saveTest": "Enregistrer et tester"
+    },
+    "diagnostic": {
+      "testing": "Test de la connexion en cours…",
+      "server": "Serveur Signal K {version}",
+      "vessel": "navire {name}",
+      "unnamed": "sans nom",
+      "engines": "{count, plural, one {# moteur} other {# moteurs}}",
+      "batteries": "{count, plural, one {# batterie} other {# batteries}}",
+      "tanks": "{count, plural, one {# réservoir} other {# réservoirs}}",
+      "positionOk": "position OK",
+      "positionMissing": "position absente",
+      "error": {
+        "invalid_url": {
+          "title": "Adresse invalide.",
+          "fix": "Saisissez une origine complète, par exemple http://openplotter.local:3000."
+        },
+        "mixed_content": {
+          "title": "Adresse bloquée par le navigateur.",
+          "fix": "Cette page est sécurisée : utilisez une adresse https://, ou choisissez le chemin Plugin."
+        },
+        "unreachable": {
+          "title": "Serveur injoignable.",
+          "fix": "Vérifiez que cet appareil est sur le Wi-Fi du bateau et que l’adresse et le port sont corrects."
+        },
+        "unauthorized": {
+          "title": "Accès refusé.",
+          "fix": "Le serveur exige un jeton : saisissez un jeton en lecture seule."
+        },
+        "tls": {
+          "title": "Connexion sécurisée refusée.",
+          "fix": "Le certificat du serveur n’est pas reconnu par cet appareil : ouvrez l’adresse une fois dans le navigateur pour l’accepter."
+        },
+        "protocol": {
+          "title": "Ce n’est pas un serveur Signal K.",
+          "fix": "Vérifiez l’adresse et le port (3000 par défaut, 3443 en HTTPS)."
+        }
+      }
+    },
+    "waiting": {
+      "waiting": "En attente du premier lot du plugin… Cette page se met à jour toute seule.",
+      "received": "Premier lot reçu : le plugin fonctionne.",
+      "stuck": "Toujours rien ?",
+      "causes": {
+        "network": "Le serveur de bord n’a pas accès à Internet.",
+        "token": "Le jeton a été mal copié ou régénéré depuis : générez-en un nouveau.",
+        "restart": "Signal K n’a pas été redémarré après l’installation.",
+        "node": "La commande a échoué : relisez sa sortie dans le terminal."
+      },
+      "retry": "Réessayer d’attendre"
+    },
+    "engines": {
+      "none": "Aucun moteur n’est enregistré sur ce bateau : vous pouvez passer cette étape.",
+      "intro": "Associez chaque moteur de FleetAi à son identifiant détecté sur le serveur.",
+      "noneDetected": "Aucun moteur détecté pour l’instant. Vous pourrez les relier plus tard.",
+      "unlinked": "Non relié",
+      "fallback": "Moteur {id}"
+    },
+    "done": {
+      "readings": "{count, plural, one {# mesure reçue.} other {# mesures reçues.}}",
+      "rules": "Les règles d’alerte intégrées (température, pression d’huile, batteries…) sont actives.",
+      "dismiss": "Masquer l’assistant"
+    }
   }
 }

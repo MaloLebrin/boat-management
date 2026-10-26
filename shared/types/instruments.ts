@@ -275,3 +275,26 @@ export interface InstrumentProbeInventory {
 export type InstrumentProbeResult =
   | { ok: true; inventory: InstrumentProbeInventory | null }
   | { ok: false; error: InstrumentProbeErrorKey; status: number | null }
+
+/** Matériel présent à bord (étape 1 de l'assistant « Connecter mon bateau », #1023). */
+export type InstrumentSetupHardware = 'none' | 'cerbo' | 'signalk'
+
+/** Chemin de connexion choisi : plugin sur le serveur Signal K, ou application ouverte à bord. */
+export type InstrumentSetupPath = 'plugin' | 'app'
+
+export type InstrumentSetupStepKey = 'hardware' | 'path' | 'connect' | 'engines' | 'done'
+
+/** Une étape du stepper : `done` est dérivé des données, jamais d'un clic. */
+export interface InstrumentSetupStep {
+  key: InstrumentSetupStepKey
+  done: boolean
+}
+
+/** Ce que l'assistant garde dans `localStorage` (`fleetai:instrument-setup:<boatId>`). */
+export interface InstrumentSetupStored {
+  hardware: InstrumentSetupHardware | null
+  path: InstrumentSetupPath | null
+  dismissed: boolean
+  /** Un test de connexion attend le rechargement complet (CSP par document). */
+  pendingTest: boolean
+}

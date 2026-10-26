@@ -255,5 +255,130 @@
       "unreachable": "Signal K server unreachable: the last known forecast stays displayed.",
       "invalid": "The weather provider answered without a usable forecast."
     }
+  },
+  "setup": {
+    "title": "Connect my boat",
+    "subtitle": "A few steps to see your boat's engines, batteries and position.",
+    "inProgress": "Connection assistant",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "reopen": "Reopen the connection assistant",
+    "advanced": "Advanced settings",
+    "stepDone": "Step completed",
+    "steps": {
+      "hardware": "Onboard hardware",
+      "path": "Connection path",
+      "connect": "Connection",
+      "engines": "Link engines",
+      "done": "Done"
+    },
+    "hardware": {
+      "intro": "What is aboard today?",
+      "guide": "See the kits and the install guide",
+      "none": {
+        "title": "Nothing yet",
+        "desc": "No onboard server: the guide tells you what to buy."
+      },
+      "cerbo": {
+        "title": "A Cerbo GX (Victron)",
+        "desc": "Signal K is enabled there with a few settings."
+      },
+      "signalk": {
+        "title": "A Signal K server",
+        "desc": "OpenPlotter, Raspberry Pi or other: already installed."
+      }
+    },
+    "path": {
+      "plugin": {
+        "title": "Plugin (recommended)",
+        "desc": "The onboard server pushes the readings to FleetAi itself, even with no screen on.",
+        "limit": "One command to paste on the onboard server."
+      },
+      "app": {
+        "title": "App on board",
+        "desc": "This app, open on the boat's Wi-Fi, reads the server and forwards the readings.",
+        "limit": "Only collects while the screen stays open."
+      }
+    },
+    "plugin": {
+      "address": "Signal K server address (optional)",
+      "addressHint": "Useful if you later switch to direct reading from the app. Leave empty to use a default address.",
+      "save": "Save the boat",
+      "generate": "Generate a token",
+      "commandIntro": "In a terminal on the onboard server, logged in as the user running Signal K, paste this command:",
+      "commandLabel": "Install command",
+      "tokenLost": "The token is only shown once. To get the full command again, generate a new token (the old one will stop working).",
+      "regenerate": "Regenerate the token",
+      "manualTitle": "Install by hand from the Appstore",
+      "manualBody": "In the Signal K admin, open Appstore, search for the signalk-fleetai plugin, install it, then enter the FleetAi address and the token in its configuration."
+    },
+    "browser": {
+      "securityNote": "Use a read-only token: the app never needs to write to the server.",
+      "readOnlyNote": "Create a read-only account for it in Signal K security.",
+      "httpsNote": "From this secure site, an http:// address is blocked by the browser: prefer https://.",
+      "httpsLink": "See how to enable HTTPS",
+      "saveTest": "Save and test"
+    },
+    "diagnostic": {
+      "testing": "Testing the connection…",
+      "server": "Signal K server {version}",
+      "vessel": "vessel {name}",
+      "unnamed": "unnamed",
+      "engines": "{count, plural, one {# engine} other {# engines}}",
+      "batteries": "{count, plural, one {# battery} other {# batteries}}",
+      "tanks": "{count, plural, one {# tank} other {# tanks}}",
+      "positionOk": "position OK",
+      "positionMissing": "no position",
+      "error": {
+        "invalid_url": {
+          "title": "Invalid address.",
+          "fix": "Enter a full origin, for example http://openplotter.local:3000."
+        },
+        "mixed_content": {
+          "title": "Address blocked by the browser.",
+          "fix": "This page is secure: use an https:// address, or choose the Plugin path."
+        },
+        "unreachable": {
+          "title": "Server unreachable.",
+          "fix": "Check that this device is on the boat's Wi-Fi and that the address and port are correct."
+        },
+        "unauthorized": {
+          "title": "Access denied.",
+          "fix": "The server requires a token: enter a read-only token."
+        },
+        "tls": {
+          "title": "Secure connection refused.",
+          "fix": "This device does not trust the server certificate: open the address once in the browser to accept it."
+        },
+        "protocol": {
+          "title": "This is not a Signal K server.",
+          "fix": "Check the address and port (3000 by default, 3443 over HTTPS)."
+        }
+      }
+    },
+    "waiting": {
+      "waiting": "Waiting for the plugin's first batch… This page refreshes by itself.",
+      "received": "First batch received: the plugin works.",
+      "stuck": "Still nothing?",
+      "causes": {
+        "network": "The onboard server has no Internet access.",
+        "token": "The token was mis-copied or regenerated since: generate a new one.",
+        "restart": "Signal K was not restarted after the install.",
+        "node": "The command failed: re-read its output in the terminal."
+      },
+      "retry": "Wait again"
+    },
+    "engines": {
+      "none": "No engine is registered on this boat: you can skip this step.",
+      "intro": "Match each FleetAi engine with the identifier detected on the server.",
+      "noneDetected": "No engine detected yet. You can link them later.",
+      "unlinked": "Not linked",
+      "fallback": "Engine {id}"
+    },
+    "done": {
+      "readings": "{count, plural, one {# reading received.} other {# readings received.}}",
+      "rules": "The built-in alert rules (temperature, oil pressure, batteries…) are active.",
+      "dismiss": "Hide the assistant"
+    }
   }
 }

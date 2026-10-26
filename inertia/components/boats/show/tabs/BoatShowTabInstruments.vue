@@ -11,6 +11,7 @@ import InstrumentConnectionBanner from '~/components/boats/show/tabs/instruments
 import InstrumentForecastPanel from '~/components/boats/show/tabs/instruments/InstrumentForecastPanel.vue'
 import InstrumentHistoryPanel from '~/components/boats/show/tabs/instruments/InstrumentHistoryPanel.vue'
 import InstrumentEmptyState from '~/components/boats/show/tabs/instruments/InstrumentEmptyState.vue'
+import InstrumentSetupWizard from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupWizard.vue'
 import InstrumentSourceForm from '~/components/boats/show/tabs/instruments/InstrumentSourceForm.vue'
 import { useAisTargets } from '~/composables/use_ais_targets'
 import { useInstrumentStream } from '~/composables/use_instrument_stream'
@@ -160,6 +161,13 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="space-y-8" data-testid="tab-instruments">
+    <InstrumentSetupWizard
+      v-if="instruments.can.manage"
+      :boat-id="boatId"
+      :instruments="instruments"
+      :engines="engines ?? []"
+      :stream-open="canStream && stream.connectionState.value === 'open'"
+    />
     <template v-if="source">
       <InstrumentConnectionBanner
         :state="bannerState"
@@ -194,7 +202,7 @@ onBeforeUnmount(() => {
       <InstrumentAlertsList :alerts="alerts" />
       <InstrumentAlarmsList :readings="alarmReadings" />
     </template>
-    <InstrumentEmptyState v-else :can-manage="instruments.can.manage" />
+    <InstrumentEmptyState v-else-if="!instruments.can.manage" :can-manage="false" />
 
     <InstrumentAlertRulesEditor
       v-if="instruments.can.manage && source"
@@ -202,11 +210,14 @@ onBeforeUnmount(() => {
       :rules="instruments.rules"
       :paths="rulePaths"
     />
-    <InstrumentPluginTokenCard
-      v-if="instruments.can.manage && source"
-      :boat-id="boatId"
-      :source="source"
-    />
-    <InstrumentSourceForm v-if="instruments.can.manage" :boat-id="boatId" :source="source" />
+    <details v-if="instruments.can.manage && source" data-testid="instrument-advanced">
+      <summary class="cursor-pointer text-sm font-semibold text-fg">
+        {{ t('instruments.setup.advanced') }}
+      </summary>
+      <div class="mt-4 space-y-8">
+        <InstrumentPluginTokenCard :boat-id="boatId" :source="source" />
+        <InstrumentSourceForm :boat-id="boatId" :source="source" />
+      </div>
+    </details>
   </div>
 </template>

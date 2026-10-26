@@ -420,16 +420,32 @@ describe('BoatShowTabInstruments', () => {
     expect(streamState.start).not.toHaveBeenCalled()
   })
 
-  test('sans source : état vide, formulaire pour l’admin seulement', async () => {
+  test('sans source : assistant pour l’admin, état vide pour le lecteur (#1023)', async () => {
     const admin = mountTab(props({ source: null, latest: [] }))
-    expect(admin.text()).toContain('instruments.empty.manage')
-    expect(admin.find('[data-testid="instrument-source-form"]').exists()).toBe(true)
+    expect(admin.find('[data-testid="instrument-setup"]').exists()).toBe(true)
+    expect(admin.text()).not.toContain('instruments.empty.manage')
+    expect(admin.find('[data-testid="instrument-source-form"]').exists()).toBe(false)
 
     const member = mountTab(
       props({ source: null, latest: [], can: { manage: false, ingest: true } })
     )
     expect(member.text()).toContain('instruments.empty.readOnly')
+    expect(member.find('[data-testid="instrument-setup"]').exists()).toBe(false)
     expect(member.find('[data-testid="instrument-source-form"]').exists()).toBe(false)
+  })
+
+  test('source sans lot reçu : assistant au-dessus des jauges, paramètres avancés dessous (#1023)', async () => {
+    const wrapper = mountTab(
+      props({ source: { ...source, lastSeenAt: null, enabled: false }, latest: [] })
+    )
+    const html = wrapper.html()
+    expect(wrapper.find('[data-testid="instrument-setup"]').exists()).toBe(true)
+    expect(html.indexOf('instrument-setup"')).toBeLessThan(html.indexOf('instrument-banner'))
+    expect(
+      wrapper
+        .find('[data-testid="instrument-advanced"] [data-testid="instrument-source-form"]')
+        .exists()
+    ).toBe(true)
   })
 
   test('source sans aucune mesure : message d’attente', async () => {

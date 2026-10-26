@@ -34,7 +34,21 @@ Le chemin le plus simple et le plus fiable est le premier. Certaines distributio
 
 > **À savoir.** La configuration iPhone avec certificat auto-signé n'a pas encore été mesurée sur appareil par l'équipe : ne pars pas de l'hypothèse qu'elle fonctionne. Si tu dépends d'un iPhone à bord, privilégie le nom de domaine avec certificat de confiance.
 
-## 3. Brancher le serveur dans FleetAi
+## L'assistant « Connecter mon bateau »
+
+À l'ouverture de l'onglet **Instruments**, un administrateur sans source voit un assistant pas à pas (un lecteur garde le message « Aucun instrument connecté »). Il se déplie tant que la connexion n'est pas confirmée, puis se replie ; « Masquer l'assistant » le range, « Rouvrir l'assistant de connexion » le ramène. Les étapes :
+
+1. **Matériel à bord** — rien, Cerbo GX ou serveur Signal K déjà présent ; un lien mène au guide public d'installation (kits).
+2. **Chemin** — _Plugin (recommandé)_ : le serveur de bord pousse lui-même les relevés ; _Application à bord_ : l'application ouverte sur le Wi-Fi du bateau lit le serveur.
+3. **Connexion**
+   - _Plugin_ : adresse du serveur (préremplie selon le matériel, facultative), génération du jeton, commande d'installation à coller sur le serveur de bord (repli : Appstore). La page vérifie toute seule, toutes les 10 secondes pendant 10 minutes, que le premier lot arrive ; au-delà, « Toujours rien ? » liste les causes probables.
+   - _Application_ : adresse et jeton en lecture seule, bouton **Enregistrer et tester**. Une adresse invalide ou `http://` depuis cette page sécurisée est refusée avant tout enregistrement. Après le test, l'assistant affiche ce que le serveur expose (version, navire, moteurs, batteries, réservoirs, position) ou la cause de l'échec avec son remède.
+4. **Relier les moteurs** — chaque moteur du bateau est associé à l'identifiant détecté (`port`, `starboard`…) ; étape passable.
+5. **Terminé** — premières mesures reçues, règles d'alerte intégrées actives, conseil d'installation sur l'écran d'accueil (iOS).
+
+La progression se déduit des données (source, jeton, dernier lot reçu, moteurs reliés) ; seuls le matériel, le chemin et le masquage sont gardés dans le navigateur (`localStorage`, par bateau). Le formulaire de la source et la carte du plugin restent disponibles sous **Paramètres avancés**.
+
+## 3. Brancher le serveur dans FleetAi (à la main)
 
 1. Ouvre la fiche du bateau, onglet **Instruments**.
 2. Renseigne l'**adresse du serveur** (par exemple `https://signalk.mon-bateau.example:3443`), le **jeton** de lecture, puis enregistre. Le jeton est chiffré et ne se relit plus ensuite.
