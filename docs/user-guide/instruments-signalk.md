@@ -2,6 +2,8 @@
 
 Mode d'emploi pour relier le serveur **Signal K** de ton bateau à FleetAi. Il faut un plan **Pro** ou **Entreprise** et un rôle d'administrateur pour brancher le serveur. Le fonctionnement et le contrat technique sont décrits dans [`docs/domain/instruments.md`](../domain/instruments.md).
 
+> **Version publique.** Ce guide existe aussi sur le site, avec le choix du matériel (Raspberry Pi + OpenPlotter, Cerbo GX, serveur existant), le comparatif plugin / appli et le pas à pas HTTPS illustré : [fleetai.app/fr/installer-signal-k-a-bord](https://fleetai.app/fr/installer-signal-k-a-bord) (EN : [/en/install-signal-k-on-board](https://fleetai.app/en/install-signal-k-on-board)). C'est la page vers laquelle renvoient la page instruments et le centre d'aide (#1022).
+
 ## Ce dont tu as besoin
 
 - Un **serveur Signal K** à bord (OpenPlotter sur Raspberry Pi, Victron Cerbo GX avec Signal K, ou une passerelle compatible), relié à ton réseau NMEA 2000 ou NMEA 0183.

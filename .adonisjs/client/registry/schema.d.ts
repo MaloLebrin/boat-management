@@ -523,6 +523,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['incrementEngineHours']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'boat_equipment.update_engine_instrument_key': {
+    methods: ["PATCH"]
+    pattern: '/boats/:boatId/engines/:engineId/instrument-key'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/boat_equipment').updateEngineInstrumentKeyValidator)>>
+      paramsTuple: [ParamValue, ParamValue]
+      params: { boatId: ParamValue; engineId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/boat_equipment').updateEngineInstrumentKeyValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['updateEngineInstrumentKey']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_equipment_controller').default['updateEngineInstrumentKey']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'boat_equipment.destroy_engine': {
     methods: ["DELETE"]
     pattern: '/boats/:boatId/engines/:engineId'
@@ -3415,6 +3427,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/boat_telemetry_controller').default['store']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'install.signalkPlugin': {
+    methods: ["GET","HEAD"]
+    pattern: '/install/signalk-plugin.sh'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/install_scripts_controller').default['signalkPlugin']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/install_scripts_controller').default['signalkPlugin']>>>
+    }
+  }
   'new_account.create': {
     methods: ["GET","HEAD"]
     pattern: '/signup'
@@ -3799,6 +3823,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['instruments']>>>
     }
   }
+  'marketing.en.installSignalK': {
+    methods: ["GET","HEAD"]
+    pattern: '/en/install-signal-k-on-board'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['installSignalK']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['installSignalK']>>>
+    }
+  }
   'marketing.en.simulator': {
     methods: ["GET","HEAD"]
     pattern: '/en/maintenance-cost-simulator'
@@ -3977,6 +4013,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['instruments']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['instruments']>>>
+    }
+  }
+  'marketing.fr.installSignalK': {
+    methods: ["GET","HEAD"]
+    pattern: '/fr/installer-signal-k-a-bord'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['installSignalK']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/marketing_features_controller').default['installSignalK']>>>
     }
   }
   'marketing.fr.simulator': {

@@ -196,7 +196,8 @@ export default class MarketingInstrumentsContentService {
       },
       install: {
         ...cards('install', 'install', INSTALL_COUNT, ICONS.install),
-        helpCta: { label: t('install_help_label'), href: marketingPath('help', locale) },
+        // Le guide d'installation public (#1022) remplace la page d'aide générique.
+        helpCta: { label: t('install_help_label'), href: marketingPath('installSignalK', locale) },
       },
       security: cards('security', 'security', INSTRUMENTS_MARKETING_SECURITY_COUNT, ICONS.security),
       crossLinks: {

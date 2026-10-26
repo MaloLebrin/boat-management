@@ -37,6 +37,7 @@ export const MARKETING_SLUGS = {
   fleet: { en: '/boat-fleet-management', fr: '/gestion-flotte-bateaux' },
   aiAssistant: { en: '/ai-boat-assistant', fr: '/assistant-ia-bateau' },
   instruments: { en: '/connected-boat-instruments', fr: '/instruments-bateau-connectes' },
+  installSignalK: { en: '/install-signal-k-on-board', fr: '/installer-signal-k-a-bord' },
   help: { en: '/help', fr: '/aide' },
   simulator: { en: '/maintenance-cost-simulator', fr: '/simulateur-cout-entretien' },
   guide: { en: '/boat-maintenance-cost', fr: '/cout-entretien-bateau' },

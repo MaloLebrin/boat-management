@@ -1,5 +1,6 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import MarketingInstallSignalKContentService from '#services/marketing_install_signalk_content_service'
 import MarketingInstrumentsContentService from '#services/marketing_instruments_content_service'
 import { marketingPath, toAppLocale } from '#shared/helpers/locale_path'
 import type { MarketingPage } from '#shared/helpers/locale_path'
@@ -56,7 +57,10 @@ const FEATURE_CROSS_LINKS: Record<FeaturePageKey, Array<{ card: string; page: Ma
 
 @inject()
 export default class MarketingFeaturesController {
-  constructor(private instrumentsContentService: MarketingInstrumentsContentService) {}
+  constructor(
+    private instrumentsContentService: MarketingInstrumentsContentService,
+    private installSignalKContentService: MarketingInstallSignalKContentService
+  ) {}
 
   async maintenance({ inertia, i18n }: HttpContext) {
     return inertia.render('marketing/feature', this.buildFeaturePageData(i18n, 'maintenance'))
@@ -78,6 +82,17 @@ export default class MarketingFeaturesController {
     return inertia.render('marketing/instruments', {
       locale: toAppLocale(i18n.locale),
       content: this.instrumentsContentService.build(i18n),
+    })
+  }
+
+  /**
+   * Page « Installer Signal K à bord » (#1022) : guide d'installation public
+   * (kits, deux chemins, HTTPS, dépannage), contenu servi par un service dédié.
+   */
+  async installSignalK({ inertia, i18n }: HttpContext) {
+    return inertia.render('marketing/install_signalk', {
+      locale: toAppLocale(i18n.locale),
+      content: this.installSignalKContentService.build(i18n),
     })
   }
 

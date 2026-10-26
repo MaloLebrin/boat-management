@@ -135,7 +135,7 @@ L'acquisition ne tourne que l'onglet ouvert : le flux est coupé quand la page p
 - **Chemin plugin** : `PUT instrument-source` (adresse par défaut `http://signalk.local:3000` si vide — la colonne `base_url` est NOT NULL), `POST …/ingest-token`, commande `signalkPluginInstallCommand(origin, jeton)`. L'attente du premier lot relance `router.reload({ only: ['instruments'] })` toutes les 10 s, 10 min au plus ; succès quand `source.lastSeenAt` dépasse l'instant d'ouverture.
 - **Chemin application** : pré-vol `probeSignalKServer({ preflight: true })` (adresse invalide / contenu mixte, sans réseau), `PUT`, puis sonde complète. Une nouvelle origine impose un rechargement complet (CSP par document, D10) : le drapeau `pendingTest` relance la sonde au retour.
 - **Moteurs** : `PATCH /boats/:boatId/engines/:engineId/instrument-key` (`{ instrumentKey }`, `null` détache) ; identifiants proposés = `propulsion.<id>` des dernières valeurs + inventaire de la sonde.
-- **Lien public** : `inertia/lib/signalk/install_page.ts` (`installSignalKPath`) — constante locale en attendant `MARKETING_SLUGS.installSignalK` (#1022).
+- **Lien public** : `inertia/lib/signalk/install_page.ts` (`installSignalKPath`) (sur `MARKETING_SLUGS.installSignalK`, #1022).
 - Le formulaire de source et la carte du plugin sont sous un `<details>` « Paramètres avancés ».
 
 ## Synchronisation métier (PR 4, #991)

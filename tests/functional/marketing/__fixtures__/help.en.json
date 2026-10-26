@@ -127,6 +127,11 @@
           "title": "AI part finder",
           "description": "Find the exact engine part reference from its serial number. Free, no account needed.",
           "href": "/en/engine-part-finder-ai"
+        },
+        {
+          "title": "Install Signal K on board",
+          "description": "Hardware, plugin or app, HTTPS address and troubleshooting: the complete guide to put your boat online.",
+          "href": "/en/install-signal-k-on-board"
         }
       ]
     },

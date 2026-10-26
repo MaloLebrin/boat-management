@@ -14,7 +14,8 @@
     "simulator": "Simulateur de coût",
     "help": "Aide",
     "instruments": "Instruments connectés",
-    "resources": "Ressources"
+    "resources": "Ressources",
+    "installSignalK": "Installer Signal K"
   },
   "actions": {
     "login": "Connexion",

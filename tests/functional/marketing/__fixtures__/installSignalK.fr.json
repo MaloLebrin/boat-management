@@ -1,0 +1,384 @@
+{
+  "content": {
+    "meta": {
+      "title": "Installer Signal K à bord : guide pas à pas",
+      "description": "Mets ton bateau en ligne toi-même : Raspberry Pi + OpenPlotter, Cerbo GX ou serveur Signal K existant, plugin ou appli, HTTPS avec Let's Encrypt, dépannage."
+    },
+    "hero": {
+      "eyebrow": "Guide d'installation",
+      "title": "Mets ton bateau en ligne",
+      "titleHighlight": "toi-même.",
+      "subtitle": "Du matériel à brancher jusqu'aux jauges dans FleetAi : ce guide couvre les trois situations de départ, les deux façons d'envoyer les mesures, l'adresse HTTPS qui fait trébucher tout le monde, et les pannes classiques. Pas besoin d'être informaticien, juste d'un après-midi au ponton.",
+      "primaryCta": {
+        "label": "Essayer gratuitement",
+        "href": "/signup?from=install-signalk"
+      },
+      "secondaryCta": {
+        "label": "Voir ce que lisent les instruments",
+        "href": "/fr/instruments-bateau-connectes"
+      },
+      "reassurance": "Plans Pro et Entreprise · FleetAi ne fait que lire, jamais piloter",
+      "durations": [
+        {
+          "label": "Serveur Signal K déjà en place, chemin plugin",
+          "value": "15 min"
+        },
+        {
+          "label": "Serveur déjà en place, chemin appli (avec HTTPS)",
+          "value": "30 à 60 min"
+        },
+        {
+          "label": "Rien à bord : Raspberry Pi, OpenPlotter et passerelle",
+          "value": "un après-midi"
+        }
+      ]
+    },
+    "kits": {
+      "eyebrow": "Étape 1",
+      "title": "Choisis ton matériel",
+      "titleHighlight": "selon ce que tu as déjà.",
+      "subtitle": "Signal K est le serveur libre qui traduit ton réseau NMEA en données lisibles. Trois points de départ, du plus complet au plus simple.",
+      "budgetLabel": "Budget indicatif",
+      "durationLabel": "Temps de mise en place",
+      "linksLabel": "Liens officiels",
+      "items": [
+        {
+          "title": "Rien à bord : Raspberry Pi + OpenPlotter",
+          "description": "Le kit de référence des plaisanciers. OpenPlotter est une image prête à flasher pour Raspberry Pi qui embarque Signal K, et une passerelle relie le Pi à ton réseau d'instruments.",
+          "budget": "150 à 350 € selon la passerelle",
+          "duration": "2 à 3 h, hors câblage",
+          "items": [
+            "Raspberry Pi 4 ou 5 (4 Go suffisent), carte microSD 32 Go, alimentation 12 V → 5 V stabilisée",
+            "Image OpenPlotter flashée sur la carte : Signal K y est préinstallé",
+            "Réseau NMEA 2000 : chapeau PICAN-M (il alimente aussi le Pi depuis le bus) ou passerelle USB Actisense NGT-1",
+            "Réseau NMEA 0183 : un simple convertisseur USB-série suffit, déclaré comme connexion dans Signal K"
+          ],
+          "links": [
+            {
+              "label": "Raspberry Pi",
+              "href": "https://www.raspberrypi.com/products/"
+            },
+            {
+              "label": "Documentation OpenPlotter",
+              "href": "https://openplotter.readthedocs.io/"
+            },
+            {
+              "label": "PICAN-M (SK Pang)",
+              "href": "https://www.skpang.co.uk/products/pican-m-with-can-bus-micro-c-and-rs422-connector-3a-smps"
+            },
+            {
+              "label": "Actisense NGT-1",
+              "href": "https://actisense.com/products/ngt-1-nmea-2000-to-pc-interface/"
+            }
+          ]
+        },
+        {
+          "title": "Un Victron Cerbo GX à bord",
+          "description": "Ton Cerbo GX sait déjà faire tourner Signal K : il suffit de passer en Venus OS Large et d'activer le service. Batteries, chargeurs et panneaux remontent sans rien ajouter.",
+          "budget": "0 €",
+          "duration": "30 min",
+          "items": [
+            "Dans la console du Cerbo : Paramètres → Micrologiciel → passer sur l'image Venus OS Large",
+            "Paramètres → Venus OS Large → activer Signal K, puis ouvrir l'admin sur le port 3000",
+            "Pour le moteur et les instruments de nav, ajoute une connexion NMEA 2000 sur le port VE.Can ou un adaptateur USB"
+          ],
+          "links": [
+            {
+              "label": "Venus OS Large (Victron)",
+              "href": "https://www.victronenergy.com/live/venus-os:large"
+            }
+          ]
+        },
+        {
+          "title": "Un serveur Signal K déjà présent",
+          "description": "Traceur, centrale ou mini-PC qui parle déjà Signal K : tu passes directement à l'étape 2. Vérifie seulement la version et que la sécurité est activée.",
+          "budget": "0 €",
+          "duration": "5 min",
+          "items": [
+            "Signal K 2.x conseillé : l'admin affiche la version en bas de page, la mise à jour se fait depuis l'Appstore",
+            "Sécurité activée (menu Security) : indispensable pour le chemin appli, recommandé dans tous les cas"
+          ],
+          "links": [
+            {
+              "label": "Site officiel Signal K",
+              "href": "https://signalk.org/"
+            }
+          ]
+        }
+      ]
+    },
+    "paths": {
+      "eyebrow": "Étape 2",
+      "title": "Choisis ton chemin :",
+      "titleHighlight": "plugin ou appli à bord.",
+      "subtitle": "Les deux arrivent au même résultat dans FleetAi. Le plugin tourne sur le serveur et pousse les mesures lui-même ; l'appli les lit depuis ton téléphone, à condition d'avoir l'écran ouvert sur le Wi-Fi du bord.",
+      "pluginTitle": "Le plugin Signal K",
+      "pluginBadge": "Recommandé",
+      "pluginDescription": "Une commande à coller dans un terminal du serveur. Il envoie les mesures dès que le bateau a du réseau, écran fermé ou téléphone à la maison. Aucune question de certificat.",
+      "appTitle": "L'appli à bord",
+      "appDescription": "Rien à installer sur le serveur : FleetAi lit Signal K en direct depuis ton navigateur. Il faut une adresse HTTPS pour le serveur et l'écran ouvert pendant la collecte.",
+      "criterionHeader": "Critère",
+      "rows": [
+        {
+          "criterion": "iPhone et iPad",
+          "plugin": "Oui, sans réglage : rien ne passe par le téléphone",
+          "app": "Oui avec un certificat de confiance ; non validé en auto-signé"
+        },
+        {
+          "criterion": "Écran ouvert nécessaire",
+          "plugin": "Non",
+          "app": "Oui, tant que tu veux collecter"
+        },
+        {
+          "criterion": "Adresse HTTPS du serveur",
+          "plugin": "Inutile",
+          "app": "Obligatoire (contenu mixte sinon)"
+        },
+        {
+          "criterion": "Jauges en direct dans l'onglet",
+          "plugin": "Dernières valeurs reçues, rafraîchies à chaque lot",
+          "app": "Oui, en temps réel sur le Wi-Fi du bord"
+        },
+        {
+          "criterion": "Réseau requis",
+          "plugin": "Internet à bord (4G, Starlink, Wi-Fi du port) ; met en file sinon",
+          "app": "Téléphone sur le Wi-Fi du bateau, avec Internet pour envoyer"
+        }
+      ]
+    },
+    "pluginHowTo": {
+      "eyebrow": "Chemin recommandé",
+      "title": "Installer le plugin",
+      "titleHighlight": "en une commande.",
+      "subtitle": "Quatre étapes, un terminal, aucun mot de passe à retenir. Le plugin signalk-fleetai est publié sur npm et maintenu par FleetAi.",
+      "totalTime": "15 minutes",
+      "packageName": "signalk-fleetai",
+      "steps": [
+        {
+          "title": "Génère ton jeton dans FleetAi",
+          "description": "Ouvre la fiche du bateau, onglet Instruments, carte « Plugin Signal K ». Génère un jeton d'ingestion : il s'affiche une seule fois, copie-le tout de suite. FleetAi n'en garde que l'empreinte ; tu peux le révoquer ou le régénérer quand tu veux."
+        },
+        {
+          "title": "Colle la commande sur le serveur",
+          "description": "Connecte-toi en SSH au Raspberry (sur OpenPlotter : utilisateur pi) ou ouvre un terminal sur le serveur, avec l'utilisateur qui fait tourner Signal K, pas en root. Remplace l'emplacement du jeton par le tien.",
+          "code": "curl -fsSL https://fleetai.app/install/signalk-plugin.sh | FLEETAI_TOKEN=fai_ing_… bash",
+          "codeLabel": "Commande d'installation",
+          "codeCaption": "Le script vérifie Node, npm et le serveur Signal K, installe le plugin, écrit sa configuration sans jamais afficher le jeton, puis redémarre Signal K s'il tourne en service. Tu peux le relancer sans risque."
+        },
+        {
+          "title": "Sans terminal : l'Appstore Signal K",
+          "description": "Dans l'admin Signal K, ouvre Appstore et cherche signalk-fleetai, installe, redémarre le serveur. Puis Server → Plugin Config → FleetAi : colle l'adresse d'ingestion et le jeton affichés dans l'onglet Instruments, active le plugin et enregistre."
+        },
+        {
+          "title": "Vérifie que ça remonte",
+          "description": "Retourne dans l'onglet Instruments : le bandeau passe en « Lecture par le plugin » et la dernière donnée reçue date de moins de deux minutes. Sur le serveur, la ligne FleetAi du tableau de bord des plugins indique le dernier envoi."
+        }
+      ]
+    },
+    "appHowTo": {
+      "eyebrow": "Chemin alternatif",
+      "title": "Brancher l'appli",
+      "titleHighlight": "sur ton serveur.",
+      "subtitle": "Rien à installer côté bateau. Le point délicat est l'adresse HTTPS : FleetAi est servi en HTTPS et ton navigateur refuse de lire un serveur en http://. La section suivante te guide.",
+      "totalTime": "30 à 60 minutes, HTTPS compris",
+      "steps": [
+        {
+          "title": "Active la sécurité de Signal K",
+          "description": "Dans l'admin Signal K, menu Security, active la sécurité si elle ne l'est pas et crée ton compte administrateur. Sans ça, n'importe qui sur le Wi-Fi du bord peut lire et écrire sur ton bateau."
+        },
+        {
+          "title": "Crée un compte en lecture seule et son jeton",
+          "description": "Ajoute un utilisateur dédié à FleetAi avec la permission Read only, puis génère un jeton pour ce compte (Security → Access Requests ou Users selon la version). FleetAi ne fait que lire : il n'a pas besoin de plus."
+        },
+        {
+          "title": "Donne au serveur une adresse HTTPS",
+          "description": "Un nom de domaine qui pointe vers l'IP locale du bateau et un certificat de confiance : c'est le chemin qui marche partout, iPhone compris. Détail pas à pas juste en dessous."
+        },
+        {
+          "title": "Saisis l'adresse et teste dans FleetAi",
+          "description": "Fiche du bateau, onglet Instruments : renseigne l'adresse https:// du serveur et le jeton, enregistre, puis « Tester la connexion ». Avec le téléphone sur le Wi-Fi du bord, les jauges s'affichent en direct."
+        }
+      ]
+    },
+    "https": {
+      "eyebrow": "Le passage obligé du chemin appli",
+      "title": "Une adresse HTTPS",
+      "titleHighlight": "pour ton serveur.",
+      "subtitle": "Le navigateur bloque un serveur http:// depuis une page HTTPS, c'est le fameux « contenu mixte ». La solution propre tient en quatre étapes et ne coûte rien.",
+      "steps": [
+        {
+          "title": "Un nom de domaine qui pointe vers le bateau",
+          "description": "Le plus simple : un sous-domaine gratuit DuckDNS (monbateau.duckdns.org) dont tu règles l'enregistrement A sur l'IP locale du serveur, par exemple 192.168.1.50. Un domaine à toi fonctionne pareil. Le certificat ne se soucie pas que l'IP soit privée.",
+          "links": [
+            {
+              "label": "DuckDNS",
+              "href": "https://www.duckdns.org/"
+            }
+          ]
+        },
+        {
+          "title": "Un certificat Let's Encrypt par défi DNS-01",
+          "description": "Le bateau n'est pas joignable depuis Internet, donc pas de défi HTTP. Le défi DNS-01 prouve que tu contrôles le domaine : certbot (ou acme.sh) avec le module DNS de ton fournisseur, DuckDNS inclus. Le certificat est gratuit et se renouvelle tout seul.",
+          "links": [
+            {
+              "label": "Let's Encrypt : types de défis",
+              "href": "https://letsencrypt.org/docs/challenge-types/"
+            }
+          ]
+        },
+        {
+          "title": "Confie le certificat à Signal K, ou mets Caddy devant",
+          "description": "Option A : copie la clé et le certificat sous ces noms dans le dossier de Signal K, active SSL dans Server → Settings et redémarre ; le serveur écoute en https sur le port 3443. Option B : laisse Signal K en http et place Caddy en frontal, qui gère le certificat pour toi.",
+          "code": "~/.signalk/ssl-key.pem\n~/.signalk/ssl-cert.pem",
+          "codeLabel": "Fichiers attendus par Signal K",
+          "codeCaption": "Sur OpenPlotter, le dossier est /home/pi/.signalk. Redémarre Signal K après chaque renouvellement, ou automatise-le avec un crochet de certbot.",
+          "links": [
+            {
+              "label": "Caddy",
+              "href": "https://caddyserver.com/"
+            }
+          ]
+        },
+        {
+          "title": "Vérifie depuis le téléphone",
+          "description": "Sur le Wi-Fi du bord, ouvre https://monbateau.duckdns.org:3443 dans le navigateur : l'admin Signal K doit s'afficher sans avertissement. C'est cette adresse, sans rien derrière le port, que tu saisis dans FleetAi."
+        }
+      ],
+      "fallbackTitle": "Le repli : le certificat auto-signé de Signal K",
+      "fallbackDescription": "Si tu actives SSL sans fournir de certificat, Signal K en génère un lui-même. Sur Android et sur ordinateur, ouvre une fois https://<adresse>:3443, accepte l'avertissement, et FleetAi pourra lire. C'est moins propre et l'avertissement revient à chaque nouvel appareil.",
+      "iphoneTitle": "iPhone et iPad",
+      "iphoneNote": "iOS exige d'installer et d'approuver le profil du certificat auto-signé, et nous n'avons pas encore validé cette configuration sur appareil. Si tu dépends d'un iPhone à bord, choisis le nom de domaine, ou le plugin, qui n'a besoin d'aucune de ces étapes."
+    },
+    "engines": {
+      "eyebrow": "Étape 3",
+      "title": "Relie tes moteurs,",
+      "titleHighlight": "puis laisse faire.",
+      "subtitle": "Une fois les mesures qui arrivent, trois choses se passent dans FleetAi sans que tu lèves le petit doigt.",
+      "items": [
+        {
+          "title": "Relier chaque moteur à son calculateur",
+          "description": "Dans la fiche du moteur, renseigne l'identifiant instruments : le segment que Signal K affiche après propulsion dans Data Browser, par exemple port, starboard ou main. Un seul moteur ? L'identifiant unique du serveur est proposé.",
+          "icon": "engine"
+        },
+        {
+          "title": "Les heures avancent toutes seules",
+          "description": "Le compteur du calculateur fait progresser les heures du moteur, une heure entière à la fois. Les échéances d'entretien en heures suivent, et le carnet garde la trace de chaque mise à jour automatique.",
+          "icon": "clock"
+        },
+        {
+          "title": "Alertes et journal de bord",
+          "description": "Batterie sous 20 %, moteur trop chaud, petits fonds, alarmes Signal K : toute l'équipe est prévenue. À la clôture d'une sortie, les heures d'arrivée sont préremplies depuis les relevés.",
+          "icon": "alarm"
+        }
+      ]
+    },
+    "troubleshooting": {
+      "eyebrow": "Dépannage",
+      "title": "Ça ne remonte pas ?",
+      "titleHighlight": "Les six cas qu'on voit passer.",
+      "subtitle": "Le bandeau de l'onglet Instruments nomme l'erreur. Voici ce qu'elle veut dire et par où commencer.",
+      "symptomHeader": "Symptôme",
+      "causeHeader": "Cause probable et remède",
+      "rows": [
+        {
+          "symptom": "« Le navigateur bloque les adresses http:// » (contenu mixte)",
+          "cause": "L'adresse saisie commence par http:// alors que FleetAi est en HTTPS. Passe le serveur en HTTPS (section ci-dessus) ou installe le plugin : le bandeau affichera alors « Lecture par le plugin »."
+        },
+        {
+          "symptom": "Erreur de certificat",
+          "cause": "Certificat auto-signé pas encore accepté sur cet appareil (ouvre l'adresse :3443 une fois), nom de domaine qui ne correspond pas au certificat, ou certificat expiré : vérifie le renouvellement."
+        },
+        {
+          "symptom": "« Non autorisé »",
+          "cause": "Jeton absent, expiré ou révoqué, ou compte sans permission de lecture. Régénère un jeton dans Signal K et ressaisis-le : FleetAi ne le relit jamais après enregistrement."
+        },
+        {
+          "symptom": "« Serveur injoignable »",
+          "cause": "Le téléphone n'est pas sur le Wi-Fi du bateau, l'IP du serveur a changé (fixe-la dans ta box ou dans OpenPlotter), ou le port est faux : 3000 en http, 3443 en https."
+        },
+        {
+          "symptom": "Jauges figées avec « périmé »",
+          "cause": "Plus de nouvelle valeur depuis deux minutes : écran verrouillé, serveur éteint ou hors de portée. Avec le plugin, vérifie que le bateau a du réseau et que le plugin est activé dans Plugin Config."
+        },
+        {
+          "symptom": "Aucune valeur dans l'historique",
+          "cause": "Avec l'appli, l'acquisition ne tourne que page ouverte. Si l'écran est resté fermé, rien n'a été envoyé : c'est exactement le cas que le plugin règle."
+        }
+      ]
+    },
+    "crossLinks": {
+      "eyebrow": "Aller plus loin",
+      "title": "FleetAi ne s'arrête pas là",
+      "linkLabel": "Découvrir",
+      "items": [
+        {
+          "title": "Instruments de bord connectés",
+          "description": "Moteur, batteries, réservoirs et AIS lus depuis ton serveur Signal K, croisés et interprétés à bord par une IA locale.",
+          "href": "/fr/instruments-bateau-connectes"
+        },
+        {
+          "title": "Centre d’aide",
+          "description": "Questions fréquentes, contact et démo : tout pour démarrer et pour nous joindre.",
+          "href": "/fr/aide"
+        },
+        {
+          "title": "Carnet d'entretien numérique",
+          "description": "L'historique, les documents et les échéances de chaque bateau, au même endroit.",
+          "href": "/fr/carnet-entretien-bateau"
+        }
+      ]
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Les questions",
+      "titleHighlight": "qu'on nous pose avant d'installer.",
+      "items": [
+        {
+          "q": "Il faut être informaticien ?",
+          "a": "Non. Flasher une carte SD, brancher un chapeau sur un Raspberry et coller une commande dans un terminal, c'est tout ce que demande le chemin plugin. La partie HTTPS du chemin appli est la seule qui réclame un peu de patience, et tu peux l'éviter en choisissant le plugin."
+        },
+        {
+          "q": "Plugin ou appli, je choisis quoi ?",
+          "a": "Le plugin, sauf raison contraire : il tourne sans toi, écran fermé, sur iPhone comme ailleurs, et n'a pas besoin d'adresse HTTPS. L'appli garde un avantage : les jauges en temps réel dans l'onglet quand tu es à bord. Les deux peuvent cohabiter."
+        },
+        {
+          "q": "Le bateau n'a pas Internet au mouillage, le plugin sert à quoi ?",
+          "a": "Il met les lots en file et les envoie dès qu'une connexion revient : 4G du téléphone en partage, Wi-Fi du port, Starlink. Rien n'est perdu entre-temps, et l'historique se recale à l'arrivée."
+        },
+        {
+          "q": "Ça marche sur iPhone ?",
+          "a": "Avec le plugin, oui, sans aucune manipulation. Avec l'appli, oui si ton serveur a un certificat de confiance (nom de domaine + Let's Encrypt). Le certificat auto-signé sur iPhone n'est pas encore validé par notre équipe."
+        },
+        {
+          "q": "Faut-il ouvrir le serveur du bateau sur Internet ?",
+          "a": "Non, et on te le déconseille. Le défi DNS-01 de Let's Encrypt délivre un certificat sans que le serveur soit joignable depuis l'extérieur, et le plugin pousse les données vers FleetAi : aucune connexion entrante n'est nécessaire."
+        },
+        {
+          "q": "Mon Cerbo GX suffit ou il me faut un Raspberry ?",
+          "a": "Pour l'énergie (batteries, chargeurs, solaire), le Cerbo en Venus OS Large suffit : Signal K y tourne nativement. Pour lire le moteur et les instruments de nav, il doit aussi recevoir le réseau NMEA 2000, via le port VE.Can ou un adaptateur USB."
+        },
+        {
+          "q": "FleetAi peut-il modifier quelque chose sur le bateau ?",
+          "a": "Non. Le compte Signal K conseillé est en lecture seule, le plugin n'émet que des envois vers FleetAi, et aucune commande n'est jamais renvoyée vers le bord. Tu peux révoquer le jeton à tout moment."
+        },
+        {
+          "q": "Quel plan faut-il ?",
+          "a": "Les instruments connectés font partie des plans Pro et Entreprise. L'historique est conservé 7 jours en Pro et 30 jours en Entreprise ; le reste de FleetAi reste accessible avec le plan Starter gratuit."
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Prêt à mettre ton bateau",
+      "titleHighlight": "en ligne ?",
+      "subtitle": "Crée ton compte, ouvre l'onglet Instruments et génère ton jeton : la commande d'installation t'attend, préremplie.",
+      "primaryCta": {
+        "label": "Créer mon compte gratuit",
+        "href": "/signup?from=install-signalk"
+      },
+      "secondaryCta": {
+        "label": "Voir la page instruments",
+        "href": "/fr/instruments-bateau-connectes"
+      }
+    }
+  }
+}

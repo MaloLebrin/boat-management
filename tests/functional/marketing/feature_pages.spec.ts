@@ -61,7 +61,7 @@ test.group('Page Aide & support', () => {
       assert.isNotEmpty(props.t.meta.title)
       assert.lengthOf(props.t.channels, 3)
       assert.lengthOf(props.t.faq.groups, 3)
-      assert.lengthOf(props.t.resources.items, 4)
+      assert.lengthOf(props.t.resources.items, 5)
 
       const serialized = JSON.stringify(props.t)
       // Aucune clé de traduction non résolue.

@@ -28,13 +28,17 @@ test.group('E2E · Assistant de connexion Signal K', (group) => {
     await page.locator('[data-testid="instrument-setup-hardware-signalk"]').click()
     await page.locator('[data-testid="instrument-setup-path-plugin"]').click()
     await page.locator('input[name="setupBaseUrl"]').fill('http://localhost:3000')
-    await page.locator('[data-testid="instrument-setup-plugin"] form button[type="submit"]').click()
-
-    // Première source : rechargement complet (CSP par document), puis jeton.
-    await page.waitForURL(/tab=instruments/)
+    // Première source : rechargement complet (CSP par document) ; on l'attend
+    // avant de générer le jeton, sinon le flash serait perdu avec la page.
+    await Promise.all([
+      page.waitForNavigation(),
+      page.locator('[data-testid="instrument-setup-plugin"] form button[type="submit"]').click(),
+    ])
+    await page.waitForLoadState('networkidle')
     await page.locator('[data-testid="instrument-setup-generate"]').click()
-    const command = await page.locator('[data-testid="base-code-block"] code').innerText()
-    const token = /FLEETAI_TOKEN=(fai_ing_\S+)/.exec(command)?.[1]
+    const code = page.locator('[data-testid="base-code-block"] code')
+    await code.filter({ hasText: /FLEETAI_TOKEN=fai_ing_[A-Za-z0-9_-]+/ }).waitFor()
+    const token = /FLEETAI_TOKEN=(fai_ing_[A-Za-z0-9_-]+)/.exec(await code.innerText())?.[1]
     assert.isDefined(token, 'la commande porte le jeton généré')
 
     const response = await page.request.post('/api/instruments/ingest', {
