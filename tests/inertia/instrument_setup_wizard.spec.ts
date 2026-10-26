@@ -5,14 +5,17 @@ import type {
   InstrumentSourceConnection,
 } from '../../shared/types/instruments'
 
-const h = vi.hoisted(() => ({
-  put: vi.fn(),
-  post: vi.fn(),
-  patch: vi.fn(),
-  reload: vi.fn(),
-  flash: { value: {} as Record<string, unknown> },
-  probe: vi.fn(),
-}))
+const h = await vi.hoisted(async () => {
+  const { shallowRef } = await import('vue')
+  return {
+    put: vi.fn(),
+    post: vi.fn(),
+    patch: vi.fn(),
+    reload: vi.fn(),
+    flash: shallowRef<Record<string, unknown>>({}),
+    probe: vi.fn(),
+  }
+})
 
 vi.mock('@inertiajs/vue3', () => ({
   useForm: (initial: Record<string, unknown>) => {
@@ -30,7 +33,11 @@ vi.mock('@inertiajs/vue3', () => ({
     return form
   },
   router: { post: h.post, patch: h.patch, reload: h.reload },
-  usePage: () => ({ props: { flash: h.flash.value, appT: {}, locale: 'fr' } }),
+  usePage: () => ({
+    get props() {
+      return { flash: h.flash.value, appT: {}, locale: 'fr' }
+    },
+  }),
 }))
 vi.mock('~/composables/use_t', () => ({
   useT: () => ({
@@ -312,5 +319,20 @@ describe('parcours application (#1023)', () => {
     expect(JSON.parse(window.localStorage.getItem('fleetai:instrument-setup:9')!).pendingTest).toBe(
       false
     )
+  })
+})
+
+describe('jeton flashé conservé (#1023)', () => {
+  test('la commande garde le jeton quand le flash disparaît d’un rechargement partiel', async () => {
+    stored({ hardware: 'signalk', path: 'plugin' })
+    h.flash.value = { instrumentIngestToken: 'fai_ing_KEEP' }
+    const wrapper = mountWizard(tab({ source: source({ hasIngestToken: true }) }))
+    await flushPromises()
+    expect(wrapper.find('[data-testid="base-code-block"]').text()).toContain('fai_ing_KEEP')
+
+    h.flash.value = {}
+    await wrapper.setProps({ instruments: tab({ source: source({ hasIngestToken: true }) }) })
+    expect(wrapper.find('[data-testid="base-code-block"]').text()).toContain('fai_ing_KEEP')
+    wrapper.unmount()
   })
 })

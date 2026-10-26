@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { router, useForm } from '@inertiajs/vue3'
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCodeBlock from '~/components/base/BaseCodeBlock.vue'
 import BaseInput from '~/components/base/BaseInput.vue'
@@ -26,7 +26,18 @@ const props = defineProps<{
 const emit = defineEmits<{ wait: [] }>()
 
 const { t } = useT()
-const freshToken = useInstrumentIngestToken()
+const flashToken = useInstrumentIngestToken()
+// Le flash ne vit que le temps d'une réponse : un rechargement partiel de la
+// page (prop différée `instruments`, attente du premier lot) l'efface. On le
+// garde donc tant que l'étape est affichée.
+const freshToken = ref<string | null>(null)
+watch(
+  flashToken,
+  (token) => {
+    if (token) freshToken.value = token
+  },
+  { immediate: true }
+)
 const tokenUrl = computed(() => `/boats/${props.boatId}/instrument-source/ingest-token`)
 
 const form = useForm({
