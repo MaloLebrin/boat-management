@@ -524,6 +524,7 @@
       "boat_instrument_alert_rule_delete": "Règle d'alerte d'instrument supprimée",
       "boat_instrument_ingest_token_issue": "Jeton d'ingestion du plugin généré",
       "boat_instrument_ingest_token_revoke": "Jeton d'ingestion du plugin révoqué",
+      "boat_instrument_pairing_attach": "Boîtier Signal K appairé par code",
       "reservation_force_unavailable": "Réservation forcée sur un bateau indisponible",
       "reservation_payment_recorded": "Encaissement enregistré sur une réservation",
       "reservation_security_deposit_held": "Caution bloquée",

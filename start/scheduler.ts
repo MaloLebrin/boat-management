@@ -13,6 +13,7 @@ import ScanFleetNotifications from '#jobs/scan_fleet_notifications'
 import GenerateAiSuggestions from '#jobs/generate_ai_suggestions'
 import ReconcileMedia from '#jobs/reconcile_media'
 import SyncExternalCalendars from '#jobs/sync_external_calendars'
+import PurgeInstrumentPairings from '#jobs/purge_instrument_pairings'
 import PurgeTelemetrySamples from '#jobs/purge_telemetry_samples'
 import PurgeTrashedBoats from '#jobs/purge_trashed_boats'
 import PurgeDeletedAccounts from '#jobs/purge_deleted_accounts'
@@ -71,6 +72,14 @@ await PurgeTelemetrySamples.schedule({})
   .cron('15 1 * * *')
   .timezone('Europe/Paris')
   .id('daily-purge-telemetry-samples')
+  .run()
+
+// Appairages de boîtier Signal K (#1032) : un code expiré ne sert plus à rien,
+// et chaque ligne porte un libellé d'appareil saisi par un tiers non authentifié.
+await PurgeInstrumentPairings.schedule({})
+  .cron('20 1 * * *')
+  .timezone('Europe/Paris')
+  .id('daily-purge-instrument-pairings')
   .run()
 
 await ResetAiTokenUsage.schedule({})

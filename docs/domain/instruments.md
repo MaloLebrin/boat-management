@@ -18,6 +18,9 @@ Acquérir sans saisie les données des instruments d'un bateau (moteur, position
 | POST    | `/boats/:boatId/instrument-source/ingest-token` | `boats.instrumentIngestToken.store`   | `manage` (#994)                   |
 | DELETE  | `/boats/:boatId/instrument-source/ingest-token` | `boats.instrumentIngestToken.destroy` | `manage` (#994)                   |
 | POST    | `/api/instruments/ingest`                       | `api.instruments.ingest`              | jeton Bearer de la source (#994)  |
+| POST    | `/boats/:boatId/instrument-source/pairing`      | `boats.instrumentPairing.store`       | `manage` (#1032)                  |
+| POST    | `/api/instruments/pairing`                      | `api.instruments.pairing.store`       | aucune, limiteur par IP (#1032)   |
+| POST    | `/api/instruments/pairing/poll`                 | `api.instruments.pairing.poll`        | `deviceCode`, limiteur par IP     |
 
 `view` (`boats.view`) couvre la lecture. `instruments.manage` est une capacité **admin seulement** : un member lit les jauges et pousse la télémétrie, mais ne branche pas de serveur.
 
@@ -205,6 +208,30 @@ Repli universel sans navigateur (D1) : un plugin installé sur le serveur Signal
   - **Gardes** : `tests/unit/hygiene/signalk_plugin_vocabulary.spec.ts` (script ↔ constantes, aucun autre nom de paquet dans les textes), `tests/unit/install/signalk_plugin_script.spec.ts` (`bash -n` + exécution en dry-run), `shellcheck` dans le job lint de la CI.
 - Audit : `boat.instrument_ingest_token_issue` / `_revoke`. Aucune clé de chiffrement : un sha256 suffit pour un jeton à haute entropie, et la valeur en clair n'est jamais relisible.
 
+## Appairage par code du boîtier (#1032, D11)
+
+Supprime le jeton à copier : un boîtier Signal K (image Raspberry Pi, niveau 1 ; kit, niveau 2) obtient un code court que l'admin saisit dans FleetAi. Flux « device » façon RFC 8628. Cette PR livre l'API ; le plugin, l'image, l'assistant et la page publique suivent (issue #1032, parties B à D).
+
+**Table `instrument_pairings`.** `device_code_hash` et `user_code_hash` (uniques), `device_label` (80), `hardware_kind` (40), `plugin_version` (40) — facultatifs, déclarés par le boîtier —, `boat_id` / `organization_id` / `claimed_by_user_id` (**nuls à la création** : le boîtier existe avant d'être rattaché, ce qui permet le rattachement par QR code au niveau 2), `expires_at`, `approved_at`, `consumed_at`.
+
+**Étapes.**
+
+1. `POST /api/instruments/pairing` (sans authentification, ni session ni CSRF) — corps JSON facultatif `{ deviceLabel?, hardwareKind?, pluginVersion? }` ; `201 { deviceCode, userCode, expiresIn: 600, interval: 5 }`. `userCode` = `ABCD-EFGH`, 8 symboles d'un alphabet de 31 caractères **sans ambiguïté** (ni `0/O` ni `1/I/L`), soit ≈ 8,5·10¹¹ valeurs. `deviceCode` = `fai_pair_` + 32 octets aléatoires (base64url). Les deux n'existent en clair que dans cette réponse (`Cache-Control: no-store`).
+2. L'admin saisit le `userCode` : `POST /boats/:boatId/instrument-source/pairing { userCode }` — route Inertia, `InstrumentSourcePolicy.manage` (admin), plans Pro/Entreprise (`requireModulePlan`). Casse, tirets et espaces sont ignorés. Le bateau est rattaché, la source créée si besoin (adresse `http://signalk.local:3000`, comme l'assistant), `approved_at` posé, l'expiration repoussée de 5 min au besoin (délai pour que le boîtier vienne chercher son jeton). Redirection avec flash `success` ou `error`. Audit : `boat.instrument_pairing_attach` (libellé, type de matériel, version du plugin — jamais de code).
+3. `POST /api/instruments/pairing/poll { deviceCode }` — `200 { status: 'pending', interval }` | `{ status: 'expired' }` | `{ status: 'approved', token }`. `expired` couvre aussi un `deviceCode` inconnu ou déjà livré : le boîtier recommence. Un appairage livré ne livre plus jamais rien.
+
+**Livraison du jeton, une seule fois, sans le stocker.** Le jeton `fai_ing_…` n'est pas créé au rattachement mais **à la première interrogation qui le suit** : `poll` verrouille la ligne (`SELECT … FOR UPDATE`), appelle `InstrumentIngestTokenService.issueForBoat` (qui ne persiste que le sha256 dans `boat_instrument_sources`), pose `consumed_at` puis renvoie le clair. Il n'existe donc nulle part en base, même chiffré, et deux interrogations simultanées ne livrent qu'un jeton. Conséquences : si la source du bateau a été supprimée entre-temps, le boîtier reçoit `expired` ; rattacher un bateau qui avait déjà un jeton **remplace** (révoque) l'ancien au moment de la livraison, comme une régénération.
+
+**Sécurité.**
+
+- Seules des **empreintes** sont stockées : `sha256` pour le `deviceCode` (256 bits d'entropie), **HMAC-SHA256 clé `APP_KEY`** pour le `userCode` (≈ 40 bits : un sha256 nu se retrouverait par force brute si la table fuitait). Les empreintes ne sont jamais sérialisées.
+- **Même erreur observable** pour un code inconnu, mal formé ou expiré (flash `pairingCodeInvalid`). « Déjà utilisé » est distinct, mais ne se déclenche que pour qui détient un code valide.
+- **Limites de débit** : création 10 / 10 min / IP, interrogation 120 / min / IP (`start/limiter.ts`) ; saisie du code **5 échecs / 15 min / utilisateur** (`INSTRUMENT_PAIRING_ATTEMPT_LIMIT`, `limiter.penalize` : seuls les échecs comptent, un succès remet à zéro, plafond atteint plus aucun code n'est vérifié — flash `pairingRateLimited`).
+- Champs facultatifs bornés et sans caractères de contrôle (VineJS) ; affichés échappés. Aucun `logger` ne reçoit de code ni de jeton (garde dans `tests/unit/services/instrument_pairing_service.spec.ts`).
+- **Purge** : `PurgeInstrumentPairings`, tous les jours à 01:20 (`start/scheduler.ts`), supprime les appairages expirés, livrés ou non.
+
+**Fichiers.** `app/services/instrument_pairing_service.ts`, `app/controllers/instrument_pairing_api_controller.ts` (JSON) et `instrument_pairings_controller.ts` (Inertia), `app/models/instrument_pairing.ts`, `app/jobs/purge_instrument_pairings.ts`, `app/exceptions/instrument_pairing_errors.ts`, validateurs `*InstrumentPairingValidator`, `shared/constants/instruments.ts` (`INSTRUMENT_PAIRING_*`), `shared/helpers/instruments.ts` (`normalizeInstrumentPairingUserCode`, `formatInstrumentPairingUserCode`, réutilisables par l'assistant), `database/factories/instrument_pairing_factory.ts`. Tests : `tests/functional/instruments/instrument_pairing.spec.ts`, `tests/unit/services/instrument_pairing_service.spec.ts`.
+
 ## Cibles AIS (#1009)
 
 Les autres navires que le serveur Signal K reçoit par AIS (contextes `vessels.urn:mrn:imo:mmsi:<mmsi>`) s'affichent dans l'onglet, **sont historisés** avec une rétention courte, et réutilisent le tuyau de la télémétrie sans le modifier. Un bateau reste une seule source ; l'AIS n'a ni table de sources ni jeton propres.
@@ -242,6 +269,7 @@ app/events/telemetry_ingested.ts, app/listeners/on_telemetry_ingested.ts
 app/services/engine_hours_sync_service.ts, position_sync_service.ts, telemetry_retention_service.ts
 app/services/ais_target_service.ts, app/models/boat_ais_sighting.ts (#1009)
 app/jobs/purge_telemetry_samples.ts
+app/services/instrument_pairing_service.ts, app/controllers/instrument_pairing(s|_api)_controller.ts, app/models/instrument_pairing.ts, app/jobs/purge_instrument_pairings.ts (#1032)
 app/exceptions/instrument_errors.ts
 app/utils/csp_connect_src.ts
 shared/types/instruments.ts, shared/constants/instruments.ts, shared/helpers/instruments.ts

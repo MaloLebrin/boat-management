@@ -1,4 +1,6 @@
 import {
+  INSTRUMENT_PAIRING_USER_CODE_ALPHABET,
+  INSTRUMENT_PAIRING_USER_CODE_LENGTH,
   SIGNALK_PLUGIN_ENV_TOKEN,
   SIGNALK_PLUGIN_INSTALL_PATH,
   TELEMETRY_SERIES_MAX_PATHS,
@@ -116,4 +118,25 @@ export function parseSeriesQuery(qs: Record<string, unknown>): InstrumentSeriesQ
 export function signalkPluginInstallCommand(origin: string, token: string | null): string {
   const base = origin.replace(/\/+$/, '')
   return `curl -fsSL ${base}${SIGNALK_PLUGIN_INSTALL_PATH} | ${SIGNALK_PLUGIN_ENV_TOKEN}=${token ?? 'fai_ing_…'} bash`
+}
+
+/**
+ * Forme canonique d'un code d'appairage saisi (#1032) : majuscules, sans
+ * espaces ni tirets. `null` si la longueur ou l'alphabet ne correspondent pas
+ * — inutile alors d'interroger le serveur. Le client et le serveur l'appliquent
+ * à l'identique.
+ */
+export function normalizeInstrumentPairingUserCode(raw: string): string | null {
+  const code = raw.toUpperCase().replaceAll(/[\s-]/g, '')
+  if (code.length !== INSTRUMENT_PAIRING_USER_CODE_LENGTH) return null
+  for (const char of code) {
+    if (!INSTRUMENT_PAIRING_USER_CODE_ALPHABET.includes(char)) return null
+  }
+  return code
+}
+
+/** `ABCDEFGH` → `ABCD-EFGH` : le format affiché par le boîtier. */
+export function formatInstrumentPairingUserCode(code: string): string {
+  const half = Math.floor(code.length / 2)
+  return `${code.slice(0, half)}-${code.slice(half)}`
 }

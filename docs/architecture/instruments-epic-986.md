@@ -129,6 +129,18 @@ Conséquence de la mesure ci-dessus : une passerelle qui rejoue ou retarde des p
 
 Corollaire : une page `https:` ne peut pas appeler une adresse `http:` (contenu mixte, hors `localhost`/`127.0.0.1`). Le client lève `mixed_content` **avant tout fetch**, erreur terminale sans reconnexion ; si un jeton de plugin existe, l'onglet affiche « lecture par le plugin » au lieu d'une erreur.
 
+### D11 — Appairage par code (#1032)
+
+Le jeton `fai_ing_…` copié à la main (#994, #1021) est la barrière du « plug and play ». Décision : un flux « device » façon RFC 8628 — le boîtier crée un appairage, affiche un `userCode` court, l'admin le saisit dans FleetAi, le boîtier récupère son jeton en interrogeant `poll`.
+
+- **Pourquoi pas un code qui _est_ le jeton.** Un code saisi à la main doit être court (8 symboles, ≈ 40 bits) : trop faible pour authentifier des envois. Il ne sert qu'à **désigner** un appairage pendant 10 min, sous limite d'essais par utilisateur ; l'authentification du boîtier repose sur le `deviceCode` (256 bits) puis sur le jeton d'ingestion.
+- **Livraison sans stockage.** Alternatives écartées : chiffrer le jeton en base jusqu'à la livraison (une donnée vivante de plus, une clé à gérer, et un jeton lisible si `ENCRYPTION_KEY` fuite) ; le renvoyer au navigateur (retour au presse-papiers). Retenu : **générer le jeton au `poll`**, sous verrou de ligne, dans la même transaction que `consumed_at`. Le clair ne transite que dans la réponse HTTPS au boîtier.
+- **Empreintes.** `sha256` pour le `deviceCode` ; HMAC `APP_KEY` pour le `userCode` (espace réduit → pas de sha256 nu).
+- **Anti-énumération.** Inconnu, mal formé et expiré donnent la même erreur ; essais ratés plafonnés par utilisateur (5 / 15 min), création et interrogation plafonnées par IP.
+- **Niveau 2.** L'appairage existe avant d'être rattaché (`boat_id`, `organization_id`, `claimed_by_user_id` nuls) et porte `hardware_kind` : un QR code `…/pair?code=ABCD-EFGH` imprimé sur le coffret pourra pré-remplir la saisie sans changer le modèle. Pas de numéro de série ni de notion de commande à ce stade.
+- **Rétrocompatibilité.** Le parcours manuel (jeton + script, #1021) est inchangé.
+- **Sources sans adresse.** La source créée au rattachement reçoit `http://signalk.local:3000` (D-assistant, `base_url` NOT NULL) ; l'admin la corrige dans « Paramètres avancés » si l'image utilise un autre nom d'hôte.
+
 ### Chemin recommandé
 
 1. **Nom DNS + certificat de confiance** sur le serveur Signal K (Let's Encrypt par défi DNS-01, le nom résout vers l'IP LAN du bateau) : fonctionne partout sans toucher aux appareils. À documenter côté utilisateur (une fois par bateau), et c'est ce que proposent déjà certaines distributions (OpenPlotter + Caddy).
@@ -148,6 +160,7 @@ Corollaire : une page `https:` ne peut pas appeler une adresse `http:` (contenu 
 - PR 4 : `boat_engines.instrument_key` + `instrument_run_time_s`, `navigation_log_entries.source` (`manual|instruments`).
 - PR 6 : `boat_instrument_alert_rules`, `boat_instrument_alerts`.
 - PR 7 : `boat_instrument_sources.ingest_token_hash`.
+- #1032 : `instrument_pairings` (voir D11).
 
 Les chemins acceptés sont une **liste blanche** (`shared/constants/instruments.ts`), partagée avec le catalogue client (catégorie, unité SI, unité d'affichage, fenêtre d'agrégation).
 

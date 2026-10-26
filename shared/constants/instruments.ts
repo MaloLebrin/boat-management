@@ -238,3 +238,50 @@ export const INSTRUMENT_SETUP_DEFAULT_URLS = {
  * source exige une origine (`base_url` NOT NULL), mais seul le plugin pousse.
  */
 export const INSTRUMENT_SETUP_PLUGIN_PLACEHOLDER_URL = 'http://signalk.local:3000'
+
+/**
+ * Appairage par code (#1032, D11) — flux « device » façon RFC 8628 : le
+ * boîtier obtient un `userCode` court à saisir dans FleetAi et un `deviceCode`
+ * secret avec lequel il interroge le serveur.
+ */
+
+/** Préfixe du `deviceCode` : repérable dans un dépôt ou un journal. */
+export const INSTRUMENT_PAIRING_DEVICE_CODE_PREFIX = 'fai_pair_'
+
+/** Entropie du `deviceCode`, en octets (base64url). */
+export const INSTRUMENT_PAIRING_DEVICE_CODE_BYTES = 32
+
+/** Garde-fou sur la longueur d'un `deviceCode` avant tout hachage. */
+export const INSTRUMENT_PAIRING_DEVICE_CODE_MAX_LENGTH = 128
+
+/**
+ * Alphabet du `userCode` : 31 symboles, sans `0/O` ni `1/I/L` (lisibles à
+ * l'écran d'un boîtier, saisis au clavier).
+ */
+export const INSTRUMENT_PAIRING_USER_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'
+
+/** Symboles du `userCode`, hors tiret : 31⁸ ≈ 8,5·10¹¹ valeurs. */
+export const INSTRUMENT_PAIRING_USER_CODE_LENGTH = 8
+
+/** Durée de vie d'un appairage non rattaché, en secondes (RFC 8628 : 10 min). */
+export const INSTRUMENT_PAIRING_TTL_SECONDS = 600
+
+/** Intervalle d'interrogation demandé au boîtier, en secondes. */
+export const INSTRUMENT_PAIRING_POLL_INTERVAL_SECONDS = 5
+
+/**
+ * Délai accordé au boîtier pour venir chercher son jeton une fois l'appairage
+ * rattaché : l'expiration est repoussée à `approbation + délai` si elle tombe avant.
+ */
+export const INSTRUMENT_PAIRING_DELIVERY_GRACE_SECONDS = 300
+
+/** Tentatives de saisie de code ratées par utilisateur et par fenêtre. */
+export const INSTRUMENT_PAIRING_ATTEMPT_LIMIT = { requests: 5, duration: '15 minutes' } as const
+
+export const INSTRUMENT_PAIRING_DEVICE_LABEL_MAX_LENGTH = 80
+export const INSTRUMENT_PAIRING_HARDWARE_KIND_MAX_LENGTH = 40
+export const INSTRUMENT_PAIRING_PLUGIN_VERSION_MAX_LENGTH = 40
+
+/** Chemins de l'API d'appairage du plugin (hors session, exemptés de CSRF). */
+export const INSTRUMENT_PAIRING_PATH = '/api/instruments/pairing'
+export const INSTRUMENT_PAIRING_POLL_PATH = '/api/instruments/pairing/poll'

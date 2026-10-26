@@ -44,6 +44,8 @@ export const AUDIT_ACTIONS = [
   'boat.instrument_alert_rule_delete',
   'boat.instrument_ingest_token_issue',
   'boat.instrument_ingest_token_revoke',
+  // Appairage par code (#1032) : ni code ni jeton dans la métadonnée.
+  'boat.instrument_pairing_attach',
   'reservation.force_unavailable',
   // Argent de la location (#875) : encaissements et caution.
   'reservation.payment_recorded',
@@ -220,6 +222,7 @@ export const AUDIT_ACTIONS_BY_FAMILY: Record<AuditFamily, readonly AuditAction[]
     'boat.instrument_alert_rule_delete',
     'boat.instrument_ingest_token_issue',
     'boat.instrument_ingest_token_revoke',
+    'boat.instrument_pairing_attach',
   ],
   member: [
     'member.add',

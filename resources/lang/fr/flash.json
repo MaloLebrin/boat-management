@@ -632,7 +632,12 @@
     "ruleNotFound": "Cette règle d’alerte n’existe plus.",
     "ingestTokenIssued": "Jeton du plugin généré. Copiez-le maintenant : il ne sera plus affiché.",
     "ingestTokenRevoked": "Jeton du plugin révoqué.",
-    "ingestTokenNone": "Aucun jeton de plugin à révoquer."
+    "ingestTokenNone": "Aucun jeton de plugin à révoquer.",
+    "pairingAttached": "Boîtier {device} rattaché. Il récupère son jeton automatiquement : les premières mesures arrivent dans quelques instants.",
+    "pairingDeviceDefault": "FleetAi",
+    "pairingCodeInvalid": "Ce code est inconnu ou a expiré. Vérifiez le code affiché par le boîtier, ou attendez qu'il en affiche un nouveau.",
+    "pairingAlreadyUsed": "Ce code a déjà été utilisé. Attendez que le boîtier en affiche un nouveau.",
+    "pairingRateLimited": "Trop d'essais de code. Réessayez dans {minutes} min."
   },
   "inventory": {
     "itemCreated": "Article ajouté à l'inventaire.",

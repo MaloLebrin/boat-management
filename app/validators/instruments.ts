@@ -1,5 +1,12 @@
 import vine from '@vinejs/vine'
-import { TELEMETRY_MAX_BATCH_SIZE, TELEMETRY_PATH_MAX_LENGTH } from '#shared/constants/instruments'
+import {
+  INSTRUMENT_PAIRING_DEVICE_CODE_MAX_LENGTH,
+  INSTRUMENT_PAIRING_DEVICE_LABEL_MAX_LENGTH,
+  INSTRUMENT_PAIRING_HARDWARE_KIND_MAX_LENGTH,
+  INSTRUMENT_PAIRING_PLUGIN_VERSION_MAX_LENGTH,
+  TELEMETRY_MAX_BATCH_SIZE,
+  TELEMETRY_PATH_MAX_LENGTH,
+} from '#shared/constants/instruments'
 
 /**
  * Formulaire de source Signal K (#988). L'origine est validée finement par
@@ -62,5 +69,58 @@ export const ingestTelemetryApiValidator = vine.create(
       )
       .minLength(1)
       .maxLength(TELEMETRY_MAX_BATCH_SIZE),
+  })
+)
+
+/** Texte libre affiché au client : pas de caractères de contrôle ni de mise en forme. */
+const PLAIN_TEXT = /^[^\p{Cc}\p{Cf}]*$/u
+const SLUG = /^[a-z0-9][a-z0-9_-]*$/
+const VERSION = /^[0-9A-Za-z][0-9A-Za-z.+_-]*$/
+
+/**
+ * Création d'un appairage (#1032), sans authentification : tout est facultatif
+ * et borné. Les champs inconnus sont ignorés.
+ */
+export const createInstrumentPairingValidator = vine.create(
+  vine.object({
+    deviceLabel: vine
+      .string()
+      .trim()
+      .minLength(1)
+      .maxLength(INSTRUMENT_PAIRING_DEVICE_LABEL_MAX_LENGTH)
+      .regex(PLAIN_TEXT)
+      .nullable()
+      .optional(),
+    hardwareKind: vine
+      .string()
+      .trim()
+      .maxLength(INSTRUMENT_PAIRING_HARDWARE_KIND_MAX_LENGTH)
+      .regex(SLUG)
+      .nullable()
+      .optional(),
+    pluginVersion: vine
+      .string()
+      .trim()
+      .maxLength(INSTRUMENT_PAIRING_PLUGIN_VERSION_MAX_LENGTH)
+      .regex(VERSION)
+      .nullable()
+      .optional(),
+  })
+)
+
+export const pollInstrumentPairingValidator = vine.create(
+  vine.object({
+    deviceCode: vine
+      .string()
+      .trim()
+      .minLength(1)
+      .maxLength(INSTRUMENT_PAIRING_DEVICE_CODE_MAX_LENGTH),
+  })
+)
+
+/** Code saisi par l'admin : la forme exacte est jugée par le service (même erreur qu'un code inconnu). */
+export const attachInstrumentPairingValidator = vine.create(
+  vine.object({
+    userCode: vine.string().trim().minLength(1).maxLength(32),
   })
 )

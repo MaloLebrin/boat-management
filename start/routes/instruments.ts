@@ -6,6 +6,7 @@ const InstrumentAlertRulesController = () =>
   import('#controllers/instrument_alert_rules_controller')
 const InstrumentIngestTokensController = () =>
   import('#controllers/instrument_ingest_tokens_controller')
+const InstrumentPairingsController = () => import('#controllers/instrument_pairings_controller')
 const BoatTelemetryController = () => import('#controllers/boat_telemetry_controller')
 
 // Instruments de bord via Signal K (#988) — plans Pro et Entreprise
@@ -46,6 +47,9 @@ router
         'destroy',
       ])
       .as('boats.instrumentIngestToken.destroy')
+    router
+      .post('boats/:boatId/instrument-source/pairing', [InstrumentPairingsController, 'store'])
+      .as('boats.instrumentPairing.store')
     router
       .post('boats/:boatId/telemetry', [BoatTelemetryController, 'store'])
       .as('boats.telemetry.store')

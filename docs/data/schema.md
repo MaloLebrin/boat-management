@@ -581,6 +581,16 @@ Cibles AIS relevées par les instruments (navires tiers : MMSI, nom, position). 
 - `name`, `latitude`/`longitude` (`numeric(9,6)`), `sog_ms`, `cog_rad`, `ship_type`, `ship_type_name`, `cpa_m`, `tcpa_s`, `created_at`
 - Unique `(source_id, mmsi, recorded_at)` ; index `(boat_id, recorded_at)`
 
+### instrument_pairings (#1032)
+
+Appairage par code d'un boîtier Signal K (D11). Créé **sans compte** par le boîtier, rattaché ensuite par un admin. Aucun secret en clair : seules les empreintes des deux codes sont stockées, le jeton d'ingestion n'est jamais écrit ici (généré à la livraison).
+
+- `id`, `deviceCodeHash` (string 64, unique, sha256), `userCodeHash` (string 64, unique, HMAC-SHA256 clé `APP_KEY`)
+- `deviceLabel` (80), `hardwareKind` (40), `pluginVersion` (40) — nullables, déclarés par le boîtier
+- `boatId` (FK `boats`, `CASCADE`, nullable), `organizationId` (FK `organizations`, `CASCADE`, nullable), `claimedByUserId` (FK `users`, `SET NULL`, nullable) — chacune indexée — nuls tant que non rattaché
+- `expiresAt` (indexée ; 10 min, repoussée de 5 min au rattachement), `approvedAt`, `consumedAt` (jeton livré — plus rien n'est livré après)
+- `createdAt`, `updatedAt` ; purge quotidienne des lignes expirées
+
 ### boat_instrument_alert_rules (#993)
 
 Règle de seuil définie par un admin sur un chemin numérique. Unique `(boat_id, path, operator)`.
@@ -1100,7 +1110,7 @@ fait un balayage complet de la table qu'elle est censée borner.
   saisie
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
-- `Boat 1..1 BoatInstrumentSource` via `boat_instrument_sources.boatId` ; `BoatInstrumentSource 1..n BoatTelemetrySample` via `sourceId` (toutes `CASCADE`, #988) ; `Boat 1..n BoatInstrumentAlertRule` et `Boat 1..n BoatInstrumentAlert` via `boatId`, `BoatInstrumentAlertRule 1..n BoatInstrumentAlert` via `ruleId` (`CASCADE`, #993)
+- `Boat 1..1 BoatInstrumentSource` via `boat_instrument_sources.boatId` ; `BoatInstrumentSource 1..n BoatTelemetrySample` via `sourceId` (toutes `CASCADE`, #988) ; `Boat 0..n InstrumentPairing` via `instrument_pairings.boatId` (`CASCADE`, nullable, #1032) ; `Boat 1..n BoatInstrumentAlertRule` et `Boat 1..n BoatInstrumentAlert` via `boatId`, `BoatInstrumentAlertRule 1..n BoatInstrumentAlert` via `ruleId` (`CASCADE`, #993)
 - `Boat 1..n BoatPositionHistory` via `boat_position_history.boatId` (cascade) ; `Spot 0..n BoatPositionHistory` via `spotId` (`SET NULL`), sur les seules lignes `kind='berth'` (#722)
 - `Boat 1..n BoatPortStay`
 - `Port 1..n MarinaStay`, `Spot 1..n MarinaStay` (cascade) ; `Boat 0..n MarinaStay`, `Client 0..n MarinaStay`, `Invoice 0..1 MarinaStay` (SET NULL) (#891)
