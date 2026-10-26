@@ -46,6 +46,8 @@ const LOCALIZED_PAGES = [
   { page: 'fleet', priority: '0.8', changefreq: 'monthly' },
   { page: 'aiAssistant', priority: '0.8', changefreq: 'monthly' },
   { page: 'instruments', priority: '0.8', changefreq: 'monthly' },
+  // Guide d'installation Signal K (#1022) : page ressource, sous les pages fonctionnalité.
+  { page: 'installSignalK', priority: '0.7', changefreq: 'monthly' },
   { page: 'simulator', priority: '0.8', changefreq: 'monthly' },
   { page: 'guide', priority: '0.7', changefreq: 'monthly' },
   // Tunnels d'acquisition (diagnostic, pièces), pages enrichies en contenu indexable : priorité relevée.

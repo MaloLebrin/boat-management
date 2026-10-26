@@ -89,7 +89,8 @@ test.group('Instruments connectés — contenu SEO (#995)', () => {
       assert.equal(content.hero.secondaryCta.href, marketingPath('pricing', locale))
       assert.equal(content.finalCta.primaryCta.href, '/signup?from=instruments')
       assert.equal(content.finalCta.secondaryCta.href, marketingPath('pricing', locale))
-      assert.equal(content.install.helpCta.href, marketingPath('help', locale))
+      // Depuis #1022, l'aide à l'installation est le guide public « Installer Signal K ».
+      assert.equal(content.install.helpCta.href, marketingPath('installSignalK', locale))
     })
 
     test(`[${locale}] aucune clé brute, aucun placeholder, aucun identifiant Signal K`, async ({

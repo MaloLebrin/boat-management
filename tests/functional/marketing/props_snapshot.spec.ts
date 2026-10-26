@@ -20,6 +20,9 @@ const PAGES: MarketingPage[] = [
   'contact',
   'guide',
   'help',
+  // Guide d'installation Signal K (#1022) : la commande du plugin et les liens
+  // officiels y sont figés comme le reste de la copie.
+  'installSignalK',
   'privacy',
   'terms',
   'salesTerms',

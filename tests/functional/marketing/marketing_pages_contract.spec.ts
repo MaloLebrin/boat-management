@@ -182,6 +182,17 @@ test.group('Marketing pages contract (functional)', (group) => {
     )
   })
 
+  test('GET /en/install-signal-k-on-board renders marketing/install_signalk', async ({
+    client,
+    assert,
+  }) => {
+    assertPageContract(
+      assert,
+      await client.get('/en/install-signal-k-on-board').withInertia(),
+      'marketing/install_signalk'
+    )
+  })
+
   test('GET a share link renders marketing/simulator_share', async ({ client, assert }) => {
     const share = await SimulatorShareFactory.merge({ locale: 'en' }).create()
 
