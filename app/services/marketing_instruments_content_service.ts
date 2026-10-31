@@ -151,6 +151,7 @@ export default class MarketingInstrumentsContentService {
           href: marketingPath('pricing', locale),
         },
         reassurance: t('hero_reassurance'),
+        comingSoon: t('hero_coming_soon'),
       },
       steps: {
         eyebrow: shared('steps_eyebrow'),

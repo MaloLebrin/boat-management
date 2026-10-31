@@ -39,6 +39,8 @@ function collectStrings(value: unknown): string[] {
 }
 
 const KEYWORD: Record<'fr' | 'en', RegExp> = { fr: /instruments/i, en: /instruments/i }
+/** La page annonce la fonctionnalité sans l'ouvrir : pastille et réassurance le disent. */
+const COMING_SOON: Record<'fr' | 'en', RegExp> = { fr: /bientôt/i, en: /coming soon/i }
 
 /**
  * SEO de la page « Instruments de bord connectés » (#995) — même traitement que
@@ -91,6 +93,19 @@ test.group('Instruments connectés — contenu SEO (#995)', () => {
       assert.equal(content.finalCta.secondaryCta.href, marketingPath('pricing', locale))
       // Depuis #1022, l'aide à l'installation est le guide public « Installer Signal K ».
       assert.equal(content.install.helpCta.href, marketingPath('installSignalK', locale))
+    })
+
+    test(`[${locale}] le héros annonce la fonctionnalité comme « bientôt disponible »`, async ({
+      client,
+      assert,
+    }) => {
+      const { content } = await fetchProps<InstrumentsPageProps>(
+        client,
+        marketingPath('instruments', locale)
+      )
+
+      assert.match(content.hero.comingSoon, COMING_SOON[locale])
+      assert.match(content.hero.reassurance, COMING_SOON[locale])
     })
 
     test(`[${locale}] aucune clé brute, aucun placeholder, aucun identifiant Signal K`, async ({
