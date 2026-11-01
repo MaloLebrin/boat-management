@@ -107,3 +107,15 @@ export class InventoryDuplicateDeviceError extends Error {
     super(`Inventory device "${deviceId}" appears twice`)
   }
 }
+
+/**
+ * Une proposition de rattachement ne peut pas être appliquée (#1037) : clé déjà
+ * prise, équipement disparu, type de cuve inconnu. Le lot entier est annulé.
+ */
+export class InstrumentMappingConflictError extends Error {
+  name = 'InstrumentMappingConflictError'
+
+  constructor(readonly instrumentKey: string) {
+    super(`Instrument mapping cannot be applied for "${instrumentKey}"`)
+  }
+}

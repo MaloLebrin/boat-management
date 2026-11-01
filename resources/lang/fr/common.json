@@ -203,5 +203,6 @@
     }
   },
   "offline.queue.type.toggle-diagnostic-step": "Étape de diagnostic de panne",
-  "offline.queue.type.ingest-telemetry": "Relevés des instruments"
+  "offline.queue.type.ingest-telemetry": "Relevés des instruments",
+  "optional": "Facultatif"
 }

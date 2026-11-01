@@ -283,6 +283,45 @@ export class BoatAisSightingSchema extends BaseModel {
   declare tcpaS: string | null
 }
 
+export class BoatBatterySchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'capacityAh',
+    'chemistry',
+    'createdAt',
+    'id',
+    'instrumentKey',
+    'lowVoltageV',
+    'name',
+    'nominalVoltage',
+    'position',
+    'updatedAt',
+  ] as const
+  $columns = BoatBatterySchema.$columns
+  @column()
+  declare boatId: number
+  @column()
+  declare capacityAh: number | null
+  @column()
+  declare chemistry: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare instrumentKey: string | null
+  @column()
+  declare lowVoltageV: string | null
+  @column()
+  declare name: string
+  @column()
+  declare nominalVoltage: string | null
+  @column()
+  declare position: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatBrandSchema extends BaseModel {
   static $columns = [
     'aliases',
@@ -886,6 +925,7 @@ export class BoatInspectionSchema extends BaseModel {
 
 export class BoatInstrumentAlertRuleSchema extends BaseModel {
   static $columns = [
+    'batteryId',
     'boatId',
     'createdAt',
     'enabled',
@@ -895,10 +935,13 @@ export class BoatInstrumentAlertRuleSchema extends BaseModel {
     'organizationId',
     'path',
     'severity',
+    'tankId',
     'threshold',
     'updatedAt',
   ] as const
   $columns = BoatInstrumentAlertRuleSchema.$columns
+  @column()
+  declare batteryId: number | null
   @column()
   declare boatId: number
   @column.dateTime({ autoCreate: true })
@@ -917,6 +960,8 @@ export class BoatInstrumentAlertRuleSchema extends BaseModel {
   declare path: string
   @column()
   declare severity: string
+  @column()
+  declare tankId: number | null
   @column()
   declare threshold: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -1777,6 +1822,39 @@ export class BoatStatusChangeSchema extends BaseModel {
   declare toStatus: string
   @column()
   declare userId: number | null
+}
+
+export class BoatTankSchema extends BaseModel {
+  static $columns = [
+    'boatId',
+    'capacityL',
+    'createdAt',
+    'id',
+    'instrumentKey',
+    'lowLevelPct',
+    'name',
+    'type',
+    'updatedAt',
+  ] as const
+  $columns = BoatTankSchema.$columns
+  @column()
+  declare boatId: number
+  @column()
+  declare capacityL: number | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare instrumentKey: string | null
+  @column()
+  declare lowLevelPct: number | null
+  @column()
+  declare name: string
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class BoatTelemetrySampleSchema extends BaseModel {
@@ -3048,9 +3126,9 @@ export class NavigationLogEntrySchema extends BaseModel {
   @column()
   declare sailConfig: string | null
   @column()
-  declare source: string
-  @column()
   declare sogKn: string | null
+  @column()
+  declare source: string
   @column()
   declare twaDeg: number | null
   @column()

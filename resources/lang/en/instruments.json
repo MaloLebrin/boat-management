@@ -269,7 +269,7 @@
       "hardware": "Onboard hardware",
       "path": "Connection path",
       "connect": "Connection",
-      "engines": "Link engines",
+      "engines": "Link your equipment",
       "done": "Done"
     },
     "hardware": {
@@ -375,6 +375,24 @@
       "unlinked": "Not linked",
       "fallback": "Engine {id}"
     },
+    "equipment": {
+      "noProposals": "All equipment is linked. You can proceed to the next step.",
+      "intro": "The box detected this equipment. Check the ones you want to create or link in FleetAi.",
+      "selectProposal": "Select this equipment",
+      "nameLabel": "Name",
+      "kind": {
+        "engine": "Engine",
+        "battery": "Battery",
+        "tank": "Tank"
+      },
+      "applyAll": "Link all",
+      "enginesTitle": "Engines",
+      "enginesIntro": "Match each FleetAi engine with the identifier detected on the server.",
+      "enginesNoneDetected": "No engine detected yet. You can link them later.",
+      "engineUnlinked": "Not linked",
+      "engineFallback": "Engine {id}",
+      "empty": "No equipment to link yet."
+    },
     "done": {
       "readings": "{count, plural, one {# reading received.} other {# readings received.}}",
       "rules": "The built-in alert rules (temperature, oil pressure, batteries…) are active.",
@@ -404,6 +422,32 @@
     "empty": {
       "title": "No device announced yet",
       "causes": "The bus may not be powered, the gateway may not be detected, or your boat may use NMEA 0183 (the box then needs a converter). Check the box is powered and connected, then come back in a few minutes."
+    }
+  },
+  "mapping": {
+    "names": {
+      "engine": {
+        "port": "Port engine",
+        "starboard": "Starboard engine",
+        "indexed": "Engine {index}",
+        "other": "Engine {id}"
+      },
+      "battery": {
+        "house": "House",
+        "start": "Starter",
+        "indexed": "Battery {index}",
+        "other": "Battery {id}"
+      },
+      "tank": {
+        "fuel": "Fuel",
+        "freshWater": "Fresh water",
+        "wasteWater": "Grey water",
+        "blackWater": "Black water",
+        "liveWell": "Live well",
+        "lubrication": "Oil",
+        "ballast": "Ballast",
+        "gas": "Gas"
+      }
     }
   }
 }

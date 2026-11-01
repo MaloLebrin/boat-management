@@ -248,6 +248,20 @@ Première brique de la découverte automatique (épopée #1044) : savoir **quels
 
 **Fichiers.** `app/services/instrument_inventory_service.ts`, `app/controllers/instrument_inventory_controller.ts`, `app/models/boat_instrument_device.ts`, `ingestInventoryApiValidator` (`app/validators/instruments.ts`), `app/transformers/instrument_transformer.ts`, `shared/types/instruments.ts` (`InstrumentDevice`, `InstrumentInventoryPayload`…), `shared/constants/instruments.ts` (`INSTRUMENT_INVENTORY_*`). Tests : `tests/functional/instruments/inventory_ingest.spec.ts`, `tests/unit/services/instrument_inventory_service.spec.ts`, `tests/inertia/instrument_inventory_card.spec.ts`, fixture `tests/fixtures/signalk_plugin_inventory.json`.
 
+## Batteries, réservoirs et rattachement automatique (#1037)
+
+Suite de l'inventaire (#1036) : FleetAi sait désormais **représenter** une batterie et une cuve, et proposer de relier ce que la boîte a trouvé.
+
+**Clés Signal K.** Moteur et batterie : `<id>` (`propulsion.<id>.…`, `electrical.batteries.<id>.…`) ; cuve : `<type>.<id>` (`tanks.<type>.<id>.…`, ex. `fuel.0`, comme `InstrumentProbeInventory.tankIds`). `instrument_key` est **unique par bateau** sur `boat_batteries` et `boat_tanks`, comme sur `boat_engines` (#991).
+
+**Propositions (`instrument_mapping_service.ts`, pur).** `proposeInstrumentMapping({ devices, engines, batteries, tanks, translate })` lit les chemins des appareils **présents** (`goneAt` nul), extrait les clés (`propulsion.<id>`, `electrical.batteries.<id>`, `tanks.<type>.<id>` avec `type` ∈ `TANK_TYPES`) et renvoie une `InstrumentMappingProposal` par clé non encore portée. Une batterie ou cuve existante **sans clé** et de même nom (insensible à la casse et aux accents) est reliée (`existingId`), sinon la ligne est une création nommée « rôle (modèle de l'appareil) ». Un moteur n'est jamais créé ; il n'est apparié que dans le cas « un moteur sans clé, une clé sans moteur » (les moteurs n'ont pas de nom). Les noms viennent de `instruments.mapping.names.*` via le `translate` injecté (`i18n.t`). Exposé par la prop différée `mappingProposals` (groupe `instruments`, jamais `null`).
+
+**Application (`instrument_mapping_apply_service.ts`).** `POST /boats/:id/instrument-mapping/apply` (`boats.instrumentMapping.apply`, `BoatPolicy.edit`) reçoit les lignes cochées (`kind`, `instrumentKey`, `name`, `existingId`, `tankType`), les applique **dans une transaction** et redirige avec un flash. Une ligne inapplicable lève `InstrumentMappingConflictError` : clé déjà prise, équipement d'un autre bateau ou déjà relié, moteur sans cible, type de cuve inconnu ou incohérent avec la clé, doublon dans le lot. Rien n'est écrit dans ce cas. Relier un moteur remet `instrument_run_time_s` à `null` (autre calculateur, D6).
+
+**Seuils liés (`instrument_entity_alert_service.ts`).** `boat_batteries.low_voltage_v` et `boat_tanks.low_level_pct` pilotent **une** règle `boat_instrument_alert_rules` (`battery_id` / `tank_id`, `ON DELETE CASCADE`, opérateur `lt`, sévérité `warning`, marges 0,3 V / 5 points). Elle suit la clé (changement de chemin), est supprimée si le seuil ou la clé disparaît, et n'est pas créée si une règle manuelle occupe déjà le même chemin ou si la limite de règles du bateau est atteinte. Les règles intégrées (`builtin:battery_voltage_low`, `builtin:fuel_low`) continuent de s'appliquer en parallèle.
+
+**Fichiers.** `app/models/boat_battery.ts`, `boat_tank.ts` ; `app/services/boat_battery_service.ts`, `boat_tank_service.ts`, `instrument_mapping_service.ts`, `instrument_mapping_apply_service.ts`, `instrument_entity_alert_service.ts` ; `app/controllers/boat_batteries_controller.ts`, `boat_tanks_controller.ts`, `instrument_mapping_controller.ts` ; `app/validators/boat_instrument_equipment.ts` ; `app/transformers/boat_battery_transformer.ts` ; `shared/constants/tanks.ts`.
+
 ## Cibles AIS (#1009)
 
 Les autres navires que le serveur Signal K reçoit par AIS (contextes `vessels.urn:mrn:imo:mmsi:<mmsi>`) s'affichent dans l'onglet, **sont historisés** avec une rétention courte, et réutilisent le tuyau de la télémétrie sans le modifier. Un bateau reste une seule source ; l'AIS n'a ni table de sources ni jeton propres.
@@ -287,6 +301,7 @@ app/services/ais_target_service.ts, app/models/boat_ais_sighting.ts (#1009)
 app/jobs/purge_telemetry_samples.ts
 app/services/instrument_pairing_service.ts, app/controllers/instrument_pairing(s|_api)_controller.ts, app/models/instrument_pairing.ts, app/jobs/purge_instrument_pairings.ts (#1032)
 app/exceptions/instrument_errors.ts
+app/services/instrument_mapping_service.ts, instrument_mapping_apply_service.ts, instrument_entity_alert_service.ts (#1037)
 app/utils/csp_connect_src.ts
 shared/types/instruments.ts, shared/constants/instruments.ts, shared/helpers/instruments.ts
 app/controllers/install_scripts_controller.ts, app/services/install_script_service.ts, resources/install/signalk-plugin.sh (#1021)

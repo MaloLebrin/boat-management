@@ -8,6 +8,7 @@ import {
   INSTRUMENT_SETUP_STORAGE_PREFIX,
 } from '#shared/constants/instruments'
 import type {
+  InstrumentMappingProposal,
   InstrumentSetupHardware,
   InstrumentSetupPath,
   InstrumentSetupStep,
@@ -20,6 +21,8 @@ export interface InstrumentSetupOptions {
   boatId: () => number
   source: () => InstrumentSourceRow | null
   engines: () => BoatShowEngine[]
+  /** Propositions de rattachement automatique (#1037). */
+  mappingProposals: () => InstrumentMappingProposal[]
   /** Chemins des dernières valeurs connues (`propulsion.<id>.…` révèle les moteurs). */
   latestPaths: () => string[]
   /** Identifiants de moteurs vus par la sonde de l'étape « Application ». */
@@ -127,13 +130,26 @@ export function useInstrumentSetup(options: InstrumentSetupOptions) {
     return engines.length === 0 || engines.every((engine) => Boolean(engine.instrumentKey))
   })
 
-  const completed = computed(() => connected.value && enginesLinked.value)
+  /**
+   * Mapping proposals resolved: no pending proposals that can be auto-applied.
+   * Engine proposals without existingId require manual linking (not auto-applied).
+   */
+  const proposalsResolved = computed(() => {
+    const proposals = options.mappingProposals()
+    // Filter out engine proposals without existingId (they need manual linking via the engine select)
+    const autoApplyable = proposals.filter((p) => !(p.kind === 'engine' && p.existingId === null))
+    return autoApplyable.length === 0
+  })
+
+  const completed = computed(
+    () => connected.value && enginesLinked.value && proposalsResolved.value
+  )
 
   const steps = computed<InstrumentSetupStep[]>(() => [
     { key: 'hardware', done: stored.value.hardware !== null || hasSource.value },
     { key: 'path', done: path.value !== null },
     { key: 'connect', done: connected.value },
-    { key: 'engines', done: connected.value && enginesLinked.value },
+    { key: 'engines', done: connected.value && enginesLinked.value && proposalsResolved.value },
     { key: 'done', done: completed.value },
   ])
 

@@ -2,6 +2,7 @@ import type { DateTime } from 'luxon'
 import type { BoatCategory } from '#shared/types/boat_catalog'
 import type { ArmamentZone } from '#shared/types/safety'
 import type { BoatStatus } from '#shared/types/boat_status'
+import type { BatteryChemistry, TankType } from '#shared/constants/tanks'
 
 export type BoatPositionSource = 'manual' | 'ais' | 'gps'
 
@@ -273,4 +274,45 @@ export type BoatOwnerBoatSummary = {
   model: string | null
   lengthM: number | null
   homePort: string | null
+}
+
+/** Batterie d'un bateau (#1037). `instrumentKey` = `<id>` de `electrical.batteries.<id>.*`. */
+export interface BoatBatteryPayload {
+  name: string
+  chemistry?: BatteryChemistry | null
+  capacityAh?: number | null
+  nominalVoltage?: number | null
+  /** Seuil de tension basse, en volts : crée/maintient la règle d'alerte liée. */
+  lowVoltageV?: number | null
+  instrumentKey?: string | null
+}
+
+/** Cuve d'un bateau (#1037). `instrumentKey` = `<type>.<id>` de `tanks.<type>.<id>.*`. */
+export interface BoatTankPayload {
+  name: string
+  type: TankType
+  capacityL?: number | null
+  /** Seuil de niveau bas, en pourcents (0–100) : crée/maintient la règle d'alerte liée. */
+  lowLevelPct?: number | null
+  instrumentKey?: string | null
+}
+
+export interface BoatBatteryRow {
+  id: number
+  name: string
+  chemistry: BatteryChemistry | null
+  capacityAh: number | null
+  nominalVoltage: number | null
+  lowVoltageV: number | null
+  position: number
+  instrumentKey: string | null
+}
+
+export interface BoatTankRow {
+  id: number
+  name: string
+  type: TankType
+  capacityL: number | null
+  lowLevelPct: number | null
+  instrumentKey: string | null
 }

@@ -1,6 +1,8 @@
 import Organization from '#models/organization'
 import BoatDocument from '#models/boat_document'
+import BoatBattery from '#models/boat_battery'
 import BoatEngine from '#models/boat_engine'
+import BoatTank from '#models/boat_tank'
 import BoatFuelLog from '#models/boat_fuel_log'
 import BoatGenericEquipment from '#models/boat_generic_equipment'
 import BoatMaintenanceEvent from '#models/boat_maintenance_event'
@@ -188,6 +190,12 @@ export default class Boat extends BaseModel {
 
   @hasMany(() => BoatEngine)
   declare engines: HasMany<typeof BoatEngine>
+
+  @hasMany(() => BoatBattery)
+  declare batteries: HasMany<typeof BoatBattery>
+
+  @hasMany(() => BoatTank)
+  declare tanks: HasMany<typeof BoatTank>
 
   @hasMany(() => BoatSail)
   declare sails: HasMany<typeof BoatSail>

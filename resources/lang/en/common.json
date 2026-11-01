@@ -203,5 +203,6 @@
     }
   },
   "offline.queue.type.toggle-diagnostic-step": "Breakdown diagnosis step",
-  "offline.queue.type.ingest-telemetry": "Instruments telemetry"
+  "offline.queue.type.ingest-telemetry": "Instruments telemetry",
+  "optional": "Optional"
 }

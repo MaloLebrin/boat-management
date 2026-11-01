@@ -637,7 +637,9 @@
     "pairingDeviceDefault": "FleetAi",
     "pairingCodeInvalid": "This code is unknown or has expired. Check the code shown by the device, or wait for it to show a new one.",
     "pairingAlreadyUsed": "This code has already been used. Wait for the device to show a new one.",
-    "pairingRateLimited": "Too many code attempts. Try again in {minutes} min."
+    "pairingRateLimited": "Too many code attempts. Try again in {minutes} min.",
+    "mappingApplied": "Equipment linked: {linked} linked, {created} created.",
+    "mappingConflict": "The mapping could not be applied (an identifier is already in use or an item changed). Nothing was modified; refresh the list and try again."
   },
   "inventory": {
     "itemCreated": "Item added to the inventory.",
@@ -665,5 +667,21 @@
     "invalidStatus": "This action is not possible in the purchase order's current status.",
     "boatNotFound": "Boat not found.",
     "nothingToReorder": "No item from this supplier is below its alert threshold."
+  },
+  "battery": {
+    "added": "Battery added.",
+    "updated": "Battery updated.",
+    "removed": "Battery removed.",
+    "notFound": "Battery not found.",
+    "instrumentKeySaved": "Battery linked to the instrument identifier.",
+    "instrumentKeyTaken": "Another battery on this boat already uses this instrument identifier."
+  },
+  "tank": {
+    "added": "Tank added.",
+    "updated": "Tank updated.",
+    "removed": "Tank removed.",
+    "notFound": "Tank not found.",
+    "instrumentKeySaved": "Tank linked to the instrument identifier.",
+    "instrumentKeyTaken": "Another tank on this boat already uses this instrument identifier."
   }
 }

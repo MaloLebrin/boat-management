@@ -388,3 +388,43 @@ export interface InstrumentDevice {
 export interface InstrumentInventoryProps {
   devices: InstrumentDevice[]
 }
+
+/** Ce qu'une proposition de rattachement concerne (#1037). */
+export type InstrumentMappingKind = 'engine' | 'battery' | 'tank'
+
+/**
+ * Une ligne de l'étape « Relier les équipements ». `existingId` désigne
+ * l'équipement FleetAi à relier ; `null` = à créer (batterie, cuve). Un moteur
+ * ne se crée jamais depuis un appareil : sans `existingId`, il reste à relier à la main.
+ */
+export interface InstrumentMappingProposal {
+  kind: InstrumentMappingKind
+  /** `<id>` moteur/batterie, `<type>.<id>` cuve. */
+  instrumentKey: string
+  /** Libellé de l'appareil qui fournit la donnée (« Victron BMV-712 »), `null` si inconnu. */
+  deviceLabel: string | null
+  suggestedName: string
+  existingId: number | null
+  tankType: string | null
+}
+
+/** Corps de `POST /boats/:boatId/instrument-mapping/apply` : les propositions cochées. */
+export interface InstrumentMappingApplyPayload {
+  items: Array<{
+    kind: InstrumentMappingKind
+    instrumentKey: string
+    name: string
+    existingId: number | null
+    tankType: string | null
+  }>
+}
+
+export interface InstrumentMappingApplyResult {
+  linked: number
+  created: number
+}
+
+/** Prop différée `mappingProposals` : jamais `null` (#478). */
+export interface InstrumentMappingProps {
+  proposals: InstrumentMappingProposal[]
+}

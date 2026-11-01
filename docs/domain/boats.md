@@ -263,6 +263,12 @@ Référence : `app/services/boat_catalog_service.ts`, corpus dans `database/data
   alimenté par le formulaire — une mise à jour ne l'écrase pas.
 - Ne pas confondre avec `navigationCategory` (catégorie CE A/B/C/D).
 
+### Batteries et réservoirs (#1037)
+
+`boat_batteries` (`name`, `chemistry` ∈ `BATTERY_CHEMISTRIES`, `capacity_ah`, `nominal_voltage`, `low_voltage_v`, `position`) et `boat_tanks` (`name`, `type` ∈ `TANK_TYPES`, `capacity_l`, `low_level_pct`) appartiennent à un bateau (`Boat.batteries` / `Boat.tanks`, `CASCADE`). Tous les champs sauf le nom sont facultatifs. `instrument_key` (nullable, **unique par bateau**) les relie à Signal K : `<id>` pour une batterie, `<type>.<id>` pour une cuve.
+
+Routes (toutes `BoatPolicy.edit`, réponses par redirection + flash) : `boats.batteries.store|update|destroy`, `boats.batteries.instrumentKey` (`PATCH …/batteries/:batteryId/instrument-key`), et les mêmes pour `boats.tanks.*`. Services `BoatBatteryService` / `BoatTankService` (même patron que `BoatEngineService`), erreurs `BoatBatteryInstrumentKeyTakenError` / `BoatTankInstrumentKeyTakenError`. Props `batteries` / `tanks` de `boats/show`, affichées dans l'onglet Équipements. Le rattachement automatique depuis l'inventaire et les seuils d'alerte liés sont décrits dans `docs/domain/instruments.md` (« Batteries, réservoirs et rattachement automatique »).
+
 ### Famille de motorisation (#574)
 
 `boat_engines.family` (nullable, indexée) décrit le couple **moteur + transmission** :

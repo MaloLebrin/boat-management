@@ -11,10 +11,12 @@ import BoatEquipmentAddModal from '~/components/boats/show/modals/BoatEquipmentA
 import BoatEquipmentActionModal from '~/components/boats/equipment-actions/BoatEquipmentActionModal.vue'
 import BoatIncidentModal from '~/components/boats/incidents/BoatIncidentModal.vue'
 import BoatMaintenanceTaskModal from '~/components/boats/maintenance/BoatMaintenanceTaskModal.vue'
+import BoatShowBatteriesTanks from '~/components/boats/show/tabs/equipment/BoatShowBatteriesTanks.vue'
 import { shouldReopenEngineForm } from '~/composables/use_engine_form_draft'
 import { shouldReopenGenericEquipmentForm } from '~/composables/use_generic_equipment_form_draft'
 import { useT } from '~/composables/use_t'
 import type { BoatCreateIntent, BoatShowDetail, EquipmentActionPrefill } from '~/types/boat_show'
+import type { BoatBatteryRow, BoatTankRow } from '#shared/types/boat'
 import type { SafetyComplianceReport } from '#shared/types/safety'
 import type { IncidentTargetRef } from '#shared/types/incident'
 import type { TaskEquipmentRef } from '#shared/types/maintenance'
@@ -22,6 +24,8 @@ import type { TaskEquipmentRef } from '#shared/types/maintenance'
 const props = withDefaults(
   defineProps<{
     boat: BoatShowDetail
+    batteries?: BoatBatteryRow[]
+    tanks?: BoatTankRow[]
     canManageEquipment: boolean
     canManageActions: boolean
     /** Droit `maintenance.create` : raccourci « + Tâche » sur chaque équipement. */
@@ -233,5 +237,13 @@ function openIncidentModal(target: IncidentTargetRef) {
         @report-incident="openIncidentModal"
       />
     </div>
+
+    <BoatShowBatteriesTanks
+      v-if="equipmentFilter === 'all' || equipmentFilter === 'generic'"
+      :boat-id="boat.id"
+      :batteries="batteries ?? []"
+      :tanks="tanks ?? []"
+      :can-manage="canManageEquipment"
+    />
   </div>
 </template>

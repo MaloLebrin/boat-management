@@ -3,8 +3,32 @@ import { computed } from 'vue'
 import InstrumentGauge from '~/components/boats/show/tabs/instruments/InstrumentGauge.vue'
 import { useT } from '~/composables/use_t'
 import { CATEGORY_ORDER, type InstrumentReading } from '~/lib/signalk/display'
+import { resolveGaugeInstanceLabel } from '#shared/helpers/instrument_gauge_label'
+import type { BoatBatteryRow, BoatTankRow } from '#shared/types/boat'
 
-const props = defineProps<{ readings: InstrumentReading[]; now: number }>()
+const props = withDefaults(
+  defineProps<{
+    readings: InstrumentReading[]
+    now: number
+    /** Noms FleetAi des batteries et cuves (#1037) : remplacent l'identifiant Signal K. */
+    batteries?: BoatBatteryRow[]
+    tanks?: BoatTankRow[]
+  }>(),
+  { batteries: () => [], tanks: () => [] }
+)
+
+function named(reading: InstrumentReading): InstrumentReading {
+  if (!reading.instance) return reading
+  return {
+    ...reading,
+    instance: resolveGaugeInstanceLabel(
+      reading.path,
+      reading.instance,
+      props.batteries,
+      props.tanks
+    ),
+  }
+}
 
 const { t } = useT()
 
@@ -33,7 +57,7 @@ const groups = computed(() =>
         <InstrumentGauge
           v-for="reading in group.readings"
           :key="reading.path"
-          :reading="reading"
+          :reading="named(reading)"
           :now="now"
         />
       </div>

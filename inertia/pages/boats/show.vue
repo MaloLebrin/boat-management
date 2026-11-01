@@ -16,12 +16,15 @@ import { usePlan } from '~/composables/use_plan'
 import { useT } from '~/composables/use_t'
 import type {
   AiSuggestion,
+  BoatBatteryRow,
   BoatCreateIntent,
   BoatDocumentRow,
   BoatEquipmentActionRow,
   BoatIncidentRow,
   BoatPositionHistoryRow,
   BoatShowDetail,
+  BoatShowMappingProposals,
+  BoatTankRow,
   FuelLogRow,
   MaintenanceEventRow,
   MaintenanceSheetRow,
@@ -43,6 +46,10 @@ const { effectiveQuotas } = usePlan()
 // et l'onglet concerné affiche un skeleton en attendant.
 const props = defineProps<{
   boat: BoatShowDetail
+  /** Batteries du bateau (#1037). */
+  batteries: BoatBatteryRow[]
+  /** Cuves du bateau (#1037). */
+  tanks: BoatTankRow[]
   maintenanceEvents?: MaintenanceEventRow[]
   maintenanceTasks?: MaintenanceTaskRow[]
   maintenanceSheets?: MaintenanceSheetRow[]
@@ -53,6 +60,8 @@ const props = defineProps<{
   navigationLogs?: NavigationLogRow[]
   /** Groupe différé « instruments » (#990) : source Signal K, dernières valeurs, droits. */
   instruments?: InstrumentsTabProps
+  /** Propositions de rattachement des équipements (#1037) — prop différée groupe `instruments`. */
+  mappingProposals?: BoatShowMappingProposals
   portOptions?: NavigationLogPortOption[]
   crewMemberOptions?: CrewMemberOption[]
   aiSuggestions?: AiSuggestion[] | null

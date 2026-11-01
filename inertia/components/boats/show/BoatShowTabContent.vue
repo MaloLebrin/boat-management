@@ -19,12 +19,15 @@ import BoatShowTabSpecs from '~/components/boats/show/tabs/BoatShowTabSpecs.vue'
 import BoatShowTabTasks from '~/components/boats/show/tabs/BoatShowTabTasks.vue'
 import type {
   AiSuggestion,
+  BoatBatteryRow,
   BoatCreateIntent,
   BoatDocumentRow,
   BoatEquipmentActionRow,
   BoatIncidentRow,
   BoatPositionHistoryRow,
   BoatShowDetail,
+  BoatShowMappingProposals,
+  BoatTankRow,
   FuelLogRow,
   MaintenanceEventRow,
   MaintenanceSheetRow,
@@ -45,6 +48,10 @@ const props = defineProps<{
   tab: BoatShowTabKey
   isLoading: boolean
   boat: BoatShowDetail
+  /** Batteries du bateau (#1037). */
+  batteries: BoatBatteryRow[]
+  /** Cuves du bateau (#1037). */
+  tanks: BoatTankRow[]
   maintenanceEvents?: MaintenanceEventRow[]
   maintenanceTasks?: MaintenanceTaskRow[]
   maintenanceSheets?: MaintenanceSheetRow[]
@@ -54,6 +61,8 @@ const props = defineProps<{
   fuelLogs?: FuelLogRow[]
   navigationLogs?: NavigationLogRow[]
   instruments?: InstrumentsTabProps
+  /** Propositions de rattachement des équipements (#1037) — prop différée groupe `instruments`. */
+  mappingProposals?: BoatShowMappingProposals
   portOptions?: NavigationLogPortOption[]
   crewMemberOptions?: CrewMemberOption[]
   aiSuggestions?: AiSuggestion[] | null
@@ -160,6 +169,8 @@ const showSkeleton = computed(
       <BoatShowTabEquipment
         v-else-if="tab === 'equipment'"
         :boat="boat"
+        :batteries="batteries"
+        :tanks="tanks"
         :safety-compliance="safetyCompliance"
         :can-manage-equipment="canManageEquipment"
         :can-manage-actions="canManageEquipmentActions"
@@ -265,6 +276,9 @@ const showSkeleton = computed(
         :boat-id="boat.id"
         :instruments="instruments"
         :engines="boat.engines"
+        :mapping-proposals="mappingProposals ?? { proposals: [] }"
+        :batteries="batteries"
+        :tanks="tanks"
       />
     </div>
   </Transition>

@@ -15,7 +15,9 @@ import PushSubscription from '#models/push_subscription'
 import BoatMaintenanceSheetItem from '#models/boat_maintenance_sheet_item'
 import BoatEngineRepairCartItem from '#models/boat_engine_repair_cart_item'
 import { BoatFactory } from '#database/factories/boat_factory'
+import { BoatBatteryFactory } from '#database/factories/boat_battery_factory'
 import { BoatEngineFactory } from '#database/factories/boat_engine_factory'
+import { BoatTankFactory } from '#database/factories/boat_tank_factory'
 import { BoatSailFactory } from '#database/factories/boat_sail_factory'
 import { BoatRigFactory } from '#database/factories/boat_rig_factory'
 import { BoatSafetyEquipmentFactory } from '#database/factories/boat_safety_equipment_factory'
@@ -62,6 +64,8 @@ export const SENTINEL = 'ORG-B-SENTINEL-855'
 export interface CrossOrgIds {
   boatId: number
   engineId: number
+  batteryId: number
+  tankId: number
   sailId: number
   partId: number
   mediaId: number
@@ -127,6 +131,8 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
 
   const boat = await BoatFactory.merge({ organizationId: orgId, name: SENTINEL }).create()
   const engine = await BoatEngineFactory.merge({ boatId: boat.id }).create()
+  const battery = await BoatBatteryFactory.merge({ boatId: boat.id }).create()
+  const tank = await BoatTankFactory.merge({ boatId: boat.id }).create()
   const sail = await BoatSailFactory.merge({ boatId: boat.id }).create()
   await BoatRigFactory.merge({ boatId: boat.id }).create()
   const safety = await BoatSafetyEquipmentFactory.merge({ boatId: boat.id }).create()
@@ -327,6 +333,8 @@ export async function seedVictimGraph(user: User): Promise<CrossOrgIds> {
   return {
     boatId: boat.id,
     engineId: engine.id,
+    batteryId: battery.id,
+    tankId: tank.id,
     sailId: sail.id,
     partId: part.id,
     mediaId: media.id,

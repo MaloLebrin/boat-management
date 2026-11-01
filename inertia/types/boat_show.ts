@@ -1,5 +1,13 @@
 import type { InventoryUnit } from '#shared/types/inventory'
+import type { BoatBatteryRow, BoatTankRow } from '#shared/types/boat'
+import type { InstrumentMappingProposal } from '#shared/types/instruments'
 /** Inertia props shapes for boat detail / maintenance UI. */
+
+export type { BoatBatteryRow, BoatTankRow }
+
+export interface BoatShowMappingProposals {
+  proposals: InstrumentMappingProposal[]
+}
 
 export type {
   BoatDocumentRow,
