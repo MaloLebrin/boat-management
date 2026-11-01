@@ -285,3 +285,16 @@ export const INSTRUMENT_PAIRING_PLUGIN_VERSION_MAX_LENGTH = 40
 /** Chemins de l'API d'appairage du plugin (hors session, exemptés de CSRF). */
 export const INSTRUMENT_PAIRING_PATH = '/api/instruments/pairing'
 export const INSTRUMENT_PAIRING_POLL_PATH = '/api/instruments/pairing/poll'
+
+/**
+ * Inventaire des appareils du bus (#1036). Le plugin envoie l'état complet
+ * connu de Signal K : un appareil absent du lot est marqué disparu.
+ */
+export const INSTRUMENT_INVENTORY_PATH = '/api/instruments/inventory'
+export const INSTRUMENT_INVENTORY_MAX_DEVICES = 64
+export const INSTRUMENT_INVENTORY_MAX_PATHS_PER_DEVICE = 100
+export const INSTRUMENT_INVENTORY_DEVICE_ID_MAX_LENGTH = 64
+export const INSTRUMENT_INVENTORY_TEXT_MAX_LENGTH = 120
+export const INSTRUMENT_INVENTORY_BUSES = ['n2k', 'nmea0183', 'other'] as const
+/** Un appareil absent d'un lot n'est marqué disparu qu'après ce délai sans l'avoir vu (aligné sur le plugin). */
+export const INSTRUMENT_INVENTORY_GONE_GRACE_MINUTES = 10

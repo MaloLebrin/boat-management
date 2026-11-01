@@ -968,6 +968,60 @@ export class BoatInstrumentAlertSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class BoatInstrumentDeviceSchema extends BaseModel {
+  static $columns = [
+    'address',
+    'bus',
+    'createdAt',
+    'deviceId',
+    'firstSeenAt',
+    'function',
+    'goneAt',
+    'id',
+    'label',
+    'lastSeenAt',
+    'manufacturer',
+    'model',
+    'paths',
+    'serialNumber',
+    'sourceId',
+    'updatedAt',
+  ] as const
+  $columns = BoatInstrumentDeviceSchema.$columns
+  @column()
+  declare address: number | null
+  @column()
+  declare bus: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare deviceId: string
+  @column.dateTime()
+  declare firstSeenAt: DateTime
+  @column()
+  declare function: string | null
+  @column.dateTime()
+  declare goneAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare label: string
+  @column.dateTime()
+  declare lastSeenAt: DateTime
+  @column()
+  declare manufacturer: string | null
+  @column()
+  declare model: string | null
+  @column()
+  declare paths: any
+  @column()
+  declare serialNumber: string | null
+  @column()
+  declare sourceId: number
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class BoatInstrumentSourceSchema extends BaseModel {
   static $columns = [
     'baseUrl',

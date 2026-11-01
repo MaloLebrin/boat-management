@@ -581,6 +581,15 @@ Cibles AIS relevées par les instruments (navires tiers : MMSI, nom, position). 
 - `name`, `latitude`/`longitude` (`numeric(9,6)`), `sog_ms`, `cog_rad`, `ship_type`, `ship_type_name`, `cpa_m`, `tcpa_s`, `created_at`
 - Unique `(source_id, mmsi, recorded_at)` ; index `(boat_id, recorded_at)`
 
+### boat_instrument_devices (#1036)
+
+Inventaire des appareils du bus (NMEA 2000, NMEA 0183) annoncés par la boîte / le plugin Signal K. Un appareil = une ligne par source ; l'état complet envoyé par le plugin est reflété (absent du lot → `goneAt`).
+
+- `id`, `sourceId` (FK `boat_instrument_sources`, `CASCADE`), `deviceId` (string 64, empreinte posée par le plugin) — **unique `(sourceId, deviceId)`**
+- `label` (120), `manufacturer`, `model`, `serialNumber`, `function` (120, nullables) ; `serialNumber` n'est jamais sérialisé vers le navigateur
+- `bus` (`n2k` | `nmea0183` | `other`), `address` (entier, nullable), `paths` (jsonb, tableau de chemins du catalogue, `[]` par défaut)
+- `firstSeenAt`, `lastSeenAt`, `goneAt` (nullable : posé à la première absence, effacé au retour), `createdAt`, `updatedAt`
+
 ### instrument_pairings (#1032)
 
 Appairage par code d'un boîtier Signal K (D11). Créé **sans compte** par le boîtier, rattaché ensuite par un admin. Aucun secret en clair : seules les empreintes des deux codes sont stockées, le jeton d'ingestion n'est jamais écrit ici (généré à la livraison).
@@ -1110,7 +1119,7 @@ fait un balayage complet de la table qu'elle est censée borner.
   saisie
 - `Boat 0..1 BoatRig`
 - `BoatMaintenanceEvent 1..n BoatMaintenancePart`
-- `Boat 1..1 BoatInstrumentSource` via `boat_instrument_sources.boatId` ; `BoatInstrumentSource 1..n BoatTelemetrySample` via `sourceId` (toutes `CASCADE`, #988) ; `Boat 0..n InstrumentPairing` via `instrument_pairings.boatId` (`CASCADE`, nullable, #1032) ; `Boat 1..n BoatInstrumentAlertRule` et `Boat 1..n BoatInstrumentAlert` via `boatId`, `BoatInstrumentAlertRule 1..n BoatInstrumentAlert` via `ruleId` (`CASCADE`, #993)
+- `Boat 1..1 BoatInstrumentSource` via `boat_instrument_sources.boatId` ; `BoatInstrumentSource 1..n BoatTelemetrySample` via `sourceId` (toutes `CASCADE`, #988) ; `BoatInstrumentSource 1..n BoatInstrumentDevice` via `sourceId` (`CASCADE`, #1036) ; `Boat 0..n InstrumentPairing` via `instrument_pairings.boatId` (`CASCADE`, nullable, #1032) ; `Boat 1..n BoatInstrumentAlertRule` et `Boat 1..n BoatInstrumentAlert` via `boatId`, `BoatInstrumentAlertRule 1..n BoatInstrumentAlert` via `ruleId` (`CASCADE`, #993)
 - `Boat 1..n BoatPositionHistory` via `boat_position_history.boatId` (cascade) ; `Spot 0..n BoatPositionHistory` via `spotId` (`SET NULL`), sur les seules lignes `kind='berth'` (#722)
 - `Boat 1..n BoatPortStay`
 - `Port 1..n MarinaStay`, `Spot 1..n MarinaStay` (cascade) ; `Boat 0..n MarinaStay`, `Client 0..n MarinaStay`, `Invoice 0..1 MarinaStay` (SET NULL) (#891)

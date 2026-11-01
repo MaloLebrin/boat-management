@@ -380,5 +380,30 @@
       "rules": "Les règles d’alerte intégrées (température, pression d’huile, batteries…) sont actives.",
       "dismiss": "Masquer l’assistant"
     }
+  },
+  "inventory": {
+    "title": "Ce que la boîte a trouvé",
+    "subtitle": "Appareils annoncés sur le bus du bateau par la boîte FleetAi.",
+    "seenNow": "Vu à l’instant",
+    "seen": {
+      "minutes": "Vu il y a {count, plural, one {# minute} other {# minutes}}",
+      "hours": "Vu il y a {count, plural, one {# heure} other {# heures}}",
+      "days": "Vu il y a {count, plural, one {# jour} other {# jours}}"
+    },
+    "gone": "N’est plus annoncé",
+    "paths": "{count, plural, one {# donnée fournie} other {# données fournies}}",
+    "group": {
+      "engine": "Moteurs",
+      "battery": "Batteries et charge",
+      "tank": "Réservoirs",
+      "gps": "GPS",
+      "ais": "AIS",
+      "weather": "Météo",
+      "other": "Autre"
+    },
+    "empty": {
+      "title": "Aucun appareil annoncé",
+      "causes": "Le bus n’est peut-être pas alimenté, la passerelle n’est pas détectée, ou votre bateau est en NMEA 0183 (la boîte nécessite alors un convertisseur). Vérifiez que la boîte est alimentée et branchée, puis revenez dans quelques minutes."
+    }
   }
 }

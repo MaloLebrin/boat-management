@@ -78,6 +78,12 @@ Remplace `fai_ing_…` par ton jeton. Le script vérifie Node, npm et `signalk-s
 
 **Alternative sans terminal.** Dans l'admin Signal K, _Appstore_ → cherche `signalk-fleetai` → _Install_, redémarre le serveur, puis _Plugin Config_ → FleetAi : colle l'adresse d'ingestion et le jeton.
 
+## Ce que la boîte a trouvé
+
+Quand le plugin (ou la boîte FleetAi) est branché, l'onglet Instruments affiche l'encart **« Ce que la boîte a trouvé »** : la liste des appareils annoncés sur le bus du bateau, rangés par fonction (moteurs, batteries et charge, réservoirs, GPS, AIS, météo, autre), avec leur fabricant, leur modèle et « vu il y a … ». Déplie « données fournies » pour voir les mesures que chaque appareil envoie à FleetAi. Un appareil qui n'est plus annoncé reste affiché, marqué « N'est plus annoncé ».
+
+Si l'encart indique **« Aucun appareil annoncé »**, vérifie dans l'ordre : le bus NMEA 2000 est alimenté ; la passerelle (PICAN-M, NGX-1…) est bien détectée par Signal K ; ton bateau n'est pas en NMEA 0183 (il faut alors un convertisseur). Le numéro de série des appareils n'est jamais affiché.
+
 ## Problèmes fréquents
 
 | Symptôme                                                      | Cause probable                                                                                                                                                                                                       |

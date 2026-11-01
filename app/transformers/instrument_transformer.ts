@@ -1,10 +1,13 @@
 import type BoatInstrumentAlert from '#models/boat_instrument_alert'
 import type BoatInstrumentAlertRule from '#models/boat_instrument_alert_rule'
+import type BoatInstrumentDevice from '#models/boat_instrument_device'
 import type BoatInstrumentSource from '#models/boat_instrument_source'
 import type InstrumentPairing from '#models/instrument_pairing'
 import type { JsonValue } from '#shared/types/notification'
 import type {
   InstrumentAlertRow,
+  InstrumentDevice,
+  InstrumentInventoryProps,
   InstrumentAlertRuleRow,
   InstrumentPairingRow,
   InstrumentSourceConnection,
@@ -97,4 +100,27 @@ export function toInstrumentPairingRow(pairing: InstrumentPairing): InstrumentPa
     hardwareKind: pairing.hardwareKind,
     pluginVersion: pairing.pluginVersion,
   }
+}
+
+/** Appareil de l'inventaire (#1036) — le numéro de série n'en sort jamais. */
+export function toInstrumentDevice(device: BoatInstrumentDevice): InstrumentDevice {
+  return {
+    id: device.id,
+    deviceId: device.deviceId,
+    label: device.label,
+    manufacturer: device.manufacturer,
+    model: device.model,
+    function: device.function,
+    bus: device.bus,
+    address: device.address,
+    paths: device.paths,
+    firstSeenAt: device.firstSeenAt.toISO()!,
+    lastSeenAt: device.lastSeenAt.toISO()!,
+    goneAt: device.goneAt?.toISO() ?? null,
+  }
+}
+
+/** Prop `inventory` sans appareil — jamais `null` (#478). */
+export function emptyInstrumentInventoryProps(): InstrumentInventoryProps {
+  return { devices: [] }
 }

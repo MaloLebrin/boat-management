@@ -73,6 +73,7 @@ export const controllers = {
   InstrumentAlertRules: () => import('#controllers/instrument_alert_rules_controller'),
   InstrumentIngest: () => import('#controllers/instrument_ingest_controller'),
   InstrumentIngestTokens: () => import('#controllers/instrument_ingest_tokens_controller'),
+  InstrumentInventory: () => import('#controllers/instrument_inventory_controller'),
   InstrumentPairingApi: () => import('#controllers/instrument_pairing_api_controller'),
   InstrumentPairings: () => import('#controllers/instrument_pairings_controller'),
   InstrumentSources: () => import('#controllers/instrument_sources_controller'),

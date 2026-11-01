@@ -380,5 +380,30 @@
       "rules": "The built-in alert rules (temperature, oil pressure, batteries…) are active.",
       "dismiss": "Hide the assistant"
     }
+  },
+  "inventory": {
+    "title": "What the box found",
+    "subtitle": "Devices announced on the boat's bus by the FleetAi box.",
+    "seenNow": "Seen just now",
+    "seen": {
+      "minutes": "Seen {count, plural, one {# minute} other {# minutes}} ago",
+      "hours": "Seen {count, plural, one {# hour} other {# hours}} ago",
+      "days": "Seen {count, plural, one {# day} other {# days}} ago"
+    },
+    "gone": "No longer announced",
+    "paths": "{count, plural, one {# data point provided} other {# data points provided}}",
+    "group": {
+      "engine": "Engines",
+      "battery": "Batteries and charging",
+      "tank": "Tanks",
+      "gps": "GPS",
+      "ais": "AIS",
+      "weather": "Weather",
+      "other": "Other"
+    },
+    "empty": {
+      "title": "No device announced yet",
+      "causes": "The bus may not be powered, the gateway may not be detected, or your boat may use NMEA 0183 (the box then needs a converter). Check the box is powered and connected, then come back in a few minutes."
+    }
   }
 }

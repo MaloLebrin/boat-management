@@ -9,6 +9,7 @@ import InstrumentAlarmsList from '~/components/boats/show/tabs/instruments/Instr
 import InstrumentCategoryGrid from '~/components/boats/show/tabs/instruments/InstrumentCategoryGrid.vue'
 import InstrumentConnectionBanner from '~/components/boats/show/tabs/instruments/InstrumentConnectionBanner.vue'
 import InstrumentForecastPanel from '~/components/boats/show/tabs/instruments/InstrumentForecastPanel.vue'
+import InstrumentInventoryCard from '~/components/boats/show/tabs/instruments/InstrumentInventoryCard.vue'
 import InstrumentHistoryPanel from '~/components/boats/show/tabs/instruments/InstrumentHistoryPanel.vue'
 import InstrumentEmptyState from '~/components/boats/show/tabs/instruments/InstrumentEmptyState.vue'
 import InstrumentSetupWizard from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupWizard.vue'
@@ -24,7 +25,11 @@ import { parsePosition } from '~/lib/signalk/weather'
 import { mergeInstrumentAlerts } from '~/utils/instrument_alerts'
 import { alertRuleSpecs } from '#shared/helpers/instrument_alerts'
 import { sortAisTargets, withDistances } from '#shared/helpers/ais'
-import type { InstrumentSeries, InstrumentsTabProps } from '#shared/types/instruments'
+import type {
+  InstrumentInventoryProps,
+  InstrumentSeries,
+  InstrumentsTabProps,
+} from '#shared/types/instruments'
 import type { BoatShowEngine } from '~/types/boat_show'
 
 const props = defineProps<{
@@ -38,7 +43,11 @@ const { t } = useT()
 const source = computed(() => props.instruments.source)
 
 /** Historique (#992) : prop optionnelle de la page, servie par `router.reload({ only })`. */
-const page = usePage<{ instrumentSeries?: InstrumentSeries }>()
+const page = usePage<{
+  instrumentSeries?: InstrumentSeries
+  /** Inventaire des appareils du bus (#1036) : groupe différé « instruments ». */
+  inventory?: InstrumentInventoryProps
+}>()
 const historyPaths = computed(() =>
   readings.value.filter((reading) => reading.value !== null).map((reading) => reading.path)
 )
@@ -177,6 +186,11 @@ onBeforeUnmount(() => {
         :read-only="!instruments.can.ingest"
         :enabled="source.enabled"
         :last-seen-at="source.lastSeenAt"
+      />
+      <InstrumentInventoryCard
+        v-if="page.props.inventory"
+        :devices="page.props.inventory.devices"
+        :now="now"
       />
       <InstrumentCategoryGrid v-if="readings.length > 0" :readings="readings" :now="now" />
       <p v-else class="text-sm text-fg-muted">{{ t('instruments.noData') }}</p>

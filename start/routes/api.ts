@@ -8,6 +8,7 @@ import {
 } from '#start/limiter'
 
 const InstrumentIngestController = () => import('#controllers/instrument_ingest_controller')
+const InstrumentInventoryController = () => import('#controllers/instrument_inventory_controller')
 const InstrumentPairingApiController = () =>
   import('#controllers/instrument_pairing_api_controller')
 
@@ -23,6 +24,10 @@ router
     router
       .post('instruments/ingest', [InstrumentIngestController, 'store'])
       .as('api.instruments.ingest')
+    // Inventaire des appareils du bus (#1036) : même jeton, mêmes limiteurs.
+    router
+      .post('instruments/inventory', [InstrumentInventoryController, 'store'])
+      .as('api.instruments.inventory')
   })
   .prefix('/api')
   .use([instrumentIngestIpThrottle, middleware.instrumentIngestToken(), instrumentIngestThrottle])

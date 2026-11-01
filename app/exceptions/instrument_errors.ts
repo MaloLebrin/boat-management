@@ -98,3 +98,12 @@ export class InstrumentAlertRuleNotFoundError extends Error {
 export class InstrumentIngestTokenInvalidError extends Error {
   name = 'InstrumentIngestTokenInvalidError'
 }
+
+/** Deux appareils du même lot portent le même `deviceId` (#1036). */
+export class InventoryDuplicateDeviceError extends Error {
+  name = 'InventoryDuplicateDeviceError'
+
+  constructor(readonly deviceId: string) {
+    super(`Inventory device "${deviceId}" appears twice`)
+  }
+}

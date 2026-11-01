@@ -59,6 +59,68 @@ User-Agent: signalk-fleetai/<version>
 - Les codes d'erreur ci-dessus sont **stables** : le plugin les teste par `error`, pas par message.
 - Le catalogue (`INSTRUMENT_PATH_CATALOG`) n'est étendu que de façon compatible : un chemin ajouté côté serveur ne casse pas un plugin plus ancien ; un chemin retiré est d'abord déprécié (le plugin le verrait en `422 path_not_allowed`, sans boucle).
 
+## Inventaire des appareils (#1036)
+
+En plus des lots de mesures, le plugin annonce **les appareils** qu'il voit sur le bus. Contrat côté FleetAi (le plugin, hors dépôt, l'implémente) :
+
+- **Lecture.** Branche `sources` de Signal K : source NMEA 2000 → `n2k.manufacturerName`, `productName`, `serialNumber`, `deviceFunction`, `src` ; source NMEA 0183 → libellé de connexion. **À confirmer sur matériel (T11 du protocole)** : si `sources` n'expose pas ces métadonnées, le plugin écoute directement les PGN 126996 (produit) et 60928 (adresse). Pour chaque appareil, la liste des chemins **du catalogue FleetAi** qu'il fournit (`$source` des deltas).
+- **`deviceId`.** Empreinte stable calculée par le plugin (fabricant + modèle + série, hachés). Si l'option « masquer » est posée, `serialNumber` est omis ou haché — jamais en clair.
+- **Requête.** `POST {endpoint}/inventory` (soit `/api/instruments/inventory`), même `Authorization: Bearer fai_ing_…` que les lots. Au démarrage, puis à chaque changement (apparition, disparition > 10 min, nouveau chemin), **au plus une fois par minute**. Le corps est l'**état complet** : un appareil absent du lot est marqué disparu une fois qu'il n'a pas été vu depuis 10 minutes (le serveur applique ce délai de grâce : un lot vide ou partiel ne vide pas l'inventaire).
+- **Réponses.** `201 { created, updated, gone }` ; `401` (jeton), `403 plan_not_allowed`, `409 source_disabled` (même consigne que pour les lots : arrêt visible), `422 validation_failed` | `duplicate_device`, `429` avec `Retry-After`. Mêmes consignes que pour les lots : `401` = arrêt visible, `429`/`5xx` = repli puis nouvel essai. Limite : ≤ 64 appareils, ≤ 100 chemins par appareil ; les chemins hors catalogue sont ignorés sans faire échouer le lot.
+
+Inventaire type (rejoué par `tests/functional/instruments/inventory_ingest.spec.ts`, fixture `tests/fixtures/signalk_plugin_inventory.json`) :
+
+```json
+{
+  "devices": [
+    {
+      "deviceId": "n2k-a1b2c3d4e5f60718",
+      "label": "Volvo Penta EVC — moteur bâbord",
+      "manufacturer": "Volvo Penta",
+      "model": "EVC",
+      "serialNumber": "h:7f3a9c21",
+      "function": "Engine",
+      "bus": "n2k",
+      "address": 12,
+      "paths": [
+        "propulsion.port.revolutions",
+        "propulsion.port.coolantTemperature",
+        "propulsion.port.runTime"
+      ]
+    },
+    {
+      "deviceId": "n2k-0f1e2d3c4b5a6978",
+      "label": "Victron BMV-712",
+      "manufacturer": "Victron Energy",
+      "model": "BMV-712",
+      "function": "Battery",
+      "bus": "n2k",
+      "address": 34,
+      "paths": [
+        "electrical.batteries.house.voltage",
+        "electrical.batteries.house.capacity.stateOfCharge"
+      ]
+    },
+    {
+      "deviceId": "n2k-9988776655443322",
+      "label": "Maretron TLM100",
+      "manufacturer": "Maretron",
+      "model": "TLM100",
+      "function": "Fluid level",
+      "bus": "n2k",
+      "address": 41,
+      "paths": ["tanks.fuel.0.currentLevel"]
+    },
+    {
+      "deviceId": "nmea0183-gps-ttyUSB0",
+      "label": "GPS (NMEA 0183, ttyUSB0)",
+      "bus": "nmea0183",
+      "paths": ["navigation.position", "navigation.speedOverGround"]
+    }
+  ]
+}
+```
+
 ## Critères d'acceptation (issue)
 
 - Sur `signalk-server` 2.x : Appstore → `signalk-fleetai` → URL + jeton → en moins de deux fenêtres `last_seen_at` est posé et l'onglet affiche les dernières valeurs. Vérifié le 25 octobre 2026 contre le service `signalk` du `docker-compose.yml` (trace NMEA 0183 d'exemple) : premier lot (`notifications.server.newVersion`) après 10 s, puis `navigation.*` et `environment.*` par fenêtres, `recordedAt` arrondi, aucun `sourceId`.
