@@ -52,29 +52,13 @@ export default class InstrumentInventoryService {
         .forUpdate()
       const byId = new Map(existing.map((device) => [device.deviceId, device]))
       const result: InstrumentInventoryResult = { created: 0, updated: 0, gone: 0 }
+      const unchanged: number[] = []
+      const fresh: Array<Partial<BoatInstrumentDevice>> = []
 
       for (const input of payload.devices) {
         const known = byId.get(input.deviceId)
-        if (known) {
-          known.merge({
-            label: input.label,
-            manufacturer: input.manufacturer ?? known.manufacturer,
-            model: input.model ?? known.model,
-            serialNumber: input.serialNumber ?? known.serialNumber,
-            function: input.function ?? known.function,
-            bus: input.bus,
-            address: input.address ?? known.address,
-            paths: mergePaths(known.paths, input.paths),
-            lastSeenAt: now,
-            goneAt: null,
-          })
-          known.useTransaction(trx)
-          await known.save()
-          result.updated++
-          continue
-        }
-        await BoatInstrumentDevice.create(
-          {
+        if (!known) {
+          fresh.push({
             sourceId: source.id,
             deviceId: input.deviceId,
             label: input.label,
@@ -88,22 +72,57 @@ export default class InstrumentInventoryService {
             firstSeenAt: now,
             lastSeenAt: now,
             goneAt: null,
-          },
-          { client: trx }
-        )
-        result.created++
+          })
+          result.created++
+          continue
+        }
+        result.updated++
+        // Champ absent = valeur conservée ; `null` explicite = valeur effacée
+        // (le plugin qui passe en mode « masquer » efface le numéro de série).
+        known.merge({
+          label: input.label,
+          manufacturer: input.manufacturer === undefined ? known.manufacturer : input.manufacturer,
+          model: input.model === undefined ? known.model : input.model,
+          serialNumber: input.serialNumber === undefined ? known.serialNumber : input.serialNumber,
+          function: input.function === undefined ? known.function : input.function,
+          bus: input.bus,
+          address: input.address === undefined ? known.address : input.address,
+          paths: mergePaths(known.paths, input.paths),
+          goneAt: null,
+        })
+        if (known.$isDirty) {
+          known.useTransaction(trx)
+          known.lastSeenAt = now
+          await known.save()
+        } else {
+          unchanged.push(known.id)
+        }
       }
+
+      // Un lot de routine ne change que `last_seen_at` : une requête pour tous.
+      if (unchanged.length > 0) {
+        await BoatInstrumentDevice.query({ client: trx })
+          .whereIn('id', unchanged)
+          .update({ lastSeenAt: now.toSQL()! })
+      }
+      if (fresh.length > 0) await BoatInstrumentDevice.createMany(fresh, { client: trx })
 
       const graceLimit = now.minus({ minutes: INSTRUMENT_INVENTORY_GONE_GRACE_MINUTES })
       const announced = new Set(payload.devices.map((device) => device.deviceId))
-      for (const device of existing) {
-        if (announced.has(device.deviceId) || device.goneAt !== null) continue
-        if (device.lastSeenAt > graceLimit) continue
-        device.useTransaction(trx)
-        device.goneAt = now
-        await device.save()
-        result.gone++
+      const vanished = existing
+        .filter(
+          (device) =>
+            !announced.has(device.deviceId) &&
+            device.goneAt === null &&
+            device.lastSeenAt <= graceLimit
+        )
+        .map((device) => device.id)
+      if (vanished.length > 0) {
+        await BoatInstrumentDevice.query({ client: trx })
+          .whereIn('id', vanished)
+          .update({ goneAt: now.toSQL()! })
       }
+      result.gone = vanished.length
       return result
     })
   }
@@ -127,12 +146,16 @@ export default class InstrumentInventoryService {
 }
 
 /**
- * Union triée et dédoublonnée, bornée : un appareil bavard ne gonfle pas la
- * ligne. Les chemins hors catalogue sont écartés (ils n'auraient aucune
- * jauge) sans refuser le lot.
+ * Union dédoublonnée et triée. Les chemins hors catalogue sont écartés (ils
+ * n'auraient aucune jauge) sans refuser le lot. La borne garde en priorité les
+ * chemins du lot courant, puis les plus anciens connus : un appareil bavard ne
+ * chasse pas ce que le plugin vient d'annoncer. Les chemins sont **cumulatifs**
+ * par contrat (le plugin n'envoie que ce qu'il a vu ; un appareil qui change
+ * d'instance garde l'ancien chemin).
  */
 export function mergePaths(known: string[], incoming: string[]): string[] {
-  return [...new Set([...known, ...incoming.filter((path) => telemetryPathSpec(path) !== null)])]
-    .sort()
+  const valid = incoming.filter((path) => telemetryPathSpec(path) !== null)
+  return [...new Set([...valid, ...known])]
     .slice(0, INSTRUMENT_INVENTORY_MAX_PATHS_PER_DEVICE)
+    .sort()
 }

@@ -6,8 +6,10 @@ import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 /**
  * Appareil du bus annoncé par la boîte (#1036). `deviceId` est l'empreinte
- * posée par le plugin, unique par source. Le numéro de série n'est jamais
- * sérialisé : il sert à départager deux appareils, pas à l'affichage.
+ * posée par le plugin, unique par source. `serialNumber` est la valeur que le
+ * plugin choisit de partager (déjà hachée ou omise s'il masque les séries) : conservée
+ * pour départager deux appareils identiques (#1037, rattachement), jamais
+ * sérialisée vers le navigateur ni journalisée.
  */
 export default class BoatInstrumentDevice extends BoatInstrumentDeviceSchema {
   declare bus: InstrumentDeviceBus

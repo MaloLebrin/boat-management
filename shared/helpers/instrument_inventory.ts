@@ -1,3 +1,4 @@
+import { isAisPathFamily } from '#shared/helpers/ais'
 import type { InstrumentDevice, InstrumentDeviceGroup } from '#shared/types/instruments'
 
 /** Ordre d'affichage des rubriques de l'encart « Ce que la boîte a trouvé » (#1036). */
@@ -42,7 +43,7 @@ const FUNCTION_GROUPS: ReadonlyArray<[keyword: string, group: InstrumentDeviceGr
 export function instrumentDeviceGroup(
   device: Pick<InstrumentDevice, 'paths' | 'function'>
 ): InstrumentDeviceGroup {
-  if (device.paths.some((path) => path.startsWith('ais.') || path.includes('.ais.'))) return 'ais'
+  if (device.paths.some(isAisPathFamily)) return 'ais'
   for (const [prefix, group] of PATH_GROUPS) {
     if (device.paths.some((path) => path.startsWith(prefix))) return group
   }

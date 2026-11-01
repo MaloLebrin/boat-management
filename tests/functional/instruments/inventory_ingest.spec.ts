@@ -5,6 +5,7 @@ import { truncateDb } from '#tests/utils/db'
 import BoatInstrumentDevice from '#models/boat_instrument_device'
 import InstrumentIngestTokenService from '#services/instrument_ingest_token_service'
 import { createAdminUser } from '#tests/functional/helpers'
+import Organization from '#models/organization'
 import { asInstrumentsReload, boatWithSource } from '#tests/functional/instruments/helpers'
 import { INSTRUMENT_INVENTORY_PATH } from '#shared/constants/instruments'
 import type { InstrumentInventoryProps } from '#shared/types/instruments'
@@ -154,6 +155,23 @@ test.group('Instruments — POST /api/instruments/inventory', (group) => {
     a.assertStatus(201)
     b.assertStatus(201)
     assert.lengthOf(await BoatInstrumentDevice.query().where('sourceId', source.id), 4)
+  })
+
+  test('403 plan_not_allowed : une organisation rétrogradée sous Pro est refusée', async ({
+    client,
+    assert,
+  }) => {
+    const { admin, token, source } = await setup()
+    await Organization.query().where('id', admin.organizationId!).update({ plan: 'starter' })
+
+    const response = await client
+      .post(INSTRUMENT_INVENTORY_PATH)
+      .header('Authorization', `Bearer ${token}`)
+      .json(inventory)
+
+    response.assertStatus(403)
+    assert.equal(response.body().error, 'plan_not_allowed')
+    assert.lengthOf(await BoatInstrumentDevice.query().where('sourceId', source.id), 0)
   })
 
   test('401 pour un jeton révoqué ou absent', async ({ client }) => {
