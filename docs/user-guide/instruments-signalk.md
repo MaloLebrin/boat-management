@@ -84,6 +84,12 @@ Quand le plugin (ou la boîte FleetAi) est branché, l'onglet Instruments affich
 
 Si l'encart indique **« Aucun appareil annoncé »**, vérifie dans l'ordre : le bus NMEA 2000 est alimenté ; la passerelle (PICAN-M, NGX-1…) est bien détectée par Signal K ; ton bateau n'est pas en NMEA 0183 (il faut alors un convertisseur). Le numéro de série des appareils n'est jamais affiché.
 
+## Batteries, réservoirs et « Relier les équipements »
+
+Dans l'onglet **Équipements** du bateau, les sections **Batteries** et **Réservoirs** te permettent de décrire tes batteries (chimie, capacité, tension) et tes cuves (carburant, eau douce, eaux grises ou noires…, capacité). Chacune peut recevoir un **identifiant Signal K** (`house` pour une batterie, `fuel.0` pour une cuve) et un **seuil d'alerte** : tension basse en volts, niveau bas en pourcents. Le seuil crée l'alerte correspondante dans l'onglet Instruments.
+
+Quand la boîte (ou le plugin) a annoncé ses appareils, l'étape **« Relier les équipements »** de l'assistant propose une ligne par moteur, batterie et cuve trouvés, cochée par défaut : « Servitude (Victron BMV-712) », « Gasoil (Maretron TLM100) »… Décoche ce que tu veux ignorer, puis clique sur **« Tout rattacher »** : FleetAi crée les batteries et cuves manquantes et relie le reste en une seule opération. Si une ligne ne peut pas être appliquée (un identifiant est déjà utilisé), **rien n'est modifié** et un message te l'indique. Un moteur n'est relié automatiquement que s'il est le seul sans identifiant ; sinon, choisis son moteur FleetAi à la main sur sa ligne. Ensuite, les jauges affichent le nom que tu as donné plutôt que l'identifiant Signal K.
+
 ## Mode technicien de la boîte
 
 > Disponible avec l'image FleetAi (boîte). Les passerelles et ports sont reconnus par la boîte elle-même ; ce mode sert quand la reconnaissance ne suffit pas.

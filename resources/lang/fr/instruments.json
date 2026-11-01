@@ -269,7 +269,7 @@
       "hardware": "Matériel à bord",
       "path": "Chemin de connexion",
       "connect": "Connexion",
-      "engines": "Relier les moteurs",
+      "engines": "Relier les équipements",
       "done": "Terminé"
     },
     "hardware": {
@@ -375,6 +375,24 @@
       "unlinked": "Non relié",
       "fallback": "Moteur {id}"
     },
+    "equipment": {
+      "noProposals": "Tous les équipements sont reliés. Vous pouvez passer à l’étape suivante.",
+      "intro": "La boîte a détecté ces équipements. Cochez ceux que vous souhaitez créer ou relier dans FleetAi.",
+      "selectProposal": "Sélectionner cet équipement",
+      "nameLabel": "Nom",
+      "kind": {
+        "engine": "Moteur",
+        "battery": "Batterie",
+        "tank": "Réservoir"
+      },
+      "applyAll": "Tout rattacher",
+      "enginesTitle": "Moteurs",
+      "enginesIntro": "Associez chaque moteur de FleetAi à son identifiant détecté sur le serveur.",
+      "enginesNoneDetected": "Aucun moteur détecté pour l’instant. Vous pourrez les relier plus tard.",
+      "engineUnlinked": "Non relié",
+      "engineFallback": "Moteur {id}",
+      "empty": "Aucun équipement à relier pour l’instant."
+    },
     "done": {
       "readings": "{count, plural, one {# mesure reçue.} other {# mesures reçues.}}",
       "rules": "Les règles d’alerte intégrées (température, pression d’huile, batteries…) sont actives.",
@@ -404,6 +422,32 @@
     "empty": {
       "title": "Aucun appareil annoncé",
       "causes": "Le bus n’est peut-être pas alimenté, la passerelle n’est pas détectée, ou votre bateau est en NMEA 0183 (la boîte nécessite alors un convertisseur). Vérifiez que la boîte est alimentée et branchée, puis revenez dans quelques minutes."
+    }
+  },
+  "mapping": {
+    "names": {
+      "engine": {
+        "port": "Moteur bâbord",
+        "starboard": "Moteur tribord",
+        "indexed": "Moteur {index}",
+        "other": "Moteur {id}"
+      },
+      "battery": {
+        "house": "Servitude",
+        "start": "Démarrage",
+        "indexed": "Batterie {index}",
+        "other": "Batterie {id}"
+      },
+      "tank": {
+        "fuel": "Gasoil",
+        "freshWater": "Eau douce",
+        "wasteWater": "Eaux grises",
+        "blackWater": "Eaux noires",
+        "liveWell": "Vivier",
+        "lubrication": "Huile",
+        "ballast": "Ballast",
+        "gas": "Gaz"
+      }
     }
   }
 }

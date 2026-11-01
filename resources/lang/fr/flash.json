@@ -637,7 +637,9 @@
     "pairingDeviceDefault": "FleetAi",
     "pairingCodeInvalid": "Ce code est inconnu ou a expiré. Vérifiez le code affiché par le boîtier, ou attendez qu'il en affiche un nouveau.",
     "pairingAlreadyUsed": "Ce code a déjà été utilisé. Attendez que le boîtier en affiche un nouveau.",
-    "pairingRateLimited": "Trop d'essais de code. Réessayez dans {minutes} min."
+    "pairingRateLimited": "Trop d'essais de code. Réessayez dans {minutes} min.",
+    "mappingApplied": "Équipements rattachés : {linked} reliés, {created} créés.",
+    "mappingConflict": "Le rattachement n’a pas pu être appliqué (un identifiant est déjà utilisé ou un équipement a changé). Rien n’a été modifié, actualisez la liste et réessayez."
   },
   "inventory": {
     "itemCreated": "Article ajouté à l'inventaire.",
@@ -665,5 +667,21 @@
     "invalidStatus": "Ce geste n'est pas possible dans l'état actuel du bon de commande.",
     "boatNotFound": "Bateau introuvable.",
     "nothingToReorder": "Aucun article de ce fournisseur n'est sous son seuil d'alerte."
+  },
+  "battery": {
+    "added": "Batterie ajoutée.",
+    "updated": "Batterie mise à jour.",
+    "removed": "Batterie supprimée.",
+    "notFound": "Batterie introuvable.",
+    "instrumentKeySaved": "Batterie reliée à l’identifiant d’instrument.",
+    "instrumentKeyTaken": "Une autre batterie de ce bateau utilise déjà cet identifiant d’instrument."
+  },
+  "tank": {
+    "added": "Réservoir ajouté.",
+    "updated": "Réservoir mis à jour.",
+    "removed": "Réservoir supprimé.",
+    "notFound": "Réservoir introuvable.",
+    "instrumentKeySaved": "Réservoir relié à l’identifiant d’instrument.",
+    "instrumentKeyTaken": "Un autre réservoir de ce bateau utilise déjà cet identifiant d’instrument."
   }
 }

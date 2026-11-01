@@ -1239,6 +1239,66 @@
       "summary_document": "safety equipment summary sheet"
     }
   },
+  "batteries": {
+    "title": "Batteries",
+    "add": "Add a battery",
+    "empty": "No battery recorded.",
+    "lowVoltageLabel": "Alert < {voltage} V",
+    "instrumentKeyLabel": "Signal K: {key}",
+    "chemistry": {
+      "lead_acid": "Lead-acid",
+      "agm": "AGM",
+      "gel": "Gel",
+      "lithium": "Lithium",
+      "other": "Other"
+    },
+    "fields": {
+      "name": "Name",
+      "chemistry": "Chemistry",
+      "capacityAh": "Capacity (Ah)",
+      "nominalVoltage": "Nominal voltage (V)",
+      "lowVoltageV": "Low voltage alert threshold (V)",
+      "lowVoltageHint": "An alert triggers when the voltage drops below this threshold.",
+      "instrumentKey": "Signal K identifier",
+      "instrumentKeyHint": "The battery's id in Signal K (electrical.batteries.ID), e.g. house or 0."
+    },
+    "modal": {
+      "title": "Add a battery",
+      "editTitle": "Edit battery",
+      "submit": "Add"
+    }
+  },
+  "tanks": {
+    "title": "Tanks",
+    "add": "Add a tank",
+    "empty": "No tank recorded.",
+    "lowLevelLabel": "Alert < {pct}%",
+    "instrumentKeyLabel": "Signal K: {key}",
+    "type": {
+      "fuel": "Fuel",
+      "freshWater": "Fresh water",
+      "wasteWater": "Grey water",
+      "blackWater": "Black water",
+      "liveWell": "Live well",
+      "lubrication": "Oil",
+      "ballast": "Ballast",
+      "gas": "Gas"
+    },
+    "fields": {
+      "name": "Name",
+      "type": "Type",
+      "capacityL": "Capacity (L)",
+      "lowLevelPct": "Low level alert threshold (%)",
+      "lowLevelHint": "An alert triggers when the level drops below this percentage (1-99).",
+      "instrumentKey": "Signal K identifier",
+      "instrumentKeyHint": "The tank's id in Signal K (tanks.TYPE.ID), e.g. fuel.0."
+    },
+    "modal": {
+      "title": "Add a tank",
+      "editTitle": "Edit tank",
+      "submit": "Add"
+    }
+  },
   "availability": {
     "status": {
       "available": "Available",

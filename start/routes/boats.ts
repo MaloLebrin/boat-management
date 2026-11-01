@@ -14,6 +14,9 @@ const BoatEquipmentMediaController = () => import('#controllers/boat_equipment_m
 const BoatIncidentMediaController = () => import('#controllers/boat_incident_media_controller')
 const BoatOwnersController = () => import('#controllers/boat_owners_controller')
 const BoatTrashController = () => import('#controllers/boat_trash_controller')
+const BoatBatteriesController = () => import('#controllers/boat_batteries_controller')
+const BoatTanksController = () => import('#controllers/boat_tanks_controller')
+const InstrumentMappingController = () => import('#controllers/instrument_mapping_controller')
 const BoatStatusController = () => import('#controllers/boat_status_controller')
 
 router
@@ -104,6 +107,39 @@ router
       'updateEngineInstrumentKey',
     ])
     router.delete('boats/:boatId/engines/:engineId', [controllers.BoatEquipment, 'destroyEngine'])
+
+    // Batteries et réservoirs (#1037) : écrans Inertia, tout redirige.
+    router
+      .post('boats/:boatId/batteries', [BoatBatteriesController, 'store'])
+      .as('boats.batteries.store')
+    router
+      .put('boats/:boatId/batteries/:batteryId', [BoatBatteriesController, 'update'])
+      .as('boats.batteries.update')
+    router
+      .patch('boats/:boatId/batteries/:batteryId/instrument-key', [
+        BoatBatteriesController,
+        'updateInstrumentKey',
+      ])
+      .as('boats.batteries.instrumentKey')
+    router
+      .delete('boats/:boatId/batteries/:batteryId', [BoatBatteriesController, 'destroy'])
+      .as('boats.batteries.destroy')
+    router.post('boats/:boatId/tanks', [BoatTanksController, 'store']).as('boats.tanks.store')
+    router
+      .put('boats/:boatId/tanks/:tankId', [BoatTanksController, 'update'])
+      .as('boats.tanks.update')
+    router
+      .patch('boats/:boatId/tanks/:tankId/instrument-key', [
+        BoatTanksController,
+        'updateInstrumentKey',
+      ])
+      .as('boats.tanks.instrumentKey')
+    router
+      .delete('boats/:boatId/tanks/:tankId', [BoatTanksController, 'destroy'])
+      .as('boats.tanks.destroy')
+    router
+      .post('boats/:id/instrument-mapping/apply', [InstrumentMappingController, 'apply'])
+      .as('boats.instrumentMapping.apply')
 
     router.post('boats/:boatId/engines/:engineId/documents', [
       controllers.BoatMedia,

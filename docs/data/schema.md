@@ -590,6 +590,26 @@ Inventaire des appareils du bus (NMEA 2000, NMEA 0183) annoncés par la boîte /
 - `bus` (`n2k` | `nmea0183` | `other`), `address` (entier, nullable), `paths` (jsonb, tableau de chemins du catalogue, `[]` par défaut)
 - `firstSeenAt`, `lastSeenAt`, `goneAt` (nullable : posé à la première absence, effacé au retour), `createdAt`, `updatedAt`
 
+### boat_batteries (#1037)
+
+Batteries d'un bateau.
+
+- `id`, `boatId` (FK `boats`, `CASCADE`), `name` (120)
+- `instrumentKey` (40, nullable) — `<id>` de `electrical.batteries.<id>.*` ; **unique `(boatId, instrumentKey)`**
+- `chemistry` (16, nullable : `lead_acid`, `agm`, `gel`, `lithium`, `other`), `capacityAh` (entier), `nominalVoltage` (decimal 5,1), `lowVoltageV` (decimal 5,2, seuil d'alerte), nullables
+- `position` (entier, 0 par défaut), `createdAt`, `updatedAt`
+
+### boat_tanks (#1037)
+
+Réservoirs d'un bateau.
+
+- `id`, `boatId` (FK `boats`, `CASCADE`), `name` (120), `type` (24, ∈ `TANK_TYPES` : `fuel`, `freshWater`, `wasteWater`, `blackWater`, `liveWell`, `lubrication`, `ballast`, `gas`)
+- `instrumentKey` (40, nullable) — `<type>.<id>` de `tanks.<type>.<id>.*` ; **unique `(boatId, instrumentKey)`**
+- `capacityL` (entier), `lowLevelPct` (entier, seuil d'alerte), nullables
+- `createdAt`, `updatedAt`
+
+`boat_instrument_alert_rules` gagne `batteryId` / `tankId` (FK `boat_batteries` / `boat_tanks`, nullables, `CASCADE`) : la règle liée au seuil d'un équipement.
+
 ### instrument_pairings (#1032)
 
 Appairage par code d'un boîtier Signal K (D11). Créé **sans compte** par le boîtier, rattaché ensuite par un admin. Aucun secret en clair : seules les empreintes des deux codes sont stockées, le jeton d'ingestion n'est jamais écrit ici (généré à la livraison).

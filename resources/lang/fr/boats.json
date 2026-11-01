@@ -1239,6 +1239,66 @@
       "summary_document": "document de synthèse (fiche d'armement)"
     }
   },
+  "batteries": {
+    "title": "Batteries",
+    "add": "Ajouter une batterie",
+    "empty": "Aucune batterie enregistree.",
+    "lowVoltageLabel": "Alerte < {voltage} V",
+    "instrumentKeyLabel": "Signal K : {key}",
+    "chemistry": {
+      "lead_acid": "Plomb-acide",
+      "agm": "AGM",
+      "gel": "Gel",
+      "lithium": "Lithium",
+      "other": "Autre"
+    },
+    "fields": {
+      "name": "Nom",
+      "chemistry": "Technologie",
+      "capacityAh": "Capacite (Ah)",
+      "nominalVoltage": "Tension nominale (V)",
+      "lowVoltageV": "Seuil d'alerte tension basse (V)",
+      "lowVoltageHint": "Une alerte se declenche quand la tension descend sous ce seuil.",
+      "instrumentKey": "Identifiant Signal K",
+      "instrumentKeyHint": "L'identifiant de la batterie dans Signal K (electrical.batteries.ID), par ex. house ou 0."
+    },
+    "modal": {
+      "title": "Ajouter une batterie",
+      "editTitle": "Modifier la batterie",
+      "submit": "Ajouter"
+    }
+  },
+  "tanks": {
+    "title": "Reservoirs",
+    "add": "Ajouter un reservoir",
+    "empty": "Aucun reservoir enregistre.",
+    "lowLevelLabel": "Alerte < {pct} %",
+    "instrumentKeyLabel": "Signal K : {key}",
+    "type": {
+      "fuel": "Carburant",
+      "freshWater": "Eau douce",
+      "wasteWater": "Eaux grises",
+      "blackWater": "Eaux noires",
+      "liveWell": "Vivier",
+      "lubrication": "Huile",
+      "ballast": "Ballast",
+      "gas": "Gaz"
+    },
+    "fields": {
+      "name": "Nom",
+      "type": "Type",
+      "capacityL": "Capacite (L)",
+      "lowLevelPct": "Seuil d'alerte niveau bas (%)",
+      "lowLevelHint": "Une alerte se declenche quand le niveau descend sous ce pourcentage (1-99).",
+      "instrumentKey": "Identifiant Signal K",
+      "instrumentKeyHint": "L'identifiant de la cuve dans Signal K (tanks.TYPE.ID), par ex. fuel.0."
+    },
+    "modal": {
+      "title": "Ajouter un reservoir",
+      "editTitle": "Modifier le reservoir",
+      "submit": "Ajouter"
+    }
+  },
   "availability": {
     "status": {
       "available": "Disponible",

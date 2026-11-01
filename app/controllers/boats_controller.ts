@@ -45,6 +45,10 @@ import BoatContextService from '#services/boat_context_service'
 import BoatHullService from '#services/boat_hull_service'
 import BoatAvailabilityService from '#services/boat_availability_service'
 import BoatStatusService from '#services/boat_status_service'
+import BoatBatteryService from '#services/boat_battery_service'
+import BoatTankService from '#services/boat_tank_service'
+import { proposeInstrumentMapping } from '#services/instrument_mapping_service'
+import { toBoatBatteryRow, toBoatTankRow } from '#transformers/boat_battery_transformer'
 import InstrumentInventoryService from '#services/instrument_inventory_service'
 import InstrumentSourceService from '#services/instrument_source_service'
 import TelemetryReadService from '#services/telemetry_read_service'
@@ -108,7 +112,9 @@ export default class BoatsController {
     private instrumentInventoryService: InstrumentInventoryService,
     private telemetryReadService: TelemetryReadService,
     private instrumentAlertService: InstrumentAlertService,
-    private instrumentAlertRuleService: InstrumentAlertRuleService
+    private instrumentAlertRuleService: InstrumentAlertRuleService,
+    private batteryService: BoatBatteryService,
+    private tankService: BoatTankService
   ) {}
 
   async index({ inertia, auth, request, bouncer, response }: HttpContext) {
@@ -344,8 +350,15 @@ export default class BoatsController {
       this.statusService.listHistory(boat),
     ])
 
+    const [batteries, tanks] = await Promise.all([
+      this.batteryService.list(boat),
+      this.tankService.list(boat),
+    ])
+
     return inertia.render('boats/show', {
       availability,
+      batteries: batteries.map(toBoatBatteryRow),
+      tanks: tanks.map(toBoatTankRow),
       statusHistory: statusChanges.map(toBoatStatusChangeRow),
       ...toShowShellProps(boat, {
         positionHistory,
@@ -467,6 +480,28 @@ export default class BoatsController {
             this.instrumentAlertService.openForBoat(boat),
           ])
           return { ...tab, rules, openAlerts }
+        }),
+        'instruments'
+      ),
+      // Rattachement automatique (#1037) : propositions dérivées de l'inventaire et
+      // des équipements existants. Même groupe que l'inventaire (rechargeable seul).
+      mappingProposals: inertia.defer(
+        deferJson(async () => {
+          if (!instrumentsEnabled || !instrumentSource) return { proposals: [] }
+          const [devices, batteryRows, tankRows] = await Promise.all([
+            this.instrumentInventoryService.listForSource(instrumentSource),
+            this.batteryService.list(boat),
+            this.tankService.list(boat),
+          ])
+          return {
+            proposals: proposeInstrumentMapping({
+              devices,
+              engines: boat.engines,
+              batteries: batteryRows,
+              tanks: tankRows,
+              translate: (key, vars) => i18n.t(key, vars),
+            }),
+          }
         }),
         'instruments'
       ),

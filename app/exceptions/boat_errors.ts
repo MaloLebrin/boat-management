@@ -13,6 +13,16 @@ export class BoatEngineInstrumentKeyTakenError extends Error {
   name = 'BoatEngineInstrumentKeyTakenError'
 }
 
+/** L'identifiant Signal K est déjà porté par une autre batterie du bateau (#1037). */
+export class BoatBatteryInstrumentKeyTakenError extends Error {
+  name = 'BoatBatteryInstrumentKeyTakenError'
+}
+
+/** L'identifiant Signal K est déjà porté par une autre cuve du bateau (#1037). */
+export class BoatTankInstrumentKeyTakenError extends Error {
+  name = 'BoatTankInstrumentKeyTakenError'
+}
+
 export class RegistrationNumberTakenError extends Error {
   name = 'RegistrationNumberTakenError'
 }
