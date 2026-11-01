@@ -1,0 +1,48 @@
+{
+  "devices": [
+    {
+      "deviceId": "n2k-a1b2c3d4e5f60718",
+      "label": "Volvo Penta EVC — moteur bâbord",
+      "manufacturer": "Volvo Penta",
+      "model": "EVC",
+      "serialNumber": "h:7f3a9c21",
+      "function": "Engine",
+      "bus": "n2k",
+      "address": 12,
+      "paths": [
+        "propulsion.port.revolutions",
+        "propulsion.port.coolantTemperature",
+        "propulsion.port.runTime"
+      ]
+    },
+    {
+      "deviceId": "n2k-0f1e2d3c4b5a6978",
+      "label": "Victron BMV-712",
+      "manufacturer": "Victron Energy",
+      "model": "BMV-712",
+      "function": "Battery",
+      "bus": "n2k",
+      "address": 34,
+      "paths": [
+        "electrical.batteries.house.voltage",
+        "electrical.batteries.house.capacity.stateOfCharge"
+      ]
+    },
+    {
+      "deviceId": "n2k-9988776655443322",
+      "label": "Maretron TLM100",
+      "manufacturer": "Maretron",
+      "model": "TLM100",
+      "function": "Fluid level",
+      "bus": "n2k",
+      "address": 41,
+      "paths": ["tanks.fuel.0.currentLevel"]
+    },
+    {
+      "deviceId": "nmea0183-gps-ttyUSB0",
+      "label": "GPS (NMEA 0183, ttyUSB0)",
+      "bus": "nmea0183",
+      "paths": ["navigation.position", "navigation.speedOverGround"]
+    }
+  ]
+}

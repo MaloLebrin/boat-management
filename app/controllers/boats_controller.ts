@@ -31,7 +31,11 @@ import { toBoatPricingRow } from '#transformers/boat_pricing_transformer'
 import { toPortFormOptions } from '#transformers/port_transformer'
 import { TELEMETRY_SERIES_DEFAULT_RANGE } from '#shared/constants/instruments'
 import { parseSeriesQuery } from '#shared/helpers/instruments'
-import { emptyInstrumentsTabProps } from '#transformers/instrument_transformer'
+import {
+  emptyInstrumentInventoryProps,
+  emptyInstrumentsTabProps,
+  toInstrumentDevice,
+} from '#transformers/instrument_transformer'
 import { applyInstrumentCsp } from '#utils/csp_connect_src'
 import BoatIncidentService from '#services/boat_incident_service'
 import BoatMaintenanceService from '#services/boat_maintenance_service'
@@ -41,6 +45,7 @@ import BoatContextService from '#services/boat_context_service'
 import BoatHullService from '#services/boat_hull_service'
 import BoatAvailabilityService from '#services/boat_availability_service'
 import BoatStatusService from '#services/boat_status_service'
+import InstrumentInventoryService from '#services/instrument_inventory_service'
 import InstrumentSourceService from '#services/instrument_source_service'
 import TelemetryReadService from '#services/telemetry_read_service'
 import InstrumentAlertService from '#services/instrument_alert_service'
@@ -100,6 +105,7 @@ export default class BoatsController {
     private availabilityService: BoatAvailabilityService,
     private statusService: BoatStatusService,
     private instrumentSourceService: InstrumentSourceService,
+    private instrumentInventoryService: InstrumentInventoryService,
     private telemetryReadService: TelemetryReadService,
     private instrumentAlertService: InstrumentAlertService,
     private instrumentAlertRuleService: InstrumentAlertRuleService
@@ -461,6 +467,16 @@ export default class BoatsController {
             this.instrumentAlertService.openForBoat(boat),
           ])
           return { ...tab, rules, openAlerts }
+        }),
+        'instruments'
+      ),
+      // Inventaire des appareils du bus (#1036) : même groupe que `instruments`,
+      // rechargeable seul par `router.reload({ only: ['inventory'] })`.
+      inventory: inertia.defer(
+        deferJson(async () => {
+          if (!instrumentsEnabled || !instrumentSource) return emptyInstrumentInventoryProps()
+          const devices = await this.instrumentInventoryService.listForSource(instrumentSource)
+          return { devices: devices.map(toInstrumentDevice) }
         }),
         'instruments'
       ),

@@ -328,3 +328,63 @@ export interface CreateInstrumentPairingPayload {
   hardwareKind?: string | null
   pluginVersion?: string | null
 }
+
+/** Bus d'où vient un appareil de l'inventaire (#1036). */
+export type InstrumentDeviceBus = 'n2k' | 'nmea0183' | 'other'
+
+/** Rubrique d'affichage de l'encart « Ce que la boîte a trouvé ». */
+export type InstrumentDeviceGroup =
+  | 'engine'
+  | 'battery'
+  | 'tank'
+  | 'gps'
+  | 'ais'
+  | 'weather'
+  | 'other'
+
+/** Un appareil annoncé par le plugin (`POST /api/instruments/inventory`). */
+export interface InstrumentInventoryDevicePayload {
+  /** Empreinte stable calculée par le plugin (fabricant + modèle + série hachés). */
+  deviceId: string
+  label: string
+  manufacturer?: string | null
+  model?: string | null
+  /** Jamais en clair si l'option « masquer » est posée côté plugin. */
+  serialNumber?: string | null
+  function?: string | null
+  bus: InstrumentDeviceBus
+  address?: number | null
+  /** Chemins du catalogue FleetAi fournis par l'appareil. */
+  paths: string[]
+}
+
+export interface InstrumentInventoryPayload {
+  devices: InstrumentInventoryDevicePayload[]
+}
+
+export interface InstrumentInventoryResult {
+  created: number
+  updated: number
+  gone: number
+}
+
+/** Un appareil tel que la fiche bateau le reçoit. */
+export interface InstrumentDevice {
+  id: number
+  deviceId: string
+  label: string
+  manufacturer: string | null
+  model: string | null
+  function: string | null
+  bus: InstrumentDeviceBus
+  address: number | null
+  paths: string[]
+  firstSeenAt: string
+  lastSeenAt: string
+  goneAt: string | null
+}
+
+/** Prop différée `inventory` : jamais `null` (#478). */
+export interface InstrumentInventoryProps {
+  devices: InstrumentDevice[]
+}

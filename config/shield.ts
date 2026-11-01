@@ -74,6 +74,7 @@ const shieldConfig = defineConfig({
       '/webhooks/stripe',
       '/webhooks/stripe/connect',
       '/api/instruments/ingest',
+      '/api/instruments/inventory',
       '/api/instruments/pairing',
       '/api/instruments/pairing/poll',
     ],

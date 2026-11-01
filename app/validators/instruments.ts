@@ -1,5 +1,10 @@
 import vine from '@vinejs/vine'
 import {
+  INSTRUMENT_INVENTORY_BUSES,
+  INSTRUMENT_INVENTORY_DEVICE_ID_MAX_LENGTH,
+  INSTRUMENT_INVENTORY_MAX_DEVICES,
+  INSTRUMENT_INVENTORY_MAX_PATHS_PER_DEVICE,
+  INSTRUMENT_INVENTORY_TEXT_MAX_LENGTH,
   INSTRUMENT_PAIRING_DEVICE_CODE_MAX_LENGTH,
   INSTRUMENT_PAIRING_DEVICE_LABEL_MAX_LENGTH,
   INSTRUMENT_PAIRING_HARDWARE_KIND_MAX_LENGTH,
@@ -75,6 +80,7 @@ export const ingestTelemetryApiValidator = vine.create(
 /** Texte libre affiché au client : pas de caractères de contrôle ni de mise en forme. */
 const PLAIN_TEXT = /^[^\p{Cc}\p{Cf}]*$/u
 const SLUG = /^[a-z0-9][a-z0-9_-]*$/
+const SLUG_OR_HASH = /^[0-9A-Za-z][0-9A-Za-z_:.-]*$/
 const VERSION = /^[0-9A-Za-z][0-9A-Za-z.+_-]*$/
 
 /**
@@ -124,3 +130,44 @@ export const attachInstrumentPairingValidator = vine.create(
     userCode: vine.string().trim().minLength(1).maxLength(32),
   })
 )
+
+/**
+ * Inventaire des appareils du bus (#1036). Les textes sont affichés tels
+ * quels : pas de caractères de contrôle. Les chemins hors catalogue sont
+ * écartés par le service, pas refusés ici.
+ */
+export const ingestInventoryApiValidator = vine.create(
+  vine.object({
+    devices: vine
+      .array(
+        vine.object({
+          deviceId: vine
+            .string()
+            .trim()
+            .minLength(1)
+            .maxLength(INSTRUMENT_INVENTORY_DEVICE_ID_MAX_LENGTH)
+            .regex(SLUG_OR_HASH),
+          label: vine
+            .string()
+            .trim()
+            .minLength(1)
+            .maxLength(INSTRUMENT_INVENTORY_TEXT_MAX_LENGTH)
+            .regex(PLAIN_TEXT),
+          manufacturer: inventoryText().nullable().optional(),
+          model: inventoryText().nullable().optional(),
+          serialNumber: inventoryText().nullable().optional(),
+          function: inventoryText().nullable().optional(),
+          bus: vine.enum(INSTRUMENT_INVENTORY_BUSES),
+          address: vine.number().min(0).max(255).withoutDecimals().nullable().optional(),
+          paths: vine
+            .array(vine.string().trim().minLength(1).maxLength(TELEMETRY_PATH_MAX_LENGTH))
+            .maxLength(INSTRUMENT_INVENTORY_MAX_PATHS_PER_DEVICE),
+        })
+      )
+      .maxLength(INSTRUMENT_INVENTORY_MAX_DEVICES),
+  })
+)
+
+function inventoryText() {
+  return vine.string().trim().maxLength(INSTRUMENT_INVENTORY_TEXT_MAX_LENGTH).regex(PLAIN_TEXT)
+}
