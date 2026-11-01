@@ -83,7 +83,13 @@ const tab = (over: Partial<InstrumentsTabProps> = {}): InstrumentsTabProps => ({
 
 const mountWizard = (instruments = tab(), engines: unknown[] = []) =>
   mount(InstrumentSetupWizard, {
-    props: { boatId: 9, instruments, engines: engines as never, streamOpen: false },
+    props: {
+      boatId: 9,
+      instruments,
+      engines: engines as never,
+      mappingProposals: { proposals: [] },
+      streamOpen: false,
+    },
   })
 
 const original = window.location

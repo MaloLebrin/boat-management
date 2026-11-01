@@ -4,14 +4,14 @@ import BaseButton from '~/components/base/BaseButton.vue'
 import BaseCard from '~/components/base/BaseCard.vue'
 import InstrumentSetupStepBrowser from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupStepBrowser.vue'
 import InstrumentSetupStepDone from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupStepDone.vue'
-import InstrumentSetupStepEngines from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupStepEngines.vue'
+import InstrumentSetupStepEquipment from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupStepEquipment.vue'
 import InstrumentSetupStepHardware from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupStepHardware.vue'
 import InstrumentSetupStepPath from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupStepPath.vue'
 import InstrumentSetupStepPlugin from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupStepPlugin.vue'
 import InstrumentSetupStepper from '~/components/boats/show/tabs/instruments/setup/InstrumentSetupStepper.vue'
 import { useInstrumentSetup } from '~/composables/use_instrument_setup'
 import { useT } from '~/composables/use_t'
-import type { BoatShowEngine } from '~/types/boat_show'
+import type { BoatShowEngine, BoatShowMappingProposals } from '~/types/boat_show'
 import type {
   InstrumentProbeInventory,
   InstrumentSetupHardware,
@@ -28,6 +28,7 @@ const props = defineProps<{
   boatId: number
   instruments: InstrumentsTabProps
   engines: BoatShowEngine[]
+  mappingProposals: BoatShowMappingProposals
   streamOpen: boolean
 }>()
 
@@ -39,6 +40,7 @@ const setup = useInstrumentSetup({
   boatId: () => props.boatId,
   source: () => source.value,
   engines: () => props.engines,
+  mappingProposals: () => props.mappingProposals.proposals,
   latestPaths: () => props.instruments.latest.map((entry) => entry.path),
   probedEngineIds: () => probed.value?.engineIds ?? [],
   streamOpen: () => props.streamOpen,
@@ -149,10 +151,11 @@ function reopen() {
         />
       </template>
       <template #engines>
-        <InstrumentSetupStepEngines
+        <InstrumentSetupStepEquipment
           :boat-id="boatId"
           :engines="engines"
           :detected-ids="setup.detectedEngineIds.value"
+          :proposals="mappingProposals.proposals"
         />
       </template>
       <template #done>

@@ -30,13 +30,23 @@ import type {
   InstrumentSeries,
   InstrumentsTabProps,
 } from '#shared/types/instruments'
-import type { BoatShowEngine } from '~/types/boat_show'
+import type {
+  BoatBatteryRow,
+  BoatShowEngine,
+  BoatShowMappingProposals,
+  BoatTankRow,
+} from '~/types/boat_show'
 
 const props = defineProps<{
   boatId: number
   instruments: InstrumentsTabProps
   /** Moteurs du bateau : l'assistant d'installation y relie les identifiants Signal K (#1023). */
   engines?: BoatShowEngine[]
+  /** Propositions de rattachement des équipements (#1037) — prop différée groupe `instruments`. */
+  mappingProposals: BoatShowMappingProposals
+  /** Noms FleetAi des jauges batterie et cuve (#1037). */
+  batteries?: BoatBatteryRow[]
+  tanks?: BoatTankRow[]
 }>()
 
 const { t } = useT()
@@ -175,6 +185,7 @@ onBeforeUnmount(() => {
       :boat-id="boatId"
       :instruments="instruments"
       :engines="engines ?? []"
+      :mapping-proposals="mappingProposals"
       :stream-open="canStream && stream.connectionState.value === 'open'"
     />
     <template v-if="source">
@@ -192,7 +203,13 @@ onBeforeUnmount(() => {
         :devices="page.props.inventory.devices"
         :now="now"
       />
-      <InstrumentCategoryGrid v-if="readings.length > 0" :readings="readings" :now="now" />
+      <InstrumentCategoryGrid
+        v-if="readings.length > 0"
+        :readings="readings"
+        :now="now"
+        :batteries="batteries"
+        :tanks="tanks"
+      />
       <p v-else class="text-sm text-fg-muted">{{ t('instruments.noData') }}</p>
       <InstrumentHistoryPanel
         v-if="historyPaths.length > 0"

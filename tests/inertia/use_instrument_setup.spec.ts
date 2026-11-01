@@ -33,6 +33,7 @@ const engine = (id: number, instrumentKey: string | null) => ({ id, instrumentKe
 interface Scenario {
   source: InstrumentSourceRow | null
   engines: never[]
+  mappingProposals: never[]
   latestPaths: string[]
   probed: string[]
   streamOpen: boolean
@@ -42,6 +43,7 @@ function harness(initial: Partial<Scenario> = {}) {
   const state = reactive<Scenario>({
     source: null,
     engines: [],
+    mappingProposals: [],
     latestPaths: [],
     probed: [],
     streamOpen: false,
@@ -55,6 +57,7 @@ function harness(initial: Partial<Scenario> = {}) {
           boatId: () => 7,
           source: () => state.source,
           engines: () => state.engines,
+          mappingProposals: () => state.mappingProposals,
           latestPaths: () => state.latestPaths,
           probedEngineIds: () => state.probed,
           streamOpen: () => state.streamOpen,
