@@ -63,6 +63,14 @@ Question : la configuration matérielle d'un kit (carte CAN, passerelle USB) peu
 Procédure : activer l'overlay de la carte CAN dans `config.txt`, monter `can0` (ou `vcan0`), configurer la source dans Signal K. Rejouer un enregistrement ou brancher un vrai bus.
 Réussite : chemins `propulsion.*` ou `electrical.*` visibles dans Signal K puis dans FleetAi. Noter chaque réglage nécessaire (il devra être préinstallé), et si une passerelle USB (Actisense, Yacht Devices) fonctionne sans aucun réglage.
 
+**T8 étendu (#1039, `signalk-image-hwdetect.md`).** À relever et à noter dans la feuille de résultats :
+
+- PICAN-M **avec et sans** carte : comportement du noyau overlay actif (messages `dmesg`, durée de démarrage, `can0` présent ou non) — décide si l'overlay reste actif par défaut.
+- NGX-1, NGT-1, iKonvert : `idVendor:idProduct` exacts (`lsusb`), lien `/dev/fleetai-n2k` créé, connexion générée, mesures dans Signal K.
+- USB-série NMEA 0183 à 4800 et à 38400 : débit détecté en moins de 6 s, port sans trame signalé, branchement à chaud, redémarrage du Pi.
+- Une connexion Signal K créée à la main n'est jamais modifiée.
+- Page technicien sur iPhone et sur Android : connexion, trames en direct, action « forcer un débit », export du diagnostic ; vérifier que le zip ne contient aucun secret.
+
 ### T9 — Appairage de bout en bout (API #1034)
 
 Procédure : plugin en mode appairage, lancer l'appairage, saisir le code dans FleetAi, observer. Variantes : code expiré, code saisi deux fois, redémarrage du Pi pendant l'attente, perte de réseau pendant l'attente.

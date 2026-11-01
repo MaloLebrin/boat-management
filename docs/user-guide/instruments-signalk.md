@@ -84,6 +84,21 @@ Quand le plugin (ou la boîte FleetAi) est branché, l'onglet Instruments affich
 
 Si l'encart indique **« Aucun appareil annoncé »**, vérifie dans l'ordre : le bus NMEA 2000 est alimenté ; la passerelle (PICAN-M, NGX-1…) est bien détectée par Signal K ; ton bateau n'est pas en NMEA 0183 (il faut alors un convertisseur). Le numéro de série des appareils n'est jamais affiché.
 
+## Mode technicien de la boîte
+
+> Disponible avec l'image FleetAi (boîte). Les passerelles et ports sont reconnus par la boîte elle-même ; ce mode sert quand la reconnaissance ne suffit pas.
+
+La boîte reconnaît seule la carte PICAN-M, les passerelles USB NMEA 2000 (Actisense NGT-1 / NGX-1, Digital Yacht iKonvert) et les convertisseurs USB-série NMEA 0183 (essai à 4800 puis 38400 bauds). Elle n'écrase jamais une connexion que tu as créée toi-même dans Signal K.
+
+Pour régler le reste sans terminal : ouvre `http://fleetai.local` depuis un appareil du même réseau, puis l'onglet **Technicien** et connecte-toi avec le mot de passe administrateur généré au premier démarrage (il n'est jamais affiché sur la page). Tu y trouves :
+
+- les ports détectés, leur débit et l'état de la carte CAN ;
+- les 20 dernières trames brutes, en direct ;
+- des actions simples : activer ou désactiver la carte CAN, forcer un débit, redémarrer Signal K ;
+- l'**export de diagnostic** (un fichier zip sans mot de passe ni jeton) à joindre à ton rapport de diagnostic FleetAi.
+
+Un port indiqué **« sans trame »** est branché mais n'envoie rien : vérifie le câblage, l'alimentation de l'instrument et son débit, puis relance la détection.
+
 ## Problèmes fréquents
 
 | Symptôme                                                      | Cause probable                                                                                                                                                                                                       |
