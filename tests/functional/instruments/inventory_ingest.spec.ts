@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { DateTime } from 'luxon'
 import app from '@adonisjs/core/services/app'
 import { truncateDb } from '#tests/utils/db'
 import BoatInstrumentDevice from '#models/boat_instrument_device'
@@ -80,6 +81,13 @@ test.group('Instruments — POST /api/instruments/inventory', (group) => {
     const [engine, battery] = inventory.devices
 
     await send([engine, battery])
+    // Dans le délai de grâce : absent du lot mais encore considéré présent.
+    const grace = await send([engine])
+    assert.deepEqual(grace.body(), { created: 0, updated: 1, gone: 0 })
+    await BoatInstrumentDevice.query()
+      .where('sourceId', source.id)
+      .where('deviceId', battery.deviceId)
+      .update({ lastSeenAt: DateTime.now().minus({ minutes: 11 }).toSQL()! })
     const gone = await send([engine])
     assert.deepEqual(gone.body(), { created: 0, updated: 1, gone: 1 })
     const missing = await BoatInstrumentDevice.query()
@@ -92,6 +100,60 @@ test.group('Instruments — POST /api/instruments/inventory', (group) => {
     assert.deepEqual(back.body(), { created: 0, updated: 2, gone: 0 })
     await missing.refresh()
     assert.isNull(missing.goneAt)
+  })
+
+  test('un lot vide n’efface rien dans le délai de grâce', async ({ client, assert }) => {
+    const { source, token } = await setup()
+    const send = (devices: unknown[]) =>
+      client
+        .post(INSTRUMENT_INVENTORY_PATH)
+        .header('Authorization', `Bearer ${token}`)
+        .json({ devices })
+
+    await send(inventory.devices)
+    const empty = await send([])
+
+    assert.deepEqual(empty.body(), { created: 0, updated: 0, gone: 0 })
+    const rows = await BoatInstrumentDevice.query()
+      .where('sourceId', source.id)
+      .whereNotNull('goneAt')
+    assert.lengthOf(rows, 0)
+  })
+
+  test('409 source_disabled : une source désactivée refuse le lot, comme l’ingestion', async ({
+    client,
+    assert,
+  }) => {
+    const { source, token } = await setup()
+    source.enabled = false
+    await source.save()
+
+    const response = await client
+      .post(INSTRUMENT_INVENTORY_PATH)
+      .header('Authorization', `Bearer ${token}`)
+      .json(inventory)
+
+    response.assertStatus(409)
+    assert.equal(response.body().error, 'source_disabled')
+    assert.lengthOf(await BoatInstrumentDevice.query().where('sourceId', source.id), 0)
+  })
+
+  test('deux premiers lots simultanés ne produisent ni 500 ni doublon', async ({
+    client,
+    assert,
+  }) => {
+    const { source, token } = await setup()
+    const send = () =>
+      client
+        .post(INSTRUMENT_INVENTORY_PATH)
+        .header('Authorization', `Bearer ${token}`)
+        .json(inventory)
+
+    const [a, b] = await Promise.all([send(), send()])
+
+    a.assertStatus(201)
+    b.assertStatus(201)
+    assert.lengthOf(await BoatInstrumentDevice.query().where('sourceId', source.id), 4)
   })
 
   test('401 pour un jeton révoqué ou absent', async ({ client }) => {

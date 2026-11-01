@@ -296,3 +296,5 @@ export const INSTRUMENT_INVENTORY_MAX_PATHS_PER_DEVICE = 100
 export const INSTRUMENT_INVENTORY_DEVICE_ID_MAX_LENGTH = 64
 export const INSTRUMENT_INVENTORY_TEXT_MAX_LENGTH = 120
 export const INSTRUMENT_INVENTORY_BUSES = ['n2k', 'nmea0183', 'other'] as const
+/** Un appareil absent d'un lot n'est marqué disparu qu'après ce délai sans l'avoir vu (aligné sur le plugin). */
+export const INSTRUMENT_INVENTORY_GONE_GRACE_MINUTES = 10

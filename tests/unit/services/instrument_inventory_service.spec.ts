@@ -59,9 +59,11 @@ test.group('InstrumentInventoryService', (group) => {
     const t0 = DateTime.fromISO('2026-11-01T10:00:00Z')
 
     await service.sync(source!, { devices: [device()] }, t0)
+    const early = await service.sync(source!, { devices: [] }, t0.plus({ minutes: 5 }))
     const first = await service.sync(source!, { devices: [] }, t0.plus({ minutes: 11 }))
     const second = await service.sync(source!, { devices: [] }, t0.plus({ minutes: 30 }))
 
+    assert.equal(early.gone, 0)
     assert.equal(first.gone, 1)
     assert.equal(second.gone, 0)
     const row = await BoatInstrumentDevice.query().where('sourceId', source!.id).firstOrFail()

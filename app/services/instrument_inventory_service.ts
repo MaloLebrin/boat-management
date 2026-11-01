@@ -1,9 +1,14 @@
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import BoatInstrumentDevice from '#models/boat_instrument_device'
-import type BoatInstrumentSource from '#models/boat_instrument_source'
-import { InventoryDuplicateDeviceError } from '#exceptions/instrument_errors'
+import BoatInstrumentSource from '#models/boat_instrument_source'
 import {
+  InstrumentSourceDisabledError,
+  InstrumentSourceNotFoundError,
+  InventoryDuplicateDeviceError,
+} from '#exceptions/instrument_errors'
+import {
+  INSTRUMENT_INVENTORY_GONE_GRACE_MINUTES,
   INSTRUMENT_INVENTORY_MAX_PATHS_PER_DEVICE,
   telemetryPathSpec,
 } from '#shared/constants/instruments'
@@ -16,8 +21,15 @@ import type {
  * Inventaire des appareils du bus (#1036). Le plugin envoie l'état complet de
  * ce qu'il connaît : chaque appareil du lot est créé ou mis à jour (chemins du
  * catalogue **fusionnés** avec ceux déjà connus, `gone_at` effacé), chaque appareil connu
- * mais absent du lot est marqué disparu. Aucune donnée du lot n'est journalisée
+ * mais absent du lot **et non vu depuis `INSTRUMENT_INVENTORY_GONE_GRACE_MINUTES`**
+ * est marqué disparu : un lot vide ou partiel (Signal K qui redémarre) n'efface
+ * rien tant que le délai de grâce court. Aucune donnée du lot n'est journalisée
  * (numéros de série).
+ *
+ * La ligne de la source est verrouillée en tête de transaction : deux envois
+ * simultanés (le plugin qui rejoue après un délai dépassé) sont sérialisés, y
+ * compris pour le tout premier lot où aucun appareil n'existe encore à verrouiller.
+ * Une source désactivée refuse le lot, comme l'ingestion.
  */
 export default class InstrumentInventoryService {
   async sync(
@@ -28,6 +40,13 @@ export default class InstrumentInventoryService {
     this.validate(payload)
 
     return db.transaction(async (trx) => {
+      const locked = await BoatInstrumentSource.query({ client: trx })
+        .where('id', source.id)
+        .forUpdate()
+        .first()
+      if (!locked) throw new InstrumentSourceNotFoundError()
+      if (!locked.enabled) throw new InstrumentSourceDisabledError()
+
       const existing = await BoatInstrumentDevice.query({ client: trx })
         .where('sourceId', source.id)
         .forUpdate()
@@ -75,9 +94,11 @@ export default class InstrumentInventoryService {
         result.created++
       }
 
+      const graceLimit = now.minus({ minutes: INSTRUMENT_INVENTORY_GONE_GRACE_MINUTES })
       const announced = new Set(payload.devices.map((device) => device.deviceId))
       for (const device of existing) {
         if (announced.has(device.deviceId) || device.goneAt !== null) continue
+        if (device.lastSeenAt > graceLimit) continue
         device.useTransaction(trx)
         device.goneAt = now
         await device.save()

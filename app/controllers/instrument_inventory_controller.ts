@@ -2,7 +2,11 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import { errors as vineErrors } from '@vinejs/vine'
 import InstrumentInventoryService from '#services/instrument_inventory_service'
-import { InventoryDuplicateDeviceError } from '#exceptions/instrument_errors'
+import {
+  InstrumentSourceDisabledError,
+  InstrumentSourceNotFoundError,
+  InventoryDuplicateDeviceError,
+} from '#exceptions/instrument_errors'
 import { ingestInventoryApiValidator } from '#validators/instruments'
 
 /**
@@ -32,6 +36,12 @@ export default class InstrumentInventoryController {
     } catch (error) {
       if (error instanceof InventoryDuplicateDeviceError) {
         return response.status(422).json({ error: 'duplicate_device' })
+      }
+      if (error instanceof InstrumentSourceDisabledError) {
+        return response.status(409).json({ error: 'source_disabled' })
+      }
+      if (error instanceof InstrumentSourceNotFoundError) {
+        return response.status(404).json({ error: 'source_not_found' })
       }
       throw error
     }
