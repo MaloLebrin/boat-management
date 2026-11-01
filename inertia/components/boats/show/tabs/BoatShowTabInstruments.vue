@@ -43,7 +43,7 @@ const props = defineProps<{
   /** Moteurs du bateau : l'assistant d'installation y relie les identifiants Signal K (#1023). */
   engines?: BoatShowEngine[]
   /** Propositions de rattachement des équipements (#1037) — prop différée groupe `instruments`. */
-  mappingProposals: BoatShowMappingProposals
+  mappingProposals?: BoatShowMappingProposals
   /** Noms FleetAi des jauges batterie et cuve (#1037). */
   batteries?: BoatBatteryRow[]
   tanks?: BoatTankRow[]

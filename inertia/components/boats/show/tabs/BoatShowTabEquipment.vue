@@ -24,8 +24,8 @@ import type { TaskEquipmentRef } from '#shared/types/maintenance'
 const props = withDefaults(
   defineProps<{
     boat: BoatShowDetail
-    batteries: BoatBatteryRow[]
-    tanks: BoatTankRow[]
+    batteries?: BoatBatteryRow[]
+    tanks?: BoatTankRow[]
     canManageEquipment: boolean
     canManageActions: boolean
     /** Droit `maintenance.create` : raccourci « + Tâche » sur chaque équipement. */
@@ -241,8 +241,8 @@ function openIncidentModal(target: IncidentTargetRef) {
     <BoatShowBatteriesTanks
       v-if="equipmentFilter === 'all' || equipmentFilter === 'generic'"
       :boat-id="boat.id"
-      :batteries="batteries"
-      :tanks="tanks"
+      :batteries="batteries ?? []"
+      :tanks="tanks ?? []"
       :can-manage="canManageEquipment"
     />
   </div>

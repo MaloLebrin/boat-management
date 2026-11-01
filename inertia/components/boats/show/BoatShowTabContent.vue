@@ -121,7 +121,7 @@ const showSkeleton = computed(
     !isTabDataReady(props.tab, {
       maintenance: isMaintenanceGroupLoaded.value,
       navigation: isNavigationGroupLoaded.value,
-      instruments: props.instruments !== undefined && props.mappingProposals !== undefined,
+      instruments: props.instruments !== undefined,
     })
 )
 </script>
@@ -272,11 +272,11 @@ const showSkeleton = computed(
       />
 
       <BoatShowTabInstruments
-        v-else-if="tab === 'instruments' && instruments && mappingProposals"
+        v-else-if="tab === 'instruments' && instruments"
         :boat-id="boat.id"
         :instruments="instruments"
         :engines="boat.engines"
-        :mapping-proposals="mappingProposals"
+        :mapping-proposals="mappingProposals ?? { proposals: [] }"
         :batteries="batteries"
         :tanks="tanks"
       />

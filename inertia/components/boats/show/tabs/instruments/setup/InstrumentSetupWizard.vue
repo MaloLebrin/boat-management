@@ -28,7 +28,7 @@ const props = defineProps<{
   boatId: number
   instruments: InstrumentsTabProps
   engines: BoatShowEngine[]
-  mappingProposals: BoatShowMappingProposals
+  mappingProposals?: BoatShowMappingProposals
   streamOpen: boolean
 }>()
 
@@ -40,7 +40,7 @@ const setup = useInstrumentSetup({
   boatId: () => props.boatId,
   source: () => source.value,
   engines: () => props.engines,
-  mappingProposals: () => props.mappingProposals.proposals,
+  mappingProposals: () => props.mappingProposals?.proposals ?? [],
   latestPaths: () => props.instruments.latest.map((entry) => entry.path),
   probedEngineIds: () => probed.value?.engineIds ?? [],
   streamOpen: () => props.streamOpen,
@@ -155,7 +155,7 @@ function reopen() {
           :boat-id="boatId"
           :engines="engines"
           :detected-ids="setup.detectedEngineIds.value"
-          :proposals="mappingProposals.proposals"
+          :proposals="mappingProposals?.proposals ?? []"
         />
       </template>
       <template #done>
