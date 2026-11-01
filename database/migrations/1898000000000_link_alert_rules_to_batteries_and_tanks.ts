@@ -14,11 +14,16 @@ export default class extends BaseSchema {
       table.foreign('battery_id').references('boat_batteries.id').onDelete('CASCADE')
       table.integer('tank_id').unsigned().nullable()
       table.foreign('tank_id').references('boat_tanks.id').onDelete('CASCADE')
+      // Index des clés étrangères : la suppression d'une batterie ou d'une cuve cherche ses règles.
+      table.index(['battery_id'])
+      table.index(['tank_id'])
     })
   }
 
   async down() {
     this.schema.alterTable(this.tableName, (table) => {
+      table.dropIndex(['battery_id'])
+      table.dropIndex(['tank_id'])
       table.dropForeign(['battery_id'])
       table.dropForeign(['tank_id'])
       table.dropColumn('battery_id')

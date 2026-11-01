@@ -112,6 +112,8 @@ function valueFor(name: string, pattern: string, ids: CrossOrgIds): string | nul
   const direct: Record<string, number> = {
     boatId: ids.boatId,
     engineId: ids.engineId,
+    batteryId: ids.batteryId,
+    tankId: ids.tankId,
     sailId: ids.sailId,
     partId: ids.partId,
     mediaId: ids.mediaId,
