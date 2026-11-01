@@ -7,4 +7,5 @@
 - **Docs mises à jour.** Spike §7 (renvoi), protocole de test T8 étendu, guide utilisateur `instruments-signalk.md` (« Mode technicien de la boîte »).
 - **Copilote.** Entrée `instruments-hwdetect` dans `product_knowledge.ts` (FR + EN).
 - **Points [M].** VID:PID des passerelles, comportement de l'overlay sans carte, paramètres PICAN-M : à relever en T8, rien n'est figé.
-- **Recouvrement avec #1036.** Aucun fichier commun ; le champ `hardware` du statut est transmis par le plugin dans l'inventaire, sans modifier le contrat de l'API.
+- **Recouvrement avec #1036.** #1036 (déjà mergée, #1047) a modifié les mêmes `shared/constants/assistant/product_knowledge.ts` et `docs/user-guide/instruments-signalk.md` : ici, ajout d'une entrée et d'une section distinctes, sans toucher aux siennes (`instruments-inventory`, « Ce que la boîte a trouvé »). Le champ `hardware` du statut est transmis par le plugin dans l'inventaire, sans modifier le contrat de l'API.
+- **Revue.** Spécification complétée : HTTPS obligatoire pour l'onglet Technicien et backoff global (plus de blocage par IP), liste fermée des écritures compatibles avec la lecture seule (§2.4), fenêtre adaptative pour les capteurs NMEA 0183 lents, nom d'instance udev `%k`, expurgation de la position et du MMSI dans l'export de diagnostic.

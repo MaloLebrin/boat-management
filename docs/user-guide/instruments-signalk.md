@@ -90,7 +90,7 @@ Si l'encart indique **« Aucun appareil annoncé »**, vérifie dans l'ordre : l
 
 La boîte reconnaît seule la carte PICAN-M, les passerelles USB NMEA 2000 (Actisense NGT-1 / NGX-1, Digital Yacht iKonvert) et les convertisseurs USB-série NMEA 0183 (essai à 4800 puis 38400 bauds). Elle n'écrase jamais une connexion que tu as créée toi-même dans Signal K.
 
-Pour régler le reste sans terminal : ouvre `http://fleetai.local` depuis un appareil du même réseau, puis l'onglet **Technicien** et connecte-toi avec le mot de passe administrateur généré au premier démarrage (il n'est jamais affiché sur la page). Tu y trouves :
+Pour régler le reste sans terminal : ouvre `http://fleetai.local` depuis un appareil du même réseau, puis l'onglet **Technicien** et connecte-toi avec le mot de passe administrateur généré au premier démarrage (il n'est jamais affiché sur la page). L'onglet est en HTTPS avec un certificat propre à la boîte : ton navigateur affichera un avertissement la première fois, c'est normal ; compare l'empreinte affichée avec celle de la console ou du fichier `fleetai-credentials.txt` avant de continuer. Tu y trouves :
 
 - les ports détectés, leur débit et l'état de la carte CAN ;
 - les 20 dernières trames brutes, en direct ;
